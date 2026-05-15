@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>週卡活動 — 前台規格文件</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+
+
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+
+  :root {
+    --pink: #FF8EC6;
+    --pink2: #FFC5E0;
+    --blue: #74C8FA;
+    --gold: #FFB300;
+    --green: #3DC98A;
+    --red: #F87171;
+    --purple: #A078F5;
+    --text: #1A1A2C;
+    --muted: #6B7280;
+    --border: #E5E7EB;
+    --bg: #F9FAFB;
+    --bg2: #FFFFFF;
+    --accent: #FF72B8;
+    --section-num: #FF8EC6;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans TC', -apple-system, sans-serif;
+    background: #F3F4F6;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* ── DOC HEADER ── */
+  .doc-header {
+    background: linear-gradient(135deg, #1A1A2C 0%, #2D1B4E 50%, #1a2a4e 100%);
+    padding: 48px 60px 40px;
+    color: #fff;
+  }
+  .doc-header h1 {
+    font-size: 28px; font-weight: 900; letter-spacing: 2px;
+    background: linear-gradient(135deg, #FF8EC6, #A078F5, #74C8FA);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: 6px;
+  }
+  .doc-meta { font-size: 12px; color: rgba(255,255,255,0.5); display: flex; gap: 24px; }
+  .doc-meta span { display: flex; align-items: center; gap: 5px; }
+
+  /* ── TOC ── */
+  .toc {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 20px 60px;
+    display: flex; flex-wrap: wrap; gap: 6px 20px;
+  }
+  .toc a {
+    font-size: 12px; color: var(--muted); text-decoration: none;
+    padding: 3px 10px; border-radius: 20px;
+    border: 1px solid var(--border);
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .toc a:hover { background: var(--pink2); border-color: var(--pink); color: var(--text); }
+
+  /* ── MAIN LAYOUT ── */
+  .main { max-width: 1100px; margin: 0 auto; padding: 40px 40px 80px; }
+
+  /* ── SECTION ── */
+  .spec-section {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    margin-bottom: 32px;
+    overflow: hidden;
+  }
+  .section-head {
+    display: flex; align-items: center; gap: 14px;
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(to right, #FAFAFA, #fff);
+  }
+  .section-num {
+    width: 32px; height: 32px; border-radius: 10px; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    color: #fff; font-size: 14px; font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .section-title { font-size: 17px; font-weight: 900; color: var(--text); }
+  .section-subtitle { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .section-body { padding: 28px; }
+
+  /* ── VISUAL + TEXT LAYOUT ── */
+  .spec-row {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 28px;
+    align-items: start;
+    margin-bottom: 28px;
+  }
+  .spec-row:last-child { margin-bottom: 0; }
+  .spec-row.wide { grid-template-columns: 380px 1fr; }
+  .spec-row.full { grid-template-columns: 1fr; }
+  .spec-row.flip { grid-template-columns: 1fr 320px; }
+
+  .visual-col { flex-shrink: 0; }
+  .visual-col svg, .visual-col img { display: block; width: 100%; border-radius: 12px; }
+
+  /* ── TEXT CONTENT ── */
+  .text-col h3 {
+    font-size: 13px; font-weight: 700; color: var(--text);
+    margin-bottom: 10px; padding-bottom: 6px;
+    border-bottom: 2px solid var(--border);
+    display: flex; align-items: center; gap: 7px;
+  }
+  .text-col h3::before {
+    content: ''; width: 4px; height: 14px;
+    background: linear-gradient(var(--pink), var(--purple));
+    border-radius: 2px; display: block;
+  }
+  .text-col p { font-size: 13px; color: #374151; margin-bottom: 8px; line-height: 1.75; }
+  .text-col ul { list-style: none; margin-bottom: 10px; }
+  .text-col ul li {
+    font-size: 13px; color: #374151; padding: 4px 0 4px 18px;
+    position: relative; line-height: 1.7;
+  }
+  .text-col ul li::before {
+    content: '·'; position: absolute; left: 6px;
+    color: var(--pink); font-weight: 900; font-size: 16px; top: 3px;
+  }
+  .text-col ul li b { color: var(--text); font-weight: 700; }
+  .text-col ul li code {
+    background: #F3F4F6; border: 1px solid var(--border);
+    padding: 1px 6px; border-radius: 4px; font-size: 12px;
+    font-family: 'SF Mono', Monaco, monospace; color: #c0392b;
+  }
+
+  /* ── TABLE ── */
+  .spec-table {
+    width: 100%; border-collapse: collapse; font-size: 12.5px;
+    margin-top: 14px; border-radius: 10px; overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .spec-table th {
+    background: #F3F4F6; padding: 8px 12px; text-align: left;
+    font-weight: 700; color: var(--muted); font-size: 11px;
+    letter-spacing: 0.5px; text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  .spec-table td {
+    padding: 9px 12px; border-bottom: 1px solid #F3F4F6;
+    color: #374151; vertical-align: top; line-height: 1.6;
+  }
+  .spec-table tr:last-child td { border-bottom: none; }
+  .spec-table tr:nth-child(even) td { background: #FAFAFA; }
+  .tag-ok { color: var(--green); font-weight: 700; }
+  .tag-no { color: var(--red); font-weight: 700; }
+  .tag-warn { color: var(--gold); font-weight: 700; }
+
+  /* ── BADGES ── */
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 700;
+  }
+  .badge-pink { background: rgba(255,142,198,0.12); color: #D63384; border: 1px solid rgba(255,142,198,0.3); }
+  .badge-green { background: rgba(61,201,138,0.1); color: #059669; border: 1px solid rgba(61,201,138,0.25); }
+  .badge-red { background: rgba(248,113,113,0.1); color: #DC2626; border: 1px solid rgba(248,113,113,0.25); }
+  .badge-gold { background: rgba(255,179,0,0.1); color: #B45309; border: 1px solid rgba(255,179,0,0.3); }
+  .badge-purple { background: rgba(160,120,245,0.1); color: #7C3AED; border: 1px solid rgba(160,120,245,0.25); }
+  .badge-gray { background: #F3F4F6; color: #6B7280; border: 1px solid var(--border); }
+
+  /* ── CALLOUT ── */
+  .callout {
+    border-radius: 10px; padding: 12px 16px;
+    font-size: 12.5px; line-height: 1.7; margin-top: 14px;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .callout-warn { background: #FFF7ED; border: 1px solid #FED7AA; color: #92400E; }
+  .callout-info { background: #EFF6FF; border: 1px solid #BFDBFE; color: #1E40AF; }
+  .callout-danger { background: #FEF2F2; border: 1px solid #FECACA; color: #991B1B; }
+  .callout-success { background: #F0FDF4; border: 1px solid #BBF7D0; color: #14532D; }
+
+  /* ── SCENARIO BOX ── */
+  .scenario {
+    background: #F9FAFB;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--purple);
+    border-radius: 0 10px 10px 0;
+    padding: 12px 16px; margin-top: 12px;
+  }
+  .scenario-title {
+    font-size: 11px; font-weight: 700; color: var(--purple);
+    letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 6px;
+  }
+  .scenario p { font-size: 12.5px; color: #374151; margin-bottom: 4px; }
+
+  /* ── DIVIDER ── */
+  .sub-divider {
+    border: none; border-top: 1px solid var(--border);
+    margin: 24px 0;
+  }
+
+  /* ── FLOW ARROW ── */
+  .flow { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .flow-step {
+    padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;
+    background: #F3F4F6; border: 1px solid var(--border); color: var(--text);
+  }
+  .flow-arrow { color: var(--muted); font-size: 14px; }
+  .flow-step.active { background: rgba(255,142,198,0.12); border-color: var(--pink); color: #D63384; }
+  .flow-step.end { background: rgba(61,201,138,0.1); border-color: var(--green); color: #059669; }
+  .flow-step.danger { background: rgba(248,113,113,0.1); border-color: var(--red); color: #DC2626; }
+
+
+/* ── TWO-COLUMN LAYOUT OVERRIDE ── */
+html, body {
+  margin: 0; padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #F3F4F6;
+}
+
+.page-wrapper {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── LEFT PANEL: Live H5 Preview ── */
+.preview-panel {
+  width: 420px;
+  flex-shrink: 0;
+  background: linear-gradient(160deg, #1a1030 0%, #0d1a30 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  border-right: 1px solid rgba(255,255,255,0.08);
+  overflow: hidden;
+}
+
+.preview-header {
+  width: 100%;
+  padding: 14px 20px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+.preview-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+}
+
+.preview-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  flex: 1;
+  text-align: center;
+}
+
+.preview-badge {
+  font-size: 9px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(255,142,198,0.15);
+  color: #FF8EC6;
+  border: 1px solid rgba(255,142,198,0.25);
+  font-weight: 700;
+}
+
+.phone-shell {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 16px 0 0;
+  overflow: hidden;
+  width: 100%;
+}
+
+.phone-frame {
+  width: 390px;
+  height: calc(100vh - 60px);
+  border: none;
+  border-radius: 0;
+  display: block;
+  background: transparent;
+  overflow: hidden;
+}
+
+/* ── RIGHT PANEL: Spec Content ── */
+.spec-panel {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #F3F4F6;
+  scroll-behavior: smooth;
+}
+
+/* Overrides for spec content inside right panel */
+.spec-panel .main {
+  max-width: 100%;
+  padding: 32px 32px 80px;
+}
+
+/* Remove fixed TOC positioning issues */
+.spec-panel .toc {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 12px 32px;
+}
+
+.spec-panel .doc-header {
+  padding: 36px 32px 28px;
+}
+</style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- LEFT: Live H5 Preview -->
+  <div class="preview-panel">
+    <div class="preview-header">
+      <div class="preview-dot" style="background:#F87171;"></div>
+      <div class="preview-dot" style="background:#FFB300;"></div>
+      <div class="preview-dot" style="background:#3DC98A;"></div>
+      <div class="preview-title">前台示意</div>
+      <span class="preview-badge">互動展示</span>
+    </div>
+    <div class="phone-shell">
+      <iframe
+        class="phone-frame"
+        src="data:text/html;charset=utf-8;base64,PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9InpoLVRXIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9IlVURi04Ij4KPG1ldGEgbmFtZT0idmlld3BvcnQiIGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCwgaW5pdGlhbC1zY2FsZT0xLjAsIG1heGltdW0tc2NhbGU9MS4wLCB1c2VyLXNjYWxhYmxlPW5vIj4KPHRpdGxlPumAseWNoea0u+WLlTwvdGl0bGU+CjxzdHlsZT4KQGltcG9ydCB1cmwoJ2h0dHBzOi8vZm9udHMuZ29vZ2xlYXBpcy5jb20vY3NzMj9mYW1pbHk9Tm90bytTYW5zK1RDOndnaHRANDAwOzUwMDs3MDA7OTAwJmRpc3BsYXk9c3dhcCcpOwoKQGltcG9ydCB1cmwoJ2h0dHBzOi8vZm9udHMuZ29vZ2xlYXBpcy5jb20vY3NzMj9mYW1pbHk9Tm90bytTYW5zK1RDOndnaHRANDAwOzUwMDs3MDA7OTAwJmRpc3BsYXk9c3dhcCcpOwoKOnJvb3QgewogIC0tcGluazogI0ZGOEVDNjsKICAtLXBpbmsyOiAjRkZDNUUwOwogIC0tcGluay1wYWxlOiAjRkZGM0ZBOwogIC0tYmx1ZTogIzc0QzhGQTsKICAtLWJsdWUyOiAjQjhFNUZGOwogIC0tZ29sZDogI0ZGQjMwMDsKICAtLWJnOiAjRkZGNUZCOwogIC0tYmcyOiAjRkZGRkZGOwogIC0tbGluZTogcmdiYSgyNTUsMTQyLDE5OCwwLjE1KTsKICAtLXRleHQ6ICMxQTFBMkM7CiAgLS1tdXRlZDogIzVFNUU3ODsKICAtLWdyZWVuOiAjM0RDOThBOwogIC0tcmVkOiAjRjg3MTcxOwogIC0tcHVycGxlOiAjQTA3OEY1OwogIC0tdzogMzkwcHg7Cn0KCiogeyBtYXJnaW46MDsgcGFkZGluZzowOyBib3gtc2l6aW5nOmJvcmRlci1ib3g7IC13ZWJraXQtdGFwLWhpZ2hsaWdodC1jb2xvcjp0cmFuc3BhcmVudDsgfQoKaHRtbCwgYm9keSB7CiAgYmFja2dyb3VuZDogbGluZWFyLWdyYWRpZW50KDE2MGRlZywgI0ZGRTRGNCAwJSwgI0Q2RUVGRiAxMDAlKTsKICBtaW4taGVpZ2h0OiAxMDB2aDsKICBkaXNwbGF5OiBmbGV4OwogIGp1c3RpZnktY29udGVudDogY2VudGVyOwogIG92ZXJmbG93LXg6IGF1dG87CiAgYWxpZ24taXRlbXM6IGZsZXgtc3RhcnQ7CiAgZmxleC13cmFwOiBub3dyYXA7Cn0KCi8qIOKUgOKUgOKUgCBERU1PIFNUQUdFIOKUgOKUgOKUgCAqLwouZGVtby1zdGFnZSB7IGRpc3BsYXk6ZmxleDsgZ2FwOjI0cHg7IHBhZGRpbmc6MjhweCAyNHB4OyBhbGlnbi1pdGVtczpmbGV4LXN0YXJ0OyB9Ci5kZW1vLWNvbCB7IGRpc3BsYXk6ZmxleDsgZmxleC1kaXJlY3Rpb246Y29sdW1uOyBhbGlnbi1pdGVtczpjZW50ZXI7IGdhcDoxMHB4OyBmbGV4LXNocmluazowOyB3aWR0aDp2YXIoLS13KTsgfQouZGVtby1sYWJlbCB7CiAgZm9udC1zaXplOjEwcHg7IGZvbnQtd2VpZ2h0OjcwMDsgbGV0dGVyLXNwYWNpbmc6MnB4OwogIGNvbG9yOnJnYmEoODAsNDAsMTIwLDAuNik7IHRleHQtdHJhbnNmb3JtOnVwcGVyY2FzZTsKICBiYWNrZ3JvdW5kOnJnYmEoMjU1LDI1NSwyNTUsMC41NSk7IGJvcmRlci1yYWRpdXM6MjBweDsKICBwYWRkaW5nOjNweCAxNHB4OyB3aGl0ZS1zcGFjZTpub3dyYXA7Cn0KLmRlbW8tY29sIC5waG9uZSB7IHdpZHRoOnZhcigtLXcpOyBmbGV4LXNocmluazowOyB9CgovKiDilIDilIDilIAgQVVUTyBQT1BVUCBQSE9ORSDilIDilIDilIAgKi8KLnBob25lLWRlbW8geyB3aWR0aDp2YXIoLS13KSFpbXBvcnRhbnQ7IG1pbi1oZWlnaHQ6NjQwcHghaW1wb3J0YW50OyBoZWlnaHQ6NjQwcHg7IG92ZXJmbG93OmhpZGRlbjsgcG9zaXRpb246cmVsYXRpdmU7IH0KLmFwdS1iZy1ibHVyIHsKICBwb3NpdGlvbjphYnNvbHV0ZTsgaW5zZXQ6MDsKICBiYWNrZ3JvdW5kOnJnYmEoMjAsMTAsNDAsMC41Mik7CiAgYmFja2Ryb3AtZmlsdGVyOmJsdXIoNHB4KTsgei1pbmRleDoxOwp9Ci5hcHUtc2hlZXQgewogIHBvc2l0aW9uOmFic29sdXRlOyBib3R0b206MDsgbGVmdDowOyByaWdodDowOwogIGJhY2tncm91bmQ6I2ZmZjsgYm9yZGVyLXJhZGl1czoyNHB4IDI0cHggMCAwOwogIHotaW5kZXg6MjsgcGFkZGluZy1ib3R0b206MjBweDsgb3ZlcmZsb3c6aGlkZGVuOwp9Ci5hcHUtc2hlZXQ6OmJlZm9yZSB7CiAgY29udGVudDonJzsgcG9zaXRpb246YWJzb2x1dGU7IHRvcDowOyBsZWZ0OjA7IHJpZ2h0OjA7IGhlaWdodDoycHg7CiAgYmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoOTBkZWcsdHJhbnNwYXJlbnQsdmFyKC0tcGluayksdmFyKC0tcHVycGxlKSx0cmFuc3BhcmVudCk7Cn0KLmFwdS1oYW5kbGUgeyB3aWR0aDozNHB4OyBoZWlnaHQ6M3B4OyBib3JkZXItcmFkaXVzOjJweDsgYmFja2dyb3VuZDpyZ2JhKDAsMCwwLDAuMSk7IG1hcmdpbjoxMHB4IGF1dG8gMDsgfQouYXB1LXRvcCB7IHBhZGRpbmc6MTJweCAyMHB4IDRweDsgdGV4dC1hbGlnbjpjZW50ZXI7IH0KLmFwdS1hdXRvLXRhZyB7CiAgZGlzcGxheTppbmxpbmUtZmxleDsgYWxpZ24taXRlbXM6Y2VudGVyOyBnYXA6NHB4OwogIGZvbnQtc2l6ZTo5cHg7IGZvbnQtd2VpZ2h0OjcwMDsgbGV0dGVyLXNwYWNpbmc6MC41cHg7CiAgYmFja2dyb3VuZDpyZ2JhKDE2MCwxMjAsMjQ1LDAuMSk7IGNvbG9yOnZhcigtLXB1cnBsZSk7CiAgYm9yZGVyOjFweCBzb2xpZCByZ2JhKDE2MCwxMjAsMjQ1LDAuMjUpOwogIHBhZGRpbmc6MnB4IDEwcHg7IGJvcmRlci1yYWRpdXM6MjBweDsgbWFyZ2luLWJvdHRvbTo4cHg7Cn0KLmFwdS1pY29uIHsgZm9udC1zaXplOjM2cHg7IGRpc3BsYXk6YmxvY2s7IG1hcmdpbi1ib3R0b206NnB4OyBhbmltYXRpb246Ym91bmNlLWkgMi41cyBlYXNlIGluZmluaXRlOyB9Ci5hcHUtdGl0bGUgeyBmb250LXNpemU6MTdweDsgZm9udC13ZWlnaHQ6OTAwOyBjb2xvcjp2YXIoLS10ZXh0KTsgbGV0dGVyLXNwYWNpbmc6MC41cHg7IG1hcmdpbi1ib3R0b206M3B4OyB9Ci5hcHUtdGl0bGUgZW0geyBmb250LXN0eWxlOm5vcm1hbDsgYmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoMTM1ZGVnLHZhcigtLXBpbmspLHZhcigtLXB1cnBsZSkpOyAtd2Via2l0LWJhY2tncm91bmQtY2xpcDp0ZXh0OyAtd2Via2l0LXRleHQtZmlsbC1jb2xvcjp0cmFuc3BhcmVudDsgYmFja2dyb3VuZC1jbGlwOnRleHQ7IH0KLmFwdS1zdWIgeyBmb250LXNpemU6MTFweDsgY29sb3I6dmFyKC0tbXV0ZWQpOyBtYXJnaW4tYm90dG9tOjEwcHg7IH0KLmFwdS1wcm9ncmVzcyB7IGRpc3BsYXk6ZmxleDsganVzdGlmeS1jb250ZW50OmNlbnRlcjsgZ2FwOjNweDsgcGFkZGluZzowIDEycHggMTBweDsgfQouYXB1LWRwIHsgZGlzcGxheTpmbGV4OyBmbGV4LWRpcmVjdGlvbjpjb2x1bW47IGFsaWduLWl0ZW1zOmNlbnRlcjsgZ2FwOjJweDsgZmxleDoxOyB9Ci5hcHUtZHAtYyB7IHdpZHRoOjI4cHg7IGhlaWdodDoyOHB4OyBib3JkZXItcmFkaXVzOjUwJTsgZGlzcGxheTpmbGV4OyBhbGlnbi1pdGVtczpjZW50ZXI7IGp1c3RpZnktY29udGVudDpjZW50ZXI7IGZvbnQtc2l6ZToxMXB4OyB9Ci5hcHUtZHAtbCB7IGZvbnQtc2l6ZTo3cHg7IGZvbnQtd2VpZ2h0OjYwMDsgY29sb3I6dmFyKC0tbXV0ZWQpOyB9Ci5hcHUtZHAuZG9uZSAuYXB1LWRwLWMgIHsgYmFja2dyb3VuZDpyZ2JhKDYxLDIwMSwxMzgsMC4xMik7IGJvcmRlcjoxLjVweCBzb2xpZCByZ2JhKDYxLDIwMSwxMzgsMC4zNSk7IH0KLmFwdS1kcC50b2RheSAuYXB1LWRwLWMgeyBiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCgxNDVkZWcscmdiYSgyNTUsMTA3LDE1NywwLjE1KSxyZ2JhKDE2MCwxMjAsMjQ1LDAuMSkpOyBib3JkZXI6MS41cHggc29saWQgdmFyKC0tcGluayk7IGJveC1zaGFkb3c6MCAwIDEwcHggcmdiYSgyNTUsMTA3LDE1NywwLjIyKTsgfQouYXB1LWRwLmxvY2tlZCAuYXB1LWRwLWMgeyBiYWNrZ3JvdW5kOnJnYmEoMCwwLDAsMC4wNCk7IGJvcmRlcjoxLjVweCBzb2xpZCByZ2JhKDAsMCwwLDAuMDgpOyB9Ci5hcHUtZHAudG9kYXkgLmFwdS1kcC1sIHsgY29sb3I6dmFyKC0tcGluayk7IGZvbnQtd2VpZ2h0OjcwMDsgfQouYXB1LXJld2FyZHMgeyBtYXJnaW46MCAxNHB4IDEycHg7IGJvcmRlcjoxcHggc29saWQgcmdiYSgwLDAsMCwwLjA2KTsgYm9yZGVyLXJhZGl1czoxNHB4OyBvdmVyZmxvdzpoaWRkZW47IH0KLmFwdS1ydyB7IGRpc3BsYXk6ZmxleDsgYWxpZ24taXRlbXM6Y2VudGVyOyBnYXA6MTBweDsgcGFkZGluZzoxMHB4IDE0cHg7IGJvcmRlci1ib3R0b206MXB4IHNvbGlkIHJnYmEoMCwwLDAsMC4wNSk7IH0KLmFwdS1ydzpsYXN0LWNoaWxkIHsgYm9yZGVyLWJvdHRvbTpub25lOyB9Ci5hcHUtcnctaWNvIHsgd2lkdGg6MzZweDsgaGVpZ2h0OjM2cHg7IGJvcmRlci1yYWRpdXM6MTBweDsgZGlzcGxheTpmbGV4OyBhbGlnbi1pdGVtczpjZW50ZXI7IGp1c3RpZnktY29udGVudDpjZW50ZXI7IGZvbnQtc2l6ZToxOHB4OyBmbGV4LXNocmluazowOyB9Ci5hcHUtcnctaWNvLmNhc2ggIHsgYmFja2dyb3VuZDpyZ2JhKDYxLDIwMSwxMzgsMC4xKTsgfQouYXB1LXJ3LWljby5wb2ludCB7IGJhY2tncm91bmQ6cmdiYSgyNTUsMTc5LDAsMC4xKTsgfQouYXB1LXJ3LWluZm8geyBmbGV4OjE7IH0KLmFwdS1ydy12YWwgIHsgZm9udC1zaXplOjE0cHg7IGZvbnQtd2VpZ2h0OjkwMDsgY29sb3I6dmFyKC0tdGV4dCk7IH0KLmFwdS1ydy1uYW1lIHsgZm9udC1zaXplOjlweDsgY29sb3I6dmFyKC0tbXV0ZWQpOyBtYXJnaW4tdG9wOjFweDsgfQouYXB1LXJ3LXRhZyB7IGZvbnQtc2l6ZTo5cHg7IGZvbnQtd2VpZ2h0OjcwMDsgcGFkZGluZzozcHggOHB4OyBib3JkZXItcmFkaXVzOjIwcHg7IGJhY2tncm91bmQ6cmdiYSg2MSwyMDEsMTM4LDAuMSk7IGNvbG9yOnZhcigtLWdyZWVuKTsgYm9yZGVyOjFweCBzb2xpZCByZ2JhKDYxLDIwMSwxMzgsMC4yMik7IGZsZXgtc2hyaW5rOjA7IH0KLmFwdS1leHRyYSB7CiAgZGlzcGxheTpmbGV4OyBhbGlnbi1pdGVtczpjZW50ZXI7IGdhcDoxMHB4OwogIG1hcmdpbjowIDE0cHggMTJweDsKICBiYWNrZ3JvdW5kOnJnYmEoMjU1LDE3OSwwLDAuMDUpOwogIGJvcmRlcjoxLjVweCBkYXNoZWQgcmdiYSgyNTUsMTc5LDAsMC40KTsKICBib3JkZXItcmFkaXVzOjEycHg7IHBhZGRpbmc6MTBweCAxMnB4Owp9Ci5hcHUtZXh0cmEtbGVmdCB7IGZsZXg6MTsgbWluLXdpZHRoOjA7IH0KLmFwdS1leHRyYS10YWcgeyBmb250LXNpemU6OXB4OyBmb250LXdlaWdodDo3MDA7IGNvbG9yOnZhcigtLWdvbGQpOyBtYXJnaW4tYm90dG9tOjNweDsgfQouYXB1LWV4dHJhLXJld2FyZCB7IGZvbnQtc2l6ZToxM3B4OyBmb250LXdlaWdodDo5MDA7IGNvbG9yOnZhcigtLXRleHQpOyB9Ci5hcHUtZXh0cmEtY29uZCB7IGZvbnQtc2l6ZTo5cHg7IGNvbG9yOnZhcigtLW11dGVkKTsgbWFyZ2luLXRvcDoycHg7IH0KLmFwdS1leHRyYS1idG4gewogIGZvbnQtc2l6ZToxMXB4OyBmb250LXdlaWdodDo3MDA7IHBhZGRpbmc6NnB4IDEycHg7CiAgYm9yZGVyLXJhZGl1czoyMHB4OyBjdXJzb3I6cG9pbnRlcjsgZmxleC1zaHJpbms6MDsKICBiYWNrZ3JvdW5kOnJnYmEoMjU1LDE3OSwwLDAuMTIpOyBjb2xvcjp2YXIoLS1nb2xkKTsKICBib3JkZXI6MS41cHggc29saWQgcmdiYSgyNTUsMTc5LDAsMC4zNSk7IGZvbnQtZmFtaWx5OmluaGVyaXQ7CiAgdHJhbnNpdGlvbjphbGwgMC4yczsKfQouYXB1LWV4dHJhLWJ0bjphY3RpdmUgeyBiYWNrZ3JvdW5kOnJnYmEoMjU1LDE3OSwwLDAuMik7IH0KLmFwdS1idG4geyBkaXNwbGF5OmJsb2NrOyB3aWR0aDpjYWxjKDEwMCUgLSAyOHB4KTsgbWFyZ2luOjAgMTRweDsgcGFkZGluZzoxMnB4OyBib3JkZXItcmFkaXVzOjEycHg7IGJvcmRlcjpub25lOyBiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCgxMzVkZWcsI0ZGNzJCOCx2YXIoLS1waW5rKSk7IGNvbG9yOiNmZmY7IGZvbnQtZmFtaWx5OmluaGVyaXQ7IGZvbnQtc2l6ZToxNHB4OyBmb250LXdlaWdodDo3MDA7IGN1cnNvcjpwb2ludGVyOyB0cmFuc2l0aW9uOmFsbCAwLjJzOyBsZXR0ZXItc3BhY2luZzowLjNweDsgYm94LXNoYWRvdzowIDRweCAxNHB4IHJnYmEoMjU1LDE0MiwxOTgsMC4yOCk7IH0KLmFwdS1idG46YWN0aXZlIHsgdHJhbnNmb3JtOnNjYWxlKDAuOTcpOyB9Ci5hcHUtZm9vdCB7IHRleHQtYWxpZ246Y2VudGVyOyBmb250LXNpemU6MTBweDsgY29sb3I6dmFyKC0tbXV0ZWQpOyBtYXJnaW4tdG9wOjhweDsgcGFkZGluZzowIDIwcHg7IH0KCi8qIOKUgOKUgOKUgCBERVBPU0lUIEFDVElWSVRZIFBPUFVQIOKUgOKUgOKUgCAqLwoucGhvbmUtZHAgeyBwb3NpdGlvbjpyZWxhdGl2ZTsgb3ZlcmZsb3c6aGlkZGVuOyBtaW4taGVpZ2h0OjY0MHB4IWltcG9ydGFudDsgaGVpZ2h0OjY0MHB4OyB9Ci5kcC1wYWdlIHsKICBwb3NpdGlvbjphYnNvbHV0ZTsgaW5zZXQ6MDsKICBiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCgxODBkZWcsI2Y4ZjlmYyAwJSwjZjBmNGZmIDEwMCUpOwp9Ci5kcC1wYWdlLXRvcGJhciB7CiAgYmFja2dyb3VuZDojZmZmOyBwYWRkaW5nOjE0cHggMTZweDsKICBmb250LXNpemU6MTRweDsgZm9udC13ZWlnaHQ6NzAwOyBjb2xvcjp2YXIoLS10ZXh0KTsKICBib3JkZXItYm90dG9tOjFweCBzb2xpZCByZ2JhKDAsMCwwLDAuMDYpOwogIGRpc3BsYXk6ZmxleDsgYWxpZ24taXRlbXM6Y2VudGVyOyBnYXA6OHB4Owp9Ci5kcC1wYWdlLXRvcGJhcjo6YmVmb3JlIHsgY29udGVudDon4oaQJzsgZm9udC1zaXplOjE2cHg7IGNvbG9yOnZhcigtLW11dGVkKTsgfQouZHAtcGFnZS1ib2R5IHsgcGFkZGluZzoxNnB4OyB9Ci5kcC1mb3JtLWJsb2NrIHsKICBiYWNrZ3JvdW5kOiNmZmY7IGJvcmRlci1yYWRpdXM6MTRweDsgcGFkZGluZzoxNHB4IDE2cHg7IG1hcmdpbi1ib3R0b206MTJweDsKICBib3JkZXI6MXB4IHNvbGlkIHJnYmEoMCwwLDAsMC4wNik7Cn0KLmRwLWZvcm0tbGFiZWwgeyBmb250LXNpemU6MTBweDsgY29sb3I6dmFyKC0tbXV0ZWQpOyBtYXJnaW4tYm90dG9tOjZweDsgfQouZHAtZm9ybS1pbnB1dCB7CiAgaGVpZ2h0OjM2cHg7IGJhY2tncm91bmQ6cmdiYSgwLDAsMCwwLjAzKTsgYm9yZGVyLXJhZGl1czo4cHg7CiAgYm9yZGVyOjFweCBzb2xpZCByZ2JhKDAsMCwwLDAuMDcpOwp9Ci8qIG92ZXJsYXkgKi8KLmRwLW92ZXJsYXkgewogIHBvc2l0aW9uOmFic29sdXRlOyBpbnNldDowOwogIGJhY2tncm91bmQ6cmdiYSgxMCw1LDMwLDAuNjIpOyBiYWNrZHJvcC1maWx0ZXI6Ymx1cigzcHgpOwogIHotaW5kZXg6MTA7IGRpc3BsYXk6ZmxleDsgYWxpZ24taXRlbXM6Y2VudGVyOyBqdXN0aWZ5LWNvbnRlbnQ6Y2VudGVyOyBwYWRkaW5nOjIwcHg7Cn0KLmRwLWNhcmQgewogIHdpZHRoOjEwMCU7IGJhY2tncm91bmQ6I2ZmZjsgYm9yZGVyLXJhZGl1czoyMnB4OwogIG92ZXJmbG93OmhpZGRlbjsgcG9zaXRpb246cmVsYXRpdmU7CiAgYm94LXNoYWRvdzowIDI0cHggNjBweCByZ2JhKDAsMCwwLDAuMjgpOwp9Ci5kcC1jYXJkOjpiZWZvcmUgewogIGNvbnRlbnQ6Jyc7IHBvc2l0aW9uOmFic29sdXRlOyB0b3A6MDsgbGVmdDowOyByaWdodDowOyBoZWlnaHQ6MnB4OwogIGJhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KDkwZGVnLHZhcigtLXBpbmspLHZhcigtLXB1cnBsZSksdmFyKC0tYmx1ZSkpOwp9Ci5kcC1jbG9zZSB7CiAgcG9zaXRpb246YWJzb2x1dGU7IHRvcDoxMHB4OyByaWdodDoxMHB4OyB6LWluZGV4OjI7CiAgd2lkdGg6MjRweDsgaGVpZ2h0OjI0cHg7IGJvcmRlci1yYWRpdXM6NTAlOwogIGJhY2tncm91bmQ6cmdiYSgyNTUsMjU1LDI1NSwwLjg1KTsgYm9yZGVyOjFweCBzb2xpZCByZ2JhKDAsMCwwLDAuMSk7CiAgZGlzcGxheTpmbGV4OyBhbGlnbi1pdGVtczpjZW50ZXI7IGp1c3RpZnktY29udGVudDpjZW50ZXI7CiAgZm9udC1zaXplOjExcHg7IGNvbG9yOnZhcigtLW11dGVkKTsgY3Vyc29yOnBvaW50ZXI7Cn0KLmRwLWJhbm5lciB7CiAgaGVpZ2h0OjE1MHB4OwogIGJhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KDEzNWRlZywjRkZEMEVBIDAlLCNFNEQwRkYgNTUlLCNDOEU4RkYgMTAwJSk7CiAgZGlzcGxheTpmbGV4OyBmbGV4LWRpcmVjdGlvbjpjb2x1bW47IGFsaWduLWl0ZW1zOmNlbnRlcjsganVzdGlmeS1jb250ZW50OmNlbnRlcjsgZ2FwOjNweDsKICBwb3NpdGlvbjpyZWxhdGl2ZTsgb3ZlcmZsb3c6aGlkZGVuOwp9Ci5kcC1iYW5uZXI6OmFmdGVyIHsKICBjb250ZW50OifinKYnOyBwb3NpdGlvbjphYnNvbHV0ZTsgZm9udC1zaXplOjkwcHg7IG9wYWNpdHk6MC4wNzsgY29sb3I6dmFyKC0tcHVycGxlKTsKICB0b3A6LTEwcHg7IHJpZ2h0Oi0xMHB4OyB0cmFuc2Zvcm06cm90YXRlKDE1ZGVnKTsKfQouZHAtYmFubmVyLWJhZGdlIHsKICBmb250LXNpemU6OXB4OyBmb250LXdlaWdodDo3MDA7IGxldHRlci1zcGFjaW5nOjJweDsKICBjb2xvcjojZmZmOyBiYWNrZ3JvdW5kOnJnYmEoMjU1LDEwMCwxODAsMC41NSk7CiAgcGFkZGluZzoycHggMTJweDsgYm9yZGVyLXJhZGl1czoyMHB4OyBtYXJnaW4tYm90dG9tOjJweDsKfQouZHAtYmFubmVyLXRpdGxlIHsKICBmb250LXNpemU6MjZweDsgZm9udC13ZWlnaHQ6OTAwOyBsZXR0ZXItc3BhY2luZzo1cHg7CiAgYmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoMTM1ZGVnLCNGRjcyQjgsIzg4NTVFRSk7CiAgLXdlYmtpdC1iYWNrZ3JvdW5kLWNsaXA6dGV4dDsgLXdlYmtpdC10ZXh0LWZpbGwtY29sb3I6dHJhbnNwYXJlbnQ7IGJhY2tncm91bmQtY2xpcDp0ZXh0OwogIGZpbHRlcjpkcm9wLXNoYWRvdygwIDJweCA4cHggcmdiYSgyNTUsMTAwLDE4MCwwLjIpKTsKfQouZHAtYmFubmVyLXN1YiB7IGZvbnQtc2l6ZToxMXB4OyBjb2xvcjpyZ2JhKDcwLDMwLDEwMCwwLjY1KTsgZm9udC13ZWlnaHQ6NjAwOyBtYXJnaW4tdG9wOjJweDsgfQouZHAtYm9keSB7IHBhZGRpbmc6MTRweCAxNnB4IDE2cHg7IH0KLmRwLWN0YSB7CiAgd2lkdGg6MTAwJTsgcGFkZGluZzoxM3B4OyBib3JkZXItcmFkaXVzOjEycHg7IGJvcmRlcjpub25lOwogIGJhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KDEzNWRlZywjRkY3MkI4LHZhcigtLXBpbmspKTsKICBjb2xvcjojZmZmOyBmb250LWZhbWlseTppbmhlcml0OyBmb250LXNpemU6MTRweDsgZm9udC13ZWlnaHQ6NzAwOwogIGN1cnNvcjpwb2ludGVyOyB0cmFuc2l0aW9uOmFsbCAwLjJzOyBsZXR0ZXItc3BhY2luZzowLjNweDsKICBib3gtc2hhZG93OjAgNHB4IDE2cHggcmdiYSgyNTUsMTQyLDE5OCwwLjMpOyBtYXJnaW4tYm90dG9tOjEwcHg7CiAgZGlzcGxheTpmbGV4OyBhbGlnbi1pdGVtczpjZW50ZXI7IGp1c3RpZnktY29udGVudDpjZW50ZXI7IGdhcDo2cHg7Cn0KLmRwLWN0YTphY3RpdmUgeyB0cmFuc2Zvcm06c2NhbGUoMC45Nyk7IH0KLmRwLWNoZWNrIHsKICBkaXNwbGF5OmZsZXg7IGFsaWduLWl0ZW1zOmNlbnRlcjsganVzdGlmeS1jb250ZW50OmNlbnRlcjsgZ2FwOjZweDsKfQouZHAtY2hlY2sgaW5wdXQgeyBhY2NlbnQtY29sb3I6dmFyKC0tcGluayk7IHdpZHRoOjEzcHg7IGhlaWdodDoxM3B4OyB9Ci5kcC1jaGVjayBsYWJlbCB7IGZvbnQtc2l6ZToxMXB4OyBjb2xvcjp2YXIoLS1tdXRlZCk7IGN1cnNvcjpwb2ludGVyOyB9Ci8qIGNvbmZpcm0gbGVhdmUgKi8KLmRwLWNvbmZpcm0tb3ZlcmxheSB7CiAgcG9zaXRpb246YWJzb2x1dGU7IGluc2V0OjA7CiAgYmFja2dyb3VuZDpyZ2JhKDEwLDUsMzAsMC43KTsgYmFja2Ryb3AtZmlsdGVyOmJsdXIoNnB4KTsKICB6LWluZGV4OjIwOyBkaXNwbGF5OmZsZXg7IGFsaWduLWl0ZW1zOmNlbnRlcjsganVzdGlmeS1jb250ZW50OmNlbnRlcjsgcGFkZGluZzoyNHB4Owp9Ci5kcC1jb25maXJtLWNhcmQgewogIHdpZHRoOjEwMCU7IGJhY2tncm91bmQ6I2ZmZjsgYm9yZGVyLXJhZGl1czoyMHB4OwogIHBhZGRpbmc6MjJweCAxOHB4IDE4cHg7IHRleHQtYWxpZ246Y2VudGVyOwogIGJveC1zaGFkb3c6MCAyMHB4IDYwcHggcmdiYSgwLDAsMCwwLjIyKTsgb3ZlcmZsb3c6aGlkZGVuOyBwb3NpdGlvbjpyZWxhdGl2ZTsKfQouZHAtY29uZmlybS1jYXJkOjpiZWZvcmUgewogIGNvbnRlbnQ6Jyc7IHBvc2l0aW9uOmFic29sdXRlOyB0b3A6MDsgbGVmdDowOyByaWdodDowOyBoZWlnaHQ6MnB4OwogIGJhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KDkwZGVnLHRyYW5zcGFyZW50LHZhcigtLXJlZCksdHJhbnNwYXJlbnQpOwp9Ci5kcC1jb25maXJtLWljb24geyBmb250LXNpemU6MzJweDsgbWFyZ2luLWJvdHRvbTo4cHg7IGRpc3BsYXk6YmxvY2s7IH0KLmRwLWNvbmZpcm0tdGl0bGUgeyBmb250LXNpemU6MTVweDsgZm9udC13ZWlnaHQ6OTAwOyBjb2xvcjp2YXIoLS10ZXh0KTsgbWFyZ2luLWJvdHRvbTo1cHg7IH0KLmRwLWNvbmZpcm0tZGVzYyB7IGZvbnQtc2l6ZToxMXB4OyBjb2xvcjp2YXIoLS1tdXRlZCk7IGxpbmUtaGVpZ2h0OjEuNzsgbWFyZ2luLWJvdHRvbToxNnB4OyB9Ci5kcC1jb25maXJtLWRlc2MgYiB7IGNvbG9yOnZhcigtLXBpbmspOyB9Ci5kcC1jb25maXJtLWJ0bnMgeyBkaXNwbGF5OmZsZXg7IGdhcDo4cHg7IH0KLmRwLWNvbmZpcm0tYnRucyBidXR0b24gewogIGZsZXg6MTsgcGFkZGluZzoxMXB4IDZweDsgYm9yZGVyLXJhZGl1czoxMHB4OwogIGZvbnQtZmFtaWx5OmluaGVyaXQ7IGZvbnQtc2l6ZToxMnB4OyBmb250LXdlaWdodDo3MDA7IGN1cnNvcjpwb2ludGVyOyBib3JkZXI6bm9uZTsKfQouZHAtYnRuLXN0YXkgeyBiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCgxMzVkZWcsI0ZGNzJCOCx2YXIoLS1waW5rKSk7IGNvbG9yOiNmZmY7IGJveC1zaGFkb3c6MCAzcHggMTBweCByZ2JhKDI1NSwxNDIsMTk4LDAuMjUpOyB9Ci5kcC1idG4tbGVhdmUgeyBiYWNrZ3JvdW5kOnJnYmEoMjQ4LDExMywxMTMsMC4wNyk7IGJvcmRlcjoxcHggc29saWQgcmdiYSgyNDgsMTEzLDExMywwLjIpIWltcG9ydGFudDsgY29sb3I6dmFyKC0tcmVkKTsgfQoKLnBob25lIHsKICB3aWR0aDogMTAwJTsKICBtYXgtd2lkdGg6IHZhcigtLXcpOwogIG1pbi1oZWlnaHQ6IDEwMHZoOwogIGJhY2tncm91bmQ6IGxpbmVhci1ncmFkaWVudCgxODBkZWcsICNGRkY0RkIgMCUsICNFQkY2RkYgNTUlLCAjRjBGOEZGIDEwMCUpOwogIGZvbnQtZmFtaWx5OiAnTm90byBTYW5zIFRDJywgc2Fucy1zZXJpZjsKICBjb2xvcjogdmFyKC0tdGV4dCk7CiAgb3ZlcmZsb3cteDogaGlkZGVuOwogIHBvc2l0aW9uOiByZWxhdGl2ZTsKfQoKLyog4pSA4pSA4pSAIEhFUk8g4pSA4pSA4pSAICovCi5oZXJvIHsKICBwb3NpdGlvbjogcmVsYXRpdmU7CiAgaGVpZ2h0OiAxOTBweDsKICBkaXNwbGF5OiBmbGV4OwogIGZsZXgtZGlyZWN0aW9uOiBjb2x1bW47CiAgYWxpZ24taXRlbXM6IGNlbnRlcjsKICBqdXN0aWZ5LWNvbnRlbnQ6IGNlbnRlcjsKICBnYXA6IDVweDsKICBvdmVyZmxvdzogdmlzaWJsZTsKfQouaGVyby1iZyB7CiAgcG9zaXRpb246IGFic29sdXRlOyBpbnNldDogMDsKICBiYWNrZ3JvdW5kOiByYWRpYWwtZ3JhZGllbnQoZWxsaXBzZSA4MCUgNTAlIGF0IDUwJSAxMDAlLCByZ2JhKDI1NSwxMDcsMTU3LDAuMSkgMCUsIHRyYW5zcGFyZW50IDcwJSk7Cn0KLmhlcm8tZXllYnJvdyB7CiAgcG9zaXRpb246IHJlbGF0aXZlOwogIGZvbnQtc2l6ZTogMTBweDsgbGV0dGVyLXNwYWNpbmc6IDRweDsKICBjb2xvcjogdmFyKC0tcGluayk7IGZvbnQtd2VpZ2h0OiA3MDA7IG9wYWNpdHk6IDAuODU7CiAgdGV4dC10cmFuc2Zvcm06IHVwcGVyY2FzZTsKfQouaGVyby10aXRsZSB7CiAgcG9zaXRpb246IHJlbGF0aXZlOwogIGZvbnQtc2l6ZTogMzhweDsgZm9udC13ZWlnaHQ6IDkwMDsgbGV0dGVyLXNwYWNpbmc6IDZweDsKICBiYWNrZ3JvdW5kOiBsaW5lYXItZ3JhZGllbnQoMTM1ZGVnLCAjRkY3MkI4IDAlLCAjQzQ5MEZGIDUwJSwgIzc0QzhGQSAxMDAlKTsKICAtd2Via2l0LWJhY2tncm91bmQtY2xpcDogdGV4dDsgLXdlYmtpdC10ZXh0LWZpbGwtY29sb3I6IHRyYW5zcGFyZW50OyBiYWNrZ3JvdW5kLWNsaXA6IHRleHQ7CiAgZmlsdGVyOiBkcm9wLXNoYWRvdygwIDJweCAxMHB4IHJnYmEoMjU1LDEwNywxNTcsMC4yKSk7CiAgbGluZS1oZWlnaHQ6IDE7Cn0KLmhlcm8tc3ViIHsKICBwb3NpdGlvbjogcmVsYXRpdmU7CiAgZm9udC1zaXplOiAxMXB4OyBjb2xvcjogdmFyKC0tbXV0ZWQpOyBsZXR0ZXItc3BhY2luZzogMS41cHg7Cn0KLmhlcm8tcGlsbCB7CiAgcG9zaXRpb246IHJlbGF0aXZlOwogIGRpc3BsYXk6IGlubGluZS1mbGV4OyBhbGlnbi1pdGVtczogY2VudGVyOyBnYXA6IDRweDsKICBiYWNrZ3JvdW5kOiByZ2JhKDI1NSwxMDcsMTU3LDAuMDgpOwogIGJvcmRlcjogMXB4IHNvbGlkIHJnYmEoMjU1LDEwNywxNTcsMC4yKTsKICBib3JkZXItcmFkaXVzOiAyMHB4OyBwYWRkaW5nOiAzcHggMTJweDsKICBmb250LXNpemU6IDEwcHg7IGNvbG9yOiB2YXIoLS1waW5rKTsgZm9udC13ZWlnaHQ6IDYwMDsKICBtYXJnaW4tdG9wOiAycHg7Cn0KLnJ1bGVzLXRhYiB7CiAgcG9zaXRpb246IGFic29sdXRlOyByaWdodDogLTFweDsgYm90dG9tOiAyNHB4OwogIGJhY2tncm91bmQ6IGxpbmVhci1ncmFkaWVudCgxMzVkZWcsICNGRjcyQjgsIHZhcigtLXBpbmspKTsKICBjb2xvcjogI2ZmZjsgZm9udC1zaXplOiAxMXB4OyBmb250LXdlaWdodDogNzAwOyBsZXR0ZXItc3BhY2luZzogMC41cHg7CiAgcGFkZGluZzogNnB4IDEwcHggNnB4IDEycHg7CiAgYm9yZGVyLXJhZGl1czogMjBweCAwIDAgMjBweDsKICBjdXJzb3I6IHBvaW50ZXI7CiAgYm94LXNoYWRvdzogLTJweCAycHggMTBweCByZ2JhKDI1NSwxMDcsMTU3LDAuMyk7CiAgZGlzcGxheTogZmxleDsgYWxpZ24taXRlbXM6IGNlbnRlcjsgZ2FwOiA1cHg7CiAgei1pbmRleDogMTA7IHVzZXItc2VsZWN0OiBub25lOyB0cmFuc2l0aW9uOiBhbGwgMC4yczsKfQoucnVsZXMtdGFiOmFjdGl2ZSB7IHRyYW5zZm9ybTogc2NhbGVYKDAuOTQpOyB9Ci5ydWxlcy10YWIgc3ZnIHsgd2lkdGg6MTFweDtoZWlnaHQ6MTFweDtmaWxsOiNmZmY7ZmxleC1zaHJpbms6MDsgfQoKLyog4pSA4pSA4pSAIFJVTEVTIE1PREFMIOKUgOKUgOKUgCAqLwoucnVsZXMtbWFzayB7CiAgcG9zaXRpb246Zml4ZWQ7aW5zZXQ6MDsKICBiYWNrZ3JvdW5kOnJnYmEoMCwwLDAsMC42NSk7YmFja2Ryb3AtZmlsdGVyOmJsdXIoOHB4KTsKICB6LWluZGV4OjQwMDtkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2p1c3RpZnktY29udGVudDpjZW50ZXI7CiAgcGFkZGluZzoyNHB4IDIwcHg7CiAgb3BhY2l0eTowO3BvaW50ZXItZXZlbnRzOm5vbmU7dHJhbnNpdGlvbjpvcGFjaXR5IDAuMjVzIGVhc2U7Cn0KLnJ1bGVzLW1hc2sub3BlbiB7IG9wYWNpdHk6MTtwb2ludGVyLWV2ZW50czphbGw7IH0KLnJ1bGVzLW1vZGFsIHsKICB3aWR0aDoxMDAlO21heC13aWR0aDozNDBweDtiYWNrZ3JvdW5kOiNmZmY7CiAgYm9yZGVyLXJhZGl1czoyMHB4O2JvcmRlcjoxcHggc29saWQgcmdiYSgyNTUsMTA3LDE1NywwLjE4KTsKICBvdmVyZmxvdzpoaWRkZW47CiAgdHJhbnNmb3JtOnNjYWxlKDAuOTIpIHRyYW5zbGF0ZVkoMTZweCk7CiAgdHJhbnNpdGlvbjp0cmFuc2Zvcm0gMC4zcyBjdWJpYy1iZXppZXIoMC4zNCwxLjU2LDAuNjQsMSk7CiAgcG9zaXRpb246cmVsYXRpdmU7Cn0KLnJ1bGVzLW1hc2sub3BlbiAucnVsZXMtbW9kYWwgeyB0cmFuc2Zvcm06c2NhbGUoMSkgdHJhbnNsYXRlWSgwKTsgfQoucnVsZXMtbW9kYWw6OmJlZm9yZSB7CiAgY29udGVudDonJztwb3NpdGlvbjphYnNvbHV0ZTt0b3A6MDtsZWZ0OjA7cmlnaHQ6MDtoZWlnaHQ6MnB4OwogIGJhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KDkwZGVnLHRyYW5zcGFyZW50LHZhcigtLXBpbmspLHRyYW5zcGFyZW50KTsKfQoucm0taGVhZCB7CiAgcGFkZGluZzoxNnB4IDE4cHggMTJweDsKICBkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2p1c3RpZnktY29udGVudDpzcGFjZS1iZXR3ZWVuOwogIGJvcmRlci1ib3R0b206MXB4IHNvbGlkIHJnYmEoMCwwLDAsMC4wNik7Cn0KLnJtLXRpdGxlIHsgZm9udC1zaXplOjEzcHg7Zm9udC13ZWlnaHQ6NzAwO2NvbG9yOnZhcigtLXBpbmspO2Rpc3BsYXk6ZmxleDthbGlnbi1pdGVtczpjZW50ZXI7Z2FwOjdweDsgfQoucm0tdGl0bGU6OmJlZm9yZSB7IGNvbnRlbnQ6J/Cfk4snO2ZvbnQtc2l6ZToxNHB4OyB9Ci5ybS1jbG9zZSB7CiAgd2lkdGg6MjZweDtoZWlnaHQ6MjZweDtib3JkZXItcmFkaXVzOjhweDtiYWNrZ3JvdW5kOnJnYmEoMCwwLDAsMC4wNCk7CiAgYm9yZGVyOjFweCBzb2xpZCByZ2JhKDAsMCwwLDAuMDcpO2Rpc3BsYXk6ZmxleDthbGlnbi1pdGVtczpjZW50ZXI7anVzdGlmeS1jb250ZW50OmNlbnRlcjsKICBmb250LXNpemU6MTNweDtjb2xvcjp2YXIoLS1tdXRlZCk7Y3Vyc29yOnBvaW50ZXI7dHJhbnNpdGlvbjphbGwgMC4xNXM7Cn0KLnJtLWNsb3NlOmFjdGl2ZSB7IGJhY2tncm91bmQ6cmdiYSgwLDAsMCwwLjA4KTsgfQoucm0tYm9keSB7IHBhZGRpbmc6MTRweCAxOHB4IDIwcHg7bWF4LWhlaWdodDo2MHZoO292ZXJmbG93LXk6YXV0bzsgfQoucm0tYm9keTo6LXdlYmtpdC1zY3JvbGxiYXIgeyB3aWR0aDozcHg7IH0KLnJtLWJvZHk6Oi13ZWJraXQtc2Nyb2xsYmFyLXRodW1iIHsgYmFja2dyb3VuZDpyZ2JhKDI1NSwxMDcsMTU3LDAuMik7Ym9yZGVyLXJhZGl1czoycHg7IH0KLnJ1bGUtaXRlbSB7IGRpc3BsYXk6ZmxleDtnYXA6MTBweDtwYWRkaW5nOjEwcHggMDtib3JkZXItYm90dG9tOjFweCBzb2xpZCByZ2JhKDAsMCwwLDAuMDUpOyB9Ci5ydWxlLWl0ZW06bGFzdC1jaGlsZCB7IGJvcmRlcjpub25lO3BhZGRpbmctYm90dG9tOjA7IH0KLnJ1bGUtaXRlbTpmaXJzdC1jaGlsZCB7IHBhZGRpbmctdG9wOjA7IH0KLnJ1bGUtZG90IHsKICB3aWR0aDoxOHB4O2hlaWdodDoxOHB4O2JvcmRlci1yYWRpdXM6NTAlO2ZsZXgtc2hyaW5rOjA7bWFyZ2luLXRvcDoycHg7CiAgYmFja2dyb3VuZDpyZ2JhKDI1NSwxMDcsMTU3LDAuMDgpO2JvcmRlcjoxcHggc29saWQgcmdiYSgyNTUsMTA3LDE1NywwLjIyKTsKICBkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2p1c3RpZnktY29udGVudDpjZW50ZXI7CiAgZm9udC1zaXplOjlweDtjb2xvcjp2YXIoLS1waW5rKTtmb250LXdlaWdodDo3MDA7Cn0KLnJ1bGUtdGV4dCB7IGZvbnQtc2l6ZToxMnB4O2NvbG9yOnZhcigtLW11dGVkKTtsaW5lLWhlaWdodDoxLjc1OyB9Ci5ydWxlLXRleHQgYiB7IGNvbG9yOnZhcigtLXRleHQpOyB9CgovKiDilIDilIDilIAgUExBTiBTRUxFQ1RPUiDilIDilIDilIAgKi8KLnBsYW4td3JhcCB7CiAgbWFyZ2luOiAwIDEycHg7CiAgcGFkZGluZzogMTRweDsKICBiYWNrZ3JvdW5kOiByZ2JhKDI1NSwyNTUsMjU1LDAuNjUpOwogIGJvcmRlci1yYWRpdXM6IDIwcHg7CiAgYm9yZGVyOiAxcHggc29saWQgcmdiYSgyNTUsMjU1LDI1NSwwLjg1KTsKICBib3gtc2hhZG93OiAwIDNweCAxOHB4IHJnYmEoMCwwLDAsMC4wNCk7Cn0KLnBsYW4tdGFicyB7IGRpc3BsYXk6Z3JpZDtncmlkLXRlbXBsYXRlLWNvbHVtbnM6MWZyIDFmcjtnYXA6MTBweDttYXJnaW4tYm90dG9tOjA7IH0KLnBsYW4tdGFiIHsKICBwb3NpdGlvbjpyZWxhdGl2ZTtiYWNrZ3JvdW5kOiNmZmY7CiAgYm9yZGVyOjEuNXB4IHNvbGlkIHJnYmEoMCwwLDAsMC4wNyk7Ym9yZGVyLXJhZGl1czoxNnB4OwogIHBhZGRpbmc6MTRweCAxNHB4IDEycHg7Y3Vyc29yOnBvaW50ZXI7dHJhbnNpdGlvbjphbGwgMC4yMnM7CiAgb3ZlcmZsb3c6aGlkZGVuO3RleHQtYWxpZ246bGVmdDsKfQoucGxhbi10YWI6OmJlZm9yZSB7CiAgY29udGVudDonJztwb3NpdGlvbjphYnNvbHV0ZTt0b3A6MDtsZWZ0OjA7cmlnaHQ6MDtoZWlnaHQ6MnB4OwogIGJhY2tncm91bmQ6dHJhbnNwYXJlbnQ7CiAgdHJhbnNpdGlvbjphbGwgMC4yMnM7Cn0KLnBsYW4tdGFiLmFjdGl2ZSB7IGJvcmRlci1jb2xvcjp2YXIoLS1waW5rKTtiYWNrZ3JvdW5kOnJnYmEoMjU1LDEwNywxNTcsMC4wMyk7IH0KLnBsYW4tdGFiLmFjdGl2ZTo6YmVmb3JlIHsgYmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoOTBkZWcsdHJhbnNwYXJlbnQsdmFyKC0tcGluayksdHJhbnNwYXJlbnQpOyB9Ci5wbGFuLXRhYi5hY3RpdmUtcHJlbWl1bSB7IGJvcmRlci1jb2xvcjp2YXIoLS1wdXJwbGUpO2JhY2tncm91bmQ6cmdiYSgxNjAsMTIwLDI0NSwwLjA0KTsgfQoucGxhbi10YWIuYWN0aXZlLXByZW1pdW06OmJlZm9yZSB7IGJhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KDkwZGVnLHRyYW5zcGFyZW50LHZhcigtLXB1cnBsZSksdHJhbnNwYXJlbnQpOyB9Ci5wdC1iYWRnZSB7CiAgZGlzcGxheTppbmxpbmUtYmxvY2s7Zm9udC1zaXplOjlweDtmb250LXdlaWdodDo3MDA7bGV0dGVyLXNwYWNpbmc6MC41cHg7CiAgcGFkZGluZzoycHggOHB4O2JvcmRlci1yYWRpdXM6MjBweDttYXJnaW4tYm90dG9tOjhweDt0ZXh0LXRyYW5zZm9ybTp1cHBlcmNhc2U7Cn0KLmJhZGdlLXN0ZCB7IGJhY2tncm91bmQ6cmdiYSgyNTUsMTA3LDE1NywwLjEpO2NvbG9yOnZhcigtLXBpbmspO2JvcmRlcjoxcHggc29saWQgcmdiYSgyNTUsMTA3LDE1NywwLjIyKTsgfQouYmFkZ2UtcHJlbSB7IGJhY2tncm91bmQ6cmdiYSgxNjAsMTIwLDI0NSwwLjEpO2NvbG9yOnZhcigtLXB1cnBsZSk7Ym9yZGVyOjFweCBzb2xpZCByZ2JhKDE2MCwxMjAsMjQ1LDAuMjIpOyB9Ci5wdC1wcmljZSB7IGZvbnQtc2l6ZToyNnB4O2ZvbnQtd2VpZ2h0OjkwMDtsaW5lLWhlaWdodDoxO2NvbG9yOnZhcigtLXRleHQpOyB9Ci5wdC1wcmljZS5nb2xkIHsgY29sb3I6dmFyKC0tcGluayk7IH0KLnB0LXByaWNlLnB1cnBsZSB7IGNvbG9yOnZhcigtLXB1cnBsZSk7IH0KLnB0LXVuaXQgeyBmb250LXNpemU6MTFweDtmb250LXdlaWdodDo1MDA7Y29sb3I6dmFyKC0tbXV0ZWQpOyB9Ci5wdC1uYW1lIHsgZm9udC1zaXplOjExcHg7Y29sb3I6dmFyKC0tbXV0ZWQpO21hcmdpbi10b3A6NXB4OyB9Ci5wdC1iZXN0IHsKICBwb3NpdGlvbjphYnNvbHV0ZTt0b3A6MTBweDtyaWdodDoxMHB4OwogIGZvbnQtc2l6ZTo5cHg7Zm9udC13ZWlnaHQ6NzAwOwogIGJhY2tncm91bmQ6cmdiYSgxNjAsMTIwLDI0NSwwLjEpO2JvcmRlcjoxcHggc29saWQgcmdiYSgxNjAsMTIwLDI0NSwwLjIyKTsKICBjb2xvcjp2YXIoLS1wdXJwbGUpO3BhZGRpbmc6MnB4IDdweDtib3JkZXItcmFkaXVzOjIwcHg7Cn0KLnB0LWNoZWNrIHsKICBwb3NpdGlvbjphYnNvbHV0ZTtib3R0b206MTBweDtyaWdodDoxMnB4OwogIHdpZHRoOjE4cHg7aGVpZ2h0OjE4cHg7Ym9yZGVyLXJhZGl1czo1MCU7CiAgZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtqdXN0aWZ5LWNvbnRlbnQ6Y2VudGVyOwogIGZvbnQtc2l6ZToxMHB4O29wYWNpdHk6MDt0cmFuc2l0aW9uOm9wYWNpdHkgMC4yczsKfQoucGxhbi10YWIuYWN0aXZlIC5wdC1jaGVjayB7IG9wYWNpdHk6MTtiYWNrZ3JvdW5kOnJnYmEoMjU1LDEwNywxNTcsMC4xMik7Ym9yZGVyOjFweCBzb2xpZCB2YXIoLS1waW5rKTtjb2xvcjp2YXIoLS1waW5rKTsgfQoucGxhbi10YWIuYWN0aXZlLXByZW1pdW0gLnB0LWNoZWNrIHsgb3BhY2l0eToxO2JhY2tncm91bmQ6cmdiYSgxNjAsMTIwLDI0NSwwLjEyKTtib3JkZXI6MXB4IHNvbGlkIHZhcigtLXB1cnBsZSk7Y29sb3I6dmFyKC0tcHVycGxlKTsgfQoKLyog4pSA4pSA4pSAIFBMQU4gREVUQUlMIOKUgOKUgOKUgCAqLwoucGxhbi1kZXRhaWwgewogIG1hcmdpbjoxMHB4IDAgMDtiYWNrZ3JvdW5kOiNmZmY7Ym9yZGVyLXJhZGl1czoxNnB4OwogIGJvcmRlcjoxcHggc29saWQgcmdiYSgyNTUsMTA3LDE1NywwLjE0KTtvdmVyZmxvdzpoaWRkZW47CiAgcG9zaXRpb246cmVsYXRpdmU7dHJhbnNpdGlvbjpib3JkZXItY29sb3IgMC4zczsKfQoucGxhbi1kZXRhaWwucHJlbSB7IGJvcmRlci1jb2xvcjpyZ2JhKDE2MCwxMjAsMjQ1LDAuMik7IH0KLnBsYW4tZGV0YWlsOjpiZWZvcmUgewogIGNvbnRlbnQ6Jyc7cG9zaXRpb246YWJzb2x1dGU7dG9wOjA7bGVmdDowO3JpZ2h0OjA7aGVpZ2h0OjJweDsKICBiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCg5MGRlZyx0cmFuc3BhcmVudCx2YXIoLS1waW5rKSx0cmFuc3BhcmVudCk7dHJhbnNpdGlvbjphbGwgMC4zczsKfQoucGxhbi1kZXRhaWwucHJlbTo6YmVmb3JlIHsgYmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoOTBkZWcsdHJhbnNwYXJlbnQsdmFyKC0tcHVycGxlKSx0cmFuc3BhcmVudCk7IH0KLnBkLXRhZ3MgewogIHBhZGRpbmc6MTJweCAxNnB4O2Rpc3BsYXk6ZmxleDtnYXA6NXB4O2ZsZXgtd3JhcDp3cmFwOwogIGJvcmRlci1ib3R0b206MXB4IHNvbGlkIHJnYmEoMCwwLDAsMC4wNSk7Cn0KLnBkLXRhZyB7IGZvbnQtc2l6ZToxMXB4O3BhZGRpbmc6M3B4IDEwcHg7Ym9yZGVyLXJhZGl1czoyMHB4O2ZvbnQtd2VpZ2h0OjYwMDsgfQoudC1jYXNoICAgeyBiYWNrZ3JvdW5kOnJnYmEoNjEsMjAxLDEzOCwwLjEpO2NvbG9yOnZhcigtLWdyZWVuKTtib3JkZXI6MXB4IHNvbGlkIHJnYmEoNjEsMjAxLDEzOCwwLjIpOyB9Ci50LXNwaW4gICB7IGJhY2tncm91bmQ6cmdiYSgxNjAsMTIwLDI0NSwwLjEpO2NvbG9yOnZhcigtLXB1cnBsZSk7Ym9yZGVyOjFweCBzb2xpZCByZ2JhKDE2MCwxMjAsMjQ1LDAuMik7IH0KLnQtcG9pbnQgIHsgYmFja2dyb3VuZDpyZ2JhKDI1NSwxNzksMCwwLjEpO2NvbG9yOnZhcigtLWdvbGQpO2JvcmRlcjoxcHggc29saWQgcmdiYSgyNTUsMTc5LDAsMC4yKTsgfQoudC1jb3Vwb24geyBiYWNrZ3JvdW5kOnJnYmEoMjU1LDE0MCw2NCwwLjEpO2NvbG9yOnZhcigtLW9yYW5nZSk7Ym9yZGVyOjFweCBzb2xpZCByZ2JhKDI1NSwxNDAsNjQsMC4yKTsgfQoucGQtbm90ZSB7CiAgcGFkZGluZzo5cHggMTZweDtmb250LXNpemU6MTFweDtjb2xvcjp2YXIoLS1tdXRlZCk7bGluZS1oZWlnaHQ6MS42OwogIGJvcmRlci1ib3R0b206MXB4IHNvbGlkIHJnYmEoMCwwLDAsMC4wNSk7Cn0KLnBkLW5vdGUgYiB7IGNvbG9yOnZhcigtLXRleHQpOyB9CgovKiBCdXkgYnV0dG9uIOKAlCBzb2xpZCBjb2xvciwgbm8gYW5pbWF0aW9uICovCi5wZC1idXkgewogIG1hcmdpbjoxMnB4IDE2cHggMTRweDsKICB3aWR0aDpjYWxjKDEwMCUgLSAzMnB4KTtwYWRkaW5nOjEzcHg7CiAgYm9yZGVyLXJhZGl1czoxMnB4O2JvcmRlcjpub25lOwogIGZvbnQtZmFtaWx5OmluaGVyaXQ7Zm9udC1zaXplOjE1cHg7Zm9udC13ZWlnaHQ6NzAwO2xldHRlci1zcGFjaW5nOjAuNXB4OwogIGN1cnNvcjpwb2ludGVyO3RyYW5zaXRpb246YWxsIDAuMnM7CiAgYmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoMTM1ZGVnLCNGRjcyQjgsI0ZGQjBEOCk7CiAgY29sb3I6I2ZmZjtib3gtc2hhZG93OjAgNHB4IDE2cHggcmdiYSgyNTUsMTQyLDE5OCwwLjMpOwp9Ci5wZC1idXkucHJlbSB7CiAgYmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoMTM1ZGVnLCM3QzNBRUQsI0EwNzhGNSk7CiAgYm94LXNoYWRvdzowIDRweCAxNnB4IHJnYmEoMTYwLDEyMCwyNDUsMC4yOCk7Cn0KLnBkLWJ1eTphY3RpdmUgeyB0cmFuc2Zvcm06c2NhbGUoMC45Nyk7Ym94LXNoYWRvdzpub25lOyB9Ci5wZC1idXkucHVyY2hhc2VkIHsKICBiYWNrZ3JvdW5kOiByZ2JhKDYxLDIwMSwxMzgsMC4xKTsKICBib3JkZXI6IDEuNXB4IHNvbGlkIHJnYmEoNjEsMjAxLDEzOCwwLjI4KTsKICBjb2xvcjogdmFyKC0tZ3JlZW4pOwogIGJveC1zaGFkb3c6IG5vbmU7CiAgY3Vyc29yOiBkZWZhdWx0Owp9Ci5wZC1idXkuYmxvY2tlZCB7CiAgYmFja2dyb3VuZDogcmdiYSgwLDAsMCwwLjA1KTsKICBjb2xvcjogdmFyKC0tbXV0ZWQpOwogIGJveC1zaGFkb3c6IG5vbmU7CiAgY3Vyc29yOiBkZWZhdWx0Owp9Ci5wdC1wdXJjaGFzZWQtdGFnIHsKICBwb3NpdGlvbjogYWJzb2x1dGU7IGJvdHRvbTogMTBweDsgbGVmdDogMTJweDsKICBmb250LXNpemU6IDhweDsgZm9udC13ZWlnaHQ6IDcwMDsKICBiYWNrZ3JvdW5kOiByZ2JhKDYxLDIwMSwxMzgsMC4xKTsgY29sb3I6IHZhcigtLWdyZWVuKTsKICBib3JkZXI6IDFweCBzb2xpZCByZ2JhKDYxLDIwMSwxMzgsMC4yMik7IHBhZGRpbmc6IDJweCA2cHg7CiAgYm9yZGVyLXJhZGl1czogMjBweDsgcG9pbnRlci1ldmVudHM6IG5vbmU7Cn0KLyogbm9uLXB1cmNoYXNlZCBwbGFuIGRpbSBvdmVybGF5ICovCi5wbGFuLWRldGFpbC5kaW1tZWQ6OmFmdGVyIHsKICBjb250ZW50OiAnJzsKICBwb3NpdGlvbjogYWJzb2x1dGU7IGluc2V0OiAwOwogIGJhY2tncm91bmQ6IHJnYmEoMTYwLDE2MCwxNjAsMC4xMyk7CiAgYm9yZGVyLXJhZGl1czogMTZweDsKICBwb2ludGVyLWV2ZW50czogbm9uZTsKICB6LWluZGV4OiAyOwp9Ci5zZWN0aW9uLmRpbW1lZCB7CiAgb3BhY2l0eTogMC42MjsKICBwb2ludGVyLWV2ZW50czogbm9uZTsKfQoKLyog4pSA4pSA4pSAIFNFQ1RJT04g4pSA4pSA4pSAICovCi5zZWN0aW9uIHsKICBtYXJnaW46IDE0cHggMTJweCAwOwogIHBhZGRpbmc6IDE2cHg7CiAgYmFja2dyb3VuZDogcmdiYSgyNTUsMjU1LDI1NSwwLjY1KTsKICBib3JkZXItcmFkaXVzOiAyMHB4OwogIGJvcmRlcjogMXB4IHNvbGlkIHJnYmEoMjU1LDI1NSwyNTUsMC44NSk7CiAgYm94LXNoYWRvdzogMCAzcHggMThweCByZ2JhKDAsMCwwLDAuMDQpOwp9Ci5zZWMtaGQgeyBkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2dhcDoxMHB4O21hcmdpbi1ib3R0b206MTJweDsgfQouc2VjLWxpbmUgeyBmbGV4OjE7aGVpZ2h0OjFweDtiYWNrZ3JvdW5kOnJnYmEoMjU1LDEwNywxNTcsMC4xNSk7IH0KLnNlYy1saW5lLnJldiB7IGJhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KDkwZGVnLHJnYmEoMjU1LDEwNywxNTcsMC4xNSksdHJhbnNwYXJlbnQpOyB9Ci5zZWMtdGl0bGUgeyBmb250LXNpemU6MTFweDtsZXR0ZXItc3BhY2luZzozcHg7Y29sb3I6dmFyKC0tcGluayk7Zm9udC13ZWlnaHQ6NzAwO3doaXRlLXNwYWNlOm5vd3JhcDsgfQoKLyog4pSA4pSA4pSAIENIRUNLSU4gQ0FSRCDilIDilIDilIAgKi8KLmNoZWNraW4tY2FyZCB7CiAgYmFja2dyb3VuZDojZmZmO2JvcmRlci1yYWRpdXM6MThweDsKICBib3JkZXI6MXB4IHNvbGlkIHJnYmEoMjU1LDEwNywxNTcsMC4xNCk7CiAgb3ZlcmZsb3c6aGlkZGVuO2JveC1zaGFkb3c6MCAycHggMTRweCByZ2JhKDAsMCwwLDAuMDQpOwp9Ci5jYy1oZCB7CiAgcGFkZGluZzoxM3B4IDE2cHggMTFweDsKICBkaXNwbGF5OmZsZXg7anVzdGlmeS1jb250ZW50OnNwYWNlLWJldHdlZW47YWxpZ24taXRlbXM6Y2VudGVyOwogIGJvcmRlci1ib3R0b206MXB4IHNvbGlkIHJnYmEoMCwwLDAsMC4wNSk7Cn0KLmNjLXRpdGxlIHsgZm9udC1zaXplOjEzcHg7Zm9udC13ZWlnaHQ6NzAwO2NvbG9yOnZhcigtLXRleHQpOyB9Ci5jYy1iYWRnZSB7CiAgZm9udC1zaXplOjExcHg7Y29sb3I6dmFyKC0tcGluayk7CiAgYmFja2dyb3VuZDpyZ2JhKDI1NSwxMDcsMTU3LDAuMDgpO2JvcmRlcjoxcHggc29saWQgcmdiYSgyNTUsMTA3LDE1NywwLjE4KTsKICBwYWRkaW5nOjJweCAxMHB4O2JvcmRlci1yYWRpdXM6MjBweDtmb250LXdlaWdodDo2MDA7Cn0KCi8qIHByb2dyZXNzIGJhciAqLwouY2MtYmFyLXdyYXAgeyBwYWRkaW5nOjEycHggMTZweCA0cHg7IH0KLmNjLWJhciB7CiAgaGVpZ2h0OjZweDtiYWNrZ3JvdW5kOnJnYmEoMCwwLDAsMC4wNik7Ym9yZGVyLXJhZGl1czozcHg7CiAgb3ZlcmZsb3c6dmlzaWJsZTttYXJnaW4tYm90dG9tOjRweDtwb3NpdGlvbjpyZWxhdGl2ZTsKfQouY2MtZmlsbCB7CiAgaGVpZ2h0OjEwMCU7Ym9yZGVyLXJhZGl1czozcHg7CiAgYmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoOTBkZWcsdmFyKC0tcGluayksdmFyKC0tYmx1ZSkpOwogIHBvc2l0aW9uOnJlbGF0aXZlO3RyYW5zaXRpb246d2lkdGggMC42cyBlYXNlOwp9Ci5jYy1maWxsOjphZnRlciB7CiAgY29udGVudDonJztwb3NpdGlvbjphYnNvbHV0ZTtyaWdodDotNXB4O3RvcDotM3B4OwogIHdpZHRoOjEycHg7aGVpZ2h0OjEycHg7Ym9yZGVyLXJhZGl1czo1MCU7CiAgYmFja2dyb3VuZDp2YXIoLS1waW5rKTtib3gtc2hhZG93OjAgMCA4cHggcmdiYSgyNTUsMTA3LDE1NywwLjQ1KTsKfQouY2MtYmFyLWxhYmVsIHsKICB0ZXh0LWFsaWduOnJpZ2h0O2ZvbnQtc2l6ZTo5cHg7Y29sb3I6dmFyKC0tbXV0ZWQpO3BhZGRpbmctYm90dG9tOjhweDsKfQoKLyog4pSA4pSA4pSAIERBWSBTVFJJUCAoY3V0ZSBpY29ucykg4pSA4pSA4pSAICovCi5kYXlzLXN0cmlwIHsKICBkaXNwbGF5OmdyaWQ7Z3JpZC10ZW1wbGF0ZS1jb2x1bW5zOnJlcGVhdCg3LDFmcik7Z2FwOjRweDsKICBwYWRkaW5nOjZweCAxMHB4IDE2cHg7Cn0KLmRheS1jb2wgeyBkaXNwbGF5OmZsZXg7ZmxleC1kaXJlY3Rpb246Y29sdW1uO2FsaWduLWl0ZW1zOmNlbnRlcjtnYXA6NHB4O2N1cnNvcjpwb2ludGVyO2JvcmRlci1yYWRpdXM6MTBweDtwYWRkaW5nOjJweDt0cmFuc2l0aW9uOmJhY2tncm91bmQgMC4xNXM7IH0KLmRheS1jb2w6aG92ZXIgeyBiYWNrZ3JvdW5kOnJnYmEoMjU1LDEwNywxNTcsMC4wNik7IH0KLmRheS1jb2w6YWN0aXZlIHsgb3BhY2l0eTowLjc7IH0KLmRheS1udW0geyBmb250LXNpemU6OHB4O2NvbG9yOnZhcigtLW11dGVkKTtmb250LXdlaWdodDo3MDA7bGV0dGVyLXNwYWNpbmc6MC4ycHg7IH0KQGtleWZyYW1lcyBydy1mbGFzaCB7IDAlLDEwMCV7Ym94LXNoYWRvdzowIDJweCA4cHggcmdiYSgwLDAsMCwwLjA0KX0gMzUle2JveC1zaGFkb3c6MCAwIDAgM3B4IHJnYmEoMjU1LDEwNywxNTcsMC4yOCksMCA0cHggMjBweCByZ2JhKDI1NSwxMDcsMTU3LDAuMTQpfSB9Ci5ydy1oaWdobGlnaHQgeyBhbmltYXRpb246cnctZmxhc2ggMS4ycyBlYXNlOyB9CgovKiBjdXRlIGNpcmN1bGFyIGRheSBkb3QgKi8KLmRheS1kb3QgewogIHdpZHRoOjM4cHg7aGVpZ2h0OjM4cHg7Ym9yZGVyLXJhZGl1czo1MCU7CiAgZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtqdXN0aWZ5LWNvbnRlbnQ6Y2VudGVyOwogIGZvbnQtc2l6ZToyMHB4O2JvcmRlcjoycHggc29saWQgdHJhbnNwYXJlbnQ7CiAgdHJhbnNpdGlvbjphbGwgMC4yczsKfQouZGF5LWRvdC5kb25lIHsKICBiYWNrZ3JvdW5kOnJnYmEoNjEsMjAxLDEzOCwwLjEpOwogIGJvcmRlci1jb2xvcjpyZ2JhKDYxLDIwMSwxMzgsMC4zNSk7CiAgZm9udC1zaXplOjE4cHg7Cn0KLmRheS1kb3QudG9kYXkgewogIGJhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KDE0NWRlZyxyZ2JhKDI1NSwxMDcsMTU3LDAuMTUpLHJnYmEoOTEsMTc5LDIzOCwwLjEpKTsKICBib3JkZXItY29sb3I6dmFyKC0tcGluayk7CiAgYm94LXNoYWRvdzowIDAgMTRweCByZ2JhKDI1NSwxMDcsMTU3LDAuMyk7CiAgYW5pbWF0aW9uOmdsb3ctcGluayAycyBlYXNlLWluLW91dCBpbmZpbml0ZTsKICBmb250LXNpemU6MjBweDsKfQouZGF5LWRvdC5sb2NrZWQgewogIGJhY2tncm91bmQ6cmdiYSgwLDAsMCwwLjA0KTsKICBib3JkZXItY29sb3I6cmdiYSgwLDAsMCwwLjA4KTsKICBmb250LXNpemU6MTZweDsKfQouZGF5LWRvdC5iaWctcHJpemUgewogIGJhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KDE0NWRlZyxyZ2JhKDI1NSwxNzksMCwwLjEyKSxyZ2JhKDI1NSwxMDcsMTU3LDAuMDgpKTsKICBib3JkZXItY29sb3I6cmdiYSgyNTUsMTc5LDAsMC40KTsKfQpAa2V5ZnJhbWVzIGdsb3ctcGluayB7CiAgMCUsMTAwJSB7IGJveC1zaGFkb3c6MCAwIDhweCByZ2JhKDI1NSwxNDIsMTk4LDAuMik7IH0KICA1MCUgICAgICB7IGJveC1zaGFkb3c6MCAwIDE4cHggcmdiYSgyNTUsMTQyLDE5OCwwLjQ1KTsgfQp9CgovKiByZXdhcmQgaGludCBiZWxvdyBpY29uICovCi5kYXktcmV3YXJkIHsKICBmb250LXNpemU6Ny41cHg7Zm9udC13ZWlnaHQ6NjAwO2NvbG9yOnZhcigtLW11dGVkKTsKICB0ZXh0LWFsaWduOmNlbnRlcjtsaW5lLWhlaWdodDoxLjM7CiAgbWF4LXdpZHRoOjQwcHg7d29yZC1icmVhazpicmVhay1hbGw7Cn0KLmRheS1jb2wuZG9uZSAgLmRheS1yZXdhcmQgeyBjb2xvcjp2YXIoLS1ncmVlbik7IH0KLmRheS1jb2wudG9kYXkgLmRheS1yZXdhcmQgeyBjb2xvcjp2YXIoLS1waW5rKTtmb250LXdlaWdodDo3MDA7IH0KLmRheS1jb2wucHJpemUgLmRheS1yZXdhcmQgeyBjb2xvcjp2YXIoLS1nb2xkKTsgfQoKLyog4pSA4pSA4pSAIFJFV0FSRCBMSVNUIChzaW1wbGlmaWVkIGN1dGUpIOKUgOKUgOKUgCAqLwoucmV3YXJkLWxpc3QgeyBkaXNwbGF5OmZsZXg7ZmxleC1kaXJlY3Rpb246Y29sdW1uO2dhcDo4cHg7IH0KCi5ydy1jYXJkIHsKICBiYWNrZ3JvdW5kOiNmZmY7Ym9yZGVyLXJhZGl1czoxNnB4OwogIGJvcmRlcjoxLjVweCBzb2xpZCByZ2JhKDAsMCwwLDAuMDcpOwogIG92ZXJmbG93OmhpZGRlbjsKICBkaXNwbGF5OmZsZXg7CiAgYm94LXNoYWRvdzowIDJweCA4cHggcmdiYSgwLDAsMCwwLjA0KTsKICB0cmFuc2l0aW9uOmJvcmRlci1jb2xvciAwLjJzOwogIGZsZXgtZGlyZWN0aW9uOmNvbHVtbjsKfQoucnctY2FyZC5kb25lICB7IGJvcmRlci1jb2xvcjpyZ2JhKDYxLDIwMSwxMzgsMC4yMik7IH0KLnJ3LWNhcmQudG9kYXkgeyBib3JkZXItY29sb3I6cmdiYSgyNTUsMTA3LDE1NywwLjMpO2JveC1zaGFkb3c6MCAzcHggMTRweCByZ2JhKDI1NSwxMDcsMTU3LDAuMSk7IH0KLnJ3LWNhcmQubG9ja2VkIHsgb3BhY2l0eTowLjgyOyB9CgovKiBpbm5lciByb3c6IGJhZGdlICsgcmV3YXJkcyArIGJ1dHRvbiAqLwoucnctbWFpbiB7IGRpc3BsYXk6ZmxleDthbGlnbi1pdGVtczpjZW50ZXI7Z2FwOjExcHg7d2lkdGg6MTAwJTtwYWRkaW5nOjEycHggMTRweDsgfQoKLnJ3LWJhZGdlIHsKICB3aWR0aDo0MnB4O2hlaWdodDo0MnB4O2JvcmRlci1yYWRpdXM6NTAlO2ZsZXgtc2hyaW5rOjA7CiAgZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtqdXN0aWZ5LWNvbnRlbnQ6Y2VudGVyOwogIGZvbnQtc2l6ZToxM3B4O2ZvbnQtd2VpZ2h0OjkwMDtsZXR0ZXItc3BhY2luZzowcHg7Cn0KLnJ3LWJhZGdlLmRvbmUgICB7IGJhY2tncm91bmQ6cmdiYSg2MSwyMDEsMTM4LDAuMSk7Y29sb3I6dmFyKC0tZ3JlZW4pO2JvcmRlcjoxLjVweCBzb2xpZCByZ2JhKDYxLDIwMSwxMzgsMC4yNSk7IH0KLnJ3LWJhZGdlLnRvZGF5ICB7IGJhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KDE0NWRlZyxyZ2JhKDI1NSwxMDcsMTU3LDAuMTIpLHJnYmEoOTEsMTc5LDIzOCwwLjA4KSk7Y29sb3I6dmFyKC0tcGluayk7Ym9yZGVyOjEuNXB4IHNvbGlkIHJnYmEoMjU1LDEwNywxNTcsMC4zKTsgfQoucnctYmFkZ2UubG9ja2VkIHsgYmFja2dyb3VuZDpyZ2JhKDAsMCwwLDAuMDQpO2NvbG9yOnZhcigtLW11dGVkKTtib3JkZXI6MS41cHggc29saWQgcmdiYSgwLDAsMCwwLjA4KTsgfQoucnctYmFkZ2UucHJpemUgIHsgYmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoMTQ1ZGVnLHJnYmEoMjU1LDE3OSwwLDAuMTIpLHJnYmEoMjU1LDEwNywxNTcsMC4wOCkpO2NvbG9yOnZhcigtLWdvbGQpO2JvcmRlcjoxLjVweCBzb2xpZCByZ2JhKDI1NSwxNzksMCwwLjMpOyB9CgoucnctbWlkIHsgZmxleDoxO21pbi13aWR0aDowOyB9Ci5ydy1jaGlwcyB7IGRpc3BsYXk6ZmxleDtnYXA6NHB4O2ZsZXgtd3JhcDp3cmFwO2FsaWduLWl0ZW1zOmNlbnRlcjsgfQoucnctY2hpcCB7CiAgZm9udC1zaXplOjEycHg7cGFkZGluZzo1cHggMTJweDtib3JkZXItcmFkaXVzOjIwcHg7Zm9udC13ZWlnaHQ6NzAwOwp9Ci5ydy1jaGlwLmRpbSB7IG9wYWNpdHk6MC40NTsgfQoKLnJ3LWFjdGlvbiB7IGZsZXgtc2hyaW5rOjA7IH0KLmNidG4gewogIHBhZGRpbmc6NXB4IDExcHg7Ym9yZGVyLXJhZGl1czo4cHg7Ym9yZGVyOm5vbmU7CiAgZm9udC1mYW1pbHk6aW5oZXJpdDtmb250LXNpemU6MTBweDtmb250LXdlaWdodDo3MDA7CiAgY3Vyc29yOnBvaW50ZXI7dHJhbnNpdGlvbjphbGwgMC4ycztsZXR0ZXItc3BhY2luZzowLjNweDsKfQouY2J0bi5hY3RpdmUgewogIGJhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KDEzNWRlZywjRkY3MkI4LHZhcigtLXBpbmspKTsKICBjb2xvcjojZmZmO2JveC1zaGFkb3c6MCAycHggMTBweCByZ2JhKDI1NSwxNDIsMTk4LDAuMyk7Cn0KLmNidG4uYWN0aXZlOmFjdGl2ZSB7IHRyYW5zZm9ybTpzY2FsZSgwLjk1KTsgfQouY2J0bi5kb25lICAgeyBiYWNrZ3JvdW5kOnJnYmEoNjEsMjAxLDEzOCwwLjA4KTtib3JkZXI6MXB4IHNvbGlkIHJnYmEoNjEsMjAxLDEzOCwwLjIpO2NvbG9yOnZhcigtLWdyZWVuKTtjdXJzb3I6ZGVmYXVsdDsgfQouY2J0bi5sb2NrZWQgeyBiYWNrZ3JvdW5kOnJnYmEoMCwwLDAsMC4wNCk7Ym9yZGVyOjFweCBzb2xpZCByZ2JhKDAsMCwwLDAuMDgpO2NvbG9yOnZhcigtLW11dGVkKTtjdXJzb3I6ZGVmYXVsdDsgfQoKLyogZXh0cmEgcmV3YXJkIHN0cmlwICovCi5ydy1leHRyYSB7CiAgd2lkdGg6MTAwJTsKICBkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2dhcDo3cHg7CiAgYmFja2dyb3VuZDpyZ2JhKDExNiwyMDAsMjUwLDAuMDkpOwogIHBhZGRpbmc6OHB4IDE0cHg7CiAgYm9yZGVyLXRvcDoxLjVweCBkYXNoZWQgcmdiYSgxMTYsMjAwLDI1MCwwLjMpOwp9Ci5ydy1leHRyYS1sYWJlbCB7CiAgZm9udC1zaXplOjguNXB4O2ZvbnQtd2VpZ2h0OjcwMDtsZXR0ZXItc3BhY2luZzowLjNweDsKICBwYWRkaW5nOjJweCA3cHg7Ym9yZGVyLXJhZGl1czoyMHB4O2ZsZXgtc2hyaW5rOjA7d2hpdGUtc3BhY2U6bm93cmFwOwp9Ci5ydy1leHRyYS1sYWJlbC5vcGVuICAgeyBjb2xvcjp2YXIoLS1ibHVlKTtiYWNrZ3JvdW5kOnJnYmEoMTE2LDIwMCwyNTAsMC4xKTtib3JkZXI6MXB4IHNvbGlkIHJnYmEoMTE2LDIwMCwyNTAsMC4yOCk7IH0KLnJ3LWV4dHJhLWxhYmVsLm1ldCAgICB7IGNvbG9yOnZhcigtLWdyZWVuKTtiYWNrZ3JvdW5kOnJnYmEoNjEsMjAxLDEzOCwwLjA4KTtib3JkZXI6MXB4IHNvbGlkIHJnYmEoNjEsMjAxLDEzOCwwLjIpOyB9Ci5ydy1leHRyYS1sYWJlbC5jbG9zZWQgeyBjb2xvcjp2YXIoLS1tdXRlZCk7YmFja2dyb3VuZDpyZ2JhKDAsMCwwLDAuMDQpO2JvcmRlcjoxcHggc29saWQgcmdiYSgwLDAsMCwwLjA3KTsgfQoucnctZXh0cmEtY29udGVudCB7IGZsZXg6MTttaW4td2lkdGg6MDsgfQoucnctZXh0cmEtY2hpcHMgeyBkaXNwbGF5OmZsZXg7Z2FwOjNweDtmbGV4LXdyYXA6d3JhcDsgfQoucnctZXh0cmEtY29uZCB7CiAgZm9udC1zaXplOjguNXB4O2NvbG9yOnZhcigtLW11dGVkKTttYXJnaW4tdG9wOjJweDtsaW5lLWhlaWdodDoxLjM7CiAgZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtnYXA6M3B4Owp9Ci5ydy1leHRyYS1jb25kLm1ldCB7IGNvbG9yOnZhcigtLWdyZWVuKTsgfQoucnctZXh0cmEtY29uZC5tZXQ6OmJlZm9yZSB7IGNvbnRlbnQ6J+Kckyc7IH0KLnJ3LWV4dHJhLWNvbmQudW5tZXQ6OmJlZm9yZSB7IGNvbnRlbnQ6J+KAuic7IG9wYWNpdHk6MC42OyB9Ci8qIOKUgOKUgOKUgCBUeXBlIDE6IOaomemhjOWIlyArIOW3puWPs+WQhOWNiiAoaGFzLWV4dHJhKSDilIDilIDilIAgKi8KLnJ3LWNhcmQuaGFzLWV4dHJhIHsgZmxleC1kaXJlY3Rpb246IGNvbHVtbjsgfQovKiDmqJnpoYzliJcgKi8KLnJ3LWhlYWQgewogIGRpc3BsYXk6IGZsZXg7IGFsaWduLWl0ZW1zOiBjZW50ZXI7IGdhcDogOHB4OwogIHBhZGRpbmc6IDVweCAxMHB4OwogIGJvcmRlci1ib3R0b206IDFweCBzb2xpZCByZ2JhKDI1NSwxNDIsMTk4LDAuMDgpOwp9Ci5ydy1oZWFkIC5ydy1iYWRnZSB7IHdpZHRoOjI2cHg7aGVpZ2h0OjI2cHg7Zm9udC1zaXplOjEwcHg7IH0KLnJ3LWhlYWQtaW5mbyB7IGZsZXg6IDE7IG1pbi13aWR0aDogMDsgfQoucnctaGVhZC10aXRsZSB7IGZvbnQtc2l6ZTogMTJweDsgZm9udC13ZWlnaHQ6IDcwMDsgY29sb3I6IHZhcigtLXRleHQpOyB9Ci5ydy1oZWFkLXN1YiB7IGZvbnQtc2l6ZTogOXB4OyBjb2xvcjogdmFyKC0tbXV0ZWQpOyBtYXJnaW4tdG9wOiAxcHg7IH0KLnJ3LWhlYWQtdGFnIHsKICBmb250LXNpemU6IDlweDsgZm9udC13ZWlnaHQ6IDcwMDsgcGFkZGluZzogMnB4IDhweDsKICBib3JkZXItcmFkaXVzOiAyMHB4OyB3aGl0ZS1zcGFjZTogbm93cmFwOyBmbGV4LXNocmluazogMDsKfQoucnctaGVhZC10YWcudG9kYXkgIHsgYmFja2dyb3VuZDogbGluZWFyLWdyYWRpZW50KDEzNWRlZyx2YXIoLS1waW5rKSx2YXIoLS1ibHVlMikpOyBjb2xvcjojZmZmOyB9Ci5ydy1oZWFkLXRhZy5kb25lICAgeyBiYWNrZ3JvdW5kOiByZ2JhKDYxLDIwMSwxMzgsMC4xKTsgY29sb3I6dmFyKC0tZ3JlZW4pOyBib3JkZXI6MXB4IHNvbGlkIHJnYmEoNjEsMjAxLDEzOCwwLjIpOyB9Ci5ydy1oZWFkLXRhZy5sb2NrZWQgeyBiYWNrZ3JvdW5kOiByZ2JhKDAsMCwwLDAuMDUpOyBjb2xvcjp2YXIoLS1tdXRlZCk7IH0KLnJ3LWhlYWQtdGFnLnByaXplICB7IGJhY2tncm91bmQ6IHJnYmEoMjU1LDE3OSwwLDAuMTIpOyBjb2xvcjp2YXIoLS1nb2xkKTsgYm9yZGVyOjFweCBzb2xpZCByZ2JhKDI1NSwxNzksMCwwLjI1KTsgfQovKiDlhanmrIQgKi8KLnJ3LWNvbHMgeyBkaXNwbGF5OiBmbGV4OyB9Ci5ydy1sZWZ0IHsKICBmbGV4OiAxOyBkaXNwbGF5OiBmbGV4OyBmbGV4LWRpcmVjdGlvbjogY29sdW1uOwogIGFsaWduLWl0ZW1zOiBjZW50ZXI7IGp1c3RpZnktY29udGVudDogc3BhY2UtYmV0d2VlbjsKICBwYWRkaW5nOiA2cHggOHB4OyBnYXA6IDNweDsgbWluLXdpZHRoOiAwOwp9Ci5ydy1yaWdodCB7CiAgZmxleDogMTsgZGlzcGxheTogZmxleDsgZmxleC1kaXJlY3Rpb246IGNvbHVtbjsKICBhbGlnbi1pdGVtczogY2VudGVyOyBqdXN0aWZ5LWNvbnRlbnQ6IHNwYWNlLWJldHdlZW47CiAgcGFkZGluZzogNnB4IDhweDsgZ2FwOiAzcHg7IG1pbi13aWR0aDogMDsKICBiYWNrZ3JvdW5kOiByZ2JhKDExNiwyMDAsMjUwLDAuMDgpOwogIGJvcmRlci1sZWZ0OiAxLjVweCBkYXNoZWQgcmdiYSgxMTYsMjAwLDI1MCwwLjI4KTsKfQoucnctY29sLXRhZyB7CiAgZm9udC1zaXplOiA4cHg7IGZvbnQtd2VpZ2h0OiA3MDA7IGxldHRlci1zcGFjaW5nOiAwLjRweDsKICBjb2xvcjogdmFyKC0tbXV0ZWQpOyB0ZXh0LXRyYW5zZm9ybTogdXBwZXJjYXNlOyB3aGl0ZS1zcGFjZTogbm93cmFwOwp9Ci5ydy1yaWdodCAucnctY29sLXRhZyB7IGNvbG9yOiAjNEFBQUQ4OyB9Ci5ydy1yZXdhcmQtY2VudGVyIHsgZGlzcGxheTogZmxleDsgZmxleC1kaXJlY3Rpb246IGNvbHVtbjsgYWxpZ24taXRlbXM6IGNlbnRlcjsgZ2FwOiAxcHg7IH0KLnJ3LWJpZy1pY29uIHsgZm9udC1zaXplOiAxOHB4OyBsaW5lLWhlaWdodDogMS4xOyB0ZXh0LWFsaWduOiBjZW50ZXI7IH0KLnJ3LWJpZy1pY29uLmRpbSB7IG9wYWNpdHk6IDAuMzU7IH0KLnJ3LWNvbC12YWwgeyBmb250LXNpemU6IDEzcHg7IGZvbnQtd2VpZ2h0OiA4MDA7IHRleHQtYWxpZ246IGNlbnRlcjsgYmFja2dyb3VuZDpub25lIWltcG9ydGFudDsgYm9yZGVyOm5vbmUhaW1wb3J0YW50OyBwYWRkaW5nOjAhaW1wb3J0YW50OyB9Ci5ydy1jb2wtdmFsLmRpbSB7IG9wYWNpdHk6IDAuNDsgfQoucnctY29sLXN1YiB7IGZvbnQtc2l6ZTogOXB4OyBjb2xvcjogdmFyKC0tbXV0ZWQpOyBmb250LXdlaWdodDogNTAwOyB0ZXh0LWFsaWduOiBjZW50ZXI7IH0KLnJ3LWNvbC1zdWIuZGltIHsgb3BhY2l0eTogMC40OyB9Ci8qIOaineS7tuiGoOWbiiAqLwoucnctY29uZC1waWxsIHsKICBmb250LXNpemU6IDlweDsgZm9udC13ZWlnaHQ6IDcwMDsgcGFkZGluZzogMnB4IDhweDsgYm9yZGVyLXJhZGl1czogMjBweDsKICBiYWNrZ3JvdW5kOiByZ2JhKDExNiwyMDAsMjUwLDAuMSk7IGNvbG9yOiAjNEFBQUQ4OwogIGJvcmRlcjogMXB4IHNvbGlkIHJnYmEoMTE2LDIwMCwyNTAsMC4zKTsgd2hpdGUtc3BhY2U6IG5vd3JhcDsgbWFyZ2luLXRvcDogMnB4Owp9Ci5ydy1jb25kLXBpbGwubWV0IHsKICBiYWNrZ3JvdW5kOiByZ2JhKDYxLDIwMSwxMzgsMC4wOCk7IGNvbG9yOiB2YXIoLS1ncmVlbik7CiAgYm9yZGVyLWNvbG9yOiByZ2JhKDYxLDIwMSwxMzgsMC4yKTsKfQoKLyog4pSA4pSA4pSAIFR5cGUgMjog57SU57C95Yiw5Zau6KGMIChuby1leHRyYSkg4pSA4pSA4pSAICovCi5ydy1jYXJkLm5vLWV4dHJhIHsKICBmbGV4LWRpcmVjdGlvbjogcm93OyBhbGlnbi1pdGVtczogY2VudGVyOwogIHBhZGRpbmc6IDhweCAxMnB4OyBnYXA6IDEwcHg7Cn0KCi8qIG1pbmkgZGVwb3NpdCBwcm9ncmVzcyBiYXIgKi8KLnJ3LWRlcC1wcm9nIHsgbWFyZ2luLXRvcDo1cHg7ZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtnYXA6NnB4OyB9Ci5ydy1kZXAtYmFyIHsgZmxleDoxO2hlaWdodDo0cHg7YmFja2dyb3VuZDpyZ2JhKDAsMCwwLDAuMDgpO2JvcmRlci1yYWRpdXM6MnB4O292ZXJmbG93OmhpZGRlbjttaW4td2lkdGg6NTBweDsgfQoucnctZGVwLWZpbGwgeyBoZWlnaHQ6MTAwJTtiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCg5MGRlZyx2YXIoLS1ibHVlKSx2YXIoLS1ibHVlMikpO2JvcmRlci1yYWRpdXM6MnB4O3RyYW5zaXRpb246d2lkdGggMC41cyBlYXNlOyB9Ci5ydy1kZXAtdGV4dCB7IGZvbnQtc2l6ZTo4cHg7Y29sb3I6dmFyKC0tYmx1ZSk7d2hpdGUtc3BhY2U6bm93cmFwO2ZvbnQtd2VpZ2h0OjYwMDsgfQouY2J0bi5leCB7CiAgZm9udC1zaXplOjEwcHg7cGFkZGluZzo1cHggMTBweDsKfQouY2J0bi5jb25kLXdhaXQgewogIGJhY2tncm91bmQ6cmdiYSgxMTYsMjAwLDI1MCwwLjA5KTtib3JkZXI6MXB4IHNvbGlkIHJnYmEoMTE2LDIwMCwyNTAsMC4yOCk7CiAgY29sb3I6dmFyKC0tYmx1ZSk7Y3Vyc29yOmRlZmF1bHQ7Zm9udC1zaXplOjEwcHg7cGFkZGluZzo1cHggMTBweDsKfQoKLyog4pSA4pSA4pSAIEJVWSBDT05GSVJNIE1PREFMIOKUgOKUgOKUgCAqLwouYnV5LW1hc2sgewogIHBvc2l0aW9uOmZpeGVkO2luc2V0OjA7CiAgYmFja2dyb3VuZDpyZ2JhKDAsMCwwLDAuNDUpO2JhY2tkcm9wLWZpbHRlcjpibHVyKDEwcHgpOwogIHotaW5kZXg6MzUwO2Rpc3BsYXk6ZmxleDthbGlnbi1pdGVtczpjZW50ZXI7anVzdGlmeS1jb250ZW50OmNlbnRlcjsKICBwYWRkaW5nOjI0cHggMjBweDsKICBvcGFjaXR5OjA7cG9pbnRlci1ldmVudHM6bm9uZTsKICB0cmFuc2l0aW9uOm9wYWNpdHkgMC4yNXMgZWFzZTsKfQouYnV5LW1hc2sub3BlbiB7IG9wYWNpdHk6MTtwb2ludGVyLWV2ZW50czphbGw7IH0KLmJ1eS1tb2RhbCB7CiAgd2lkdGg6MTAwJTttYXgtd2lkdGg6MzIwcHg7CiAgYmFja2dyb3VuZDojZmZmO2JvcmRlci1yYWRpdXM6MjRweDsKICBwYWRkaW5nOjI0cHggMjJweCAyMnB4OwogIHBvc2l0aW9uOnJlbGF0aXZlOwogIHRyYW5zZm9ybTpzY2FsZSgwLjkpIHRyYW5zbGF0ZVkoMjBweCk7CiAgdHJhbnNpdGlvbjp0cmFuc2Zvcm0gMC4zMnMgY3ViaWMtYmV6aWVyKDAuMzQsMS41NiwwLjY0LDEpOwogIGJveC1zaGFkb3c6MCAyNHB4IDYwcHggcmdiYSgwLDAsMCwwLjEyKTsKICBvdmVyZmxvdzpoaWRkZW47Cn0KLmJ1eS1tb2RhbDo6YmVmb3JlIHsKICBjb250ZW50OicnO3Bvc2l0aW9uOmFic29sdXRlO3RvcDowO2xlZnQ6MDtyaWdodDowO2hlaWdodDozcHg7CiAgYmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoOTBkZWcsdmFyKC0tcGluayksdmFyKC0tYmx1ZSkpOwp9Ci5idXktbWFzay5vcGVuIC5idXktbW9kYWwgeyB0cmFuc2Zvcm06c2NhbGUoMSkgdHJhbnNsYXRlWSgwKTsgfQouYnV5LWljb24geyBmb250LXNpemU6NDJweDt0ZXh0LWFsaWduOmNlbnRlcjttYXJnaW4tYm90dG9tOjEwcHg7ZGlzcGxheTpibG9jazsgfQouYnV5LWhlYWRpbmcgeyB0ZXh0LWFsaWduOmNlbnRlcjttYXJnaW4tYm90dG9tOjZweDsgfQouYnV5LXN1YnRpdGxlIHsgZm9udC1zaXplOjEwcHg7Y29sb3I6dmFyKC0tbXV0ZWQpO2xldHRlci1zcGFjaW5nOjJweDttYXJnaW4tYm90dG9tOjVweDsgfQouYnV5LXBsYW4tbmFtZSB7IGZvbnQtc2l6ZToxOHB4O2ZvbnQtd2VpZ2h0OjkwMDtjb2xvcjp2YXIoLS10ZXh0KTtsZXR0ZXItc3BhY2luZzoxcHg7IH0KLmJ1eS1wcmljZSB7CiAgdGV4dC1hbGlnbjpjZW50ZXI7CiAgZm9udC1zaXplOjM4cHg7Zm9udC13ZWlnaHQ6OTAwO2xldHRlci1zcGFjaW5nOjFweDsKICBiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCgxMzVkZWcsdmFyKC0tcGluayksdmFyKC0tYmx1ZSkpOwogIC13ZWJraXQtYmFja2dyb3VuZC1jbGlwOnRleHQ7LXdlYmtpdC10ZXh0LWZpbGwtY29sb3I6dHJhbnNwYXJlbnQ7YmFja2dyb3VuZC1jbGlwOnRleHQ7CiAgbWFyZ2luOjEwcHggMCAxOHB4O2xpbmUtaGVpZ2h0OjE7Cn0KLmJ1eS1pbmZvIHsKICBiYWNrZ3JvdW5kOnJnYmEoMTE2LDIwMCwyNTAsMC4wNyk7CiAgYm9yZGVyOjFweCBzb2xpZCByZ2JhKDExNiwyMDAsMjUwLDAuMik7CiAgYm9yZGVyLXJhZGl1czoxNHB4O3BhZGRpbmc6MTNweCAxNXB4OwogIG1hcmdpbi1ib3R0b206MThweDsKICBkaXNwbGF5OmZsZXg7ZmxleC1kaXJlY3Rpb246Y29sdW1uO2dhcDo5cHg7Cn0KLmJ1eS1pbmZvLWl0ZW0gewogIGZvbnQtc2l6ZToxMnB4O2NvbG9yOnZhcigtLXRleHQpO2xpbmUtaGVpZ2h0OjEuNDsKICBkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6ZmxleC1zdGFydDtnYXA6OHB4Owp9Ci5idXktaW5mby1pdGVtIC5iaS1pY29uIHsgZmxleC1zaHJpbms6MDtmb250LXNpemU6MTNweDttYXJnaW4tdG9wOjBweDsgfQouYnV5LWluZm8taXRlbS53YXJuIHsgY29sb3I6dmFyKC0tbXV0ZWQpO2ZvbnQtc2l6ZToxMXB4OyB9Ci5idXktYWN0aW9ucyB7IGRpc3BsYXk6ZmxleDtnYXA6OXB4OyB9Ci5idXktY2FuY2VsIHsKICBmbGV4OjE7cGFkZGluZzoxMnB4IDhweDtib3JkZXItcmFkaXVzOjEycHg7CiAgYm9yZGVyOjEuNXB4IHNvbGlkIHJnYmEoMCwwLDAsMC4wOSk7CiAgYmFja2dyb3VuZDpyZ2JhKDAsMCwwLDAuMDMpO2ZvbnQtZmFtaWx5OmluaGVyaXQ7CiAgZm9udC1zaXplOjEzcHg7Zm9udC13ZWlnaHQ6NzAwO2NvbG9yOnZhcigtLW11dGVkKTsKICBjdXJzb3I6cG9pbnRlcjt0cmFuc2l0aW9uOmFsbCAwLjJzOwogIGRpc3BsYXk6ZmxleDthbGlnbi1pdGVtczpjZW50ZXI7anVzdGlmeS1jb250ZW50OmNlbnRlcjtnYXA6NXB4Owp9Ci5idXktY2FuY2VsOmFjdGl2ZSB7IGJhY2tncm91bmQ6cmdiYSgwLDAsMCwwLjA3KTsgfQouYnV5LWNvbmZpcm0gewogIGZsZXg6MjtwYWRkaW5nOjEycHggOHB4O2JvcmRlci1yYWRpdXM6MTJweDtib3JkZXI6bm9uZTsKICBiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCgxMzVkZWcsI0ZGNzJCOCx2YXIoLS1waW5rKSk7CiAgZm9udC1mYW1pbHk6aW5oZXJpdDtmb250LXNpemU6MTNweDtmb250LXdlaWdodDo3MDA7CiAgY29sb3I6I2ZmZjtjdXJzb3I6cG9pbnRlcjt0cmFuc2l0aW9uOmFsbCAwLjJzOwogIGJveC1zaGFkb3c6MCA0cHggMTRweCByZ2JhKDI1NSwxNDIsMTk4LDAuMyk7CiAgZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtqdXN0aWZ5LWNvbnRlbnQ6Y2VudGVyO2dhcDo1cHg7Cn0KLmJ1eS1jb25maXJtOmFjdGl2ZSB7IHRyYW5zZm9ybTpzY2FsZSgwLjk3KTtib3gtc2hhZG93Om5vbmU7IH0KCi8qIOKUgOKUgOKUgCBQT1BVUFMg4pSA4pSA4pSAICovCi5wb3B1cC1tYXNrIHsKICBwb3NpdGlvbjpmaXhlZDtpbnNldDowO2JhY2tncm91bmQ6cmdiYSgwLDAsMCwwLjcpOwogIGJhY2tkcm9wLWZpbHRlcjpibHVyKDhweCk7ei1pbmRleDoyMDA7CiAgZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmZsZXgtZW5kO2p1c3RpZnktY29udGVudDpjZW50ZXI7CiAgYW5pbWF0aW9uOm1hc2staW4gMC4ycyBlYXNlOwp9CkBrZXlmcmFtZXMgbWFzay1pbiB7IGZyb217b3BhY2l0eTowfSB0b3tvcGFjaXR5OjF9IH0KLnBvcHVwLXNoZWV0IHsKICB3aWR0aDoxMDAlO21heC13aWR0aDp2YXIoLS13KTtiYWNrZ3JvdW5kOiNmZmY7CiAgYm9yZGVyLXJhZGl1czoyNHB4IDI0cHggMCAwO2JvcmRlci10b3A6MS41cHggc29saWQgcmdiYSgyNTUsMTA3LDE1NywwLjIpOwogIHBhZGRpbmctYm90dG9tOmVudihzYWZlLWFyZWEtaW5zZXQtYm90dG9tLDIwcHgpOwogIGFuaW1hdGlvbjpzaGVldC11cCAwLjMycyBjdWJpYy1iZXppZXIoMC4zNCwxLjU2LDAuNjQsMSk7CiAgcG9zaXRpb246cmVsYXRpdmU7b3ZlcmZsb3c6aGlkZGVuOwp9Ci5wb3B1cC1zaGVldDo6YmVmb3JlIHsKICBjb250ZW50OicnO3Bvc2l0aW9uOmFic29sdXRlO3RvcDowO2xlZnQ6MDtyaWdodDowO2hlaWdodDoycHg7CiAgYmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoOTBkZWcsdHJhbnNwYXJlbnQsdmFyKC0tcGluayksdHJhbnNwYXJlbnQpOwp9CkBrZXlmcmFtZXMgc2hlZXQtdXAgeyBmcm9te3RyYW5zZm9ybTp0cmFuc2xhdGVZKDEwMCUpO29wYWNpdHk6MH0gdG97dHJhbnNmb3JtOnRyYW5zbGF0ZVkoMCk7b3BhY2l0eToxfSB9Ci5zaC1oYW5kbGUgeyB3aWR0aDozNHB4O2hlaWdodDozcHg7Ym9yZGVyLXJhZGl1czoycHg7YmFja2dyb3VuZDpyZ2JhKDAsMCwwLDAuMSk7bWFyZ2luOjEwcHggYXV0byAwOyB9Ci5zaC10b3AgeyBwYWRkaW5nOjEycHggMjBweCAwO3RleHQtYWxpZ246Y2VudGVyOyB9Ci5zaC1pY29uIHsgZm9udC1zaXplOjM0cHg7ZGlzcGxheTpibG9jazttYXJnaW4tYm90dG9tOjZweDthbmltYXRpb246Ym91bmNlLWkgMi41cyBlYXNlIGluZmluaXRlOyB9CkBrZXlmcmFtZXMgYm91bmNlLWkgeyAwJSwxMDAle3RyYW5zZm9ybTpzY2FsZSgxKX0gNTAle3RyYW5zZm9ybTpzY2FsZSgxLjEpfSB9Ci5zaC10aXRsZSB7IGZvbnQtc2l6ZToxNnB4O2ZvbnQtd2VpZ2h0OjkwMDtsZXR0ZXItc3BhY2luZzowLjVweDttYXJnaW4tYm90dG9tOjNweDtjb2xvcjp2YXIoLS10ZXh0KTsgfQouc2gtdGl0bGUgc3BhbiB7IGJhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KDEzNWRlZyx2YXIoLS1waW5rKSx2YXIoLS1ibHVlKSk7LXdlYmtpdC1iYWNrZ3JvdW5kLWNsaXA6dGV4dDstd2Via2l0LXRleHQtZmlsbC1jb2xvcjp0cmFuc3BhcmVudDtiYWNrZ3JvdW5kLWNsaXA6dGV4dDsgfQouc2gtaW5mbyB7IGZvbnQtc2l6ZToxMXB4O2NvbG9yOnZhcigtLW11dGVkKTttYXJnaW4tYm90dG9tOjEycHg7IH0KLnNoLXJld2FyZHMgeyBkaXNwbGF5OmZsZXg7Z2FwOjhweDtwYWRkaW5nOjAgMThweDttYXJnaW4tYm90dG9tOjE0cHg7IH0KLnNoLXJjIHsgZmxleDoxO2JhY2tncm91bmQ6cmdiYSgwLDAsMCwwLjAyKTtib3JkZXI6MXB4IHNvbGlkIHJnYmEoMCwwLDAsMC4wNik7Ym9yZGVyLXJhZGl1czoxMnB4O3BhZGRpbmc6MTBweCA2cHg7dGV4dC1hbGlnbjpjZW50ZXI7IH0KLnNoLXJjIC5yaSB7IGZvbnQtc2l6ZToyMHB4O21hcmdpbi1ib3R0b206M3B4O2Rpc3BsYXk6YmxvY2s7IH0KLnNoLXJjIC5ydiB7IGZvbnQtc2l6ZToxMnB4O2ZvbnQtd2VpZ2h0OjkwMDtjb2xvcjp2YXIoLS1waW5rKTsgfQouc2gtcmMgLnJuIHsgZm9udC1zaXplOjlweDtjb2xvcjp2YXIoLS1tdXRlZCk7bWFyZ2luLXRvcDoycHg7IH0KLnNoLWJ0bnMgeyBwYWRkaW5nOjAgMThweCA4cHg7ZGlzcGxheTpmbGV4O2ZsZXgtZGlyZWN0aW9uOmNvbHVtbjtnYXA6N3B4OyB9Ci5zaC1idG4geyB3aWR0aDoxMDAlO3BhZGRpbmc6MTFweDtib3JkZXItcmFkaXVzOjEycHg7Ym9yZGVyOm5vbmU7Zm9udC1mYW1pbHk6aW5oZXJpdDtmb250LXNpemU6MTRweDtmb250LXdlaWdodDo3MDA7Y3Vyc29yOnBvaW50ZXI7dHJhbnNpdGlvbjphbGwgMC4ycztsZXR0ZXItc3BhY2luZzowLjNweDsgfQouc2gtYnRuLnByaW1hcnkgeyBiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCgxMzVkZWcsI0ZGNzJCOCx2YXIoLS1waW5rKSk7Y29sb3I6I2ZmZjtib3gtc2hhZG93OjAgM3B4IDE0cHggcmdiYSgyNTUsMTQyLDE5OCwwLjI4KTsgfQouc2gtYnRuLmRvbmUgeyBiYWNrZ3JvdW5kOnJnYmEoNjEsMjAxLDEzOCwwLjA4KTtib3JkZXI6MXB4IHNvbGlkIHJnYmEoNjEsMjAxLDEzOCwwLjIyKTtjb2xvcjp2YXIoLS1ncmVlbik7Y3Vyc29yOmRlZmF1bHQ7IH0KLnNoLWJ0bi5wcmltYXJ5OmFjdGl2ZSB7IHRyYW5zZm9ybTpzY2FsZSgwLjk3KTsgfQouc2gtYnRuLmdob3N0IHsgYmFja2dyb3VuZDpyZ2JhKDAsMCwwLDAuMDQpO2JvcmRlcjoxcHggc29saWQgcmdiYSgwLDAsMCwwLjA3KTtjb2xvcjp2YXIoLS1tdXRlZCk7Zm9udC1zaXplOjEycHg7IH0KLmNvbmZpcm0tc2hlZXQgewogIHdpZHRoOjEwMCU7bWF4LXdpZHRoOnZhcigtLXcpO2JhY2tncm91bmQ6I2ZmZjtib3JkZXItcmFkaXVzOjI0cHggMjRweCAwIDA7CiAgYm9yZGVyLXRvcDoxcHggc29saWQgcmdiYSgyNDgsMTEzLDExMywwLjIpOwogIHBhZGRpbmc6MjJweCAxOHB4IGNhbGMoZW52KHNhZmUtYXJlYS1pbnNldC1ib3R0b20sMHB4KSArIDIwcHgpOwogIHRleHQtYWxpZ246Y2VudGVyO2FuaW1hdGlvbjpzaGVldC11cCAwLjI4cyBjdWJpYy1iZXppZXIoMC4zNCwxLjU2LDAuNjQsMSk7Cn0KLmNzLWljb24geyBmb250LXNpemU6MzJweDttYXJnaW4tYm90dG9tOjhweDtkaXNwbGF5OmJsb2NrOyB9Ci5jcy10aXRsZSB7IGZvbnQtc2l6ZToxNnB4O2ZvbnQtd2VpZ2h0OjcwMDttYXJnaW4tYm90dG9tOjZweDtjb2xvcjp2YXIoLS10ZXh0KTsgfQouY3MtZGVzYyB7IGZvbnQtc2l6ZToxMnB4O2NvbG9yOnZhcigtLW11dGVkKTtsaW5lLWhlaWdodDoxLjc7bWFyZ2luLWJvdHRvbToxOHB4OyB9Ci5jcy1kZXNjIGIgeyBjb2xvcjp2YXIoLS1waW5rKTsgfQouY3MtYnRucyB7IGRpc3BsYXk6ZmxleDtnYXA6MTBweDsgfQouY3MtYnRucyBidXR0b24geyBmbGV4OjE7cGFkZGluZzoxMXB4O2JvcmRlci1yYWRpdXM6MTBweDtib3JkZXI6bm9uZTtmb250LWZhbWlseTppbmhlcml0O2ZvbnQtc2l6ZToxM3B4O2ZvbnQtd2VpZ2h0OjcwMDtjdXJzb3I6cG9pbnRlcjsgfQouYy1zdGF5ICB7IGJhY2tncm91bmQ6cmdiYSgyNTUsMTA3LDE1NywwLjEpO2JvcmRlcjoxcHggc29saWQgcmdiYSgyNTUsMTA3LDE1NywwLjIyKSFpbXBvcnRhbnQ7Y29sb3I6dmFyKC0tcGluayk7IH0KLmMtbGVhdmUgeyBiYWNrZ3JvdW5kOnJnYmEoMjQ4LDExMywxMTMsMC4wOCk7Ym9yZGVyOjFweCBzb2xpZCByZ2JhKDI0OCwxMTMsMTEzLDAuMikhaW1wb3J0YW50O2NvbG9yOnZhcigtLXJlZCk7IH0KCi8qIHRvYXN0ICovCi50b2FzdCB7CiAgcG9zaXRpb246Zml4ZWQ7dG9wOjIwcHg7bGVmdDo1MCU7CiAgdHJhbnNmb3JtOnRyYW5zbGF0ZVgoLTUwJSkgdHJhbnNsYXRlWSgtMTRweCk7CiAgYmFja2dyb3VuZDpyZ2JhKDYxLDIwMSwxMzgsMC4xKTtib3JkZXI6MXB4IHNvbGlkIHJnYmEoNjEsMjAxLDEzOCwwLjI1KTsKICBjb2xvcjp2YXIoLS1ncmVlbik7cGFkZGluZzo5cHggMThweDtib3JkZXItcmFkaXVzOjEwcHg7CiAgZm9udC1zaXplOjEycHg7Zm9udC13ZWlnaHQ6NjAwO3doaXRlLXNwYWNlOm5vd3JhcDsKICB6LWluZGV4Ojk5OTtvcGFjaXR5OjA7dHJhbnNpdGlvbjphbGwgMC4zcyBlYXNlO3BvaW50ZXItZXZlbnRzOm5vbmU7Cn0KLnRvYXN0LnNob3cgeyBvcGFjaXR5OjE7dHJhbnNmb3JtOnRyYW5zbGF0ZVgoLTUwJSkgdHJhbnNsYXRlWSgwKTsgfQoKLnNwYWNlciB7IGhlaWdodDozMnB4OyB9CgoKLyogU2luZ2xlLXBob25lIG1vZGUgb3ZlcnJpZGVzICovCmh0bWwsIGJvZHkgewogIGJhY2tncm91bmQ6IGxpbmVhci1ncmFkaWVudCgxNjBkZWcsICNGRkU0RjQgMCUsICNENkVFRkYgMTAwJSk7CiAgbWluLWhlaWdodDogMTAwdmg7CiAgZGlzcGxheTogZmxleDsKICBqdXN0aWZ5LWNvbnRlbnQ6IGNlbnRlcjsKICBhbGlnbi1pdGVtczogZmxleC1zdGFydDsKICBvdmVyZmxvdy14OiBoaWRkZW47Cn0KLmRlbW8tc3RhZ2UsIC5kZW1vLWNvbCwgLmRlbW8tbGFiZWwgeyBkaXNwbGF5OiBub25lICFpbXBvcnRhbnQ7IH0KPC9zdHlsZT4KPC9oZWFkPgo8Ym9keT4KPGRpdiBjbGFzcz0icGhvbmUiPgoKPCEtLSBIRVJPIC0tPgo8ZGl2IGNsYXNzPSJoZXJvIj4KICA8ZGl2IGNsYXNzPSJoZXJvLWJnIj48L2Rpdj4KICA8ZGl2IGNsYXNzPSJoZXJvLWV5ZWJyb3ciPumZkOaZgua0u+WLlTwvZGl2PgogIDxkaXYgY2xhc3M9Imhlcm8tdGl0bGUiPumAseWNoea0u+WLlTwvZGl2PgogIDxkaXYgY2xhc3M9Imhlcm8tc3ViIj7os7zosrfljbPkuqsgwrcgN+WkqemAo+e6jOewveWIsOmgmOeNjjwvZGl2PgogIDxkaXYgY2xhc3M9Imhlcm8tcGlsbCI+4q2QIOavj+aXpeeZu+WFpeiHquWLleewveWIsDwvZGl2PgogIDxkaXYgY2xhc3M9InJ1bGVzLXRhYiIgb25jbGljaz0ib3BlblJ1bGVzTW9kYWwoKSI+CiAgICA8c3ZnIHZpZXdCb3g9IjAgMCAxNiAxNiI+PHBhdGggZD0iTTIgMmgxMnYxMkgyeiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEuNSIgcng9IjIiLz48cGF0aCBkPSJNNSA1aDZNNSA4aDZNNSAxMWg0IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMS4zIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48L3N2Zz4KICAgIOimj+WJhwogIDwvZGl2Pgo8L2Rpdj4KCjwhLS0gUExBTiBTRUxFQ1RPUiAtLT4KPGRpdiBjbGFzcz0icGxhbi13cmFwIj4KICA8ZGl2IGNsYXNzPSJwbGFuLXRhYnMiPgogICAgPGRpdiBjbGFzcz0icGxhbi10YWIgYWN0aXZlIiBpZD0idGFiLTUwMCIgb25jbGljaz0ic2VsZWN0UGxhbignNTAwJykiPgogICAgICA8ZGl2IGNsYXNzPSJwdC1iYWRnZSBiYWRnZS1zdGQiPuaomea6ljwvZGl2PgogICAgICA8ZGl2IGNsYXNzPSJwdC1wcmljZSBnb2xkIj41MDA8L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0icHQtdW5pdCI+UEhQIC8gN+WkqTwvZGl2PgogICAgICA8ZGl2IGNsYXNzPSJwdC1jaGVjayI+4pyTPC9kaXY+CiAgICA8L2Rpdj4KICAgIDxkaXYgY2xhc3M9InBsYW4tdGFiIiBpZD0idGFiLTIwMDAiIG9uY2xpY2s9InNlbGVjdFBsYW4oJzIwMDAnKSI+CiAgICAgIDxkaXYgY2xhc3M9InB0LWJhZGdlIGJhZGdlLXByZW0iPuixquiPrzwvZGl2PgogICAgICA8ZGl2IGNsYXNzPSJwdC1wcmljZSBwdXJwbGUiPjIsMDAwPC9kaXY+CiAgICAgIDxkaXYgY2xhc3M9InB0LXVuaXQiPlBIUCAvIDflpKk8L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0icHQtYmVzdCI+5o6o6JamPC9kaXY+CiAgICAgIDxkaXYgY2xhc3M9InB0LWNoZWNrIj7inJM8L2Rpdj4KICAgIDwvZGl2PgogIDwvZGl2PgoKICA8ZGl2IGNsYXNzPSJwbGFuLWRldGFpbCIgaWQ9InBsYW4tZGV0YWlsIiBzdHlsZT0iZGlzcGxheTpub25lIj4KICAgIDxkaXYgY2xhc3M9InBkLXRhZ3MiIGlkPSJwZC10YWdzIj4KICAgICAgPHNwYW4gY2xhc3M9InBkLXRhZyB0LWNhc2giPvCfkrUg54++6YeRPC9zcGFuPgogICAgICA8c3BhbiBjbGFzcz0icGQtdGFnIHQtcG9pbnQiPuKtkCDnqY3liIY8L3NwYW4+CiAgICA8L2Rpdj4KICAgIDxkaXYgY2xhc3M9InBkLW5vdGUiIGlkPSJwZC1ub3RlIj4KICAgICAg5b2p6YeR5rWB5rC05L6d5ZCE5aSp6YWN572uIMK3IOepjeWIhueNjuWLteeEoea1geawtOimgeaxgiDCtyDmr4/pgLHmnJ/pmZDos7zkuIDmrKEKICAgIDwvZGl2PgogICAgPGJ1dHRvbiBjbGFzcz0icGQtYnV5IiBpZD0icGQtYnV5IiBvbmNsaWNrPSJ0cmlnZ2VyQnV5KCkiPueri+WNs+izvOiytyDigJQgNTAwIFBIUDwvYnV0dG9uPgogIDwvZGl2Pgo8L2Rpdj4KCjwhLS0gQ0hFQ0tJTiBQUk9HUkVTUyAtLT4KPGRpdiBjbGFzcz0ic2VjdGlvbiI+CiAgPGRpdiBjbGFzcz0ic2VjLWhkIj4KICAgIDxkaXYgY2xhc3M9InNlYy1saW5lIj48L2Rpdj4KICAgIDxkaXYgY2xhc3M9InNlYy10aXRsZSI+57C95Yiw6YCy5bqmPC9kaXY+CiAgICA8ZGl2IGNsYXNzPSJzZWMtbGluZSByZXYiPjwvZGl2PgogIDwvZGl2PgogIDxkaXYgY2xhc3M9ImNoZWNraW4tY2FyZCI+CiAgICA8ZGl2IGNsYXNzPSJjYy1oZCI+CiAgICAgIDxkaXYgY2xhc3M9ImNjLXRpdGxlIj7mnKzpgLHnsL3liLA8L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0iY2MtYmFkZ2UiIGlkPSJjYy1iYWRnZS10ZXh0Ij7lt7LnsL0gMyAvIDcg5aSpPC9kaXY+CiAgICA8L2Rpdj4KICAgIDxkaXYgY2xhc3M9ImNjLWJhci13cmFwIj4KICAgICAgPGRpdiBjbGFzcz0iY2MtYmFyIj4KICAgICAgICA8ZGl2IGNsYXNzPSJjYy1maWxsIiBzdHlsZT0id2lkdGg6MzglIj48L2Rpdj4KICAgICAgPC9kaXY+CiAgICAgIDxkaXYgY2xhc3M9ImNjLWJhci1sYWJlbCI+5YaNIDQg5aSp6Kej6Y6W57WC5qW15aSn542OIPCfjoE8L2Rpdj4KICAgIDwvZGl2PgogICAgPGRpdiBjbGFzcz0iZGF5cy1zdHJpcCIgaWQ9ImRheXMtc3RyaXAiPgogICAgICA8IS0tIHJlbmRlcmVkIGJ5IEpTIC0tPgogICAgPC9kaXY+CiAgPC9kaXY+CjwvZGl2PgoKPCEtLSBEQUlMWSBSRVdBUkQgTElTVCAtLT4KPGRpdiBjbGFzcz0ic2VjdGlvbiI+CiAgPGRpdiBjbGFzcz0ic2VjLWhkIj4KICAgIDxkaXYgY2xhc3M9InNlYy1saW5lIj48L2Rpdj4KICAgIDxkaXYgY2xhc3M9InNlYy10aXRsZSI+5q+P5pel542O5Yu1PC9kaXY+CiAgICA8ZGl2IGNsYXNzPSJzZWMtbGluZSByZXYiPjwvZGl2PgogIDwvZGl2PgogIDxkaXYgY2xhc3M9InJld2FyZC1saXN0IiBpZD0icmV3YXJkLWxpc3QiPjwvZGl2Pgo8L2Rpdj4KCjxkaXYgY2xhc3M9InNwYWNlciI+PC9kaXY+CjwvZGl2PjwhLS0gL3Bob25lIC0tPgo8IS0tIEJVWSBDT05GSVJNIE1PREFMIC0tPgo8ZGl2IGNsYXNzPSJidXktbWFzayIgaWQ9ImJ1eS1tYXNrIiBvbmNsaWNrPSJoYW5kbGVCdXlNYXNrQ2xpY2soZXZlbnQpIj4KICA8ZGl2IGNsYXNzPSJidXktbW9kYWwiIG9uY2xpY2s9ImV2ZW50LnN0b3BQcm9wYWdhdGlvbigpIj4KICAgIDxzcGFuIGNsYXNzPSJidXktaWNvbiI+8J+bkjwvc3Bhbj4KICAgIDxkaXYgY2xhc3M9ImJ1eS1oZWFkaW5nIj4KICAgICAgPGRpdiBjbGFzcz0iYnV5LXN1YnRpdGxlIj7norroqo3os7zosrc8L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0iYnV5LXBsYW4tbmFtZSIgaWQ9ImJ1eS1wbGFuLW5hbWUiPuixquiPr+WRqOWNoTwvZGl2PgogICAgPC9kaXY+CiAgICA8ZGl2IGNsYXNzPSJidXktcHJpY2UiIGlkPSJidXktcHJpY2UiPuKCsTIsMDAwPC9kaXY+CiAgICA8ZGl2IGNsYXNzPSJidXktaW5mbyI+CiAgICAgIDxkaXYgY2xhc3M9ImJ1eS1pbmZvLWl0ZW0iPgogICAgICAgIDxzcGFuIGNsYXNzPSJiaS1pY29uIj7inKY8L3NwYW4+CiAgICAgICAg6LO86LK35b6M56uL5Y2z6ZaL5aeLIDcg5aSp542O5Yu16YCx5pyfCiAgICAgIDwvZGl2PgogICAgICA8ZGl2IGNsYXNzPSJidXktaW5mby1pdGVtIj4KICAgICAgICA8c3BhbiBjbGFzcz0iYmktaWNvbiI+4pymPC9zcGFuPgogICAgICAgIOavj+aXpeeZu+WFpeWNs+WPr+mgmOWPluWwiOWxrOeNjuWLtQogICAgICA8L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0iYnV5LWluZm8taXRlbSB3YXJuIj4KICAgICAgICA8c3BhbiBjbGFzcz0iYmktaWNvbiI+ITwvc3Bhbj4KICAgICAgICDos7zosrflvozkuI3lj6/pgIDmrL7vvIzoq4vnorroqo3lvozlho3mk43kvZwKICAgICAgPC9kaXY+CiAgICA8L2Rpdj4KICAgIDxkaXYgY2xhc3M9ImJ1eS1hY3Rpb25zIj4KICAgICAgPGJ1dHRvbiBjbGFzcz0iYnV5LWNhbmNlbCIgb25jbGljaz0iY2xvc2VCdXlNb2RhbCgpIj7inJUg5Y+W5raIPC9idXR0b24+CiAgICAgIDxidXR0b24gY2xhc3M9ImJ1eS1jb25maXJtIiBvbmNsaWNrPSJjb25maXJtUHVyY2hhc2UoKSI+8J+bkiDnorroqo3os7zosrc8L2J1dHRvbj4KICAgIDwvZGl2PgogIDwvZGl2Pgo8L2Rpdj4KCjwhLS0gUlVMRVMgTU9EQUwgLS0+CjxkaXYgY2xhc3M9InJ1bGVzLW1hc2siIGlkPSJydWxlcy1tYXNrIiBvbmNsaWNrPSJoYW5kbGVSdWxlc01hc2tDbGljayhldmVudCkiPgogIDxkaXYgY2xhc3M9InJ1bGVzLW1vZGFsIiBvbmNsaWNrPSJldmVudC5zdG9wUHJvcGFnYXRpb24oKSI+CiAgICA8ZGl2IGNsYXNzPSJybS1oZWFkIj4KICAgICAgPGRpdiBjbGFzcz0icm0tdGl0bGUiPua0u+WLleimj+WJhzwvZGl2PgogICAgICA8ZGl2IGNsYXNzPSJybS1jbG9zZSIgb25jbGljaz0iY2xvc2VSdWxlc01vZGFsKCkiPuKclTwvZGl2PgogICAgPC9kaXY+CiAgICA8ZGl2IGNsYXNzPSJybS1ib2R5Ij4KICAgICAgPGRpdiBjbGFzcz0icnVsZS1pdGVtIj48ZGl2IGNsYXNzPSJydWxlLWRvdCI+MTwvZGl2PjxkaXYgY2xhc3M9InJ1bGUtdGV4dCI+5q+P5YCL6YCx5pyf5YOF5Y+v6LO86LK3PGI+5LiA5qyhPC9iPumAseWNoe+8jOmAseacn+e1kOadn+W+jOizh+agvOiHquWLlemHjee9ruOAgjwvZGl2PjwvZGl2PgogICAgICA8ZGl2IGNsYXNzPSJydWxlLWl0ZW0iPjxkaXYgY2xhc3M9InJ1bGUtZG90Ij4yPC9kaXY+PGRpdiBjbGFzcz0icnVsZS10ZXh0Ij7nsL3liLDnjY7li7XmjIk8Yj7lr6bpmpvnmbvlhaXlpKnmlbg8L2I+57Sv6KiI77yM6IulN+WkqeWFp+acquWFqOmDqOewveWIsO+8jOmAseacn+e1kOadn+aZguW8t+WItumHjee9ruOAgjwvZGl2PjwvZGl2PgogICAgICA8ZGl2IGNsYXNzPSJydWxlLWl0ZW0iPjxkaXYgY2xhc3M9InJ1bGUtZG90Ij4zPC9kaXY+PGRpdiBjbGFzcz0icnVsZS10ZXh0Ij48Yj7ml6XluLjnsL3liLDnjY7li7U8L2I+77yIRlJFRe+8ieeZu+WFpeW+jOWPr+ebtOaOpeaJi+WLlemgmOWPlu+8mzxiPumhjeWklueNjuWLtTwvYj7poIjmu7/otrPnlbbml6Xmop3ku7blvozmiY3lj6/poJjlj5bjgII8L2Rpdj48L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0icnVsZS1pdGVtIj48ZGl2IGNsYXNzPSJydWxlLWRvdCI+NDwvZGl2PjxkaXYgY2xhc3M9InJ1bGUtdGV4dCI+5b2p6YeR77yIQm9udXPvvInpoZ7njY7li7XpnIDlrozmiJDlsI3mh4k8Yj7mtYHmsLTlgI3mlbg8L2I+5LmL5pyJ5pWI5oqV5rOo77yM5YW26aSY6aGe5Z6L77yI56mN5YiG44CB5peL6L2J44CB5YSq5oOg5Yi477yJ5LiN6Kit5rWB5rC06KaB5rGC44CCPC9kaXY+PC9kaXY+CiAgICAgIDxkaXYgY2xhc3M9InJ1bGUtaXRlbSI+PGRpdiBjbGFzcz0icnVsZS1kb3QiPjU8L2Rpdj48ZGl2IGNsYXNzPSJydWxlLXRleHQiPumhjeWklueNjuWLteaineS7tumgiOaWvDxiPueVtuaXpSAyNDowMCDliY08L2I+5a6M5oiQ6YGU5qiZ77yM6YC+5pyf6KaW54K65pyq6YGU5qiZ77yM5LiN5LqI6KOc55m844CCPC9kaXY+PC9kaXY+CiAgICAgIDxkaXYgY2xhc3M9InJ1bGUtaXRlbSI+PGRpdiBjbGFzcz0icnVsZS1kb3QiPjY8L2Rpdj48ZGl2IGNsYXNzPSJydWxlLXRleHQiPua0u+WLleacn+mWk+iLpeeNjuWLteimj+WJh+iqv+aVtO+8jDxiPuW3sumgmOWPlueNjuWLtTwvYj7kuI3lj5flvbHpn7/vvIzmnKrpoJjlj5bmjInmnIDmlrDopo/liYfln7fooYzjgII8L2Rpdj48L2Rpdj4KICAgIDwvZGl2PgogIDwvZGl2Pgo8L2Rpdj4KCjwhLS0gQ0hFQ0tJTiBQT1BVUCAtLT4KPGRpdiBjbGFzcz0icG9wdXAtbWFzayIgaWQ9ImNoZWNraW4tcG9wdXAiIHN0eWxlPSJkaXNwbGF5Om5vbmUiIG9uY2xpY2s9ImhhbmRsZU1hc2tDbGljayhldmVudCwnY2hlY2tpbi1wb3B1cCcpIj4KICA8ZGl2IGNsYXNzPSJwb3B1cC1zaGVldCIgb25jbGljaz0iZXZlbnQuc3RvcFByb3BhZ2F0aW9uKCkiIHN0eWxlPSJwb3NpdGlvbjpyZWxhdGl2ZTsiPgogICAgPGJ1dHRvbiBvbmNsaWNrPSJ0cnlDbG9zZUNoZWNraW4oKSIgc3R5bGU9InBvc2l0aW9uOmFic29sdXRlO3RvcDoxMHB4O3JpZ2h0OjE0cHg7YmFja2dyb3VuZDpyZ2JhKDAsMCwwLDAuMDYpO2JvcmRlcjpub25lO2JvcmRlci1yYWRpdXM6NTAlO3dpZHRoOjI0cHg7aGVpZ2h0OjI0cHg7Zm9udC1zaXplOjEzcHg7Y29sb3I6dmFyKC0tbXV0ZWQpO2N1cnNvcjpwb2ludGVyO2Rpc3BsYXk6ZmxleDthbGlnbi1pdGVtczpjZW50ZXI7anVzdGlmeS1jb250ZW50OmNlbnRlcjt6LWluZGV4OjU7Ij7inJU8L2J1dHRvbj4KICAgIDxkaXYgY2xhc3M9InNoLWhhbmRsZSI+PC9kaXY+CiAgICA8ZGl2IGNsYXNzPSJzaC10b3AiPgogICAgICA8c3BhbiBjbGFzcz0ic2gtaWNvbiI+8J+OiTwvc3Bhbj4KICAgICAgPGRpdiBjbGFzcz0ic2gtdGl0bGUiPjxzcGFuPuesrCA0IOWkqeewveWIsOeNjuWLtTwvc3Bhbj48L2Rpdj4KICAgICAgPGRpdiBjbGFzcz0ic2gtaW5mbyIgc3R5bGU9ImNvbG9yOnZhcigtLXRleHQpO2ZvbnQtd2VpZ2h0OjYwMDsiPuWGjeWgheaMgeS4ieWkqeWujOaIkOS7u+WLmTwvZGl2PgogICAgPC9kaXY+CiAgICA8ZGl2IGNsYXNzPSJzaC1yZXdhcmRzIiBpZD0icG9wdXAtcmV3YXJkcyI+PC9kaXY+CiAgICA8ZGl2IHN0eWxlPSJoZWlnaHQ6MTZweCI+PC9kaXY+CiAgPC9kaXY+CjwvZGl2PgoKCgo8c2NyaXB0Pgpjb25zdCBwbGFucyA9IHsKICAnNTAwJzogewogICAgdGFnczogJzxzcGFuIGNsYXNzPSJwZC10YWcgdC1jYXNoIj7wn5K1IOePvumHkTwvc3Bhbj48c3BhbiBjbGFzcz0icGQtdGFnIHQtcG9pbnQiPuKtkCDnqY3liIY8L3NwYW4+JywKICAgIG5vdGU6ICfpgYvnh5/mlofmoYjljYAnLAogICAgYnRuVGV4dDogJ+eri+WNs+izvOiytyDigJQgNTAwIFBIUCcsCiAgICBidG5DbGFzczogJycsCiAgICBkYXlzOiBbCiAgICAgIHsgZnJlZTp7IGNoaXBzOlt7Y2xzOid0LWNhc2gnLHR4dDon8J+StSA1MCBQSFAnfV0gfSwgZXh0cmE6eyBjaGlwczpbe2NsczondC1wb2ludCcsdHh0OifirZAgODAgcHRzJ31dLCBjb25kOifnlbbml6XlrZjmrL4g4omlIDIwMCBQSFAnLCBjb25kTWV0OnRydWUgfSwgIHR1cm5vdmVyOjMsIHN0YXR1czonZG9uZScsICAgc3RyaXBJY29uOifirZAnLCBzdHJpcEhpbnQ6JzUwIFBIUCcgfSwKICAgICAgeyBmcmVlOnsgY2hpcHM6W3tjbHM6J3QtcG9pbnQnLHR4dDon4q2QIDEwMCBwdHMnfV0gfSwgZXh0cmE6eyBjaGlwczpbe2NsczondC1jYXNoJyx0eHQ6J/CfkrUgMzAgUEhQJ31dLCBjb25kOifnlbbml6XlrZjmrL4g4omlIDIwMCBQSFAnLCBjb25kTWV0OnRydWUgfSwgdHVybm92ZXI6Mywgc3RhdHVzOidkb25lJywgICBzdHJpcEljb246J+KtkCcsIHN0cmlwSGludDonMTAwIHB0cycgfSwKICAgICAgeyBmcmVlOnsgY2hpcHM6W3tjbHM6J3QtY2FzaCcsdHh0Oifwn5K1IDYwIFBIUCd9XSB9LCBleHRyYTp7IGNoaXBzOlt7Y2xzOid0LXBvaW50Jyx0eHQ6J+KtkCAxMjAgcHRzJ31dLCBjb25kOifnlbbml6XlrZjmrL4g4omlIDMwMCBQSFAnLCBjb25kTWV0OnRydWUgfSwgdHVybm92ZXI6Mywgc3RhdHVzOidkb25lJywgICBzdHJpcEljb246J+KtkCcsIHN0cmlwSGludDonNjAgUEhQJyB9LAogICAgICB7IGZyZWU6eyBjaGlwczpbe2NsczondC1jYXNoJyx0eHQ6J/CfkrUgNzAgUEhQJ31dIH0sIGV4dHJhOnsgY2hpcHM6W3tjbHM6J3QtY2FzaCcsdHh0Oifwn5K1IDUwIFBIUCd9XSwgY29uZDon55W25pel5a2Y5qy+IOKJpSAzMDAgUEhQJywgY29uZE1ldDpmYWxzZSwgZGVwb3NpdE5vdzoxMjAsIGRlcG9zaXRUYXJnZXQ6MzAwIH0sIHR1cm5vdmVyOjMsIHN0YXR1czondG9kYXknLCAgc3RyaXBJY29uOifwn46AJywgc3RyaXBIaW50Oifku4rml6UnIH0sCiAgICAgIHsgZnJlZTp7IGNoaXBzOlt7Y2xzOid0LXBvaW50Jyx0eHQ6J+KtkCAyMDAgcHRzJ31dIH0sIGV4dHJhOm51bGwsIHR1cm5vdmVyOjMsIHN0YXR1czonbG9ja2VkJywgc3RyaXBJY29uOifwn4yZJywgc3RyaXBIaW50OicyMDAgcHRzJyB9LAogICAgICB7IGZyZWU6eyBjaGlwczpbe2NsczondC1jYXNoJyx0eHQ6J/CfkrUgODAgUEhQJ31dIH0sIGV4dHJhOm51bGwsIHR1cm5vdmVyOjMsIHN0YXR1czonbG9ja2VkJywgc3RyaXBJY29uOifwn4yZJywgc3RyaXBIaW50Oic4MCBQSFAnIH0sCiAgICAgIHsgZnJlZTp7IGNoaXBzOlt7Y2xzOid0LWNhc2gnLHR4dDon8J+StSAxMjAgUEhQJ31dIH0sIGV4dHJhOnsgY2hpcHM6W3tjbHM6J3QtY2FzaCcsdHh0Oifwn5K1IDgwIFBIUCd9XSwgY29uZDon55W25pel5a2Y5qy+IOKJpSA1MDAgUEhQJywgY29uZE1ldDpmYWxzZSB9LCB0dXJub3Zlcjo1LCBzdGF0dXM6J2xvY2tlZCcsIHN0cmlwSWNvbjon8J+MmScsIHN0cmlwSGludDon5aSn542OJyB9LAogICAgXSwKICAgIHBvcHVwUmV3YXJkczogW3sgaWNvbjon8J+StScsIHZhbDonNzAgUEhQJywgbmFtZTon54++6YeRJyB9XSwKICB9LAogICcyMDAwJzogewogICAgdGFnczogJzxzcGFuIGNsYXNzPSJwZC10YWcgdC1jYXNoIj7wn5K1IOePvumHkTwvc3Bhbj48c3BhbiBjbGFzcz0icGQtdGFnIHQtc3BpbiI+8J+OsCDml4vovYk8L3NwYW4+PHNwYW4gY2xhc3M9InBkLXRhZyB0LXBvaW50Ij7irZAg56mN5YiGPC9zcGFuPjxzcGFuIGNsYXNzPSJwZC10YWcgdC1jb3Vwb24iPvCfjp8g5YSq5oOg5Yi4PC9zcGFuPicsCiAgICBub3RlOiAn6YGL54ef5paH5qGI5Y2AJywKICAgIGJ0blRleHQ6ICfnq4vljbPos7zosrcg4oCUIDIsMDAwIFBIUCcsCiAgICBidG5DbGFzczogJ3ByZW0nLAogICAgZGF5czogWwogICAgICB7IGZyZWU6eyBjaGlwczpbe2NsczondC1jYXNoJyx0eHQ6J/CfkrUgMjAwIFBIUCd9XSB9LCBleHRyYTp7IGNoaXBzOlt7Y2xzOid0LWNvdXBvbicsdHh0Oifwn46fIMOXMSd9XSwgY29uZDon55W25pel5a2Y5qy+IOKJpSA1MDAgUEhQJywgY29uZE1ldDp0cnVlIH0sICB0dXJub3Zlcjo1LCBzdGF0dXM6J2RvbmUnLCAgIHN0cmlwSWNvbjon4q2QJywgc3RyaXBIaW50OicyMDAgUEhQJyB9LAogICAgICB7IGZyZWU6eyBjaGlwczpbe2NsczondC1wb2ludCcsdHh0OifirZAgNTAwIHB0cyd9XSB9LCBleHRyYTp7IGNoaXBzOlt7Y2xzOid0LWNhc2gnLHR4dDon8J+StSAxMDAgUEhQJ31dLCBjb25kOifnlbbml6XlrZjmrL4g4omlIDUwMCBQSFAnLCBjb25kTWV0OnRydWUgfSwgdHVybm92ZXI6NSwgc3RhdHVzOidkb25lJywgICBzdHJpcEljb246J+KtkCcsIHN0cmlwSGludDonNTAwIHB0cycgfSwKICAgICAgeyBmcmVlOnsgY2hpcHM6W3tjbHM6J3QtY2FzaCcsdHh0Oifwn5K1IDIyMCBQSFAnfV0gfSwgZXh0cmE6eyBjaGlwczpbe2NsczondC1zcGluJyx0eHQ6J/CfjrAgw5cxNSd9XSwgY29uZDon55W25pel5oqV5rOoIOKJpSA0MDAgUEhQJywgY29uZE1ldDpmYWxzZSB9LCB0dXJub3Zlcjo1LCBzdGF0dXM6J2RvbmUnLCAgIHN0cmlwSWNvbjon4q2QJywgc3RyaXBIaW50OicyMjAgUEhQJyB9LAogICAgICB7IGZyZWU6eyBjaGlwczpbe2NsczondC1jYXNoJyx0eHQ6J/CfkrUgMjUwIFBIUCd9XSB9LCBleHRyYTp7IGNoaXBzOlt7Y2xzOid0LWNhc2gnLHR4dDon8J+StSAxNTAgUEhQJ31dLCBjb25kOifnlbbml6XlrZjmrL4g4omlIDEwMDAgUEhQJywgY29uZE1ldDpmYWxzZSwgZGVwb3NpdE5vdzozNTAsIGRlcG9zaXRUYXJnZXQ6MTAwMCB9LCB0dXJub3Zlcjo1LCBzdGF0dXM6J3RvZGF5JywgIHN0cmlwSWNvbjon8J+OgCcsIHN0cmlwSGludDon5LuK5pelJyB9LAogICAgICB7IGZyZWU6eyBjaGlwczpbe2NsczondC1jYXNoJyx0eHQ6J/CfkrUgMjcwIFBIUCd9XSB9LCBleHRyYTp7IGNoaXBzOlt7Y2xzOid0LXBvaW50Jyx0eHQ6J+KtkCA1MDAgcHRzJ31dLCBjb25kOifnlbbml6XlrZjmrL4g4omlIDEwMDAgUEhQJywgY29uZE1ldDpmYWxzZSB9LCB0dXJub3Zlcjo1LCBzdGF0dXM6J2xvY2tlZCcsIHN0cmlwSWNvbjon8J+MmScsIHN0cmlwSGludDonMjcwIFBIUCcgfSwKICAgICAgeyBmcmVlOnsgY2hpcHM6W3tjbHM6J3Qtc3BpbicsdHh0Oifwn46wIMOXMzAnfV0gfSwgZXh0cmE6eyBjaGlwczpbe2NsczondC1jYXNoJyx0eHQ6J/CfkrUgMjAwIFBIUCd9XSwgY29uZDon55W25pel5a2Y5qy+IOKJpSAxNTAwIFBIUCcsIGNvbmRNZXQ6ZmFsc2UgfSwgdHVybm92ZXI6NSwgc3RhdHVzOidsb2NrZWQnLCBzdHJpcEljb246J/CfjJknLCBzdHJpcEhpbnQ6J8OXMzAg5peL6L2JJyB9LAogICAgICB7IGZyZWU6eyBjaGlwczpbe2NsczondC1jYXNoJyx0eHQ6J/CfkrUgNTAwIFBIUCd9XSB9LCBleHRyYTp7IGNoaXBzOlt7Y2xzOid0LWNvdXBvbicsdHh0Oifwn46fIMOXMyd9XSwgY29uZDon55W25pel5a2Y5qy+IOKJpSAyMDAwIFBIUCcsIGNvbmRNZXQ6ZmFsc2UgfSwgdHVybm92ZXI6OCwgc3RhdHVzOidsb2NrZWQnLCBzdHJpcEljb246J/CfjJknLCBzdHJpcEhpbnQ6J+Wkp+eNjicgfSwKICAgIF0sCiAgICBwb3B1cFJld2FyZHM6IFt7IGljb246J/CfkrUnLCB2YWw6JzI1MCBQSFAnLCBuYW1lOifnj77ph5EnIH0sIHsgaWNvbjon8J+OsCcsIHZhbDonw5cyMCDovYknLCBuYW1lOiflhY3osrvml4vovYknIH1dLAogIH0KfTsKCmxldCBjdXJyZW50UGxhbiA9ICc1MDAnOwpsZXQgZGF5NENsYWltZWQgPSBmYWxzZTsKbGV0IHB1cmNoYXNlZFBsYW4gPSBudWxsOwoKZnVuY3Rpb24gc2VsZWN0UGxhbihrZXksIHNob3dEZXRhaWwgPSB0cnVlKSB7CiAgY3VycmVudFBsYW4gPSBrZXk7CiAgY29uc3QgcCA9IHBsYW5zW2tleV07CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3RhYi01MDAnKS5jbGFzc05hbWUgPSAncGxhbi10YWInICsgKGtleT09PSc1MDAnID8gJyBhY3RpdmUnIDogJycpOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd0YWItMjAwMCcpLmNsYXNzTmFtZSA9ICdwbGFuLXRhYicgKyAoa2V5PT09JzIwMDAnID8gJyBhY3RpdmUtcHJlbWl1bScgOiAnJyk7CiAgY29uc3QgZGV0YWlsID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3BsYW4tZGV0YWlsJyk7CiAgZGV0YWlsLmNsYXNzTmFtZSA9ICdwbGFuLWRldGFpbCcgKyAoa2V5PT09JzIwMDAnID8gJyBwcmVtJyA6ICcnKTsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncGQtdGFncycpLmlubmVySFRNTCA9IHAudGFnczsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncGQtbm90ZScpLmlubmVySFRNTCA9IHAubm90ZTsKICBjb25zdCBidG4gPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncGQtYnV5Jyk7CiAgYnRuLnRleHRDb250ZW50ID0gcC5idG5UZXh0OwogIGJ0bi5jbGFzc05hbWUgPSAncGQtYnV5JyArIChwLmJ0bkNsYXNzID8gJyAnICsgcC5idG5DbGFzcyA6ICcnKTsKICByZW5kZXJDaGVja2luQ2FyZChrZXkpOwogIHJlbmRlckRheVN0cmlwKGtleSk7CiAgcmVuZGVyUmV3YXJkTGlzdChrZXkpOwogIHJlbmRlclBvcHVwUmV3YXJkcyhrZXkpOwogIHVwZGF0ZUJ1eUJ1dHRvbigpOwogIGlmIChzaG93RGV0YWlsKSB7CiAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncGxhbi1kZXRhaWwnKS5zdHlsZS5kaXNwbGF5ID0gJ2Jsb2NrJzsKICB9Cn0KCmZ1bmN0aW9uIHJlbmRlckRheVN0cmlwKGtleSkgewogIGNvbnN0IHAgPSBwbGFuc1trZXldOwogIGNvbnN0IGlzTWluZSA9IChwdXJjaGFzZWRQbGFuID09PSBudWxsIHx8IHB1cmNoYXNlZFBsYW4gPT09IGtleSk7CiAgY29uc3Qgc3RyaXAgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnZGF5cy1zdHJpcCcpOwogIHN0cmlwLmlubmVySFRNTCA9IHAuZGF5cy5tYXAoKGQsIGkpID0+IHsKICAgIGNvbnN0IHN0ID0gaXNNaW5lID8gKChpPT09MyAmJiBkYXk0Q2xhaW1lZCkgPyAnZG9uZScgOiBkLnN0YXR1cykgOiAnbG9ja2VkJzsKICAgIGNvbnN0IGlzTGFzdCA9IGkgPT09IDY7CiAgICBjb25zdCBjb2xDbHMgPSBzdCArIChpc0xhc3QgPyAnIHByaXplJyA6ICcnKTsKICAgIGNvbnN0IGRvdENscyA9IHN0ICsgKGlzTGFzdCA/ICcgYmlnLXByaXplJyA6ICcnKTsKICAgIGxldCBpY29uLCBoaW50OwogICAgaWYgKGlzTWluZSkgewogICAgICBpY29uID0gKGk9PT0zICYmIGRheTRDbGFpbWVkKSA/ICfirZAnIDogZC5zdHJpcEljb247CiAgICAgIGhpbnQgPSAoaT09PTMgJiYgZGF5NENsYWltZWQpID8gJ+W3suewveWIsCcgOiAoc3Q9PT0nZG9uZScgPyAn5bey57C95YiwJyA6IGQuc3RyaXBIaW50KTsKICAgIH0gZWxzZSB7CiAgICAgIGljb24gPSAn8J+MmSc7CiAgICAgIGhpbnQgPSBkLmZyZWUuY2hpcHNbMF0udHh0LnJlcGxhY2UoL15bXlxzXStccy8sICcnKTsKICAgIH0KICAgIHJldHVybiBgCiAgICAgIDxkaXYgY2xhc3M9ImRheS1jb2wgJHtjb2xDbHN9IiBvbmNsaWNrPSJzY3JvbGxUb0RheSgke2krMX0pIj4KICAgICAgICA8ZGl2IGNsYXNzPSJkYXktbnVtIj5EQVkke2krMX08L2Rpdj4KICAgICAgICA8ZGl2IGNsYXNzPSJkYXktZG90ICR7ZG90Q2xzfSI+JHtpY29ufTwvZGl2PgogICAgICAgIDxkaXYgY2xhc3M9ImRheS1yZXdhcmQiPiR7aGludH08L2Rpdj4KICAgICAgPC9kaXY+YDsKICB9KS5qb2luKCcnKTsKfQoKZnVuY3Rpb24gcmVuZGVyQ2hlY2tpbkNhcmQoa2V5KSB7CiAgY29uc3QgaXNNaW5lID0gKHB1cmNoYXNlZFBsYW4gPT09IG51bGwgfHwgcHVyY2hhc2VkUGxhbiA9PT0ga2V5KTsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnY2MtYmFkZ2UtdGV4dCcpLnRleHRDb250ZW50ID0KICAgIGlzTWluZSA/ICflt7LnsL0gMyAvIDcg5aSpJyA6ICcwIC8gNyDlpKknOwogIGRvY3VtZW50LnF1ZXJ5U2VsZWN0b3IoJy5jYy1maWxsJykuc3R5bGUud2lkdGggPQogICAgaXNNaW5lID8gJzM4JScgOiAnMCUnOwogIGRvY3VtZW50LnF1ZXJ5U2VsZWN0b3IoJy5jYy1iYXItbGFiZWwnKS50ZXh0Q29udGVudCA9CiAgICBpc01pbmUgPyAn5ZyoIDQg5aSp5a6M5oiQ57C95Yiw6aCY542OJyA6ICfos7zosrflvozplovlp4vnsL3liLAgwrcgNyDlpKnpgKPnuozop6PpjpblpKfnjY4g8J+OgSc7Cn0KCmZ1bmN0aW9uIHJlbmRlclJld2FyZExpc3Qoa2V5KSB7CiAgY29uc3QgcCA9IHBsYW5zW2tleV07CiAgY29uc3QgbGlzdCA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdyZXdhcmQtbGlzdCcpOwogIGNvbnN0IGlzTWluZSA9IChwdXJjaGFzZWRQbGFuID09PSBudWxsIHx8IHB1cmNoYXNlZFBsYW4gPT09IGtleSk7CiAgY29uc3Qgc3ViTGFiZWwgPSB7ICd0LWNhc2gnOifnj77ph5EnLCAndC1wb2ludCc6J+epjeWIhicsICd0LXNwaW4nOiflhY3osrvml4vovYknLCAndC1jb3Vwb24nOiflhKrmg6DliLgnIH07CgogIGxpc3QuaW5uZXJIVE1MID0gcC5kYXlzLm1hcCgoZCwgaSkgPT4gewogICAgY29uc3Qgc3QgICAgICAgPSBpc01pbmUgPyAoKGk9PT0zICYmIGRheTRDbGFpbWVkKSA/ICdkb25lJyA6IGQuc3RhdHVzKSA6ICdsb2NrZWQnOwogICAgY29uc3QgaXNUb2RheSAgPSBzdCA9PT0gJ3RvZGF5JzsKICAgIGNvbnN0IGlzRG9uZSAgID0gc3QgPT09ICdkb25lJzsKICAgIGNvbnN0IGlzTG9ja2VkID0gc3QgPT09ICdsb2NrZWQnOwogICAgY29uc3QgaGFzRXh0cmFDb25maWcgPSAhIShkLmV4dHJhICYmIGQuZXh0cmEuY2hpcHMgJiYgZC5leHRyYS5jaGlwcy5sZW5ndGggPiAwKTsKCiAgICBjb25zdCBiYWRnZUNscyAgID0gc3Q7CiAgICBjb25zdCBiYWRnZUxhYmVsID0gYEQke2krMX1gOwoKICAgIGNvbnN0IGZjICA9IGQuZnJlZS5jaGlwc1swXTsKICAgIGNvbnN0IGZTcCA9IGZjLnR4dC5pbmRleE9mKCcgJyk7CiAgICBjb25zdCBmSWNvbiA9IGZTcCA+IC0xID8gZmMudHh0LnNsaWNlKDAsIGZTcCkgOiBmYy50eHQ7CiAgICBjb25zdCBmQW10ICA9IGZTcCA+IC0xID8gZmMudHh0LnNsaWNlKGZTcCArIDEpIDogZmMudHh0OwogICAgY29uc3QgZlN1YiAgPSBzdWJMYWJlbFtmYy5jbHNdIHx8ICcnOwoKICAgIC8vIOKUgOKUgCBMT0NLRUQg4pSA4pSACiAgICBpZiAoaXNMb2NrZWQpIHsKICAgICAgaWYgKGhhc0V4dHJhQ29uZmlnKSB7CiAgICAgICAgY29uc3QgZWMgID0gZC5leHRyYS5jaGlwc1swXTsKICAgICAgICBjb25zdCBlU3AgPSBlYy50eHQuaW5kZXhPZignICcpOwogICAgICAgIGNvbnN0IGVJY29uID0gZVNwID4gLTEgPyBlYy50eHQuc2xpY2UoMCwgZVNwKSA6IGVjLnR4dDsKICAgICAgICBjb25zdCBlQW10ICA9IGVTcCA+IC0xID8gZWMudHh0LnNsaWNlKGVTcCArIDEpIDogZWMudHh0OwogICAgICAgIGNvbnN0IGVTdWIgID0gc3ViTGFiZWxbZWMuY2xzXSB8fCAnJzsKICAgICAgICByZXR1cm4gYAogICAgICAgICAgPGRpdiBjbGFzcz0icnctY2FyZCBoYXMtZXh0cmEgbG9ja2VkIiBpZD0icnctZGF5LSR7aSsxfSI+CiAgICAgICAgICAgIDxkaXYgY2xhc3M9InJ3LWhlYWQiPgogICAgICAgICAgICAgIDxkaXYgY2xhc3M9InJ3LWJhZGdlICR7YmFkZ2VDbHN9Ij4ke2JhZGdlTGFiZWx9PC9kaXY+CiAgICAgICAgICAgICAgPGRpdiBjbGFzcz0icnctaGVhZC1pbmZvIj48ZGl2IGNsYXNzPSJydy1oZWFkLXRpdGxlIj7nrKwgJHtpKzF9IOWkqTwvZGl2PjwvZGl2PgogICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgPGRpdiBjbGFzcz0icnctY29scyI+CiAgICAgICAgICAgICAgPGRpdiBjbGFzcz0icnctbGVmdCI+CiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJydy1jb2wtdGFnIj7nsL3liLDnjY7li7U8L2Rpdj4KICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9InJ3LXJld2FyZC1jZW50ZXIiPgogICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJydy1iaWctaWNvbiBkaW0iPiR7Zkljb259PC9kaXY+CiAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9InJ3LWNvbC12YWwgJHtmYy5jbHN9IGRpbSI+JHtmQW10fTwvZGl2PgogICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJydy1jb2wtc3ViIGRpbSI+JHtmU3VifTwvZGl2PgogICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJydy1hY3Rpb24iPjxidXR0b24gY2xhc3M9ImNidG4gbG9ja2VkIj7lvoXop6PpjpY8L2J1dHRvbj48L2Rpdj4KICAgICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJydy1yaWdodCI+CiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJydy1jb2wtdGFnIj7poY3lpJbnjY7li7U8L2Rpdj4KICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9InJ3LXJld2FyZC1jZW50ZXIiPgogICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJydy1iaWctaWNvbiBkaW0iPiR7ZUljb259PC9kaXY+CiAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9InJ3LWNvbC12YWwgJHtlYy5jbHN9IGRpbSI+JHtlQW10fTwvZGl2PgogICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJydy1jb2wtc3ViIGRpbSI+JHtlU3VifTwvZGl2PgogICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJydy1jb25kLXBpbGwiPiR7ZC5leHRyYS5jb25kfTwvZGl2PgogICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJydy1hY3Rpb24iPjxidXR0b24gY2xhc3M9ImNidG4gbG9ja2VkIj7lvoXop6PpjpY8L2J1dHRvbj48L2Rpdj4KICAgICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICA8L2Rpdj5gOwogICAgICB9IGVsc2UgewogICAgICAgIHJldHVybiBgCiAgICAgICAgICA8ZGl2IGNsYXNzPSJydy1jYXJkIGhhcy1leHRyYSBsb2NrZWQiIGlkPSJydy1kYXktJHtpKzF9Ij4KICAgICAgICAgICAgPGRpdiBjbGFzcz0icnctaGVhZCI+CiAgICAgICAgICAgICAgPGRpdiBjbGFzcz0icnctYmFkZ2UgJHtiYWRnZUNsc30iPiR7YmFkZ2VMYWJlbH08L2Rpdj4KICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJydy1oZWFkLWluZm8iPjxkaXYgY2xhc3M9InJ3LWhlYWQtdGl0bGUiPuesrCAke2krMX0g5aSpPC9kaXY+PC9kaXY+CiAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICA8ZGl2IGNsYXNzPSJydy1jb2xzIj4KICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJydy1sZWZ0IiBzdHlsZT0iZmxleDoxIDEgMTAwJSI+CiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJydy1jb2wtdGFnIj7nsL3liLDnjY7li7U8L2Rpdj4KICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9InJ3LXJld2FyZC1jZW50ZXIiPgogICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJydy1iaWctaWNvbiBkaW0iPiR7Zkljb259PC9kaXY+CiAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9InJ3LWNvbC12YWwgJHtmYy5jbHN9IGRpbSI+JHtmQW10fTwvZGl2PgogICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJydy1jb2wtc3ViIGRpbSI+JHtmU3VifTwvZGl2PgogICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJydy1hY3Rpb24iPjxidXR0b24gY2xhc3M9ImNidG4gbG9ja2VkIj7lvoXop6PpjpY8L2J1dHRvbj48L2Rpdj4KICAgICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICA8L2Rpdj5gOwogICAgICB9CiAgICB9CgogICAgLy8g4pSA4pSAIE5PTi1MT0NLRUQg4pSA4pSACiAgICBsZXQgYnRuID0gJyc7CiAgICBpZiAoaXNUb2RheSAmJiAhZGF5NENsYWltZWQpIHsKICAgICAgYnRuID0gYDxidXR0b24gY2xhc3M9ImNidG4gYWN0aXZlIiBvbmNsaWNrPSJvcGVuQ2hlY2tpblBvcHVwKCkiPumgmOWPljwvYnV0dG9uPmA7CiAgICB9IGVsc2UgaWYgKGlzRG9uZSkgewogICAgICBidG4gPSBgPGJ1dHRvbiBjbGFzcz0iY2J0biBkb25lIj7inJMg5bey6aCY5Y+WPC9idXR0b24+YDsKICAgIH0gZWxzZSB7CiAgICAgIGJ0biA9IGA8YnV0dG9uIGNsYXNzPSJjYnRuIGxvY2tlZCI+5b6F6Kej6Y6WPC9idXR0b24+YDsKICAgIH0KCiAgICBpZiAoaGFzRXh0cmFDb25maWcpIHsKICAgICAgLy8g4pSA4pSAIDItY29sIHdpdGggZXh0cmEg4pSA4pSACiAgICAgIGNvbnN0IGV4ICAgICAgICAgICA9IGQuZXh0cmE7CiAgICAgIGNvbnN0IGV4dHJhS2V5ICAgICA9IGAke2tleX0tJHtpfWA7CiAgICAgIGNvbnN0IGV4dHJhQ2xhaW1lZCA9IGV4dHJhQ2xhaW1lZFNldC5oYXMoZXh0cmFLZXkpOwogICAgICBjb25zdCBleERpbSAgICAgICAgPSBpc0RvbmUgJiYgZXguY29uZE1ldCAmJiAhZXh0cmFDbGFpbWVkOwoKICAgICAgY29uc3QgZWMgID0gZXguY2hpcHNbMF07CiAgICAgIGNvbnN0IGVTcCA9IGVjLnR4dC5pbmRleE9mKCcgJyk7CiAgICAgIGNvbnN0IGVJY29uID0gZVNwID4gLTEgPyBlYy50eHQuc2xpY2UoMCwgZVNwKSA6IGVjLnR4dDsKICAgICAgY29uc3QgZUFtdCAgPSBlU3AgPiAtMSA/IGVjLnR4dC5zbGljZShlU3AgKyAxKSA6IGVjLnR4dDsKICAgICAgY29uc3QgZVN1YiAgPSBzdWJMYWJlbFtlYy5jbHNdIHx8ICcnOwoKICAgICAgY29uc3QgZGF5U3ViID0gaXNUb2RheSA/ICfku4rml6Xlj6/poJjlj5YnIDogJyc7CgogICAgICBjb25zdCBjb25kUGlsbCA9IGV4LmNvbmRNZXQKICAgICAgICA/IGA8ZGl2IGNsYXNzPSJydy1jb25kLXBpbGwgbWV0Ij7inJMg5qKd5Lu25bey6YGUPC9kaXY+YAogICAgICAgIDogYDxkaXYgY2xhc3M9InJ3LWNvbmQtcGlsbCI+JHtleC5jb25kfTwvZGl2PmA7CgogICAgICBsZXQgcHJvZ0h0bWwgPSAnJzsKICAgICAgaWYgKGlzVG9kYXkgJiYgIWV4LmNvbmRNZXQgJiYgZXguZGVwb3NpdE5vdyAhPT0gdW5kZWZpbmVkKSB7CiAgICAgICAgY29uc3QgcGN0ICA9IE1hdGgubWluKDEwMCwgTWF0aC5yb3VuZChleC5kZXBvc2l0Tm93IC8gZXguZGVwb3NpdFRhcmdldCAqIDEwMCkpOwogICAgICAgIGNvbnN0IGxlZnQgPSBleC5kZXBvc2l0VGFyZ2V0IC0gZXguZGVwb3NpdE5vdzsKICAgICAgICBwcm9nSHRtbCA9IGA8ZGl2IGNsYXNzPSJydy1kZXAtcHJvZyI+CiAgICAgICAgICA8ZGl2IGNsYXNzPSJydy1kZXAtYmFyIj48ZGl2IGNsYXNzPSJydy1kZXAtZmlsbCIgc3R5bGU9IndpZHRoOiR7cGN0fSUiPjwvZGl2PjwvZGl2PgogICAgICAgICAgPHNwYW4gY2xhc3M9InJ3LWRlcC10ZXh0Ij7igrEke2V4LmRlcG9zaXROb3d9L+KCsSR7ZXguZGVwb3NpdFRhcmdldH0gwrcg6YKE5beu4oKxJHtsZWZ0fTwvc3Bhbj4KICAgICAgICA8L2Rpdj5gOwogICAgICB9CgogICAgICBsZXQgZXhCdG4gPSAnJzsKICAgICAgaWYgKGlzRG9uZSkgewogICAgICAgIGlmIChleC5jb25kTWV0ICYmIGV4dHJhQ2xhaW1lZCkgewogICAgICAgICAgZXhCdG4gPSBgPGJ1dHRvbiBjbGFzcz0iY2J0biBkb25lIj7inJMg5bey6aCY5Y+WPC9idXR0b24+YDsKICAgICAgICB9IGVsc2UgaWYgKGV4LmNvbmRNZXQgJiYgIWV4dHJhQ2xhaW1lZCkgewogICAgICAgICAgZXhCdG4gPSBgPGJ1dHRvbiBjbGFzcz0iY2J0biBsb2NrZWQiPuW3sumBjuacnzwvYnV0dG9uPmA7CiAgICAgICAgfSBlbHNlIHsKICAgICAgICAgIGV4QnRuID0gYDxidXR0b24gY2xhc3M9ImNidG4gY29uZC13YWl0Ij7mnKrpgZTmqJk8L2J1dHRvbj5gOwogICAgICAgIH0KICAgICAgfSBlbHNlIGlmIChpc1RvZGF5ICYmIGV4LmNvbmRNZXQpIHsKICAgICAgICBleEJ0biA9IGA8YnV0dG9uIGNsYXNzPSJjYnRuIGFjdGl2ZSIgb25jbGljaz0iY2xhaW1FeHRyYURheSgnJHtrZXl9Jywke2l9KSI+6aCY5Y+WPC9idXR0b24+YDsKICAgICAgfSBlbHNlIGlmIChpc1RvZGF5ICYmICFleC5jb25kTWV0KSB7CiAgICAgICAgZXhCdG4gPSBgPGJ1dHRvbiBjbGFzcz0iY2J0biBjb25kLXdhaXQiPuacqumBlOaomTwvYnV0dG9uPmA7CiAgICAgIH0gZWxzZSB7CiAgICAgICAgZXhCdG4gPSBgPGJ1dHRvbiBjbGFzcz0iY2J0biBsb2NrZWQiPuW+heino+mOljwvYnV0dG9uPmA7CiAgICAgIH0KCiAgICAgIHJldHVybiBgCiAgICAgICAgPGRpdiBjbGFzcz0icnctY2FyZCBoYXMtZXh0cmEgJHtzdH0iIGlkPSJydy1kYXktJHtpKzF9Ij4KICAgICAgICAgIDxkaXYgY2xhc3M9InJ3LWhlYWQiPgogICAgICAgICAgICA8ZGl2IGNsYXNzPSJydy1iYWRnZSAke2JhZGdlQ2xzfSI+JHtiYWRnZUxhYmVsfTwvZGl2PgogICAgICAgICAgICA8ZGl2IGNsYXNzPSJydy1oZWFkLWluZm8iPgogICAgICAgICAgICAgIDxkaXYgY2xhc3M9InJ3LWhlYWQtdGl0bGUiPuesrCAke2krMX0g5aSpPC9kaXY+CiAgICAgICAgICAgICAgJHtkYXlTdWIgPyBgPGRpdiBjbGFzcz0icnctaGVhZC1zdWIiPiR7ZGF5U3VifTwvZGl2PmAgOiAnJ30KICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICA8L2Rpdj4KICAgICAgICAgIDxkaXYgY2xhc3M9InJ3LWNvbHMiPgogICAgICAgICAgICA8ZGl2IGNsYXNzPSJydy1sZWZ0Ij4KICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJydy1jb2wtdGFnIj7nsL3liLDnjY7li7U8L2Rpdj4KICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJydy1yZXdhcmQtY2VudGVyIj4KICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9InJ3LWJpZy1pY29uIj4ke2ZJY29ufTwvZGl2PgogICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0icnctY29sLXZhbCAke2ZjLmNsc30iPiR7ZkFtdH08L2Rpdj4KICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9InJ3LWNvbC1zdWIiPiR7ZlN1Yn08L2Rpdj4KICAgICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJydy1hY3Rpb24iPiR7YnRufTwvZGl2PgogICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgPGRpdiBjbGFzcz0icnctcmlnaHQiPgogICAgICAgICAgICAgIDxkaXYgY2xhc3M9InJ3LWNvbC10YWciPumhjeWklueNjuWLtTwvZGl2PgogICAgICAgICAgICAgIDxkaXYgY2xhc3M9InJ3LXJld2FyZC1jZW50ZXIiPgogICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0icnctYmlnLWljb24ke2V4RGltID8gJyBkaW0nIDogJyd9Ij4ke2VJY29ufTwvZGl2PgogICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0icnctY29sLXZhbCAke2VjLmNsc30ke2V4RGltID8gJyBkaW0nIDogJyd9Ij4ke2VBbXR9PC9kaXY+CiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJydy1jb2wtc3ViJHtleERpbSA/ICcgZGltJyA6ICcnfSI+JHtlU3VifTwvZGl2PgogICAgICAgICAgICAgICAgJHtjb25kUGlsbH0ke3Byb2dIdG1sfQogICAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICAgIDxkaXYgY2xhc3M9InJ3LWFjdGlvbiI+JHtleEJ0bn08L2Rpdj4KICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICA8L2Rpdj4KICAgICAgICA8L2Rpdj5gOwogICAgfSBlbHNlIHsKICAgICAgLy8g4pSA4pSAIHNpbmdsZS1yb3cgKG5vIGV4dHJhIGNvbmZpZ3VyZWQpIOKUgOKUgAogICAgICByZXR1cm4gYAogICAgICAgIDxkaXYgY2xhc3M9InJ3LWNhcmQgbm8tZXh0cmEgJHtzdH0iIGlkPSJydy1kYXktJHtpKzF9Ij4KICAgICAgICAgIDxkaXYgY2xhc3M9InJ3LWJhZGdlICR7YmFkZ2VDbHN9Ij4ke2JhZGdlTGFiZWx9PC9kaXY+CiAgICAgICAgICA8ZGl2IGNsYXNzPSJydy1taWQiPjxkaXYgY2xhc3M9InJ3LWNoaXBzIj4ke2QuZnJlZS5jaGlwcy5tYXAoYyA9PgogICAgICAgICAgICBgPHNwYW4gY2xhc3M9InJ3LWNoaXAgJHtjLmNsc30iPiR7Yy50eHR9PC9zcGFuPmApLmpvaW4oJycpfTwvZGl2PjwvZGl2PgogICAgICAgICAgPGRpdiBjbGFzcz0icnctYWN0aW9uIj4ke2J0bn08L2Rpdj4KICAgICAgICA8L2Rpdj5gOwogICAgfQogIH0pLmpvaW4oJycpOwp9CgovLyBleHRyYSByZXdhcmQgY2xhaW1lZCB0cmFja2luZyAoZGF5MSAmIGRheTIgcHJlLWNsYWltZWQgZm9yIGRlbW8pCmNvbnN0IGV4dHJhQ2xhaW1lZFNldCA9IG5ldyBTZXQoWyc1MDAtMCcsICc1MDAtMScsICcyMDAwLTAnLCAnMjAwMC0xJ10pOwoKZnVuY3Rpb24gY2xhaW1FeHRyYURheShrZXksIGkpIHsKICBleHRyYUNsYWltZWRTZXQuYWRkKGAke2tleX0tJHtpfWApOwogIHJlbmRlclJld2FyZExpc3Qoa2V5KTsKICBzaG93VG9hc3QoJ+KchSDpoY3lpJbnjY7li7Xlt7LpoJjlj5bvvIEnKTsKfQoKZnVuY3Rpb24gc2Nyb2xsVG9EYXkobikgewogIGNvbnN0IGNhcmQgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncnctZGF5LScgKyBuKTsKICBpZiAoIWNhcmQpIHJldHVybjsKICBjYXJkLnNjcm9sbEludG9WaWV3KHsgYmVoYXZpb3I6J3Ntb290aCcsIGJsb2NrOidjZW50ZXInIH0pOwogIGNhcmQuY2xhc3NMaXN0LmFkZCgncnctaGlnaGxpZ2h0Jyk7CiAgc2V0VGltZW91dCgoKSA9PiBjYXJkLmNsYXNzTGlzdC5yZW1vdmUoJ3J3LWhpZ2hsaWdodCcpLCAxNTAwKTsKfQoKZnVuY3Rpb24gcmVuZGVyUG9wdXBSZXdhcmRzKGtleSkgewogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdwb3B1cC1yZXdhcmRzJykuaW5uZXJIVE1MID0gcGxhbnNba2V5XS5wb3B1cFJld2FyZHMubWFwKHIgPT4KICAgIGA8ZGl2IGNsYXNzPSJzaC1yYyI+PHNwYW4gY2xhc3M9InJpIj4ke3IuaWNvbn08L3NwYW4+PGRpdiBjbGFzcz0icnYiPiR7ci52YWx9PC9kaXY+PGRpdiBjbGFzcz0icm4iPiR7ci5uYW1lfTwvZGl2PjwvZGl2PmAKICApLmpvaW4oJycpOwp9CgovLyDilIDilIDilIAgUlVMRVMgTU9EQUwg4pSA4pSA4pSACmZ1bmN0aW9uIG9wZW5SdWxlc01vZGFsKCkgewogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdydWxlcy1tYXNrJykuY2xhc3NMaXN0LmFkZCgnb3BlbicpOwogIGRvY3VtZW50LmJvZHkuc3R5bGUub3ZlcmZsb3cgPSAnaGlkZGVuJzsKfQpmdW5jdGlvbiBjbG9zZVJ1bGVzTW9kYWwoKSB7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3J1bGVzLW1hc2snKS5jbGFzc0xpc3QucmVtb3ZlKCdvcGVuJyk7CiAgZG9jdW1lbnQuYm9keS5zdHlsZS5vdmVyZmxvdyA9ICcnOwp9CmZ1bmN0aW9uIGhhbmRsZVJ1bGVzTWFza0NsaWNrKGUpIHsKICBpZiAoZS50YXJnZXQgPT09IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdydWxlcy1tYXNrJykpIGNsb3NlUnVsZXNNb2RhbCgpOwp9CgovLyDilIDilIDilIAgUE9QVVAgTE9HSUMg4pSA4pSA4pSACmZ1bmN0aW9uIG9wZW5DaGVja2luUG9wdXAoKSB7CiAgcmVuZGVyUG9wdXBSZXdhcmRzKGN1cnJlbnRQbGFuKTsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnY2hlY2tpbi1wb3B1cCcpLnN0eWxlLmRpc3BsYXkgPSAnZmxleCc7Cn0KZnVuY3Rpb24gaGFuZGxlTWFza0NsaWNrKGUsIGlkKSB7CiAgaWYgKGUudGFyZ2V0LmNsYXNzTGlzdC5jb250YWlucygncG9wdXAtbWFzaycpKSB7CiAgICBpZiAoaWQ9PT0nY2hlY2tpbi1wb3B1cCcpIHRyeUNsb3NlQ2hlY2tpbigpOwogIH0KfQpmdW5jdGlvbiB0cnlDbG9zZUNoZWNraW4oKSB7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2NoZWNraW4tcG9wdXAnKS5zdHlsZS5kaXNwbGF5ID0gJ25vbmUnOwp9CmZ1bmN0aW9uIGRvQ2xhaW0oKSB7CiAgZGF5NENsYWltZWQgPSB0cnVlOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdjaGVja2luLXBvcHVwJykuc3R5bGUuZGlzcGxheSA9ICdub25lJzsKICByZW5kZXJDaGVja2luQ2FyZChjdXJyZW50UGxhbik7CiAgcmVuZGVyRGF5U3RyaXAoY3VycmVudFBsYW4pOwogIHJlbmRlclJld2FyZExpc3QoY3VycmVudFBsYW4pOwogIHNob3dUb2FzdCgn8J+OiSDnjY7li7Xlt7LnmbzmlL7oh7PmgqjnmoTluLPmiLbvvIEnKTsKfQpmdW5jdGlvbiB0cmlnZ2VyQnV5KCkgewogIGlmIChwdXJjaGFzZWRQbGFuICE9PSBudWxsKSByZXR1cm47CiAgb3BlbkJ1eU1vZGFsKCk7Cn0KCmZ1bmN0aW9uIG9wZW5CdXlNb2RhbCgpIHsKICBjb25zdCBwbGFuTmFtZSA9IGN1cnJlbnRQbGFuID09PSAnNTAwJyA/ICfmqJnmupblkajljaEnIDogJ+ixquiPr+WRqOWNoSc7CiAgY29uc3QgcHJpY2UgICAgPSBjdXJyZW50UGxhbiA9PT0gJzUwMCcgPyAn4oKxNTAwJyAgICA6ICfigrEyLDAwMCc7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2J1eS1wbGFuLW5hbWUnKS50ZXh0Q29udGVudCA9IHBsYW5OYW1lOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdidXktcHJpY2UnKS50ZXh0Q29udGVudCA9IHByaWNlOwogIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdidXktbWFzaycpLmNsYXNzTGlzdC5hZGQoJ29wZW4nKTsKICBkb2N1bWVudC5ib2R5LnN0eWxlLm92ZXJmbG93ID0gJ2hpZGRlbic7Cn0KCmZ1bmN0aW9uIGNsb3NlQnV5TW9kYWwoKSB7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2J1eS1tYXNrJykuY2xhc3NMaXN0LnJlbW92ZSgnb3BlbicpOwogIGRvY3VtZW50LmJvZHkuc3R5bGUub3ZlcmZsb3cgPSAnJzsKfQoKZnVuY3Rpb24gaGFuZGxlQnV5TWFza0NsaWNrKGUpIHsKICBpZiAoZS50YXJnZXQgPT09IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdidXktbWFzaycpKSBjbG9zZUJ1eU1vZGFsKCk7Cn0KCmZ1bmN0aW9uIGNvbmZpcm1QdXJjaGFzZSgpIHsKICBjbG9zZUJ1eU1vZGFsKCk7CiAgcHVyY2hhc2VkUGxhbiA9IGN1cnJlbnRQbGFuOwogIHVwZGF0ZUJ1eUJ1dHRvbigpOwogIHNob3dUb2FzdCgn4pyFIOizvOiyt+aIkOWKn++8gemAseWNoeW3suWVn+WLlScpOwp9CgpmdW5jdGlvbiB1cGRhdGVCdXlCdXR0b24oKSB7CiAgY29uc3QgYnRuID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3BkLWJ1eScpOwogIGNvbnN0IHAgPSBwbGFuc1tjdXJyZW50UGxhbl07CiAgLy8gY2xlYXIgYWxsIHB1cmNoYXNlZCB0YWdzIG9uIHRhYnMKICBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCcucHQtcHVyY2hhc2VkLXRhZycpLmZvckVhY2goZSA9PiBlLnJlbW92ZSgpKTsKICAvLyBzaG93IHB1cmNoYXNlZCB0YWcgb24gdGhlIHB1cmNoYXNlZCB0YWIKICBpZiAocHVyY2hhc2VkUGxhbikgewogICAgY29uc3QgdGFiID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3RhYi0nICsgcHVyY2hhc2VkUGxhbik7CiAgICBpZiAodGFiKSB7CiAgICAgIGNvbnN0IHRhZyA9IGRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoJ2RpdicpOwogICAgICB0YWcuY2xhc3NOYW1lID0gJ3B0LXB1cmNoYXNlZC10YWcnOwogICAgICB0YWcudGV4dENvbnRlbnQgPSAn4pyTIOW3suizvCc7CiAgICAgIHRhYi5hcHBlbmRDaGlsZCh0YWcpOwogICAgfQogIH0KICBjb25zdCBkZXRhaWwgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncGxhbi1kZXRhaWwnKTsKICBjb25zdCBzZWN0aW9ucyA9IGRvY3VtZW50LnF1ZXJ5U2VsZWN0b3JBbGwoJy5zZWN0aW9uJyk7CiAgY29uc3QgaXNPdGhlclB1cmNoYXNlZCA9IHB1cmNoYXNlZFBsYW4gIT09IG51bGwgJiYgcHVyY2hhc2VkUGxhbiAhPT0gY3VycmVudFBsYW47CgogIGlmIChwdXJjaGFzZWRQbGFuID09PSBjdXJyZW50UGxhbikgewogICAgYnRuLnRleHRDb250ZW50ID0gJ+avj+mAsemZkOizvOS4gOasoSc7CiAgICBidG4uY2xhc3NOYW1lID0gJ3BkLWJ1eSBwdXJjaGFzZWQnOwogIH0gZWxzZSBpZiAoaXNPdGhlclB1cmNoYXNlZCkgewogICAgYnRuLnRleHRDb250ZW50ID0gJ+avj+mAsemZkOizvOS4gOasoSc7CiAgICBidG4uY2xhc3NOYW1lID0gJ3BkLWJ1eSBibG9ja2VkJzsKICB9IGVsc2UgewogICAgYnRuLnRleHRDb250ZW50ID0gcC5idG5UZXh0OwogICAgYnRuLmNsYXNzTmFtZSA9ICdwZC1idXknICsgKHAuYnRuQ2xhc3MgPyAnICcgKyBwLmJ0bkNsYXNzIDogJycpOwogIH0KCiAgLy8gZGltIG5vbi1wdXJjaGFzZWQgcGxhbidzIGNvbnRlbnQKICBpZiAoaXNPdGhlclB1cmNoYXNlZCkgewogICAgZGV0YWlsLmNsYXNzTGlzdC5hZGQoJ2RpbW1lZCcpOwogICAgc2VjdGlvbnMuZm9yRWFjaChzID0+IHMuY2xhc3NMaXN0LmFkZCgnZGltbWVkJykpOwogIH0gZWxzZSB7CiAgICBkZXRhaWwuY2xhc3NMaXN0LnJlbW92ZSgnZGltbWVkJyk7CiAgICBzZWN0aW9ucy5mb3JFYWNoKHMgPT4gcy5jbGFzc0xpc3QucmVtb3ZlKCdkaW1tZWQnKSk7CiAgfQp9CmZ1bmN0aW9uIHNob3dUb2FzdChtc2cpIHsKICBjb25zdCB0ID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3RvYXN0Jyk7CiAgdC50ZXh0Q29udGVudCA9IG1zZzsKICB0LmNsYXNzTGlzdC5hZGQoJ3Nob3cnKTsKICBzZXRUaW1lb3V0KCgpID0+IHQuY2xhc3NMaXN0LnJlbW92ZSgnc2hvdycpLCAyNTAwKTsKfQoKc2VsZWN0UGxhbignNTAwJywgZmFsc2UpOwo8L3NjcmlwdD4KPGRpdiBjbGFzcz0idG9hc3QiIGlkPSJ0b2FzdCI+PC9kaXY+CjwvYm9keT4KPC9odG1sPg=="
+        scrolling="yes"
+        sandbox="allow-scripts allow-same-origin"
+        title="週卡活動前台展示"
+      ></iframe>
+    </div>
+  </div>
+
+  <!-- RIGHT: Spec Document -->
+  <div class="spec-panel">
+    
+
+<!-- DOC HEADER -->
+<div class="doc-header">
+  <h1>週卡活動 — 前台規格文件</h1>
+  <div class="doc-meta">
+    <span>📄 v1.2</span>
+    <span>🎯 適用：RD / QA / PM</span>
+    <span>📐 頁面類型：H5 單頁活動</span>
+  </div>
+</div>
+
+<!-- TOC -->
+<div class="toc">
+  <a href="#s1">1. 頁面總覽</a>
+  <a href="#s2">2. 後台配置項</a>
+  <a href="#s3">3. Hero 區塊</a>
+  <a href="#s4">4. 方案選擇器</a>
+  <a href="#s5">5. 簽到進度卡</a>
+  <a href="#s6">6. 每日獎勵列表</a>
+  <a href="#s7">7. 按鈕狀態規則</a>
+  <a href="#s8">8. 彈窗顯示規則</a>
+  <a href="#s9">9. 存款頁入口彈窗</a>
+  <a href="#s10">10. 活動規則彈窗</a>
+  <a href="#s11">11. 資料介面說明</a>
+</div>
+
+<div class="main">
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 1 -->
+<!-- ═══════════════════════════════════════ -->
+<div class="spec-section" id="s1">
+  <div class="section-head">
+    <div class="section-num">1</div>
+    <div>
+      <div class="section-title">頁面總覽</div>
+      <div class="section-subtitle">頁面結構、活動時間與週卡效期規則</div>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="spec-row wide">
+      <!-- SVG: Page Layout Overview -->
+      <div class="visual-col">
+        <svg viewBox="0 0 340 520" xmlns="http://www.w3.org/2000/svg" style="border:1px solid #E5E7EB;border-radius:12px;background:#F9FAFB;">
+          <!-- phone frame -->
+          <rect x="10" y="10" width="320" height="500" rx="16" fill="#fff" stroke="#E5E7EB" stroke-width="1.5"/>
+          <!-- Hero -->
+          <rect x="10" y="10" width="320" height="90" rx="16" fill="url(#heroGrad)"/>
+          <defs>
+            <linearGradient id="heroGrad" x1="0" y1="0" x2="320" y2="90" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#FFD0EA"/>
+              <stop offset="50%" stop-color="#E4D0FF"/>
+              <stop offset="100%" stop-color="#C8E8FF"/>
+            </linearGradient>
+          </defs>
+          <text x="170" y="44" text-anchor="middle" font-size="18" font-weight="900" fill="#C0206C" font-family="sans-serif">週卡活動</text>
+          <rect x="120" y="52" width="100" height="16" rx="8" fill="rgba(255,255,255,0.6)"/>
+          <text x="170" y="64" text-anchor="middle" font-size="9" fill="#7C3AED" font-family="sans-serif">2024/06/01 — 2024/06/07</text>
+          <!-- rules tab -->
+          <rect x="280" y="68" width="50" height="18" rx="9" fill="#FF8EC6"/>
+          <text x="305" y="80" text-anchor="middle" font-size="8" fill="#fff" font-family="sans-serif">活動規則</text>
+          <!-- label -->
+          <text x="25" y="16" font-size="9" fill="#9CA3AF" font-family="sans-serif" font-weight="700">① HERO</text>
+
+          <!-- Plan Selector -->
+          <rect x="18" y="110" width="304" height="58" rx="10" fill="#FFF4FB" stroke="#FFD0EA" stroke-width="1"/>
+          <rect x="24" y="118" width="140" height="26" rx="8" fill="#FF8EC6"/>
+          <text x="94" y="135" text-anchor="middle" font-size="10" fill="#fff" font-family="sans-serif" font-weight="700">標準週卡 500 PHP</text>
+          <rect x="170" y="118" width="145" height="26" rx="8" fill="rgba(0,0,0,0.04)" stroke="#E5E7EB" stroke-width="1"/>
+          <text x="243" y="135" text-anchor="middle" font-size="10" fill="#9CA3AF" font-family="sans-serif">豪華週卡 2000 PHP</text>
+          <!-- detail row -->
+          <rect x="24" y="149" width="295" height="14" rx="4" fill="#F3F4F6"/>
+          <text x="25" y="16" font-size="9" fill="#9CA3AF" font-family="sans-serif" font-weight="700">① HERO</text>
+          <text x="25" y="110" font-size="9" fill="#9CA3AF" font-family="sans-serif" font-weight="700">② 方案選擇器</text>
+
+          <!-- Progress Card -->
+          <rect x="18" y="178" width="304" height="62" rx="10" fill="#fff" stroke="#E5E7EB" stroke-width="1"/>
+          <text x="28" y="193" font-size="9" fill="#9CA3AF" font-family="sans-serif">已簽 3 / 7 天</text>
+          <rect x="28" y="197" width="285" height="6" rx="3" fill="#F3F4F6"/>
+          <rect x="28" y="197" width="120" height="6" rx="3" fill="url(#progGrad)"/>
+          <defs>
+            <linearGradient id="progGrad" x1="0" y1="0" x2="120" y2="0" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#FF8EC6"/>
+              <stop offset="100%" stop-color="#A078F5"/>
+            </linearGradient>
+          </defs>
+          <!-- 7 dots -->
+          <circle cx="42" cy="222" r="9" fill="rgba(61,201,138,0.15)" stroke="#3DC98A" stroke-width="1.5"/>
+          <text x="42" y="226" text-anchor="middle" font-size="8" fill="#3DC98A" font-family="sans-serif">⭐</text>
+          <circle cx="66" cy="222" r="9" fill="rgba(61,201,138,0.15)" stroke="#3DC98A" stroke-width="1.5"/>
+          <text x="66" y="226" text-anchor="middle" font-size="8" fill="#3DC98A" font-family="sans-serif">⭐</text>
+          <circle cx="90" cy="222" r="9" fill="rgba(61,201,138,0.15)" stroke="#3DC98A" stroke-width="1.5"/>
+          <text x="90" y="226" text-anchor="middle" font-size="8" fill="#3DC98A" font-family="sans-serif">⭐</text>
+          <circle cx="114" cy="222" r="9" fill="rgba(255,114,184,0.12)" stroke="#FF8EC6" stroke-width="1.5"/>
+          <text x="114" y="226" text-anchor="middle" font-size="8" fill="#FF8EC6" font-family="sans-serif">🎀</text>
+          <circle cx="138" cy="222" r="9" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="1.5"/>
+          <text x="138" y="226" text-anchor="middle" font-size="8" fill="#9CA3AF" font-family="sans-serif">🌙</text>
+          <circle cx="162" cy="222" r="9" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="1.5"/>
+          <text x="162" y="226" text-anchor="middle" font-size="8" fill="#9CA3AF" font-family="sans-serif">🌙</text>
+          <circle cx="186" cy="222" r="9" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="1.5"/>
+          <text x="186" y="226" text-anchor="middle" font-size="8" fill="#9CA3AF" font-family="sans-serif">🌙</text>
+          <text x="25" y="180" font-size="9" fill="#9CA3AF" font-family="sans-serif" font-weight="700">③ 簽到進度卡</text>
+
+          <!-- Reward List (3 cards) -->
+          <!-- card 1 done -->
+          <rect x="18" y="251" width="304" height="44" rx="8" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1"/>
+          <rect x="26" y="261" width="20" height="20" rx="6" fill="#3DC98A"/>
+          <text x="36" y="275" text-anchor="middle" font-size="9" fill="#fff" font-family="sans-serif" font-weight="700">D1</text>
+          <text x="54" y="270" font-size="9" fill="#374151" font-family="sans-serif" font-weight="600">💵 50 PHP  |  簽到獎勵</text>
+          <text x="54" y="282" font-size="8" fill="#9CA3AF" font-family="sans-serif">⭐ 80 pts · 額外獎勵 · 已領取</text>
+          <rect x="268" y="263" width="44" height="16" rx="8" fill="rgba(61,201,138,0.1)" stroke="#3DC98A" stroke-width="1"/>
+          <text x="290" y="274" text-anchor="middle" font-size="8" fill="#059669" font-family="sans-serif" font-weight="700">✓ 已領取</text>
+
+          <!-- card today -->
+          <rect x="18" y="300" width="304" height="52" rx="8" fill="rgba(255,114,184,0.05)" stroke="#FFB0D8" stroke-width="1.5"/>
+          <rect x="26" y="310" width="20" height="20" rx="6" fill="#FF8EC6"/>
+          <text x="36" y="324" text-anchor="middle" font-size="9" fill="#fff" font-family="sans-serif" font-weight="700">D4</text>
+          <text x="54" y="316" font-size="9" fill="#374151" font-family="sans-serif" font-weight="600">💵 70 PHP  |  今日可領</text>
+          <text x="54" y="327" font-size="8" fill="#9CA3AF" font-family="sans-serif">💵 50 PHP · 額外 · 存款 ≥ 300 PHP</text>
+          <rect x="268" y="303" width="44" height="16" rx="8" fill="rgba(255,114,184,0.12)" stroke="#FF8EC6" stroke-width="1"/>
+          <text x="290" y="314" text-anchor="middle" font-size="9" fill="#D63384" font-family="sans-serif" font-weight="700">領取</text>
+          <!-- progress bar mini -->
+          <rect x="54" y="332" width="180" height="4" rx="2" fill="#F3F4F6"/>
+          <rect x="54" y="332" width="72" height="4" rx="2" fill="#FF8EC6"/>
+          <text x="240" y="337" font-size="7" fill="#9CA3AF" font-family="sans-serif">120/300</text>
+
+          <!-- card locked -->
+          <rect x="18" y="358" width="304" height="38" rx="8" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1"/>
+          <rect x="26" y="366" width="20" height="20" rx="6" fill="#E5E7EB"/>
+          <text x="36" y="380" text-anchor="middle" font-size="9" fill="#9CA3AF" font-family="sans-serif" font-weight="700">D5</text>
+          <text x="54" y="374" font-size="9" fill="#9CA3AF" font-family="sans-serif">⭐ 200 pts  |  待解鎖</text>
+          <text x="54" y="385" font-size="8" fill="#C4C4C4" font-family="sans-serif">💵 80 PHP · 額外獎勵</text>
+          <rect x="276" y="368" width="36" height="16" rx="8" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="1"/>
+          <text x="294" y="379" text-anchor="middle" font-size="8" fill="#9CA3AF" font-family="sans-serif">待解鎖</text>
+
+          <text x="25" y="252" font-size="9" fill="#9CA3AF" font-family="sans-serif" font-weight="700">④ 每日獎勵列表（7 天）</text>
+
+          <!-- legend -->
+          <rect x="18" y="415" width="304" height="88" rx="8" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1" stroke-dasharray="4,3"/>
+          <text x="170" y="432" text-anchor="middle" font-size="9" fill="#9CA3AF" font-family="sans-serif" font-weight="700">頁面區塊由上至下排列（單頁捲動）</text>
+          <circle cx="36" cy="450" r="6" fill="#3DC98A"/>
+          <text x="46" y="454" font-size="9" fill="#374151" font-family="sans-serif">done（已完成）</text>
+          <circle cx="36" cy="466" r="6" fill="#FF8EC6"/>
+          <text x="46" y="470" font-size="9" fill="#374151" font-family="sans-serif">today（今日）</text>
+          <circle cx="130" cy="450" r="6" fill="#E5E7EB"/>
+          <text x="140" y="454" font-size="9" fill="#374151" font-family="sans-serif">locked（未解鎖）</text>
+          <circle cx="130" cy="466" r="6" fill="#D1D5DB"/>
+          <text x="140" y="470" font-size="9" fill="#374151" font-family="sans-serif">expired（已過期）</text>
+          <text x="25" y="494" font-size="8" fill="#C4C4C4" font-family="sans-serif">★ 以上為示意，顏色與版型請以設計稿為準</text>
+        </svg>
+      </div>
+      <div class="text-col">
+        <h3>頁面結構</h3>
+        <p>頁面為 H5 單頁捲動設計，由上至下依序包含四個主要區塊：</p>
+        <ul>
+          <li><b>① Hero</b>：Banner 圖片 + 活動名稱 + 效期 Pill + 規則入口</li>
+          <li><b>② 方案選擇器</b>：Tab 切換標準 / 豪華週卡規格，含方案詳情卡與購買按鈕</li>
+          <li><b>③ 簽到進度卡</b>：進度條 + 7 天進度點，可點擊跳轉至對應獎勵卡片</li>
+          <li><b>④ 每日獎勵列表</b>：共 7 張卡片，依簽到狀態動態渲染</li>
+        </ul>
+
+        <hr class="sub-divider">
+        <h3>活動時間與週卡效期</h3>
+        <ul>
+          <li><b>活動時間</b>：後台設定起訖，前台僅顯示文字，不做時間控制邏輯</li>
+          <li><b>週卡效期起算</b>：購買完成 API 回傳成功後，<b>當下即計為第 1 天</b>，不等隔日凌晨重置</li>
+          <li><b>效期由後台計算</b>：前台從 API 取得效期區間後直接顯示，格式 <code>YYYY/MM/DD — YYYY/MM/DD</code></li>
+          <li>週期（7 天）結束後用戶資格自動重置，可購買下一週期</li>
+        </ul>
+
+        <div class="callout callout-warn">
+          <span class="callout-icon">⚠️</span>
+          <div><b>特殊情境：</b>用戶於 23:50 購買週卡，當日（購買日）即為第 1 天。即便僅剩 10 分鐘，第 1 天的簽到獎勵仍可在當日 24:00 前領取，過期則不予補發。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 2 -->
+<!-- ═══════════════════════════════════════ -->
+<div class="spec-section" id="s2">
+  <div class="section-head">
+    <div class="section-num">2</div>
+    <div>
+      <div class="section-title">後台配置項總覽</div>
+      <div class="section-subtitle">所有由後台管理後台設定、前台不硬編碼的欄位</div>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="spec-row full">
+      <div class="text-col">
+        <table class="spec-table">
+          <thead>
+            <tr><th>配置項</th><th>說明</th><th>前台渲染方式</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>活動起訖時間</td><td>控制活動顯示期間</td><td>顯示活動日期區間文字</td></tr>
+            <tr><td>Banner 圖片 URL</td><td>Hero 區背景圖，後台上傳後取得 URL</td><td><code>&lt;img src="..."&gt;</code> 渲染，佔滿 Hero 區域</td></tr>
+            <tr><td>週卡規格名稱 / 售價</td><td>支援 2 種規格（可擴充）</td><td>Tab 標籤文字 + 購買按鈕文字</td></tr>
+            <tr><td>各規格運營文案</td><td>每種規格的簡短說明文字</td><td>方案詳情卡中顯示</td></tr>
+            <tr><td>各規格每日普通獎勵</td><td>類型（現金/積分/旋轉/優惠券）+ 數值，共 7 天</td><td>依類型顯示圖示與數值</td></tr>
+            <tr><td>各規格每日額外獎勵</td><td>類型 + 數值（可為 null，代表無額外獎勵）</td><td>有值顯示版型 A；null 顯示版型 B</td></tr>
+            <tr><td>額外獎勵達成條件文字</td><td>例：「當日存款 ≥ 200 PHP」</td><td>直接顯示文字，不解析邏輯</td></tr>
+            <tr><td>各規格每日流水倍數</td><td>彩金（現金 Bonus）對應的流水要求</td><td>顯示流水說明文字；積分/旋轉/券不顯示</td></tr>
+          </tbody>
+        </table>
+        <div class="callout callout-info" style="margin-top:14px">
+          <span class="callout-icon">ℹ️</span>
+          <div>前台不做任何業務規則計算。每日狀態（done / today / locked / expired）、condMet（條件是否達成）、存款進度等，全部由後台 API 回傳，前台依欄位值渲染。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 3 -->
+<!-- ═══════════════════════════════════════ -->
+<div class="spec-section" id="s3">
+  <div class="section-head">
+    <div class="section-num">3</div>
+    <div>
+      <div class="section-title">Hero 區塊</div>
+      <div class="section-subtitle">Banner 圖、活動名稱、效期 Pill、規則入口</div>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="spec-row">
+      <div class="visual-col">
+        <svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg" style="border:1px solid #E5E7EB;border-radius:12px;">
+          <defs>
+            <linearGradient id="hg2" x1="0" y1="0" x2="300" y2="200" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#FFD0EA"/>
+              <stop offset="50%" stop-color="#E4D0FF"/>
+              <stop offset="100%" stop-color="#C8E8FF"/>
+            </linearGradient>
+          </defs>
+          <!-- banner bg -->
+          <rect width="300" height="190" rx="12" fill="url(#hg2)"/>
+          <!-- banner label -->
+          <rect x="8" y="8" width="116" height="16" rx="4" fill="rgba(255,255,255,0.4)" stroke="rgba(255,255,255,0.5)" stroke-width="1" stroke-dasharray="3,2"/>
+          <text x="66" y="20" text-anchor="middle" font-size="8" fill="#7C3AED" font-family="sans-serif" font-weight="700">Banner 圖片（後台上傳）</text>
+          <!-- title -->
+          <text x="150" y="88" text-anchor="middle" font-size="28" font-weight="900" fill="#C0206C" font-family="sans-serif" opacity="0.85">週卡活動</text>
+          <!-- eyebrow -->
+          <text x="150" y="68" text-anchor="middle" font-size="9" fill="#7C3AED" font-family="sans-serif" letter-spacing="4">WEEKLY CARD</text>
+          <!-- pill -->
+          <rect x="88" y="98" width="124" height="18" rx="9" fill="rgba(255,255,255,0.65)" stroke="rgba(255,114,184,0.35)" stroke-width="1"/>
+          <text x="150" y="111" text-anchor="middle" font-size="9" fill="#7C3AED" font-family="sans-serif">📅 2024/06/01 — 2024/06/07</text>
+          <!-- rules tab -->
+          <rect x="248" y="138" width="52" height="22" rx="11" fill="#FF8EC6"/>
+          <text x="274" y="153" text-anchor="middle" font-size="9" fill="#fff" font-family="sans-serif" font-weight="700">活動規則</text>
+          <!-- annotations -->
+          <!-- pill annotation -->
+          <line x1="88" y1="107" x2="60" y2="130" stroke="#A078F5" stroke-width="1" stroke-dasharray="3,2"/>
+          <rect x="6" y="128" width="56" height="22" rx="4" fill="rgba(160,120,245,0.1)" stroke="#A078F5" stroke-width="1"/>
+          <text x="34" y="137" text-anchor="middle" font-size="7" fill="#7C3AED" font-family="sans-serif" font-weight="700">效期 Pill</text>
+          <text x="34" y="147" text-anchor="middle" font-size="7" fill="#7C3AED" font-family="sans-serif">已購 → 個人效期</text>
+          <!-- rules annotation -->
+          <line x1="248" y1="149" x2="220" y2="175" stroke="#FF8EC6" stroke-width="1" stroke-dasharray="3,2"/>
+          <rect x="150" y="173" width="72" height="16" rx="4" fill="rgba(255,142,198,0.1)" stroke="#FF8EC6" stroke-width="1"/>
+          <text x="186" y="184" text-anchor="middle" font-size="7" fill="#D63384" font-family="sans-serif" font-weight="700">點擊 → 規則彈窗</text>
+        </svg>
+      </div>
+      <div class="text-col">
+        <h3>Hero 組成元素</h3>
+        <ul>
+          <li><b>Banner 圖片</b>：後台上傳，以 <code>&lt;img&gt;</code> 渲染，佔滿 Hero 區域（高度固定 190px）。圖片 URL 從 API 取得</li>
+          <li><b>活動名稱</b>：疊加於 Banner 上方，固定顯示「週卡活動」</li>
+          <li><b>效期 Pill</b>：顯示於標題下方
+            <ul>
+              <li>未購買：顯示活動期間（後台設定）</li>
+              <li>已購買：顯示個人週卡效期（後台回傳）</li>
+            </ul>
+          </li>
+          <li><b>規則入口</b>：固定於 Hero 右側，點擊觸發活動規則彈窗（見 §8.5）</li>
+        </ul>
+        <div class="callout callout-info">
+          <span class="callout-icon">ℹ️</span>
+          <div>Banner 圖片若載入失敗，需有 fallback 處理（建議保留漸層背景色作為預設底色），避免區塊空白。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 4 -->
+<!-- ═══════════════════════════════════════ -->
+<div class="spec-section" id="s4">
+  <div class="section-head">
+    <div class="section-num">4</div>
+    <div>
+      <div class="section-title">週卡方案選擇器</div>
+      <div class="section-subtitle">Tab 切換、每週限購、已購 dimmed 狀態</div>
+    </div>
+  </div>
+  <div class="section-body">
+
+    <!-- Row 1: Tab & Detail -->
+    <div class="spec-row wide">
+      <div class="visual-col">
+        <svg viewBox="0 0 360 230" xmlns="http://www.w3.org/2000/svg" style="border:1px solid #E5E7EB;border-radius:12px;background:#F9FAFB;">
+          <text x="12" y="18" font-size="9" fill="#9CA3AF" font-family="sans-serif" font-weight="700">狀態 A — 未購買（預設）</text>
+          <!-- tab bar -->
+          <rect x="10" y="24" width="340" height="36" rx="10" fill="#fff" stroke="#E5E7EB" stroke-width="1"/>
+          <!-- tab 1 active -->
+          <rect x="14" y="27" width="163" height="28" rx="8" fill="#FF8EC6"/>
+          <text x="96" y="45" text-anchor="middle" font-size="11" fill="#fff" font-family="sans-serif" font-weight="700">標準週卡 ⓢ 500 PHP</text>
+          <!-- tab 2 -->
+          <rect x="183" y="27" width="163" height="28" rx="8" fill="transparent"/>
+          <text x="265" y="45" text-anchor="middle" font-size="11" fill="#9CA3AF" font-family="sans-serif">豪華週卡 ✦ 2000 PHP</text>
+
+          <!-- detail card -->
+          <rect x="10" y="66" width="340" height="88" rx="10" fill="#fff" stroke="#E5E7EB" stroke-width="1"/>
+          <!-- reward tags -->
+          <rect x="20" y="76" width="44" height="16" rx="8" fill="rgba(61,201,138,0.1)" stroke="rgba(61,201,138,0.3)" stroke-width="1"/>
+          <text x="42" y="87" text-anchor="middle" font-size="9" fill="#059669" font-family="sans-serif" font-weight="700">💵 現金</text>
+          <rect x="68" y="76" width="44" height="16" rx="8" fill="rgba(255,179,0,0.1)" stroke="rgba(255,179,0,0.3)" stroke-width="1"/>
+          <text x="90" y="87" text-anchor="middle" font-size="9" fill="#B45309" font-family="sans-serif" font-weight="700">⭐ 積分</text>
+          <!-- note text -->
+          <text x="20" y="106" font-size="10" fill="#6B7280" font-family="sans-serif">運營文案區（後台可編輯）</text>
+          <!-- buy btn -->
+          <rect x="20" y="118" width="320" height="30" rx="10" fill="url(#buyGrad)"/>
+          <defs>
+            <linearGradient id="buyGrad" x1="0" y1="0" x2="320" y2="0" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#FF72B8"/>
+              <stop offset="100%" stop-color="#FF8EC6"/>
+            </linearGradient>
+          </defs>
+          <text x="180" y="137" text-anchor="middle" font-size="11" fill="#fff" font-family="sans-serif" font-weight="700">立即購買 — 500 PHP</text>
+
+          <text x="12" y="168" font-size="9" fill="#9CA3AF" font-family="sans-serif" font-weight="700">狀態 B — 已購標準週卡，切換至豪華週卡</text>
+          <!-- dimmed state -->
+          <rect x="10" y="174" width="340" height="50" rx="10" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="1" opacity="0.6"/>
+          <!-- purchased tag on tab1 -->
+          <rect x="14" y="177" width="163" height="22" rx="6" fill="#3DC98A" opacity="0.9"/>
+          <text x="96" y="192" text-anchor="middle" font-size="10" fill="#fff" font-family="sans-serif" font-weight="700">標準週卡  ✓ 已購</text>
+          <rect x="183" y="177" width="163" height="22" rx="6" fill="#FF8EC6"/>
+          <text x="265" y="192" text-anchor="middle" font-size="10" fill="#fff" font-family="sans-serif" font-weight="700">豪華週卡 ✦ 2000 PHP</text>
+          <!-- blocked btn -->
+          <rect x="10" y="202" width="340" height="18" rx="6" fill="#E5E7EB"/>
+          <text x="180" y="214" text-anchor="middle" font-size="9" fill="#9CA3AF" font-family="sans-serif" font-weight="700">每週限購一次（禁用）</text>
+        </svg>
+      </div>
+      <div class="text-col">
+        <h3>規格說明</h3>
+        <ul>
+          <li>共 <b>2 種規格</b>（名稱、售價由後台配置），設計支援擴充</li>
+          <li>每個週期用戶<b>只能購買 1 種</b>，購買後同週期內不可切換，也不可重複購買</li>
+        </ul>
+
+        <h3 style="margin-top:16px">Tab 切換邏輯</h3>
+        <ul>
+          <li>預設選中第 1 種規格</li>
+          <li>切換 Tab 後，同步更新：方案詳情（文案、獎勵標籤）、簽到進度卡、每日獎勵列表、購買按鈕</li>
+        </ul>
+
+        <h3 style="margin-top:16px">已購狀態規則</h3>
+        <ul>
+          <li>已購的 Tab 顯示「✓ 已購」綠色標籤</li>
+          <li>切換至<b>另一規格</b>：整個內容區灰暗（dimmed），購買按鈕顯示「每週限購一次」禁用</li>
+          <li>切換回<b>已購規格</b>：內容區恢復正常</li>
+        </ul>
+
+        <div class="scenario">
+          <div class="scenario-title">⚡ 特殊情境 — 用戶誤觸另一規格 Tab</div>
+          <p>用戶已購標準週卡 → 點擊豪華週卡 Tab → 內容灰暗 + 按鈕禁用 → 點回標準週卡 Tab → 恢復正常。整個過程不呼叫任何 API。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 5 -->
+<!-- ═══════════════════════════════════════ -->
+<div class="spec-section" id="s5">
+  <div class="section-head">
+    <div class="section-num">5</div>
+    <div>
+      <div class="section-title">簽到進度卡</div>
+      <div class="section-subtitle">進度條、天數點狀態、點擊捲動行為</div>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="spec-row">
+      <div class="visual-col">
+        <svg viewBox="0 0 300 260" xmlns="http://www.w3.org/2000/svg" style="border:1px solid #E5E7EB;border-radius:12px;background:#F9FAFB;">
+          <!-- purchased state -->
+          <text x="10" y="16" font-size="9" fill="#9CA3AF" font-family="sans-serif" font-weight="700">已購買 — 已簽 3 / 7 天</text>
+          <rect x="10" y="22" width="280" height="90" rx="10" fill="#fff" stroke="#E5E7EB" stroke-width="1"/>
+          <text x="20" y="38" font-size="10" fill="#374151" font-family="sans-serif" font-weight="700">已簽 3 / 7 天</text>
+          <text x="260" y="38" text-anchor="end" font-size="9" fill="#3DC98A" font-family="sans-serif" font-weight="700">還需 4 天完成</text>
+          <!-- progress bar -->
+          <rect x="20" y="42" width="260" height="7" rx="3.5" fill="#F3F4F6"/>
+          <rect x="20" y="42" width="111" height="7" rx="3.5" fill="url(#pg2)"/>
+          <defs>
+            <linearGradient id="pg2"><stop offset="0%" stop-color="#FF8EC6"/><stop offset="100%" stop-color="#A078F5"/></linearGradient>
+          </defs>
+          <!-- 7 dots row -->
+          <circle cx="35" cy="70" r="11" fill="rgba(61,201,138,0.15)" stroke="#3DC98A" stroke-width="1.5"/>
+          <text x="35" y="74" text-anchor="middle" font-size="10" font-family="sans-serif" fill="#3DC98A">⭐</text>
+          <text x="35" y="90" text-anchor="middle" font-size="7" fill="#9CA3AF" font-family="sans-serif">D1</text>
+
+          <circle cx="75" cy="70" r="11" fill="rgba(61,201,138,0.15)" stroke="#3DC98A" stroke-width="1.5"/>
+          <text x="75" y="74" text-anchor="middle" font-size="10" font-family="sans-serif" fill="#3DC98A">⭐</text>
+          <text x="75" y="90" text-anchor="middle" font-size="7" fill="#9CA3AF" font-family="sans-serif">D2</text>
+
+          <circle cx="115" cy="70" r="11" fill="rgba(61,201,138,0.15)" stroke="#3DC98A" stroke-width="1.5"/>
+          <text x="115" y="74" text-anchor="middle" font-size="10" font-family="sans-serif" fill="#3DC98A">⭐</text>
+          <text x="115" y="90" text-anchor="middle" font-size="7" fill="#9CA3AF" font-family="sans-serif">D3</text>
+
+          <circle cx="155" cy="70" r="13" fill="rgba(255,114,184,0.1)" stroke="#FF8EC6" stroke-width="2"/>
+          <text x="155" y="74" text-anchor="middle" font-size="11" font-family="sans-serif">🎀</text>
+          <text x="155" y="90" text-anchor="middle" font-size="7" fill="#FF8EC6" font-family="sans-serif" font-weight="700">D4 今日</text>
+
+          <circle cx="195" cy="70" r="11" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="1.5"/>
+          <text x="195" y="74" text-anchor="middle" font-size="10" font-family="sans-serif">🌙</text>
+          <text x="195" y="90" text-anchor="middle" font-size="7" fill="#9CA3AF" font-family="sans-serif">D5</text>
+
+          <circle cx="233" cy="70" r="11" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="1.5"/>
+          <text x="233" y="74" text-anchor="middle" font-size="10" font-family="sans-serif">🌙</text>
+          <text x="233" y="90" text-anchor="middle" font-size="7" fill="#9CA3AF" font-family="sans-serif">D6</text>
+
+          <circle cx="271" cy="70" r="11" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="1.5"/>
+          <text x="271" y="74" text-anchor="middle" font-size="10" font-family="sans-serif">🌙</text>
+          <text x="271" y="90" text-anchor="middle" font-size="7" fill="#9CA3AF" font-family="sans-serif">D7</text>
+
+          <!-- unpurchased state -->
+          <text x="10" y="130" font-size="9" fill="#9CA3AF" font-family="sans-serif" font-weight="700">未購買</text>
+          <rect x="10" y="136" width="280" height="65" rx="10" fill="#fff" stroke="#E5E7EB" stroke-width="1"/>
+          <text x="20" y="155" font-size="10" fill="#374151" font-family="sans-serif" font-weight="700">0 / 7 天</text>
+          <rect x="20" y="159" width="260" height="6" rx="3" fill="#F3F4F6"/>
+          <text x="150" y="180" text-anchor="middle" font-size="10" fill="#9CA3AF" font-family="sans-serif">購買後開始簽到 · 7 天連續解鎖大獎 🎁</text>
+          <!-- 7 dots all locked -->
+          <circle cx="35" cy="196" r="8" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="1.5"/>
+          <text x="35" y="200" text-anchor="middle" font-size="8" font-family="sans-serif">🌙</text>
+          <circle cx="75" cy="196" r="8" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="1.5"/>
+          <text x="75" y="200" text-anchor="middle" font-size="8" font-family="sans-serif">🌙</text>
+          <circle cx="115" cy="196" r="8" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="1.5"/>
+          <text x="115" y="200" text-anchor="middle" font-size="8" font-family="sans-serif">🌙</text>
+          <circle cx="155" cy="196" r="8" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="1.5"/>
+          <text x="155" y="200" text-anchor="middle" font-size="8" font-family="sans-serif">🌙</text>
+          <circle cx="195" cy="196" r="8" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="1.5"/>
+          <text x="195" y="200" text-anchor="middle" font-size="8" font-family="sans-serif">🌙</text>
+          <circle cx="233" cy="196" r="8" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="1.5"/>
+          <text x="233" y="200" text-anchor="middle" font-size="8" font-family="sans-serif">🌙</text>
+          <circle cx="271" cy="196" r="8" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="1.5"/>
+          <text x="271" y="200" text-anchor="middle" font-size="8" font-family="sans-serif">🌙</text>
+
+          <!-- legend -->
+          <circle cx="20" cy="232" r="6" fill="rgba(61,201,138,0.15)" stroke="#3DC98A" stroke-width="1.5"/>
+          <text x="30" y="236" font-size="8" fill="#374151" font-family="sans-serif">done</text>
+          <circle cx="74" cy="232" r="6" fill="rgba(255,114,184,0.1)" stroke="#FF8EC6" stroke-width="1.5"/>
+          <text x="84" y="236" font-size="8" fill="#374151" font-family="sans-serif">today</text>
+          <circle cx="132" cy="232" r="6" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="1.5"/>
+          <text x="142" y="236" font-size="8" fill="#374151" font-family="sans-serif">locked</text>
+          <circle cx="194" cy="232" r="6" fill="#E5E7EB" stroke="#D1D5DB" stroke-width="1.5"/>
+          <text x="204" y="236" font-size="8" fill="#374151" font-family="sans-serif">expired</text>
+
+          <text x="10" y="255" font-size="8" fill="#C4C4C4" font-family="sans-serif">★ 點擊天數點 → 頁面滾動至對應獎勵卡片並高亮</text>
+        </svg>
+      </div>
+      <div class="text-col">
+        <h3>天數點狀態</h3>
+        <table class="spec-table">
+          <thead><tr><th>狀態</th><th>觸發條件</th><th>顯示</th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge badge-green">done</span></td><td>該天已完成領取</td><td>綠色底 + ⭐ 圖示</td></tr>
+            <tr><td><span class="badge badge-pink">today</span></td><td>今日，可簽到</td><td>粉色高亮邊框，尺寸略大</td></tr>
+            <tr><td><span class="badge badge-gray">locked</span></td><td>尚未到達的天數</td><td>灰底 + 🌙 圖示</td></tr>
+            <tr><td><span class="badge badge-red">expired</span></td><td>已過期且未領取</td><td>深灰底，無互動</td></tr>
+          </tbody>
+        </table>
+
+        <h3 style="margin-top:16px">特殊規則</h3>
+        <ul>
+          <li>若用戶檢視的 Tab 為<b>未購買的規格</b>，7 個天數點全部強制顯示 <code>locked</code>，不顯示實際進度</li>
+          <li>點擊天數點：頁面以 smooth scroll 滾動至對應獎勵卡片，卡片短暫高亮（約 1.5s）後恢復</li>
+        </ul>
+
+        <div class="scenario">
+          <div class="scenario-title">⚡ 特殊情境 — 已過期天數</div>
+          <p>用戶第 2 天未登入未領取 → D2 狀態為 <code>expired</code> → 進度點顯示灰色（不計入已完成天數）→ 進度條不增加 → D2 獎勵卡片按鈕顯示「已過期」</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 6 -->
+<!-- ═══════════════════════════════════════ -->
+<div class="spec-section" id="s6">
+  <div class="section-head">
+    <div class="section-num">6</div>
+    <div>
+      <div class="section-title">每日獎勵列表</div>
+      <div class="section-subtitle">卡片版型、普通獎勵、額外獎勵、過期規則、全狀態對照</div>
+    </div>
+  </div>
+  <div class="section-body">
+
+    <!-- Card Types -->
+    <div class="spec-row wide">
+      <div class="visual-col">
+        <svg viewBox="0 0 360 340" xmlns="http://www.w3.org/2000/svg" style="border:1px solid #E5E7EB;border-radius:12px;background:#F9FAFB;">
+          <text x="10" y="16" font-size="9" fill="#9CA3AF" font-family="sans-serif" font-weight="700">版型 A — 有額外獎勵（左右雙欄）· 狀態：today</text>
+          <!-- card A today -->
+          <rect x="10" y="22" width="340" height="106" rx="10" fill="rgba(255,114,184,0.04)" stroke="#FFB0D8" stroke-width="1.5"/>
+          <!-- head -->
+          <rect x="18" y="30" width="22" height="22" rx="7" fill="#FF8EC6"/>
+          <text x="29" y="45" text-anchor="middle" font-size="10" fill="#fff" font-family="sans-serif" font-weight="700">D4</text>
+          <text x="46" y="40" font-size="11" fill="#374151" font-family="sans-serif" font-weight="700">第 4 天</text>
+          <text x="46" y="51" font-size="9" fill="#FF8EC6" font-family="sans-serif">今日可領取</text>
+          <!-- left col -->
+          <rect x="18" y="58" width="156" height="62" rx="8" fill="rgba(255,255,255,0.7)" stroke="#E5E7EB" stroke-width="1"/>
+          <text x="96" y="70" text-anchor="middle" font-size="8" fill="#9CA3AF" font-family="sans-serif" font-weight="600">簽到獎勵</text>
+          <text x="96" y="84" text-anchor="middle" font-size="18" font-family="sans-serif">💵</text>
+          <text x="96" y="96" text-anchor="middle" font-size="11" fill="#059669" font-family="sans-serif" font-weight="700">70 PHP</text>
+          <text x="96" y="106" text-anchor="middle" font-size="8" fill="#6B7280" font-family="sans-serif">現金 · 3x流水</text>
+          <rect x="34" y="112" width="124" height="20" rx="8" fill="rgba(255,114,184,0.12)" stroke="#FF8EC6" stroke-width="1"/>
+          <text x="96" y="125" text-anchor="middle" font-size="10" fill="#D63384" font-family="sans-serif" font-weight="700">領取</text>
+          <!-- right col -->
+          <rect x="180" y="58" width="162" height="62" rx="8" fill="rgba(255,255,255,0.7)" stroke="#E5E7EB" stroke-width="1"/>
+          <text x="261" y="70" text-anchor="middle" font-size="8" fill="#9CA3AF" font-family="sans-serif" font-weight="600">額外獎勵</text>
+          <text x="261" y="84" text-anchor="middle" font-size="18" font-family="sans-serif">💵</text>
+          <text x="261" y="96" text-anchor="middle" font-size="11" fill="#059669" font-family="sans-serif" font-weight="700">50 PHP</text>
+          <!-- progress -->
+          <rect x="188" y="100" width="146" height="5" rx="2.5" fill="#F3F4F6"/>
+          <rect x="188" y="100" width="58" height="5" rx="2.5" fill="#FF8EC6"/>
+          <text x="261" y="110" text-anchor="middle" font-size="7" fill="#9CA3AF" font-family="sans-serif">₱120/₱300 · 還差 ₱180</text>
+          <!-- cond-wait btn -->
+          <rect x="196" y="112" width="128" height="20" rx="8" fill="rgba(0,0,0,0.04)" stroke="#E5E7EB" stroke-width="1"/>
+          <text x="260" y="125" text-anchor="middle" font-size="10" fill="#9CA3AF" font-family="sans-serif" font-weight="600">未達標</text>
+
+          <!-- card B -->
+          <text x="10" y="148" font-size="9" fill="#9CA3AF" font-family="sans-serif" font-weight="700">版型 B — 無額外獎勵（單行）· 狀態：done</text>
+          <rect x="10" y="154" width="340" height="42" rx="10" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1"/>
+          <rect x="18" y="162" width="22" height="22" rx="7" fill="#3DC98A"/>
+          <text x="29" y="177" text-anchor="middle" font-size="10" fill="#fff" font-family="sans-serif" font-weight="700">D5</text>
+          <text x="48" y="174" font-size="10" fill="#374151" font-family="sans-serif" font-weight="600">⭐ 200 pts</text>
+          <text x="48" y="185" font-size="8" fill="#9CA3AF" font-family="sans-serif">積分（無流水要求）</text>
+          <rect x="286" y="164" width="56" height="18" rx="8" fill="rgba(61,201,138,0.1)" stroke="#3DC98A" stroke-width="1"/>
+          <text x="314" y="176" text-anchor="middle" font-size="9" fill="#059669" font-family="sans-serif" font-weight="700">✓ 已領取</text>
+
+          <!-- expired card -->
+          <text x="10" y="212" font-size="9" fill="#9CA3AF" font-family="sans-serif" font-weight="700">版型 A — 狀態：expired（普通 + 額外皆過期）</text>
+          <rect x="10" y="218" width="340" height="80" rx="10" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1" opacity="0.9"/>
+          <rect x="18" y="226" width="22" height="22" rx="7" fill="#D1D5DB"/>
+          <text x="29" y="241" text-anchor="middle" font-size="10" fill="#9CA3AF" font-family="sans-serif" font-weight="700">D2</text>
+          <text x="46" y="236" font-size="10" fill="#9CA3AF" font-family="sans-serif">第 2 天（已過期）</text>
+          <rect x="18" y="252" width="156" height="38" rx="8" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="1" opacity="0.7"/>
+          <text x="96" y="265" text-anchor="middle" font-size="8" fill="#C4C4C4" font-family="sans-serif">簽到獎勵</text>
+          <text x="96" y="278" text-anchor="middle" font-size="9" fill="#C4C4C4" font-family="sans-serif">💵 50 PHP</text>
+          <rect x="34" y="284" width="124" height="18" rx="8" fill="#E5E7EB"/>
+          <text x="96" y="295" text-anchor="middle" font-size="9" fill="#9CA3AF" font-family="sans-serif" font-weight="600">已過期</text>
+          <rect x="180" y="252" width="162" height="38" rx="8" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="1" opacity="0.7"/>
+          <text x="261" y="265" text-anchor="middle" font-size="8" fill="#C4C4C4" font-family="sans-serif">額外獎勵</text>
+          <text x="261" y="278" text-anchor="middle" font-size="9" fill="#C4C4C4" font-family="sans-serif">⭐ 80 pts</text>
+          <rect x="196" y="284" width="128" height="18" rx="8" fill="#E5E7EB"/>
+          <text x="260" y="295" text-anchor="middle" font-size="9" fill="#9CA3AF" font-family="sans-serif" font-weight="600">已過期</text>
+
+          <text x="10" y="315" font-size="8" fill="#C4C4C4" font-family="sans-serif">★ 版型 A / B 由後台是否配置「額外獎勵」決定，前台不判斷</text>
+          <text x="10" y="328" font-size="8" fill="#C4C4C4" font-family="sans-serif">★ 普通 + 額外獎勵皆須於當日 24:00 前領取，逾期顯示「已過期」不予補發</text>
+        </svg>
+      </div>
+      <div class="text-col">
+        <h3>卡片版型</h3>
+        <ul>
+          <li><b>版型 A（雙欄）</b>：後台有配置額外獎勵 → 左欄普通獎勵、右欄額外獎勵</li>
+          <li><b>版型 B（單行）</b>：後台未配置額外獎勵（null）→ 僅顯示普通獎勵</li>
+        </ul>
+
+        <h3 style="margin-top:16px">普通簽到獎勵</h3>
+        <ul>
+          <li>支援類型：現金（PHP）、積分（pts）、免費旋轉（次數）、優惠券（張數）</li>
+          <li>現金（Bonus）類型：需附顯示流水倍數說明（倍數由後台配置）</li>
+          <li>積分 / 旋轉 / 優惠券：<b>無流水要求</b>，不顯示流水說明</li>
+        </ul>
+
+        <h3 style="margin-top:16px">額外獎勵規則</h3>
+        <ul>
+          <li>達成條件：<b>僅計算當日（自然日）充值或投注</b>，跨日不累計</li>
+          <li>條件達成即可領取，無需等待其他事件</li>
+          <li><b>過期</b>：當日 24:00 後無論條件達成與否，一律視為過期，顯示「已過期」，不予補發</li>
+        </ul>
+
+        <div class="callout callout-danger">
+          <span class="callout-icon">🚫</span>
+          <div><b>普通獎勵同樣有過期限制：</b>須於當日 24:00 前手動領取。過期後按鈕顯示「已過期」禁用，不予補發。整張卡片呈灰暗樣式。</div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="sub-divider">
+
+    <!-- Full State Table -->
+    <div class="spec-row full">
+      <div class="text-col">
+        <h3>按鈕狀態完整對照表</h3>
+        <table class="spec-table">
+          <thead><tr><th>天數狀態</th><th>普通獎勵按鈕</th><th>額外獎勵按鈕（版型A）</th><th>卡片視覺</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="badge badge-gray">locked</span></td>
+              <td>「待解鎖」<span class="tag-no">禁用</span></td>
+              <td>「待解鎖」<span class="tag-no">禁用</span></td>
+              <td>整卡灰暗</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-pink">today</span>，未領取</td>
+              <td>「領取」<span class="tag-ok">可點擊</span></td>
+              <td>見下方細分</td>
+              <td>粉色高亮</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-pink">today</span>，已領取</td>
+              <td>「✓ 已領取」<span class="tag-no">禁用</span></td>
+              <td>見下方細分</td>
+              <td>正常</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-green">done</span></td>
+              <td>「✓ 已領取」<span class="tag-no">禁用</span></td>
+              <td>見下方細分</td>
+              <td>綠色邊框</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-red">expired</span></td>
+              <td>「已過期」<span class="tag-no">禁用</span></td>
+              <td>「已過期」<span class="tag-no">禁用</span></td>
+              <td>整卡灰暗</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p style="margin-top:14px;font-weight:700;color:#374151;font-size:13px;">額外獎勵按鈕細分（版型 A）：</p>
+        <table class="spec-table" style="margin-top:8px">
+          <thead><tr><th>條件</th><th>按鈕文字</th><th>可點擊</th></tr></thead>
+          <tbody>
+            <tr><td>today + 條件已達標（condMet: true）</td><td>「領取」</td><td class="tag-ok">✅</td></tr>
+            <tr><td>today + 條件未達標（condMet: false）</td><td>「未達標」</td><td class="tag-no">❌</td></tr>
+            <tr><td>done + condMet: true + 已領取</td><td>「✓ 已領取」</td><td class="tag-no">❌</td></tr>
+            <tr><td>done + condMet: true + 未領取（過期）</td><td>「已過期」</td><td class="tag-no">❌</td></tr>
+            <tr><td>done + condMet: false（條件未達標已過日）</td><td>「已過期」</td><td class="tag-no">❌</td></tr>
+            <tr><td>locked</td><td>「待解鎖」</td><td class="tag-no">❌</td></tr>
+          </tbody>
+        </table>
+
+        <div class="scenario" style="margin-top:14px">
+          <div class="scenario-title">⚡ 特殊情境 — 普通已領但額外已過期</div>
+          <p>D3 狀態 done（普通獎勵已於當日領取），但 D3 額外獎勵條件未達標且已過日 → 普通按鈕顯示「✓ 已領取」，額外按鈕顯示「已過期」。卡片整體不灰暗（已完成普通領取）。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 7 -->
+<!-- ═══════════════════════════════════════ -->
+<div class="spec-section" id="s7">
+  <div class="section-head">
+    <div class="section-num">7</div>
+    <div>
+      <div class="section-title">按鈕狀態規則</div>
+      <div class="section-subtitle">購買按鈕三種狀態</div>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="spec-row">
+      <div class="visual-col">
+        <svg viewBox="0 0 300 210" xmlns="http://www.w3.org/2000/svg" style="border:1px solid #E5E7EB;border-radius:12px;background:#F9FAFB;">
+          <!-- state 1: unpurchased -->
+          <text x="10" y="16" font-size="9" fill="#9CA3AF" font-family="sans-serif" font-weight="700">狀態 1 — 本週期未購買</text>
+          <rect x="10" y="22" width="280" height="30" rx="10" fill="url(#b1g)"/>
+          <defs><linearGradient id="b1g"><stop offset="0%" stop-color="#FF72B8"/><stop offset="100%" stop-color="#FF8EC6"/></linearGradient></defs>
+          <text x="150" y="41" text-anchor="middle" font-size="12" fill="#fff" font-family="sans-serif" font-weight="700">立即購買 — 500 PHP</text>
+
+          <!-- state 2: purchased this plan -->
+          <text x="10" y="72" font-size="9" fill="#9CA3AF" font-family="sans-serif" font-weight="700">狀態 2 — 已購買此規格</text>
+          <rect x="10" y="78" width="280" height="30" rx="10" fill="#E5E7EB"/>
+          <text x="150" y="97" text-anchor="middle" font-size="12" fill="#9CA3AF" font-family="sans-serif" font-weight="700">每週限購一次</text>
+          <text x="260" y="120" text-anchor="end" font-size="8" fill="#3DC98A" font-family="sans-serif">Tab 顯示 ✓ 已購</text>
+
+          <!-- state 3: purchased other plan -->
+          <text x="10" y="132" font-size="9" fill="#9CA3AF" font-family="sans-serif" font-weight="700">狀態 3 — 已購買其他規格（整區 dimmed）</text>
+          <rect x="10" y="138" width="280" height="60" rx="10" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="1" opacity="0.7"/>
+          <text x="10" y="138" font-size="9" fill="#E5E7EB" font-family="sans-serif"/>
+          <!-- dimmed overlay hint -->
+          <rect x="10" y="138" width="280" height="60" rx="10" fill="rgba(255,255,255,0.5)"/>
+          <text x="150" y="162" text-anchor="middle" font-size="10" fill="#C4C4C4" font-family="sans-serif">內容區灰暗（dimmed）</text>
+          <rect x="30" y="170" width="240" height="22" rx="8" fill="#E5E7EB"/>
+          <text x="150" y="184" text-anchor="middle" font-size="11" fill="#9CA3AF" font-family="sans-serif" font-weight="700">每週限購一次</text>
+
+          <text x="10" y="208" font-size="8" fill="#C4C4C4" font-family="sans-serif">★ 狀態 2 與狀態 3 的按鈕文字相同，但 3 整個區域呈灰暗</text>
+        </svg>
+      </div>
+      <div class="text-col">
+        <h3>購買按鈕狀態</h3>
+        <table class="spec-table">
+          <thead><tr><th>情況</th><th>按鈕文字</th><th>可點擊</th></tr></thead>
+          <tbody>
+            <tr><td>本週期未購買任何規格</td><td>「立即購買 — {售價}」</td><td class="tag-ok">✅</td></tr>
+            <tr><td>本週期已購買此規格</td><td>「每週限購一次」</td><td class="tag-no">❌</td></tr>
+            <tr><td>本週期已購買其他規格</td><td>「每週限購一次」（整區 dimmed）</td><td class="tag-no">❌</td></tr>
+          </tbody>
+        </table>
+        <ul style="margin-top:12px">
+          <li>點擊可點擊的購買按鈕 → 觸發購買確認彈窗（見 §8.2）</li>
+          <li>購買成功後：Tab 顯示「✓ 已購」標籤、按鈕更新、簽到進度初始化</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 8 -->
+<!-- ═══════════════════════════════════════ -->
+<div class="spec-section" id="s8">
+  <div class="section-head">
+    <div class="section-num">8</div>
+    <div>
+      <div class="section-title">彈窗顯示規則</div>
+      <div class="section-subtitle">四種彈窗的觸發時機、內容、關閉方式</div>
+    </div>
+  </div>
+  <div class="section-body">
+
+    <!-- 8.1 Auto Sheet -->
+    <div class="spec-row wide">
+      <div class="visual-col">
+        <svg viewBox="0 0 360 280" xmlns="http://www.w3.org/2000/svg" style="border:1px solid #E5E7EB;border-radius:12px;background:#1a1a2c;">
+          <!-- blur bg -->
+          <rect width="360" height="280" rx="12" fill="rgba(20,10,40,0.85)"/>
+          <!-- sheet -->
+          <rect x="0" y="90" width="360" height="190" rx="0" fill="#fff"/>
+          <rect x="0" y="90" width="360" height="190" fill="#fff"/>
+          <!-- handle -->
+          <rect x="155" y="100" width="50" height="4" rx="2" fill="#E5E7EB"/>
+          <!-- head -->
+          <text x="180" y="130" text-anchor="middle" font-size="22" font-family="sans-serif">🎉</text>
+          <text x="180" y="150" text-anchor="middle" font-size="13" fill="#1A1A2C" font-family="sans-serif" font-weight="700">第 4 天簽到獎勵</text>
+          <text x="180" y="163" text-anchor="middle" font-size="10" fill="#6B7280" font-family="sans-serif">再堅持三天完成任務</text>
+          <!-- reward row -->
+          <rect x="30" y="172" width="300" height="42" rx="8" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1"/>
+          <rect x="40" y="180" width="28" height="28" rx="8" fill="rgba(61,201,138,0.1)"/>
+          <text x="54" y="198" text-anchor="middle" font-size="14" font-family="sans-serif">💵</text>
+          <text x="80" y="191" font-size="12" fill="#1A1A2C" font-family="sans-serif" font-weight="700">70 PHP</text>
+          <text x="80" y="203" font-size="9" fill="#9CA3AF" font-family="sans-serif">現金</text>
+          <rect x="260" y="182" width="56" height="18" rx="9" fill="rgba(61,201,138,0.1)" stroke="#3DC98A" stroke-width="1"/>
+          <text x="288" y="194" text-anchor="middle" font-size="9" fill="#059669" font-family="sans-serif" font-weight="700">已到帳</text>
+          <!-- extra strip -->
+          <rect x="30" y="220" width="300" height="32" rx="8" fill="rgba(255,179,0,0.06)" stroke="rgba(255,179,0,0.3)" stroke-width="1" stroke-dasharray="4,3"/>
+          <text x="40" y="231" font-size="8" fill="#B45309" font-family="sans-serif" font-weight="700">🎯 額外獎勵待解鎖</text>
+          <text x="40" y="242" font-size="9" fill="#1A1A2C" font-family="sans-serif" font-weight="600">💵 50 PHP · 今日存款 ≥ 300 PHP</text>
+          <rect x="294" y="224" width="30" height="20" rx="8" fill="rgba(255,179,0,0.12)" stroke="rgba(255,179,0,0.4)" stroke-width="1"/>
+          <text x="309" y="237" text-anchor="middle" font-size="8" fill="#B45309" font-family="sans-serif" font-weight="700">存款</text>
+          <!-- confirm btn -->
+          <rect x="30" y="258" width="300" height="22" rx="8" fill="url(#cb)"/>
+          <defs><linearGradient id="cb"><stop offset="0%" stop-color="#FF72B8"/><stop offset="100%" stop-color="#FF8EC6"/></linearGradient></defs>
+          <text x="180" y="273" text-anchor="middle" font-size="11" fill="#fff" font-family="sans-serif" font-weight="700">確認</text>
+          <!-- close -->
+          <circle cx="340" cy="100" r="10" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+          <text x="340" y="104" text-anchor="middle" font-size="10" fill="#fff" font-family="sans-serif">✕</text>
+        </svg>
+      </div>
+      <div class="text-col">
+        <h3>8.1 自動簽到提示（Auto Reward Sheet）</h3>
+        <p>進入頁面時自動從底部滑出，提示用戶領取今日獎勵。</p>
+        <ul>
+          <li><b>觸發條件</b>：用戶已購買週卡 + 今日尚未完成普通簽到</li>
+          <li><b>不顯示</b>：未購買週卡 / 今日已簽到</li>
+        </ul>
+        <p style="margin-top:10px"><b>內容：</b></p>
+        <ul>
+          <li>今日天數標題（例：「第 4 天簽到獎勵」）</li>
+          <li>今日普通獎勵明細（圖示 + 數值 + 名稱）</li>
+          <li>額外獎勵區塊（若後台有配置）：
+            <ul>
+              <li>條件未達標 → 顯示獎勵內容 + 條件文字 + 「存款」捷徑按鈕（跳轉存款頁）</li>
+              <li>條件已達標 → 顯示「領取」按鈕</li>
+            </ul>
+          </li>
+          <li>「確認」按鈕：完成簽到（普通獎勵發放），關閉彈窗，頁面狀態同步</li>
+        </ul>
+        <p style="margin-top:10px"><b>關閉方式：</b></p>
+        <ul>
+          <li>點「確認」→ 關閉 + 完成簽到</li>
+          <li>點遮罩 → 僅關閉，<b>不觸發簽到</b></li>
+        </ul>
+        <div class="callout callout-warn">
+          <span class="callout-icon">⚠️</span>
+          <div>點遮罩關閉後，用戶仍需至每日獎勵列表手動點擊今日的「領取」按鈕才能完成簽到。</div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="sub-divider">
+
+    <!-- 8.2 Buy Modal -->
+    <div class="spec-row">
+      <div class="visual-col">
+        <svg viewBox="0 0 300 230" xmlns="http://www.w3.org/2000/svg" style="border:1px solid #E5E7EB;border-radius:12px;background:#111827;">
+          <rect width="300" height="230" rx="12" fill="rgba(10,5,30,0.7)"/>
+          <!-- card -->
+          <rect x="20" y="20" width="260" height="190" rx="16" fill="#fff"/>
+          <!-- top bar -->
+          <rect x="20" y="20" width="260" height="2" rx="1" fill="url(#buyBar)"/>
+          <defs><linearGradient id="buyBar"><stop offset="0%" stop-color="#FF8EC6"/><stop offset="50%" stop-color="#A078F5"/><stop offset="100%" stop-color="#74C8FA"/></linearGradient></defs>
+          <!-- close -->
+          <circle cx="264" cy="30" r="8" fill="#F3F4F6"/>
+          <text x="264" y="34" text-anchor="middle" font-size="9" fill="#6B7280" font-family="sans-serif">✕</text>
+          <!-- content -->
+          <text x="150" y="60" text-anchor="middle" font-size="11" fill="#6B7280" font-family="sans-serif">確認購買以下週卡？</text>
+          <text x="150" y="84" text-anchor="middle" font-size="17" fill="#1A1A2C" font-family="sans-serif" font-weight="900">標準週卡</text>
+          <text x="150" y="104" text-anchor="middle" font-size="24" fill="#FF72B8" font-family="sans-serif" font-weight="900">₱500</text>
+          <text x="150" y="120" text-anchor="middle" font-size="9" fill="#9CA3AF" font-family="sans-serif">從您的帳戶餘額扣除</text>
+          <!-- divider -->
+          <line x1="40" y1="132" x2="260" y2="132" stroke="#F3F4F6" stroke-width="1"/>
+          <!-- btns -->
+          <rect x="36" y="142" width="80" height="28" rx="8" fill="rgba(248,113,113,0.07)" stroke="rgba(248,113,113,0.25)" stroke-width="1"/>
+          <text x="76" y="160" text-anchor="middle" font-size="10" fill="#DC2626" font-family="sans-serif" font-weight="700">取消</text>
+          <rect x="128" y="142" width="152" height="28" rx="8" fill="url(#buyBtnG)"/>
+          <defs><linearGradient id="buyBtnG"><stop offset="0%" stop-color="#FF72B8"/><stop offset="100%" stop-color="#FF8EC6"/></linearGradient></defs>
+          <text x="204" y="160" text-anchor="middle" font-size="11" fill="#fff" font-family="sans-serif" font-weight="700">🛒 確認購買</text>
+          <text x="150" y="200" text-anchor="middle" font-size="9" fill="#9CA3AF" font-family="sans-serif">購買後週卡立即啟動，當下即計為第 1 天</text>
+        </svg>
+      </div>
+      <div class="text-col">
+        <h3>8.2 購買確認彈窗</h3>
+        <ul>
+          <li><b>觸發</b>：點擊方案詳情卡「立即購買」按鈕</li>
+          <li><b>內容</b>：方案名稱、購買金額、「確認購買」與「取消」按鈕</li>
+        </ul>
+        <p style="margin-top:10px"><b>確認購買後流程：</b></p>
+        <div class="flow">
+          <div class="flow-step">API 購買請求</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step active">成功回傳</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step end">關閉彈窗</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step end">Toast 提示</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step end">頁面狀態同步</div>
+        </div>
+        <ul style="margin-top:12px">
+          <li><b>關閉方式</b>：點「取消」或點遮罩 → 不執行購買</li>
+        </ul>
+        <div class="scenario">
+          <div class="scenario-title">⚡ 特殊情境 — API 購買失敗</div>
+          <p>購買 API 失敗（餘額不足、網路錯誤）→ 彈窗不關閉，顯示錯誤提示文字，按鈕恢復可點擊狀態。</p>
+        </div>
+      </div>
+    </div>
+
+    <hr class="sub-divider">
+
+    <!-- 8.3 Checkin Popup -->
+    <div class="spec-row">
+      <div class="visual-col">
+        <svg viewBox="0 0 300 220" xmlns="http://www.w3.org/2000/svg" style="border:1px solid #E5E7EB;border-radius:12px;background:#111827;">
+          <rect width="300" height="220" rx="12" fill="rgba(10,5,30,0.7)"/>
+          <rect x="0" y="100" width="300" height="120" fill="#fff"/>
+          <rect x="125" y="108" width="50" height="4" rx="2" fill="#E5E7EB"/>
+          <text x="150" y="132" text-anchor="middle" font-size="20" font-family="sans-serif">🎉</text>
+          <text x="150" y="150" text-anchor="middle" font-size="13" fill="#1A1A2C" font-family="sans-serif" font-weight="700">第 4 天簽到獎勵</text>
+          <!-- reward -->
+          <rect x="30" y="158" width="240" height="36" rx="8" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1"/>
+          <text x="50" y="174" font-size="16" font-family="sans-serif">💵</text>
+          <text x="74" y="172" font-size="12" fill="#1A1A2C" font-family="sans-serif" font-weight="700">70 PHP</text>
+          <text x="74" y="183" font-size="9" fill="#9CA3AF" font-family="sans-serif">現金獎勵已發放</text>
+          <circle cx="278" cy="114" r="10" fill="#F3F4F6"/>
+          <text x="278" y="118" text-anchor="middle" font-size="10" fill="#6B7280" font-family="sans-serif">✕</text>
+          <text x="150" y="212" text-anchor="middle" font-size="9" fill="#9CA3AF" font-family="sans-serif">點遮罩或 ✕ 可關閉</text>
+        </svg>
+      </div>
+      <div class="text-col">
+        <h3>8.3 每日簽到完成彈窗</h3>
+        <ul>
+          <li><b>觸發</b>：用戶點擊今日獎勵卡片的「領取」按鈕後彈出</li>
+          <li><b>內容</b>：天數標題 + 今日普通獎勵明細（由後台配置渲染）</li>
+          <li><b>無操作按鈕</b>：簽到已於點擊「領取」時完成，此彈窗僅為確認提示</li>
+          <li><b>關閉方式</b>：點右上角「✕」或點遮罩</li>
+        </ul>
+        <div class="callout callout-info">
+          <span class="callout-icon">ℹ️</span>
+          <div>此彈窗關閉後，頁面狀態已完成更新（今日按鈕已切為「✓ 已領取」），不需再觸發任何 API。</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 9 -->
+<!-- ═══════════════════════════════════════ -->
+<div class="spec-section" id="s9">
+  <div class="section-head">
+    <div class="section-num">9</div>
+    <div>
+      <div class="section-title">存款頁活動入口彈窗</div>
+      <div class="section-subtitle">顯示時機、Banner、離開確認二次對話</div>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="spec-row wide">
+      <div class="visual-col">
+        <svg viewBox="0 0 380 300" xmlns="http://www.w3.org/2000/svg" style="border:1px solid #E5E7EB;border-radius:12px;background:#F3F4F6;">
+          <!-- State 1: activity popup -->
+          <text x="10" y="14" font-size="9" fill="#9CA3AF" font-family="sans-serif" font-weight="700">狀態 1 — 活動彈窗</text>
+          <rect x="10" y="18" width="170" height="272" rx="12" fill="#f0f4ff"/>
+          <!-- deposit page bg -->
+          <rect x="14" y="22" width="162" height="30" rx="4" fill="#fff" stroke="#E5E7EB" stroke-width="1"/>
+          <text x="26" y="41" font-size="9" fill="#374151" font-family="sans-serif">← 存款</text>
+          <!-- overlay -->
+          <rect x="10" y="52" width="170" height="238" rx="0" fill="rgba(10,5,30,0.6)"/>
+          <!-- activity card -->
+          <rect x="24" y="70" width="142" height="206" rx="12" fill="#fff"/>
+          <rect x="24" y="70" width="142" height="2" rx="1" fill="url(#dpbar)"/>
+          <defs><linearGradient id="dpbar"><stop offset="0%" stop-color="#FF8EC6"/><stop offset="50%" stop-color="#A078F5"/><stop offset="100%" stop-color="#74C8FA"/></linearGradient></defs>
+          <!-- banner area -->
+          <rect x="24" y="72" width="142" height="60" fill="url(#dpbanner)"/>
+          <defs><linearGradient id="dpbanner" x1="0" y1="0" x2="142" y2="60" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#FFD0EA"/><stop offset="100%" stop-color="#C8E8FF"/></linearGradient></defs>
+          <text x="95" y="96" text-anchor="middle" font-size="12" fill="#C0206C" font-family="sans-serif" font-weight="900">週卡活動</text>
+          <text x="95" y="108" text-anchor="middle" font-size="8" fill="#6B7280" font-family="sans-serif">存款享 7 天連續簽到獎勵</text>
+          <!-- banner label -->
+          <rect x="28" y="76" width="68" height="12" rx="3" fill="rgba(255,255,255,0.4)" stroke="rgba(160,120,245,0.4)" stroke-width="1" stroke-dasharray="3,2"/>
+          <text x="62" y="85" text-anchor="middle" font-size="6" fill="#7C3AED" font-family="sans-serif">後台上傳 Banner</text>
+          <!-- close -->
+          <circle cx="154" cy="80" r="7" fill="rgba(255,255,255,0.8)"/>
+          <text x="154" y="84" text-anchor="middle" font-size="8" fill="#6B7280" font-family="sans-serif">✕</text>
+          <!-- body -->
+          <text x="95" y="150" text-anchor="middle" font-size="9" fill="#374151" font-family="sans-serif">活動說明文字（後台配置）</text>
+          <!-- checkbox -->
+          <rect x="36" y="158" width="8" height="8" rx="2" fill="#F3F4F6" stroke="#E5E7EB" stroke-width="1"/>
+          <text x="48" y="166" font-size="8" fill="#6B7280" font-family="sans-serif">不再顯示</text>
+          <!-- main btn -->
+          <rect x="36" y="172" width="120" height="22" rx="8" fill="url(#dpbtn)"/>
+          <defs><linearGradient id="dpbtn"><stop offset="0%" stop-color="#FF72B8"/><stop offset="100%" stop-color="#FF8EC6"/></linearGradient></defs>
+          <text x="96" y="187" text-anchor="middle" font-size="10" fill="#fff" font-family="sans-serif" font-weight="700">參加活動</text>
+
+          <!-- State 2: confirm leave -->
+          <text x="205" y="14" font-size="9" fill="#9CA3AF" font-family="sans-serif" font-weight="700">狀態 2 — 點 ✕（未勾選「不再顯示」）</text>
+          <rect x="200" y="18" width="170" height="272" rx="12" fill="#f0f4ff"/>
+          <rect x="204" y="22" width="162" height="30" rx="4" fill="#fff" stroke="#E5E7EB" stroke-width="1"/>
+          <text x="216" y="41" font-size="9" fill="#374151" font-family="sans-serif">← 存款</text>
+          <!-- overlay -->
+          <rect x="200" y="52" width="170" height="238" fill="rgba(10,5,30,0.72)"/>
+          <!-- activity card dimmed -->
+          <rect x="214" y="70" width="142" height="206" rx="12" fill="#fff" opacity="0.3"/>
+          <!-- confirm dialog -->
+          <rect x="214" y="110" width="142" height="120" rx="12" fill="#fff"/>
+          <rect x="214" y="110" width="142" height="2" rx="1" fill="url(#cbar)"/>
+          <defs><linearGradient id="cbar"><stop offset="0%" stop-color="transparent"/><stop offset="50%" stop-color="#F87171"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs>
+          <text x="285" y="134" text-anchor="middle" font-size="20" font-family="sans-serif">⚠️</text>
+          <text x="285" y="152" text-anchor="middle" font-size="10" fill="#1A1A2C" font-family="sans-serif" font-weight="700">確定離開？</text>
+          <text x="285" y="164" text-anchor="middle" font-size="8" fill="#6B7280" font-family="sans-serif">錯過本次週卡活動</text>
+          <rect x="222" y="176" width="62" height="20" rx="8" fill="url(#stayBtn)"/>
+          <defs><linearGradient id="stayBtn"><stop offset="0%" stop-color="#FF72B8"/><stop offset="100%" stop-color="#FF8EC6"/></linearGradient></defs>
+          <text x="253" y="190" text-anchor="middle" font-size="9" fill="#fff" font-family="sans-serif" font-weight="700">參加</text>
+          <rect x="290" y="176" width="58" height="20" rx="8" fill="rgba(248,113,113,0.07)" stroke="rgba(248,113,113,0.3)" stroke-width="1"/>
+          <text x="319" y="190" text-anchor="middle" font-size="9" fill="#DC2626" font-family="sans-serif" font-weight="700">離開</text>
+
+          <!-- flow arrow between -->
+          <text x="190" y="175" text-anchor="middle" font-size="16" fill="#9CA3AF" font-family="sans-serif">→</text>
+        </svg>
+      </div>
+      <div class="text-col">
+        <h3>顯示時機</h3>
+        <ul>
+          <li>用戶進入<b>存款頁</b>時，若活動進行中且用戶本週期<b>尚未購買週卡</b>，自動疊加顯示</li>
+          <li>已購買 → 不顯示此彈窗</li>
+        </ul>
+
+        <h3 style="margin-top:16px">彈窗內容</h3>
+        <ul>
+          <li><b>Banner 圖片</b>：同主頁 Banner，後台上傳 URL 渲染</li>
+          <li><b>活動說明文字</b>：後台可配置</li>
+          <li><b>「參加活動」主按鈕</b>：跳轉週卡活動頁</li>
+          <li><b>「不再顯示」Checkbox</b>：勾選後本週期不再對此用戶彈出</li>
+          <li><b>「✕」關閉按鈕</b>：觸發離開確認邏輯（見下）</li>
+        </ul>
+
+        <h3 style="margin-top:16px">離開確認流程</h3>
+        <div class="flow" style="flex-direction:column;align-items:flex-start;gap:4px">
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="flow-step">點擊 ✕</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">已勾選「不再顯示」？</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;padding-left:60px">
+            <span style="font-size:12px;color:#059669;font-weight:700">YES</span>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step end">直接關閉</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;padding-left:60px">
+            <span style="font-size:12px;color:#DC2626;font-weight:700">NO</span>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step active">顯示二次確認</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">「參加」/ 「離開」</div>
+          </div>
+        </div>
+
+        <div class="scenario" style="margin-top:12px">
+          <div class="scenario-title">⚡ 特殊情境 — 不再顯示後購買失敗</div>
+          <p>用戶勾選「不再顯示」後直接關閉，但未實際購買。本週期不再彈窗。用戶仍可透過活動頁面入口手動購買。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 10 -->
+<!-- ═══════════════════════════════════════ -->
+<div class="spec-section" id="s10">
+  <div class="section-head">
+    <div class="section-num">10</div>
+    <div>
+      <div class="section-title">活動規則彈窗</div>
+      <div class="section-subtitle">固定文字 7 條規則</div>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="spec-row">
+      <div class="visual-col">
+        <svg viewBox="0 0 280 310" xmlns="http://www.w3.org/2000/svg" style="border:1px solid #E5E7EB;border-radius:12px;background:#111827;">
+          <rect width="280" height="310" rx="12" fill="rgba(10,5,30,0.75)"/>
+          <rect x="16" y="30" width="248" height="270" rx="14" fill="#fff"/>
+          <!-- head -->
+          <text x="100" y="55" font-size="13" fill="#1A1A2C" font-family="sans-serif" font-weight="700">活動規則</text>
+          <circle cx="248" cy="45" r="9" fill="#F3F4F6"/>
+          <text x="248" y="49" text-anchor="middle" font-size="9" fill="#6B7280" font-family="sans-serif">✕</text>
+          <line x1="24" y1="63" x2="256" y2="63" stroke="#F3F4F6" stroke-width="1"/>
+          <!-- rules -->
+          <circle cx="32" cy="80" r="7" fill="#FF8EC6"/>
+          <text x="32" y="84" text-anchor="middle" font-size="8" fill="#fff" font-family="sans-serif" font-weight="700">1</text>
+          <text x="44" y="80" font-size="8" fill="#374151" font-family="sans-serif" font-weight="600">每週期僅可購買一次週卡</text>
+          <text x="44" y="90" font-size="7.5" fill="#6B7280" font-family="sans-serif">週期結束後資格自動重置</text>
+
+          <circle cx="32" cy="108" r="7" fill="#FF8EC6"/>
+          <text x="32" y="112" text-anchor="middle" font-size="8" fill="#fff" font-family="sans-serif" font-weight="700">2</text>
+          <text x="44" y="108" font-size="8" fill="#374151" font-family="sans-serif" font-weight="600">購買完成當下即計為第 1 天</text>
+          <text x="44" y="118" font-size="7.5" fill="#6B7280" font-family="sans-serif">依序至第 7 天，按實際登入累計</text>
+
+          <circle cx="32" cy="136" r="7" fill="#A078F5"/>
+          <text x="32" y="140" text-anchor="middle" font-size="8" fill="#fff" font-family="sans-serif" font-weight="700">3</text>
+          <text x="44" y="136" font-size="8" fill="#374151" font-family="sans-serif" font-weight="600">日常獎勵登入後可直接手動領取</text>
+          <text x="44" y="146" font-size="7.5" fill="#6B7280" font-family="sans-serif">額外獎勵須滿足當日條件後才可領取</text>
+
+          <circle cx="32" cy="164" r="7" fill="#A078F5"/>
+          <text x="32" y="168" text-anchor="middle" font-size="8" fill="#fff" font-family="sans-serif" font-weight="700">4</text>
+          <text x="44" y="164" font-size="8" fill="#374151" font-family="sans-serif" font-weight="600">彩金類需完成對應流水倍數投注</text>
+          <text x="44" y="174" font-size="7.5" fill="#6B7280" font-family="sans-serif">積分 / 旋轉 / 優惠券不設流水要求</text>
+
+          <circle cx="32" cy="192" r="7" fill="#74C8FA"/>
+          <text x="32" y="196" text-anchor="middle" font-size="8" fill="#fff" font-family="sans-serif" font-weight="700">5</text>
+          <text x="44" y="192" font-size="8" fill="#374151" font-family="sans-serif" font-weight="600">額外獎勵僅計算當日充值或投注</text>
+          <text x="44" y="202" font-size="7.5" fill="#6B7280" font-family="sans-serif">達標即可領，24:00 前領取，逾期不補發</text>
+
+          <circle cx="32" cy="220" r="7" fill="#74C8FA"/>
+          <text x="32" y="224" text-anchor="middle" font-size="8" fill="#fff" font-family="sans-serif" font-weight="700">6</text>
+          <text x="44" y="220" font-size="8" fill="#374151" font-family="sans-serif" font-weight="600">普通獎勵同樣須當日 24:00 前領取</text>
+          <text x="44" y="230" font-size="7.5" fill="#6B7280" font-family="sans-serif">逾期視為放棄，不予補發</text>
+
+          <circle cx="32" cy="248" r="7" fill="#3DC98A"/>
+          <text x="32" y="252" text-anchor="middle" font-size="8" fill="#fff" font-family="sans-serif" font-weight="700">7</text>
+          <text x="44" y="248" font-size="8" fill="#374151" font-family="sans-serif" font-weight="600">規則調整時，已領取獎勵不受影響</text>
+          <text x="44" y="258" font-size="7.5" fill="#6B7280" font-family="sans-serif">未領取按最新規則執行</text>
+
+          <text x="140" y="290" text-anchor="middle" font-size="8" fill="#9CA3AF" font-family="sans-serif">點遮罩或 ✕ 可關閉</text>
+        </svg>
+      </div>
+      <div class="text-col">
+        <h3>觸發與關閉</h3>
+        <ul>
+          <li><b>觸發</b>：點擊 Hero 區「活動規則」按鈕</li>
+          <li><b>關閉</b>：點「✕」或點遮罩</li>
+        </ul>
+        <h3 style="margin-top:16px">固定規則文字（共 7 條）</h3>
+        <ol style="list-style:decimal;padding-left:18px;font-size:13px;color:#374151;line-height:2;">
+          <li>每個週期僅可購買<b>一次</b>週卡，週期結束後資格自動重置。</li>
+          <li>購買成功後<b>當下即計為第 1 天</b>，往後依序至第 7 天；簽到獎勵按實際登入天數累計，若週期結束前未全部簽到，週期結束時強制重置。</li>
+          <li>日常簽到獎勵（FREE）登入後可直接手動領取；<b>額外獎勵</b>須滿足當日條件後才可領取。</li>
+          <li>彩金（Bonus）類獎勵需完成對應<b>流水倍數</b>之有效投注，積分 / 旋轉 / 優惠券不設流水要求。</li>
+          <li>額外獎勵條件<b>僅計算當日充值或投注金額</b>，達成後即可領取；須於<b>當日 24:00 前</b>領取，逾期不可補領，不予補發。</li>
+          <li>普通簽到獎勵同樣須於<b>當日 24:00 前</b>手動領取，逾期視為放棄，不予補發。</li>
+          <li>活動期間若獎勵規則調整，<b>已領取獎勵</b>不受影響，未領取按最新規則執行。</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 11 -->
+<!-- ═══════════════════════════════════════ -->
+<div class="spec-section" id="s11">
+  <div class="section-head">
+    <div class="section-num">11</div>
+    <div>
+      <div class="section-title">資料介面說明</div>
+      <div class="section-subtitle">頁面初始化 GET、操作 POST、前後台職責分界</div>
+    </div>
+  </div>
+  <div class="section-body">
+    <div class="spec-row full">
+      <div class="text-col">
+        <h3>頁面初始化所需資料（GET）</h3>
+        <table class="spec-table">
+          <thead><tr><th>欄位群</th><th>欄位</th><th>說明</th></tr></thead>
+          <tbody>
+            <tr><td rowspan="2"><b>活動狀態</b></td><td>is_active</td><td>活動是否進行中</td></tr>
+            <tr><td>activity_period</td><td>活動起訖時間</td></tr>
+            <tr><td rowspan="5"><b>用戶週期狀態</b></td><td>has_purchased</td><td>本週期是否已購買</td></tr>
+            <tr><td>purchased_plan_id</td><td>已購規格 ID（未購為 null）</td></tr>
+            <tr><td>card_period</td><td>週卡效期起訖（未購為 null）</td></tr>
+            <tr><td>today_checked_in</td><td>今日是否已完成普通簽到</td></tr>
+            <tr><td>checked_in_days</td><td>已簽到天數（含 done 不含 expired）</td></tr>
+            <tr><td rowspan="7"><b>各規格配置</b>（陣列）</td><td>plan_id / name / price</td><td>規格 ID、名稱、售價</td></tr>
+            <tr><td>note</td><td>運營文案</td></tr>
+            <tr><td>banner_url</td><td>Banner 圖片 URL</td></tr>
+            <tr><td>days[].status</td><td>done / today / locked / expired</td></tr>
+            <tr><td>days[].free</td><td>普通獎勵：type / value / turnover</td></tr>
+            <tr><td>days[].extra</td><td>額外獎勵：type / value / cond / condMet / depositNow / depositTarget（可為 null）</td></tr>
+            <tr><td>days[].extra_claimed</td><td>額外獎勵是否已領取</td></tr>
+          </tbody>
+        </table>
+
+        <h3 style="margin-top:20px">操作 API（POST）</h3>
+        <table class="spec-table">
+          <thead><tr><th>操作</th><th>傳入參數</th><th>成功後前台動作</th></tr></thead>
+          <tbody>
+            <tr><td>購買週卡</td><td>plan_id</td><td>更新頁面狀態（Tab 已購標記、按鈕禁用、進度初始化）</td></tr>
+            <tr><td>領取普通簽到獎勵</td><td>plan_id + day</td><td>按鈕切為「✓ 已領取」，彈出簽到完成彈窗</td></tr>
+            <tr><td>領取額外獎勵</td><td>plan_id + day</td><td>額外獎勵按鈕切為「✓ 已領取」</td></tr>
+          </tbody>
+        </table>
+
+        <h3 style="margin-top:20px">前後台職責分界</h3>
+        <div class="callout callout-danger">
+          <span class="callout-icon">🚫</span>
+          <div><b>以下邏輯由後台負責，前台不自行計算：</b>每日狀態（done/today/locked/expired）、condMet（條件是否達成）、週卡效期起訖、存款進度（depositNow/depositTarget）、是否逾期（過當日 24:00）。前台依 API 回傳值直接渲染，不做二次判斷。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+  </div>
+
+</div>
+</body>
+</html>
