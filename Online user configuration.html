@@ -223,6 +223,28 @@
     padding: 7px 28px;
     font-size: 14px;
   }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    top: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: rgba(0,0,0,0.78);
+    color: #fff;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s, transform 0.22s;
+    z-index: 9999;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 </style>
 </head>
 <body>
@@ -231,6 +253,18 @@
   <!-- 基础参数 -->
   <div class="section">
     <div class="section-title">游戏浮动人数配置参数</div>
+
+    <div class="config-row">
+      <div class="config-label">显示浮动人数开关</div>
+      <div class="config-value">
+        <div class="toggle">
+          <div class="toggle-track" id="toggle-track-show" onclick="toggleShow()">
+            <div class="toggle-thumb"></div>
+          </div>
+          <span class="toggle-label" id="toggle-label-show">开启</span>
+        </div>
+      </div>
+    </div>
 
     <div class="config-row">
       <div class="config-label">浮动人数开关</div>
@@ -260,7 +294,7 @@
         <tr>
           <th style="width:60px">序号</th>
           <th>游戏类型</th>
-          <th>最小人数</th>
+          <th>最少人数</th>
           <th>最大人数</th>
         </tr>
       </thead>
@@ -274,7 +308,7 @@
 
     <div class="tag-header">
       <div>标签</div>
-      <div>最小人数</div>
+      <div>最少人数</div>
       <div>最大人数</div>
       <div style="text-align:center">操作</div>
     </div>
@@ -287,8 +321,10 @@
   </div>
 
   <div class="save-bar">
-    <button class="btn btn-primary btn-save-main" onclick="alert('保存成功')">保存</button>
+    <button class="btn btn-primary btn-save-main" onclick="handleSave()">保存</button>
   </div>
+
+  <div class="toast" id="toast"></div>
 
 </div>
 
@@ -300,6 +336,23 @@
     const track = document.getElementById('toggle-track');
     const label = document.getElementById('toggle-label');
     if (isOn) {
+      track.classList.remove('off');
+      label.textContent = '开启';
+      label.style.color = '#1677ff';
+    } else {
+      track.classList.add('off');
+      label.textContent = '关闭';
+      label.style.color = '#999';
+    }
+  }
+
+  // Show toggle
+  let isShowOn = true;
+  function toggleShow() {
+    isShowOn = !isShowOn;
+    const track = document.getElementById('toggle-track-show');
+    const label = document.getElementById('toggle-label-show');
+    if (isShowOn) {
       track.classList.remove('off');
       label.textContent = '开启';
       label.style.color = '#1677ff';
@@ -377,6 +430,43 @@
   }
 
   renderTags();
+
+  let toastTimer = null;
+  function showToast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+  }
+
+  function handleSave() {
+    // Validate game type rows
+    const rows = document.querySelectorAll('#game-tbody tr');
+    for (const row of rows) {
+      const inputs = row.querySelectorAll('input[type="number"]');
+      const min = +inputs[0].value;
+      const max = +inputs[1].value;
+      if (max < min) {
+        showToast('最大人数不可小于最少人数');
+        return;
+      }
+    }
+
+    // Validate tag rows
+    const tagRows = document.querySelectorAll('#tag-list .tag-row');
+    for (const row of tagRows) {
+      const inputs = row.querySelectorAll('input[type="number"]');
+      const min = +inputs[0].value;
+      const max = +inputs[1].value;
+      if (max < min) {
+        showToast('最大人数不可小于最少人数');
+        return;
+      }
+    }
+
+    alert('保存成功');
+  }
 </script>
 </body>
 </html>
