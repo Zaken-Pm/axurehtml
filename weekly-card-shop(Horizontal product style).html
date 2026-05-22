@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Weekly Card · Shop</title>
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+:root{
+  --bg:#071422;--bg-card:#0C1D33;--bg-2:#0A1828;--bd:#182E4A;--bd2:#1E3860;
+  --gold:#F5C842;--gold2:#FFE566;--gold3:#C89000;
+  --g-dim:rgba(245,200,66,0.13);--g-bd:rgba(245,200,66,0.32);
+  --blue:#2C71F4;--blue2:#5A96FF;
+  --b-dim:rgba(44,113,244,0.13);--b-bd:rgba(44,113,244,0.32);
+  --purple:#9B6FFF;--p-dim:rgba(155,111,255,0.13);--p-bd:rgba(155,111,255,0.35);
+  --green:#28C668;--gr-dim:rgba(40,198,104,0.12);--gr-bd:rgba(40,198,104,0.28);
+  --red:#FF3D5C;--r-dim:rgba(255,61,92,0.10);--r-bd:rgba(255,61,92,0.25);
+  --t1:#FFFFFF;--t2:#8AACC8;--t3:#4A6E8E;--t4:#2B4460;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans TC',-apple-system,sans-serif;background:#020C18;display:flex;align-items:flex-start;justify-content:center;min-height:100vh;padding:24px 12px 60px;gap:24px;flex-wrap:wrap}
+.phone{width:390px;min-height:844px;background:var(--bg);border-radius:46px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.07),0 40px 100px rgba(0,0,0,.85),inset 0 1px 0 rgba(255,255,255,.05);display:flex;flex-direction:column}
+.sb{display:flex;align-items:center;justify-content:space-between;padding:14px 28px 0;flex-shrink:0}
+.sb-time{font-size:15px;font-weight:800;color:var(--t1)}
+.sb-icons{font-size:11px;color:var(--t2);display:flex;gap:5px}
+.nav{display:flex;align-items:center;gap:10px;padding:8px 18px 10px;flex-shrink:0}
+.nav-back{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--t1);cursor:pointer;transition:background .15s}
+.nav-back:hover{background:rgba(255,255,255,.09)}
+.nav-title{font-size:17px;font-weight:800;color:var(--t1);flex:1}
+.nav-more{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;color:var(--t2);font-size:18px;cursor:pointer}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:80px}
+.scroll::-webkit-scrollbar{display:none}
+/* BANNER */
+.banner{position:relative;height:180px;overflow:hidden;background:linear-gradient(150deg,#081C38 0%,#0D3268 55%,#071525 100%)}
+.banner-glow{position:absolute;inset:0;background:radial-gradient(ellipse 65% 80% at 85% 50%,rgba(245,200,66,.18) 0%,transparent 60%),radial-gradient(ellipse 50% 70% at 10% 35%,rgba(44,113,244,.15) 0%,transparent 55%);pointer-events:none}
+.banner-stars{position:absolute;inset:0;pointer-events:none}
+.star{position:absolute;border-radius:50%;background:rgba(255,255,255,.75);animation:tw 3s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.2}50%{opacity:.9}}
+.banner-deco{position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:80px;opacity:.1;user-select:none;pointer-events:none}
+.banner-content{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;justify-content:center;padding:0 24px}
+.banner-tag{display:inline-flex;align-items:center;gap:5px;background:var(--g-dim);border:1px solid var(--g-bd);padding:4px 12px;border-radius:20px;font-size:10px;font-weight:800;color:var(--gold);letter-spacing:1.5px;margin-bottom:10px;width:fit-content}
+.banner-title{font-size:26px;font-weight:900;line-height:1.1;margin-bottom:5px;background:linear-gradient(135deg,#FFE566,#F5C842,#C89000);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.banner-sub{font-size:12px;color:var(--t2)}
+.banner-cycle{font-size:11px;color:var(--t3);margin-top:5px}
+.banner-cycle b{color:var(--t2);font-weight:600}
+/* RULES */
+.rules{background:var(--bg-card);border:1px solid var(--bd);border-radius:14px;padding:14px;font-size:11px;color:var(--t3);line-height:1.85}
+.rules-title{font-size:12px;font-weight:800;color:var(--t2);margin-bottom:8px}
+/* BNAV */
+.bnav{background:rgba(7,20,34,.97);border-top:1px solid var(--bd);display:flex;padding:8px 8px 20px;backdrop-filter:blur(12px);flex-shrink:0}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:5px 2px;border-radius:10px}
+.bnav-ico{font-size:20px;line-height:1}
+.bnav-lbl{font-size:9px;font-weight:600;color:var(--t4)}
+.bnav-act{color:var(--gold)}
+/* OVERLAYS */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(6px);z-index:1000;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.overlay.show{opacity:1;pointer-events:all}
+.sheet{background:var(--bg-card);border-radius:24px 24px 0 0;border-top:1px solid var(--bd2);width:100%;max-width:390px;transform:translateY(100%);transition:transform .3s cubic-bezier(.34,1.2,.64,1)}
+.overlay.show .sheet{transform:translateY(0)}
+.sh-handle{width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,.14);margin:12px auto 0}
+.sh-gap{height:28px}
+/* REWARD SHEET */
+.rsh-head{text-align:center;padding:20px 20px 10px}
+.rsh-trophy{font-size:56px;display:block;margin-bottom:10px}
+.rsh-title{font-size:22px;font-weight:900;background:linear-gradient(135deg,#FFE566,#F5C842);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
+.rsh-sub{font-size:12px;color:var(--t3)}
+.rsh-list{padding:12px 18px;display:flex;flex-direction:column;gap:8px}
+.rsh-item{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:14px;padding:13px}
+.rsi-ico{width:50px;height:50px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(255,255,255,.06);overflow:hidden}
+.rsi-ico img{width:100%;height:100%;object-fit:contain}
+.rsi-type{font-size:10px;color:var(--t3);margin-bottom:3px}
+.rsi-amt{font-size:24px;font-weight:900;color:var(--gold);line-height:1.1}
+.rsi-name{font-size:12px;color:var(--t2);margin-top:2px}
+.rsh-extra{margin:0 18px 12px;background:rgba(155,111,255,.08);border:1px solid rgba(155,111,255,.25);border-radius:12px;padding:12px 14px}
+.rse-title{font-size:11px;font-weight:800;color:#C5AAFF;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.rse-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-top:1px solid rgba(155,111,255,.1)}
+.rse-row:first-of-type{border-top:none}
+.rse-ico{width:28px;height:28px;object-fit:contain}
+.rse-reward{font-size:12px;font-weight:700;color:#C5AAFF}
+.rse-cond{font-size:10px;color:var(--t3);margin-top:1px}
+.rsh-close{margin:0 18px;width:calc(100% - 36px);padding:15px;border-radius:14px;background:linear-gradient(135deg,#F5C842,#C89000);color:#1A0E00;font-size:16px;font-weight:900;border:none;cursor:pointer;font-family:inherit}
+/* TOAST */
+.toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%) translateY(14px);background:rgba(10,24,44,.96);border:1px solid var(--bd2);border-radius:12px;padding:10px 18px;font-size:13px;color:var(--t1);font-weight:500;white-space:nowrap;z-index:2000;opacity:0;transition:all .25s;pointer-events:none;backdrop-filter:blur(10px);max-width:88vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* DEMO */
+.demo{width:390px;background:rgba(8,20,36,.9);border:1px solid var(--bd2);border-radius:20px;padding:16px;align-self:flex-start}
+.demo-ttl{font-size:10px;font-weight:800;color:var(--t3);letter-spacing:1.8px;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.demo-ttl::before{content:'⚙';font-size:13px}
+.demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.demo-day-row{grid-column:1/-1;background:rgba(245,200,66,.06);border:1px solid var(--g-bd);border-radius:11px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between}
+.ddr-lbl{font-size:12px;font-weight:800;color:var(--gold)}
+.ddr-sub{font-size:10px;color:var(--t3);margin-top:2px}
+.ddr-btns{display:flex;gap:6px}
+.ddr-btn{width:32px;height:32px;border-radius:8px;background:var(--g-dim);border:1px solid var(--g-bd);color:var(--gold);font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit}
+.ddr-btn:hover{background:rgba(245,200,66,.24)}
+.d-tog{background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:11px;padding:11px 10px;cursor:pointer;font-family:inherit;text-align:center;transition:all .18s}
+.d-tog:hover{background:rgba(255,255,255,.07)}
+.d-tog.on{background:rgba(44,113,244,.12);border-color:rgba(44,113,244,.4)}
+.dt-ico{font-size:18px;margin-bottom:4px}
+.dt-lbl{font-size:11px;font-weight:700;color:var(--t2);display:block}
+.dt-val{font-size:10px;color:var(--t4);margin-top:2px;display:block}
+.d-tog.on .dt-val{color:var(--blue2)}
+.d-auto{grid-column:1/-1;background:rgba(155,111,255,.08);border:1px solid rgba(155,111,255,.25);border-radius:11px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.da-txt{font-size:11px;color:var(--t2);line-height:1.5}
+.da-txt b{color:#C5AAFF}
+.da-btn{padding:8px 14px;border-radius:9px;border:none;cursor:pointer;font-family:inherit;font-size:11px;font-weight:800;background:var(--purple);color:#fff;transition:filter .15s}
+.da-btn:hover{filter:brightness(1.1)}
+.d-reset{grid-column:1/-1;background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:11px;padding:11px;cursor:pointer;font-family:inherit;color:var(--t3);font-size:12px;font-weight:700;text-align:center;transition:all .15s}
+.d-reset:hover{color:var(--t2);border-color:var(--bd2)}
+
+
+.pre-wrap{padding:14px 16px 16px}
+.cards-grid{display:flex;flex-direction:column;gap:14px;margin-bottom:16px}
+.pass-card{border-radius:20px;overflow:hidden;position:relative;cursor:pointer;transition:transform .15s,box-shadow .2s;border:1.5px solid transparent}
+.pass-card:hover{transform:translateY(-2px)}
+.pass-card:active{transform:scale(.98)}
+.pc-elite{background:linear-gradient(135deg,#5B2D99 0%,#7B3FC4 55%,#4A2080 100%);border-color:rgba(155,111,255,.5);box-shadow:0 6px 28px rgba(100,50,180,.35)}
+.pc-prime{background:linear-gradient(135deg,#C47800 0%,#E8A000 55%,#A56000 100%);border-color:rgba(245,200,66,.5);box-shadow:0 6px 28px rgba(200,140,0,.35)}
+.pc-ribbon{position:absolute;top:12px;left:12px;background:rgba(0,0,0,.45);color:rgba(255,255,255,.85);font-size:9px;font-weight:800;padding:3px 8px;letter-spacing:.5px;border-radius:20px;border:1px solid rgba(255,255,255,.15);white-space:nowrap;z-index:3}
+/* horizontal card body */
+.pc-body{padding:16px 16px 14px;display:flex;flex-direction:column;gap:12px}
+/* top row: art + identity + price */
+.pc-top-row{display:flex;align-items:center;gap:14px}
+.pc-art{width:64px;height:64px;flex-shrink:0;position:relative;display:flex;align-items:center;justify-content:center}
+.pc-card-img{font-size:52px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.45));position:relative;z-index:2;line-height:1}
+.pc-card-shadow{position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);width:52px;height:8px;background:rgba(0,0,0,.3);border-radius:50%;filter:blur(4px)}
+.pc-identity{flex:1}
+.pc-name{font-size:18px;font-weight:900;margin-bottom:3px;text-shadow:0 2px 6px rgba(0,0,0,.4);letter-spacing:.3px}
+.pcn-elite{color:#FFE4FF}.pcn-prime{color:#FFF0A0}
+.pc-sublabel{font-size:11px;font-weight:600;color:rgba(255,255,255,.6)}
+.pc-price-col{text-align:right;flex-shrink:0}
+.pc-price-num{font-size:22px;font-weight:900;line-height:1}
+.pcpn-elite{color:#FFE4FF}.pcpn-prime{color:#FFF0A0}
+.pc-price-unit{font-size:10px;color:rgba(255,255,255,.5);margin-top:2px}
+/* reward grid — 4 cols horizontal */
+.pc-rewards{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.pc-reward-item{background:rgba(0,0,0,.2);border-radius:10px;padding:8px 4px 6px;display:flex;flex-direction:column;align-items:center;gap:3px;border:1px solid rgba(255,255,255,.08)}
+.pri-ico{width:36px;height:36px;object-fit:contain}
+.pri-label{font-size:9px;font-weight:700;color:rgba(255,255,255,.7);text-align:center;line-height:1.2}
+.pri-qty{font-size:12px;font-weight:900;text-align:center}
+.pq-elite{color:#E0CCFF}.pq-prime{color:#FFE566}
+.pc-btn{display:block;width:100%;padding:13px 0;border-radius:22px;border:none;font-family:inherit;font-size:15px;font-weight:900;text-align:center;cursor:pointer;transition:all .18s;text-shadow:0 1px 3px rgba(0,0,0,.3)}
+.pcbtn-elite{background:linear-gradient(135deg,#FFE566,#F5C842,#C89000);color:#3A1A00;box-shadow:0 4px 16px rgba(245,200,66,.4)}
+.pcbtn-prime{background:linear-gradient(135deg,#FF6B00,#FF9500,#FFB700);color:#3A0000;box-shadow:0 4px 16px rgba(255,150,0,.4)}
+.pc-btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.pc-btn:disabled{background:rgba(255,255,255,.08)!important;color:rgba(255,255,255,.3)!important;box-shadow:none!important;cursor:not-allowed;transform:none!important;text-shadow:none}
+/* confirm hero styles */
+.csh-hero{position:relative;padding:24px 20px 16px;text-align:center;overflow:hidden}
+.csh-hero-bg-elite{background:linear-gradient(160deg,#3D1A80,#6030B0,#2A1060)}
+.csh-hero-bg-prime{background:linear-gradient(160deg,#8A5000,#C07800,#6A3800)}
+.csh-hero-ico{font-size:48px;display:block;margin-bottom:8px}
+.csh-hero-badge{display:inline-block;font-size:10px;font-weight:800;padding:3px 12px;border-radius:20px;letter-spacing:1px;margin-bottom:8px}
+.chb-elite{background:var(--p-dim);border:1px solid var(--p-bd);color:#D0AAFF}
+.chb-prime{background:var(--g-dim);border:1px solid var(--g-bd);color:var(--gold)}
+.csh-hero-name{font-size:18px;font-weight:900;color:var(--t1);margin-bottom:4px}
+.csh-hero-price{font-size:36px;font-weight:900;line-height:1;margin-bottom:4px}
+.chp-elite{color:#E0AAFF}.chp-prime{color:var(--gold2)}
+.csh-hero-sub{font-size:11px;color:rgba(255,255,255,.5)}
+.csh-totals{padding:14px 16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.csh-total-item{display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:12px;padding:12px 8px}
+.cti-img{width:40px;height:40px;object-fit:contain}
+.cti-name{font-size:10px;color:var(--t3);text-align:center}
+.cti-val{font-size:14px;font-weight:900;line-height:1;text-align:center}
+.ctiv-elite{color:#D0AAFF}.ctiv-prime{color:var(--gold)}
+.csh-desc{font-size:12px;color:var(--t3);line-height:1.65;text-align:center;padding:0 20px 14px}
+.csh-btns{display:flex;gap:10px;padding:0 18px}
+.csh-cancel{flex:1;padding:13px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--bd);color:var(--t2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+.csh-ok{flex:1.6;padding:13px;border-radius:12px;font-size:15px;font-weight:900;border:none;cursor:pointer;font-family:inherit}
+.csok-elite{background:linear-gradient(135deg,#C084FC,#9B6FFF);color:#fff}
+.csok-prime{background:linear-gradient(135deg,#F5C842,#C89000);color:#1A0E00}
+
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="sb"><div class="sb-time">9:41</div><div class="sb-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div></div>
+  <div class="scroll">
+    <div class="banner">
+  <div class="banner-glow"></div>
+  <div class="banner-stars" id="bstars"></div>
+  <div class="banner-deco">🎴</div>
+  <div class="banner-content">
+    <div class="banner-tag">✦ WEEKLY CARD</div>
+    <div class="banner-title">Weekly Card</div>
+    <div class="banner-sub">购买周卡，每日签到领取专属奖励</div>
+    <div class="banner-cycle">📅 活动时间：<b>06/02 – 06/08</b></div>
+  </div>
+</div>
+    <div class="pre-wrap">
+      <div class="cards-grid">
+        <div class="pass-card pc-prime" id="card-prime" onclick="openConfirm('prime')">
+          <div class="pc-ribbon" id="ribbon-prime">未购买</div>
+          <div class="pc-body">
+            <div class="pc-top-row">
+              <div class="pc-art"><div class="pc-card-img">🏆</div><div class="pc-card-shadow"></div></div>
+              <div class="pc-identity">
+                <div class="pc-name pcn-prime">Prime Pass</div>
+                <div class="pc-sublabel">连续7天每日奖励</div>
+              </div>
+              <div class="pc-price-col">
+                <div class="pc-price-num pcpn-prime">₱999</div>
+                <div class="pc-price-unit">/ 7天</div>
+              </div>
+            </div>
+            <div class="pc-rewards" id="prime-grid"></div>
+            <button class="pc-btn pcbtn-prime" id="btn-prime" onclick="event.stopPropagation();openConfirm('prime')">立即购买</button>
+          </div>
+        </div>
+        <div class="pass-card pc-elite" id="card-elite" onclick="openConfirm('elite')">
+          <div class="pc-ribbon" id="ribbon-elite">未购买</div>
+          <div class="pc-body">
+            <div class="pc-top-row">
+              <div class="pc-art"><div class="pc-card-img">🎫</div><div class="pc-card-shadow"></div></div>
+              <div class="pc-identity">
+                <div class="pc-name pcn-elite">Elite Pass</div>
+                <div class="pc-sublabel">连续7天每日奖励</div>
+              </div>
+              <div class="pc-price-col">
+                <div class="pc-price-num pcpn-elite">₱399</div>
+                <div class="pc-price-unit">/ 7天</div>
+              </div>
+            </div>
+            <div class="pc-rewards" id="elite-grid"></div>
+            <button class="pc-btn pcbtn-elite" id="btn-elite" onclick="event.stopPropagation();openConfirm('elite')">立即购买</button>
+          </div>
+        </div>
+      </div>
+      <div class="rules">
+  <div class="rules-title">📋 活动规则</div>
+  <div>· 每周期仅可购买<b style="color:var(--t2)">一种</b>类型周卡，购买后不可退款</div>
+  <div>· 购买后连续7天，每日签到可领取一般奖励</div>
+  <div>· 额外奖励需达成充值或有效投注条件后方可领取</div>
+  <div>· 当日奖励未领取次日<span style="color:var(--red)">自动过期</span>，不可补领</div>
+  <div>· 彩金奖励须完成 <span style="color:var(--gold)">1倍流水</span> 方可提款</div>
+  <div>· 周期结束后购买资格自动重置</div>
+</div>
+    </div>
+  </div>
+  <div class="bnav">
+    <div class="bnav-item"><div class="bnav-ico">🏠</div><div class="bnav-lbl">首页</div></div>
+    <div class="bnav-item"><div class="bnav-ico">🎮</div><div class="bnav-lbl">游戏</div></div>
+    <div class="bnav-item"><div class="bnav-ico">🎁</div><div class="bnav-lbl bnav-act">奖励</div></div>
+    <div class="bnav-item"><div class="bnav-ico">👤</div><div class="bnav-lbl">我的</div></div>
+  </div>
+</div>
+
+<div class="demo">
+  <div class="demo-ttl">示意操作面板 · Demo Controls</div>
+  <div class="demo-grid">
+    <div class="demo-day-row">
+      <div>
+        <div class="ddr-lbl">📅 今日天数：第 <span id="dp-day">1</span> 天</div>
+        <div class="ddr-sub">调整以模拟不同天数状态</div>
+      </div>
+      <div class="ddr-btns">
+        <button class="ddr-btn" onclick="changeDay(-1)">−</button>
+        <button class="ddr-btn" onclick="changeDay(+1)">+</button>
+      </div>
+    </div>
+    <button class="d-tog" id="dtog-dep" onclick="toggleDeposit()">
+      <div class="dt-ico">💳</div>
+      <span class="dt-lbl">充值条件</span>
+      <span class="dt-val" id="dtval-dep">未达成</span>
+    </button>
+    <button class="d-tog" id="dtog-bet" onclick="toggleBet()">
+      <div class="dt-ico">🎲</div>
+      <span class="dt-lbl">投注条件</span>
+      <span class="dt-val" id="dtval-bet">未达成</span>
+    </button>
+    <div class="d-auto">
+      <div class="da-txt"><b>🤖 自动领取示意</b><br>模拟后台开启自动领取弹窗</div>
+      <button class="da-btn" onclick="showAutoDemo()">触发弹窗</button>
+    </div>
+    <button class="d-reset" onclick="resetAll()">🔄 重置所有状态</button>
+  </div>
+</div>
+
+<!-- CONFIRM SHEET -->
+<div class="overlay" id="ov-confirm" onclick="closeOv('ov-confirm',event)">
+  <div class="sheet">
+    <div class="sh-handle"></div>
+    <div class="csh-hero" id="csh-hero">
+      <span class="csh-hero-ico" id="cs-ico">🎫</span>
+      <div class="csh-hero-badge" id="cs-badge">ELITE PASS</div>
+      <div class="csh-hero-name" id="cs-name">Elite Pass</div>
+      <div class="csh-hero-price" id="cs-price">₱399</div>
+      <div class="csh-hero-sub">购买后连续7天每日签到领取奖励 · 购买后不可退款</div>
+    </div>
+    <div class="csh-totals" id="csh-totals"></div>
+    <div class="csh-desc">购买后即可进入签到领奖页面，每日登录领取专属奖励</div>
+    <div class="csh-btns">
+      <button class="csh-cancel" onclick="closeOv('ov-confirm')">取消</button>
+      <button class="csh-ok" id="cs-ok" onclick="doPurchase()">确认购买</button>
+    </div>
+    <div class="sh-gap"></div>
+  </div>
+</div>
+
+<!-- REWARD SHEET -->
+<div class="overlay" id="ov-reward" onclick="closeOv('ov-reward',event)">
+  <div class="sheet">
+    <div class="sh-handle"></div>
+    <div class="rsh-head">
+      <span class="rsh-trophy" id="rsh-trophy">🎉</span>
+      <div class="rsh-title" id="rsh-title">恭喜获得奖励！</div>
+      <div class="rsh-sub" id="rsh-sub">奖励已即时发放至您的账户</div>
+    </div>
+    <div class="rsh-list" id="rsh-list"></div>
+    <div id="rsh-extra" class="rsh-extra" style="display:none">
+      <div class="rse-title">✨ 今日额外奖励 — 达标后可领取</div>
+      <div id="rse-rows"></div>
+    </div>
+    <button class="rsh-close" style="margin-bottom:4px" onclick="closeOv('ov-reward')">太棒了，收下！</button>
+    <div class="sh-gap"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const ICO_CAIJIN = "data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAPAA4DASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAABQYH/8QAJBAAAgEDAwQDAQAAAAAAAAAAAQIEAwURBgcSCBMhUQAUIjH/xAAUAQEAAAAAAAAAAAAAAAAAAAAG/8QAHxEAAgIBBAMAAAAAAAAAAAAAARECIQADBAWREkFh/9oADAMBAAIRAxEAPwBvp32s0HZ9CwK90s9vul/mwKU2TIlR0kFRUAdUpq4IUKrqCVGSQcnGAMm6rNtbBbVp3/S0GLBqif8ATlx4q8KNQsjOrqo/KEcCpC4Hkejk7bHfO2QdLxbFq2PcA8OMsWlLhqlTu0UIKI6sRgqFUBgTkAZ9mT3t3Tpa1pRLPZIciDZYdU1x32HdkVSOPNgPC4BIABP9PwvpR5KW+HkFEEsuiPVdfcSap42OxcZOZApWDTL7z//Z";
+const ICO_JIFEN = "data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAPAA4DASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAABAYH/8QAJBAAAgIBAwQCAwAAAAAAAAAAAQIDBAUGBxEACBIhEzEUQVH/xAAVAQEBAAAAAAAAAAAAAAAAAAAFBv/EAB4RAAIBBAMBAAAAAAAAAAAAAAECEQADBSEEMUEi/9oADAMBAAIRAxEAPwBPbXtZok6YqxXaOMuZyzTjuW57USTuokXzVY1cEKqhlUlQCTySSCAMY7j9C4zEX3uYmrQq2orn4tuGiw+FyVLBgBwFYeJUgADn9Ag8k233kfBY2GremyNSzXrLVW5SK+UkKkFUYHggjxUcg+wAD1Nbs7hyaytCOtFLDUE7WZGl4+SeZvt2C+h9n0P70ao5BvbHp35FW144hMaxVwxZVhY+w+pMx13X/9k=";
+const ICO_FREEBET = "data:image/png;base64,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";
+const ICO_FREESPIN = "data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAwADADASIAAhEBAxEB/8QAGwAAAQUBAQAAAAAAAAAAAAAABwADBAgJBQb/xAArEAACAgIBBAIBAwQDAAAAAAABAgMEBREGAAcSIRMxIggUURUyQWEjQnH/xAAXAQEBAQEAAAAAAAAAAAAAAAAEBQAD/8QAKBEAAQIFAgYCAwAAAAAAAAAAAQIDAAQREiEFMUFRYXGBoRMiscHh/9oADAMBAAIRAxEAPwCmXS6XRg7U9pKuXx8Ge5hYuVMdYAatWraWaYH2HJYHSka169gg7X1s8zNNSyL3DCpSSenF/GympgWx4bLyYOTOx4q82JimFeS8K7GBZSAfAya8Q2iDre/Y6g9aPcV4122pdsJuEQ4+nFg8hG5nqGT5XlZwCXLEk+YIUq29qVXxI8RqnGa7A9yoea5Hj+E43kMpXrSD9vfaIV4Z420UYPIQnlpgGUMdNsbOt9c5eeafFQY0xJusGihAo6XRT7gdhe4XBOCDl3JKtGtXE6wy1EsfJYiDbAdgoKeHl4rsMTth6+9CzpaVBW0GII3iViRTbK1FyPy/sjOgsfEwV/j8h5eJIIB1vRIP/h60cyuP7eYbB4O3b4pdyozFVfgpQVXtKwKKxV4xvxX8wCSPH/qSNgHNnrQvtvyzL3v05cUytDkEdOylqGvlbzxLKkEbMfLyVv4Dxj0QQdff0QTzaTRahsDwrTbnFHT3HBVCDS4gHJFcHenWPb4OalPhcViRh8bSx2QpXYJcDJWVZpPi/A10HqJdLoFDoa2ANAlY+YzN2bjuNyEsk1JpqksckFnJwwLDJExC7jO/kkb6/FtfiPY9E8iHH0rfIqLTQ27uGjyrLNZ/rENmCb5drFKVjKtHK8zJ/jWhokkgBmrfqzchg4wLWFi5ncwmRqtFiCxrQyqVML+LE+Lp4ODokg+mP9g6mlC1ptOOH4zt398s0kttpVcM8ew+2+eAp6rvQQ/1EJhua9nedUqNyizU6y39x1HZ4HiRLHjI5/FXcKVGtbEg+/8AOd3Wmt3kvFMhn8zDeihRMliUeq5b/hyEDRK6rJ/EqsXAHraON79azQu12qXJ6rvG7QyNGWjYMrEHWwR6I/2OqUirK01BzXHmJU8yW7VEEVHHsIZ6OvbDvbjeJdkchwOzi7Nia3YeVJoZfExPtWViNfkpKINBgQFP89ArpdMdaS6m1UGZeUyq5O/9r+oNmZ/UdyuzVgixWJxGJkEsM1qSvWjQ25IWDxPJ8aISVYEgb8Rv0AQCOn2r7gzW8haz0/hJl7NgvlxohrYPpSWO96UADe9MpJBLEsAOnqlu1Ud3q2ZoGdCjmNypZT9g6+x/rok1p7b7RQMRS0/V3JV8OLFw5YHkdevLEXE5FzHBcTWTkOQiYRxziWsGXxksSBf7UBAOwW97+vskA9VBzd+TK5m9lJo445bliSw6RjSqXYsQB/HvqH0utISCZNJANSY56pqitQcCim0Dz7j/2Q==";
+const ICO_TOOL = "data:image/png;base64,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";
+
+const CARDS = {
+  elite:{
+    name:'Elite Pass',icon:'🎫',price:'₱399',c:'elite',
+    badgeTxt:'ELITE PASS',badgeCls:'chb-elite',heroBg:'csh-hero-bg-elite',
+    priceCls:'chp-elite',okCls:'csok-elite',
+    totals:[
+      {img:ICO_CAIJIN,  name:'彩金',   val:'3,500万',vc:'ctiv-elite'},
+      {img:ICO_JIFEN,   name:'积分',   val:'700,000',vc:'ctiv-elite'},
+      {img:ICO_FREESPIN,name:'旋转券', val:'×20',    vc:'ctiv-elite'},
+      {img:ICO_FREEBET, name:'免费投注',val:'×10',   vc:'ctiv-elite'},
+      {img:ICO_TOOL,    name:'道具卡', val:'×15',    vc:'ctiv-elite'},
+    ],
+    gridRewards:[
+      {img:ICO_CAIJIN,  qty:'500万',  label:'彩金',    qc:'pq-elite'},
+      {img:ICO_JIFEN,   qty:'100,000',label:'积分',    qc:'pq-elite'},
+      {img:ICO_FREESPIN,qty:'×3',     label:'旋转券',  qc:'pq-elite'},
+      {img:ICO_FREEBET, qty:'×1',     label:'免费投注',qc:'pq-elite'},
+    ],
+    days:[
+      {b:{img:ICO_CAIJIN,  n:'彩金',   a:'350万',  ac:'ramt-g'},e:{img:ICO_FREESPIN,n:'旋转券',  a:'×3', cond:'充值 ₱500',      nd:true, nb:false}},
+      {b:{img:ICO_JIFEN,   n:'积分',   a:'100K',   ac:'ramt-g'},e:{img:ICO_CAIJIN,  n:'彩金',    a:'50万',cond:'有效投注 ₱1,000',nd:false,nb:true }},
+      {b:{img:ICO_CAIJIN,  n:'彩金',   a:'500万',  ac:'ramt-g'},e:{img:ICO_FREEBET, n:'免费投注',a:'×2', cond:'充值 ₱300',      nd:true, nb:false}},
+      {b:{img:ICO_FREESPIN,n:'旋转券', a:'×3',     ac:'ramt-b'},e:{img:ICO_CAIJIN,  n:'彩金',    a:'80万',cond:'有效投注 ₱2,000',nd:false,nb:true }},
+      {b:{img:ICO_CAIJIN,  n:'彩金',   a:'600万',  ac:'ramt-g'},e:{img:ICO_JIFEN,   n:'积分',    a:'150K',cond:'充值 ₱500',      nd:true, nb:false}},
+      {b:{img:ICO_TOOL,    n:'道具卡', a:'×2',     ac:'ramt-b'},e:{img:ICO_CAIJIN,  n:'彩金',    a:'120万',cond:'有效投注 ₱3,000',nd:false,nb:true }},
+      {b:{img:ICO_CAIJIN,  n:'彩金',   a:'1,000万',ac:'ramt-g'},e:{img:ICO_TOOL,   n:'道具卡',  a:'×3', cond:'充值 ₱1,000',    nd:true, nb:false}},
+    ]
+  },
+  prime:{
+    name:'Prime Pass',icon:'🏆',price:'₱999',c:'prime',
+    badgeTxt:'PRIME PASS',badgeCls:'chb-prime',heroBg:'csh-hero-bg-prime',
+    priceCls:'chp-prime',okCls:'csok-prime',
+    totals:[
+      {img:ICO_CAIJIN,  name:'彩金',   val:'1亿',      vc:'ctiv-prime'},
+      {img:ICO_JIFEN,   name:'积分',   val:'2,000,000',vc:'ctiv-prime'},
+      {img:ICO_FREESPIN,name:'旋转券', val:'×50',      vc:'ctiv-prime'},
+      {img:ICO_FREEBET, name:'免费投注',val:'×25',     vc:'ctiv-prime'},
+      {img:ICO_TOOL,    name:'道具卡', val:'×40',      vc:'ctiv-prime'},
+    ],
+    gridRewards:[
+      {img:ICO_CAIJIN,  qty:'1,500万',label:'彩金',    qc:'pq-prime'},
+      {img:ICO_JIFEN,   qty:'300,000', label:'积分',    qc:'pq-prime'},
+      {img:ICO_FREESPIN,qty:'×7',      label:'旋转券',  qc:'pq-prime'},
+      {img:ICO_FREEBET, qty:'×3',      label:'免费投注',qc:'pq-prime'},
+    ],
+    days:[
+      {b:{img:ICO_CAIJIN,  n:'彩金',   a:'800万',  ac:'ramt-g'},e:{img:ICO_FREESPIN,n:'旋转券',  a:'×8', cond:'充值 ₱1,000',    nd:true, nb:false}},
+      {b:{img:ICO_JIFEN,   n:'积分',   a:'300K',   ac:'ramt-g'},e:{img:ICO_CAIJIN,  n:'彩金',    a:'200万',cond:'有效投注 ₱2,000',nd:false,nb:true }},
+      {b:{img:ICO_CAIJIN,  n:'彩金',   a:'1,200万',ac:'ramt-g'},e:{img:ICO_FREEBET, n:'免费投注',a:'×5', cond:'充值 ₱800',      nd:true, nb:false}},
+      {b:{img:ICO_FREESPIN,n:'旋转券', a:'×10',    ac:'ramt-b'},e:{img:ICO_CAIJIN,  n:'彩金',    a:'400万',cond:'有效投注 ₱5,000',nd:false,nb:true }},
+      {b:{img:ICO_CAIJIN,  n:'彩金',   a:'1,500万',ac:'ramt-g'},e:{img:ICO_JIFEN,   n:'积分',    a:'400K',cond:'充值 ₱1,000',    nd:true, nb:false}},
+      {b:{img:ICO_TOOL,    n:'道具卡', a:'×5',     ac:'ramt-b'},e:{img:ICO_CAIJIN,  n:'彩金',    a:'600万',cond:'有效投注 ₱8,000',nd:false,nb:true }},
+      {b:{img:ICO_CAIJIN,  n:'彩金',   a:'3,000万',ac:'ramt-g'},e:{img:ICO_TOOL,   n:'道具卡',  a:'×8', cond:'充值₱2,000+投注₱10,000',nd:true,nb:true}},
+    ]
+  }
+};
+
+
+function initStars(id){
+  const sc=document.getElementById(id);
+  for(let i=0;i<20;i++){
+    const s=document.createElement('div');s.className='star';
+    const sz=Math.random()*2+1;
+    s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*3}s;animation-duration:${2+Math.random()*2}s`;
+    sc.appendChild(s);
+  }
+}
+
+const S={purchased:null,currentDay:1,depositMet:false,betMet:false,pendingType:null};
+function init(){
+  initStars('bstars');
+  ['elite','prime'].forEach(t=>{
+    const cd=CARDS[t];
+    document.getElementById(t+'-grid').innerHTML=cd.gridRewards.map(r=>`
+      <div class="pc-reward-item">
+        <img class="pri-ico" src="${r.img}" alt="${r.label}">
+        <div class="pri-label">${r.label}</div>
+        <div class="pri-qty ${r.qc}">${r.qty}</div>
+      </div>`).join('');
+  });
+  const saved=sessionStorage.getItem('wc_purchased');
+  if(saved){S.purchased=saved;refreshButtons();}
+}
+function doPurchase(){
+  const t=S.pendingType;S.purchased=t;
+  sessionStorage.setItem('wc_purchased',t);
+  closeOv('ov-confirm');refreshButtons();
+  showToast('✅ 成功购买 '+CARDS[t].name+'！购买后请前往签到领奖页面');
+}
+function refreshButtons(){
+  const p=S.purchased;
+  ['elite','prime'].forEach(t=>{
+    const btn=document.getElementById('btn-'+t);
+    const card=document.getElementById('card-'+t);
+    const ribbon=document.getElementById('ribbon-'+t);
+    if(p===t){
+      btn.textContent='✓ 已购买';btn.disabled=true;
+      ribbon.textContent='已购买';ribbon.style.color='rgba(100,255,150,.9)';
+      card.style.opacity='';card.style.pointerEvents='';
+    }else if(p&&p!==t){
+      btn.textContent='本期已购其他周卡';btn.disabled=true;
+      card.style.opacity='.4';card.style.pointerEvents='none';
+    }else{
+      btn.textContent='立即购买';btn.disabled=false;      btn.onclick=(e)=>{e.stopPropagation();openConfirm(t);};
+      card.onclick=()=>openConfirm(t);
+      ribbon.textContent='未购买';ribbon.style.color='';
+      card.style.opacity='';card.style.pointerEvents='';
+    }
+  });
+}
+function onDayChange(){}
+function onCondChange(){}
+function showAutoDemo(){showToast('请在签到领奖页面触发自动领取示意');}
+function resetAll(){
+  S.purchased=null;S.currentDay=1;S.depositMet=false;S.betMet=false;
+  sessionStorage.removeItem('wc_purchased');
+  document.getElementById('dp-day').textContent='1';
+  ['dtog-dep','dtog-bet'].forEach(id=>document.getElementById(id).classList.remove('on'));
+  document.getElementById('dtval-dep').textContent='未达成';
+  document.getElementById('dtval-bet').textContent='未达成';
+  refreshButtons();showToast('🔄 已重置所有状态');
+}
+
+function closeOv(id,e){if(e&&e.target!==document.getElementById(id))return;document.getElementById(id).classList.remove('show');}
+function showReward(rewards,isAuto,extraHint){
+  document.getElementById('rsh-trophy').textContent=isAuto?'🤖':'🎉';
+  document.getElementById('rsh-title').textContent=isAuto?'今日一般奖励已自动发放！':'恭喜获得奖励！';
+  document.getElementById('rsh-sub').textContent=isAuto?'后台已开启自动领取，奖励已自动发放至您的账户':'奖励已即时发放至您的账户';
+  document.getElementById('rsh-list').innerHTML=rewards.map(r=>`
+    <div class="rsh-item">
+      <div class="rsi-ico"><img src="${r.img}" alt="${r.n}"></div>
+      <div><div class="rsi-type">${r.type}</div><div class="rsi-amt">${r.a}</div><div class="rsi-name">${r.n}</div></div>
+    </div>`).join('');
+  const ex=document.getElementById('rsh-extra');
+  if(isAuto&&extraHint&&extraHint.length){
+    ex.style.display='block';
+    document.getElementById('rse-rows').innerHTML=extraHint.map(h=>`
+      <div class="rse-row"><img class="rse-ico" src="${h.img}" alt="${h.n}">
+      <div><div class="rse-reward">${h.a} ${h.n}</div><div class="rse-cond">条件：${h.cond}</div></div></div>`).join('');
+  }else{ex.style.display='none';}
+  document.getElementById('ov-reward').classList.add('show');
+}
+function openConfirm(type){
+  S.pendingType=type;const cd=CARDS[type];
+  document.getElementById('cs-ico').textContent=cd.icon;
+  const badge=document.getElementById('cs-badge');badge.textContent=cd.badgeTxt;badge.className='csh-hero-badge '+cd.badgeCls;
+  document.getElementById('csh-hero').className='csh-hero '+cd.heroBg;
+  document.getElementById('cs-name').textContent=cd.name;
+  const p=document.getElementById('cs-price');p.textContent=cd.price;p.className='csh-hero-price '+cd.priceCls;
+  document.getElementById('cs-ok').className='csh-ok '+cd.okCls;
+  document.getElementById('csh-totals').innerHTML=cd.totals.map(t=>`
+    <div class="csh-total-item">
+      <img class="cti-img" src="${t.img}" alt="${t.name}">
+      <div class="cti-name">${t.name}</div>
+      <div class="cti-val ${t.vc}">${t.val}</div>
+    </div>`).join('');
+  document.getElementById('ov-confirm').classList.add('show');
+}
+function checkCond(e){if(e.nd&&e.nb)return S.depositMet&&S.betMet;if(e.nd)return S.depositMet;if(e.nb)return S.betMet;return true;}
+let _tm;
+function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(_tm);_tm=setTimeout(()=>el.classList.remove('show'),2400);}
+function changeDay(d){
+  const n=S.currentDay+d;if(n<1||n>7)return;S.currentDay=n;
+  document.getElementById('dp-day').textContent=n;
+  onDayChange();showToast('📅 切换至第 '+n+' 天');
+}
+function toggleDeposit(){
+  S.depositMet=!S.depositMet;
+  document.getElementById('dtog-dep').classList.toggle('on',S.depositMet);
+  document.getElementById('dtval-dep').textContent=S.depositMet?'✓ 已达成':'未达成';
+  onCondChange();showToast(S.depositMet?'💳 充值条件达成':'💳 充值条件重置');
+}
+function toggleBet(){
+  S.betMet=!S.betMet;
+  document.getElementById('dtog-bet').classList.toggle('on',S.betMet);
+  document.getElementById('dtval-bet').textContent=S.betMet?'✓ 已达成':'未达成';
+  onCondChange();showToast(S.betMet?'🎲 投注条件达成':'🎲 投注条件重置');
+}
+
+init();
+</script>
+</body>
+</html>
