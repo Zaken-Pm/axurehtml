@@ -224,26 +224,16 @@
     font-size: 14px;
   }
 
-  /* Toast */
-  .toast {
-    position: fixed;
-    top: 32px;
-    left: 50%;
-    transform: translateX(-50%) translateY(-20px);
-    background: rgba(0,0,0,0.78);
-    color: #fff;
-    padding: 10px 22px;
-    border-radius: 8px;
-    font-size: 14px;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.22s, transform 0.22s;
-    z-index: 9999;
+  /* Field error */
+  .field-error {
+    color: #e24b4a;
+    font-size: 12px;
+    margin-top: 4px;
+    line-height: 1.4;
   }
-  .toast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
+  input.input-error {
+    border-color: #e24b4a !important;
+    box-shadow: 0 0 0 2px rgba(226,75,74,0.1) !important;
   }
 </style>
 </head>
@@ -324,7 +314,6 @@
     <button class="btn btn-primary btn-save-main" onclick="handleSave()">保存</button>
   </div>
 
-  <div class="toast" id="toast"></div>
 
 </div>
 
@@ -379,7 +368,10 @@
       <td>${i + 1}</td>
       <td><span class="game-badge">${g}</span></td>
       <td><input type="number" class="mini-input" style="width:100px;display:inline-block" value="${mn}" min="0"></td>
-      <td><input type="number" class="mini-input" style="width:100px;display:inline-block" value="${mx}" min="0"></td>
+      <td>
+        <input type="number" class="mini-input" style="width:100px;display:inline-block" value="${mx}" min="0">
+        <div class="field-error" style="display:none"></div>
+      </td>
     `;
     tbody.appendChild(tr);
   });
@@ -399,7 +391,10 @@
       row.innerHTML = `
         <select onchange="tags[${i}].tag=this.value">${opts}</select>
         <input class="mini-input" type="number" value="${t.min}" min="0" onchange="tags[${i}].min=+this.value">
-        <input class="mini-input" type="number" value="${t.max}" min="0" onchange="tags[${i}].max=+this.value">
+        <div>
+          <input class="mini-input" type="number" value="${t.max}" min="0" onchange="tags[${i}].max=+this.value">
+          <div class="field-error" style="display:none"></div>
+        </div>
         <div style="text-align:center">
           <button class="btn btn-danger" onclick="removeTag(${i})">删除</button>
         </div>
@@ -431,41 +426,50 @@
 
   renderTags();
 
-  let toastTimer = null;
-  function showToast(msg) {
-    const el = document.getElementById('toast');
-    el.textContent = msg;
-    el.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+  function clearErrors() {
+    document.querySelectorAll('.field-error').forEach(el => {
+      el.style.display = 'none';
+      el.textContent = '';
+    });
+    document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+  }
+
+  function showFieldError(maxInput) {
+    maxInput.classList.add('input-error');
+    const errorEl = maxInput.parentElement.querySelector('.field-error');
+    if (errorEl) {
+      errorEl.textContent = '最大人数不可小于最少人数';
+      errorEl.style.display = 'block';
+    }
   }
 
   function handleSave() {
+    clearErrors();
+    let hasError = false;
+
     // Validate game type rows
-    const rows = document.querySelectorAll('#game-tbody tr');
-    for (const row of rows) {
+    document.querySelectorAll('#game-tbody tr').forEach(row => {
       const inputs = row.querySelectorAll('input[type="number"]');
       const min = +inputs[0].value;
       const max = +inputs[1].value;
       if (max < min) {
-        showToast('最大人数不可小于最少人数');
-        return;
+        showFieldError(inputs[1]);
+        hasError = true;
       }
-    }
+    });
 
     // Validate tag rows
-    const tagRows = document.querySelectorAll('#tag-list .tag-row');
-    for (const row of tagRows) {
+    document.querySelectorAll('#tag-list .tag-row').forEach(row => {
       const inputs = row.querySelectorAll('input[type="number"]');
       const min = +inputs[0].value;
       const max = +inputs[1].value;
       if (max < min) {
-        showToast('最大人数不可小于最少人数');
-        return;
+        showFieldError(inputs[1]);
+        hasError = true;
       }
-    }
+    });
 
-    alert('保存成功');
+    if (!hasError) alert('保存成功');
   }
 </script>
 </body>
