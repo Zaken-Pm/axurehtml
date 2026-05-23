@@ -367,9 +367,9 @@
     tr.innerHTML = `
       <td>${i + 1}</td>
       <td><span class="game-badge">${g}</span></td>
-      <td><input type="number" class="mini-input" style="width:100px;display:inline-block" value="${mn}" min="0"></td>
+      <td><input type="number" class="mini-input" style="width:100px;display:inline-block" value="${mn}" min="0" oninput="validateGameRow(this.closest('tr'))"></td>
       <td>
-        <input type="number" class="mini-input" style="width:100px;display:inline-block" value="${mx}" min="0">
+        <input type="number" class="mini-input" style="width:100px;display:inline-block" value="${mx}" min="0" oninput="validateGameRow(this.closest('tr'))">
         <div class="field-error" style="display:none"></div>
       </td>
     `;
@@ -390,9 +390,9 @@
       const opts = tagOptions.map(o => `<option value="${o}"${o === t.tag ? ' selected' : ''}>${o}</option>`).join('');
       row.innerHTML = `
         <select onchange="tags[${i}].tag=this.value">${opts}</select>
-        <input class="mini-input" type="number" value="${t.min}" min="0" onchange="tags[${i}].min=+this.value">
+        <input class="mini-input" type="number" value="${t.min}" min="0" oninput="tags[${i}].min=+this.value; validateTagRow(this)">
         <div>
-          <input class="mini-input" type="number" value="${t.max}" min="0" onchange="tags[${i}].max=+this.value">
+          <input class="mini-input" type="number" value="${t.max}" min="0" oninput="tags[${i}].max=+this.value; validateTagRow(this)">
           <div class="field-error" style="display:none"></div>
         </div>
         <div style="text-align:center">
@@ -425,6 +425,38 @@
   }
 
   renderTags();
+
+  function clearRowError(maxInput) {
+    maxInput.classList.remove('input-error');
+    const errorEl = maxInput.parentElement.querySelector('.field-error');
+    if (errorEl) {
+      errorEl.style.display = 'none';
+      errorEl.textContent = '';
+    }
+  }
+
+  function validateGameRow(tr) {
+    const inputs = tr.querySelectorAll('input[type="number"]');
+    const min = +inputs[0].value;
+    const max = +inputs[1].value;
+    if (max < min) {
+      showFieldError(inputs[1]);
+    } else {
+      clearRowError(inputs[1]);
+    }
+  }
+
+  function validateTagRow(input) {
+    const row = input.closest('.tag-row');
+    const inputs = row.querySelectorAll('input[type="number"]');
+    const min = +inputs[0].value;
+    const max = +inputs[1].value;
+    if (max < min) {
+      showFieldError(inputs[1]);
+    } else {
+      clearRowError(inputs[1]);
+    }
+  }
 
   function clearErrors() {
     document.querySelectorAll('.field-error').forEach(el => {
