@@ -1,0 +1,159 @@
+<h2 class="sr-only">新增H5轮播图弹窗表单示意</h2>
+
+<div style="padding:24px 0;display:flex;justify-content:center;">
+  <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);width:640px;padding:24px 32px 28px;">
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+      <p style="font-size:15px;font-weight:500;margin:0;color:var(--color-text-primary);">新增H5轮播图</p>
+      <i class="ti ti-x" style="font-size:17px;color:var(--color-text-secondary);cursor:pointer;" aria-hidden="true"></i>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:13px;color:var(--color-text-danger);min-width:8px;">*</span>
+        <label style="font-size:13px;color:var(--color-text-primary);min-width:100px;text-align:right;">排序</label>
+        <input type="text" style="flex:1;height:32px;font-size:13px;" />
+      </div>
+
+      <div style="display:flex;align-items:flex-start;gap:8px;">
+        <span style="min-width:8px;"></span>
+        <label style="font-size:13px;color:var(--color-text-primary);min-width:100px;text-align:right;padding-top:6px;">标题</label>
+        <textarea style="flex:1;height:58px;font-size:13px;resize:none;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:6px 8px;background:var(--color-background-primary);color:var(--color-text-primary);"></textarea>
+      </div>
+
+      <div style="display:flex;align-items:flex-start;gap:8px;">
+        <span style="min-width:8px;"></span>
+        <label style="font-size:13px;color:var(--color-text-primary);min-width:100px;text-align:right;padding-top:6px;">摘要</label>
+        <textarea style="flex:1;height:58px;font-size:13px;resize:none;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:6px 8px;background:var(--color-background-primary);color:var(--color-text-primary);"></textarea>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:13px;color:var(--color-text-danger);min-width:8px;">*</span>
+        <label style="font-size:13px;color:var(--color-text-primary);min-width:100px;text-align:right;">图片</label>
+        <button style="background:#1890ff;color:#fff;border:none;border-radius:var(--border-radius-md);padding:5px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;">
+          <i class="ti ti-file-upload" style="font-size:14px;" aria-hidden="true"></i>选择文件
+        </button>
+        <div style="flex:1;height:32px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);"></div>
+      </div>
+      <div style="padding-left:120px;">
+        <span style="font-size:12px;color:var(--color-text-tertiary);">只能上传jpg/png/gif/webp文件，且不超过2MB</span>
+      </div>
+
+      <div style="border:1.5px solid #1890ff;border-radius:var(--border-radius-lg);padding:14px 14px 12px;position:relative;margin-top:2px;">
+        <span style="position:absolute;top:-10px;left:14px;background:#fff;padding:0 6px;font-size:12px;color:#1890ff;font-weight:500;">跳转链接</span>
+
+        <div style="display:flex;gap:24px;margin-bottom:12px;">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--color-text-primary);">
+            <input type="radio" name="link_type" value="link" checked style="accent-color:#1890ff;" onchange="toggleLink(this.value)" />
+            链接
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--color-text-primary);">
+            <input type="radio" name="link_type" value="activity" style="accent-color:#1890ff;" onchange="toggleLink(this.value)" />
+            活动
+          </label>
+        </div>
+
+        <div id="panel-link">
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:13px;color:var(--color-text-secondary);min-width:44px;text-align:right;white-space:nowrap;">PC/H5</span>
+              <input type="text" style="flex:1;height:32px;font-size:13px;" placeholder="请输入 PC/H5 跳转链接" />
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:8px;">
+              <span style="font-size:13px;color:var(--color-text-secondary);min-width:44px;text-align:right;white-space:nowrap;padding-top:7px;">APP</span>
+              <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+                <input type="text" style="width:100%;height:32px;font-size:13px;box-sizing:border-box;" placeholder="请输入 APP 跳转链接" />
+                <span style="font-size:12px;color:var(--color-text-danger);">* 必须输入完整链接地址</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="panel-activity" style="display:none;">
+          <select style="width:100%;height:32px;font-size:13px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;color:#333;padding:0 8px;">
+            <option value="" disabled selected>选择活动</option>
+            <option>存款优惠活动</option>
+            <option>每日签到活动</option>
+            <option>新人注册礼包</option>
+            <option>VIP 专属返水</option>
+            <option>周周好礼活动</option>
+          </select>
+          <p style="font-size:12px;color:var(--color-text-tertiary);margin:6px 0 0;">下拉清单显示当前已开启的活动</p>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:13px;color:var(--color-text-danger);min-width:8px;">*</span>
+        <label style="font-size:13px;color:var(--color-text-primary);min-width:100px;text-align:right;">币种</label>
+        <select style="height:32px;font-size:13px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-tertiary);padding:0 8px;width:200px;">
+          <option value="" disabled selected>选择币别</option>
+        </select>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:13px;color:var(--color-text-danger);min-width:8px;">*</span>
+        <label style="font-size:13px;color:var(--color-text-primary);min-width:100px;text-align:right;">语系</label>
+        <select style="height:32px;font-size:13px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-tertiary);padding:0 8px;width:200px;">
+          <option value="" disabled selected>选择语系</option>
+        </select>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="min-width:8px;"></span>
+        <label style="font-size:13px;color:var(--color-text-primary);min-width:100px;text-align:right;">默认显示</label>
+        <select style="height:32px;font-size:13px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);padding:0 8px;width:200px;">
+          <option selected>否</option>
+          <option>是</option>
+        </select>
+      </div>
+      <div style="padding-left:120px;">
+        <span style="font-size:12px;color:var(--color-text-tertiary);">一个币别只能有一个默认显示</span>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="min-width:8px;"></span>
+        <label style="font-size:13px;color:var(--color-text-primary);min-width:100px;text-align:right;">送审版本是否隐藏</label>
+        <div style="display:flex;gap:16px;">
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;"><input type="radio" name="review_hide" /> 是</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;color:#1890ff;"><input type="radio" name="review_hide" checked style="accent-color:#1890ff;" /> 否</label>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="min-width:8px;"></span>
+        <label style="font-size:13px;color:var(--color-text-primary);min-width:100px;text-align:right;">是否隐藏</label>
+        <div style="display:flex;gap:16px;">
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;"><input type="radio" name="is_hide" /> 是</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;color:#1890ff;"><input type="radio" name="is_hide" checked style="accent-color:#1890ff;" /> 否</label>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:13px;color:var(--color-text-danger);min-width:8px;">*</span>
+        <label style="font-size:13px;color:var(--color-text-primary);min-width:100px;text-align:right;">Google验证码</label>
+        <input type="text" style="flex:1;height:32px;font-size:13px;" />
+      </div>
+
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="min-width:8px;"></span>
+        <label style="font-size:13px;color:var(--color-text-primary);min-width:100px;text-align:right;">用户标签展示</label>
+        <select style="height:32px;font-size:13px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-tertiary);padding:0 8px;width:200px;">
+          <option value="" disabled selected>用户标签展示</option>
+        </select>
+      </div>
+
+      <div style="display:flex;justify-content:center;margin-top:10px;">
+        <button style="background:#1890ff;color:#fff;border:none;border-radius:var(--border-radius-md);padding:8px 40px;font-size:14px;cursor:pointer;">确定</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleLink(val) {
+  document.getElementById('panel-link').style.display = val === 'link' ? 'block' : 'none';
+  document.getElementById('panel-activity').style.display = val === 'activity' ? 'block' : 'none';
+}
+</script>

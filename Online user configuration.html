@@ -269,9 +269,15 @@
     </div>
 
     <div class="config-row">
-      <div class="config-label">浮动人数更新周期（秒）</div>
+      <div class="config-label">浮动人数更新周期</div>
       <div class="config-value">
-        <input type="number" value="30" min="1" style="width:220px">
+        <select style="width:220px">
+          <option value="10">10秒</option>
+          <option value="30" selected>30秒</option>
+          <option value="60">60秒</option>
+          <option value="300">5分钟</option>
+          <option value="600">10分钟</option>
+        </select>
       </div>
     </div>
   </div>
