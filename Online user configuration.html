@@ -118,7 +118,7 @@
   /* Tag section */
   .tag-header {
     display: grid;
-    grid-template-columns: 150px 1fr 1fr 90px;
+    grid-template-columns: 150px 150px 1fr 1fr 90px;
     gap: 8px;
     font-size: 12px;
     font-weight: 500;
@@ -130,7 +130,7 @@
 
   .tag-row {
     display: grid;
-    grid-template-columns: 150px 1fr 1fr 90px;
+    grid-template-columns: 150px 150px 1fr 1fr 90px;
     gap: 8px;
     align-items: center;
     padding: 8px 0;
@@ -272,7 +272,6 @@
       <div class="config-label">浮动人数更新周期</div>
       <div class="config-value">
         <select style="width:220px">
-          <option value="10">10秒</option>
           <option value="30" selected>30秒</option>
           <option value="60">60秒</option>
           <option value="300">5分钟</option>
@@ -284,12 +283,12 @@
 
   <!-- 游戏类型配置 -->
   <div class="section">
-    <div class="section-title">游戏类型浮动人数配置</div>
+    <div class="section-title">首页分类浮动人数配置</div>
     <table>
       <thead>
         <tr>
           <th style="width:60px">序号</th>
-          <th>游戏类型</th>
+          <th>首页分类</th>
           <th>最少人数</th>
           <th>最大人数</th>
         </tr>
@@ -303,6 +302,7 @@
     <div class="section-title">标签浮动人数配置</div>
 
     <div class="tag-header">
+      <div>首页分类</div>
       <div>标签</div>
       <div>最少人数</div>
       <div>最大人数</div>
@@ -383,8 +383,9 @@
   });
 
   // Tags
+  const categoryOptions = ['SLOT','PERYA','CASINO','POKER','ARCADE','EBINGO','NUMERIC','SPORT','POPULAR'];
   const tagOptions = ['top','hot','new','recommend','featured','live','exclusive'];
-  let tags = [{tag:'top', min:500, max:1200}, {tag:'hot', min:300, max:900}];
+  let tags = [{category:'SLOT', tag:'top', min:500, max:1200}, {category:'SLOT', tag:'hot', min:300, max:900}];
   const MAX_TAGS = 10;
 
   function renderTags() {
@@ -393,8 +394,10 @@
     tags.forEach((t, i) => {
       const row = document.createElement('div');
       row.className = 'tag-row';
+      const catOpts = categoryOptions.map(o => `<option value="${o}"${o === t.category ? ' selected' : ''}>${o}</option>`).join('');
       const opts = tagOptions.map(o => `<option value="${o}"${o === t.tag ? ' selected' : ''}>${o}</option>`).join('');
       row.innerHTML = `
+        <select onchange="tags[${i}].category=this.value">${catOpts}</select>
         <select onchange="tags[${i}].tag=this.value">${opts}</select>
         <input class="mini-input" type="number" value="${t.min}" min="0" oninput="tags[${i}].min=+this.value; validateTagRow(this)">
         <div>
@@ -421,7 +424,7 @@
 
   function addTag() {
     if (tags.length >= MAX_TAGS) return;
-    tags.push({tag: 'top', min: 0, max: 500});
+    tags.push({category: 'SLOT', tag: 'top', min: 0, max: 500});
     renderTags();
   }
 
