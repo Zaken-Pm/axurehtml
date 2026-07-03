@@ -1,0 +1,2851 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>一番赏（Ichiban Kuji）开发规格说明书</title>
+<style>
+/* ============================================================
+   一番赏 开发规格说明书 v1.1
+   - 图文分区块：每个区块 = 示意图 + 规则说明
+   - 前台 Tab 左侧完整内嵌 ichiban_kuji_h5 原型（可交互）
+   - 文档自身 CSS 遵循 Figma / Axure 9 防折行规范：
+     文字元素 nowrap + max-content；容器固定 px；全 px 字级行高
+   ============================================================ */
+:root{
+  --ink:#1F2329; --ink-2:#3D4652; --ink-3:#6B7686;
+  --line:#E3E8EF; --line-2:#EEF1F5;
+  --blue:#1657C6; --blue-bg:#EFF6FF;
+  --red:#C6362F; --red-bg:#FFF1F0;
+  --gold:#B08A3C; --gold-bg:#FFF9E8;
+  --green:#2E7D32; --green-bg:#F0F9F0;
+  --card:#FFFFFF; --page:#EDF0F4;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--page);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans","Microsoft YaHei",sans-serif;
+  display:flex;flex-direction:column;align-items:center;padding:28px 0 64px}
+
+/* ── 防折行全局规则（文档区） ── */
+h1,h2,h3,h4,h5,h6,p,li,span,td,th,label{white-space:nowrap;width:max-content}
+b,code,a{display:inline-block;white-space:nowrap;width:max-content}
+code{font-family:"SF Mono",Consolas,Menlo,monospace;font-size:12px;line-height:18px;
+  background:#F2F4F8;border:1px solid var(--line);border-radius:4px;padding:1px 6px;color:#9C2A22}
+a{color:var(--blue);text-decoration:none}
+
+/* ── HEADER ── */
+.spec-header{width:1240px;flex-shrink:0;background:var(--card);border:1px solid var(--line);
+  border-radius:10px;padding:22px 28px;display:flex;flex-direction:column;gap:12px}
+.spec-header h1{font-size:22px;line-height:30px;font-weight:700}
+.meta-row{display:flex;gap:10px;width:1184px;flex-shrink:0}
+.chip{display:inline-flex;align-items:center;gap:6px;background:#F5F7FA;border:1px solid var(--line);
+  border-radius:14px;padding:3px 12px;font-size:12px;line-height:18px;color:var(--ink-2);flex-shrink:0}
+.chip b{color:var(--ink);font-size:12px;line-height:18px}
+
+/* ── TAB NAV ── */
+.tab-nav{width:1240px;flex-shrink:0;display:flex;gap:8px;margin:16px 0 14px}
+.tab-btn{border:1px solid #D5DBE3;background:#fff;border-radius:8px;padding:10px 22px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:8px;flex-shrink:0;font-family:inherit}
+.tab-btn span{font-size:14px;line-height:20px;color:var(--ink-2);font-weight:500}
+.tab-btn .dot{width:8px;height:8px;border-radius:50%;background:#C4CBD4;flex-shrink:0}
+.tab-btn:hover{border-color:var(--blue)}
+.tab-btn.active{background:var(--blue);border-color:var(--blue)}
+.tab-btn.active span{color:#fff}
+.tab-btn.active .dot{background:#fff}
+
+/* ── PANEL / TOOLS ── */
+.panel{display:none;flex-direction:column;gap:14px;width:1240px;flex-shrink:0}
+.panel.active{display:flex}
+.panel-tools{width:1240px;flex-shrink:0;display:flex;align-items:center;gap:8px;
+  background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 16px}
+.tools-label{font-size:12px;line-height:18px;color:var(--ink-3)}
+.anchor-btn{border:1px solid var(--line);background:#F8FAFC;border-radius:14px;padding:4px 14px;
+  cursor:pointer;flex-shrink:0;font-family:inherit;display:inline-flex;align-items:center}
+.anchor-btn span{font-size:12px;line-height:18px;color:var(--ink-2)}
+.anchor-btn:hover{border-color:var(--blue)}
+.anchor-btn:hover span{color:var(--blue)}
+.tools-gap{width:24px;height:1px;flex-shrink:0}
+.mini-btn{border:1px solid var(--line);background:#fff;border-radius:6px;padding:4px 12px;
+  cursor:pointer;flex-shrink:0;font-family:inherit;display:inline-flex;align-items:center}
+.mini-btn span{font-size:12px;line-height:18px;color:var(--ink-2)}
+.mini-btn:hover{border-color:var(--blue)}
+
+/* ── SECTION CARD ── */
+.sec-card{width:1240px;flex-shrink:0;background:var(--card);border:1px solid var(--line);border-radius:10px}
+.sec-head{width:1238px;display:flex;align-items:center;gap:12px;padding:14px 22px;cursor:pointer;
+  border-bottom:1px solid var(--line-2)}
+.sec-num{display:inline-flex;align-items:center;justify-content:center;width:56px;height:24px;
+  border-radius:6px;font-size:12px;line-height:18px;font-weight:700;flex-shrink:0}
+.n-blue{background:var(--blue-bg);color:var(--blue);border:1px solid #BFDBFE}
+.n-red{background:var(--red-bg);color:var(--red);border:1px solid #FFCCC7}
+.n-gold{background:var(--gold-bg);color:#8C6A26;border:1px solid #F5D98E}
+.n-green{background:var(--green-bg);color:var(--green);border:1px solid #C8E6C9}
+.sec-head h2{font-size:16px;line-height:24px;font-weight:700}
+.sec-head .chev{margin-left:auto;font-size:13px;line-height:20px;color:var(--ink-3)}
+.sec-card.fold .sec-head{border-bottom:none}
+.sec-card.fold .sec-body{display:none}
+.sec-body{width:1238px;padding:18px 22px 22px;display:flex;flex-direction:column;gap:14px}
+
+/* 窄卡（前台右栏） */
+.sec-card.w790{width:790px}
+.sec-card.w790 .sec-head{width:788px;padding:12px 20px}
+.sec-card.w790 .sec-body{width:788px;padding:16px 20px 20px;gap:12px}
+
+.sub-t{font-size:14px;line-height:22px;font-weight:700;display:flex;align-items:center;gap:8px}
+.sub-t::before{content:'';width:4px;height:14px;border-radius:2px;background:var(--blue);flex-shrink:0}
+
+/* ── TABLE ── */
+.spec-table{width:1194px;border-collapse:collapse;border:1px solid var(--line)}
+.spec-table th{background:#F5F7FA;text-align:left;font-size:13px;line-height:20px;font-weight:600;
+  color:var(--ink-2);padding:9px 12px;border-bottom:1px solid var(--line)}
+.spec-table td{font-size:13px;line-height:20px;color:#2A3340;padding:9px 12px;
+  border-bottom:1px solid var(--line-2);vertical-align:top}
+.spec-table tr:last-child td{border-bottom:none}
+.spec-table tbody tr:hover td{background:#FAFCFF}
+.cl{white-space:nowrap;width:max-content;font-size:13px;line-height:20px;color:#2A3340}
+.cl.sub{font-size:12px;line-height:18px;color:var(--ink-3)}
+
+/* ── TAG ── */
+.tag{display:inline-flex;align-items:center;padding:1px 9px;border-radius:10px;
+  font-size:12px;line-height:18px;font-weight:600;flex-shrink:0}
+.tag-req{background:var(--red-bg);color:#CF1322;border:1px solid #FFCCC7}
+.tag-opt{background:#F5F5F5;color:#666;border:1px solid #E5E5E5}
+.tag-blue{background:#E6F4FF;color:#1677FF;border:1px solid #91CAFF}
+.tag-gold{background:#FFF7E6;color:#D46B08;border:1px solid #FFD591}
+.tag-green{background:#F6FFED;color:#389E0D;border:1px solid #B7EB8F}
+.tag-gray{background:#F5F5F5;color:#666;border:1px solid #E5E5E5}
+
+/* ── CALLOUT ── */
+.callout{width:1194px;flex-shrink:0;display:flex;gap:12px;border-radius:8px;padding:12px 16px;border:1px solid}
+.callout.w-in{width:582px}
+.co-warn{background:var(--gold-bg);border-color:#F5D98E}
+.co-info{background:var(--blue-bg);border-color:#BFDBFE}
+.co-risk{background:var(--red-bg);border-color:#FFCCC7}
+.co-icon{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-size:12px;line-height:18px;font-weight:700;color:#fff}
+.co-warn .co-icon{background:#D9A62E}
+.co-info .co-icon{background:var(--blue)}
+.co-risk .co-icon{background:var(--red)}
+.co-body{width:1120px;flex-shrink:0;display:flex;flex-direction:column;gap:4px}
+.callout.w-in .co-body{width:520px}
+.co-body .t{font-size:13px;line-height:20px;font-weight:700}
+.co-body .d{font-size:13px;line-height:20px;color:var(--ink-2)}
+
+/* ── FLOW ── */
+.flow{width:1194px;flex-shrink:0;display:flex;align-items:center;gap:8px}
+.flow-step{display:flex;flex-direction:column;gap:3px;background:#F8FAFC;border:1px solid var(--line);
+  border-radius:8px;padding:10px 14px;flex-shrink:0}
+.flow-step .fs-n{font-size:11px;line-height:16px;color:var(--ink-3);font-weight:600}
+.flow-step .fs-t{font-size:13px;line-height:20px;font-weight:600}
+.flow-arrow{font-size:14px;line-height:20px;color:#A8B2BE;flex-shrink:0}
+
+/* ══ 前台双栏布局 ══ */
+.h5-layout{width:1240px;flex-shrink:0;display:flex;gap:20px;align-items:flex-start}
+.h5-left{width:430px;flex-shrink:0;display:flex;flex-direction:column;gap:10px;position:sticky;top:16px}
+.h5-left-cap{display:flex;gap:8px;align-items:center;width:430px;flex-shrink:0}
+.h5-right{width:790px;flex-shrink:0;display:flex;flex-direction:column;gap:12px}
+
+/* ── 区块卡内部：示意图 + 规则 ── */
+.blk-body{width:748px;flex-shrink:0;display:flex;gap:16px;align-items:flex-start}
+.rules-col{width:582px;flex-shrink:0;display:flex;flex-direction:column;gap:8px}
+.rl{display:flex;gap:10px;width:582px;flex-shrink:0;align-items:flex-start}
+.rl-n{width:22px;height:22px;border-radius:50%;background:var(--red-bg);border:1px solid #FFCCC7;
+  color:var(--red);font-size:11px;line-height:16px;font-weight:700;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;margin-top:1px}
+.rl-t{width:550px;flex-shrink:0;display:flex;flex-direction:column;gap:2px}
+.demo-btn{border:1px solid var(--red);background:#fff;border-radius:6px;padding:5px 14px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;flex-shrink:0;font-family:inherit}
+.demo-btn span{font-size:12px;line-height:18px;color:var(--red);font-weight:600}
+.demo-btn:hover{background:var(--red-bg)}
+.demo-row{display:flex;gap:8px;width:550px;flex-shrink:0}
+
+/* ── 位置示意（迷你骨架） ── */
+.skel{width:150px;flex-shrink:0;display:flex;flex-direction:column;gap:8px;align-items:center}
+.skel-dev{width:132px;flex-shrink:0;border:1px solid #C9D2DD;border-radius:10px;background:#fff;
+  padding:5px;display:flex;flex-direction:column;gap:4px}
+.sk{width:120px;border-radius:3px;background:#E8EDF3;flex-shrink:0}
+.sk-top{height:14px}.sk-kv{height:52px}.sk-stock{height:10px}.sk-draw{height:52px}.sk-pool{height:110px}
+.sk.on{background:var(--red)}
+.sk-box{width:120px;height:110px;border-radius:3px;background:#4A4440;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center}
+.sk-modal{width:84px;height:64px;border-radius:5px;background:#fff;border:2px solid var(--red);flex-shrink:0}
+.sk-cap{font-size:11px;line-height:16px;color:var(--ink-3);text-align:center}
+
+/* ── 后台区块示意图（mock） ── */
+.mock{width:1194px;flex-shrink:0;background:#F7F9FC;border:1px dashed #C9D2DD;border-radius:8px;
+  padding:16px;display:flex;flex-direction:column;gap:10px}
+.mock-cap{font-size:12px;line-height:18px;color:var(--ink-3);font-weight:600}
+.mk-modal{width:560px;flex-shrink:0;border:1px solid var(--line);border-radius:6px;background:#fff;
+  display:flex;flex-direction:column;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+.mk-mhead{width:558px;padding:10px 16px;border-bottom:1px solid #F0F0F0;display:flex;
+  justify-content:space-between;align-items:center}
+.mk-mtitle{font-size:14px;line-height:20px;font-weight:700}
+.mk-x{font-size:14px;line-height:20px;color:#999}
+.mk-mbody{width:558px;padding:20px 16px;display:flex;justify-content:center}
+.mk-dim{font-size:12px;line-height:18px;color:#A8B2BE}
+.mk-mfoot{width:558px;padding:10px 16px;border-top:1px solid #F0F0F0;display:flex;justify-content:center;gap:10px}
+.mk-btn{display:inline-flex;align-items:center;background:#1677FF;color:#fff;border-radius:4px;
+  padding:5px 18px;font-size:13px;line-height:20px;flex-shrink:0}
+.mk-btn-o{display:inline-flex;align-items:center;background:#FA8C16;color:#fff;border-radius:4px;
+  padding:5px 18px;font-size:13px;line-height:20px;flex-shrink:0}
+.mk-row{display:flex;align-items:center;flex-shrink:0}
+.mk-lab{width:150px;flex-shrink:0;display:flex;justify-content:flex-end;padding-right:12px}
+.mk-lab span{font-size:13px;line-height:20px;color:#333}
+.mk-req{color:#FF4D4F}
+.mk-input{width:300px;height:32px;border:1px solid #D9D9D9;border-radius:4px;background:#fff;
+  display:flex;align-items:center;padding:0 10px;flex-shrink:0}
+.mk-input span{font-size:13px;line-height:20px;color:#BBB}
+.mk-check{display:flex;gap:16px;flex-shrink:0}
+.mk-check span{font-size:13px;line-height:20px;color:#333}
+.mk-check .on{color:#1677FF;font-weight:700}
+.mk-panels{display:flex;gap:14px;flex-shrink:0}
+.mk-panel{width:272px;flex-shrink:0;border:1px solid #E8E8E8;border-radius:6px;background:#fff;
+  display:flex;flex-direction:column}
+.mk-phead{width:270px;padding:7px 12px;background:#FAFAFA;border-bottom:1px solid #F0F0F0;
+  display:flex;justify-content:space-between;align-items:center}
+.mk-phead span{font-size:12px;line-height:18px;color:#555}
+.mk-phead .hint{color:#BBB}
+.mk-drop{width:246px;height:84px;border:1px dashed #D9D9D9;border-radius:4px;margin:12px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;flex-shrink:0}
+.mk-drop span{font-size:12px;line-height:18px;color:#BBB}
+.mk-drop .plus{font-size:20px;line-height:24px;color:#D9D9D9}
+.mk-total{width:560px;flex-shrink:0;background:#E6F4FF;border:1px solid #91CAFF;border-radius:4px;
+  padding:9px 14px;display:flex;align-items:baseline;gap:6px}
+.mk-total span{font-size:13px;line-height:20px;color:#0958D9}
+.mk-total b{font-size:20px;line-height:26px;color:#1677FF}
+.mk-tier{width:560px;flex-shrink:0;border:1px solid #E8E8E8;border-radius:6px;background:#FAFAFA;
+  padding:9px 14px;display:flex;align-items:center;gap:10px}
+.mk-tier.last{background:#FFF7E6;border-color:#FFD591}
+.mk-badge{display:inline-flex;align-items:center;justify-content:center;background:#1677FF;color:#fff;
+  font-size:12px;line-height:18px;font-weight:700;padding:2px 12px;border-radius:12px;flex-shrink:0}
+.mk-badge.gold{background:#FA8C16}
+.mk-tier span{font-size:12px;line-height:18px;color:#666}
+.mk-realin{width:64px;height:28px;border:1px solid #D9D9D9;border-radius:4px;text-align:center;
+  font-size:13px;font-family:inherit;color:#333;outline:none;flex-shrink:0;background:#fff}
+.mk-realin:focus{border-color:#1677FF}
+.mk-realin.err{border-color:#FF4D4F;box-shadow:0 0 0 2px rgba(255,77,79,0.12)}
+.mk-realin.wide{width:200px;text-align:left;padding:0 10px}
+.mk-sel{height:30px;border:1px solid #D9D9D9;border-radius:4px;font-size:13px;font-family:inherit;
+  color:#333;outline:none;background:#fff;flex-shrink:0;padding:0 8px;cursor:pointer;width:150px}
+.mk-chip{display:inline-flex;align-items:center;background:#fff;border:1px solid #91CAFF;color:#1677FF;
+  border-radius:4px;padding:4px 12px;font-size:12px;line-height:18px;flex-shrink:0}
+.mk-errmsg{font-size:12px;line-height:18px;color:#FF4D4F}
+.mk-tabbar{display:flex;gap:0;border-bottom:2px solid #F0F0F0;width:1160px;flex-shrink:0}
+.mk-tab{padding:8px 18px;flex-shrink:0;display:flex;align-items:center}
+.mk-tab span{font-size:13px;line-height:20px;color:#666}
+.mk-tab.on{border-bottom:2px solid #1677FF;margin-bottom:-2px}
+.mk-tab.on span{color:#1677FF;font-weight:700}
+.mk-table{width:1160px;border-collapse:collapse;border:1px solid var(--line);background:#fff}
+.mk-table th{background:#FAFAFA;text-align:left;font-size:12px;line-height:18px;font-weight:600;
+  color:#555;padding:7px 10px;border-bottom:1px solid #F0F0F0}
+.mk-table td{font-size:12px;line-height:18px;color:#333;padding:8px 10px;border-bottom:1px solid #F8F8F8}
+.mk-qty{display:inline-flex;align-items:center;padding:1px 10px;border-radius:12px;
+  font-size:12px;line-height:18px;font-weight:600}
+.mk-qty.q1{background:#F5F5F5;color:#666;border:1px solid #E8E8E8}
+.mk-qty.q5{background:#E6F4FF;color:#1677FF;border:1px solid #91CAFF}
+.mk-qty.qa{background:#FFF7E6;color:#FA8C16;border:1px solid #FFD591}
+.mk-stats{display:flex;width:720px;flex-shrink:0;border:1px solid #F0F0F0;border-radius:6px;background:#fff}
+.mk-stat{width:240px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:16px 0;border-right:1px solid #F5F5F5}
+.mk-stat:last-child{border-right:none}
+.mk-stat .v{font-size:24px;line-height:30px;font-weight:700;color:#1A1A1A}
+.mk-stat .k{font-size:12px;line-height:18px;color:#999}
+.mk-pgn{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.mk-pgn .pt{font-size:13px;line-height:20px;color:#999;padding-right:8px}
+.mk-pg{width:32px;height:32px;border:1px solid #D9D9D9;background:#fff;border-radius:4px;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-family:inherit}
+.mk-pg span{font-size:13px;line-height:20px;color:#333}
+.mk-pg:hover{border-color:#1677FF}
+.mk-pg.active{background:#1677FF;border-color:#1677FF}
+.mk-pg.active span{color:#fff}
+.mk-pg.dots{border:none;cursor:default}
+.mk-fmt{display:flex;gap:10px;align-items:center;flex-shrink:0}
+.mk-fmt .in{font-size:12px;line-height:18px;color:#666;background:#fff;border:1px solid #E8E8E8;
+  border-radius:4px;padding:3px 10px}
+.mk-fmt .ar{font-size:13px;line-height:20px;color:#A8B2BE}
+.mk-fmt .out{font-size:12px;line-height:18px;color:#0958D9;background:#E6F4FF;border:1px solid #91CAFF;
+  border-radius:4px;padding:3px 10px;font-weight:600}
+
+/* ── 交叉查阅页签 ── */
+.xref-row{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.xref{display:inline-flex;align-items:center;border:1px dashed #91CAFF;background:#F0F7FF;
+  border-radius:4px;padding:1px 8px;flex-shrink:0;cursor:pointer}
+.xref span{font-size:12px;line-height:18px;color:var(--blue)}
+.xref:hover{background:#E0EFFF}
+
+/* ── 窄卡内表格 ── */
+.spec-table.tw{width:748px}
+
+/* ── 垂直流程图 ── */
+.vflow{width:748px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px}
+.vf-node{border:1px solid var(--line);background:#F8FAFC;border-radius:8px;padding:7px 18px;
+  flex-shrink:0;display:flex;align-items:center;gap:8px}
+.vf-node span{font-size:12px;line-height:18px;font-weight:600;color:var(--ink)}
+.vf-node.dec{border-color:#F5D98E;background:var(--gold-bg)}
+.vf-node.ok{border-color:#C8E6C9;background:var(--green-bg)}
+.vf-arrow{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.vf-arrow .dn{font-size:12px;line-height:18px;color:var(--ink-3);font-weight:600}
+.vf-else{display:inline-flex;align-items:center;border:1px solid #FFCCC7;background:var(--red-bg);
+  border-radius:4px;padding:1px 8px;flex-shrink:0}
+.vf-else span{font-size:12px;line-height:18px;color:#CF1322}
+.vf-side{display:inline-flex;align-items:center;border:1px solid #C8E6C9;background:var(--green-bg);
+  border-radius:4px;padding:1px 8px;flex-shrink:0}
+.vf-side span{font-size:12px;line-height:18px;color:#389E0D}
+
+/* ── FOOTER ── */
+.spec-footer{width:1240px;flex-shrink:0;margin-top:18px;display:flex;justify-content:center;padding:14px 0}
+.spec-footer span{font-size:12px;line-height:18px;color:var(--ink-3)}
+
+/* ============================================================
+   以下为 ichiban_kuji_h5 原型 CSS —— 完整保留，作用域 #h5proto
+   ============================================================ */
+#h5proto{--paper:#F1E9D6;--fuda:#FBF6EA;--sumi:#2A2723;--sumi-2:#6B6256;
+  --shu:#C6362F;--shu-d:#9C2A22;--kin:#B08A3C;--kin-d:#8c6a26;--ai:#33506A;
+  --line:#E0D5BC;--line-2:#D2C4A4;--img:64px;
+  width:430px;flex-shrink:0;background:#332e2a;padding:20px;border-radius:12px;
+  display:flex;justify-content:center;color:var(--sumi);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans","Microsoft YaHei",sans-serif}
+/* 还原文档全局防折行规则，保证原型原始排版 */
+#h5proto h1,#h5proto h2,#h5proto h3,#h5proto p,#h5proto li,#h5proto span,
+#h5proto td,#h5proto th,#h5proto label{white-space:normal;width:auto}
+#h5proto b,#h5proto a{display:inline;white-space:normal;width:auto}
+#h5proto *{-webkit-tap-highlight-color:transparent}
+#h5proto .serif{font-family:"Songti SC","Hiragino Mincho ProN","STSong",serif}
+#h5proto .device{width:390px;min-height:880px;background:var(--paper);position:relative;border-radius:6px;overflow:hidden;
+  background-image:
+    repeating-linear-gradient(0deg,rgba(0,0,0,.012) 0 1px,transparent 1px 4px),
+    repeating-linear-gradient(90deg,rgba(0,0,0,.012) 0 1px,transparent 1px 4px)}
+#h5proto .topbar{display:flex;align-items:center;gap:10px;padding:11px 16px}
+#h5proto .icon-btn{width:30px;height:30px;border:1px solid var(--line-2);border-radius:50%;background:var(--fuda);color:var(--sumi-2);font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#h5proto .topbar .title{flex:1;text-align:center;font-size:15px;letter-spacing:4px}
+#h5proto .banner{position:relative}
+#h5proto .kv{height:142px;position:relative;overflow:hidden;background:repeating-linear-gradient(45deg,#E7DEC8 0 11px,#E1D7BC 11px 22px)}
+#h5proto .kv .kv-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--sumi-2);font-size:12px;text-align:center;gap:3px;letter-spacing:1px}
+#h5proto .kv .kv-ph small{font-size:10px;opacity:.7}
+#h5proto .kv .scrim{position:absolute;left:0;right:0;bottom:0;height:84px;background:linear-gradient(transparent,rgba(42,39,35,.62))}
+#h5proto .kv .nobori{position:absolute;top:10px;left:12px;writing-mode:vertical-rl;text-orientation:upright;background:var(--shu);color:#fff;font-size:14px;letter-spacing:3px;padding:6px 4px;border-radius:3px;box-shadow:1px 1px 0 var(--shu-d);z-index:2}
+#h5proto .kv .kv-text{position:absolute;left:14px;right:14px;bottom:11px;z-index:2;color:#fff}
+#h5proto .kv .kv-text .kicker{font-size:10px;letter-spacing:3px;opacity:.92;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+#h5proto .kv .kv-text .kv-title{font-size:23px;font-weight:700;line-height:1.1;margin-top:2px;text-shadow:0 1px 4px rgba(0,0,0,.55)}
+#h5proto .noren-edge{height:14px;background:radial-gradient(circle 9px at 12px -1px,var(--shu) 70%,transparent 72%) repeat-x;background-size:24px 14px}
+#h5proto .b-stock{padding:9px 16px 11px;border-bottom:1px solid var(--line);background:#F6EFDD}
+#h5proto .b-stock .r1{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;color:var(--sumi-2)}
+#h5proto .b-stock .r1 b{font-family:"Songti SC",serif;font-size:18px;color:var(--shu);margin-right:1px}
+#h5proto .stock-bar{height:6px;background:#E7DcC4;border:1px solid var(--line-2);border-radius:4px;overflow:hidden;margin-top:5px}
+#h5proto .stock-fill{height:100%;background:repeating-linear-gradient(45deg,var(--shu) 0 6px,var(--shu-d) 6px 12px)}
+#h5proto .draw-zone{padding:14px 16px 16px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#F6EFDD,var(--paper))}
+#h5proto .seg{display:flex;gap:6px;margin-bottom:11px}
+#h5proto .seg button{flex:1;background:#fff;border:1px solid var(--line-2);color:var(--sumi-2);border-radius:5px;padding:8px 0;font-size:13px;cursor:pointer;font-family:"Songti SC",serif;white-space:nowrap}
+#h5proto .seg button .x{font-size:10px;opacity:.7}
+#h5proto .seg button.on{background:var(--sumi);color:#fff;border-color:var(--sumi)}
+#h5proto .seg button.all{border-color:var(--kin);color:var(--kin-d)}
+#h5proto .seg button.all.on{background:linear-gradient(135deg,#C9A24B,#9c7a2c);color:#fff;border-color:var(--kin-d)}
+#h5proto .ticket-btn{width:100%;border:none;cursor:pointer;display:flex;align-items:stretch;background:var(--shu);color:#fff;border-radius:7px;overflow:hidden;box-shadow:0 2px 0 var(--shu-d);padding:0}
+#h5proto .ticket-btn:active{transform:translateY(1px);box-shadow:0 1px 0 var(--shu-d)}
+#h5proto .ticket-btn .stub{flex:0 0 84px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 6px;border-right:2px dashed rgba(255,255,255,.55);background:rgba(0,0,0,.08)}
+#h5proto .ticket-btn .stub .s1{font-size:10px;letter-spacing:2px;opacity:.9}
+#h5proto .ticket-btn .stub .s2{font-family:"Songti SC",serif;font-size:16px;margin-top:3px}
+#h5proto .ticket-btn .main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px}
+#h5proto .ticket-btn .main .t1{font-size:11px;letter-spacing:3px;opacity:.9}
+#h5proto .ticket-btn .main .t2{font-family:"Songti SC",serif;font-size:19px;font-weight:700;letter-spacing:2px;margin-top:3px}
+#h5proto .ticket-btn .main .t2 small{font-size:12px;font-weight:400;opacity:.9}
+#h5proto .ticket-btn[disabled]{background:#b3a69a;box-shadow:0 2px 0 #968a7d;cursor:not-allowed}
+#h5proto .dz-foot{display:flex;justify-content:space-between;margin-top:9px;font-size:11px;color:var(--sumi-2)}
+#h5proto .dz-foot .mine b{color:var(--sumi);font-size:12px}
+#h5proto .kv-rules{position:absolute;bottom:10px;right:10px;z-index:3;border:none;border-radius:14px;background:rgba(255,255,255,.88);color:var(--sumi-2);font-size:11px;font-weight:600;padding:5px 11px;cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;font-family:inherit;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+#h5proto .kv-rules:active{background:#fff}
+#h5proto .rules-ov{position:absolute;inset:0;background:rgba(42,39,35,.75);z-index:60;display:none;align-items:flex-start;justify-content:center;padding:80px 24px 24px}
+#h5proto .rules-ov.show{display:flex}
+#h5proto .rules-box{background:var(--paper);border-radius:10px;width:100%;max-height:80%;display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--kin)}
+#h5proto .rules-hd{display:flex;align-items:center;justify-content:space-between;padding:13px 16px 11px;border-bottom:1px solid var(--line)}
+#h5proto .rules-htitle{font-size:14px;letter-spacing:4px}
+#h5proto .rules-bd{overflow-y:auto;padding:12px 16px 16px}
+#h5proto .rules-row{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+#h5proto .rules-row:last-child{border:none;padding-bottom:0}
+#h5proto .rules-row:first-child{padding-top:0}
+#h5proto .rules-dot{width:18px;height:18px;border-radius:50%;flex-shrink:0;margin-top:2px;background:rgba(198,54,47,.08);border:1px solid rgba(198,54,47,.22);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--shu);font-weight:700}
+#h5proto .rules-txt{font-size:11.5px;color:var(--sumi-2);line-height:1.7}
+#h5proto .rules-txt b{color:var(--sumi)}
+#h5proto .tkt-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+#h5proto .tkt-card{border:none;cursor:pointer;border-radius:7px;background:var(--shu);color:#fff;box-shadow:0 2px 0 var(--shu-d);padding:9px 12px;display:flex;flex-direction:column;align-items:center;gap:3px;position:relative;overflow:hidden;font-family:inherit}
+#h5proto .tkt-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:rgba(255,255,255,.25)}
+#h5proto .tkt-card:active{transform:translateY(1px);box-shadow:0 1px 0 var(--shu-d)}
+#h5proto .tkt-card .tc-n{font-family:"Songti SC",serif;font-size:16px;font-weight:700;line-height:1}
+#h5proto .tkt-card .tc-cost{font-size:10px;opacity:.8}
+#h5proto .tkt-card.all{background:linear-gradient(135deg,#C9A24B,#9c7a2c)}
+#h5proto .tkt-card.on{box-shadow:0 0 0 2.5px rgba(255,255,255,.9),0 0 0 4.5px var(--shu-d),0 2px 0 var(--shu-d)}
+#h5proto .tkt-card.all.on{box-shadow:0 0 0 2.5px rgba(255,255,255,.9),0 0 0 4.5px var(--kin-d),0 2px 0 var(--kin-d)}
+#h5proto .tkt-card[disabled]{background:#b3a69a;box-shadow:none;cursor:not-allowed}
+#h5proto .tear-main{width:100%;border:none;cursor:pointer;background:var(--sumi);color:#fff;border-radius:7px;padding:10px;box-shadow:0 2px 0 #1a1714;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit}
+#h5proto .tear-main:active{transform:translateY(1px);box-shadow:0 1px 0 #1a1714}
+#h5proto .tear-main .tm-lbl{font-family:"Songti SC",serif;font-size:14px;letter-spacing:2px}
+#h5proto .tear-main small{font-size:11px;opacity:.8}
+#h5proto .tear-main[disabled]{background:#b3a69a;box-shadow:none;cursor:not-allowed}
+#h5proto .pool{padding:14px 16px 24px}
+#h5proto .noren{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:13px}
+#h5proto .noren::before,#h5proto .noren::after{content:"";flex:1;height:0;border-top:2px solid var(--line-2)}
+#h5proto .noren .band{background:var(--shu);color:#fff;font-size:14px;letter-spacing:6px;padding:5px 18px;border-radius:3px;box-shadow:0 2px 0 var(--shu-d)}
+#h5proto .seal2{flex-shrink:0;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;background:var(--shu);color:#fff;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.4)}
+#h5proto .seal2 .a{font-family:"Songti SC",serif;font-size:15px;font-weight:700;line-height:1}
+#h5proto .seal2 .s{font-size:8px;opacity:.9;margin-top:1px;letter-spacing:.5px}
+#h5proto .seal2.gold{background:linear-gradient(135deg,#D9B45A,#9c7a2c);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.55),0 0 0 2px rgba(201,162,75,.25)}
+#h5proto .ph{background:repeating-linear-gradient(45deg,#EEE6D0 0 8px,#E9E0C8 8px 16px);border:1px solid var(--line-2);border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--sumi-2);font-size:9px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+#h5proto .ic{border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:800;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+#h5proto .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#h5proto .gfeat{grid-column:1/-1;display:flex;gap:13px;align-items:center;background:linear-gradient(135deg,#FBF3DC,#F3E4B8);border:1.5px solid var(--kin);border-radius:9px;padding:12px;position:relative;overflow:hidden;box-shadow:0 3px 14px rgba(176,138,60,.3);margin-bottom:2px}
+#h5proto .gfeat::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 90% 8%,rgba(255,240,200,.6),transparent 40%)}
+#h5proto .gfeat .g-img{background:#fff;border:1px solid var(--line-2);border-radius:9px;padding:6px;box-shadow:0 1px 5px rgba(0,0,0,.07);flex-shrink:0;z-index:2}
+#h5proto .gfeat .g-img .ph,#h5proto .gfeat .g-img .ic{width:104px;height:104px;flex-shrink:0;box-shadow:none}
+#h5proto .gfeat .g-img .ic span{font-size:46px}
+#h5proto .gfeat .info{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px;z-index:2}
+#h5proto .gfeat .f-name{font-size:17px;font-weight:700;line-height:1.2}
+#h5proto .gfeat .f-type{font-size:11px;color:var(--ai);border:1px solid var(--ai);border-radius:3px;padding:0 6px;align-self:flex-start}
+#h5proto .gfeat .f-note{font-size:11px;color:var(--kin-d)}
+#h5proto .gfeat .f-zan{font-size:11px;color:var(--sumi-2);margin-top:3px;padding-top:7px;border-top:1px dashed rgba(176,138,60,.45)}
+#h5proto .gfeat .f-zan b{font-family:"Songti SC",serif;font-size:20px;color:var(--shu)}
+#h5proto .gfeat .r-ribbon{position:absolute;top:0;right:0;background:linear-gradient(135deg,#D9B45A,#9c7a2c);color:#fff;font-size:10px;letter-spacing:1px;padding:3px 11px;border-radius:0 0 0 8px;z-index:3}
+#h5proto .gcard{background:var(--fuda);border:1px solid var(--line-2);border-radius:9px;padding:8px;position:relative;overflow:hidden}
+#h5proto .gcard.sold{opacity:.55;filter:grayscale(.4)}
+#h5proto .gcard.hi{border:1.5px solid var(--kin);background:linear-gradient(160deg,#FDF6E1,#F4E6BD);box-shadow:0 3px 12px rgba(176,138,60,.28)}
+#h5proto .gcard.hi::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 92% 6%,rgba(255,242,205,.75),transparent 38%)}
+#h5proto .gcard.mid{border:1px solid #E3CF9A;background:#FBF7EC}
+#h5proto .gcard .midtag{font-size:9px;color:var(--kin-d);border:1px solid #D9B45A;background:#fff;border-radius:3px;padding:1px 5px;position:relative;z-index:2}
+#h5proto .gcard .g-top{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+#h5proto .gcard .g-zan{margin-left:auto;display:flex;align-items:baseline;gap:2px}
+#h5proto .gcard .g-zan .lbl{font-size:10px;color:var(--sumi-2)}
+#h5proto .gcard .g-zan .num{font-family:"Songti SC",serif;font-size:19px;font-weight:700;color:var(--sumi)}
+#h5proto .gcard .g-zan .num.low{color:var(--shu)}
+#h5proto .gcard .g-zan .tot{font-size:10px;color:var(--sumi-2)}
+#h5proto .gcard .g-img{margin-bottom:7px;display:flex;justify-content:center}
+#h5proto .gcard .g-img .ph,#h5proto .gcard .g-img .ic{width:92px;height:92px}
+#h5proto .gcard .g-img .ic span{font-size:38px}
+#h5proto .gcard .g-name{font-size:12.5px;font-weight:600;line-height:1.3;min-height:32px}
+#h5proto .gcard .g-type{font-size:10px;color:var(--ai);margin-top:2px}
+#h5proto .gcard .uptag{font-size:9px;color:#fff;background:linear-gradient(135deg,#D9B45A,#9c7a2c);border:none;border-radius:3px;padding:1px 6px;position:relative;z-index:2}
+#h5proto .sold-chip{font-family:"Songti SC",serif;color:var(--shu);border:1.5px solid var(--shu);border-radius:4px;font-size:11px;padding:1px 7px;transform:rotate(-5deg)}
+#h5proto .overlay{position:absolute;inset:0;background:rgba(42,39,35,.78);display:none;align-items:flex-start;justify-content:center;padding:430px 24px 8px;z-index:50}
+#h5proto .overlay.show{display:flex}
+#h5proto .result{background:var(--paper);border-radius:10px;width:100%;max-height:440px;display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--kin)}
+#h5proto .result-head{text-align:center;padding:11px 16px 7px;font-size:15px;letter-spacing:3px}
+#h5proto .result-body{overflow-y:auto;padding:4px 10px 8px}
+#h5proto .last-hit{background:linear-gradient(135deg,#D9B45A,#9c7a2c);color:#fff;text-align:center;padding:9px;font-size:13px;letter-spacing:3px;margin-bottom:10px;border-radius:5px}
+#h5proto .rk-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+#h5proto .rk{position:relative;border:1px solid var(--line-2);border-radius:7px;margin-bottom:0;overflow:hidden;min-height:54px;background:var(--fuda)}
+#h5proto .rk .reveal{display:flex;align-items:center;gap:8px;padding:8px 9px}
+#h5proto .rk .rseal{flex-shrink:0;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:38px;height:38px;border-radius:6px;background:var(--shu);color:#fff;box-shadow:inset 0 0 0 2px rgba(255,255,255,.45)}
+#h5proto .rk .rseal .a{font-family:"Songti SC",serif;font-size:16px;font-weight:700;line-height:1}
+#h5proto .rk .rseal .s{font-size:7px;opacity:.9;margin-top:1px;letter-spacing:.5px}
+#h5proto .rk .rseal.gold{background:linear-gradient(135deg,#D9B45A,#9c7a2c);box-shadow:inset 0 0 0 2px rgba(255,255,255,.55),0 0 0 3px rgba(201,162,75,.3)}
+#h5proto .rk .reveal .r-txt{flex:1;min-width:0}
+#h5proto .rk .reveal .nm{font-size:12px;font-weight:700;line-height:1.25}
+#h5proto .rk .reveal .ty{font-size:10px;color:var(--sumi-2);margin-top:2px}
+#h5proto .rk .reveal .r-pic{background:#fff;border:1px solid var(--line-2);border-radius:8px;padding:4px;box-shadow:0 1px 4px rgba(0,0,0,.07);flex-shrink:0}
+#h5proto .rk .reveal .r-pic .ph,#h5proto .rk .reveal .r-pic .ic{width:46px;height:46px;box-shadow:none}
+#h5proto .rk .reveal .r-pic .ic span{font-size:24px}
+#h5proto .rk .cover{position:absolute;inset:0;background:var(--sumi);color:#fff;display:flex;align-items:center;justify-content:center;gap:6px;font-family:"Songti SC",serif;font-size:11px;letter-spacing:2px;z-index:2;border-left:3px dashed rgba(255,255,255,.55);clip-path:inset(0 0 0 0);transition:clip-path 1.1s ease}
+#h5proto .rk.torn .cover{clip-path:inset(0 0 0 100%)}
+#h5proto .rk .cover .arrow{font-size:13px;opacity:.85}
+#h5proto .sum-row{display:flex;align-items:center;gap:10px;background:var(--fuda);border:1px solid var(--line-2);border-radius:7px;padding:9px 12px;margin-bottom:8px}
+#h5proto .sum-row .ph,#h5proto .sum-row .ic{width:40px;height:40px;flex-shrink:0}
+#h5proto .sum-row .ic span{font-size:20px}
+#h5proto .sum-row .nm{flex:1;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+#h5proto .sum-row .cnt{font-family:"Songti SC",serif;font-size:18px;font-weight:700;color:var(--shu)}
+#h5proto .result-foot{padding:12px 16px 16px;border-top:1px solid var(--line)}
+#h5proto .btn-ok{width:100%;background:var(--sumi);color:#fff;border:none;border-radius:6px;padding:11px;font-size:14px;letter-spacing:3px;cursor:pointer;font-family:"Songti SC",serif}
+@media (prefers-reduced-motion:reduce){#h5proto .rk .cover{transition:none}}
+
+/* ============================================================
+   以下为 ichiban_kuji_admin_modal 原型 CSS —— 完整保留，作用域 #admproto
+   （原 .overlay 为 position:fixed 全屏遮罩，内嵌时改为文档内区块，其余不变）
+   ============================================================ */
+#admproto{width:1194px;flex-shrink:0;font-size:14px;color:#333;
+  font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif}
+#admproto h1,#admproto h2,#admproto h3,#admproto p,#admproto li,#admproto span,
+#admproto td,#admproto th,#admproto label{white-space:normal;width:auto}
+#admproto b,#admproto a{display:inline;white-space:normal;width:auto}
+#admproto .overlay{background:rgba(0,0,0,0.45);display:flex;align-items:flex-start;justify-content:center;
+  padding:24px;border-radius:8px}
+#admproto .modal{background:#fff;border-radius:4px;width:860px;position:relative;box-shadow:0 4px 24px rgba(0,0,0,0.18)}
+#admproto .modal-header{padding:16px 24px;font-size:16px;font-weight:600;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between}
+#admproto .modal-close{background:none;border:none;font-size:18px;color:#999;cursor:pointer;line-height:1}
+#admproto .modal-close:hover{color:#333}
+#admproto .modal-body{padding:24px}
+#admproto .modal-footer{padding:14px 24px;border-top:1px solid #f0f0f0;display:flex;justify-content:center;gap:12px}
+#admproto .form-row{display:flex;align-items:flex-start;margin-bottom:16px;gap:0}
+#admproto .form-label{width:130px;flex-shrink:0;padding-top:6px;text-align:right;padding-right:12px;color:#333;font-size:13px;line-height:1.4}
+#admproto .form-label .req,#admproto .tier-field label .req,#admproto .tier-upload label .req{color:#ff4d4f;margin-right:2px}
+#admproto .req{color:#ff4d4f;margin-right:2px}
+#admproto .form-control{flex:1}
+#admproto input[type="text"],#admproto input[type="number"],#admproto select,#admproto textarea{
+  width:100%;border:1px solid #d9d9d9;border-radius:4px;padding:5px 10px;font-size:13px;color:#333;outline:none;height:32px;transition:border-color 0.2s}
+#admproto input[type="text"]:focus,#admproto input[type="number"]:focus,
+#admproto select:focus{border-color:#1677ff;box-shadow:0 0 0 2px rgba(22,119,255,0.1)}
+#admproto select{background:#fff;cursor:pointer}
+#admproto .input-suffix{display:flex;align-items:center}
+#admproto .input-suffix input{border-radius:4px 0 0 4px}
+#admproto .suffix-tag{background:#fafafa;border:1px solid #d9d9d9;border-left:none;padding:0 10px;height:32px;display:flex;align-items:center;color:#999;font-size:13px;border-radius:0 4px 4px 0;white-space:nowrap}
+#admproto .checkbox-group{display:flex;flex-wrap:wrap;gap:6px 16px;padding-top:6px}
+#admproto .checkbox-group label,#admproto .radio-group label{display:flex;align-items:center;gap:5px;cursor:pointer;font-size:13px;white-space:nowrap}
+#admproto .radio-group{display:flex;flex-wrap:wrap;gap:6px 20px;padding-top:6px}
+#admproto input[type="checkbox"],#admproto input[type="radio"]{cursor:pointer;accent-color:#1677ff;width:auto;height:auto}
+#admproto .ichiban-label{color:#1677ff;font-weight:600}
+#admproto .section-divider{margin:20px 0 16px;border-top:1px dashed #e8e8e8;padding-top:16px}
+#admproto .section-title{font-size:13px;font-weight:600;color:#1677ff;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+#admproto .section-title::after{content:'';flex:1;height:1px;background:#f0f0f0}
+#admproto .vip-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+#admproto .vip-item{display:flex;align-items:center;border:1px solid #d9d9d9;border-radius:4px;overflow:hidden;height:32px}
+#admproto .vip-tag{background:#fafafa;border-right:1px solid #d9d9d9;padding:0 10px;font-size:12px;color:#555;white-space:nowrap;height:100%;display:flex;align-items:center;min-width:48px}
+#admproto .vip-item input{border:none;border-radius:0;height:100%;padding:0 8px;flex:1;min-width:0}
+#admproto .vip-item input:focus{box-shadow:none}
+#admproto .upload-btn{display:inline-flex;align-items:center;gap:6px;background:#1677ff;color:#fff;border:none;padding:5px 14px;border-radius:4px;font-size:13px;cursor:pointer;height:32px}
+#admproto .upload-btn:hover{background:#0958d9}
+#admproto .upload-hint{font-size:12px;color:#ff4d4f;margin-top:4px}
+#admproto .btn{padding:6px 20px;border-radius:4px;font-size:14px;cursor:pointer;border:1px solid transparent;height:34px;display:inline-flex;align-items:center;gap:6px}
+#admproto .btn-primary{background:#1677ff;color:#fff;border-color:#1677ff}
+#admproto .btn-primary:hover{background:#0958d9}
+#admproto .btn-warning{background:#fa8c16;color:#fff;border-color:#fa8c16}
+#admproto .btn-warning:hover{background:#d46b08}
+#admproto .btn-default{background:#fff;color:#333;border-color:#d9d9d9}
+#admproto .btn-default:hover{border-color:#1677ff;color:#1677ff}
+#admproto .btn-danger-text{background:none;border:none;color:#ff4d4f;font-size:13px;cursor:pointer;padding:0 4px}
+#admproto .btn-danger-text:hover{color:#cf1322}
+#admproto .total-banner{background:#e6f4ff;border:1px solid #91caff;border-radius:4px;padding:10px 16px;margin-bottom:16px;display:flex;align-items:center;gap:8px;font-size:13px;color:#0958d9}
+#admproto .total-banner strong{font-size:20px;font-weight:700;color:#1677ff}
+#admproto .prize-tier{border:1px solid #e8e8e8;border-radius:6px;margin-bottom:12px;overflow:hidden}
+#admproto .tier-header{background:#fafafa;padding:10px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #f0f0f0}
+#admproto .tier-badge{background:#1677ff;color:#fff;font-size:12px;font-weight:700;padding:2px 10px;border-radius:12px;min-width:42px;text-align:center}
+#admproto .tier-badge.last{background:linear-gradient(135deg,#fa8c16,#faad14)}
+#admproto .tier-name-input{flex:1;max-width:160px;border:1px solid #d9d9d9;border-radius:4px;padding:3px 8px;font-size:13px;height:28px}
+#admproto .tier-name-input:focus{border-color:#1677ff;outline:none}
+#admproto .tier-qty-wrap{display:flex;align-items:center;gap:6px;margin-left:auto}
+#admproto .tier-qty-wrap label{font-size:12px;color:#666}
+#admproto .tier-qty-input{width:80px;border:1px solid #d9d9d9;border-radius:4px;padding:3px 8px;font-size:13px;height:28px;text-align:center}
+#admproto .tier-qty-input:focus{border-color:#1677ff;outline:none}
+#admproto .tier-qty-wrap .qty-unit{font-size:12px;color:#999}
+#admproto .tier-body{padding:12px 16px}
+#admproto .tier-fields{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 16px;align-items:end}
+#admproto .tier-field label{display:block;font-size:12px;color:#666;margin-bottom:4px}
+#admproto .tier-field select,#admproto .tier-field input[type="text"]{height:30px;font-size:13px}
+#admproto .tier-upload{margin-top:10px}
+#admproto .tier-upload label{font-size:12px;color:#666;margin-bottom:4px;display:block}
+#admproto .upload-btn-sm{display:inline-flex;align-items:center;gap:5px;background:#1677ff;color:#fff;border:none;padding:3px 12px;border-radius:4px;font-size:12px;cursor:pointer;height:28px}
+#admproto .upload-btn-sm:hover{background:#0958d9}
+#admproto .prize-tier.last-tier{border-color:#ffd591}
+#admproto .prize-tier.last-tier .tier-header{background:#fff7e6;border-color:#ffd591}
+#admproto .last-note{font-size:11px;color:#fa8c16;margin-left:6px;background:rgba(250,140,22,0.08);padding:2px 8px;border-radius:10px}
+#admproto .freespin-row{display:flex;align-items:center;gap:10px;background:#fafafa;border:1px solid #e8e8e8;border-radius:6px;padding:10px 12px}
+#admproto .freespin-row select{flex:1;min-width:160px;height:30px;font-size:13px}
+#admproto .freespin-row .upload-btn-sm{white-space:nowrap;flex-shrink:0}
+#admproto .freespin-preview{width:36px;height:36px;object-fit:cover;border-radius:4px;border:1px solid #e8e8e8;display:none}
+#admproto .freespin-filename{font-size:12px;color:#999;flex:0 0 auto;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#admproto .add-tier-wrap{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+#admproto .btn-add-tier{display:inline-flex;align-items:center;gap:6px;border:1px dashed #1677ff;color:#1677ff;background:none;padding:5px 16px;border-radius:4px;font-size:13px;cursor:pointer;height:32px;transition:background 0.15s}
+#admproto .btn-add-tier:hover{background:#e6f4ff}
+#admproto .tier-count-info{font-size:12px;color:#999}
+#admproto input[type="number"]::-webkit-inner-spin-button,
+#admproto input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+#admproto .hint{font-size:12px;color:#999;margin-top:3px}
+#admproto .limit-row{display:flex;align-items:center;gap:8px;margin-top:8px}
+#admproto .banner-panels{display:flex;gap:16px;flex-wrap:wrap}
+#admproto .banner-panel{flex:1;min-width:280px;border:1px solid #e8e8e8;border-radius:6px;overflow:hidden}
+#admproto .banner-panel-header{background:#fafafa;padding:8px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0f0f0;font-size:13px;color:#555;font-weight:500}
+#admproto .banner-panel-header .size-hint{font-size:12px;color:#bbb}
+#admproto .banner-panel-body{padding:12px;min-height:180px;position:relative;display:flex;flex-direction:column}
+#admproto .banner-drop-zone{flex:1;border:1.5px dashed #d9d9d9;border-radius:4px;display:flex;align-items:center;justify-content:center;min-height:150px;cursor:pointer;position:relative;overflow:hidden;transition:border-color 0.2s,background 0.2s}
+#admproto .banner-drop-zone:hover{border-color:#1677ff;background:#f0f7ff}
+#admproto .banner-drop-zone img.banner-preview{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+#admproto .banner-drop-zone .banner-placeholder{display:flex;flex-direction:column;align-items:center;gap:6px;color:#bbb;font-size:12px;pointer-events:none}
+#admproto .banner-drop-zone .banner-placeholder .plus-icon{font-size:24px;color:#d9d9d9;line-height:1}
+#admproto .banner-panel-footer{display:flex;justify-content:flex-end;padding-top:8px}
+#admproto .btn-banner-delete{background:none;border:none;color:#1677ff;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:4px;padding:0 2px}
+#admproto .btn-banner-delete:hover{color:#ff4d4f}
+#admproto .banner-field-row{display:flex;align-items:flex-start;margin-bottom:14px;gap:0}
+#admproto .banner-field-label{width:130px;flex-shrink:0;padding-top:4px;text-align:right;padding-right:12px;color:#333;font-size:13px}
+</style>
+</head>
+<body>
+
+<header class="spec-header">
+  <h1>一番赏（Ichiban Kuji）开发规格说明书</h1>
+  <div class="meta-row">
+    <span class="chip">版本 <b>v1.2</b></span>
+    <span class="chip">日期 <b>2026-07-03</b></span>
+    <span class="chip">状态 <b>评审中</b></span>
+    <span class="chip">适用 <b>前端 / 后端 / QA / 设计</b></span>
+    <span class="chip">呈现 <b>图文分区块 · 前台/后台原型内嵌可交互</b></span>
+  </div>
+  <div class="meta-row">
+    <span class="chip">规则分类图例 <span class="tag tag-green">新增</span> <span class="tag tag-gold">异动</span> <span class="tag tag-gray">不异动</span></span>
+    <span class="chip">页签编号 <b>①总览 ②前台 ③商品配置 ④记录查询</b></span>
+    <span class="chip">交叉查阅格式 <b>「对应 ③B4 页签」＝页签③内 B4 区块</b></span>
+  </div>
+</header>
+
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="showTab('t1',this)"><span class="dot"></span><span>① 总览与业务规则</span></button>
+  <button class="tab-btn" onclick="showTab('t2',this)"><span class="dot"></span><span>② 前台 H5（用户端）</span></button>
+  <button class="tab-btn" onclick="showTab('t3',this)"><span class="dot"></span><span>③ 后台 · 商品配置</span></button>
+  <button class="tab-btn" onclick="showTab('t4',this)"><span class="dot"></span><span>④ 后台 · 记录查询</span></button>
+</nav>
+
+<!-- ════════════════ TAB 1 总览 ════════════════ -->
+<section class="panel active" id="t1">
+
+  <div class="panel-tools">
+    <span class="tools-label">快速定位：</span>
+    <button class="anchor-btn" onclick="goCard('c11')"><span>文件资讯</span></button>
+    <button class="anchor-btn" onclick="goCard('c12')"><span>模块与页面</span></button>
+    <button class="anchor-btn" onclick="goCard('c13')"><span>名词定义</span></button>
+    <button class="anchor-btn" onclick="goCard('c14')"><span>核心业务规则</span></button>
+    <button class="anchor-btn" onclick="goCard('c15')"><span>奖品类型对照</span></button>
+    <button class="anchor-btn" onclick="goCard('c16')"><span>待确认事项</span></button>
+    <button class="anchor-btn" onclick="goCard('c17')"><span>变更分类总览</span></button>
+    <div class="tools-gap"></div>
+    <button class="mini-btn" onclick="setFold('t1',false)"><span>全部展开</span></button>
+    <button class="mini-btn" onclick="setFold('t1',true)"><span>全部收合</span></button>
+  </div>
+
+  <article class="sec-card" id="c11">
+    <div class="sec-head"><span class="sec-num n-blue">1.1</span><h2>文件资讯</h2><span class="chev">▾ 点击收合</span></div>
+    <div class="sec-body">
+      <table class="spec-table">
+        <thead><tr><th style="width:200px">项目</th><th style="width:994px">内容</th></tr></thead>
+        <tbody>
+          <tr><td>功能名称</td><td>一番赏（Ichiban Kuji）积分抽赏活动</td></tr>
+          <tr><td>文件版本</td><td>v1.1（图文分区块改版；前台内嵌可交互原型）</td></tr>
+          <tr><td>原型来源</td><td>
+            <div class="cl">前台：<code>ichiban_kuji_h5.html</code>（已 1:1 内嵌于 Tab ②左侧，可直接操作）</div>
+            <div class="cl">后台：<code>ichiban_kuji_admin_modal.html</code>（新增商品弹窗）</div>
+            <div class="cl">后台：<code>ichiban_kuji_records.html</code>（4 个记录 / 报表页）</div>
+          </td></tr>
+          <tr><td>功能摘要</td><td>
+            <div class="cl">会员使用积分购券抽赏，每券必中一个赏级奖品。</div>
+            <div class="cl">奖品含彩金、积分、优惠券、免费旋转券、免费投注券、道具卡、实物。</div>
+            <div class="cl">最后一张券抽出时自动触发 Last赏（压轴奖）。</div>
+          </td></tr>
+          <tr><td>阅读说明</td><td>
+            <div class="cl">各区块 = 位置示意图 + 编号规则条目；<span class="tag tag-gold">待确认</span> 为原型歧义项。</div>
+            <div class="cl">规则分类三态：<span class="tag tag-green">新增</span> 本次新建规则；<span class="tag tag-gold">异动</span> 既有规则本次修改 / 扩充；<span class="tag tag-gray">不异动</span> 既有规则本次沿用不改。</div>
+            <div class="cl">分类标注于各区块标题；混合区块在字段 / 条目级再细分。总表见 1.7 页签。</div>
+            <div class="cl">页签编号：①总览 ②前台 ③商品配置 ④记录查询；交叉查阅标注如「对应 ③B4 页签」，点击可跳转。</div>
+            <div class="cl">条件判断 / 状态切换 / 多选项组合类规则一律附「情境穷举表」或「判定流程图」，穷举全部分支。</div>
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article class="sec-card" id="c12">
+    <div class="sec-head"><span class="sec-num n-blue">1.2</span><h2>系统模块与页面清单</h2><span class="chev">▾ 点击收合</span></div>
+    <div class="sec-body">
+      <div class="flow">
+        <div class="flow-step"><span class="fs-n">STEP 1 · 后台</span><span class="fs-t">商品配置（奖级 / 券数 / 图片）</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><span class="fs-n">STEP 2 · 前台</span><span class="fs-t">H5 购券抽赏</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><span class="fs-n">STEP 3 · 系统</span><span class="fs-t">扣积分 / 派奖 / 落库</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><span class="fs-n">STEP 4 · 后台</span><span class="fs-t">记录查询 / 导出</span></div>
+      </div>
+      <table class="spec-table">
+        <thead><tr>
+          <th style="width:70px">端</th><th style="width:230px">页面</th>
+          <th style="width:320px">路由</th><th style="width:280px">原型来源</th><th style="width:294px">说明</th>
+        </tr></thead>
+        <tbody>
+          <tr><td><span class="tag tag-blue">前台</span></td><td>一番赏活动页（H5）</td><td><span class="tag tag-gold">待确认</span></td><td>ichiban_kuji_h5.html</td><td>390px 设计稿，双列奖品版式</td></tr>
+          <tr><td><span class="tag tag-gray">后台</span></td><td>新增 / 编辑商品（弹窗）</td><td>积分商城 › 商品管理</td><td>ichiban_kuji_admin_modal.html</td><td>宽 860px，编辑复用同弹窗</td></tr>
+          <tr><td><span class="tag tag-gray">后台</span></td><td>用户积分纪录</td><td><code>/points-mall/user-points-records</code></td><td>records · PAGE 1</td><td>积分账变流水</td></tr>
+          <tr><td><span class="tag tag-gray">后台</span></td><td>Ichiban Kuji 抽奖记录</td><td><code>/ichiban-kuji/records</code></td><td>records · PAGE 2</td><td>订单级抽奖明细</td></tr>
+          <tr><td><span class="tag tag-gray">后台</span></td><td>全部优惠券</td><td><code>/coupon-management/all-coupons</code></td><td>records · PAGE 3</td><td>彩金券 / 优惠券发放落库</td></tr>
+          <tr><td><span class="tag tag-gray">后台</span></td><td>免费旋转管理</td><td><code>/free-spin/management</code></td><td>records · PAGE 4</td><td>4 个子 Tab：配置 / 记录 / 统计 / 发送</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article class="sec-card" id="c13">
+    <div class="sec-head"><span class="sec-num n-blue">1.3</span><h2>名词定义</h2><span class="chev">▾ 点击收合</span></div>
+    <div class="sec-body">
+      <table class="spec-table">
+        <thead><tr><th style="width:160px">名词</th><th style="width:1034px">定义</th></tr></thead>
+        <tbody>
+          <tr><td>券（Ticket）</td><td>一次抽奖资格。购买后立即消耗并开奖，不存在持券未开状态。</td></tr>
+          <tr><td>赏级（Tier）</td><td>奖品档位，默认命名 A赏 ～ G赏，名称可自定义，每级独立配置奖品与数量。</td></tr>
+          <tr><td>Last赏</td><td>压轴奖，每期固定 1 张，抽走最后一张普通券的会员自动获得。</td></tr>
+          <tr><td>总券数</td><td>Σ 各赏级数量 + 1（Last赏），由后台自动加总，不可手动输入。</td></tr>
+          <tr><td>全包</td><td>一次买断当前全部剩余普通券，费用 = 单价 × 剩余张数。</td></tr>
+          <tr><td>上位赏</td><td>前台高亮展示的高价值赏级（金框 + 「★ 上位赏」标签）。</td></tr>
+          <tr><td>流水倍数（Turnover）</td><td>彩金类奖品的打码倍数要求，随奖品一并配置与展示。</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article class="sec-card" id="c14">
+    <div class="sec-head"><span class="sec-num n-blue">1.4</span><h2>核心业务规则</h2><span class="tag tag-green">新增</span><span class="chev">▾ 点击收合</span></div>
+    <div class="sec-body">
+      <div class="xref-row"><span class="cl sub">交叉查阅：</span>
+        <span class="xref" onclick="goTabCard('t2','c24')"><span>②R4 撕券区</span></span>
+        <span class="xref" onclick="goTabCard('t3','c34')"><span>③B4 奖级配置</span></span>
+        <span class="xref" onclick="goTabCard('t4','c42')"><span>④C2 抽奖记录</span></span>
+      </div>
+      <table class="spec-table">
+        <thead><tr><th style="width:70px">编号</th><th style="width:180px">规则</th><th style="width:944px">内容</th></tr></thead>
+        <tbody>
+          <tr><td>BR-01</td><td>抽奖模型</td><td>
+            <div class="cl">无放回抽取：奖池 = 各赏级剩余张数展开的全部票券，抽出即扣减库存。</div>
+            <div class="cl">每张券必中一个赏级奖品，不存在「谢谢参与」。</div>
+          </td></tr>
+          <tr><td>BR-02</td><td>Last赏触发</td><td>
+            <div class="cl">当本次抽取使普通券奖池归零、且 Last赏库存 = 1 时，自动追加发放 Last赏。</div>
+            <div class="cl">Last赏不占普通券数、不单独售卖、无法被指定购买。</div>
+          </td></tr>
+          <tr><td>BR-03</td><td>定价与扣款</td><td>
+            <div class="cl">单价 = 后台「购买价格」（积分）。本次消耗 = 单价 × 实际抽出张数。</div>
+            <div class="cl">扣积分与派奖需在同一事务内完成，失败整体回滚。</div>
+          </td></tr>
+          <tr><td>BR-04</td><td>张数选项</td><td>
+            <div class="cl">前台提供 单张 / 五连 / 十连 / 全包。剩余不足所选张数时按实际剩余抽取。</div>
+          </td></tr>
+          <tr><td>BR-05</td><td>库存与售罄</td><td>
+            <div class="cl">赏级售罄后卡片置灰并盖「售罄」章，不再补充。全部抽完后购券入口禁用。</div>
+            <div class="cl">高并发下须以库存扣减为准（建议行锁或乐观锁），防止超卖。</div>
+          </td></tr>
+          <tr><td>BR-06</td><td>积分不足</td><td>拦截购券请求并提示「积分不足」，不发生任何扣减。</td></tr>
+          <tr><td>BR-07</td><td>币种</td><td>本期仅 PHP（菲律宾比索）。币种为商品级配置，记录页可按币别筛选。</td></tr>
+          <tr><td>BR-08</td><td>限购</td><td>按 VIP0～VIP10 分别配置单会员限购张数，0 = 不限购；勾选「限购」后生效。穷举见 ③B2 页签。</td></tr>
+        </tbody>
+      </table>
+      <span class="sub-t">BR-02 · Last赏触发判定表（情境穷举，2×2 全分支）</span>
+      <table class="spec-table">
+        <thead><tr>
+          <th style="width:70px">情境</th><th style="width:260px">本次抽取后普通券池 = 0？</th>
+          <th style="width:220px">Last赏库存 = 1？</th><th style="width:220px">判定结果</th><th style="width:424px">说明</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>L1</td><td>是</td><td>是</td><td><span class="tag tag-green">追加发放 Last赏</span></td><td>Last赏并入本次开奖结果，结果张数 = 抽出张数 + 1</td></tr>
+          <tr><td>L2</td><td>是</td><td>否</td><td>不追加</td><td>Last赏已派发过，活动为完结态（防御分支，正常不可达）</td></tr>
+          <tr><td>L3</td><td>否</td><td>是</td><td>不追加</td><td>普通券尚有剩余，Last赏继续等待</td></tr>
+          <tr><td>L4</td><td>否</td><td>否</td><td>不追加（异常）</td><td>理论不可达；出现即数据异常，需告警并禁止继续售券</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article class="sec-card" id="c15">
+    <div class="sec-head"><span class="sec-num n-blue">1.5</span><h2>奖品类型与发放落库对照</h2><span class="chev">▾ 点击收合</span></div>
+    <div class="sec-body">
+      <table class="spec-table">
+        <thead><tr>
+          <th style="width:130px">奖品类型</th><th style="width:290px">后台配置字段</th>
+          <th style="width:300px">发放动作</th><th style="width:280px">可查询页面</th><th style="width:194px">备注</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>彩金</td><td>流水倍数 + 金额</td><td>生成彩金券（含 Turnover）</td><td>全部优惠券</td><td>金额显示保留 2 位小数</td></tr>
+          <tr><td>积分</td><td>积分数量</td><td>直接加积分（账变）</td><td>用户积分纪录</td><td>正数入账</td></tr>
+          <tr><td>优惠券</td><td>下拉选择既有优惠券</td><td>发券</td><td>全部优惠券</td><td>来源 = 积分购买</td></tr>
+          <tr><td>免费旋转券</td><td>旋转券配置（游戏 + 张数，可多行）</td><td>发送免费旋转</td><td>免费旋转管理</td><td>发送记录含券编号</td></tr>
+          <tr><td>免费投注券</td><td>下拉选择既有投注券</td><td>发送免费投注</td><td>免费旋转管理</td><td>免费类型 = 免费投注</td></tr>
+          <tr><td>道具卡</td><td>下拉选择既有道具卡</td><td>发卡</td><td><span class="tag tag-gold">待确认</span></td><td>查询入口原型未呈现</td></tr>
+          <tr><td>实物</td><td>商品简介 + 奖品名称</td><td>线下配送，另行通知</td><td><span class="tag tag-gold">待确认</span></td><td>需补收货 / 核销流程</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article class="sec-card" id="c16">
+    <div class="sec-head"><span class="sec-num n-blue">1.6</span><h2>待确认事项（Open Questions）</h2><span class="chev">▾ 点击收合</span></div>
+    <div class="sec-body">
+      <table class="spec-table">
+        <thead><tr><th style="width:70px">编号</th><th style="width:820px">问题</th><th style="width:304px">影响</th></tr></thead>
+        <tbody>
+          <tr><td>Q-01</td><td>
+            <div class="cl">奖级上限不一致：按钮提示「最多 G赏共 7 级」，计数文案「最多 H赏共 8 级」，</div>
+            <div class="cl">代码实际限制为 8 级。以哪个为准？</div>
+          </td><td>后台奖级配置 / 校验</td></tr>
+          <tr><td>Q-02</td><td>
+            <div class="cl">H5 有「十连」，但抽奖记录页券数徽章仅定义 单张 / 五连 / 全包，</div>
+            <div class="cl">缺少「十连」样式与取值（qty = 10）。</div>
+          </td><td>记录页展示</td></tr>
+          <tr><td>Q-03</td><td>H5 原型单价写死 95 积分、KV 占位 1080×600，与后台配置（购买价格、H5 顶部图 390×320）不一致，应以后台配置为准。</td><td>前台数据来源</td></tr>
+          <tr><td>Q-04</td><td>各列表「导出」的文件格式（CSV / XLSX）、字段范围与是否遵循当前筛选条件。</td><td>全部记录页</td></tr>
+          <tr><td>Q-05</td><td>优惠券状态「待结算」的判定逻辑与流转时机。</td><td>全部优惠券</td></tr>
+          <tr><td>Q-06</td><td>审核模式当前锁定「自动审核」，后续是否开放手动审核。</td><td>商品配置</td></tr>
+          <tr><td>Q-07</td><td>实物 / 道具卡的发放查询入口与配送状态管理原型未覆盖。</td><td>发放闭环</td></tr>
+          <tr><td>Q-08</td><td>限时抢购「未开始 / 已结束」时前台的可见性与可购性行为原型未定义（穷举见 ③B2 页签）。</td><td>前台展示 / 购券</td></tr>
+          <tr><td>Q-09</td><td>限购生效时，本次购买张数将超过剩余可购额度的处理方式（拦截或按剩余额度抽取，穷举见 ③B2 页签）。</td><td>购券校验</td></tr>
+          <tr><td>Q-10</td><td>商品类别（多选）与商品类型（单选）对「Ichiban Kuji」标记不一致时的口径（穷举见 ③B2 页签）。</td><td>商品配置</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article class="sec-card" id="c17">
+    <div class="sec-head"><span class="sec-num n-blue">1.7</span><h2>变更分类总览与本次未涉及之既有规则</h2><span class="chev">▾ 点击收合</span></div>
+    <div class="sec-body">
+      <span class="sub-t">变更分类总表（按页签区块）</span>
+      <table class="spec-table">
+        <thead><tr>
+          <th style="width:150px">对应页签</th><th style="width:250px">区块</th>
+          <th style="width:110px">分类</th><th style="width:684px">分类依据</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>②R1～R7</td><td>前台 H5 活动页全部区块</td><td><span class="tag tag-green">新增</span></td><td>一番赏为全新前台页面，无既有规则</td></tr>
+          <tr><td>②R8</td><td>埋点</td><td><span class="tag tag-green">新增</span></td><td>建议项，非原型内容</td></tr>
+          <tr><td>③B1</td><td>弹窗框架</td><td><span class="tag tag-gray">不异动</span></td><td>沿用既有「新增商品」弹窗框架与开关行为</td></tr>
+          <tr><td>③B2</td><td>基础字段区</td><td><span class="tag tag-gold">异动</span></td><td>商品类别 / 商品类型新增「Ichiban Kuji」选项；其余字段沿用（字段级细分见 ③B2）</td></tr>
+          <tr><td>③B3</td><td>图片配置区</td><td><span class="tag tag-green">新增</span></td><td>顶部图 / 规则弹窗图为本功能新增配置（若平台已有同名字段，改列异动，需确认）</td></tr>
+          <tr><td>③B4～B6</td><td>奖级配置 / 动态字段 / Last赏</td><td><span class="tag tag-green">新增</span></td><td>Ichiban Kuji 专属区块</td></tr>
+          <tr><td>③B7</td><td>提交校验</td><td><span class="tag tag-gold">异动</span></td><td>沿用既有校验框架（V-01～03 不异动），新增奖级相关校验项（S-01～06）</td></tr>
+          <tr><td>④C1</td><td>页面清单</td><td><span class="tag tag-gold">异动</span></td><td>既有记录 Tab 组新增第 3 个页签</td></tr>
+          <tr><td>④C2、④C3</td><td>抽奖记录 / 奖品格式规则</td><td><span class="tag tag-green">新增</span></td><td>新页签之查询、列表与显示格式</td></tr>
+          <tr><td>④C4</td><td>用户积分纪录</td><td><span class="tag tag-gold">异动</span></td><td>页面功能不变；新增一番赏来源的「原因 / 备注」填充格式</td></tr>
+          <tr><td>④C5</td><td>优惠券管理</td><td><span class="tag tag-gold">异动</span></td><td>页面与状态机不变；新增「积分购买」来源之一番赏发放数据</td></tr>
+          <tr><td>④C6</td><td>免费旋转管理</td><td><span class="tag tag-gold">异动</span></td><td>4 子 Tab 结构不变；新增一番赏来源之发放数据</td></tr>
+          <tr><td>④C7</td><td>分页与导出</td><td><span class="tag tag-gray">不异动</span></td><td>沿用平台通用组件与机制</td></tr>
+        </tbody>
+      </table>
+      <span class="sub-t">本次未涉及之既有规则清单（明确不在本需求范围内）</span>
+      <table class="spec-table">
+        <thead><tr>
+          <th style="width:70px">编号</th><th style="width:700px">既有规则</th><th style="width:424px">关联位置</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>N-01</td><td>「商品兑换记录」「盲盒抽奖记录」两个既有页签的查询与展示规则</td><td>④C1 同 Tab 组</td></tr>
+          <tr><td>N-02</td><td>优惠券状态机（未使用 / 待结算 / 已使用 / 已过期）的既有判定与结算流程</td><td>④C5</td></tr>
+          <tr><td>N-03</td><td>免费旋转 / 免费投注的派发执行、有效期计算、绑定游戏等既有机制</td><td>④C6</td></tr>
+          <tr><td>N-04</td><td>积分体系的其他获取 / 消费途径及其账变规则</td><td>④C4</td></tr>
+          <tr><td>N-05</td><td>VIP 等级评定、升降级与权益规则（本需求仅引用其等级作限购维度）</td><td>③B2 限购</td></tr>
+          <tr><td>N-06</td><td>商品上下架、排序权重计算、审核流的既有流程</td><td>③B2</td></tr>
+          <tr><td>N-07</td><td>其他商品类型（实物 / 彩金 / 盲盒等）的动态表单与兑换流程</td><td>③B2 商品类型</td></tr>
+          <tr><td>N-08</td><td>各列表导出的通用实现与权限控制</td><td>④C7</td></tr>
+          <tr><td>N-09</td><td>后台账号权限体系与操作日志记录</td><td>全后台页面</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+</section>
+
+<!-- ════════════════ TAB 2 前台 H5：左原型 · 右分区块规则 ════════════════ -->
+<section class="panel" id="t2">
+
+  <div class="panel-tools">
+    <span class="tools-label">区块定位：</span>
+    <button class="anchor-btn" onclick="goCard('c21')"><span>R1 顶栏</span></button>
+    <button class="anchor-btn" onclick="goCard('c22')"><span>R2 Banner</span></button>
+    <button class="anchor-btn" onclick="goCard('c23')"><span>R3 库存条</span></button>
+    <button class="anchor-btn" onclick="goCard('c24')"><span>R4 撕券区</span></button>
+    <button class="anchor-btn" onclick="goCard('c25')"><span>R5 奖品一览</span></button>
+    <button class="anchor-btn" onclick="goCard('c26')"><span>R6 规则弹窗</span></button>
+    <button class="anchor-btn" onclick="goCard('c27')"><span>R7 结果弹窗</span></button>
+    <button class="anchor-btn" onclick="goCard('c28')"><span>R8 埋点</span></button>
+    <div class="tools-gap"></div>
+    <button class="mini-btn" onclick="setFold('t2',false)"><span>全部展开</span></button>
+    <button class="mini-btn" onclick="setFold('t2',true)"><span>全部收合</span></button>
+  </div>
+
+  <div class="h5-layout">
+
+    <!-- ── 左：完整内嵌原型（可交互） ── -->
+    <aside class="h5-left">
+      <div class="h5-left-cap">
+        <span class="tag tag-blue">原型 1:1 内嵌</span>
+        <span class="cl sub">可直接操作：切换张数 / 撕券抽赏 / 查看规则</span>
+      </div>
+      <div id="h5proto"><div class="device" id="dev-B"></div></div>
+    </aside>
+
+    <!-- ── 右：分区块图文规则 ── -->
+    <div class="h5-right">
+
+      <article class="sec-card w790" id="c21">
+        <div class="sec-head"><span class="sec-num n-red">R1</span><h2>顶栏</h2><span class="tag tag-green">新增</span><span class="chev">▾ 点击收合</span></div>
+        <div class="sec-body"><div class="blk-body">
+          <div class="skel">
+            <div class="skel-dev">
+              <div class="sk sk-top on"></div><div class="sk sk-kv"></div><div class="sk sk-stock"></div>
+              <div class="sk sk-draw"></div><div class="sk sk-pool"></div>
+            </div>
+            <span class="sk-cap">位置：页面最上方</span>
+          </div>
+          <div class="rules-col">
+            <div class="rl"><span class="rl-n">1</span><div class="rl-t">
+              <span class="cl">返回按钮：30×30 圆形描边，点击返回上一页。</span></div></div>
+            <div class="rl"><span class="rl-n">2</span><div class="rl-t">
+              <span class="cl">标题「一番赏」居中，宋体衬线、15px、字距 4px。</span></div></div>
+            <div class="rl"><span class="rl-n">3</span><div class="rl-t">
+              <span class="cl">顶栏不随页面滚动固定（跟随内容滚动）。</span></div></div>
+          </div>
+        </div></div>
+      </article>
+
+      <article class="sec-card w790" id="c22">
+        <div class="sec-head"><span class="sec-num n-red">R2</span><h2>Banner 区（KV / 竖幡 / 标题 / Rules）</h2><span class="tag tag-green">新增</span><span class="chev">▾ 点击收合</span></div>
+        <div class="sec-body"><div class="blk-body">
+          <div class="skel">
+            <div class="skel-dev">
+              <div class="sk sk-top"></div><div class="sk sk-kv on"></div><div class="sk sk-stock"></div>
+              <div class="sk sk-draw"></div><div class="sk sk-pool"></div>
+            </div>
+            <span class="sk-cap">位置：顶栏下方通栏</span>
+          </div>
+          <div class="rules-col">
+            <div class="rl"><span class="rl-n">1</span><div class="rl-t">
+              <span class="cl">KV 主视觉 = 后台「顶部图 · H5 端」，建议 390×320px。</span>
+              <span class="cl sub">原型占位写 1080×600，以后台配置为准（Q-03）。</span></div></div>
+            <div class="rl"><span class="rl-n">2</span><div class="rl-t">
+              <span class="cl">KV 底部压深色渐层（scrim），保证白色标题对比度。</span></div></div>
+            <div class="rl"><span class="rl-n">3</span><div class="rl-t">
+              <span class="cl">左上角红色竖排幡「一番赏」为固定装饰元素。</span></div></div>
+            <div class="rl"><span class="rl-n">4</span><div class="rl-t">
+              <span class="cl">活动标题 = 后台「商品名称」，白字 23px 粗体、带投影。</span></div></div>
+            <div class="rl"><span class="rl-n">5</span><div class="rl-t">
+              <span class="cl">「Rules」按钮固定于 KV 右下角，点击打开规则弹窗（R6）。</span></div></div>
+            <div class="rl"><span class="rl-n">6</span><div class="rl-t">
+              <span class="cl">Banner 底缘为暖帘（noren）红色半圆连续装饰边。</span></div></div>
+            <div class="demo-row"><button class="demo-btn" onclick="demoRules()"><span>▶ 左侧原型演示：打开规则弹窗</span></button></div>
+            <div class="xref-row"><span class="cl sub">交叉查阅：</span>
+              <span class="xref" onclick="goTabCard('t3','c32')"><span>③B2 商品名称/价格</span></span>
+              <span class="xref" onclick="goTabCard('t3','c33')"><span>③B3 图片配置</span></span>
+            </div>
+          </div>
+        </div></div>
+      </article>
+
+      <article class="sec-card w790" id="c23">
+        <div class="sec-head"><span class="sec-num n-red">R3</span><h2>库存条</h2><span class="tag tag-green">新增</span><span class="chev">▾ 点击收合</span></div>
+        <div class="sec-body"><div class="blk-body">
+          <div class="skel">
+            <div class="skel-dev">
+              <div class="sk sk-top"></div><div class="sk sk-kv"></div><div class="sk sk-stock on"></div>
+              <div class="sk sk-draw"></div><div class="sk sk-pool"></div>
+            </div>
+            <span class="sk-cap">位置：Banner 下方</span>
+          </div>
+          <div class="rules-col">
+            <div class="rl"><span class="rl-n">1</span><div class="rl-t">
+              <span class="cl">文案「剩 N / 总数 张」，N 为红色衬线大号数字（18px）。</span></div></div>
+            <div class="rl"><span class="rl-n">2</span><div class="rl-t">
+              <span class="cl">N = 普通券剩余 + Last赏剩余；总数 = 总券数（Σ 赏级 + 1）。</span></div></div>
+            <div class="rl"><span class="rl-n">3</span><div class="rl-t">
+              <span class="cl">进度条填充宽度 = 剩余 ÷ 总券数，红色斜纹样式。</span></div></div>
+            <div class="rl"><span class="rl-n">4</span><div class="rl-t">
+              <span class="cl">每次开奖结束后即时刷新数字与进度。</span></div></div>
+            <div class="xref-row"><span class="cl sub">交叉查阅：</span>
+              <span class="xref" onclick="goTabCard('t3','c34')"><span>③B4 总券数</span></span>
+              <span class="xref" onclick="goTabCard('t1','c14')"><span>①1.4 BR-05</span></span>
+            </div>
+          </div>
+        </div></div>
+      </article>
+
+      <article class="sec-card w790" id="c24">
+        <div class="sec-head"><span class="sec-num n-red">R4</span><h2>撕券区（张数选择 + 撕券按钮）</h2><span class="tag tag-green">新增</span><span class="chev">▾ 点击收合</span></div>
+        <div class="sec-body"><div class="blk-body">
+          <div class="skel">
+            <div class="skel-dev">
+              <div class="sk sk-top"></div><div class="sk sk-kv"></div><div class="sk sk-stock"></div>
+              <div class="sk sk-draw on"></div><div class="sk sk-pool"></div>
+            </div>
+            <span class="sk-cap">位置：库存条下方</span>
+          </div>
+          <div class="rules-col">
+            <div class="rl"><span class="rl-n">1</span><div class="rl-t">
+              <span class="cl">张数单选：单张(1) / 五连(5) / 十连(10) / 全包，默认单张。</span>
+              <span class="cl sub">选中态深色底白字；「全包」选中为金色渐变。</span></div></div>
+            <div class="rl"><span class="rl-n">2</span><div class="rl-t">
+              <span class="cl">撕券按钮费用即时更新：费用 = 单价 × 张数。</span>
+              <span class="cl sub">全包 = 单价 × 普通券剩余张数；单价 = 后台「购买价格」。</span></div></div>
+            <div class="rl"><span class="rl-n">3</span><div class="rl-t">
+              <span class="cl">底注左侧「每张 N 积分 · 必中一赏」；右侧积分余额（千分位）。</span></div></div>
+            <div class="rl"><span class="rl-n">4</span><div class="rl-t">
+              <span class="cl">点击撕券后校验顺序：</span>
+              <span class="cl sub">a. 普通券剩余 &gt; 0；b. 剩余不足按实际张数抽取并计费；</span>
+              <span class="cl sub">c. 积分 &lt; 费用 → 提示「积分不足」终止；d. 请求期间防重复点击。</span></div></div>
+            <div class="rl"><span class="rl-n">5</span><div class="rl-t">
+              <span class="cl">通过校验 → 扣积分 → 无放回抽取 → Last赏判定 → 结果弹窗（R7）。</span></div></div>
+            <div class="rl"><span class="rl-n">6</span><div class="rl-t">
+              <span class="cl">全部抽完：按钮禁用（灰底），文案改「已全部抽完」。</span></div></div>
+            <div class="demo-row">
+              <button class="demo-btn" onclick="demoDraw('1')"><span>▶ 演示：单张抽赏</span></button>
+              <button class="demo-btn" onclick="demoDraw('10')"><span>▶ 演示：十连抽赏</span></button>
+              <button class="demo-btn" onclick="demoDraw('all')"><span>▶ 演示：全包</span></button>
+            </div>
+            <div class="callout co-risk w-in"><span class="co-icon">!</span><div class="co-body">
+              <span class="t">后端要求</span>
+              <span class="d">结果由服务端产生并落库；扣款 / 抽奖 / 派奖同事务；</span>
+              <span class="d">接口以订单号幂等去重，并发以库存扣减为准防超卖。</span>
+            </div></div>
+          </div>
+        </div>
+        <div class="xref-row"><span class="cl sub">交叉查阅：</span>
+          <span class="xref" onclick="goTabCard('t1','c14')"><span>①1.4 BR-01/02/03/06</span></span>
+          <span class="xref" onclick="goTabCard('t3','c32')"><span>③B2 购买价格 / 限购</span></span>
+          <span class="xref" onclick="goTabCard('t4','c42')"><span>④C2 抽奖记录</span></span>
+        </div>
+        <span class="sub-t">购券判定流程图（对应下方穷举表）</span>
+        <div class="vflow">
+          <div class="vf-node"><span>点击「撕券抽赏」</span></div>
+          <div class="vf-arrow"><span class="dn">↓</span></div>
+          <div class="vf-node dec"><span>判定① 普通券剩余 &gt; 0？</span></div>
+          <div class="vf-arrow"><span class="dn">是 ↓</span><span class="vf-else"><span>否 → 按钮已禁用「已全部抽完」，不可触发</span></span></div>
+          <div class="vf-node"><span>实际张数 want = min(所选张数, 普通券剩余)</span></div>
+          <div class="vf-arrow"><span class="dn">↓</span></div>
+          <div class="vf-node dec"><span>判定② 积分余额 ≥ 单价 × want？</span></div>
+          <div class="vf-arrow"><span class="dn">是 ↓</span><span class="vf-else"><span>否 → 提示「积分不足」，流程终止，无任何扣减</span></span></div>
+          <div class="vf-node"><span>扣积分（单价 × want）→ 无放回抽取 want 张</span></div>
+          <div class="vf-arrow"><span class="dn">↓</span></div>
+          <div class="vf-node dec"><span>判定③ 抽后普通券池 = 0 且 Last赏库存 = 1？（①1.4 判定表）</span></div>
+          <div class="vf-arrow"><span class="dn">否 ↓</span><span class="vf-side"><span>是 → 追加 Last赏至本次结果</span></span></div>
+          <div class="vf-node ok"><span>更新库存条 / 奖品卡 / 积分余额 → 弹出结果弹窗（②R7）</span></div>
+        </div>
+        <span class="sub-t">购券情境穷举表（张数选项 × 剩余量 × 积分，全分支）</span>
+        <table class="spec-table tw">
+          <thead><tr>
+            <th style="width:56px">情境</th><th style="width:110px">所选张数 K</th><th style="width:130px">普通券剩余 N</th>
+            <th style="width:120px">积分 vs 费用</th><th style="width:332px">结果</th>
+          </tr></thead>
+          <tbody>
+            <tr><td>S1</td><td>任意</td><td>N = 0</td><td>—</td><td>按钮禁用「已全部抽完」，不可点击</td></tr>
+            <tr><td>S2</td><td>1 / 5 / 10</td><td>N ≥ K</td><td>足够</td><td>抽 K 张；若 K = N 触发 Last赏（结果 K+1 张）</td></tr>
+            <tr><td>S3</td><td>1 / 5 / 10</td><td>N ≥ K</td><td>不足</td><td>提示「积分不足」，终止</td></tr>
+            <tr><td>S4</td><td>5 / 10</td><td>0 &lt; N &lt; K</td><td>足够（按 N 计）</td><td>按实际 N 张抽取并计费；必触发 Last赏（结果 N+1 张）</td></tr>
+            <tr><td>S5</td><td>5 / 10</td><td>0 &lt; N &lt; K</td><td>不足（按 N 计）</td><td>提示「积分不足」，终止</td></tr>
+            <tr><td>S6</td><td>全包（K=N）</td><td>N &gt; 0</td><td>足够</td><td>抽全部 N 张；必触发 Last赏（结果 N+1 张）</td></tr>
+            <tr><td>S7</td><td>全包（K=N）</td><td>N &gt; 0</td><td>不足</td><td>提示「积分不足」，终止</td></tr>
+          </tbody>
+        </table>
+        <span class="sub-t">张数选项穷举表（4 选项全列）</span>
+        <table class="spec-table tw">
+          <thead><tr>
+            <th style="width:100px">选项</th><th style="width:130px">抽取张数</th><th style="width:190px">费用</th>
+            <th style="width:180px">记录页券数徽章</th><th style="width:148px">分类</th>
+          </tr></thead>
+          <tbody>
+            <tr><td>单张</td><td>1</td><td>单价 × 1</td><td>单张（灰）</td><td><span class="tag tag-green">新增</span></td></tr>
+            <tr><td>五连</td><td>5</td><td>单价 × 5</td><td>五连（蓝）</td><td><span class="tag tag-green">新增</span></td></tr>
+            <tr><td>十连</td><td>10</td><td>单价 × 10</td><td><span class="tag tag-gold">待确认</span>（Q-02 缺样式）</td><td><span class="tag tag-green">新增</span></td></tr>
+            <tr><td>全包</td><td>剩余 N</td><td>单价 × N（即时计算）</td><td>全包（橙）</td><td><span class="tag tag-green">新增</span></td></tr>
+          </tbody>
+        </table>
+        </div>
+      </article>
+
+      <article class="sec-card w790" id="c25">
+        <div class="sec-head"><span class="sec-num n-red">R5</span><h2>奖品一览（Last赏特卡 + 赏级卡片）</h2><span class="tag tag-green">新增</span><span class="chev">▾ 点击收合</span></div>
+        <div class="sec-body"><div class="blk-body">
+          <div class="skel">
+            <div class="skel-dev">
+              <div class="sk sk-top"></div><div class="sk sk-kv"></div><div class="sk sk-stock"></div>
+              <div class="sk sk-draw"></div><div class="sk sk-pool on"></div>
+            </div>
+            <span class="sk-cap">位置：页面下半部</span>
+          </div>
+          <div class="rules-col">
+            <div class="rl"><span class="rl-n">1</span><div class="rl-t">
+              <span class="cl">区块标题为红色「奖品一览」横幅，左右延伸装饰线。</span></div></div>
+            <div class="rl"><span class="rl-n">2</span><div class="rl-t">
+              <span class="cl">Last赏特卡通栏置顶：金框、右上「压轴大奖」缎带、</span>
+              <span class="cl">金色「楽 LAST」章、说明「抽走最后一张券者自动获得」、剩余/总数。</span></div></div>
+            <div class="rl"><span class="rl-n">3</span><div class="rl-t">
+              <span class="cl">赏级卡片双列网格，每卡：赏别章 + 奖品图 + 名称 + 类型 + 剩余/总数。</span>
+              <span class="cl sub">奖品图 = 后台上传（750×750），卡内等比缩放。</span></div></div>
+            <div class="rl"><span class="rl-n">4</span><div class="rl-t">
+              <span class="cl">状态样式：</span>
+              <span class="cl sub">上位赏 = 金框 + 金章 + 「★ 上位赏」标签（后台标记高价值）；</span>
+              <span class="cl sub">人气 = 「人气」描边标签（运营标记）；</span>
+              <span class="cl sub">低库存 = 剩余 ÷ 总数 ≤ 34%（且 &gt; 0）时剩余数字变红；</span>
+              <span class="cl sub">售罄 = 整卡 55% 透明 + 灰阶 + 红色「售罄」斜章。</span></div></div>
+            <div class="rl"><span class="rl-n">5</span><div class="rl-t">
+              <span class="cl">每次开奖后所有卡片剩余数即时刷新。</span></div></div>
+          </div>
+        </div>
+        <div class="xref-row"><span class="cl sub">交叉查阅：</span>
+          <span class="xref" onclick="goTabCard('t3','c34')"><span>③B4 奖级配置</span></span>
+          <span class="xref" onclick="goTabCard('t3','c35')"><span>③B5 奖品字段</span></span>
+          <span class="xref" onclick="goTabCard('t4','c43')"><span>④C3 奖品格式</span></span>
+        </div>
+        <span class="sub-t">赏级卡片状态穷举表（库存 3 态 × 上位赏 × 人气 = 12 组合）</span>
+        <table class="spec-table tw">
+          <thead><tr>
+            <th style="width:56px">组合</th><th style="width:150px">库存状态</th><th style="width:90px">上位赏</th>
+            <th style="width:70px">人气</th><th style="width:382px">卡片表现</th>
+          </tr></thead>
+          <tbody>
+            <tr><td>K1</td><td>正常（比例 &gt; 34%）</td><td>否</td><td>否</td><td>基础米色卡</td></tr>
+            <tr><td>K2</td><td>正常</td><td>是</td><td>否</td><td>金框 + 金色赏章 + 「★ 上位赏」标签</td></tr>
+            <tr><td>K3</td><td>正常</td><td>否</td><td>是</td><td>米白底 + 「人气」描边标签</td></tr>
+            <tr><td>K4</td><td>正常</td><td>是</td><td>是</td><td>样式叠加（金框 + 双标签）；数据未出现，建议运营避免同时标记</td></tr>
+            <tr><td>K5</td><td>低库存（0 &lt; 比例 ≤ 34%）</td><td>否</td><td>否</td><td>基础卡 + 剩余数字红色</td></tr>
+            <tr><td>K6</td><td>低库存</td><td>是</td><td>否</td><td>金框卡 + 剩余数字红色</td></tr>
+            <tr><td>K7</td><td>低库存</td><td>否</td><td>是</td><td>人气卡 + 剩余数字红色</td></tr>
+            <tr><td>K8</td><td>低库存</td><td>是</td><td>是</td><td>叠加样式 + 剩余数字红色（同 K4 建议）</td></tr>
+            <tr><td>K9</td><td>售罄（剩余 = 0）</td><td>否</td><td>否</td><td>整卡 55% 透明 + 灰阶 + 红「售罄」斜章；不显示剩余数字</td></tr>
+            <tr><td>K10</td><td>售罄</td><td>是</td><td>否</td><td>金框随卡置灰 + 售罄章</td></tr>
+            <tr><td>K11</td><td>售罄</td><td>否</td><td>是</td><td>人气标签随卡置灰 + 售罄章</td></tr>
+            <tr><td>K12</td><td>售罄</td><td>是</td><td>是</td><td>叠加样式随卡置灰 + 售罄章（同 K4 建议）</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </article>
+
+      <article class="sec-card w790" id="c26">
+        <div class="sec-head"><span class="sec-num n-red">R6</span><h2>规则弹窗</h2><span class="tag tag-green">新增</span><span class="chev">▾ 点击收合</span></div>
+        <div class="sec-body"><div class="blk-body">
+          <div class="skel">
+            <div class="skel-dev">
+              <div class="sk sk-top"></div>
+              <div class="sk-box"><div class="sk-modal"></div></div>
+              <div class="sk sk-draw"></div><div class="sk sk-pool" style="height:60px"></div>
+            </div>
+            <span class="sk-cap">遮罩层 · 页面置中偏上</span>
+          </div>
+          <div class="rules-col">
+            <div class="rl"><span class="rl-n">1</span><div class="rl-t">
+              <span class="cl">入口：Banner 右下「Rules」按钮；半透明深色遮罩。</span></div></div>
+            <div class="rl"><span class="rl-n">2</span><div class="rl-t">
+              <span class="cl">后台已传「规则弹窗图 · H5」（356×422）时优先显示图片；</span>
+              <span class="cl">未配置时显示默认 5 条文字规则作兜底。</span></div></div>
+            <div class="rl"><span class="rl-n">3</span><div class="rl-t">
+              <span class="cl">默认文案：① 每张售价 N 积分必中一赏，当场揭晓；</span>
+              <span class="cl sub">② Last赏于最后一张券抽出时自动触发；③ 数量有限售罄不补；</span>
+              <span class="cl sub">④ 奖品以实际派发为准，实物另行通知配送；⑤ 积分不足无法购券。</span></div></div>
+            <div class="rl"><span class="rl-n">4</span><div class="rl-t">
+              <span class="cl">右上 ✕ 关闭；内容超高时弹窗内部滚动（最高 80%）。</span></div></div>
+            <div class="demo-row"><button class="demo-btn" onclick="demoRules()"><span>▶ 左侧原型演示：打开规则弹窗</span></button></div>
+            <div class="xref-row"><span class="cl sub">交叉查阅：</span>
+              <span class="xref" onclick="goTabCard('t3','c33')"><span>③B3 规则弹窗图</span></span>
+            </div>
+          </div>
+        </div></div>
+      </article>
+
+      <article class="sec-card w790" id="c27">
+        <div class="sec-head"><span class="sec-num n-red">R7</span><h2>开奖结果弹窗</h2><span class="tag tag-green">新增</span><span class="chev">▾ 点击收合</span></div>
+        <div class="sec-body"><div class="blk-body">
+          <div class="skel">
+            <div class="skel-dev">
+              <div class="sk sk-top"></div><div class="sk sk-kv" style="height:30px"></div>
+              <div class="sk-box"><div class="sk-modal"></div></div>
+              <div class="sk sk-pool" style="height:60px"></div>
+            </div>
+            <span class="sk-cap">遮罩层 · 开奖后弹出</span>
+          </div>
+          <div class="rules-col">
+            <div class="rl"><span class="rl-n">1</span><div class="rl-t">
+              <span class="cl">标题「抽出 N 张」，N = 实际抽出张数（含 Last赏）。</span></div></div>
+            <div class="rl"><span class="rl-n">2</span><div class="rl-t">
+              <span class="cl">模式 A · 逐张（结果 ≤ 12 张）：双列刮券卡。</span>
+              <span class="cl sub">黑色封条自左向右撕开：clip-path 1.1s ease，</span>
+              <span class="cl sub">首张延迟 300ms，之后每张间隔 280ms 依序揭晓。</span></div></div>
+            <div class="rl"><span class="rl-n">3</span><div class="rl-t">
+              <span class="cl">模式 B · 汇总（结果 &gt; 12 张）：按赏级聚合为「章 + 名称 + ×N」。</span>
+              <span class="cl sub">排序：Last赏置顶，其余按赏级顺序。</span></div></div>
+            <div class="rl"><span class="rl-n">4</span><div class="rl-t">
+              <span class="cl">命中 Last赏：列表顶部金色横幅「★ 恭喜抽中 Last赏 ★」。</span></div></div>
+            <div class="rl"><span class="rl-n">5</span><div class="rl-t">
+              <span class="cl">底部「收下」按钮关闭；遮罩点击不关闭（防误触）。</span></div></div>
+            <div class="rl"><span class="rl-n">6</span><div class="rl-t">
+              <span class="cl">关闭时若总剩余 = 0：撕券按钮禁用并显示「已全部抽完」。</span></div></div>
+            <div class="rl"><span class="rl-n">7</span><div class="rl-t">
+              <span class="cl"><code>prefers-reduced-motion</code> 时停用撕开动画，直接呈现结果。</span></div></div>
+            <div class="demo-row">
+              <button class="demo-btn" onclick="demoDraw('5')"><span>▶ 演示：五连（逐张模式）</span></button>
+              <button class="demo-btn" onclick="demoDraw('all')"><span>▶ 演示：全包（汇总模式）</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="xref-row"><span class="cl sub">交叉查阅：</span>
+          <span class="xref" onclick="goTabCard('t1','c14')"><span>①1.4 BR-02 判定表</span></span>
+          <span class="xref" onclick="goTabCard('t4','c42')"><span>④C2 抽奖记录</span></span>
+          <span class="xref" onclick="goTabCard('t4','c43')"><span>④C3 奖品格式</span></span>
+        </div>
+        <span class="sub-t">展示模式判定表（结果张数 × 是否命中 Last赏 = 4 组合）</span>
+        <table class="spec-table tw">
+          <thead><tr>
+            <th style="width:56px">组合</th><th style="width:170px">结果张数（含 Last）</th><th style="width:130px">命中 Last赏</th>
+            <th style="width:392px">弹窗表现</th>
+          </tr></thead>
+          <tbody>
+            <tr><td>M1</td><td>≤ 12</td><td>否</td><td>模式 A 逐张：双列刮券卡，逐张撕开动画</td></tr>
+            <tr><td>M2</td><td>≤ 12</td><td>是</td><td>模式 A + 顶部金色横幅；Last赏卡用金色「楽 LAST」章</td></tr>
+            <tr><td>M3</td><td>&gt; 12</td><td>否</td><td>模式 B 汇总：按赏级聚合「章 + 名称 + ×N」，赏级顺序排列</td></tr>
+            <tr><td>M4</td><td>&gt; 12</td><td>是</td><td>模式 B + 顶部金色横幅；Last赏行置顶</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </article>
+
+      <article class="sec-card w790" id="c28">
+        <div class="sec-head"><span class="sec-num n-red">R8</span><h2>埋点建议（非原型内容，供评审）</h2><span class="tag tag-green">新增</span><span class="chev">▾ 点击收合</span></div>
+        <div class="sec-body">
+          <div class="rules-col" style="width:748px">
+            <div class="rl" style="width:748px"><span class="rl-n">1</span><div class="rl-t" style="width:716px">
+              <span class="cl"><code>ichiban_page_view</code> 进入活动页｜product_id, member_id</span></div></div>
+            <div class="rl" style="width:748px"><span class="rl-n">2</span><div class="rl-t" style="width:716px">
+              <span class="cl"><code>ichiban_rules_open</code> 打开规则弹窗｜product_id</span></div></div>
+            <div class="rl" style="width:748px"><span class="rl-n">3</span><div class="rl-t" style="width:716px">
+              <span class="cl"><code>ichiban_draw_click</code> 点击撕券｜product_id, qty_type(1/5/10/all), cost</span></div></div>
+            <div class="rl" style="width:748px"><span class="rl-n">4</span><div class="rl-t" style="width:716px">
+              <span class="cl"><code>ichiban_draw_result</code> 开奖返回｜order_no, tiers[], last_hit(bool)</span></div></div>
+            <div class="rl" style="width:748px"><span class="rl-n">5</span><div class="rl-t" style="width:716px">
+              <span class="cl"><code>ichiban_soldout_view</code> 售罄状态曝光｜product_id</span></div></div>
+          </div>
+        </div>
+      </article>
+
+    </div><!-- /h5-right -->
+  </div><!-- /h5-layout -->
+
+</section>
+
+<!-- ════════════════ TAB 3 后台 · 商品配置（分区块图文） ════════════════ -->
+<section class="panel" id="t3">
+
+  <div class="panel-tools">
+    <span class="tools-label">区块定位：</span>
+    <button class="anchor-btn" onclick="goCard('c30')"><span>B0 原型内嵌</span></button>
+    <button class="anchor-btn" onclick="goCard('c31')"><span>B1 弹窗框架</span></button>
+    <button class="anchor-btn" onclick="goCard('c32')"><span>B2 基础字段</span></button>
+    <button class="anchor-btn" onclick="goCard('c33')"><span>B3 图片配置</span></button>
+    <button class="anchor-btn" onclick="goCard('c34')"><span>B4 奖级配置</span></button>
+    <button class="anchor-btn" onclick="goCard('c35')"><span>B5 奖品动态字段</span></button>
+    <button class="anchor-btn" onclick="goCard('c36')"><span>B6 Last赏</span></button>
+    <button class="anchor-btn" onclick="goCard('c37')"><span>B7 提交校验</span></button>
+    <div class="tools-gap"></div>
+    <button class="mini-btn" onclick="setFold('t3',false)"><span>全部展开</span></button>
+    <button class="mini-btn" onclick="setFold('t3',true)"><span>全部收合</span></button>
+  </div>
+
+  <article class="sec-card" id="c30">
+    <div class="sec-head"><span class="sec-num n-gold">B0</span><h2>原型 1:1 内嵌（ichiban_kuji_admin_modal · 可交互）</h2><span class="chev">▾ 点击收合</span></div>
+    <div class="sec-body">
+      <div class="xref-row">
+        <span class="tag tag-blue">原型 1:1 内嵌</span>
+        <span class="cl sub">可操作：新增/删除奖级、修改数量看总券数、切换第一/二层看动态字段、旋转券行增删、限时抢购切换、图片上传预览、点「确定」演示必填校验</span>
+        <button class="mini-btn" onclick="document.querySelector('#admproto .overlay').style.display='flex'"><span>↻ 重新显示弹窗</span></button>
+      </div>
+      <div id="admproto">
+        <div class="overlay">
+          <div class="modal">
+            <div class="modal-header">
+              新增商品
+              <button class="modal-close" onclick="this.closest('.overlay').style.display='none'">✕</button>
+            </div>
+            <div class="modal-body">
+              <div class="form-row">
+                <div class="form-label"><span class="req">*</span>币种：</div>
+                <div class="form-control">
+                  <select style="max-width:180px;">
+                    <option>菲律宾比索</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-label">商品类别：</div>
+                <div class="form-control">
+                  <div class="checkbox-group">
+                    <label><input type="checkbox"> FREESPIN</label>
+                    <label><input type="checkbox"> MONEY</label>
+                    <label><input type="checkbox"> COUPON</label>
+                    <label><input type="checkbox"> tickets（票券）</label>
+                    <label><input type="checkbox"> 实物</label>
+                    <label><input type="checkbox"> 彩金</label>
+                    <label><input type="checkbox"> 优惠券</label>
+                    <label><input type="checkbox"> 免费旋转</label>
+                    <label><input type="checkbox"> 话费</label>
+                    <label><input type="checkbox"> 流量</label>
+                    <label><input type="checkbox"> pisoluck</label>
+                    <label><input type="checkbox"> 免费投注</label>
+                    <label><input type="checkbox"> 盲盒</label>
+                    <label><input type="checkbox"> 道具卡</label>
+                    <label><input type="checkbox" checked class="ichiban-cb"> <span class="ichiban-label">Ichiban Kuji</span></label>
+                  </div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-label"><span class="req">*</span>商品名称：</div>
+                <div class="form-control">
+                  <input type="text" placeholder="请输入商品名称">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-label"><span class="req">*</span>商品类型：</div>
+                <div class="form-control">
+                  <div class="radio-group">
+                    <label><input type="radio" name="productType" value="real"> 实物</label>
+                    <label><input type="radio" name="productType" value="bonus"> 彩金</label>
+                    <label><input type="radio" name="productType" value="coupon"> 优惠券</label>
+                    <label><input type="radio" name="productType" value="freespin"> 免费旋转</label>
+                    <label><input type="radio" name="productType" value="phone"> 话费</label>
+                    <label><input type="radio" name="productType" value="data"> 流量</label>
+                    <label><input type="radio" name="productType" value="pisoluck"> pisoluck</label>
+                    <label><input type="radio" name="productType" value="ticket"> 票券</label>
+                    <label><input type="radio" name="productType" value="blind"> 盲盒</label>
+                    <label><input type="radio" name="productType" value="freebet"> 免费投注</label>
+                    <label><input type="radio" name="productType" value="tool"> 道具卡</label>
+                    <label><input type="radio" name="productType" value="ichiban" checked> <span class="ichiban-label">Ichiban Kuji</span></label>
+                  </div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-label"><span class="req">*</span>商品图片：</div>
+                <div class="form-control">
+                  <button class="upload-btn">📁 选择文件</button>
+                  <div class="upload-hint">尺寸750×750，最多可上传6张图，默认第一张图为封面图</div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-label"><span class="req">*</span>购买价格：</div>
+                <div class="form-control">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                    <label><input type="radio" name="priceType" checked> 积分</label>
+                  </div>
+                  <div class="input-suffix">
+                    <input type="number" placeholder="请输入" style="max-width:300px;border-radius:4px 0 0 4px;">
+                    <span class="suffix-tag">积分</span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-label"><span class="req">*</span>排序：</div>
+                <div class="form-control">
+                  <input type="number" value="1" style="max-width:100px;">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-label">单个会员限购数：</div>
+                <div class="form-control">
+                  <div class="vip-grid">
+                    <div class="vip-item"><span class="vip-tag">VIP0</span><input type="number" value="0"></div>
+                    <div class="vip-item"><span class="vip-tag">VIP1</span><input type="number" value="0"></div>
+                    <div class="vip-item"><span class="vip-tag">VIP2</span><input type="number" value="0"></div>
+                    <div class="vip-item"><span class="vip-tag">VIP3</span><input type="number" value="0"></div>
+                    <div class="vip-item"><span class="vip-tag">VIP4</span><input type="number" value="0"></div>
+                    <div class="vip-item"><span class="vip-tag">VIP5</span><input type="number" value="0"></div>
+                    <div class="vip-item"><span class="vip-tag">VIP6</span><input type="number" value="0"></div>
+                    <div class="vip-item"><span class="vip-tag">VIP7</span><input type="number" value="0"></div>
+                    <div class="vip-item"><span class="vip-tag">VIP8</span><input type="number" value="0"></div>
+                    <div class="vip-item"><span class="vip-tag">VIP9</span><input type="number" value="0"></div>
+                    <div class="vip-item"><span class="vip-tag">VIP10</span><input type="number" value="0"></div>
+                  </div>
+                  <div class="limit-row">
+                    <input type="checkbox" id="limitCheck">
+                    <label for="limitCheck" style="font-size:13px;color:#1677ff;cursor:pointer;">限购</label>
+                  </div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-label"><span class="req">*</span>是否限时抢购：</div>
+                <div class="form-control">
+                  <div class="radio-group">
+                    <label><input type="radio" name="flashSale" value="no" checked onchange="toggleFlashSale(this)"> 否</label>
+                    <label><input type="radio" name="flashSale" value="yes" onchange="toggleFlashSale(this)"> 是</label>
+                  </div>
+                  <div id="flashSaleRange" style="display:none;margin-top:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;border:1px solid #d9d9d9;border-radius:4px;padding:6px 12px;max-width:420px;background:#fff;">
+                      <span style="color:#bbb;font-size:15px;">🕐</span>
+                      <input type="datetime-local" style="border:none;outline:none;font-size:13px;color:#333;flex:1;background:transparent;" id="flashStart">
+                      <span style="color:#999;font-size:13px;">～</span>
+                      <input type="datetime-local" style="border:none;outline:none;font-size:13px;color:#333;flex:1;background:transparent;" id="flashEnd">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-label">审核模式：</div>
+                <div class="form-control">
+                  <div class="radio-group">
+                    <label style="color:#bbb;cursor:not-allowed;"><input type="radio" name="auditMode" checked disabled> 自动审核</label>
+                    <label style="color:#bbb;cursor:not-allowed;"><input type="radio" name="auditMode" disabled> 手动审核</label>
+                  </div>
+                </div>
+              </div>
+              <div style="margin-top:16px;">
+                <div class="banner-field-row">
+                  <div class="banner-field-label"><span class="req">*</span>顶部图：</div>
+                  <div style="flex:1;">
+                    <div class="banner-panels">
+                      <div class="banner-panel">
+                        <div class="banner-panel-header">
+                          <span>PC 端</span>
+                          <span class="size-hint">建议尺寸 1400×800px</span>
+                        </div>
+                        <div class="banner-panel-body">
+                          <div class="banner-drop-zone" onclick="document.getElementById('bannerPcInput').click()">
+                            <img class="banner-preview" id="bannerPcPreview" src="" style="display:none;">
+                            <div class="banner-placeholder" id="bannerPcPlaceholder">
+                              <span class="plus-icon">＋</span>
+                              <span>点击上传图片</span>
+                            </div>
+                          </div>
+                          <input type="file" id="bannerPcInput" accept="image/*" style="display:none;"
+                            onchange="previewBanner(this,'bannerPcPreview','bannerPcPlaceholder')">
+                          <div class="banner-panel-footer">
+                            <button type="button" class="btn-banner-delete" onclick="clearBanner('bannerPcInput','bannerPcPreview','bannerPcPlaceholder')">🗑 删除</button>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="banner-panel">
+                        <div class="banner-panel-header">
+                          <span>H5 端</span>
+                          <span class="size-hint">建议尺寸 390×320px</span>
+                        </div>
+                        <div class="banner-panel-body">
+                          <div class="banner-drop-zone" onclick="document.getElementById('bannerH5Input').click()">
+                            <img class="banner-preview" id="bannerH5Preview" src="" style="display:none;">
+                            <div class="banner-placeholder" id="bannerH5Placeholder">
+                              <span class="plus-icon">＋</span>
+                              <span>点击上传图片</span>
+                            </div>
+                          </div>
+                          <input type="file" id="bannerH5Input" accept="image/*" style="display:none;"
+                            onchange="previewBanner(this,'bannerH5Preview','bannerH5Placeholder')">
+                          <div class="banner-panel-footer">
+                            <button type="button" class="btn-banner-delete" onclick="clearBanner('bannerH5Input','bannerH5Preview','bannerH5Placeholder')">🗑 删除</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style="margin-top:16px;">
+                <div class="banner-field-row">
+                  <div class="banner-field-label"><span class="req">*</span>规则弹窗图：</div>
+                  <div style="flex:1;">
+                    <div class="banner-panels">
+                      <div class="banner-panel">
+                        <div class="banner-panel-header">
+                          <span>PC 端</span>
+                          <span class="size-hint">建议尺寸 356×422px</span>
+                        </div>
+                        <div class="banner-panel-body">
+                          <div class="banner-drop-zone" onclick="document.getElementById('rulePcInput').click()">
+                            <img class="banner-preview" id="rulePcPreview" src="" style="display:none;">
+                            <div class="banner-placeholder" id="rulePcPlaceholder">
+                              <span class="plus-icon">＋</span>
+                              <span>点击上传图片</span>
+                            </div>
+                          </div>
+                          <input type="file" id="rulePcInput" accept="image/*" style="display:none;"
+                            onchange="previewBanner(this,'rulePcPreview','rulePcPlaceholder')">
+                          <div class="banner-panel-footer">
+                            <button type="button" class="btn-banner-delete" onclick="clearBanner('rulePcInput','rulePcPreview','rulePcPlaceholder')">🗑 删除</button>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="banner-panel">
+                        <div class="banner-panel-header">
+                          <span>H5 端</span>
+                          <span class="size-hint">建议尺寸 356×422px</span>
+                        </div>
+                        <div class="banner-panel-body">
+                          <div class="banner-drop-zone" onclick="document.getElementById('ruleH5Input').click()">
+                            <img class="banner-preview" id="ruleH5Preview" src="" style="display:none;">
+                            <div class="banner-placeholder" id="ruleH5Placeholder">
+                              <span class="plus-icon">＋</span>
+                              <span>点击上传图片</span>
+                            </div>
+                          </div>
+                          <input type="file" id="ruleH5Input" accept="image/*" style="display:none;"
+                            onchange="previewBanner(this,'ruleH5Preview','ruleH5Placeholder')">
+                          <div class="banner-panel-footer">
+                            <button type="button" class="btn-banner-delete" onclick="clearBanner('ruleH5Input','ruleH5Preview','ruleH5Placeholder')">🗑 删除</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="section-divider">
+                <div class="section-title">Ichiban Kuji 奖级配置</div>
+                <div class="total-banner">
+                  🎫 总券数：<strong id="totalCount">0</strong> 张
+                  <span style="color:#666;font-size:12px;margin-left:4px;">（各奖级数量自动加总）</span>
+                </div>
+                <div class="add-tier-wrap">
+                  <button class="btn-add-tier" onclick="addTier()">＋ 新增奖级</button>
+                  <span class="tier-count-info" id="tierCountInfo">目前 1 个奖级（最多 G赏，共 7 级）</span>
+                </div>
+                <div id="tierList"></div>
+                <div class="prize-tier last-tier" id="lastTier">
+                  <div class="tier-header">
+                    <div style="display:flex;align-items:center;gap:8px;flex:1;">
+                      <span class="req">*</span><input class="tier-name-input" type="text" value="Last赏" placeholder="奖级名称" style="max-width:120px;" required>
+                      <div style="display:flex;align-items:center;gap:5px;background:#fff7e6;border:1px solid #ffd591;border-radius:4px;padding:0 10px;height:28px;">
+                        <span style="font-size:12px;color:#fa8c16;white-space:nowrap;">数量</span>
+                        <input type="number" value="1" disabled style="width:40px;border:none;background:transparent;text-align:center;font-size:13px;font-weight:600;color:#fa8c16;outline:none;">
+                        <span style="font-size:12px;color:#fa8c16;">张</span>
+                      </div>
+                      <span class="last-note">🏆 压轴奖：最后一抽自动触发，固定 1 张</span>
+                    </div>
+                  </div>
+                  <div class="tier-body" id="tbody-last">
+                    <div style="display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;">
+                      <div class="tier-field" style="min-width:130px;">
+                        <label><span class="req">*</span>第一层</label>
+                        <select onchange="onCat1Change(this,'last')" required>
+                          <option value="virtual">虚拟物品</option>
+                          <option value="real">实物</option>
+                        </select>
+                      </div>
+                      <div class="tier-field" style="min-width:130px;" id="cat2-wrap-last">
+                        <label><span class="req">*</span>第二层</label>
+                        <select onchange="onCat2Change(this,'last')" required>
+                          <option value="bonus">彩金</option>
+                          <option value="points">积分</option>
+                          <option value="coupon">优惠券</option>
+                          <option value="freespin">免费旋转券</option>
+                          <option value="freebet">免费投注券</option>
+                          <option value="tool">道具卡</option>
+                        </select>
+                      </div>
+                      <div id="dynamic-fields-last" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;"></div>
+                      <div class="tier-field" id="prize-name-wrap-last" style="min-width:130px;display:none;">
+                        <label><span class="req">*</span>奖品名称</label>
+                        <input type="text" placeholder="请输入奖品名称">
+                      </div>
+                    </div>
+                    <div class="tier-upload" style="margin-top:10px;">
+                      <label><span class="req">*</span>奖品图片</label>
+                      <button class="upload-btn-sm">📁 选择文件</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-primary" onclick="submitForm()">确定</button>
+              <button class="btn btn-warning" onclick="this.closest('.overlay').style.display='none'">取消</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="sec-card" id="c31">
+    <div class="sec-head"><span class="sec-num n-gold">B1</span><h2>弹窗框架</h2><span class="tag tag-gray">不异动</span><span class="chev">▾ 点击收合</span></div>
+    <div class="sec-body">
+      <div class="mock">
+        <span class="mock-cap">区块示意 · 弹窗框架（实际宽 860px）</span>
+        <div class="mk-modal">
+          <div class="mk-mhead"><span class="mk-mtitle">新增商品</span><span class="mk-x">✕</span></div>
+          <div class="mk-mbody"><span class="mk-dim">表单内容区（B2 ～ B6，垂直滚动）</span></div>
+          <div class="mk-mfoot"><span class="mk-btn">确定</span><span class="mk-btn-o">取消</span></div>
+        </div>
+      </div>
+      <table class="spec-table">
+        <thead><tr><th style="width:200px">项目</th><th style="width:994px">规则</th></tr></thead>
+        <tbody>
+          <tr><td>入口</td><td>积分商城 › 商品管理 › 新增商品；列表行「编辑」复用同弹窗（标题改「编辑商品」并回填）。</td></tr>
+          <tr><td>尺寸</td><td>宽 860px；内容超高时页面级垂直滚动。</td></tr>
+          <tr><td>底部操作</td><td>「确定」先执行前端校验（B7）；「取消」/ 右上 ✕ 直接关闭，不保存。</td></tr>
+          <tr><td>一番赏识别</td><td>商品类别勾选 + 商品类型选中「Ichiban Kuji」时，显示奖级配置区块（B4～B6）。</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article class="sec-card" id="c32">
+    <div class="sec-head"><span class="sec-num n-gold">B2</span><h2>基础字段区</h2><span class="tag tag-gold">异动</span><span class="chev">▾ 点击收合</span></div>
+    <div class="sec-body">
+      <div class="mock">
+        <span class="mock-cap">区块示意 · 表单行版式（标签右对齐 130px + 控件区）</span>
+        <div class="mk-row"><div class="mk-lab"><span><span class="mk-req">*</span> 商品名称：</span></div><div class="mk-input"><span>请输入商品名称</span></div></div>
+        <div class="mk-row"><div class="mk-lab"><span>商品类别：</span></div><div class="mk-check"><span>☐ 实物</span><span>☐ 彩金</span><span>☐ 盲盒</span><span class="on">☑ Ichiban Kuji</span></div></div>
+        <div class="mk-row"><div class="mk-lab"><span><span class="mk-req">*</span> 购买价格：</span></div><div class="mk-input" style="width:200px"><span>请输入</span></div><span style="font-size:12px;line-height:18px;color:#999;background:#FAFAFA;border:1px solid #D9D9D9;border-radius:0 4px 4px 0;padding:7px 10px;flex-shrink:0">积分</span></div>
+      </div>
+      <table class="spec-table">
+        <thead><tr>
+          <th style="width:140px">字段</th><th style="width:130px">控件</th><th style="width:70px">必填</th>
+          <th style="width:90px">分类</th><th style="width:450px">规则</th><th style="width:314px">备注</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>币种</td><td>下拉单选</td><td><span class="tag tag-req">必填</span></td><td><span class="tag tag-gray">不异动</span></td><td>本期仅「菲律宾比索」</td><td>默认选中</td></tr>
+          <tr><td>商品类别</td><td>复选框组</td><td><span class="tag tag-opt">选填</span></td><td><span class="tag tag-gold">异动</span></td><td>既有 14 类别之外新增「Ichiban Kuji」选项</td><td>作前台分类筛选用</td></tr>
+          <tr><td>商品名称</td><td>文本框</td><td><span class="tag tag-req">必填</span></td><td><span class="tag tag-gray">不异动</span></td><td>即前台活动标题（对应 ②R2 页签）</td><td>建议限 30 字（待确认）</td></tr>
+          <tr><td>商品类型</td><td>单选组</td><td><span class="tag tag-req">必填</span></td><td><span class="tag tag-gold">异动</span></td><td>既有 11 类型之外新增「Ichiban Kuji」；选中触发奖级区块</td><td>与类别独立</td></tr>
+          <tr><td>商品图片</td><td>文件上传</td><td><span class="tag tag-req">必填</span></td><td><span class="tag tag-gray">不异动</span></td><td>750×750，最多 6 张，第 1 张为封面</td><td>红字提示尺寸</td></tr>
+          <tr><td>购买价格</td><td>数字框 + 后缀</td><td><span class="tag tag-req">必填</span></td><td><span class="tag tag-gray">不异动</span></td><td>计价方式固定「积分」；正整数（对应 ②R4 页签）</td><td>即前台单价</td></tr>
+          <tr><td>排序</td><td>数字框</td><td><span class="tag tag-req">必填</span></td><td><span class="tag tag-gray">不异动</span></td><td>默认 1；数值越小越靠前（待确认方向）</td><td>—</td></tr>
+          <tr><td>单个会员限购数</td><td>VIP0～VIP10 数字框</td><td><span class="tag tag-opt">选填</span></td><td><span class="tag tag-gray">不异动</span></td><td>各等级独立张数，0 = 不限；勾选「限购」后生效（穷举见下表）</td><td>3 列网格排布</td></tr>
+          <tr><td>是否限时抢购</td><td>单选 否 / 是</td><td><span class="tag tag-req">必填</span></td><td><span class="tag tag-gray">不异动</span></td><td>选「是」展开起讫时间（datetime，秒级；穷举见下表）</td><td>结束须晚于开始</td></tr>
+          <tr><td>审核模式</td><td>单选（禁用）</td><td>—</td><td><span class="tag tag-gray">不异动</span></td><td>锁定「自动审核」，不可更改</td><td>Q-06</td></tr>
+        </tbody>
+      </table>
+      <span class="sub-t">类别 × 类型组合穷举表（对「Ichiban Kuji」标记，2×2 全分支）</span>
+      <table class="spec-table">
+        <thead><tr>
+          <th style="width:70px">组合</th><th style="width:220px">类别勾选 Ichiban Kuji</th><th style="width:220px">类型选中 Ichiban Kuji</th>
+          <th style="width:200px">奖级区块</th><th style="width:484px">说明</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>T1</td><td>是</td><td>是</td><td>显示</td><td>标准一番赏配置路径</td></tr>
+          <tr><td>T2</td><td>是</td><td>否</td><td>不显示</td><td>按所选类型渲染对应表单；类别仅影响前台筛选</td></tr>
+          <tr><td>T3</td><td>否</td><td>是</td><td>显示</td><td><span class="tag tag-gold">待确认</span> Q-10：建议以类型为准，保存时自动勾选类别</td></tr>
+          <tr><td>T4</td><td>否</td><td>否</td><td>不显示</td><td>与一番赏无关的普通商品</td></tr>
+        </tbody>
+      </table>
+      <span class="sub-t">限时抢购情境穷举表（设置 × 当前时间，全分支）</span>
+      <table class="spec-table">
+        <thead><tr>
+          <th style="width:70px">情境</th><th style="width:160px">限时抢购</th><th style="width:220px">当前时间 vs 区间</th>
+          <th style="width:744px">前台行为</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>F1</td><td>否</td><td>—</td><td>常驻显示、可购</td></tr>
+          <tr><td>F2</td><td>是</td><td>&lt; 开始时间</td><td><span class="tag tag-gold">待确认</span> Q-08：建议显示但不可购，展示开抢倒计时</td></tr>
+          <tr><td>F3</td><td>是</td><td>区间内</td><td>显示、可购</td></tr>
+          <tr><td>F4</td><td>是</td><td>&gt; 结束时间</td><td><span class="tag tag-gold">待确认</span> Q-08：建议不可购，显示「已结束」；未售完库存处置需定义</td></tr>
+        </tbody>
+      </table>
+      <span class="sub-t">限购判定穷举表（勾选 × 配置值 × 已购额度，全分支）</span>
+      <table class="spec-table">
+        <thead><tr>
+          <th style="width:70px">情境</th><th style="width:130px">勾选「限购」</th><th style="width:170px">该 VIP 配置值 K</th>
+          <th style="width:250px">已购 P 与本次 W</th><th style="width:574px">判定</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>P1</td><td>否</td><td>任意</td><td>任意</td><td>不限购，放行</td></tr>
+          <tr><td>P2</td><td>是</td><td>K = 0</td><td>任意</td><td>0 = 不限，放行</td></tr>
+          <tr><td>P3</td><td>是</td><td>K &gt; 0</td><td>P + W ≤ K</td><td>放行</td></tr>
+          <tr><td>P4</td><td>是</td><td>K &gt; 0</td><td>P &lt; K 且 P + W &gt; K</td><td><span class="tag tag-gold">待确认</span> Q-09：拦截提示，或按剩余额度 K−P 抽取</td></tr>
+          <tr><td>P5</td><td>是</td><td>K &gt; 0</td><td>P ≥ K</td><td>拦截，提示已达限购上限</td></tr>
+        </tbody>
+      </table>
+      <div class="xref-row"><span class="cl sub">交叉查阅：</span>
+        <span class="xref" onclick="goTabCard('t2','c22')"><span>②R2 Banner</span></span>
+        <span class="xref" onclick="goTabCard('t2','c24')"><span>②R4 撕券区</span></span>
+        <span class="xref" onclick="goTabCard('t1','c16')"><span>①1.6 Q-06/08/09/10</span></span>
+      </div>
+    </div>
+  </article>
+
+  <article class="sec-card" id="c33">
+    <div class="sec-head"><span class="sec-num n-gold">B3</span><h2>图片配置区（顶部图 / 规则弹窗图）</h2><span class="tag tag-green">新增</span><span class="chev">▾ 点击收合</span></div>
+    <div class="sec-body">
+      <div class="mock">
+        <span class="mock-cap">区块示意 · PC / H5 双面板上传</span>
+        <div class="mk-panels">
+          <div class="mk-panel">
+            <div class="mk-phead"><span>PC 端</span><span class="hint">建议尺寸 1400×800px</span></div>
+            <div class="mk-drop"><span class="plus">＋</span><span>点击上传图片</span></div>
+          </div>
+          <div class="mk-panel">
+            <div class="mk-phead"><span>H5 端</span><span class="hint">建议尺寸 390×320px</span></div>
+            <div class="mk-drop"><span class="plus">＋</span><span>点击上传图片</span></div>
+          </div>
+        </div>
+      </div>
+      <table class="spec-table">
+        <thead><tr>
+          <th style="width:180px">字段</th><th style="width:110px">端</th><th style="width:160px">建议尺寸</th>
+          <th style="width:80px">必填</th><th style="width:664px">交互</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>顶部图</td><td>PC</td><td>1400×800px</td><td><span class="tag tag-req">必填</span></td><td rowspan="4">
+            <div class="cl">虚线拖放区，点击唤起文件选择；选图后即时预览（cover 填充）。</div>
+            <div class="cl">面板右下「删除」清空已选图并还原占位。</div>
+            <div class="cl">仅接受 image/*；单图上传，重复选择即替换。</div>
+          </td></tr>
+          <tr><td>顶部图</td><td>H5</td><td>390×320px</td><td><span class="tag tag-req">必填</span></td></tr>
+          <tr><td>规则弹窗图</td><td>PC</td><td>356×422px</td><td><span class="tag tag-req">必填</span></td></tr>
+          <tr><td>规则弹窗图</td><td>H5</td><td>356×422px</td><td><span class="tag tag-req">必填</span></td></tr>
+        </tbody>
+      </table>
+      <span class="sub-t">上传区状态穷举表（3 态全列）</span>
+      <table class="spec-table">
+        <thead><tr>
+          <th style="width:70px">状态</th><th style="width:200px">触发</th><th style="width:400px">拖放区表现</th><th style="width:524px">可用操作</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>U1</td><td>初始 / 未选图</td><td>虚线框 + 「＋ 点击上传图片」占位</td><td>点击唤起文件选择（仅 image/*）</td></tr>
+          <tr><td>U2</td><td>已选图</td><td>图片预览铺满（cover），占位隐藏</td><td>再次点击重选即替换；「删除」清空</td></tr>
+          <tr><td>U3</td><td>点击「删除」</td><td>清空文件与预览，还原 U1 占位</td><td>同 U1</td></tr>
+        </tbody>
+      </table>
+      <div class="xref-row"><span class="cl sub">交叉查阅：</span>
+        <span class="xref" onclick="goTabCard('t2','c22')"><span>②R2 KV 主视觉</span></span>
+        <span class="xref" onclick="goTabCard('t2','c26')"><span>②R6 规则弹窗</span></span>
+        <span class="xref" onclick="goTabCard('t3','c30')"><span>③B0 原型演示</span></span>
+      </div>
+    </div>
+  </article>
+
+  <article class="sec-card" id="c34">
+    <div class="sec-head"><span class="sec-num n-gold">B4</span><h2>奖级配置区</h2><span class="tag tag-green">新增</span><span class="chev">▾ 点击收合</span></div>
+    <div class="sec-body">
+      <div class="mock">
+        <span class="mock-cap">区块示意 · 总券数自动加总（下方数量输入可试算）</span>
+        <div class="mk-total"><span>总券数：</span><b id="mkTotal">19</b><span>张（各奖级数量 + Last赏 1 张，自动加总）</span></div>
+        <div class="mk-tier">
+          <span class="mk-badge">A赏</span><span>名称可改</span>
+          <span>数量</span><input class="mk-realin" id="mkQtyA" type="number" value="6" oninput="mkCalcTotal()"><span>张</span>
+          <span style="color:#FF4D4F">✕ 删除</span>
+        </div>
+        <div class="mk-tier">
+          <span class="mk-badge">B赏</span><span>名称可改</span>
+          <span>数量</span><input class="mk-realin" id="mkQtyB" type="number" value="12" oninput="mkCalcTotal()"><span>张</span>
+          <span style="color:#FF4D4F">✕ 删除</span>
+        </div>
+        <div class="mk-tier last">
+          <span class="mk-badge gold">Last赏</span><span>数量固定 1 张（disabled）· 不可删除</span>
+        </div>
+      </div>
+      <table class="spec-table">
+        <thead><tr><th style="width:200px">项目</th><th style="width:994px">规则</th></tr></thead>
+        <tbody>
+          <tr><td>总券数横幅</td><td>总券数 = Σ 各赏级数量 + 1（Last赏），实时自动计算，只读展示。</td></tr>
+          <tr><td>新增奖级</td><td>
+            <div class="cl">默认依序命名 A赏 → B赏 → …（名称可自由修改）。</div>
+            <div class="cl">初始 1 个奖级（A赏）；达到上限后按钮提示并阻止新增。</div>
+          </td></tr>
+          <tr><td>删除奖级</td><td>至少保留 1 个普通奖级；仅剩 1 个时隐藏删除按钮。</td></tr>
+          <tr><td>奖级字段</td><td>名称（必填）+ 数量（必填，≥1 正整数）+ 奖品配置（B5）+ 奖品图片（必填）。</td></tr>
+        </tbody>
+      </table>
+      <div class="callout co-warn"><span class="co-icon">!</span><div class="co-body">
+        <span class="t">Q-01 · 奖级上限口径不一致（需产品确认）</span>
+        <span class="d">按钮提示：「最多可新增至 G赏，共 7 个奖级」；计数文案：「最多 H赏，共 8 级」。</span>
+        <span class="d">代码实际判断 tiers.length ≥ 8 才阻止，即最多可建 8 个普通奖级。</span>
+      </div></div>
+      <div class="xref-row"><span class="cl sub">交叉查阅：</span>
+        <span class="xref" onclick="goTabCard('t2','c23')"><span>②R3 库存条</span></span>
+        <span class="xref" onclick="goTabCard('t2','c25')"><span>②R5 奖品一览</span></span>
+        <span class="xref" onclick="goTabCard('t1','c14')"><span>①1.4 BR-02</span></span>
+        <span class="xref" onclick="goTabCard('t3','c30')"><span>③B0 原型演示</span></span>
+      </div>
+    </div>
+  </article>
+
+  <article class="sec-card" id="c35">
+    <div class="sec-head"><span class="sec-num n-gold">B5</span><h2>奖品配置动态字段（两层级联）</h2><span class="tag tag-green">新增</span><span class="chev">▾ 点击收合</span></div>
+    <div class="sec-body">
+      <div class="mock">
+        <span class="mock-cap">区块示意 · 可操作：切换第一层 / 第二层，观察动态字段变化</span>
+        <div style="display:flex;gap:12px;align-items:center;flex-shrink:0">
+          <select class="mk-sel" id="mkCat1" onchange="mkRenderDyn()">
+            <option value="virtual">第一层：虚拟物品</option>
+            <option value="real">第一层：实物</option>
+          </select>
+          <select class="mk-sel" id="mkCat2" onchange="mkRenderDyn()">
+            <option value="bonus">第二层：彩金</option>
+            <option value="points">第二层：积分</option>
+            <option value="coupon">第二层：优惠券</option>
+            <option value="freespin">第二层：免费旋转券</option>
+            <option value="freebet">第二层：免费投注券</option>
+            <option value="tool">第二层：道具卡</option>
+          </select>
+          <div id="mkDyn" style="display:flex;gap:8px;flex-shrink:0"></div>
+        </div>
+      </div>
+      <table class="spec-table">
+        <thead><tr>
+          <th style="width:130px">第一层</th><th style="width:160px">第二层</th>
+          <th style="width:480px">动态字段</th><th style="width:80px">必填</th><th style="width:344px">说明</th>
+        </tr></thead>
+        <tbody>
+          <tr><td rowspan="6">虚拟物品</td><td>彩金</td><td>流水倍数（number）+ 金额（number）</td><td><span class="tag tag-req">必填</span></td><td>默认选项</td></tr>
+          <tr><td>积分</td><td>积分数量（number）</td><td><span class="tag tag-req">必填</span></td><td>—</td></tr>
+          <tr><td>优惠券</td><td>下拉选择既有优惠券</td><td><span class="tag tag-req">必填</span></td><td>选项取自优惠券管理</td></tr>
+          <tr><td>免费旋转券</td><td>旋转券配置：多行（游戏下拉 + 张数），可增删行</td><td><span class="tag tag-req">必填</span></td><td>行序号自动重排</td></tr>
+          <tr><td>免费投注券</td><td>下拉选择既有投注券</td><td><span class="tag tag-req">必填</span></td><td>—</td></tr>
+          <tr><td>道具卡</td><td>下拉选择既有道具卡</td><td><span class="tag tag-req">必填</span></td><td>—</td></tr>
+          <tr><td>实物</td><td>（隐藏第二层）</td><td>商品简介（text）+ 奖品名称（text）</td><td><span class="tag tag-req">必填</span></td><td>选「实物」时第二层下拉隐藏</td></tr>
+        </tbody>
+      </table>
+      <table class="spec-table">
+        <thead><tr><th style="width:70px">编号</th><th style="width:1124px">联动规则</th></tr></thead>
+        <tbody>
+          <tr><td>L-01</td><td>第一层切换为「实物」→ 隐藏第二层下拉，直接渲染实物字段；切回「虚拟物品」→ 恢复第二层并默认「彩金」。</td></tr>
+          <tr><td>L-02</td><td>第二层切换 → 清空并重建动态字段区；旋转券配置区块仅在「免费旋转券」时显示。</td></tr>
+          <tr><td>L-03</td><td>「奖品名称」输入框仅在实物类型显示，其余类型隐藏且不参与必填校验。</td></tr>
+          <tr><td>L-04</td><td>每个奖级（含 Last赏）都必须上传奖品图片。</td></tr>
+        </tbody>
+      </table>
+      <div class="callout co-info"><span class="co-icon">i</span><div class="co-body">
+        <span class="t">穷举说明</span>
+        <span class="d">上方级联表已穷举全部组合：虚拟物品 × 6 种第二层 + 实物 × 1，共 7 条路径，无其他分支。</span>
+      </div></div>
+      <div class="xref-row"><span class="cl sub">交叉查阅：</span>
+        <span class="xref" onclick="goTabCard('t1','c15')"><span>①1.5 发放落库对照</span></span>
+        <span class="xref" onclick="goTabCard('t4','c45')"><span>④C5 优惠券管理</span></span>
+        <span class="xref" onclick="goTabCard('t4','c46')"><span>④C6 免费旋转管理</span></span>
+        <span class="xref" onclick="goTabCard('t3','c30')"><span>③B0 原型演示</span></span>
+      </div>
+    </div>
+  </article>
+
+  <article class="sec-card" id="c36">
+    <div class="sec-head"><span class="sec-num n-gold">B6</span><h2>Last赏（固定压轴奖）</h2><span class="tag tag-green">新增</span><span class="chev">▾ 点击收合</span></div>
+    <div class="sec-body">
+      <div class="mock">
+        <span class="mock-cap">区块示意 · Last赏卡片（橙色系，区别于普通奖级）</span>
+        <div class="mk-tier last">
+          <span class="mk-badge gold">Last赏</span>
+          <span>数量</span><input class="mk-realin" type="number" value="1" disabled><span>张</span>
+          <span style="color:#FA8C16">压轴奖：最后一抽自动触发，固定 1 张</span>
+        </div>
+      </div>
+      <table class="spec-table">
+        <thead><tr><th style="width:200px">项目</th><th style="width:994px">规则</th></tr></thead>
+        <tbody>
+          <tr><td>存在性</td><td>每期固定 1 个，不可删除、不可新增第二个。</td></tr>
+          <tr><td>数量</td><td>固定 1 张，输入框禁用（disabled）。</td></tr>
+          <tr><td>名称</td><td>默认「Last赏」，可修改。</td></tr>
+          <tr><td>奖品配置</td><td>与普通奖级完全相同（两层级联 + 动态字段 + 奖品图片，见 B5）。</td></tr>
+          <tr><td>视觉</td><td>橙色系卡片头部与徽章，标注「压轴奖：最后一抽自动触发，固定 1 张」。</td></tr>
+        </tbody>
+      </table>
+      <div class="xref-row"><span class="cl sub">交叉查阅：</span>
+        <span class="xref" onclick="goTabCard('t1','c14')"><span>①1.4 BR-02 判定表</span></span>
+        <span class="xref" onclick="goTabCard('t2','c25')"><span>②R5 Last赏特卡</span></span>
+        <span class="xref" onclick="goTabCard('t2','c27')"><span>②R7 命中横幅</span></span>
+      </div>
+    </div>
+  </article>
+
+  <article class="sec-card" id="c37">
+    <div class="sec-head"><span class="sec-num n-gold">B7</span><h2>提交校验</h2><span class="tag tag-gold">异动</span><span class="chev">▾ 点击收合</span></div>
+    <div class="sec-body">
+      <div class="mock">
+        <span class="mock-cap">区块示意 · 可操作：点击按钮演示必填校验失败态</span>
+        <div style="display:flex;gap:12px;align-items:center;flex-shrink:0">
+          <div class="mk-lab" style="width:130px"><span><span class="mk-req">*</span> 商品名称：</span></div>
+          <input class="mk-realin wide" id="mkValInput" type="text" placeholder="请输入商品名称">
+          <button class="mini-btn" onclick="demoValidate()"><span>▶ 演示校验</span></button>
+          <span class="mk-errmsg" id="mkValMsg" style="display:none">必填项为空：红框 + 滚动定位 + 聚焦</span>
+        </div>
+      </div>
+      <span class="sub-t">前端校验（点击「确定」时）</span>
+      <table class="spec-table">
+        <thead><tr><th style="width:70px">编号</th><th style="width:1124px">规则</th></tr></thead>
+        <tbody>
+          <tr><td>V-01</td><td>遍历弹窗内全部 required 控件（disabled 除外），空值 → 红色边框 + 红色外发光。<span class="tag tag-gray">不异动</span></td></tr>
+          <tr><td>V-02</td><td>滚动定位至第一个错误控件（居中）并聚焦。<span class="tag tag-gray">不异动</span></td></tr>
+          <tr><td>V-03</td><td>全部通过 → 提交；成功后关闭弹窗并刷新商品列表。<span class="tag tag-gray">不异动</span></td></tr>
+        </tbody>
+      </table>
+      <span class="sub-t">单控件校验分支穷举表（required × disabled × 空值，全分支）</span>
+      <table class="spec-table">
+        <thead><tr>
+          <th style="width:70px">分支</th><th style="width:130px">required</th><th style="width:130px">disabled</th>
+          <th style="width:130px">值为空</th><th style="width:734px">处理</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>C1</td><td>是</td><td>否</td><td>是</td><td>标红框 + 外发光；若为首个错误 → 滚动居中并聚焦；阻止提交</td></tr>
+          <tr><td>C2</td><td>是</td><td>否</td><td>否</td><td>通过，清除错误样式</td></tr>
+          <tr><td>C3</td><td>是</td><td>是</td><td>任意</td><td>跳过（如 Last赏数量固定输入框）</td></tr>
+          <tr><td>C4</td><td>否</td><td>任意</td><td>任意</td><td>跳过（如商品类别、隐藏中的奖品名称）</td></tr>
+        </tbody>
+      </table>
+      <span class="sub-t">后端二次校验（建议清单）</span>
+      <table class="spec-table">
+        <thead><tr><th style="width:70px">编号</th><th style="width:1124px">规则</th></tr></thead>
+        <tbody>
+          <tr><td>S-01</td><td>各奖级数量为正整数；总券数 ≥ 2（至少 1 张普通券 + Last赏）。</td></tr>
+          <tr><td>S-02</td><td>购买价格为正整数；彩金金额 &gt; 0、流水倍数 ≥ 0。</td></tr>
+          <tr><td>S-03</td><td>4 张配置图（顶部图 PC/H5、规则弹窗图 PC/H5）与各奖级奖品图齐全。</td></tr>
+          <tr><td>S-04</td><td>引用型奖品（优惠券 / 投注券 / 道具卡 / 旋转游戏）ID 有效且未下架。</td></tr>
+          <tr><td>S-05</td><td>限时抢购结束时间晚于开始时间；奖级名称同一商品内不重复。</td></tr>
+          <tr><td>S-06</td><td>已开卖商品的奖级与总券数禁止修改（建议，待确认）。</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+</section>
+
+<!-- ════════════════ TAB 4 后台 · 记录查询（分区块图文） ════════════════ -->
+<section class="panel" id="t4">
+
+  <div class="panel-tools">
+    <span class="tools-label">区块定位：</span>
+    <button class="anchor-btn" onclick="goCard('c41')"><span>C1 页面清单</span></button>
+    <button class="anchor-btn" onclick="goCard('c42')"><span>C2 抽奖记录</span></button>
+    <button class="anchor-btn" onclick="goCard('c43')"><span>C3 奖品格式</span></button>
+    <button class="anchor-btn" onclick="goCard('c44')"><span>C4 积分纪录</span></button>
+    <button class="anchor-btn" onclick="goCard('c45')"><span>C5 优惠券</span></button>
+    <button class="anchor-btn" onclick="goCard('c46')"><span>C6 免费旋转</span></button>
+    <button class="anchor-btn" onclick="goCard('c47')"><span>C7 分页与导出</span></button>
+    <div class="tools-gap"></div>
+    <button class="mini-btn" onclick="setFold('t4',false)"><span>全部展开</span></button>
+    <button class="mini-btn" onclick="setFold('t4',true)"><span>全部收合</span></button>
+  </div>
+
+  <article class="sec-card" id="c41">
+    <div class="sec-head"><span class="sec-num n-green">C1</span><h2>页面清单与共用规则</h2><span class="tag tag-gold">异动</span><span class="chev">▾ 点击收合</span></div>
+    <div class="sec-body">
+      <table class="spec-table">
+        <thead><tr>
+          <th style="width:230px">页面</th><th style="width:320px">路由</th>
+          <th style="width:300px">入口 / 所属 Tab</th><th style="width:344px">主要作用</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>用户积分纪录</td><td><code>/points-mall/user-points-records</code></td><td>积分商城</td><td>积分账变流水（购券扣分 / 中奖加分）</td></tr>
+          <tr><td>Ichiban Kuji 抽奖记录</td><td><code>/ichiban-kuji/records</code></td><td>Tab 组第 3 项（兑换 / 盲盒 / 一番赏）</td><td>订单级抽奖明细</td></tr>
+          <tr><td>全部优惠券</td><td><code>/coupon-management/all-coupons</code></td><td>优惠券管理</td><td>彩金券 / 优惠券发放与状态</td></tr>
+          <tr><td>免费旋转管理</td><td><code>/free-spin/management</code></td><td>独立菜单，4 子 Tab</td><td>旋转 / 投注类奖品配置与发放</td></tr>
+        </tbody>
+      </table>
+      <div class="callout co-info"><span class="co-icon">i</span><div class="co-body">
+        <span class="t">共用规则</span>
+        <span class="d">时间筛选均为 datetime 起讫区间（秒级）；空表显示「暂无数据」；表格支持横向滚动（min-width 900px）。</span>
+        <span class="d">一番赏产生的发放记录：活动名称 = 商品名称，获得方式 / 来源 = 「积分购买」，操作人 = SYSTEM。</span>
+      </div></div>
+    </div>
+  </article>
+
+  <article class="sec-card" id="c42">
+    <div class="sec-head"><span class="sec-num n-green">C2</span><h2>Ichiban Kuji 抽奖记录</h2><span class="tag tag-green">新增</span><span class="chev">▾ 点击收合</span></div>
+    <div class="sec-body">
+      <div class="mock">
+        <span class="mock-cap">区块示意 · Tab 组 + 表格（示例数据 1 行）</span>
+        <div class="mk-tabbar">
+          <div class="mk-tab"><span>商品兑换记录</span></div>
+          <div class="mk-tab"><span>盲盒抽奖记录</span></div>
+          <div class="mk-tab on"><span>Ichiban Kuji 抽奖记录</span></div>
+        </div>
+        <table class="mk-table">
+          <thead><tr><th>订单号</th><th>会员名</th><th>创建时间</th><th>币种</th><th>商品名称</th><th>券数</th><th>购买积分</th><th>奖品</th></tr></thead>
+          <tbody><tr>
+            <td>PR605996359563974932</td><td>okbet9994fg5vz</td><td>2026-06-12 16:45</td><td>菲律宾比索</td>
+            <td>苹果 Ichiban Kuji</td><td><span class="mk-qty qa">全包</span></td><td>80</td>
+            <td>LAST赏 彩金100.00，A赏 彩金100.00，C赏 积分50 ×2</td>
+          </tr></tbody>
+        </table>
+        <div style="display:flex;gap:8px;flex-shrink:0">
+          <span class="mk-qty q1">单张</span><span class="mk-qty q5">五连</span><span class="mk-qty qa">全包</span>
+          <span class="cl sub">← 券数徽章三态；「十连」样式缺失（Q-02）</span>
+        </div>
+      </div>
+      <span class="sub-t">筛选条件</span>
+      <table class="spec-table">
+        <thead><tr>
+          <th style="width:180px">条件</th><th style="width:150px">控件</th><th style="width:864px">选项 / 规则</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>币别</td><td>下拉</td><td>全部 / 菲律宾比索（PHP）</td></tr>
+          <tr><td>会员名</td><td>文本框</td><td>模糊匹配（不区分大小写）</td></tr>
+          <tr><td>创建时间</td><td>起讫 datetime</td><td>秒级，默认近 7 天（待确认默认区间）</td></tr>
+          <tr><td>商品</td><td>下拉</td><td>全部商品 / 各一番赏商品名称</td></tr>
+          <tr><td>奖品类型</td><td>下拉</td><td>全部 / 彩金 / 积分 / 旋转券 / 免费旋转券 / 免费投注券 / 道具卡（命中任一奖品即符合）</td></tr>
+          <tr><td>操作</td><td>按钮</td><td>「搜索」执行查询并回到第 1 页；「导出」见 C7</td></tr>
+        </tbody>
+      </table>
+      <span class="sub-t">表格列定义（8 列）</span>
+      <table class="spec-table">
+        <thead><tr>
+          <th style="width:60px">序</th><th style="width:150px">列名</th><th style="width:984px">内容与格式</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>1</td><td>订单号</td><td>前缀 <code>PR</code> + 数字流水（示例 20 位），等宽字体显示，全局唯一（幂等键）。</td></tr>
+          <tr><td>2</td><td>会员名</td><td>会员账号</td></tr>
+          <tr><td>3</td><td>创建时间</td><td>YYYY-MM-DD HH:mm</td></tr>
+          <tr><td>4</td><td>币种</td><td>币种中文名（菲律宾比索）</td></tr>
+          <tr><td>5</td><td>商品名称</td><td>一番赏商品名</td></tr>
+          <tr><td>6</td><td>券数</td><td>徽章：单张（灰）/ 五连（蓝）/ 全包（橙）；「十连」样式缺失，见 Q-02</td></tr>
+          <tr><td>7</td><td>购买积分</td><td>本笔订单实际消耗积分总额（= 单价 × 实际张数）</td></tr>
+          <tr><td>8</td><td>奖品</td><td>本笔全部奖品合并显示，格式见 C3</td></tr>
+        </tbody>
+      </table>
+      <div class="callout co-warn"><span class="co-icon">!</span><div class="co-body">
+        <span class="t">口径说明</span>
+        <span class="d">单张 / 五连每张券一笔订单一个奖品；全包一笔订单含多个奖品（含可能的 Last赏）。</span>
+      </div></div>
+      <div class="xref-row"><span class="cl sub">交叉查阅：</span>
+        <span class="xref" onclick="goTabCard('t2','c24')"><span>②R4 张数选项穷举</span></span>
+        <span class="xref" onclick="goTabCard('t2','c27')"><span>②R7 结果弹窗</span></span>
+        <span class="xref" onclick="goTabCard('t4','c43')"><span>④C3 奖品格式</span></span>
+      </div>
+    </div>
+  </article>
+
+  <article class="sec-card" id="c43">
+    <div class="sec-head"><span class="sec-num n-green">C3</span><h2>奖品显示格式规则（跨页共用）</h2><span class="tag tag-green">新增</span><span class="chev">▾ 点击收合</span></div>
+    <div class="sec-body">
+      <div class="mock">
+        <span class="mock-cap">区块示意 · 原始数据 → 显示结果</span>
+        <div class="mk-fmt"><span class="in">B赏 · 彩金 500（1x）</span><span class="ar">→</span><span class="out">B赏 彩金500.00</span></div>
+        <div class="mk-fmt"><span class="in">E赏 · 旋转券 × 20</span><span class="ar">→</span><span class="out">E赏 旋转券×20</span></div>
+        <div class="mk-fmt"><span class="in">[C赏 积分500.00, C赏 积分500.00, E赏 旋转券×20]</span><span class="ar">→</span><span class="out">C赏 积分500.00 ×2，E赏 旋转券×20</span></div>
+      </div>
+      <span class="sub-t">单奖品格式 formatPrizeLabel</span>
+      <table class="spec-table">
+        <thead><tr>
+          <th style="width:200px">奖品类型</th><th style="width:450px">格式</th><th style="width:544px">示例</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>彩金</td><td>{赏级大写} 彩金{金额，固定 2 位小数}</td><td><code>B赏 彩金500.00</code>　<code>LAST赏 彩金5000.00</code></td></tr>
+          <tr><td>积分</td><td>{赏级大写} 积分{数量，整数}</td><td><code>C赏 积分50</code></td></tr>
+          <tr><td>数量类（券 / 卡）</td><td>{赏级大写} {类型}×{数量}</td><td><code>E赏 旋转券×20</code>　<code>A赏 免费旋转券×20</code></td></tr>
+        </tbody>
+      </table>
+      <span class="sub-t">多奖品合并 renderPrizes</span>
+      <table class="spec-table">
+        <thead><tr><th style="width:70px">编号</th><th style="width:1124px">规则</th></tr></thead>
+        <tbody>
+          <tr><td>F-01</td><td>排序：LAST赏 置顶，其余按赏级字母升序。</td></tr>
+          <tr><td>F-02</td><td>去重合并：完全相同的奖品标签合并为一条并追加 ×N。</td></tr>
+          <tr><td>F-03</td><td>分隔符：中文逗号「，」。</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article class="sec-card" id="c44">
+    <div class="sec-head"><span class="sec-num n-green">C4</span><h2>用户积分纪录</h2><span class="tag tag-gold">异动</span><span class="chev">▾ 点击收合</span></div>
+    <div class="sec-body">
+      <div class="mock">
+        <span class="mock-cap">区块示意 · 表格（示例数据 1 行）</span>
+        <table class="mk-table">
+          <thead><tr><th>会员名</th><th>创建时间</th><th>积分</th><th>当前总积分</th><th>操作人</th><th>原因</th><th>备注</th></tr></thead>
+          <tbody><tr>
+            <td>xnjobe3</td><td>2026-06-16 09:53</td><td>-366</td><td>481150</td><td>SYSTEM</td>
+            <td>苹果 Ichiban Kuji</td><td>A赏 免费旋转券×20，C赏 道具卡×3，E赏 旋转券×10</td>
+          </tr></tbody>
+        </table>
+      </div>
+      <span class="sub-t">筛选条件</span>
+      <table class="spec-table">
+        <thead><tr>
+          <th style="width:180px">条件</th><th style="width:150px">控件</th><th style="width:864px">选项 / 规则</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>积分兑换商品</td><td>下拉</td><td>全部 / 各商品名称</td></tr>
+          <tr><td>会员名</td><td>文本框</td><td>模糊匹配</td></tr>
+          <tr><td>创建时间</td><td>起讫 datetime</td><td>秒级</td></tr>
+          <tr><td>操作</td><td>按钮</td><td>「搜索」/「导出」</td></tr>
+        </tbody>
+      </table>
+      <span class="sub-t">表格列定义（7 列）</span>
+      <table class="spec-table">
+        <thead><tr>
+          <th style="width:60px">序</th><th style="width:170px">列名</th><th style="width:964px">内容与格式</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>1</td><td>会员名</td><td>会员账号</td></tr>
+          <tr><td>2</td><td>创建时间</td><td>YYYY-MM-DD HH:mm</td></tr>
+          <tr><td>3</td><td>积分</td><td>本笔变动：扣除为负数（-366）；增加带正号（+50）</td></tr>
+          <tr><td>4</td><td>当前总积分</td><td>变动后余额快照</td></tr>
+          <tr><td>5</td><td>操作人</td><td>一番赏自动流水固定 SYSTEM；人工调整为操作员账号</td></tr>
+          <tr><td>6</td><td>原因</td><td>一番赏购券：显示商品名称（如「苹果 Ichiban Kuji」）</td></tr>
+          <tr><td>7</td><td>备注</td><td>本笔对应的奖品列表，格式同 C3</td></tr>
+        </tbody>
+      </table>
+      <span class="sub-t">积分列符号穷举表（变动方向全分支）</span>
+      <table class="spec-table">
+        <thead><tr>
+          <th style="width:70px">分支</th><th style="width:200px">变动值</th><th style="width:250px">显示</th><th style="width:674px">场景</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>D1</td><td>&lt; 0</td><td>负号原样（如 -366）</td><td>一番赏购券扣积分</td></tr>
+          <tr><td>D2</td><td>&gt; 0</td><td>带正号（如 +50）</td><td>抽中「积分」类奖品入账</td></tr>
+          <tr><td>D3</td><td>= 0</td><td>不产生记录</td><td>约定：零变动不落账变流水</td></tr>
+        </tbody>
+      </table>
+      <div class="xref-row"><span class="cl sub">交叉查阅：</span>
+        <span class="xref" onclick="goTabCard('t1','c15')"><span>①1.5 积分类奖品</span></span>
+        <span class="xref" onclick="goTabCard('t4','c43')"><span>④C3 奖品格式</span></span>
+      </div>
+    </div>
+  </article>
+
+  <article class="sec-card" id="c45">
+    <div class="sec-head"><span class="sec-num n-green">C5</span><h2>优惠券管理 · 全部优惠券</h2><span class="tag tag-gold">异动</span><span class="chev">▾ 点击收合</span></div>
+    <div class="sec-body">
+      <div class="mock">
+        <span class="mock-cap">区块示意 · 统计面板（独立时间区间）</span>
+        <div class="mk-stats">
+          <div class="mk-stat"><span class="v">7</span><span class="k">优惠券发放总量</span></div>
+          <div class="mk-stat"><span class="v">42.86%</span><span class="k">优惠券使用率</span></div>
+          <div class="mk-stat"><span class="v">₱180.00</span><span class="k">优惠券累计发放彩金</span></div>
+        </div>
+      </div>
+      <span class="sub-t">统计面板</span>
+      <table class="spec-table">
+        <thead><tr>
+          <th style="width:230px">指标</th><th style="width:964px">说明</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>优惠券发放总量</td><td>统计时间区间内发放张数（独立于下方列表筛选）</td></tr>
+          <tr><td>优惠券使用率</td><td>已使用 ÷ 发放总量，百分比保留 2 位小数（如 42.86%）</td></tr>
+          <tr><td>优惠券累计发放彩金</td><td>区间内彩金券累计金额，带币符（如 ₱180.00）</td></tr>
+        </tbody>
+      </table>
+      <span class="sub-t">筛选与操作</span>
+      <table class="spec-table">
+        <thead><tr>
+          <th style="width:180px">条件</th><th style="width:150px">控件</th><th style="width:864px">选项 / 规则</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>优惠券类别</td><td>胶囊下拉</td><td>全部 / 输返券 / 存送比例券 / 彩金券 / 旋转券 / 免费投注券</td></tr>
+          <tr><td>状态</td><td>胶囊下拉</td><td>全部 / 未使用 / 待结算 / 已使用 / 已过期（待结算逻辑见 Q-05）</td></tr>
+          <tr><td>来源</td><td>胶囊下拉</td><td>全部 / 积分购买（一番赏发放固定此来源）</td></tr>
+          <tr><td>获得时间</td><td>起讫 datetime</td><td>秒级</td></tr>
+          <tr><td>关键字</td><td>类型下拉 + 文本框</td><td>会员名 / 活动名称 / 优惠券ID，模糊匹配</td></tr>
+          <tr><td>操作</td><td>按钮</td><td>「查询」/「导出」/「赠送优惠券」（人工发券入口）</td></tr>
+        </tbody>
+      </table>
+      <span class="sub-t">表格列定义（11 列）</span>
+      <table class="spec-table">
+        <thead><tr><th style="width:60px">序</th><th style="width:170px">列名</th><th style="width:964px">内容与格式</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>会员账号</td><td>—</td></tr>
+          <tr><td>2</td><td>获得时间</td><td>YYYY-MM-DD HH:mm</td></tr>
+          <tr><td>3</td><td>活动名称</td><td>一番赏发放 = 商品名称</td></tr>
+          <tr><td>4</td><td>获得方式</td><td>一番赏发放 = 积分购买</td></tr>
+          <tr><td>5</td><td>优惠券名称</td><td>如 <code>彩金 ₱50 (1x Turnover)</code>、<code>Free Spin ×10</code></td></tr>
+          <tr><td>6</td><td>优惠券ID</td><td>数字流水号</td></tr>
+          <tr><td>7</td><td>优惠券类别</td><td>彩金券 / 旋转券 / 免费投注券 …</td></tr>
+          <tr><td>8</td><td>状态</td><td>未使用（灰）/ 已使用（绿）/ 已过期（红）/ 待结算</td></tr>
+          <tr><td>9</td><td>操作人</td><td>系统核销 = SYSTEM；未使用 = 「–」</td></tr>
+          <tr><td>10</td><td>操作时间</td><td>核销时间；未使用 = 「–」</td></tr>
+          <tr><td>11</td><td>备注</td><td>默认「–」</td></tr>
+        </tbody>
+      </table>
+      <span class="sub-t">优惠券状态流转穷举表（既有状态机，本次不异动，仅供关联查阅）</span>
+      <table class="spec-table">
+        <thead><tr>
+          <th style="width:70px">流转</th><th style="width:150px">当前状态</th><th style="width:250px">事件</th>
+          <th style="width:150px">目标状态</th><th style="width:574px">说明</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>ST1</td><td>未使用</td><td>会员使用 / 系统核销</td><td>已使用</td><td>是否先经「待结算」见 Q-05</td></tr>
+          <tr><td>ST2</td><td>未使用</td><td>有效期届满</td><td>已过期</td><td>—</td></tr>
+          <tr><td>ST3</td><td>待结算</td><td>结算完成</td><td>已使用</td><td><span class="tag tag-gold">待确认</span> Q-05：触发与回退条件</td></tr>
+          <tr><td>ST4</td><td>已使用</td><td>任意</td><td>已使用</td><td>终态，不再流转</td></tr>
+          <tr><td>ST5</td><td>已过期</td><td>任意</td><td>已过期</td><td>终态，不再流转</td></tr>
+        </tbody>
+      </table>
+      <div class="xref-row"><span class="cl sub">交叉查阅：</span>
+        <span class="xref" onclick="goTabCard('t1','c15')"><span>①1.5 彩金/优惠券发放</span></span>
+        <span class="xref" onclick="goTabCard('t3','c35')"><span>③B5 奖品配置</span></span>
+        <span class="xref" onclick="goTabCard('t1','c17')"><span>①1.7 N-02 未涉及清单</span></span>
+      </div>
+    </div>
+  </article>
+
+  <article class="sec-card" id="c46">
+    <div class="sec-head"><span class="sec-num n-green">C6</span><h2>免费旋转管理（4 个子 Tab）</h2><span class="tag tag-gold">异动</span><span class="chev">▾ 点击收合</span></div>
+    <div class="sec-body">
+      <div class="mock">
+        <span class="mock-cap">区块示意 · 子 Tab 结构</span>
+        <div class="mk-tabbar">
+          <div class="mk-tab"><span>免费项目配置</span></div>
+          <div class="mk-tab on"><span>免费项目记录</span></div>
+          <div class="mk-tab"><span>免费项目统计</span></div>
+          <div class="mk-tab"><span>免费项目发送记录</span></div>
+        </div>
+      </div>
+      <span class="sub-t">Tab 1 · 免费项目配置</span>
+      <table class="spec-table">
+        <thead><tr><th style="width:200px">项目</th><th style="width:994px">说明</th></tr></thead>
+        <tbody>
+          <tr><td>作用</td><td>维护可作为一番赏奖品引用的免费旋转 / 免费投注配置。</td></tr>
+          <tr><td>列（8）</td><td>配置名称 / 免费类型 / 游戏平台 / 次数 / 有效期（小时）/ 状态 / 创建时间 / 操作（编辑）</td></tr>
+          <tr><td>操作</td><td>「+ 新增配置」；状态徽章 启用（绿）</td></tr>
+        </tbody>
+      </table>
+      <span class="sub-t">Tab 2 · 免费项目记录</span>
+      <table class="spec-table">
+        <thead><tr><th style="width:200px">项目</th><th style="width:994px">说明</th></tr></thead>
+        <tbody>
+          <tr><td>筛选</td><td>免费旋转类型 / 来源（积分购买）/ 获得时间起讫 / 免费类型 / 关键字（会员名 / 活动名称）</td></tr>
+          <tr><td>列（11）</td><td>会员账号 / 获得时间 / 活动名称 / 获得方式 / 免费旋转名称 / 免费类型 / 获得次数 / 状态 / 操作人 / 操作时间 / 备注</td></tr>
+          <tr><td>操作</td><td>「查询」/「赠送免费旋转」（人工发放入口）</td></tr>
+        </tbody>
+      </table>
+      <span class="sub-t">Tab 3 · 免费项目统计</span>
+      <table class="spec-table">
+        <thead><tr><th style="width:200px">项目</th><th style="width:994px">说明</th></tr></thead>
+        <tbody>
+          <tr><td>筛选</td><td>状态 / 使用时间起讫 / 免费类型 / 关键字</td></tr>
+          <tr><td>列（8）</td><td>会员账号 / 免费旋转名称 / 免费类型 / 厂商 / 状态 / 使用时间 / 绑定游戏 / 获得次数</td></tr>
+          <tr><td>操作</td><td>「查询」/「导出」；未绑定字段显示「–」</td></tr>
+        </tbody>
+      </table>
+      <span class="sub-t">Tab 4 · 免费项目发送记录</span>
+      <table class="spec-table">
+        <thead><tr><th style="width:200px">项目</th><th style="width:994px">说明</th></tr></thead>
+        <tbody>
+          <tr><td>筛选</td><td>状态（已发送 / 待发送）/ 发送时间起讫 / 免费类型 / 关键字（会员名 / 免费名称）</td></tr>
+          <tr><td>列（8）</td><td>会员账号 / 免费旋转名称 / 免费类型 / 免费旋转券编号（<code>T</code> 前缀流水，等宽字体）/ 状态 / 发送时间 / 操作 / 备注</td></tr>
+          <tr><td>操作</td><td>
+            <div class="cl">待发送行显示「重新发送」链接；已发送显示「–」。</div>
+            <div class="cl">顶部「批量重新发送」/「导出」；一番赏发放的备注 = 积分购买。</div>
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article class="sec-card" id="c47">
+    <div class="sec-head"><span class="sec-num n-green">C7</span><h2>分页组件与导出</h2><span class="tag tag-gray">不异动</span><span class="chev">▾ 点击收合</span></div>
+    <div class="sec-body">
+      <div class="mock">
+        <span class="mock-cap">区块示意 · 可操作：点击页码体验规则（共 10 页示例）</span>
+        <div class="mk-pgn" id="mkPgn"></div>
+      </div>
+      <span class="sub-t">分页规则（全部列表共用）</span>
+      <table class="spec-table">
+        <thead><tr><th style="width:70px">编号</th><th style="width:1124px">规则</th></tr></thead>
+        <tbody>
+          <tr><td>P-01</td><td>每页 10 条；左侧显示 <code>Total N</code>；两端为 ‹ / › 上下页按钮，越界点击无效。</td></tr>
+          <tr><td>P-02</td><td>总页数 ≤ 7：全部页码平铺显示。</td></tr>
+          <tr><td>P-03</td><td>当前页 ≤ 4：显示 1 2 3 4 5 … 末页。</td></tr>
+          <tr><td>P-04</td><td>当前页 ≥ 总页数 - 3：显示 1 … 后 5 页。</td></tr>
+          <tr><td>P-05</td><td>其余情况：显示 1 … 当前-1 当前 当前+1 … 末页。</td></tr>
+          <tr><td>P-06</td><td>切换筛选并查询后重置回第 1 页。</td></tr>
+        </tbody>
+      </table>
+      <span class="sub-t">导出</span>
+      <div class="callout co-warn"><span class="co-icon">!</span><div class="co-body">
+        <span class="t">Q-04 · 导出规格待定</span>
+        <span class="d">原型中导出按钮均为占位。建议：按当前筛选条件导出全量结果，格式 XLSX，列与页面表格一致；需产品确认。</span>
+      </div></div>
+    </div>
+  </article>
+
+</section>
+
+<footer class="spec-footer">
+  <span>一番赏（Ichiban Kuji）开发规格说明书 · v1.2 · 2026-07-03 · 前台/后台原型 1:1 内嵌可交互 · 规则含变更三态分类与情境穷举 · 标注「待确认」处以产品结论为准</span>
+</footer>
+
+<script>
+/* ════════════════ 文档交互 ════════════════ */
+function showTab(id, btn){
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+document.querySelectorAll('.sec-head').forEach(function(h){
+  h.addEventListener('click', function(){
+    var card = h.parentElement;
+    card.classList.toggle('fold');
+    h.querySelector('.chev').textContent = card.classList.contains('fold') ? '▸ 点击展开' : '▾ 点击收合';
+  });
+});
+function setFold(panelId, fold){
+  document.querySelectorAll('#' + panelId + ' .sec-card').forEach(function(card){
+    card.classList.toggle('fold', fold);
+    card.querySelector('.chev').textContent = fold ? '▸ 点击展开' : '▾ 点击收合';
+  });
+}
+function goCard(id){
+  var card = document.getElementById(id);
+  if(!card) return;
+  card.classList.remove('fold');
+  card.querySelector('.chev').textContent = '▾ 点击收合';
+  card.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+/* ── 跨页签交叉查阅跳转 ── */
+function goTabCard(tabId, cardId){
+  var map = {t1:0, t2:1, t3:2, t4:3};
+  var btns = document.querySelectorAll('.tab-nav .tab-btn');
+  var btn = btns[map[tabId]];
+  if(btn) showTab(tabId, btn);
+  setTimeout(function(){ goCard(cardId); }, 80);
+}
+
+/* ── 前台演示联动（操作左侧原型） ── */
+function demoRules(){
+  var ov = document.querySelector('#h5proto .rules-ov');
+  if(ov) ov.classList.add('show');
+  document.querySelector('.h5-left').scrollIntoView({behavior:'smooth', block:'start'});
+}
+function demoDraw(n){
+  var seg = document.querySelector('#h5proto .js-seg button[data-n="' + n + '"]');
+  if(seg) seg.click();
+  var tear = document.querySelector('#h5proto .js-tear');
+  if(tear && !tear.disabled) tear.click();
+  document.querySelector('.h5-left').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+/* ── B4 总券数试算 ── */
+function mkCalcTotal(){
+  var a = parseInt(document.getElementById('mkQtyA').value) || 0;
+  var b = parseInt(document.getElementById('mkQtyB').value) || 0;
+  document.getElementById('mkTotal').textContent = a + b + 1;
+}
+
+/* ── B5 级联动态字段演示 ── */
+function mkRenderDyn(){
+  var c1 = document.getElementById('mkCat1').value;
+  var c2sel = document.getElementById('mkCat2');
+  var dyn = document.getElementById('mkDyn');
+  var chips = [];
+  if(c1 === 'real'){
+    c2sel.style.display = 'none';
+    chips = ['商品简介', '奖品名称'];
+  }else{
+    c2sel.style.display = '';
+    var c2 = c2sel.value;
+    if(c2 === 'bonus') chips = ['流水倍数', '金额'];
+    else if(c2 === 'points') chips = ['积分数量'];
+    else if(c2 === 'coupon') chips = ['选择优惠券 ▾'];
+    else if(c2 === 'freespin') chips = ['旋转券配置：游戏 ▾ + 张数（可多行）'];
+    else if(c2 === 'freebet') chips = ['选择免费投注券 ▾'];
+    else if(c2 === 'tool') chips = ['选择道具卡 ▾'];
+  }
+  chips.push('奖品图片（必传）');
+  var html = '';
+  chips.forEach(function(c){ html += '<span class="mk-chip">' + c + '</span>'; });
+  dyn.innerHTML = html;
+}
+mkRenderDyn();
+mkCalcTotal();
+
+/* ── B7 校验演示 ── */
+function demoValidate(){
+  var inp = document.getElementById('mkValInput');
+  var msg = document.getElementById('mkValMsg');
+  var empty = inp.value.trim() === '';
+  inp.classList.toggle('err', empty);
+  msg.style.display = empty ? '' : 'none';
+  if(empty) inp.focus();
+}
+
+/* ── C7 分页规则演示（共 10 页） ── */
+var mkCur = 1, mkTotalPages = 10;
+function mkBuildPages(cur, total){
+  if(total <= 7) return Array.from({length: total}, function(_, i){ return i + 1; });
+  var pages = [];
+  if(cur <= 4){
+    for(var i = 1; i <= 5; i++) pages.push(i);
+    pages.push('...'); pages.push(total);
+  }else if(cur >= total - 3){
+    pages.push(1); pages.push('...');
+    for(var j = total - 4; j <= total; j++) pages.push(j);
+  }else{
+    pages.push(1); pages.push('...');
+    for(var k = cur - 1; k <= cur + 1; k++) pages.push(k);
+    pages.push('...'); pages.push(total);
+  }
+  return pages;
+}
+function mkRenderPgn(){
+  var el = document.getElementById('mkPgn');
+  var html = '<span class="pt">Total 96</span>';
+  html += '<button class="mk-pg" onclick="mkGo(' + (mkCur - 1) + ')"><span>‹</span></button>';
+  mkBuildPages(mkCur, mkTotalPages).forEach(function(p){
+    if(p === '...') html += '<div class="mk-pg dots"><span>···</span></div>';
+    else html += '<button class="mk-pg' + (p === mkCur ? ' active' : '') + '" onclick="mkGo(' + p + ')"><span>' + p + '</span></button>';
+  });
+  html += '<button class="mk-pg" onclick="mkGo(' + (mkCur + 1) + ')"><span>›</span></button>';
+  el.innerHTML = html;
+}
+function mkGo(p){
+  if(p < 1 || p > mkTotalPages) return;
+  mkCur = p;
+  mkRenderPgn();
+}
+mkRenderPgn();
+</script>
+
+<!-- ============================================================
+     以下为 ichiban_kuji_h5 原型 JS —— 完整保留（挂载至 #dev-B）
+     ============================================================ -->
+<script>
+/* ── 共用资料 ── */
+const ART={
+  bonus:{kind:'icon',glyph:'₱',bg:'#FCEBD6',fg:'#C9761E'},
+  point:{kind:'icon',glyph:'★',bg:'#FADBDA',fg:'#C13B36'},
+  spintok:{kind:'icon',glyph:'↻',bg:'#D8EEEC',fg:'#246E69'},
+  freespin:{kind:'icon',glyph:'⟳',bg:'#FBE4D2',fg:'#B85F1F'},
+  freebet:{kind:'icon',glyph:'＄',bg:'#EBE0F7',fg:'#6238A8'},
+  tool:{kind:'icon',glyph:'▤',bg:'#DEEAF8',fg:'#2E5DA0'},
+  physical:{kind:'photo'},
+};
+const TIERS=[
+  {sho:'A',name:'招财猫 大号公仔',type:'实物',art:'physical',total:2,left:1,hi:true},
+  {sho:'B',name:'5,000（流水x3）',type:'彩金',art:'bonus',total:5,left:2,hi:true},
+  {sho:'C',name:'免费旋转 ×30',type:'免费旋转',art:'freespin',total:8,left:4,mid:true},
+  {sho:'D',name:'免费投注 ₱50',type:'免费投注',art:'freebet',total:10,left:5,mid:true},
+  {sho:'E',name:'旋转券 ×10',type:'旋转券',art:'spintok',total:12,left:6},
+  {sho:'F',name:'1,000',type:'积分',art:'point',total:15,left:8},
+  {sho:'G',name:'道具卡 · 加倍卡',type:'道具卡',art:'tool',total:20,left:11},
+  {sho:'H',name:'1,000（流水x1）',type:'彩金',art:'bonus',total:27,left:12},
+];
+const LAST={sho:'楽',name:'招财猫 黄金开运摆件',type:'实物',art:'physical',total:1,left:1};
+const COST=95;
+
+function artImg(key){const a=ART[key];return a.kind==='photo'
+  ?`<div class="ph">实物图</div>`
+  :`<div class="ic" style="background:${a.bg}"><span style="color:${a.fg}">${a.glyph}</span></div>`;}
+function badge(t,isLast,gold){return isLast
+  ?`<span class="seal2 gold serif"><span class="a">楽</span><span class="s">LAST</span></span>`
+  :`<span class="seal2 ${gold?'gold':''} serif"><span class="a">${t.sho}</span><span class="s">赏</span></span>`;}
+function revealBadge(t,isLast){return isLast
+  ?`<span class="rseal gold serif"><span class="a">楽</span><span class="s">LAST</span></span>`
+  :`<span class="rseal serif"><span class="a">${t.sho}</span><span class="s">赏</span></span>`;}
+
+function deviceHTML(){return `
+  <div class="topbar"><div class="icon-btn">‹</div><div class="title serif">一番赏</div></div>
+  <div class="banner">
+    <div class="kv"><div class="kv-ph">主视觉 KV 图<br><small>建议 1080×600</small></div>
+      <div class="scrim"></div><div class="nobori serif">一番赏</div>
+      <div class="kv-text"><div class="kv-title serif">招财猫 开运赏</div></div>
+      <button class="kv-rules" onclick="var d=this.closest('.device');d.querySelector('.rules-ov').classList.add('show');d.scrollIntoView({behavior:'smooth',block:'start'})">📋 Rules</button></div>
+    <div class="noren-edge"></div>
+    <div class="b-stock"><div class="r1"><span>剩 <b class="js-zan">49</b> / 100 张</span></div>
+      <div class="stock-bar"><div class="stock-fill js-fill" style="width:49%"></div></div></div>
+  </div>
+  <div class="draw-zone">
+    <div class="seg js-seg">
+      <button class="on" data-n="1">单张</button><button data-n="5">五连<span class="x"> ×5</span></button>
+      <button data-n="10">十连<span class="x"> ×10</span></button><button class="all" data-n="all">全包</button></div>
+    <button class="ticket-btn js-tear"><div class="stub"><span class="s1">ICHIBAN</span><span class="s2">券</span></div>
+      <div class="main"><span class="t1">▼ 沿虚线撕开 ▼</span><span class="t2">撕券抽赏 <small class="js-cost">95 积分</small></span></div></button>
+    <div class="dz-foot"><span>每张 95 积分 · 必中一赏</span><span class="mine">积分 <b class="js-pts2">316,149</b></span></div>
+  </div>
+  <div class="pool"><div class="noren"><div class="band serif">奖品一览</div></div><div class="js-pool"></div></div>
+  <div class="rules-ov"><div class="rules-box">
+    <div class="rules-hd"><div class="rules-htitle serif">活动规则</div>
+      <div class="icon-btn" onclick="this.closest('.rules-ov').classList.remove('show')">✕</div></div>
+    <div class="rules-bd">
+      <div class="rules-row"><div class="rules-dot">1</div><div class="rules-txt">每张抽券售价 <b>95 积分</b>，必中一赏，抽奖结果当场揭晓。</div></div>
+      <div class="rules-row"><div class="rules-dot">2</div><div class="rules-txt"><b>Last赏</b>（压轴大奖）将在最后一张券被抽出时自动触发。</div></div>
+      <div class="rules-row"><div class="rules-dot">3</div><div class="rules-txt">各赏位数量有限，售罄后不再补充，请尽早参与。</div></div>
+      <div class="rules-row"><div class="rules-dot">4</div><div class="rules-txt">奖品以实际派发为准，实物奖品将另行通知配送事宜。</div></div>
+      <div class="rules-row"><div class="rules-dot">5</div><div class="rules-txt">积分余额不足时无法购券，请确认余额后再操作。</div></div>
+    </div>
+  </div></div>
+  <div class="overlay js-overlay"><div class="result">
+    <div class="result-head serif js-rhead">开奖结果</div>
+    <div class="result-body js-rbody"></div>
+    <div class="result-foot"><button class="btn-ok js-ok">收下</button></div></div></div>`;}
+
+function createApp(rootId){
+  const root=document.getElementById(rootId);
+  root.innerHTML=deviceHTML();
+  const $=s=>root.querySelector(s);
+  const tiers=TIERS.map(t=>({...t})); const last={...LAST};
+  let points=316149, drawN=1;
+
+  const normalLeft=()=>tiers.reduce((s,t)=>s+t.left,0);
+  const totalLeft=()=>normalLeft()+last.left;
+  const grand=()=>tiers.reduce((s,t)=>s+t.total,0)+last.total;
+  const curN=()=>drawN==='all'?normalLeft():drawN;
+
+  function featB(t,ribbon,note){return `<div class="gfeat"><div class="r-ribbon serif">${ribbon}</div>
+    <div class="g-img">${artImg(t.art)}</div><div class="info">${badge(t,true)}
+      <div class="f-name serif">Last赏 · ${t.name}</div><span class="f-type">${t.type}</span>
+      <div class="f-note">${note}</div><div class="f-zan">剩 <b>${t.left}</b> / ${t.total} 张</div></div></div>`;}
+  function cardB(t,{hi,mid}={}){
+    const sold=t.left<=0, low=t.left>0&&t.left/t.total<=.34;
+    return `<div class="gcard ${hi?'hi':''} ${mid?'mid':''} ${sold?'sold':''}"><div class="g-top">${badge(t,false,hi)}
+      ${hi?'<span class="uptag">★ 上位赏</span>':''}${mid?'<span class="midtag">人气</span>':''}<div class="g-zan">${sold?'<span class="sold-chip serif">售罄</span>':
+        `<span class="lbl">剩</span><span class="num ${low?'low':''}">${t.left}</span><span class="tot">/${t.total}</span>`}</div></div>
+      <div class="g-img">${artImg(t.art)}</div><div class="g-name">${t.name}</div><div class="g-type">${t.type}</div></div>`;
+  }
+  function renderPool(){
+    $('.js-pool').innerHTML=`<div class="grid">${featB(last,'压轴大奖','抽走最后一张券者自动获得')}
+      ${tiers.map(t=>cardB(t,{hi:t.hi,mid:t.mid})).join('')}</div>`;
+    updateStock();
+  }
+  function updateStock(){
+    const left=totalLeft(),tot=grand();
+    $('.js-zan').textContent=left;
+    $('.js-fill').style.width=(left/tot*100)+'%';
+    $('.js-pts2').textContent=points.toLocaleString();
+    $('.js-cost').textContent=(COST*curN()).toLocaleString()+' 积分';
+  }
+  function showResult(results,lastTriggered){
+    $('.js-rhead').textContent='抽出 '+results.length+' 张';
+    let html=lastTriggered?'<div class="last-hit serif">★ 恭喜抽中 Last赏 ★</div>':'';
+    if(results.length>12){
+      const agg={};
+      results.forEach(r=>{const k=r.isLast?'L':r.tier.sho;(agg[k]=agg[k]||{tier:r.tier,isLast:r.isLast,n:0}).n++;});
+      const aggList=Object.values(agg).sort((a,b)=>a.isLast?-1:b.isLast?1:0);
+      aggList.forEach(g=>{html+=`<div class="sum-row">
+        <div class="nm">${badge(g.tier,g.isLast)} ${g.isLast?'Last赏 · ':''}${g.tier.name}</div><div class="cnt">×${g.n}</div></div>`;});
+      $('.js-rbody').innerHTML=html;
+    }else{
+      html+='<div class="rk-grid">';
+      results.forEach((r,i)=>{const t=r.tier;
+        html+=`<div class="rk" data-i="${i}"><div class="reveal">${revealBadge(t,r.isLast)}
+          <div class="r-txt"><div class="nm">${r.isLast?'Last赏·':''}${t.name}</div><div class="ty">${t.type}</div></div>
+          </div>
+          <div class="cover serif">一番赏 <span class="arrow">撕▶</span></div></div>`;});
+      html+='</div>';
+      $('.js-rbody').innerHTML=html;
+      results.forEach((r,i)=>setTimeout(()=>{const el=$(`.rk[data-i="${i}"]`);if(el)el.classList.add('torn');},300+i*280));
+    }
+    $('.js-overlay').classList.add('show');
+    root.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  function draw(){
+    if(totalLeft()<=0)return;
+    const want=Math.min(curN(),normalLeft()); if(want<=0)return;
+    const cost=COST*want; if(points<cost){alert('积分不足');return;}
+    let pool=[]; tiers.forEach((t,i)=>{for(let k=0;k<t.left;k++)pool.push(i);});
+    const results=[]; let lastTriggered=false;
+    for(let d=0;d<want;d++){
+      if(pool.length>0){
+        const idx=Math.floor(Math.random()*pool.length); const ti=pool.splice(idx,1)[0];
+        tiers[ti].left--; results.push({tier:tiers[ti]});
+        if(pool.length===0&&last.left>0){last.left--;lastTriggered=true;results.push({tier:last,isLast:true});}
+      }
+    }
+    points-=cost; renderPool(); showResult(results,lastTriggered);
+  }
+
+  $('.js-seg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+    $('.js-seg').querySelectorAll('button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on'); drawN=b.dataset.n==='all'?'all':parseInt(b.dataset.n); updateStock();});
+  $('.js-tear').addEventListener('click',draw);
+  $('.js-ok').addEventListener('click',()=>{$('.js-overlay').classList.remove('show');
+    if(totalLeft()<=0){const b=$('.js-tear');b.disabled=true;b.querySelector('.main').innerHTML='<span class="t2">已全部抽完</span>';}});
+
+  renderPool();
+}
+
+createApp('dev-B');
+</script>
+
+<!-- ============================================================
+     以下为 ichiban_kuji_admin_modal 原型 JS —— 完整保留
+     ============================================================ -->
+<script>
+const TIER_NAMES = ['A赏','B赏','C赏','D赏','E赏','F赏','G赏'];
+let admTiers = []; // [{id, name, qty}]
+let nextId = 0;
+
+function addTier() {
+  if (admTiers.length >= 8) {
+    alert('最多可新增至 G赏，共 7 个奖级');
+    return;
+  }
+  const id = nextId++;
+  const defaultName = TIER_NAMES[admTiers.length];
+  admTiers.push({ id, name: defaultName });
+  renderTiers();
+}
+
+function removeTier(id) {
+  if (admTiers.length <= 1) {
+    alert('至少需要保留 1 个奖级');
+    return;
+  }
+  admTiers = admTiers.filter(t => t.id !== id);
+  renderTiers();
+}
+
+function renderDynamicFields(containerId, cat2Val) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  let html = '';
+  if (cat2Val === 'bonus') {
+    html = `
+      <div class="tier-field">
+        <label><span class="req">*</span>流水倍数</label>
+        <input type="number" placeholder="请输入" min="0" required>
+      </div>
+      <div class="tier-field">
+        <label><span class="req">*</span>金额</label>
+        <input type="number" placeholder="请输入" min="0" required>
+      </div>`;
+  } else if (cat2Val === 'points') {
+    html = `
+      <div class="tier-field">
+        <label><span class="req">*</span>积分数量</label>
+        <input type="number" placeholder="请输入" min="0" required>
+      </div>`;
+  } else if (cat2Val === 'freespin') {
+    const tierId = containerId.replace('dynamic-fields-', '');
+    const extra = document.getElementById('freespin-extra-' + tierId);
+    if (extra) {
+      extra.style.display = 'block';
+      const list = document.getElementById('freespin-list-extra-' + tierId);
+      if (list && list.children.length === 0) addFreespinRow('extra-' + tierId);
+    }
+  } else if (cat2Val === 'real') {
+    html = `
+      <div class="tier-field" style="flex:2">
+        <label><span class="req">*</span>商品简介</label>
+        <input type="text" placeholder="请输入商品简介" required>
+      </div>`;
+  } else if (cat2Val === 'coupon') {
+    html = `
+      <div class="tier-field" style="flex:2">
+        <label><span class="req">*</span>选择优惠券</label>
+        <select>
+          <option value="">请选择</option>
+          <option>优惠券 A</option>
+          <option>优惠券 B</option>
+        </select>
+      </div>`;
+  } else if (cat2Val === 'ticket') {
+    html = `
+      <div class="tier-field" style="flex:2">
+        <label><span class="req">*</span>选择票券</label>
+        <select>
+          <option value="">请选择</option>
+          <option>票券 A</option>
+        </select>
+      </div>`;
+  } else if (cat2Val === 'freebet') {
+    html = `
+      <div class="tier-field" style="flex:2">
+        <label><span class="req">*</span>选择免费投注券</label>
+        <select required>
+          <option value="" disabled selected>请选择</option>
+          <option>免费投注券 A</option>
+          <option>免费投注券 B</option>
+        </select>
+      </div>`;
+  } else if (cat2Val === 'tool') {
+    html = `
+      <div class="tier-field" style="flex:2">
+        <label><span class="req">*</span>选择道具卡</label>
+        <select required>
+          <option value="" disabled selected>请选择</option>
+          <option>道具卡 A</option>
+          <option>道具卡 B</option>
+        </select>
+      </div>`;
+  }
+  container.innerHTML = html;
+
+  const SHOW_NAME_CATS = ['real'];
+  const tierId = containerId.replace('dynamic-fields-', '');
+  const nameWrap = document.getElementById('prize-name-wrap-' + tierId);
+  if (nameWrap) {
+    const show = SHOW_NAME_CATS.includes(cat2Val);
+    nameWrap.style.display = show ? '' : 'none';
+    const inp = nameWrap.querySelector('input');
+    if (inp) inp.required = show;
+  }
+}
+
+const CAT1_OPTIONS = [
+  { value: 'virtual', label: '虚拟物品' },
+  { value: 'real',    label: '实物' },
+];
+
+const CAT2_MAP = {
+  virtual: [
+    { value: 'bonus',        label: '彩金' },
+    { value: 'points',       label: '积分' },
+    { value: 'coupon',       label: '优惠券' },
+    { value: 'freespin',     label: '免费旋转券' },
+    { value: 'freebet',      label: '免费投注券' },
+    { value: 'tool',         label: '道具卡' },
+  ],
+  real: [
+    { value: 'real', label: '实物商品' },
+  ],
+};
+
+function tierFieldsHtml(tierId, isLast) {
+  return `
+    <div class="tier-body" id="tbody-${tierId}">
+      <div style="display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;">
+        <div class="tier-field" style="min-width:130px;">
+          <label><span class='req'>*</span>第一层</label>
+          <select onchange="onCat1Change(this,'${tierId}')" required>
+            ${CAT1_OPTIONS.map(o=>`<option value="${o.value}">${o.label}</option>`).join('')}
+          </select>
+        </div>
+        <div class="tier-field" style="min-width:130px;" id="cat2-wrap-${tierId}">
+          <label><span class='req'>*</span>第二层</label>
+          <select onchange="onCat2Change(this,'${tierId}')" required>
+            ${(CAT2_MAP['virtual']||[]).map(o=>`<option value="${o.value}">${o.label}</option>`).join('')}
+          </select>
+        </div>
+        <div id="dynamic-fields-${tierId}" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;"></div>
+        <div class="tier-field" id="prize-name-wrap-${tierId}" style="min-width:130px;display:none;">
+          <label><span class='req'>*</span>奖品名称</label>
+          <input type="text" placeholder="请输入奖品名称">
+        </div>
+      </div>
+      <div class="tier-upload" style="margin-top:10px;">
+        <label><span class="req">*</span>奖品图片</label>
+        <button class="upload-btn-sm">📁 选择文件</button>
+      </div>
+      <div id="freespin-extra-${tierId}" style="margin-top:12px;display:none;">
+        <div style="font-size:12px;color:#1677ff;font-weight:600;margin-bottom:8px;">旋转券配置</div>
+        <div id="freespin-list-extra-${tierId}" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;"></div>
+        <button type="button" class="btn-add-tier" style="height:30px;font-size:12px;" onclick="addFreespinRow('extra-${tierId}')">＋ 新增旋转券</button>
+      </div>
+    </div>
+  `;
+}
+
+function onCat1Change(sel, tierId) {
+  const cat1Val = sel.value;
+  const cat2Wrap = document.getElementById('cat2-wrap-' + tierId);
+  const opts = CAT2_MAP[cat1Val] || [];
+  if (cat1Val === 'real') {
+    cat2Wrap.style.display = 'none';
+    renderDynamicFields('dynamic-fields-' + tierId, 'real');
+  } else {
+    cat2Wrap.style.display = '';
+    cat2Wrap.querySelector('select').innerHTML = opts.map(o=>`<option value="${o.value}">${o.label}</option>`).join('');
+    const firstVal = opts[0] ? opts[0].value : '';
+    renderDynamicFields('dynamic-fields-' + tierId, firstVal);
+  }
+}
+
+function onCat2Change(sel, tierId) {
+  const extra = document.getElementById('freespin-extra-' + tierId);
+  if (extra) extra.style.display = 'none';
+  renderDynamicFields('dynamic-fields-' + tierId, sel.value);
+}
+
+function renderTiers() {
+  const list = document.getElementById('tierList');
+  list.innerHTML = admTiers.map((t, idx) => `
+    <div class="prize-tier" id="tier-${t.id}">
+      <div class="tier-header">
+        <div style="display:flex;align-items:center;gap:8px;flex:1;">
+          <span class="req">*</span><input class="tier-name-input" type="text" value="${t.name}"
+            onchange="admTiers[${idx}].name = this.value"
+            placeholder="奖级名称" style="max-width:120px;" required>
+          <div style="display:flex;align-items:center;gap:5px;background:#f5f7fa;border:1px solid #e4e7ed;border-radius:4px;padding:0 10px;height:28px;">
+            <span style="font-size:12px;color:#666;white-space:nowrap;">数量</span>
+            <input class="tier-qty-input" type="number" min="1" value="${t.qty||1}"
+              oninput="admTiers[${idx}].qty = parseInt(this.value)||0; updateTotal();"
+              placeholder="0" style="width:56px;border:none;background:transparent;text-align:center;font-size:13px;font-weight:600;color:#333;outline:none;" required>
+            <span style="font-size:12px;color:#999;">张</span>
+          </div>
+        </div>
+        ${admTiers.length > 1 ? `<button class="btn-danger-text" onclick="removeTier(${t.id})">✕ 删除</button>` : ''}
+      </div>
+      ${tierFieldsHtml(t.id, false)}
+    </div>
+  `).join('');
+
+  admTiers.forEach(t => {
+    renderDynamicFields('dynamic-fields-' + t.id, 'bonus');
+  });
+
+  updateTotal();
+  updateTierInfo();
+}
+
+function updateTotal() {
+  const sum = admTiers.reduce((acc, t) => acc + (parseInt(t.qty) || 0), 0) + 1; // +1 for Last赏
+  document.getElementById('totalCount').textContent = sum;
+}
+
+function updateTierInfo() {
+  const remaining = 8 - admTiers.length;
+  document.getElementById('tierCountInfo').textContent =
+    `目前 ${admTiers.length} 个奖级（最多 H赏，共 8 级，还可新增 ${remaining} 个）`;
+}
+
+let freespinRowId = 0;
+
+function addFreespinRow(containerId) {
+  const list = document.getElementById('freespin-list-' + containerId);
+  if (!list) return;
+  const rowId = 'fs-' + containerId + '-' + (freespinRowId++);
+  const div = document.createElement('div');
+  div.className = 'freespin-row';
+  div.id = rowId;
+  div.innerHTML = `
+    <span style="font-size:12px;color:#999;white-space:nowrap;">旋转券 ${list.children.length + 1}</span>
+    <select required>
+      <option value="" disabled selected>选择免费旋转游戏</option>
+      <option>J Mania Triple Jam</option>
+      <option>FC Freespins</option>
+      <option>Slot Game A</option>
+      <option>Slot Game B</option>
+    </select>
+    <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
+      <span style="font-size:12px;color:#666;white-space:nowrap;"><span style="color:#ff4d4f;">*</span> 张数</span>
+      <input type="number" min="1" placeholder="0" required
+        style="width:60px;height:30px;border:1px solid #d9d9d9;border-radius:4px;padding:0 8px;font-size:13px;text-align:center;">
+      <span style="font-size:12px;color:#999;">张</span>
+    </div>
+    <button type="button" class="btn-danger-text" onclick="removeFreespinRow('${rowId}', '${containerId}')">✕ 删除</button>
+  `;
+  list.appendChild(div);
+  updateFreespinNumbers(containerId);
+}
+
+function removeFreespinRow(rowId, containerId) {
+  const el = document.getElementById(rowId);
+  if (el) el.remove();
+  updateFreespinNumbers(containerId);
+}
+
+function updateFreespinNumbers(containerId) {
+  const list = document.getElementById('freespin-list-' + containerId);
+  if (!list) return;
+  Array.from(list.children).forEach((row, i) => {
+    const label = row.querySelector('span');
+    if (label) label.textContent = '旋转券 ' + (i + 1);
+  });
+}
+
+function toggleFlashSale(el) {
+  document.getElementById('flashSaleRange').style.display =
+    el.value === 'yes' ? 'block' : 'none';
+}
+
+function previewBanner(input, previewId, placeholderId) {
+  const file = input.files[0];
+  if (!file) return;
+  const prev = document.getElementById(previewId);
+  const ph = document.getElementById(placeholderId);
+  prev.src = URL.createObjectURL(file);
+  prev.style.display = 'block';
+  ph.style.display = 'none';
+}
+
+function clearBanner(inputId, previewId, placeholderId) {
+  const input = document.getElementById(inputId);
+  const prev = document.getElementById(previewId);
+  const ph = document.getElementById(placeholderId);
+  input.value = '';
+  prev.src = '';
+  prev.style.display = 'none';
+  ph.style.display = 'flex';
+}
+
+// Init with A賞
+addTier();
+// Init Last赏 dynamic fields
+renderDynamicFields('dynamic-fields-last', 'bonus');
+
+function submitForm() {
+  const modal = document.querySelector('#admproto .modal-body');
+  const inputs = modal.querySelectorAll('input[required], select[required]');
+  let firstEmpty = null;
+  let allValid = true;
+
+  inputs.forEach(el => {
+    const isEmpty = el.disabled ? false : (el.value === '' || el.value === null);
+    if (isEmpty) {
+      el.style.borderColor = '#ff4d4f';
+      el.style.boxShadow = '0 0 0 2px rgba(255,77,79,0.1)';
+      if (!firstEmpty) firstEmpty = el;
+      allValid = false;
+    } else {
+      el.style.borderColor = '';
+      el.style.boxShadow = '';
+    }
+  });
+
+  if (!allValid) {
+    firstEmpty && firstEmpty.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    firstEmpty && firstEmpty.focus();
+    return;
+  }
+  alert('✅ 验证通过，提交成功！');
+}
+</script>
+</body>
+</html>
