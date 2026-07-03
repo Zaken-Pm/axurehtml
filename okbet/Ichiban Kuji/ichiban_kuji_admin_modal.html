@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>新增商品 — 一番赏</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: 14px;
+  background: #f0f2f5;
+  color: #333;
+}
+
+/* ── OVERLAY ── */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 24px 0;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+/* ── MODAL ── */
+.modal {
+  background: #fff;
+  border-radius: 4px;
+  width: 860px;
+  max-width: 96vw;
+  position: relative;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+}
+.modal-header {
+  padding: 16px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-close {
+  background: none; border: none; font-size: 18px;
+  color: #999; cursor: pointer; line-height: 1;
+}
+.modal-close:hover { color: #333; }
+.modal-body { padding: 24px; }
+.modal-footer {
+  padding: 14px 24px;
+  border-top: 1px solid #f0f0f0;
+  display: flex; justify-content: center; gap: 12px;
+}
+
+/* ── FORM ROW ── */
+.form-row {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  gap: 0;
+}
+.form-label {
+  width: 130px;
+  flex-shrink: 0;
+  padding-top: 6px;
+  text-align: right;
+  padding-right: 12px;
+  color: #333;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.form-label .req, .tier-field label .req, .tier-upload label .req { color: #ff4d4f; margin-right: 2px; }
+.req { color: #ff4d4f; margin-right: 2px; }
+.form-control { flex: 1; }
+
+/* ── INPUTS ── */
+input[type="text"], input[type="number"], select, textarea {
+  width: 100%;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 13px;
+  color: #333;
+  outline: none;
+  height: 32px;
+  transition: border-color 0.2s;
+}
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus { border-color: #1677ff; box-shadow: 0 0 0 2px rgba(22,119,255,0.1); }
+select { background: #fff; cursor: pointer; }
+
+.input-suffix {
+  display: flex; align-items: center;
+}
+.input-suffix input { border-radius: 4px 0 0 4px; }
+.suffix-tag {
+  background: #fafafa; border: 1px solid #d9d9d9; border-left: none;
+  padding: 0 10px; height: 32px; display: flex; align-items: center;
+  color: #999; font-size: 13px; border-radius: 0 4px 4px 0; white-space: nowrap;
+}
+
+/* ── CHECKBOX / RADIO ── */
+.checkbox-group {
+  display: flex; flex-wrap: wrap; gap: 6px 16px;
+  padding-top: 6px;
+}
+.checkbox-group label,
+.radio-group label {
+  display: flex; align-items: center; gap: 5px;
+  cursor: pointer; font-size: 13px; white-space: nowrap;
+}
+.radio-group {
+  display: flex; flex-wrap: wrap; gap: 6px 20px;
+  padding-top: 6px;
+}
+input[type="checkbox"], input[type="radio"] { cursor: pointer; accent-color: #1677ff; }
+.ichiban-label { color: #1677ff; font-weight: 600; }
+
+/* ── SECTION DIVIDER ── */
+.section-divider {
+  margin: 20px 0 16px;
+  border-top: 1px dashed #e8e8e8;
+  padding-top: 16px;
+}
+.section-title {
+  font-size: 13px; font-weight: 600; color: #1677ff;
+  margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-title::after {
+  content: ''; flex: 1; height: 1px; background: #f0f0f0;
+}
+
+/* ── VIP GRID ── */
+.vip-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+}
+.vip-item {
+  display: flex; align-items: center;
+  border: 1px solid #d9d9d9; border-radius: 4px; overflow: hidden;
+  height: 32px;
+}
+.vip-tag {
+  background: #fafafa; border-right: 1px solid #d9d9d9;
+  padding: 0 10px; font-size: 12px; color: #555;
+  white-space: nowrap; height: 100%; display: flex; align-items: center;
+  min-width: 48px;
+}
+.vip-item input {
+  border: none; border-radius: 0; height: 100%; padding: 0 8px;
+  flex: 1; min-width: 0;
+}
+.vip-item input:focus { box-shadow: none; }
+
+/* ── UPLOAD BTN ── */
+.upload-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #1677ff; color: #fff; border: none;
+  padding: 5px 14px; border-radius: 4px; font-size: 13px;
+  cursor: pointer; height: 32px;
+}
+.upload-btn:hover { background: #0958d9; }
+.upload-hint { font-size: 12px; color: #ff4d4f; margin-top: 4px; }
+
+/* ── BUTTONS ── */
+.btn {
+  padding: 6px 20px; border-radius: 4px; font-size: 14px;
+  cursor: pointer; border: 1px solid transparent; height: 34px;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-primary { background: #1677ff; color: #fff; border-color: #1677ff; }
+.btn-primary:hover { background: #0958d9; }
+.btn-warning { background: #fa8c16; color: #fff; border-color: #fa8c16; }
+.btn-warning:hover { background: #d46b08; }
+.btn-default { background: #fff; color: #333; border-color: #d9d9d9; }
+.btn-default:hover { border-color: #1677ff; color: #1677ff; }
+.btn-danger-text { background: none; border: none; color: #ff4d4f; font-size: 13px; cursor: pointer; padding: 0 4px; }
+.btn-danger-text:hover { color: #cf1322; }
+
+/* ── TOTAL TICKETS BANNER ── */
+.total-banner {
+  background: #e6f4ff; border: 1px solid #91caff; border-radius: 4px;
+  padding: 10px 16px; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: #0958d9;
+}
+.total-banner strong { font-size: 20px; font-weight: 700; color: #1677ff; }
+
+/* ── PRIZE TIER ── */
+.prize-tier {
+  border: 1px solid #e8e8e8; border-radius: 6px;
+  margin-bottom: 12px; overflow: hidden;
+}
+.tier-header {
+  background: #fafafa; padding: 10px 16px;
+  display: flex; align-items: center; gap: 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.tier-badge {
+  background: #1677ff; color: #fff;
+  font-size: 12px; font-weight: 700;
+  padding: 2px 10px; border-radius: 12px;
+  min-width: 42px; text-align: center;
+}
+.tier-badge.last { background: linear-gradient(135deg, #fa8c16, #faad14); }
+.tier-name-input {
+  flex: 1; max-width: 160px;
+  border: 1px solid #d9d9d9; border-radius: 4px;
+  padding: 3px 8px; font-size: 13px; height: 28px;
+}
+.tier-name-input:focus { border-color: #1677ff; outline: none; }
+.tier-qty-wrap {
+  display: flex; align-items: center; gap: 6px; margin-left: auto;
+}
+.tier-qty-wrap label { font-size: 12px; color: #666; }
+.tier-qty-input {
+  width: 80px; border: 1px solid #d9d9d9; border-radius: 4px;
+  padding: 3px 8px; font-size: 13px; height: 28px; text-align: center;
+}
+.tier-qty-input:focus { border-color: #1677ff; outline: none; }
+.tier-qty-wrap .qty-unit { font-size: 12px; color: #999; }
+
+.tier-body { padding: 12px 16px; }
+.tier-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px 16px;
+  align-items: end;
+}
+.tier-field label {
+  display: block; font-size: 12px; color: #666; margin-bottom: 4px;
+}
+.tier-field select,
+.tier-field input[type="text"] {
+  height: 30px; font-size: 13px;
+}
+
+.tier-upload { margin-top: 10px; }
+.tier-upload label { font-size: 12px; color: #666; margin-bottom: 4px; display: block; }
+.upload-btn-sm {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: #1677ff; color: #fff; border: none;
+  padding: 3px 12px; border-radius: 4px; font-size: 12px;
+  cursor: pointer; height: 28px;
+}
+.upload-btn-sm:hover { background: #0958d9; }
+
+/* LAST tier special */
+.prize-tier.last-tier { border-color: #ffd591; }
+.prize-tier.last-tier .tier-header { background: #fff7e6; border-color: #ffd591; }
+.last-note {
+  font-size: 11px; color: #fa8c16; margin-left: 6px;
+  background: rgba(250,140,22,0.08); padding: 2px 8px; border-radius: 10px;
+}
+
+/* FREESPIN ROW */
+.freespin-row {
+  display: flex; align-items: center; gap: 10px;
+  background: #fafafa; border: 1px solid #e8e8e8;
+  border-radius: 6px; padding: 10px 12px;
+}
+.freespin-row select { flex: 1; min-width: 160px; height: 30px; font-size: 13px; }
+.freespin-row .upload-btn-sm { white-space: nowrap; flex-shrink: 0; }
+.freespin-preview { width: 36px; height: 36px; object-fit: cover; border-radius: 4px; border: 1px solid #e8e8e8; display:none; }
+.freespin-filename { font-size: 12px; color: #999; flex: 0 0 auto; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ADD TIER BTN */
+.add-tier-wrap {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+}
+.btn-add-tier {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px dashed #1677ff; color: #1677ff; background: none;
+  padding: 5px 16px; border-radius: 4px; font-size: 13px; cursor: pointer;
+  height: 32px; transition: background 0.15s;
+}
+.btn-add-tier:hover { background: #e6f4ff; }
+.tier-count-info { font-size: 12px; color: #999; }
+
+/* 移除 number input 的上下箭頭 */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+/* ── HINT TEXT ── */
+.hint { font-size: 12px; color: #999; margin-top: 3px; }
+
+/* ── LIMIT PURCHASE CHECK ── */
+.limit-row {
+  display: flex; align-items: center; gap: 8px; margin-top: 8px;
+}
+
+/* ── BANNER UPLOAD ── */
+.banner-panels {
+  display: flex; gap: 16px; flex-wrap: wrap;
+}
+.banner-panel {
+  flex: 1; min-width: 280px;
+  border: 1px solid #e8e8e8; border-radius: 6px; overflow: hidden;
+}
+.banner-panel-header {
+  background: #fafafa; padding: 8px 14px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 13px; color: #555; font-weight: 500;
+}
+.banner-panel-header .size-hint { font-size: 12px; color: #bbb; }
+.banner-panel-body {
+  padding: 12px; min-height: 180px; position: relative;
+  display: flex; flex-direction: column;
+}
+.banner-drop-zone {
+  flex: 1; border: 1.5px dashed #d9d9d9; border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  min-height: 150px; cursor: pointer; position: relative; overflow: hidden;
+  transition: border-color 0.2s, background 0.2s;
+}
+.banner-drop-zone:hover { border-color: #1677ff; background: #f0f7ff; }
+.banner-drop-zone img.banner-preview {
+  width: 100%; height: 100%; object-fit: cover;
+  position: absolute; inset: 0;
+}
+.banner-drop-zone .banner-placeholder {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  color: #bbb; font-size: 12px; pointer-events: none;
+}
+.banner-drop-zone .banner-placeholder .plus-icon {
+  font-size: 24px; color: #d9d9d9; line-height: 1;
+}
+.banner-panel-footer {
+  display: flex; justify-content: flex-end; padding-top: 8px;
+}
+.btn-banner-delete {
+  background: none; border: none; color: #1677ff; font-size: 13px;
+  cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 0 2px;
+}
+.btn-banner-delete:hover { color: #ff4d4f; }
+.banner-field-row {
+  display: flex; align-items: flex-start; margin-bottom: 14px; gap: 0;
+}
+.banner-field-label {
+  width: 130px; flex-shrink: 0; padding-top: 4px;
+  text-align: right; padding-right: 12px;
+  color: #333; font-size: 13px;
+}
+</style>
+</head>
+<body>
+
+<div class="overlay">
+  <div class="modal">
+    <div class="modal-header">
+      新增商品
+      <button class="modal-close" onclick="this.closest('.overlay').style.display='none'">✕</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- 币种 -->
+      <div class="form-row">
+        <div class="form-label"><span class="req">*</span>币种：</div>
+        <div class="form-control">
+          <select style="max-width:180px;">
+            <option>菲律宾比索</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 商品类别 checkbox -->
+      <div class="form-row">
+        <div class="form-label">商品类别：</div>
+        <div class="form-control">
+          <div class="checkbox-group">
+            <label><input type="checkbox"> FREESPIN</label>
+            <label><input type="checkbox"> MONEY</label>
+            <label><input type="checkbox"> COUPON</label>
+            <label><input type="checkbox"> tickets（票券）</label>
+            <label><input type="checkbox"> 实物</label>
+            <label><input type="checkbox"> 彩金</label>
+            <label><input type="checkbox"> 优惠券</label>
+            <label><input type="checkbox"> 免费旋转</label>
+            <label><input type="checkbox"> 话费</label>
+            <label><input type="checkbox"> 流量</label>
+            <label><input type="checkbox"> pisoluck</label>
+            <label><input type="checkbox"> 免费投注</label>
+            <label><input type="checkbox"> 盲盒</label>
+            <label><input type="checkbox"> 道具卡</label>
+            <label><input type="checkbox" checked class="ichiban-cb"> <span class="ichiban-label">Ichiban Kuji</span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- 商品名称 -->
+      <div class="form-row">
+        <div class="form-label"><span class="req">*</span>商品名称：</div>
+        <div class="form-control">
+          <input type="text" placeholder="请输入商品名称">
+        </div>
+      </div>
+
+      <!-- 商品类型 radio -->
+      <div class="form-row">
+        <div class="form-label"><span class="req">*</span>商品类型：</div>
+        <div class="form-control">
+          <div class="radio-group">
+            <label><input type="radio" name="productType" value="real"> 实物</label>
+            <label><input type="radio" name="productType" value="bonus"> 彩金</label>
+            <label><input type="radio" name="productType" value="coupon"> 优惠券</label>
+            <label><input type="radio" name="productType" value="freespin"> 免费旋转</label>
+            <label><input type="radio" name="productType" value="phone"> 话费</label>
+            <label><input type="radio" name="productType" value="data"> 流量</label>
+            <label><input type="radio" name="productType" value="pisoluck"> pisoluck</label>
+            <label><input type="radio" name="productType" value="ticket"> 票券</label>
+            <label><input type="radio" name="productType" value="blind"> 盲盒</label>
+            <label><input type="radio" name="productType" value="freebet"> 免费投注</label>
+            <label><input type="radio" name="productType" value="tool"> 道具卡</label>
+            <label><input type="radio" name="productType" value="ichiban" checked> <span class="ichiban-label">Ichiban Kuji</span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- 商品图片 -->
+      <div class="form-row">
+        <div class="form-label"><span class="req">*</span>商品图片：</div>
+        <div class="form-control">
+          <button class="upload-btn">📁 选择文件</button>
+          <div class="upload-hint">尺寸750×750，最多可上传6张图，默认第一张图为封面图</div>
+        </div>
+      </div>
+
+      <!-- 购买价格 -->
+      <div class="form-row">
+        <div class="form-label"><span class="req">*</span>购买价格：</div>
+        <div class="form-control">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <label><input type="radio" name="priceType" checked> 积分</label>
+          </div>
+          <div class="input-suffix">
+            <input type="number" placeholder="请输入" style="max-width:300px;border-radius:4px 0 0 4px;">
+            <span class="suffix-tag">积分</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 排序 -->
+      <div class="form-row">
+        <div class="form-label"><span class="req">*</span>排序：</div>
+        <div class="form-control">
+          <input type="number" value="1" style="max-width:100px;">
+        </div>
+      </div>
+
+      <!-- 单个会员限购数 -->
+      <div class="form-row">
+        <div class="form-label">单个会员限购数：</div>
+        <div class="form-control">
+          <div class="vip-grid">
+            <div class="vip-item"><span class="vip-tag">VIP0</span><input type="number" value="0"></div>
+            <div class="vip-item"><span class="vip-tag">VIP1</span><input type="number" value="0"></div>
+            <div class="vip-item"><span class="vip-tag">VIP2</span><input type="number" value="0"></div>
+            <div class="vip-item"><span class="vip-tag">VIP3</span><input type="number" value="0"></div>
+            <div class="vip-item"><span class="vip-tag">VIP4</span><input type="number" value="0"></div>
+            <div class="vip-item"><span class="vip-tag">VIP5</span><input type="number" value="0"></div>
+            <div class="vip-item"><span class="vip-tag">VIP6</span><input type="number" value="0"></div>
+            <div class="vip-item"><span class="vip-tag">VIP7</span><input type="number" value="0"></div>
+            <div class="vip-item"><span class="vip-tag">VIP8</span><input type="number" value="0"></div>
+            <div class="vip-item"><span class="vip-tag">VIP9</span><input type="number" value="0"></div>
+            <div class="vip-item"><span class="vip-tag">VIP10</span><input type="number" value="0"></div>
+          </div>
+          <div class="limit-row">
+            <input type="checkbox" id="limitCheck">
+            <label for="limitCheck" style="font-size:13px;color:#1677ff;cursor:pointer;">限购</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- 是否限时抢购 -->
+      <div class="form-row">
+        <div class="form-label"><span class="req">*</span>是否限时抢购：</div>
+        <div class="form-control">
+          <div class="radio-group">
+            <label><input type="radio" name="flashSale" value="no" checked onchange="toggleFlashSale(this)"> 否</label>
+            <label><input type="radio" name="flashSale" value="yes" onchange="toggleFlashSale(this)"> 是</label>
+          </div>
+          <div id="flashSaleRange" style="display:none;margin-top:8px;">
+            <div style="display:flex;align-items:center;gap:8px;border:1px solid #d9d9d9;border-radius:4px;padding:6px 12px;max-width:420px;background:#fff;">
+              <span style="color:#bbb;font-size:15px;">🕐</span>
+              <input type="datetime-local" style="border:none;outline:none;font-size:13px;color:#333;flex:1;background:transparent;" id="flashStart">
+              <span style="color:#999;font-size:13px;">～</span>
+              <input type="datetime-local" style="border:none;outline:none;font-size:13px;color:#333;flex:1;background:transparent;" id="flashEnd">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 审核模式 -->
+      <div class="form-row">
+        <div class="form-label">审核模式：</div>
+        <div class="form-control">
+          <div class="radio-group">
+            <label style="color:#bbb;cursor:not-allowed;"><input type="radio" name="auditMode" checked disabled> 自动审核</label>
+            <label style="color:#bbb;cursor:not-allowed;"><input type="radio" name="auditMode" disabled> 手动审核</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- 顶部图配置 -->
+      <div style="margin-top:16px;">
+        <div class="banner-field-row">
+          <div class="banner-field-label"><span class="req">*</span>顶部图：</div>
+          <div style="flex:1;">
+            <div class="banner-panels">
+              <!-- PC 端 -->
+              <div class="banner-panel">
+                <div class="banner-panel-header">
+                  <span>PC 端</span>
+                  <span class="size-hint">建议尺寸 1400×800px</span>
+                </div>
+                <div class="banner-panel-body">
+                  <div class="banner-drop-zone" onclick="document.getElementById('bannerPcInput').click()">
+                    <img class="banner-preview" id="bannerPcPreview" src="" style="display:none;">
+                    <div class="banner-placeholder" id="bannerPcPlaceholder">
+                      <span class="plus-icon">＋</span>
+                      <span>点击上传图片</span>
+                    </div>
+                  </div>
+                  <input type="file" id="bannerPcInput" accept="image/*" style="display:none;"
+                    onchange="previewBanner(this,'bannerPcPreview','bannerPcPlaceholder')">
+                  <div class="banner-panel-footer">
+                    <button type="button" class="btn-banner-delete" onclick="clearBanner('bannerPcInput','bannerPcPreview','bannerPcPlaceholder')">
+                      <svg viewBox="64 64 896 896" width="13" height="13" fill="currentColor" style="vertical-align:-1px;margin-right:4px;"><path d="M360 184h-8c4.4 0 8-3.6 8-8v8h304v-8c0 4.4 3.6 8 8 8h-8v72h72v-80c0-35.3-28.7-64-64-64H352c-35.3 0-64 28.7-64 64v80h72v-72zm504 72H160c-17.7 0-32 14.3-32 32v32c0 4.4 3.6 8 8 8h60.4l24.7 523c1.6 34.1 29.8 61 63.9 61h454c34.2 0 62.3-26.8 63.9-61l24.7-523H888c4.4 0 8-3.6 8-8v-32c0-17.7-14.3-32-32-32zM731.3 840H292.7l-24.2-512h487l-24.2 512z"/></svg>删除
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <!-- H5 端 -->
+              <div class="banner-panel">
+                <div class="banner-panel-header">
+                  <span>H5 端</span>
+                  <span class="size-hint">建议尺寸 390×320px</span>
+                </div>
+                <div class="banner-panel-body">
+                  <div class="banner-drop-zone" onclick="document.getElementById('bannerH5Input').click()">
+                    <img class="banner-preview" id="bannerH5Preview" src="" style="display:none;">
+                    <div class="banner-placeholder" id="bannerH5Placeholder">
+                      <span class="plus-icon">＋</span>
+                      <span>点击上传图片</span>
+                    </div>
+                  </div>
+                  <input type="file" id="bannerH5Input" accept="image/*" style="display:none;"
+                    onchange="previewBanner(this,'bannerH5Preview','bannerH5Placeholder')">
+                  <div class="banner-panel-footer">
+                    <button type="button" class="btn-banner-delete" onclick="clearBanner('bannerH5Input','bannerH5Preview','bannerH5Placeholder')">
+                      <svg viewBox="64 64 896 896" width="13" height="13" fill="currentColor" style="vertical-align:-1px;margin-right:4px;"><path d="M360 184h-8c4.4 0 8-3.6 8-8v8h304v-8c0 4.4 3.6 8 8 8h-8v72h72v-80c0-35.3-28.7-64-64-64H352c-35.3 0-64 28.7-64 64v80h72v-72zm504 72H160c-17.7 0-32 14.3-32 32v32c0 4.4 3.6 8 8 8h60.4l24.7 523c1.6 34.1 29.8 61 63.9 61h454c34.2 0 62.3-26.8 63.9-61l24.7-523H888c4.4 0 8-3.6 8-8v-32c0-17.7-14.3-32-32-32zM731.3 840H292.7l-24.2-512h487l-24.2 512z"/></svg>删除
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /顶部图配置 -->
+
+      <!-- 规则弹窗图配置 -->
+      <div style="margin-top:16px;">
+        <div class="banner-field-row">
+          <div class="banner-field-label"><span class="req">*</span>规则弹窗图：</div>
+          <div style="flex:1;">
+            <div class="banner-panels">
+              <!-- PC 端 -->
+              <div class="banner-panel">
+                <div class="banner-panel-header">
+                  <span>PC 端</span>
+                  <span class="size-hint">建议尺寸 356×422px</span>
+                </div>
+                <div class="banner-panel-body">
+                  <div class="banner-drop-zone" onclick="document.getElementById('rulePcInput').click()">
+                    <img class="banner-preview" id="rulePcPreview" src="" style="display:none;">
+                    <div class="banner-placeholder" id="rulePcPlaceholder">
+                      <span class="plus-icon">＋</span>
+                      <span>点击上传图片</span>
+                    </div>
+                  </div>
+                  <input type="file" id="rulePcInput" accept="image/*" style="display:none;"
+                    onchange="previewBanner(this,'rulePcPreview','rulePcPlaceholder')">
+                  <div class="banner-panel-footer">
+                    <button type="button" class="btn-banner-delete" onclick="clearBanner('rulePcInput','rulePcPreview','rulePcPlaceholder')">
+                      <svg viewBox="64 64 896 896" width="13" height="13" fill="currentColor" style="vertical-align:-1px;margin-right:4px;"><path d="M360 184h-8c4.4 0 8-3.6 8-8v8h304v-8c0 4.4 3.6 8 8 8h-8v72h72v-80c0-35.3-28.7-64-64-64H352c-35.3 0-64 28.7-64 64v80h72v-72zm504 72H160c-17.7 0-32 14.3-32 32v32c0 4.4 3.6 8 8 8h60.4l24.7 523c1.6 34.1 29.8 61 63.9 61h454c34.2 0 62.3-26.8 63.9-61l24.7-523H888c4.4 0 8-3.6 8-8v-32c0-17.7-14.3-32-32-32zM731.3 840H292.7l-24.2-512h487l-24.2 512z"/></svg>删除
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <!-- H5 端 -->
+              <div class="banner-panel">
+                <div class="banner-panel-header">
+                  <span>H5 端</span>
+                  <span class="size-hint">建议尺寸 356×422px</span>
+                </div>
+                <div class="banner-panel-body">
+                  <div class="banner-drop-zone" onclick="document.getElementById('ruleH5Input').click()">
+                    <img class="banner-preview" id="ruleH5Preview" src="" style="display:none;">
+                    <div class="banner-placeholder" id="ruleH5Placeholder">
+                      <span class="plus-icon">＋</span>
+                      <span>点击上传图片</span>
+                    </div>
+                  </div>
+                  <input type="file" id="ruleH5Input" accept="image/*" style="display:none;"
+                    onchange="previewBanner(this,'ruleH5Preview','ruleH5Placeholder')">
+                  <div class="banner-panel-footer">
+                    <button type="button" class="btn-banner-delete" onclick="clearBanner('ruleH5Input','ruleH5Preview','ruleH5Placeholder')">
+                      <svg viewBox="64 64 896 896" width="13" height="13" fill="currentColor" style="vertical-align:-1px;margin-right:4px;"><path d="M360 184h-8c4.4 0 8-3.6 8-8v8h304v-8c0 4.4 3.6 8 8 8h-8v72h72v-80c0-35.3-28.7-64-64-64H352c-35.3 0-64 28.7-64 64v80h72v-72zm504 72H160c-17.7 0-32 14.3-32 32v32c0 4.4 3.6 8 8 8h60.4l24.7 523c1.6 34.1 29.8 61 63.9 61h454c34.2 0 62.3-26.8 63.9-61l24.7-523H888c4.4 0 8-3.6 8-8v-32c0-17.7-14.3-32-32-32zM731.3 840H292.7l-24.2-512h487l-24.2 512z"/></svg>删除
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /规则弹窗图配置 -->
+
+      <!-- ═══════════════════════════════════════
+           一番赏奖级配置區塊
+           ═══════════════════════════════════════ -->
+      <div class="section-divider">
+        <div class="section-title">Ichiban Kuji 奖级配置</div>
+
+        <!-- 总券数 banner -->
+        <div class="total-banner">
+          🎫 总券数：<strong id="totalCount">0</strong> 张
+          <span style="color:#666;font-size:12px;margin-left:4px;">（各奖级数量自动加总）</span>
+        </div>
+
+        <!-- 新增奖级按鈕 -->
+        <div class="add-tier-wrap">
+          <button class="btn-add-tier" onclick="addTier()">＋ 新增奖级</button>
+          <span class="tier-count-info" id="tierCountInfo">目前 1 个奖级（最多 G赏，共 7 级）</span>
+        </div>
+
+        <!-- 獎級列表 -->
+        <div id="tierList"></div>
+
+        <!-- Last 赏（固定，不可删除）-->
+        <div class="prize-tier last-tier" id="lastTier">
+          <div class="tier-header">
+            <div style="display:flex;align-items:center;gap:8px;flex:1;">
+              <span class="req">*</span><input class="tier-name-input" type="text" value="Last赏" placeholder="奖级名称" style="max-width:120px;" required>
+              <div style="display:flex;align-items:center;gap:5px;background:#fff7e6;border:1px solid #ffd591;border-radius:4px;padding:0 10px;height:28px;">
+                <span style="font-size:12px;color:#fa8c16;white-space:nowrap;">数量</span>
+                <input type="number" value="1" disabled style="width:40px;border:none;background:transparent;text-align:center;font-size:13px;font-weight:600;color:#fa8c16;outline:none;">
+                <span style="font-size:12px;color:#fa8c16;">张</span>
+              </div>
+              <span class="last-note">🏆 压轴奖：最后一抽自动触发，固定 1 张</span>
+            </div>
+          </div>
+          <div class="tier-body" id="tbody-last">
+            <div style="display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;">
+              <div class="tier-field" style="min-width:130px;">
+                <label><span class="req">*</span>第一层</label>
+                <select onchange="onCat1Change(this,'last')" required>
+                  <option value="virtual">虚拟物品</option>
+                  <option value="real">实物</option>
+                </select>
+              </div>
+              <div class="tier-field" style="min-width:130px;" id="cat2-wrap-last">
+                <label><span class="req">*</span>第二层</label>
+                <select onchange="onCat2Change(this,'last')" required>
+                  <option value="bonus">彩金</option>
+                  <option value="points">积分</option>
+                  <option value="coupon">优惠券</option>
+                  <option value="freespin">免费旋转券</option>
+                  <option value="freebet">免费投注券</option>
+                  <option value="tool">道具卡</option>
+                </select>
+              </div>
+              <div id="dynamic-fields-last" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;"></div>
+              <div class="tier-field" id="prize-name-wrap-last" style="min-width:130px;display:none;">
+                <label><span class="req">*</span>奖品名称</label>
+                <input type="text" placeholder="请输入奖品名称">
+              </div>
+            </div>
+            <div class="tier-upload" style="margin-top:10px;">
+              <label><span class="req">*</span>奖品图片</label>
+              <button class="upload-btn-sm">📁 选择文件</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /section-divider -->
+
+    </div><!-- /modal-body -->
+
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="submitForm()">确定</button>
+      <button class="btn btn-warning" onclick="this.closest('.overlay').style.display='none'">取消</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const TIER_NAMES = ['A赏','B赏','C赏','D赏','E赏','F赏','G赏'];
+let tiers = []; // [{id, name, qty}]
+let nextId = 0;
+
+function addTier() {
+  if (tiers.length >= 8) {
+    alert('最多可新增至 G赏，共 7 个奖级');
+    return;
+  }
+  const id = nextId++;
+  const defaultName = TIER_NAMES[tiers.length];
+  tiers.push({ id, name: defaultName });
+  renderTiers();
+}
+
+function removeTier(id) {
+  if (tiers.length <= 1) {
+    alert('至少需要保留 1 个奖级');
+    return;
+  }
+  tiers = tiers.filter(t => t.id !== id);
+  // re-assign default names only for un-customized
+  renderTiers();
+}
+
+// 動態欄位：依第二层選擇渲染不同欄位
+function renderDynamicFields(containerId, cat2Val) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  let html = '';
+  if (cat2Val === 'bonus') {
+    html = `
+      <div class="tier-field">
+        <label><span class="req">*</span>流水倍数</label>
+        <input type="number" placeholder="请输入" min="0" required>
+      </div>
+      <div class="tier-field">
+        <label><span class="req">*</span>金额</label>
+        <input type="number" placeholder="请输入" min="0" required>
+      </div>`;
+  } else if (cat2Val === 'points') {
+    html = `
+      <div class="tier-field">
+        <label><span class="req">*</span>积分数量</label>
+        <input type="number" placeholder="请输入" min="0" required>
+      </div>`;
+  } else if (cat2Val === 'freespin') {
+    // 顯示下方的旋轉券區塊
+    const tierId = containerId.replace('dynamic-fields-', '');
+    const extra = document.getElementById('freespin-extra-' + tierId);
+    if (extra) {
+      extra.style.display = 'block';
+      const list = document.getElementById('freespin-list-extra-' + tierId);
+      if (list && list.children.length === 0) addFreespinRow('extra-' + tierId);
+    }
+  } else if (cat2Val === 'real') {
+    html = `
+      <div class="tier-field" style="flex:2">
+        <label><span class="req">*</span>商品简介</label>
+        <input type="text" placeholder="请输入商品简介" required>
+      </div>`;
+  } else if (cat2Val === 'coupon') {
+    html = `
+      <div class="tier-field" style="flex:2">
+        <label><span class="req">*</span>选择优惠券</label>
+        <select>
+          <option value="">请选择</option>
+          <option>优惠券 A</option>
+          <option>优惠券 B</option>
+        </select>
+      </div>`;
+  } else if (cat2Val === 'ticket') {
+    html = `
+      <div class="tier-field" style="flex:2">
+        <label><span class="req">*</span>选择票券</label>
+        <select>
+          <option value="">请选择</option>
+          <option>票券 A</option>
+        </select>
+      </div>`;
+  } else if (cat2Val === 'freebet') {
+    html = `
+      <div class="tier-field" style="flex:2">
+        <label><span class="req">*</span>选择免费投注券</label>
+        <select required>
+          <option value="" disabled selected>请选择</option>
+          <option>免费投注券 A</option>
+          <option>免费投注券 B</option>
+        </select>
+      </div>`;
+  } else if (cat2Val === 'tool') {
+    html = `
+      <div class="tier-field" style="flex:2">
+        <label><span class="req">*</span>选择道具卡</label>
+        <select required>
+          <option value="" disabled selected>请选择</option>
+          <option>道具卡 A</option>
+          <option>道具卡 B</option>
+        </select>
+      </div>`;
+  }
+  container.innerHTML = html;
+
+  // 奖品名称：只在实物(real)时显示
+  const SHOW_NAME_CATS = ['real'];
+  const tierId = containerId.replace('dynamic-fields-', '');
+  const nameWrap = document.getElementById('prize-name-wrap-' + tierId);
+  if (nameWrap) {
+    const show = SHOW_NAME_CATS.includes(cat2Val);
+    nameWrap.style.display = show ? '' : 'none';
+    const inp = nameWrap.querySelector('input');
+    if (inp) inp.required = show;
+  }
+}
+
+// 第一层 虚拟物品/实物 選項
+const CAT1_OPTIONS = [
+  { value: 'virtual', label: '虚拟物品' },
+  { value: 'real',    label: '实物' },
+];
+
+// 第二层：依第一层決定
+const CAT2_MAP = {
+  virtual: [
+    { value: 'bonus',        label: '彩金' },
+    { value: 'points',       label: '积分' },
+    { value: 'coupon',       label: '优惠券' },
+    { value: 'freespin',     label: '免费旋转券' },
+    { value: 'freebet',      label: '免费投注券' },
+    { value: 'tool',         label: '道具卡' },
+  ],
+  real: [
+    { value: 'real', label: '实物商品' },
+  ],
+};
+
+function tierFieldsHtml(tierId, isLast) {
+  return `
+    <div class="tier-body" id="tbody-${tierId}">
+      <div style="display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;">
+        <div class="tier-field" style="min-width:130px;">
+          <label><span class='req'>*</span>第一层</label>
+          <select onchange="onCat1Change(this,'${tierId}')" required>
+            ${CAT1_OPTIONS.map(o=>`<option value="${o.value}">${o.label}</option>`).join('')}
+          </select>
+        </div>
+        <div class="tier-field" style="min-width:130px;" id="cat2-wrap-${tierId}">
+          <label><span class='req'>*</span>第二层</label>
+          <select onchange="onCat2Change(this,'${tierId}')" required>
+            ${(CAT2_MAP['virtual']||[]).map(o=>`<option value="${o.value}">${o.label}</option>`).join('')}
+          </select>
+        </div>
+        <div id="dynamic-fields-${tierId}" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;"></div>
+        <div class="tier-field" id="prize-name-wrap-${tierId}" style="min-width:130px;display:none;">
+          <label><span class='req'>*</span>奖品名称</label>
+          <input type="text" placeholder="请输入奖品名称">
+        </div>
+      </div>
+      <div class="tier-upload" style="margin-top:10px;">
+        <label><span class="req">*</span>奖品图片</label>
+        <button class="upload-btn-sm">📁 选择文件</button>
+      </div>
+      <div id="freespin-extra-${tierId}" style="margin-top:12px;display:none;">
+        <div style="font-size:12px;color:#1677ff;font-weight:600;margin-bottom:8px;">旋转券配置</div>
+        <div id="freespin-list-extra-${tierId}" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;"></div>
+        <button type="button" class="btn-add-tier" style="height:30px;font-size:12px;" onclick="addFreespinRow('extra-${tierId}')">＋ 新增旋转券</button>
+      </div>
+    </div>
+  `;
+}
+
+function onCat1Change(sel, tierId) {
+  const cat1Val = sel.value;
+  const cat2Wrap = document.getElementById('cat2-wrap-' + tierId);
+  const opts = CAT2_MAP[cat1Val] || [];
+  if (cat1Val === 'real') {
+    // 实物：隱藏第二层，直接顯示商品简介
+    cat2Wrap.style.display = 'none';
+    renderDynamicFields('dynamic-fields-' + tierId, 'real');
+  } else {
+    cat2Wrap.style.display = '';
+    cat2Wrap.querySelector('select').innerHTML = opts.map(o=>`<option value="${o.value}">${o.label}</option>`).join('');
+    const firstVal = opts[0] ? opts[0].value : '';
+    renderDynamicFields('dynamic-fields-' + tierId, firstVal);
+  }
+}
+
+function onCat2Change(sel, tierId) {
+  // 隱藏旋轉券區塊（切換到其他類型時）
+  const extra = document.getElementById('freespin-extra-' + tierId);
+  if (extra) extra.style.display = 'none';
+  renderDynamicFields('dynamic-fields-' + tierId, sel.value);
+}
+
+function renderTiers() {
+  const list = document.getElementById('tierList');
+  list.innerHTML = tiers.map((t, idx) => `
+    <div class="prize-tier" id="tier-${t.id}">
+      <div class="tier-header">
+        <div style="display:flex;align-items:center;gap:8px;flex:1;">
+          <span class="req">*</span><input class="tier-name-input" type="text" value="${t.name}"
+            onchange="tiers[${idx}].name = this.value"
+            placeholder="奖级名称" style="max-width:120px;" required>
+          <div style="display:flex;align-items:center;gap:5px;background:#f5f7fa;border:1px solid #e4e7ed;border-radius:4px;padding:0 10px;height:28px;">
+            <span style="font-size:12px;color:#666;white-space:nowrap;">数量</span>
+            <input class="tier-qty-input" type="number" min="1" value="${t.qty||1}"
+              oninput="tiers[${idx}].qty = parseInt(this.value)||0; updateTotal();"
+              placeholder="0" style="width:56px;border:none;background:transparent;text-align:center;font-size:13px;font-weight:600;color:#333;outline:none;" required>
+            <span style="font-size:12px;color:#999;">张</span>
+          </div>
+        </div>
+        ${tiers.length > 1 ? `<button class="btn-danger-text" onclick="removeTier(${t.id})">✕ 删除</button>` : ''}
+      </div>
+      ${tierFieldsHtml(t.id, false)}
+    </div>
+  `).join('');
+
+  // init dynamic fields for each tier
+  tiers.forEach(t => {
+    renderDynamicFields('dynamic-fields-' + t.id, 'bonus');
+  });
+
+  updateTotal();
+  updateTierInfo();
+}
+
+function updateTotal() {
+  const sum = tiers.reduce((acc, t) => acc + (parseInt(t.qty) || 0), 0) + 1; // +1 for Last赏
+  document.getElementById('totalCount').textContent = sum;
+}
+
+function updateTierInfo() {
+  const remaining = 8 - tiers.length;
+  document.getElementById('tierCountInfo').textContent =
+    `目前 ${tiers.length} 个奖级（最多 H赏，共 8 级，还可新增 ${remaining} 个）`;
+}
+
+let freespinRowId = 0;
+
+function addFreespinRow(containerId) {
+  const list = document.getElementById('freespin-list-' + containerId);
+  if (!list) return;
+  const rowId = 'fs-' + containerId + '-' + (freespinRowId++);
+  const div = document.createElement('div');
+  div.className = 'freespin-row';
+  div.id = rowId;
+  div.innerHTML = `
+    <span style="font-size:12px;color:#999;white-space:nowrap;">旋转券 ${list.children.length + 1}</span>
+    <select required>
+      <option value="" disabled selected>选择免费旋转游戏</option>
+      <option>J Mania Triple Jam</option>
+      <option>FC Freespins</option>
+      <option>Slot Game A</option>
+      <option>Slot Game B</option>
+    </select>
+    <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
+      <span style="font-size:12px;color:#666;white-space:nowrap;"><span style="color:#ff4d4f;">*</span> 张数</span>
+      <input type="number" min="1" placeholder="0" required
+        style="width:60px;height:30px;border:1px solid #d9d9d9;border-radius:4px;padding:0 8px;font-size:13px;text-align:center;">
+      <span style="font-size:12px;color:#999;">张</span>
+    </div>
+
+    <button type="button" class="btn-danger-text" onclick="removeFreespinRow('${rowId}', '${containerId}')">✕ 删除</button>
+  `;
+  list.appendChild(div);
+  updateFreespinNumbers(containerId);
+}
+
+function removeFreespinRow(rowId, containerId) {
+  const el = document.getElementById(rowId);
+  if (el) el.remove();
+  updateFreespinNumbers(containerId);
+}
+
+function updateFreespinNumbers(containerId) {
+  const list = document.getElementById('freespin-list-' + containerId);
+  if (!list) return;
+  Array.from(list.children).forEach((row, i) => {
+    const label = row.querySelector('span');
+    if (label) label.textContent = '旋转券 ' + (i + 1);
+  });
+}
+
+function triggerFsUpload(rowId) {
+  const input = document.getElementById('file-' + rowId);
+  if (input) input.click();
+}
+
+function previewFsImage(input, rowId) {
+  const file = input.files[0];
+  if (!file) return;
+  const prev = document.getElementById('prev-' + rowId);
+  const fname = document.getElementById('fname-' + rowId);
+  if (prev) { prev.src = URL.createObjectURL(file); prev.style.display = 'block'; }
+  if (fname) fname.textContent = file.name;
+}
+
+function toggleFlashSale(el) {
+  document.getElementById('flashSaleRange').style.display =
+    el.value === 'yes' ? 'block' : 'none';
+}
+
+function previewBanner(input, previewId, placeholderId) {
+  const file = input.files[0];
+  if (!file) return;
+  const prev = document.getElementById(previewId);
+  const ph = document.getElementById(placeholderId);
+  prev.src = URL.createObjectURL(file);
+  prev.style.display = 'block';
+  ph.style.display = 'none';
+}
+
+function clearBanner(inputId, previewId, placeholderId) {
+  const input = document.getElementById(inputId);
+  const prev = document.getElementById(previewId);
+  const ph = document.getElementById(placeholderId);
+  input.value = '';
+  prev.src = '';
+  prev.style.display = 'none';
+  ph.style.display = 'flex';
+}
+
+// Init with A賞
+addTier();
+// Init Last赏 dynamic fields
+renderDynamicFields('dynamic-fields-last', 'bonus');
+
+function submitForm() {
+  // 收集所有必填欄位
+  const modal = document.querySelector('.modal-body');
+  const inputs = modal.querySelectorAll('input[required], select[required]');
+  let firstEmpty = null;
+  let allValid = true;
+
+  inputs.forEach(el => {
+    const isEmpty = el.disabled ? false : (el.value === '' || el.value === null);
+    if (isEmpty) {
+      el.style.borderColor = '#ff4d4f';
+      el.style.boxShadow = '0 0 0 2px rgba(255,77,79,0.1)';
+      if (!firstEmpty) firstEmpty = el;
+      allValid = false;
+    } else {
+      el.style.borderColor = '';
+      el.style.boxShadow = '';
+    }
+  });
+
+  if (!allValid) {
+    firstEmpty && firstEmpty.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    firstEmpty && firstEmpty.focus();
+    return;
+  }
+  alert('✅ 验证通过，提交成功！');
+}
+
+</script>
+</body>
+</html>

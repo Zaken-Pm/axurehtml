@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ichiban Kuji 抽奖记录</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: 14px;
+  background: #f0f2f5;
+  color: #333;
+}
+
+.page { padding: 24px; }
+
+/* ── BREADCRUMB ── */
+.breadcrumb {
+  font-size: 13px; color: #999; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 6px;
+}
+.breadcrumb span { color: #333; }
+
+/* ── TABS ── */
+.tab-bar {
+  display: flex; border-bottom: 2px solid #f0f0f0;
+  margin-bottom: 16px; gap: 0;
+}
+.tab-item {
+  padding: 10px 20px; font-size: 14px; color: #666;
+  cursor: pointer; border-bottom: 2px solid transparent;
+  margin-bottom: -2px; transition: color 0.2s;
+  white-space: nowrap;
+}
+.tab-item:hover { color: #1677ff; }
+.tab-item.active { color: #1677ff; border-bottom-color: #1677ff; font-weight: 600; }
+
+/* ── FILTER BAR ── */
+.filter-bar {
+  background: #fff; border-radius: 4px;
+  padding: 14px 20px; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.filter-bar input[type="text"],
+.filter-bar select {
+  height: 32px; border: 1px solid #d9d9d9; border-radius: 4px;
+  padding: 0 10px; font-size: 13px; color: #333; outline: none; background: #fff;
+}
+.filter-bar input[type="text"] { width: 160px; }
+.filter-bar select { width: 130px; cursor: pointer; }
+.filter-bar input:focus, .filter-bar select:focus { border-color: #1677ff; }
+
+.date-range-wrap {
+  display: flex; align-items: center; gap: 6px;
+  border: 1px solid #d9d9d9; border-radius: 4px;
+  padding: 0 10px; height: 32px; background: #fff;
+}
+.date-range-wrap input[type="datetime-local"] {
+  border: none; outline: none; font-size: 13px; background: transparent;
+  width: 220px; height: 28px; padding: 0;
+}
+.date-range-wrap input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  display: none;
+}
+.date-sep { color: #bbb; font-size: 13px; }
+.date-icon { color: #bbb; font-size: 14px; }
+
+.btn {
+  padding: 6px 16px; border-radius: 4px; font-size: 13px;
+  cursor: pointer; border: 1px solid transparent; height: 32px;
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+}
+.btn-primary { background: #1677ff; color: #fff; border-color: #1677ff; }
+.btn-primary:hover { background: #0958d9; }
+.btn-warning { background: #fa8c16; color: #fff; border-color: #fa8c16; }
+.btn-warning:hover { background: #d46b08; }
+
+/* ── EXPORT ROW ── */
+.action-row {
+  display: flex; justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+/* ── TABLE ── */
+.table-wrap {
+  background: #fff; border-radius: 4px; overflow: hidden;
+}
+table { width: 100%; min-width: 900px; border-collapse: collapse; }
+thead tr { background: #fafafa; }
+th {
+  padding: 12px 16px; font-size: 13px; font-weight: 600;
+  color: #555; text-align: left; border-bottom: 1px solid #f0f0f0;
+  white-space: nowrap;
+}
+td {
+  padding: 13px 16px; font-size: 13px; color: #333;
+  border-bottom: 1px solid #f8f8f8; vertical-align: middle;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #fafcff; }
+
+/* ── TICKET QTY BADGE ── */
+.qty-badge {
+  display: inline-flex; align-items: center;
+  padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;
+}
+.qty-1  { background: #f5f5f5; color: #666; border: 1px solid #e8e8e8; }
+.qty-5  { background: #e6f4ff; color: #1677ff; border: 1px solid #91caff; }
+.qty-all { background: #fff7e6; color: #fa8c16; border: 1px solid #ffd591; }
+
+/* ── PRIZE TIER TAG ── */
+.tier-tag {
+  display: inline-flex; align-items: center;
+  padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: 600;
+  background: #e6f4ff; color: #1677ff; border: 1px solid #91caff;
+}
+.tier-tag.last { background: #fff7e6; color: #fa8c16; border-color: #ffd591; }
+
+/* ── PRIZE DETAIL ── */
+.prize-detail { line-height: 1.6; }
+.prize-name   { font-weight: 500; color: #1a1a1a; }
+.prize-sub    { font-size: 12px; color: #999; margin-top: 2px; }
+
+/* ── POINTS ── */
+.points-val { font-weight: 600; color: #1a1a1a; }
+
+/* ── ORDER NO ── */
+.order-no { font-size: 12px; color: #666; font-family: monospace; }
+
+/* ── PAGINATION ── */
+.pagination {
+  display: flex; align-items: center; justify-content: flex-end;
+  padding: 14px 20px; gap: 4px; border-top: 1px solid #f0f0f0;
+}
+.page-total { font-size: 13px; color: #999; margin-right: 8px; }
+.page-btn {
+  min-width: 32px; height: 32px; border: 1px solid #d9d9d9;
+  background: #fff; border-radius: 4px; font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; padding: 0 8px;
+}
+.page-btn:hover { border-color: #1677ff; color: #1677ff; }
+.page-btn.active { background: #1677ff; border-color: #1677ff; color: #fff; }
+.page-btn.ellipsis { border: none; cursor: default; color: #999; }
+.page-btn.ellipsis:hover { color: #999; border: none; }
+.btn-success { background: #52c41a; color: #fff; border-color: #52c41a; }
+.btn-success:hover { background: #389e0d; }
+.link-btn { color: #1677ff; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<script>
+/* ── 共享工具函数 Shared Utilities ── */
+
+/**
+ * formatPrizeLabel(tier, prizeType, prize)
+ * 输出格式：{TIER大写} {类型}{金额.00} 或 {TIER大写} {类型}×{数量}
+ * 例：B赏 彩金500.00 / LAST赏 彩金5000.00 / E赏 旋转券×20
+ */
+function formatPrizeLabel(tier, prizeType, prize) {
+  let val;
+  if (prizeType === '彩金' || prizeType === '积分') {
+    const m = prize.match(/[\d,]+(?:\.\d+)?/);
+    const num = m ? parseFloat(m[0].replace(/,/g, '')) : 0;
+    val = prizeType + (prizeType === '彩金' ? num.toFixed(2) : num);
+  } else {
+    const m = prize.match(/×\s*(\d+)/);
+    val = prizeType + (m ? '×' + m[1] : '');
+  }
+  return tier.toUpperCase() + ' ' + val;
+}
+
+/**
+ * renderPrizes(prizes)
+ * 同 prizeLabel 的多個獎品合併輸出，重複品項自動加 ×N
+ * 例：[C赏 积分500.00, C赏 积分500.00, E赏 旋转券×20] → "C赏 积分500.00 ×2，E赏 旋转券×20"
+ */
+function renderPrizes(prizes) {
+  const sorted = [...prizes].sort((a, b) => {
+    const au = a.tier.toUpperCase();
+    const bu = b.tier.toUpperCase();
+    if (au.startsWith('LAST')) return -1;
+    if (bu.startsWith('LAST')) return 1;
+    const la = au.replace('赏', '');
+    const lb = bu.replace('赏', '');
+    return la < lb ? -1 : la > lb ? 1 : 0;
+  });
+  const labels = sorted.map(p => formatPrizeLabel(p.tier, p.prizeType, p.prize));
+  const counts = {};
+  labels.forEach(l => { counts[l] = (counts[l] || 0) + 1; });
+  const seen = new Set();
+  const result = [];
+  labels.forEach(l => {
+    if (!seen.has(l)) {
+      seen.add(l);
+      result.push(counts[l] > 1 ? l + ' ×' + counts[l] : l);
+    }
+  });
+  return result.join('，');
+}
+
+function buildPageNums(cur, total) {
+  if (total <= 7) return Array.from({length: total}, (_, i) => i + 1);
+  const pages = [];
+  if (cur <= 4) {
+    for (let i = 1; i <= 5; i++) pages.push(i);
+    pages.push('...'); pages.push(total);
+  } else if (cur >= total - 3) {
+    pages.push(1); pages.push('...');
+    for (let i = total - 4; i <= total; i++) pages.push(i);
+  } else {
+    pages.push(1); pages.push('...');
+    for (let i = cur - 1; i <= cur + 1; i++) pages.push(i);
+    pages.push('...'); pages.push(total);
+  }
+  return pages;
+}
+</script>
+
+<!-- ============================================================
+     PAGE 1：积分商城 > 用户积分纪录
+     路由：/points-mall/user-points-records
+     ============================================================ -->
+<div style="padding:8px 24px 4px;">
+  <span style="font-size:11px;color:#aaa;font-family:monospace;">PAGE 1 &nbsp;/points-mall/user-points-records</span>
+</div>
+
+<div class="page">
+
+  <!-- 面包屑 -->
+  <div class="breadcrumb">
+    位置 › <span>用户积分纪录</span>
+  </div>
+
+  <!-- 筛选栏 -->
+  <div class="filter-bar" style="justify-content:space-between;">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <select id="p2FilterProduct">
+        <option value="">积分兑换商品</option>
+        <option>苹果 Ichiban Kuji</option>
+        <option>节日特别版 Ichiban Kuji</option>
+        <option>高价值VIP专属赏</option>
+        <option>入门款 Ichiban Kuji</option>
+        <option>盲盒美术图测试2</option>
+      </select>
+
+      <input type="text" id="p2FilterMember" placeholder="会员名">
+
+      <div class="date-range-wrap">
+        <span class="date-icon">🕐</span>
+        <input type="datetime-local" id="p2DateStart" value="2026-06-15T00:00:00" step="1">
+        <span class="date-sep">～</span>
+        <input type="datetime-local" id="p2DateEnd" value="2026-06-16T23:59:59" step="1">
+      </div>
+
+      <button class="btn btn-primary" onclick="p2RenderTable()">
+        <svg viewBox="0 0 1024 1024" width="13" height="13" fill="currentColor"><path d="M909.6 854.5L649.9 594.8C690.2 542.7 712 479 712 412c0-80.2-31.3-155.4-87.9-212.1-56.6-56.7-132-87.9-212.1-87.9s-155.5 31.3-212.1 87.9C143.2 256.5 112 331.8 112 412c0 80.1 31.3 155.5 87.9 212.1C256.5 680.8 331.8 712 412 712c67 0 130.6-21.8 182.7-62l259.7 259.6a8.2 8.2 0 0011.6 0l43.6-43.5a8.2 8.2 0 000-11.6zM570.4 570.4C528 612.7 471.8 636 412 636s-116-23.3-158.4-65.6C211.3 528 188 471.8 188 412s23.3-116.1 65.6-158.4C296 211.3 352.2 188 412 188s116.1 23.3 158.4 65.6S636 352.2 636 412s-23.3 116.1-65.6 158.4z"/></svg>
+        搜索
+      </button>
+    </div>
+
+    <button class="btn btn-warning">导出</button>
+  </div>
+
+  <!-- 表格 -->
+  <div class="table-wrap">
+    <div style="overflow-x:auto;"><table>
+      <thead>
+        <tr>
+          <th>会员名</th>
+          <th>创建时间</th>
+          <th>积分</th>
+          <th>当前总积分</th>
+          <th>操作人</th>
+          <th>原因</th>
+          <th>备注</th>
+        </tr>
+      </thead>
+      <tbody id="p2TableBody"></tbody>
+    </table></div>
+    <div class="pagination" id="p2Pagination"></div>
+  </div>
+
+</div>
+
+<!-- ============================================================
+     PAGE 2：Ichiban Kuji 抽奖记录
+     路由：/ichiban-kuji/records
+     ============================================================ -->
+<div style="margin-top:16px; border-top:3px dashed #d0d0d0; padding-top:8px; margin-bottom:4px; padding-left:24px;">
+  <span style="font-size:11px;color:#aaa;font-family:monospace;">PAGE 2 &nbsp;/ichiban-kuji/records</span>
+</div>
+
+<div class="page">
+
+  <!-- 面包屑 -->
+  <div class="breadcrumb">
+    位置 › <span>商品兑换记录</span>
+  </div>
+
+  <!-- 标签页 -->
+  <div class="tab-bar">
+    <div class="tab-item">商品兑换记录</div>
+    <div class="tab-item">盲盒抽奖记录</div>
+    <div class="tab-item active">Ichiban Kuji 抽奖记录</div>
+  </div>
+
+  <!-- 筛选栏 -->
+  <div class="filter-bar">
+    <select id="filterCoin">
+      <option value="">选择币别</option>
+      <option value="PHP">菲律宾比索</option>
+    </select>
+
+    <input type="text" id="filterMember" placeholder="会员名">
+
+    <div class="date-range-wrap">
+      <span class="date-icon">🕐</span>
+      <input type="datetime-local" id="dateStart" value="2026-06-09T00:00:00" step="1">
+      <span class="date-sep">～</span>
+      <input type="datetime-local" id="dateEnd" value="2026-06-16T23:59:59" step="1">
+    </div>
+
+    <select id="filterProduct">
+      <option value="">全部商品</option>
+      <option>苹果 Ichiban Kuji</option>
+      <option>节日特别版 Ichiban Kuji</option>
+      <option>高价值VIP专属赏</option>
+      <option>入门款 Ichiban Kuji</option>
+    </select>
+
+    <select id="filterPrizeType">
+      <option value="">全部奖品</option>
+      <option value="彩金">彩金</option>
+      <option value="积分">积分</option>
+      <option value="旋转券">旋转券</option>
+      <option value="免费旋转券">免费旋转券</option>
+      <option value="免费投注券">免费投注券</option>
+      <option value="道具卡">道具卡</option>
+    </select>
+
+    <button class="btn btn-primary" onclick="renderTable()">
+      <svg viewBox="0 0 1024 1024" width="13" height="13" fill="currentColor"><path d="M909.6 854.5L649.9 594.8C690.2 542.7 712 479 712 412c0-80.2-31.3-155.4-87.9-212.1-56.6-56.7-132-87.9-212.1-87.9s-155.5 31.3-212.1 87.9C143.2 256.5 112 331.8 112 412c0 80.1 31.3 155.5 87.9 212.1C256.5 680.8 331.8 712 412 712c67 0 130.6-21.8 182.7-62l259.7 259.6a8.2 8.2 0 0011.6 0l43.6-43.5a8.2 8.2 0 000-11.6zM570.4 570.4C528 612.7 471.8 636 412 636s-116-23.3-158.4-65.6C211.3 528 188 471.8 188 412s23.3-116.1 65.6-158.4C296 211.3 352.2 188 412 188s116.1 23.3 158.4 65.6S636 352.2 636 412s-23.3 116.1-65.6 158.4z"/></svg>
+      搜索
+    </button>
+  </div>
+
+  <!-- 导出 -->
+  <div class="action-row">
+    <button class="btn btn-warning">导出</button>
+  </div>
+
+  <!-- 表格 -->
+  <div class="table-wrap">
+    <div style="overflow-x:auto;"><table>
+      <thead>
+        <tr>
+          <th>订单号</th>
+          <th>会员名</th>
+          <th>创建时间</th>
+          <th>币种</th>
+          <th>商品名称</th>
+          <th>券数</th>
+          <th>购买积分</th>
+          <th>奖品</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table></div>
+    <div class="pagination" id="pagination"></div>
+  </div>
+
+</div>
+
+<!-- PAGE 1 script：用户积分纪录 -->
+<script>
+/*
+  备注栏显示规则：
+  - 原因列：商品名称（如"苹果 Ichiban Kuji"）
+  - 备注列：奖品列表，格式 {TIER大写} {类型}{值}，多个用逗号分隔
+    彩金/积分  → B赏 彩金500.00
+    数量类     → E赏 旋转券×20
+*/
+const P2_RECORDS = [
+  {
+    member: 'xnjobe3', time: '2026-06-16 09:53', points: -366, total: 481150,
+    operator: 'SYSTEM',
+    reason: '苹果 Ichiban Kuji',
+    prizes: [
+      { tier: 'A赏', prizeType: '免费旋转券', prize: '免费旋转券 × 20' },
+      { tier: 'C赏', prizeType: '道具卡',     prize: '道具卡 × 3'       },
+      { tier: 'E赏', prizeType: '旋转券',     prize: '旋转券 × 10'      },
+    ]
+  },
+  {
+    member: 'vivian01', time: '2026-06-15 17:22', points: -500, total: 316140,
+    operator: 'SYSTEM',
+    reason: '节日特别版 Ichiban Kuji',
+    prizes: [
+      { tier: 'B赏',    prizeType: '彩金',       prize: '彩金 50（1x Turnover）' },
+      { tier: 'C赏',    prizeType: '积分',       prize: '积分 50'                },
+      { tier: 'D赏',    prizeType: '积分',       prize: '积分 20'                },
+      { tier: 'E赏',    prizeType: '免费旋转券', prize: '免费旋转券 × 10'         },
+      { tier: 'Last赏', prizeType: '道具卡',     prize: '道具卡 × 3'              },
+    ]
+  },
+  {
+    member: 'vivian01', time: '2026-06-15 17:21', points: -1, total: 316640,
+    operator: 'SYSTEM',
+    reason: '盲盒美术图测试2',
+    prizes: [
+      { tier: 'C赏', prizeType: '积分', prize: '积分 50' },
+    ]
+  },
+];
+
+let p2Filtered = [...P2_RECORDS];
+let p2Page = 1;
+const P2_PAGE_SIZE = 10;
+
+function p2RenderTable() {
+  const member = document.getElementById('p2FilterMember').value.trim().toLowerCase();
+  p2Filtered = P2_RECORDS.filter(r => {
+    if (member && !r.member.toLowerCase().includes(member)) return false;
+    return true;
+  });
+  p2Page = 1;
+  p2RenderPage();
+}
+
+function p2RenderPage() {
+  const start = (p2Page - 1) * P2_PAGE_SIZE;
+  const rows  = p2Filtered.slice(start, start + P2_PAGE_SIZE);
+  document.getElementById('p2TableBody').innerHTML = rows.map(r => `
+    <tr>
+      <td>${r.member}</td>
+      <td>${r.time}</td>
+      <td>${r.points > 0 ? '+' : ''}${r.points}</td>
+      <td>${r.total}</td>
+      <td>${r.operator}</td>
+      <td>${r.reason}</td>
+      <td>${renderPrizes(r.prizes)}</td>
+    </tr>
+  `).join('');
+  p2RenderPagination();
+}
+
+function p2RenderPagination() {
+  const total      = p2Filtered.length;
+  const totalPages = Math.ceil(total / P2_PAGE_SIZE);
+  const pg         = document.getElementById('p2Pagination');
+  let html = `<span class="page-total">Total ${total}</span>`;
+  html += `<div class="page-btn" onclick="p2GoPage(${p2Page-1})">‹</div>`;
+  buildPageNums(p2Page, totalPages).forEach(p => {
+    if (p === '...') html += `<div class="page-btn ellipsis">···</div>`;
+    else html += `<div class="page-btn${p === p2Page ? ' active' : ''}" onclick="p2GoPage(${p})">${p}</div>`;
+  });
+  html += `<div class="page-btn" onclick="p2GoPage(${p2Page+1})">›</div>`;
+  pg.innerHTML = html;
+}
+
+function p2GoPage(p) {
+  const totalPages = Math.ceil(p2Filtered.length / P2_PAGE_SIZE);
+  if (p < 1 || p > totalPages) return;
+  p2Page = p;
+  p2RenderPage();
+}
+
+p2RenderTable();
+</script>
+
+<!-- PAGE 2 script：Ichiban Kuji 抽奖记录 -->
+<script>
+/*
+  奖品列显示规则：prizes 数组 → renderPrizes()
+  单张/五连：prizes 1 项
+  全包：prizes 多项，重复品项自动合并 ×N
+*/
+const RECORDS = [
+  { order:'PR605996359563974932', member:'okbet9994fg5vz', time:'2026-06-12 16:45', coin:'PHP', product:'苹果 Ichiban Kuji',       qty:'all', points:80, prizes:[
+    { tier:'A赏',    prizeType:'彩金',       prize:'彩金 Cash 100（1x Turnover）' },
+    { tier:'B赏',    prizeType:'免费旋转券', prize:'免费旋转券 × 10'               },
+    { tier:'C赏',    prizeType:'积分',       prize:'积分 50'                       },
+    { tier:'C赏',    prizeType:'积分',       prize:'积分 50'                       },
+    { tier:'D赏',    prizeType:'道具卡',     prize:'道具卡 × 2'                     },
+    { tier:'Last赏', prizeType:'彩金',       prize:'彩金 Cash 100（1x Turnover）' },
+  ]},
+  { order:'PR605840546270849300', member:'okbet04597i9j3', time:'2026-06-11 20:05', coin:'PHP', product:'苹果 Ichiban Kuji',       qty:'5',   points:25,   prizes:[
+    { tier:'A赏', prizeType:'彩金', prize:'彩金 Cash 100（1x Turnover）' },
+  ]},
+  { order:'PR605830768509364500', member:'vivian01',       time:'2026-06-11 18:27', coin:'PHP', product:'节日特别版 Ichiban Kuji', qty:'1',   points:50, prizes:[
+    { tier:'B赏', prizeType:'彩金', prize:'彩金 50（1x Turnover）' },
+  ]},
+  { order:'PR605830753728637204', member:'vivian01',       time:'2026-06-11 18:27', coin:'PHP', product:'节日特别版 Ichiban Kuji', qty:'1',   points:50, prizes:[
+    { tier:'C赏', prizeType:'积分', prize:'积分 50' },
+  ]},
+  { order:'PR605830739937765652', member:'vivian01',       time:'2026-06-11 18:27', coin:'PHP', product:'节日特别版 Ichiban Kuji', qty:'1',   points:50, prizes:[
+    { tier:'D赏', prizeType:'积分', prize:'积分 20' },
+  ]},
+  { order:'PR605828198642526484', member:'vivian01',       time:'2026-06-11 18:02', coin:'PHP', product:'高价值VIP专属赏',         qty:'5',   points:500, prizes:[
+    { tier:'A赏', prizeType:'彩金', prize:'彩金 ₱80（2x Turnover）' },
+  ]},
+  { order:'PR605828183543032084', member:'vivian01',       time:'2026-06-11 18:02', coin:'PHP', product:'高价值VIP专属赏',         qty:'5',   points:500, prizes:[
+    { tier:'E赏', prizeType:'旋转券', prize:'旋转券 × 20' },
+  ]},
+  { order:'PR605820423443097876', member:'vivian01',       time:'2026-06-11 16:45', coin:'PHP', product:'苹果 Ichiban Kuji',       qty:'1',   points:5,   prizes:[
+    { tier:'B赏', prizeType:'免费旋转券', prize:'免费旋转券 × 10' },
+  ]},
+  { order:'PR605817703537617172', member:'vivian01',       time:'2026-06-11 16:18', coin:'PHP', product:'苹果 Ichiban Kuji',       qty:'1',   points:5,   prizes:[
+    { tier:'C赏', prizeType:'免费投注券', prize:'免费投注券 × 5' },
+  ]},
+  { order:'PR605817154788436244', member:'vivian01',       time:'2026-06-11 16:12', coin:'PHP', product:'节日特别版 Ichiban Kuji', qty:'all', points:500, prizes:[
+    { tier:'B赏',    prizeType:'彩金',       prize:'彩金 50（1x Turnover）' },
+    { tier:'C赏',    prizeType:'积分',       prize:'积分 50'                 },
+    { tier:'D赏',    prizeType:'积分',       prize:'积分 20'                 },
+    { tier:'E赏',    prizeType:'免费旋转券', prize:'免费旋转券 × 10'          },
+    { tier:'Last赏', prizeType:'道具卡',     prize:'道具卡 × 3'               },
+  ]},
+  { order:'PR605800234891723001', member:'player_tom88',   time:'2026-06-11 14:30', coin:'PHP', product:'高价值VIP专属赏',         qty:'5',   points:500, prizes:[
+    { tier:'A赏', prizeType:'彩金', prize:'彩金 50（2x Turnover）' },
+  ]},
+  { order:'PR605799812345678900', member:'player_tom88',   time:'2026-06-11 14:28', coin:'PHP', product:'高价值VIP专属赏',         qty:'5',   points:500, prizes:[
+    { tier:'F赏', prizeType:'旋转券', prize:'旋转券 × 10' },
+  ]},
+  { order:'PR605780001122334455', member:'alice_vip3',     time:'2026-06-11 10:05', coin:'PHP', product:'入门款 Ichiban Kuji',     qty:'1',   points:10,  prizes:[
+    { tier:'D赏', prizeType:'积分', prize:'积分 20' },
+  ]},
+  { order:'PR605770099887766554', member:'alice_vip3',     time:'2026-06-10 22:40', coin:'PHP', product:'入门款 Ichiban Kuji',     qty:'all', points:80,  prizes:[
+    { tier:'A赏',    prizeType:'积分',       prize:'积分 20'           },
+    { tier:'B赏',    prizeType:'道具卡',     prize:'道具卡 × 1'          },
+    { tier:'C赏',    prizeType:'积分',       prize:'积分 100'            },
+    { tier:'C赏',    prizeType:'积分',       prize:'积分 100'            },
+    { tier:'Last赏', prizeType:'免费旋转券', prize:'免费旋转券 × 20'     },
+  ]},
+  { order:'PR605760123456789012', member:'jay_pm',         time:'2026-06-10 18:15', coin:'PHP', product:'苹果 Ichiban Kuji',       qty:'5',   points:25, prizes:[
+    { tier:'G赏', prizeType:'道具卡', prize:'道具卡 × 2' },
+  ]},
+  { order:'PR605750987654321098', member:'jay_pm',         time:'2026-06-10 15:00', coin:'PHP', product:'苹果 Ichiban Kuji',       qty:'1',   points:5, prizes:[
+    { tier:'A赏', prizeType:'彩金', prize:'彩金 ₱30（3x）' },
+  ]},
+  { order:'PR605740112233445566', member:'user_beta01',    time:'2026-06-10 11:22', coin:'PHP', product:'节日特别版 Ichiban Kuji', qty:'1',   points:50, prizes:[
+    { tier:'B赏', prizeType:'免费投注券', prize:'免费投注券 × 8' },
+  ]},
+  { order:'PR605730223344556677', member:'user_beta01',    time:'2026-06-09 20:10', coin:'PHP', product:'节日特别版 Ichiban Kuji', qty:'5',   points:250, prizes:[
+    { tier:'E赏', prizeType:'免费旋转券', prize:'免费旋转券 × 30' },
+  ]},
+  { order:'PR605720334455667788', member:'olivia_admin',   time:'2026-06-09 14:33', coin:'PHP', product:'高价值VIP专属赏',         qty:'1',   points:100, prizes:[
+    { tier:'C赏', prizeType:'道具卡', prize:'道具卡 × 5' },
+  ]},
+  { order:'PR605710445566778899', member:'olivia_admin',   time:'2026-06-08 09:00', coin:'PHP', product:'高价值VIP专属赏',         qty:'all', points:800, prizes:[
+    { tier:'A赏',    prizeType:'彩金',   prize:'彩金 ₱80（2x Turnover）'   },
+    { tier:'B赏',    prizeType:'旋转券', prize:'旋转券 × 20'                  },
+    { tier:'C赏',    prizeType:'道具卡', prize:'道具卡 × 5'                   },
+    { tier:'D赏',    prizeType:'积分',   prize:'积分 99'                     },
+    { tier:'Last赏', prizeType:'彩金',   prize:'彩金 ₱99（3x Turnover）'  },
+  ]},
+];
+
+const PAGE_SIZE = 10;
+let currentPage = 1;
+let filteredData = [...RECORDS];
+
+function qtyBadge(qty) {
+  if (qty === '1')   return '单张';
+  if (qty === '5')   return '五连';
+  if (qty === 'all') return '全包';
+  return qty;
+}
+
+function renderTable() {
+  const coin      = document.getElementById('filterCoin').value;
+  const member    = document.getElementById('filterMember').value.trim().toLowerCase();
+  const product   = document.getElementById('filterProduct').value;
+  const prizeType = document.getElementById('filterPrizeType').value;
+
+  filteredData = RECORDS.filter(r => {
+    if (coin      && r.coin !== coin)                           return false;
+    if (member    && !r.member.toLowerCase().includes(member)) return false;
+    if (product   && r.product !== product)                    return false;
+    if (prizeType && !r.prizes.some(p => p.prizeType === prizeType)) return false;
+    return true;
+  });
+
+  currentPage = 1;
+  renderPage();
+}
+
+function renderPage() {
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const rows  = filteredData.slice(start, start + PAGE_SIZE);
+  const tbody = document.getElementById('tableBody');
+
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td class="order-no">${r.order}</td>
+      <td>${r.member}</td>
+      <td>${r.time}</td>
+      <td>菲律宾比索</td>
+      <td>${r.product}</td>
+      <td>${qtyBadge(r.qty)}</td>
+      <td><span class="points-val">${r.points}</span></td>
+      <td>${renderPrizes(r.prizes)}</td>
+    </tr>
+  `).join('');
+
+  renderPagination();
+}
+
+function renderPagination() {
+  const total      = filteredData.length;
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const pg         = document.getElementById('pagination');
+
+  let html = `<span class="page-total">Total ${total}</span>`;
+  html += `<div class="page-btn" onclick="goPage(${currentPage-1})">‹</div>`;
+
+  buildPageNums(currentPage, totalPages).forEach(p => {
+    if (p === '...') {
+      html += `<div class="page-btn ellipsis">···</div>`;
+    } else {
+      html += `<div class="page-btn${p === currentPage ? ' active' : ''}" onclick="goPage(${p})">${p}</div>`;
+    }
+  });
+
+  html += `<div class="page-btn" onclick="goPage(${currentPage+1})">›</div>`;
+  pg.innerHTML = html;
+}
+
+function goPage(p) {
+  const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
+  if (p < 1 || p > totalPages) return;
+  currentPage = p;
+  renderPage();
+}
+
+renderTable();
+</script>
+
+<!-- ============================================================
+     PAGE 3：优惠券管理 > 全部优惠券
+     路由：/coupon-management/all-coupons
+     ============================================================ -->
+<div style="margin-top:16px; border-top:3px dashed #d0d0d0; padding-top:8px; margin-bottom:4px; padding-left:24px;">
+  <span style="font-size:11px;color:#aaa;font-family:monospace;">PAGE 3 &nbsp;/coupon-management/all-coupons</span>
+</div>
+
+<style>
+.p3-pill { display:inline-flex; align-items:center; position:relative; }
+.p3-pill select {
+  height:32px; border:1px solid #d9d9d9; border-radius:16px;
+  padding:0 28px 0 12px; font-size:13px; color:#333;
+  outline:none; background:#fff; cursor:pointer;
+  appearance:none; -webkit-appearance:none;
+}
+.p3-pill select:focus { border-color:#1677ff; }
+.p3-pill::after {
+  content:'▾'; position:absolute; right:10px;
+  pointer-events:none; font-size:11px; color:#888;
+}
+.sbadge { display:inline-flex; align-items:center; padding:2px 10px; border-radius:10px; font-size:12px; }
+.sbadge-unused  { background:#f5f5f5; color:#666; border:1px solid #e8e8e8; }
+.sbadge-used    { background:#f6ffed; color:#52c41a; border:1px solid #b7eb8f; }
+.sbadge-expired { background:#fff2f0; color:#ff4d4f; border:1px solid #ffccc7; }
+</style>
+
+<div class="page">
+
+  <!-- 面包屑 -->
+  <div class="breadcrumb">
+    位置 › 优惠券管理 › <span>全部优惠券</span>
+  </div>
+
+  <!-- 统计面板 -->
+  <div style="background:#fff;border-radius:4px;border:1px solid #f0f0f0;padding:20px 24px;margin-bottom:16px;">
+    <div style="margin-bottom:16px;">
+      <div class="date-range-wrap" style="width:fit-content;">
+        <span class="date-icon">🕐</span>
+        <input type="datetime-local" id="p3StatStart" value="2026-06-30T00:00:00" step="1">
+        <span class="date-sep">～</span>
+        <input type="datetime-local" id="p3StatEnd" value="2026-06-30T23:59:59" step="1">
+      </div>
+    </div>
+    <div style="display:flex; border-top:1px solid #f5f5f5; padding-top:16px;">
+      <div style="flex:1; text-align:center; border-right:1px solid #f5f5f5;">
+        <div id="p3StatTotal" style="font-size:28px;font-weight:700;color:#1a1a1a;line-height:1.2;">7</div>
+        <div style="font-size:13px;color:#999;margin-top:6px;">优惠券发放总量</div>
+      </div>
+      <div style="flex:1; text-align:center; border-right:1px solid #f5f5f5;">
+        <div id="p3StatRate" style="font-size:28px;font-weight:700;color:#1a1a1a;line-height:1.2;">42.86%</div>
+        <div style="font-size:13px;color:#999;margin-top:6px;">优惠券使用率</div>
+      </div>
+      <div style="flex:1; text-align:center;">
+        <div id="p3StatPayout" style="font-size:28px;font-weight:700;color:#1a1a1a;line-height:1.2;">₱180.00</div>
+        <div style="font-size:13px;color:#999;margin-top:6px;">优惠券累计发放彩金</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 筛选栏 -->
+  <div class="filter-bar" style="gap:8px; flex-wrap:wrap; align-items:center;">
+    <div class="p3-pill">
+      <select id="p3FilterType">
+        <option value="">全部优惠券</option>
+        <option value="输返券">输返券</option>
+        <option value="存送比例券">存送比例券</option>
+        <option value="彩金券">彩金券</option>
+        <option value="旋转券">旋转券</option>
+        <option value="免费投注券">免费投注券</option>
+      </select>
+    </div>
+
+    <div class="p3-pill">
+      <select id="p3FilterStatus">
+        <option value="">全部状态</option>
+        <option value="未使用">未使用</option>
+        <option value="待结算">待结算</option>
+        <option value="已使用">已使用</option>
+        <option value="已过期">已过期</option>
+      </select>
+    </div>
+
+    <div class="p3-pill">
+      <select id="p3FilterSource">
+        <option value="">全部来源</option>
+        <option value="积分购买">积分购买</option>
+      </select>
+    </div>
+
+    <span style="font-size:13px;color:#333;white-space:nowrap;margin-left:4px;">获得时间：</span>
+    <div class="date-range-wrap">
+      <span class="date-icon">🕐</span>
+      <input type="datetime-local" id="p3DateStart" value="2026-06-01T00:00:00" step="1">
+      <span class="date-sep">～</span>
+      <input type="datetime-local" id="p3DateEnd" value="2026-06-30T23:59:59" step="1">
+    </div>
+
+    <div class="p3-pill">
+      <select id="p3FilterMemberType" style="min-width:76px;">
+        <option value="name">会员名</option>
+      </select>
+    </div>
+    <input type="text" id="p3FilterKeyword" placeholder="会员名/活动名称/优惠券ID" style="width:220px;">
+
+    <button class="btn btn-primary" onclick="p3Search()">查询</button>
+    <button class="btn btn-warning">导出</button>
+    <button class="btn btn-primary">赠送优惠券</button>
+  </div>
+
+  <!-- 表格 -->
+  <div class="table-wrap">
+    <div style="overflow-x:auto;"><table>
+      <thead>
+        <tr>
+          <th>会员账号</th>
+          <th>获得时间</th>
+          <th>活动名称</th>
+          <th>获得方式</th>
+          <th>优惠券名称</th>
+          <th>优惠券ID</th>
+          <th>优惠券类别</th>
+          <th>状态</th>
+          <th>操作人</th>
+          <th>操作时间</th>
+          <th>备注</th>
+        </tr>
+      </thead>
+      <tbody id="p3TableBody"></tbody>
+    </table></div>
+    <div class="pagination" id="p3Pagination"></div>
+  </div>
+
+</div>
+
+<!-- PAGE 3 script：优惠券管理 -->
+<script>
+const P3_RECORDS = [
+  { id:6709, member:'okbet9994fg5vz', time:'2026-06-12 16:45', activity:'苹果 Ichiban Kuji',       source:'积分购买', name:'Free Spin ×10',         type:'旋转券',    status:'已使用', operator:'SYSTEM', opTime:'2026-06-12 17:00', remark:'–' },
+  { id:6708, member:'vivian01',       time:'2026-06-15 17:22', activity:'节日特别版 Ichiban Kuji', source:'积分购买', name:'彩金 ₱50 (1x Turnover)', type:'彩金券',    status:'已使用', operator:'SYSTEM', opTime:'2026-06-15 18:10', remark:'–' },
+  { id:6707, member:'vivian01',       time:'2026-06-15 17:21', activity:'节日特别版 Ichiban Kuji', source:'积分购买', name:'Free Spin ×20',         type:'旋转券',    status:'未使用', operator:'–',      opTime:'–',                  remark:'–' },
+  { id:6706, member:'vivian01',       time:'2026-06-11 18:02', activity:'高价值VIP专属赏',         source:'积分购买', name:'彩金 ₱80 (2x Turnover)', type:'彩金券',    status:'未使用', operator:'–',      opTime:'–',                  remark:'–' },
+  { id:6705, member:'alice_vip3',     time:'2026-06-11 10:05', activity:'入门款 Ichiban Kuji',     source:'积分购买', name:'Free Bet ×5',           type:'免费投注券', status:'未使用', operator:'–',      opTime:'–',                  remark:'–' },
+  { id:6704, member:'player_tom88',   time:'2026-06-11 14:30', activity:'高价值VIP专属赏',         source:'积分购买', name:'彩金 ₱50 (2x Turnover)', type:'彩金券',    status:'已使用', operator:'SYSTEM', opTime:'2026-06-11 14:45', remark:'–' },
+  { id:6703, member:'jay_pm',         time:'2026-06-10 18:15', activity:'苹果 Ichiban Kuji',       source:'积分购买', name:'Free Spin ×10',         type:'旋转券',    status:'未使用', operator:'–',      opTime:'–',                  remark:'–' },
+];
+
+let p3Filtered = [...P3_RECORDS];
+let p3Page = 1;
+const P3_PAGE_SIZE = 10;
+
+function p3Search() {
+  const type    = document.getElementById('p3FilterType').value;
+  const status  = document.getElementById('p3FilterStatus').value;
+  const source  = document.getElementById('p3FilterSource').value;
+  const keyword = document.getElementById('p3FilterKeyword').value.trim().toLowerCase();
+
+  p3Filtered = P3_RECORDS.filter(r => {
+    if (type   && r.type   !== type)   return false;
+    if (status && r.status !== status) return false;
+    if (source && r.source !== source) return false;
+    if (keyword &&
+        !r.member.toLowerCase().includes(keyword) &&
+        !r.activity.toLowerCase().includes(keyword) &&
+        !String(r.id).includes(keyword)) return false;
+    return true;
+  });
+  p3Page = 1;
+  p3RenderPage();
+}
+
+function p3RenderPage() {
+  const start = (p3Page - 1) * P3_PAGE_SIZE;
+  const rows  = p3Filtered.slice(start, start + P3_PAGE_SIZE);
+  document.getElementById('p3TableBody').innerHTML = rows.map(r => `
+    <tr>
+      <td>${r.member}</td>
+      <td>${r.time}</td>
+      <td>${r.activity}</td>
+      <td>${r.source}</td>
+      <td>${r.name}</td>
+      <td>${r.id}</td>
+      <td>${r.type}</td>
+      <td>${r.status}</td>
+      <td>${r.operator}</td>
+      <td>${r.opTime}</td>
+      <td>${r.remark}</td>
+    </tr>
+  `).join('');
+  p3RenderPagination();
+}
+
+function p3RenderPagination() {
+  const total      = p3Filtered.length;
+  const totalPages = Math.ceil(total / P3_PAGE_SIZE);
+  const pg         = document.getElementById('p3Pagination');
+  let html = `<span class="page-total">Total ${total}</span>`;
+  html += `<div class="page-btn" onclick="p3GoPage(${p3Page-1})">‹</div>`;
+  buildPageNums(p3Page, totalPages).forEach(p => {
+    if (p === '...') html += `<div class="page-btn ellipsis">···</div>`;
+    else html += `<div class="page-btn${p === p3Page ? ' active' : ''}" onclick="p3GoPage(${p})">${p}</div>`;
+  });
+  html += `<div class="page-btn" onclick="p3GoPage(${p3Page+1})">›</div>`;
+  pg.innerHTML = html;
+}
+
+function p3GoPage(p) {
+  const totalPages = Math.ceil(p3Filtered.length / P3_PAGE_SIZE);
+  if (p < 1 || p > totalPages) return;
+  p3Page = p;
+  p3RenderPage();
+}
+
+p3Search();
+</script>
+
+<!-- ============================================================
+     PAGE 4：免費旋轉管理
+     路由：/free-spin/management
+     ============================================================ -->
+<div style="margin-top:16px; border-top:3px dashed #d0d0d0; padding-top:8px; margin-bottom:4px; padding-left:24px;">
+  <span style="font-size:11px;color:#aaa;font-family:monospace;">PAGE 4 &nbsp;/free-spin/management</span>
+</div>
+
+<div class="page">
+
+  <!-- 面包屑 -->
+  <div class="breadcrumb">
+    位置 › <span>免费旋转管理</span>
+  </div>
+
+  <!-- 子标签页 -->
+  <div class="tab-bar" id="p4TabBar">
+    <div class="tab-item" onclick="p4Switch(1)">免费项目配置</div>
+    <div class="tab-item active" onclick="p4Switch(2)">免费项目记录</div>
+    <div class="tab-item" onclick="p4Switch(3)">免费项目统计</div>
+    <div class="tab-item" onclick="p4Switch(4)">免费项目发送记录</div>
+  </div>
+
+  <!-- ── TAB 1: 免费项目配置 ── -->
+  <div id="p4t1" style="display:none">
+    <div class="action-row" style="margin-bottom:10px;">
+      <button class="btn btn-primary">+ 新增配置</button>
+    </div>
+    <div class="table-wrap">
+      <div style="overflow-x:auto;"><table>
+        <thead>
+          <tr>
+            <th>配置名称</th>
+            <th>免费类型</th>
+            <th>游戏平台</th>
+            <th>次数</th>
+            <th>有效期（小时）</th>
+            <th>状态</th>
+            <th>创建时间</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>colorgame</td><td>免费投注</td><td>ColorGame</td><td>1</td><td>24</td><td><span class="sbadge sbadge-used">启用</span></td><td>2026-01-10 09:00:00</td><td><span style="color:#1677ff;cursor:pointer;">编辑</span></td></tr>
+          <tr><td>免费投注PT单个游戏</td><td>免费投注</td><td>PT</td><td>10</td><td>48</td><td><span class="sbadge sbadge-used">启用</span></td><td>2026-02-15 10:30:00</td><td><span style="color:#1677ff;cursor:pointer;">编辑</span></td></tr>
+          <tr><td>PT免费投注1</td><td>免费投注</td><td>PT</td><td>10</td><td>72</td><td><span class="sbadge sbadge-used">启用</span></td><td>2026-03-01 14:00:00</td><td><span style="color:#1677ff;cursor:pointer;">编辑</span></td></tr>
+          <tr><td>Free Spin ×10</td><td>免费旋转</td><td>全平台</td><td>10</td><td>240</td><td><span class="sbadge sbadge-used">启用</span></td><td>2026-05-20 11:00:00</td><td><span style="color:#1677ff;cursor:pointer;">编辑</span></td></tr>
+          <tr><td>Free Spin ×20</td><td>免费旋转</td><td>全平台</td><td>20</td><td>240</td><td><span class="sbadge sbadge-used">启用</span></td><td>2026-05-20 11:05:00</td><td><span style="color:#1677ff;cursor:pointer;">编辑</span></td></tr>
+          <tr><td>Free Spin ×30</td><td>免费旋转</td><td>全平台</td><td>30</td><td>240</td><td><span class="sbadge sbadge-used">启用</span></td><td>2026-05-20 11:10:00</td><td><span style="color:#1677ff;cursor:pointer;">编辑</span></td></tr>
+        </tbody>
+      </table></div>
+      <div style="padding:14px 20px;text-align:right;font-size:13px;color:#999;border-top:1px solid #f0f0f0;">Total 6</div>
+    </div>
+  </div>
+
+  <!-- ── TAB 2: 免费项目记录 ── -->
+  <div id="p4t2">
+    <div class="filter-bar" style="gap:8px; flex-wrap:wrap; align-items:center;">
+      <div class="p3-pill">
+        <select id="p4FilterSpin">
+          <option value="">全部免费旋转</option>
+          <option value="免费旋转">免费旋转</option>
+          <option value="免费投注">免费投注</option>
+        </select>
+      </div>
+
+      <div class="p3-pill">
+        <select id="p4FilterSource" style="min-width:110px;">
+          <option value="">全部来源</option>
+          <option value="积分购买">积分购买</option>
+        </select>
+      </div>
+
+      <span style="font-size:13px;color:#333;white-space:nowrap;margin-left:4px;">获得时间：</span>
+      <div class="date-range-wrap">
+        <span class="date-icon">🕐</span>
+        <input type="datetime-local" id="p4DateStart" value="2026-06-30T00:00:00" step="1">
+        <span class="date-sep">～</span>
+        <input type="datetime-local" id="p4DateEnd" value="2026-06-30T23:59:59" step="1">
+      </div>
+
+      <div class="p3-pill">
+        <select id="p4FilterType" style="min-width:110px;">
+          <option value="">全部免费类型</option>
+          <option value="免费旋转">免费旋转</option>
+          <option value="免费投注">免费投注</option>
+        </select>
+      </div>
+
+      <div class="p3-pill">
+        <select id="p4FilterSelect" style="min-width:80px;">
+          <option value="">Select</option>
+        </select>
+      </div>
+
+      <input type="text" id="p4FilterKeyword" placeholder="会员名/活动名称" style="width:160px;">
+
+      <button class="btn btn-primary" onclick="p4Search()">查询</button>
+      <button class="btn btn-primary" style="margin-left:auto;">赠送免费旋转</button>
+    </div>
+
+    <div class="table-wrap">
+      <div style="overflow-x:auto;"><table>
+        <thead>
+          <tr>
+            <th>会员账号</th>
+            <th>获得时间</th>
+            <th>活动名称</th>
+            <th>获得方式</th>
+            <th>免费旋转名称</th>
+            <th>免费类型</th>
+            <th>获得次数</th>
+            <th>状态</th>
+            <th>操作人</th>
+            <th>操作时间</th>
+            <th>备注</th>
+          </tr>
+        </thead>
+        <tbody id="p4TableBody"></tbody>
+      </table></div>
+      <div class="pagination" id="p4Pagination"></div>
+    </div>
+  </div>
+
+  <!-- ── TAB 3: 免费项目统计 ── -->
+  <div id="p4t3" style="display:none">
+    <div class="filter-bar" style="gap:8px; flex-wrap:wrap; align-items:center;">
+      <div class="p3-pill">
+        <select id="p4StatStatus" style="min-width:96px;">
+          <option value="">所有状态</option>
+          <option value="已使用">已使用</option>
+          <option value="未使用">未使用</option>
+          <option value="已过期">已过期</option>
+        </select>
+      </div>
+
+      <span style="font-size:13px;color:#333;white-space:nowrap;margin-left:4px;">使用时间：</span>
+      <div class="date-range-wrap">
+        <span class="date-icon">🕐</span>
+        <input type="datetime-local" id="p4StatDateStart" value="2026-07-02T00:00:00" step="1">
+        <span class="date-sep">～</span>
+        <input type="datetime-local" id="p4StatDateEnd" value="2026-07-02T23:59:59" step="1">
+      </div>
+
+      <div class="p3-pill">
+        <select id="p4StatType" style="min-width:110px;">
+          <option value="">全部免费类型</option>
+          <option value="免费旋转">免费旋转</option>
+          <option value="道具卡">道具卡</option>
+          <option value="免费投注">免费投注</option>
+        </select>
+      </div>
+
+      <div class="p3-pill">
+        <select id="p4StatSelect" style="min-width:80px;">
+          <option value="">Select</option>
+        </select>
+      </div>
+
+      <input type="text" id="p4StatKeyword" placeholder="会员名/活动名称" style="width:160px;">
+
+      <button class="btn btn-primary" onclick="p4StatSearch()">查询</button>
+      <button class="btn btn-warning">导出</button>
+    </div>
+
+    <div class="table-wrap">
+      <div style="overflow-x:auto;"><table>
+        <thead>
+          <tr>
+            <th>会员账号</th>
+            <th>免费旋转名称</th>
+            <th>免费类型</th>
+            <th>厂商</th>
+            <th>状态</th>
+            <th>使用时间</th>
+            <th>绑定游戏</th>
+            <th>获得次数</th>
+          </tr>
+        </thead>
+        <tbody id="p4StatTableBody"></tbody>
+      </table></div>
+      <div class="pagination" id="p4StatPagination"></div>
+    </div>
+  </div>
+
+  <!-- ── TAB 4: 免费项目发送记录 ── -->
+  <div id="p4t4" style="display:none">
+    <div class="filter-bar" style="gap:8px; flex-wrap:wrap; align-items:center;">
+      <div class="p3-pill">
+        <select id="p4SendStatus" style="min-width:96px;">
+          <option value="">所有状态</option>
+          <option value="已发送">已发送</option>
+          <option value="待发送">待发送</option>
+        </select>
+      </div>
+
+      <span style="font-size:13px;color:#333;white-space:nowrap;margin-left:4px;">发送时间：</span>
+      <div class="date-range-wrap">
+        <span class="date-icon">🕐</span>
+        <input type="datetime-local" id="p4SendDateStart" value="2026-07-02T00:00:00" step="1">
+        <span class="date-sep">～</span>
+        <input type="datetime-local" id="p4SendDateEnd" value="2026-07-02T23:59:59" step="1">
+      </div>
+
+      <div class="p3-pill">
+        <select id="p4SendType" style="min-width:110px;">
+          <option value="">全部免费类型</option>
+          <option value="免费旋转">免费旋转</option>
+          <option value="道具卡">道具卡</option>
+          <option value="免费投注">免费投注</option>
+        </select>
+      </div>
+
+      <div class="p3-pill">
+        <select id="p4SendSelect" style="min-width:80px;">
+          <option value="">Select</option>
+        </select>
+      </div>
+
+      <input type="text" id="p4SendKeyword" placeholder="会员名/免费名称" style="width:160px;">
+
+      <button class="btn btn-primary" onclick="p4SendSearch()">查询</button>
+      <button class="btn btn-warning">批量重新发送</button>
+      <button class="btn btn-success">导出</button>
+    </div>
+
+    <div class="table-wrap" style="margin-top:12px;">
+      <div style="overflow-x:auto;"><table>
+        <thead>
+          <tr>
+            <th>会员账号</th>
+            <th>免费旋转名称</th>
+            <th>免费类型</th>
+            <th>免费旋转券编号</th>
+            <th>状态</th>
+            <th>发送时间</th>
+            <th>操作</th>
+            <th>备注</th>
+          </tr>
+        </thead>
+        <tbody id="p4SendTableBody"></tbody>
+      </table></div>
+      <div class="pagination" id="p4SendPagination"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- PAGE 4 script -->
+<script>
+function p4Switch(n) {
+  [1,2,3,4].forEach(i => {
+    document.getElementById('p4t'+i).style.display = i===n ? '' : 'none';
+  });
+  document.getElementById('p4TabBar').querySelectorAll('.tab-item').forEach((t,i) => {
+    t.classList.toggle('active', i===n-1);
+  });
+}
+
+const P4_RECORDS = [
+  { member:'okbet9994fg5vz',  time:'2026-06-12 16:45', activity:'苹果 Ichiban Kuji',       source:'积分购买', name:'Free Spin ×10', type:'免费旋转', qty:10, status:'已使用', operator:'SYSTEM', opTime:'2026-06-12 17:00', remark:'–' },
+  { member:'vivian01',        time:'2026-06-15 17:22', activity:'节日特别版 Ichiban Kuji', source:'积分购买', name:'Free Spin ×10', type:'免费旋转', qty:10, status:'未使用', operator:'–',      opTime:'–',                remark:'–' },
+  { member:'vivian01',        time:'2026-06-11 18:27', activity:'节日特别版 Ichiban Kuji', source:'积分购买', name:'Free Spin ×10', type:'免费旋转', qty:10, status:'未使用', operator:'–',      opTime:'–',                remark:'–' },
+  { member:'alice_vip3',      time:'2026-06-10 22:40', activity:'入门款 Ichiban Kuji',     source:'积分购买', name:'Free Spin ×20', type:'免费旋转', qty:20, status:'未使用', operator:'–',      opTime:'–',                remark:'–' },
+  { member:'user_beta01',     time:'2026-06-09 20:10', activity:'节日特别版 Ichiban Kuji', source:'积分购买', name:'Free Spin ×30', type:'免费旋转', qty:30, status:'未使用', operator:'–',      opTime:'–',                remark:'–' },
+  { member:'vivian01',        time:'2026-06-11 16:12', activity:'节日特别版 Ichiban Kuji', source:'积分购买', name:'Free Spin ×10', type:'免费旋转', qty:10, status:'已使用', operator:'SYSTEM', opTime:'2026-06-11 16:30', remark:'–' },
+  { member:'vivian01',        time:'2026-06-11 18:02', activity:'高价值VIP专属赏',         source:'积分购买', name:'Free Spin ×20', type:'免费旋转', qty:20, status:'未使用', operator:'–',      opTime:'–',                remark:'–' },
+];
+
+let p4Filtered = [...P4_RECORDS];
+let p4Page = 1;
+const P4_PAGE_SIZE = 10;
+
+function p4Search() {
+  const spin    = document.getElementById('p4FilterSpin').value;
+  const source  = document.getElementById('p4FilterSource').value;
+  const type    = document.getElementById('p4FilterType').value;
+  const keyword = document.getElementById('p4FilterKeyword').value.trim().toLowerCase();
+
+  p4Filtered = P4_RECORDS.filter(r => {
+    if (spin   && r.type   !== spin)   return false;
+    if (source && r.source !== source) return false;
+    if (type   && r.type   !== type)   return false;
+    if (keyword && !r.member.toLowerCase().includes(keyword) &&
+                   !r.activity.toLowerCase().includes(keyword)) return false;
+    return true;
+  });
+  p4Page = 1;
+  p4RenderPage();
+}
+
+function p4RenderPage() {
+  const start = (p4Page - 1) * P4_PAGE_SIZE;
+  const rows  = p4Filtered.slice(start, start + P4_PAGE_SIZE);
+  document.getElementById('p4TableBody').innerHTML = rows.map(r => `
+    <tr>
+      <td>${r.member}</td>
+      <td>${r.time}</td>
+      <td>${r.activity}</td>
+      <td>${r.source}</td>
+      <td>${r.name}</td>
+      <td>${r.type}</td>
+      <td>${r.qty}</td>
+      <td>${r.status}</td>
+      <td>${r.operator}</td>
+      <td>${r.opTime}</td>
+      <td>${r.remark}</td>
+    </tr>
+  `).join('');
+  p4RenderPagination();
+}
+
+function p4RenderPagination() {
+  const total      = p4Filtered.length;
+  const totalPages = Math.ceil(total / P4_PAGE_SIZE);
+  const pg         = document.getElementById('p4Pagination');
+  let html = `<span class="page-total">Total ${total}</span>`;
+  html += `<div class="page-btn" onclick="p4GoPage(${p4Page-1})">‹</div>`;
+  buildPageNums(p4Page, totalPages).forEach(p => {
+    if (p === '...') html += `<div class="page-btn ellipsis">···</div>`;
+    else html += `<div class="page-btn${p === p4Page ? ' active' : ''}" onclick="p4GoPage(${p})">${p}</div>`;
+  });
+  html += `<div class="page-btn" onclick="p4GoPage(${p4Page+1})">›</div>`;
+  pg.innerHTML = html;
+}
+
+function p4GoPage(p) {
+  const totalPages = Math.ceil(p4Filtered.length / P4_PAGE_SIZE);
+  if (p < 1 || p > totalPages) return;
+  p4Page = p;
+  p4RenderPage();
+}
+
+p4Search();
+
+/* ── TAB 3: 免费项目统计（示意：仅呈现一番赏/积分购买相关资料） ── */
+const P4_STAT_RECORDS = [
+  { member:'okbet9994fg5vz', name:'Free Spin ×10', type:'免费旋转', vendor:'–', status:'已使用', time:'2026-06-12 17:00:00', game:'–', qty:10 },
+  { member:'vivian01',       name:'Free Spin ×10', type:'免费旋转', vendor:'–', status:'已使用', time:'2026-06-11 16:30:00', game:'–', qty:10 },
+];
+
+let p4StatFiltered = [...P4_STAT_RECORDS];
+let p4StatPage = 1;
+const P4_STAT_PAGE_SIZE = 10;
+
+function p4StatSearch() {
+  const status  = document.getElementById('p4StatStatus').value;
+  const type    = document.getElementById('p4StatType').value;
+  const keyword = document.getElementById('p4StatKeyword').value.trim().toLowerCase();
+
+  p4StatFiltered = P4_STAT_RECORDS.filter(r => {
+    if (status  && r.status !== status) return false;
+    if (type    && r.type   !== type)   return false;
+    if (keyword && !r.member.toLowerCase().includes(keyword) &&
+                   !r.name.toLowerCase().includes(keyword)) return false;
+    return true;
+  });
+  p4StatPage = 1;
+  p4StatRenderPage();
+}
+
+function p4StatRenderPage() {
+  const start = (p4StatPage - 1) * P4_STAT_PAGE_SIZE;
+  const rows  = p4StatFiltered.slice(start, start + P4_STAT_PAGE_SIZE);
+  document.getElementById('p4StatTableBody').innerHTML = rows.map(r => `
+    <tr>
+      <td>${r.member}</td>
+      <td>${r.name}</td>
+      <td>${r.type}</td>
+      <td>${r.vendor}</td>
+      <td>${r.status}</td>
+      <td>${r.time}</td>
+      <td>${r.game}</td>
+      <td>${r.qty}</td>
+    </tr>
+  `).join('');
+  const pg = document.getElementById('p4StatPagination');
+  pg.innerHTML = `<span class="page-total">Total ${p4StatFiltered.length}</span><div class="page-btn active">1</div>`;
+}
+
+p4StatSearch();
+
+/* ── TAB 4: 免费项目发送记录（示意：仅呈现一番赏/积分购买相关资料） ── */
+const P4_SEND_RECORDS = [
+  { member:'okbet9994fg5vz', name:'Free Spin ×10', type:'免费旋转', code:'T31509991234500001', status:'已发送', time:'2026-06-12 16:45:00', remark:'积分购买' },
+  { member:'vivian01',       name:'Free Spin ×10', type:'免费旋转', code:'T31509991234500002', status:'已发送', time:'2026-06-15 17:22:00', remark:'积分购买' },
+  { member:'vivian01',       name:'Free Spin ×10', type:'免费旋转', code:'T31509991234500003', status:'已发送', time:'2026-06-11 18:27:00', remark:'积分购买' },
+  { member:'alice_vip3',     name:'Free Spin ×20', type:'免费旋转', code:'T31509991234500004', status:'已发送', time:'2026-06-10 22:40:00', remark:'积分购买' },
+  { member:'user_beta01',    name:'Free Spin ×30', type:'免费旋转', code:'T31509991234500005', status:'已发送', time:'2026-06-09 20:10:00', remark:'积分购买' },
+  { member:'vivian01',       name:'Free Spin ×10', type:'免费旋转', code:'T31509991234500006', status:'已发送', time:'2026-06-11 16:12:00', remark:'积分购买' },
+  { member:'vivian01',       name:'Free Spin ×20', type:'免费旋转', code:'T31509991234500007', status:'已发送', time:'2026-06-11 18:02:00', remark:'积分购买' },
+];
+
+let p4SendFiltered = [...P4_SEND_RECORDS];
+let p4SendPage = 1;
+const P4_SEND_PAGE_SIZE = 10;
+
+function p4SendSearch() {
+  const status  = document.getElementById('p4SendStatus').value;
+  const type    = document.getElementById('p4SendType').value;
+  const keyword = document.getElementById('p4SendKeyword').value.trim().toLowerCase();
+
+  p4SendFiltered = P4_SEND_RECORDS.filter(r => {
+    if (status  && r.status !== status) return false;
+    if (type    && r.type   !== type)   return false;
+    if (keyword && !r.member.toLowerCase().includes(keyword) &&
+                   !r.name.toLowerCase().includes(keyword)) return false;
+    return true;
+  });
+  p4SendPage = 1;
+  p4SendRenderPage();
+}
+
+function p4SendRenderPage() {
+  const start = (p4SendPage - 1) * P4_SEND_PAGE_SIZE;
+  const rows  = p4SendFiltered.slice(start, start + P4_SEND_PAGE_SIZE);
+  document.getElementById('p4SendTableBody').innerHTML = rows.map(r => `
+    <tr>
+      <td>${r.member}</td>
+      <td>${r.name}</td>
+      <td>${r.type}</td>
+      <td class="order-no">${r.code}</td>
+      <td>${r.status}</td>
+      <td>${r.time}</td>
+      <td>${r.status === '待发送' ? '<span class="link-btn">重新发送</span>' : '–'}</td>
+      <td>${r.remark}</td>
+    </tr>
+  `).join('');
+  const pg = document.getElementById('p4SendPagination');
+  pg.innerHTML = `<span class="page-total">Total ${p4SendFiltered.length}</span><div class="page-btn active">1</div>`;
+}
+
+p4SendSearch();
+</script>
+
+</body>
+</html>

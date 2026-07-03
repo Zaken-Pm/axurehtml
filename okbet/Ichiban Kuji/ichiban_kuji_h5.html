@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>一番赏 H5</title>
+<style>
+/* ============================================================
+   日系·和纸风一番赏 H5  ── A 单列 / B 双列，两台并排同时显示
+   ============================================================ */
+:root{
+  --paper:#F1E9D6; --fuda:#FBF6EA; --sumi:#2A2723; --sumi-2:#6B6256;
+  --shu:#C6362F; --shu-d:#9C2A22; --kin:#B08A3C; --kin-d:#8c6a26; --ai:#33506A;
+  --line:#E0D5BC; --line-2:#D2C4A4; --img:64px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans","Microsoft YaHei",sans-serif;
+  background:#332e2a;color:var(--sumi);padding:24px 12px}
+.serif{font-family:"Songti SC","Hiragino Mincho ProN","STSong",serif}
+
+.stage{display:flex;flex-wrap:wrap;gap:28px;justify-content:center;align-items:flex-start}
+.col{display:flex;flex-direction:column;align-items:center;gap:10px}
+.vlabel{color:#F1E9D6;font-size:14px;letter-spacing:3px;background:rgba(198,54,47,.9);padding:6px 18px;border-radius:20px}
+.vlabel small{opacity:.8;letter-spacing:1px;font-size:11px;margin-left:4px}
+
+.device{width:390px;max-width:94vw;min-height:880px;background:var(--paper);position:relative;border-radius:6px;overflow:hidden;
+  background-image:
+    repeating-linear-gradient(0deg,rgba(0,0,0,.012) 0 1px,transparent 1px 4px),
+    repeating-linear-gradient(90deg,rgba(0,0,0,.012) 0 1px,transparent 1px 4px)}
+
+/* 顶栏 */
+.topbar{display:flex;align-items:center;gap:10px;padding:11px 16px}
+.icon-btn{width:30px;height:30px;border:1px solid var(--line-2);border-radius:50%;background:var(--fuda);color:var(--sumi-2);font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.topbar .title{flex:1;text-align:center;font-size:15px;letter-spacing:4px}
+.pts-pill{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--shu-d);background:#fff;border:1px solid var(--line-2);border-radius:14px;padding:3px 10px;white-space:nowrap}
+.pts-pill b{font-size:13px} .pts-pill .star{color:var(--kin)}
+
+/* BANNER */
+.banner{position:relative}
+.kv{height:142px;position:relative;overflow:hidden;background:repeating-linear-gradient(45deg,#E7DEC8 0 11px,#E1D7BC 11px 22px)}
+.kv .kv-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--sumi-2);font-size:12px;text-align:center;gap:3px;letter-spacing:1px}
+.kv .kv-ph small{font-size:10px;opacity:.7}
+.kv .scrim{position:absolute;left:0;right:0;bottom:0;height:84px;background:linear-gradient(transparent,rgba(42,39,35,.62))}
+.kv .nobori{position:absolute;top:10px;left:12px;writing-mode:vertical-rl;text-orientation:upright;background:var(--shu);color:#fff;font-size:14px;letter-spacing:3px;padding:6px 4px;border-radius:3px;box-shadow:1px 1px 0 var(--shu-d);z-index:2}
+.kv .kv-text{position:absolute;left:14px;right:14px;bottom:11px;z-index:2;color:#fff}
+.kv .kv-text .kicker{font-size:10px;letter-spacing:3px;opacity:.92;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.kv .kv-text .kv-title{font-size:23px;font-weight:700;line-height:1.1;margin-top:2px;text-shadow:0 1px 4px rgba(0,0,0,.55)}
+.noren-edge{height:14px;background:radial-gradient(circle 9px at 12px -1px,var(--shu) 70%,transparent 72%) repeat-x;background-size:24px 14px}
+.b-stock{padding:9px 16px 11px;border-bottom:1px solid var(--line);background:#F6EFDD}
+.b-stock .r1{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;color:var(--sumi-2)}
+.b-stock .r1 b{font-family:"Songti SC",serif;font-size:18px;color:var(--shu);margin-right:1px}
+.stock-bar{height:6px;background:#E7DcC4;border:1px solid var(--line-2);border-radius:4px;overflow:hidden;margin-top:5px}
+.stock-fill{height:100%;background:repeating-linear-gradient(45deg,var(--shu) 0 6px,var(--shu-d) 6px 12px)}
+
+/* 撕券台 */
+.draw-zone{padding:14px 16px 16px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#F6EFDD,var(--paper))}
+.seg{display:flex;gap:6px;margin-bottom:11px}
+.seg button{flex:1;background:#fff;border:1px solid var(--line-2);color:var(--sumi-2);border-radius:5px;padding:8px 0;font-size:13px;cursor:pointer;font-family:"Songti SC",serif;white-space:nowrap}
+.seg button .x{font-size:10px;opacity:.7}
+.seg button.on{background:var(--sumi);color:#fff;border-color:var(--sumi)}
+.seg button.all{border-color:var(--kin);color:var(--kin-d)}
+.seg button.all.on{background:linear-gradient(135deg,#C9A24B,#9c7a2c);color:#fff;border-color:var(--kin-d)}
+.ticket-btn{width:100%;border:none;cursor:pointer;display:flex;align-items:stretch;background:var(--shu);color:#fff;border-radius:7px;overflow:hidden;box-shadow:0 2px 0 var(--shu-d);padding:0}
+.ticket-btn:active{transform:translateY(1px);box-shadow:0 1px 0 var(--shu-d)}
+.ticket-btn .stub{flex:0 0 84px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 6px;border-right:2px dashed rgba(255,255,255,.55);background:rgba(0,0,0,.08)}
+.ticket-btn .stub .s1{font-size:10px;letter-spacing:2px;opacity:.9}
+.ticket-btn .stub .s2{font-family:"Songti SC",serif;font-size:16px;margin-top:3px}
+.ticket-btn .main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px}
+.ticket-btn .main .t1{font-size:11px;letter-spacing:3px;opacity:.9}
+.ticket-btn .main .t2{font-family:"Songti SC",serif;font-size:19px;font-weight:700;letter-spacing:2px;margin-top:3px}
+.ticket-btn .main .t2 small{font-size:12px;font-weight:400;opacity:.9}
+.ticket-btn[disabled]{background:#b3a69a;box-shadow:0 2px 0 #968a7d;cursor:not-allowed}
+.dz-foot{display:flex;justify-content:space-between;margin-top:9px;font-size:11px;color:var(--sumi-2)}
+.dz-foot .mine b{color:var(--sumi);font-size:12px}
+
+/* 规则按钮（banner右下角） */
+.kv-rules{position:absolute;bottom:10px;right:10px;z-index:3;border:none;border-radius:14px;background:rgba(255,255,255,.88);color:var(--sumi-2);font-size:11px;font-weight:600;padding:5px 11px;cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;font-family:inherit;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.kv-rules:active{background:#fff}
+/* 规则弹窗 */
+.rules-ov{position:absolute;inset:0;background:rgba(42,39,35,.75);z-index:60;display:none;align-items:flex-start;justify-content:center;padding:80px 24px 24px}
+.rules-ov.show{display:flex}
+.rules-box{background:var(--paper);border-radius:10px;width:100%;max-height:80%;display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--kin)}
+.rules-hd{display:flex;align-items:center;justify-content:space-between;padding:13px 16px 11px;border-bottom:1px solid var(--line)}
+.rules-htitle{font-size:14px;letter-spacing:4px}
+.rules-bd{overflow-y:auto;padding:12px 16px 16px}
+.rules-row{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.rules-row:last-child{border:none;padding-bottom:0}
+.rules-row:first-child{padding-top:0}
+.rules-dot{width:18px;height:18px;border-radius:50%;flex-shrink:0;margin-top:2px;background:rgba(198,54,47,.08);border:1px solid rgba(198,54,47,.22);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--shu);font-weight:700}
+.rules-txt{font-size:11.5px;color:var(--sumi-2);line-height:1.7}
+.rules-txt b{color:var(--sumi)}
+/* 新撕券区 */
+.tkt-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+.tkt-card{border:none;cursor:pointer;border-radius:7px;background:var(--shu);color:#fff;box-shadow:0 2px 0 var(--shu-d);padding:9px 12px;display:flex;flex-direction:column;align-items:center;gap:3px;position:relative;overflow:hidden;font-family:inherit}
+.tkt-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:rgba(255,255,255,.25)}
+.tkt-card:active{transform:translateY(1px);box-shadow:0 1px 0 var(--shu-d)}
+.tkt-card .tc-n{font-family:"Songti SC",serif;font-size:16px;font-weight:700;line-height:1}
+.tkt-card .tc-cost{font-size:10px;opacity:.8}
+.tkt-card.all{background:linear-gradient(135deg,#C9A24B,#9c7a2c)}
+.tkt-card.on{box-shadow:0 0 0 2.5px rgba(255,255,255,.9),0 0 0 4.5px var(--shu-d),0 2px 0 var(--shu-d)}
+.tkt-card.all.on{box-shadow:0 0 0 2.5px rgba(255,255,255,.9),0 0 0 4.5px var(--kin-d),0 2px 0 var(--kin-d)}
+.tkt-card[disabled]{background:#b3a69a;box-shadow:none;cursor:not-allowed}
+.tear-main{width:100%;border:none;cursor:pointer;background:var(--sumi);color:#fff;border-radius:7px;padding:10px;box-shadow:0 2px 0 #1a1714;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit}
+.tear-main:active{transform:translateY(1px);box-shadow:0 1px 0 #1a1714}
+.tear-main .tm-lbl{font-family:"Songti SC",serif;font-size:14px;letter-spacing:2px}
+.tear-main small{font-size:11px;opacity:.8}
+.tear-main[disabled]{background:#b3a69a;box-shadow:none;cursor:not-allowed}
+
+/* 奖品一览 */
+.pool{padding:14px 16px 24px}
+.noren{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:13px}
+.noren::before,.noren::after{content:"";flex:1;height:0;border-top:2px solid var(--line-2)}
+.noren .band{background:var(--shu);color:#fff;font-size:14px;letter-spacing:6px;padding:5px 18px;border-radius:3px;box-shadow:0 2px 0 var(--shu-d)}
+
+/* 赏别章 */
+.seal2{flex-shrink:0;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;background:var(--shu);color:#fff;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.4)}
+.seal2 .a{font-family:"Songti SC",serif;font-size:15px;font-weight:700;line-height:1}
+.seal2 .s{font-size:8px;opacity:.9;margin-top:1px;letter-spacing:.5px}
+.seal2.gold{background:linear-gradient(135deg,#D9B45A,#9c7a2c);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.55),0 0 0 2px rgba(201,162,75,.25)}
+
+/* 图位 */
+.ph{background:repeating-linear-gradient(45deg,#EEE6D0 0 8px,#E9E0C8 8px 16px);border:1px solid var(--line-2);border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--sumi-2);font-size:9px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.ic{border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:800;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+
+/* B 版双列 */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gfeat{grid-column:1/-1;display:flex;gap:13px;align-items:center;background:linear-gradient(135deg,#FBF3DC,#F3E4B8);border:1.5px solid var(--kin);border-radius:9px;padding:12px;position:relative;overflow:hidden;box-shadow:0 3px 14px rgba(176,138,60,.3);margin-bottom:2px}
+.gfeat::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 90% 8%,rgba(255,240,200,.6),transparent 40%)}
+.gfeat .g-img{background:#fff;border:1px solid var(--line-2);border-radius:9px;padding:6px;box-shadow:0 1px 5px rgba(0,0,0,.07);flex-shrink:0;z-index:2}
+.gfeat .g-img .ph,.gfeat .g-img .ic{width:104px;height:104px;flex-shrink:0;box-shadow:none}
+.gfeat .g-img .ic span{font-size:46px}
+.gfeat .info{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px;z-index:2}
+.gfeat .f-name{font-size:17px;font-weight:700;line-height:1.2}
+.gfeat .f-type{font-size:11px;color:var(--ai);border:1px solid var(--ai);border-radius:3px;padding:0 6px;align-self:flex-start}
+.gfeat .f-note{font-size:11px;color:var(--kin-d)}
+.gfeat .f-zan{font-size:11px;color:var(--sumi-2);margin-top:3px;padding-top:7px;border-top:1px dashed rgba(176,138,60,.45)}
+.gfeat .f-zan b{font-family:"Songti SC",serif;font-size:20px;color:var(--shu)}
+.gfeat .r-ribbon{position:absolute;top:0;right:0;background:linear-gradient(135deg,#D9B45A,#9c7a2c);color:#fff;font-size:10px;letter-spacing:1px;padding:3px 11px;border-radius:0 0 0 8px;z-index:3}
+.gcard{background:var(--fuda);border:1px solid var(--line-2);border-radius:9px;padding:8px;position:relative;overflow:hidden}
+.gcard.sold{opacity:.55;filter:grayscale(.4)}
+.gcard.hi{border:1.5px solid var(--kin);background:linear-gradient(160deg,#FDF6E1,#F4E6BD);box-shadow:0 3px 12px rgba(176,138,60,.28)}
+.gcard.hi::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 92% 6%,rgba(255,242,205,.75),transparent 38%)}
+.gcard.mid{border:1px solid #E3CF9A;background:#FBF7EC}
+.gcard .midtag{font-size:9px;color:var(--kin-d);border:1px solid #D9B45A;background:#fff;border-radius:3px;padding:1px 5px;position:relative;z-index:2}
+.gcard .g-top{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.gcard .g-zan{margin-left:auto;display:flex;align-items:baseline;gap:2px}
+.gcard .g-zan .lbl{font-size:10px;color:var(--sumi-2)}
+.gcard .g-zan .num{font-family:"Songti SC",serif;font-size:19px;font-weight:700;color:var(--sumi)}
+.gcard .g-zan .num.low{color:var(--shu)}
+.gcard .g-zan .tot{font-size:10px;color:var(--sumi-2)}
+.gcard .g-img{margin-bottom:7px;display:flex;justify-content:center}
+.gcard .g-img .ph,.gcard .g-img .ic{width:92px;height:92px}
+.gcard .g-img .ic span{font-size:38px}
+.gcard .g-name{font-size:12.5px;font-weight:600;line-height:1.3;min-height:32px}
+.gcard .g-type{font-size:10px;color:var(--ai);margin-top:2px}
+.gcard .uptag{font-size:9px;color:#fff;background:linear-gradient(135deg,#D9B45A,#9c7a2c);border:none;border-radius:3px;padding:1px 6px;position:relative;z-index:2}
+
+.sold-chip{font-family:"Songti SC",serif;color:var(--shu);border:1.5px solid var(--shu);border-radius:4px;font-size:11px;padding:1px 7px;transform:rotate(-5deg)}
+
+/* 弹窗（置中）*/
+.overlay{position:absolute;inset:0;background:rgba(42,39,35,.78);display:none;align-items:flex-start;justify-content:center;padding:430px 24px 8px;z-index:50}
+.overlay.show{display:flex}
+.result{background:var(--paper);border-radius:10px;width:100%;max-height:440px;display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--kin)}
+.result-head{text-align:center;padding:11px 16px 7px;font-size:15px;letter-spacing:3px}
+.result-body{overflow-y:auto;padding:4px 10px 8px}
+.last-hit{background:linear-gradient(135deg,#D9B45A,#9c7a2c);color:#fff;text-align:center;padding:9px;font-size:13px;letter-spacing:3px;margin-bottom:10px;border-radius:5px}
+.rk-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.rk{position:relative;border:1px solid var(--line-2);border-radius:7px;margin-bottom:0;overflow:hidden;min-height:54px;background:var(--fuda)}
+.rk .reveal{display:flex;align-items:center;gap:8px;padding:8px 9px}
+.rk .rseal{flex-shrink:0;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:38px;height:38px;border-radius:6px;background:var(--shu);color:#fff;box-shadow:inset 0 0 0 2px rgba(255,255,255,.45)}
+.rk .rseal .a{font-family:"Songti SC",serif;font-size:16px;font-weight:700;line-height:1}
+.rk .rseal .s{font-size:7px;opacity:.9;margin-top:1px;letter-spacing:.5px}
+.rk .rseal.gold{background:linear-gradient(135deg,#D9B45A,#9c7a2c);box-shadow:inset 0 0 0 2px rgba(255,255,255,.55),0 0 0 3px rgba(201,162,75,.3)}
+.rk .reveal .r-txt{flex:1;min-width:0}
+.rk .reveal .nm{font-size:12px;font-weight:700;line-height:1.25}
+.rk .reveal .ty{font-size:10px;color:var(--sumi-2);margin-top:2px}
+.rk .reveal .r-pic{background:#fff;border:1px solid var(--line-2);border-radius:8px;padding:4px;box-shadow:0 1px 4px rgba(0,0,0,.07);flex-shrink:0}
+.rk .reveal .r-pic .ph,.rk .reveal .r-pic .ic{width:46px;height:46px;box-shadow:none}
+.rk .reveal .r-pic .ic span{font-size:24px}
+.rk .cover{position:absolute;inset:0;background:var(--sumi);color:#fff;display:flex;align-items:center;justify-content:center;gap:6px;font-family:"Songti SC",serif;font-size:11px;letter-spacing:2px;z-index:2;border-left:3px dashed rgba(255,255,255,.55);clip-path:inset(0 0 0 0);transition:clip-path 1.1s ease}
+.rk.torn .cover{clip-path:inset(0 0 0 100%)}
+.rk .cover .arrow{font-size:13px;opacity:.85}
+.sum-row{display:flex;align-items:center;gap:10px;background:var(--fuda);border:1px solid var(--line-2);border-radius:7px;padding:9px 12px;margin-bottom:8px}
+.sum-row .ph,.sum-row .ic{width:40px;height:40px;flex-shrink:0} .sum-row .ic span{font-size:20px}
+.sum-row .nm{flex:1;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+.sum-row .cnt{font-family:"Songti SC",serif;font-size:18px;font-weight:700;color:var(--shu)}
+.result-foot{padding:12px 16px 16px;border-top:1px solid var(--line)}
+.btn-ok{width:100%;background:var(--sumi);color:#fff;border:none;border-radius:6px;padding:11px;font-size:14px;letter-spacing:3px;cursor:pointer;font-family:"Songti SC",serif}
+@media (prefers-reduced-motion:reduce){.rk .cover{transition:none}}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="col"><div class="device" id="dev-B"></div></div>
+</div>
+
+<script>
+/* ── 共用资料 ── */
+const ART={
+  bonus:{kind:'icon',glyph:'₱',bg:'#FCEBD6',fg:'#C9761E'},
+  point:{kind:'icon',glyph:'★',bg:'#FADBDA',fg:'#C13B36'},
+  spintok:{kind:'icon',glyph:'↻',bg:'#D8EEEC',fg:'#246E69'},
+  freespin:{kind:'icon',glyph:'⟳',bg:'#FBE4D2',fg:'#B85F1F'},
+  freebet:{kind:'icon',glyph:'＄',bg:'#EBE0F7',fg:'#6238A8'},
+  tool:{kind:'icon',glyph:'▤',bg:'#DEEAF8',fg:'#2E5DA0'},
+  physical:{kind:'photo'},
+};
+const TIERS=[
+  {sho:'A',name:'招财猫 大号公仔',type:'实物',art:'physical',total:2,left:1,hi:true},
+  {sho:'B',name:'5,000（流水x3）',type:'彩金',art:'bonus',total:5,left:2,hi:true},
+  {sho:'C',name:'免费旋转 ×30',type:'免费旋转',art:'freespin',total:8,left:4,mid:true},
+  {sho:'D',name:'免费投注 ₱50',type:'免费投注',art:'freebet',total:10,left:5,mid:true},
+  {sho:'E',name:'旋转券 ×10',type:'旋转券',art:'spintok',total:12,left:6},
+  {sho:'F',name:'1,000',type:'积分',art:'point',total:15,left:8},
+  {sho:'G',name:'道具卡 · 加倍卡',type:'道具卡',art:'tool',total:20,left:11},
+  {sho:'H',name:'1,000（流水x1）',type:'彩金',art:'bonus',total:27,left:12},
+];
+const LAST={sho:'楽',name:'招财猫 黄金开运摆件',type:'实物',art:'physical',total:1,left:1};
+const COST=95;
+
+function artImg(key){const a=ART[key];return a.kind==='photo'
+  ?`<div class="ph">实物图</div>`
+  :`<div class="ic" style="background:${a.bg}"><span style="color:${a.fg}">${a.glyph}</span></div>`;}
+function badge(t,isLast,gold){return isLast
+  ?`<span class="seal2 gold serif"><span class="a">楽</span><span class="s">LAST</span></span>`
+  :`<span class="seal2 ${gold?'gold':''} serif"><span class="a">${t.sho}</span><span class="s">赏</span></span>`;}
+function revealBadge(t,isLast){return isLast
+  ?`<span class="rseal gold serif"><span class="a">楽</span><span class="s">LAST</span></span>`
+  :`<span class="rseal serif"><span class="a">${t.sho}</span><span class="s">赏</span></span>`;}
+
+function deviceHTML(){return `
+  <div class="topbar"><div class="icon-btn">‹</div><div class="title serif">一番赏</div></div>
+  <div class="banner">
+    <div class="kv"><div class="kv-ph">主视觉 KV 图<br><small>建议 1080×600</small></div>
+      <div class="scrim"></div><div class="nobori serif">一番赏</div>
+      <div class="kv-text"><div class="kv-title serif">招财猫 开运赏</div></div>
+      <button class="kv-rules" onclick="var d=this.closest('.device');d.querySelector('.rules-ov').classList.add('show');d.scrollIntoView({behavior:'smooth',block:'start'})">📋 Rules</button></div>
+    <div class="noren-edge"></div>
+    <div class="b-stock"><div class="r1"><span>剩 <b class="js-zan">49</b> / 100 张</span></div>
+      <div class="stock-bar"><div class="stock-fill js-fill" style="width:49%"></div></div></div>
+  </div>
+  <div class="draw-zone">
+    <div class="seg js-seg">
+      <button class="on" data-n="1">单张</button><button data-n="5">五连<span class="x"> ×5</span></button>
+      <button data-n="10">十连<span class="x"> ×10</span></button><button class="all" data-n="all">全包</button></div>
+    <button class="ticket-btn js-tear"><div class="stub"><span class="s1">ICHIBAN</span><span class="s2">券</span></div>
+      <div class="main"><span class="t1">▼ 沿虚线撕开 ▼</span><span class="t2">撕券抽赏 <small class="js-cost">95 积分</small></span></div></button>
+    <div class="dz-foot"><span>每张 95 积分 · 必中一赏</span><span class="mine">积分 <b class="js-pts2">316,149</b></span></div>
+  </div>
+  <div class="pool"><div class="noren"><div class="band serif">奖品一览</div></div><div class="js-pool"></div></div>
+  <div class="rules-ov"><div class="rules-box">
+    <div class="rules-hd"><div class="rules-htitle serif">活动规则</div>
+      <div class="icon-btn" onclick="this.closest('.rules-ov').classList.remove('show')">✕</div></div>
+    <div class="rules-bd">
+      <div class="rules-row"><div class="rules-dot">1</div><div class="rules-txt">每张抽券售价 <b>95 积分</b>，必中一赏，抽奖结果当场揭晓。</div></div>
+      <div class="rules-row"><div class="rules-dot">2</div><div class="rules-txt"><b>Last赏</b>（压轴大奖）将在最后一张券被抽出时自动触发。</div></div>
+      <div class="rules-row"><div class="rules-dot">3</div><div class="rules-txt">各赏位数量有限，售罄后不再补充，请尽早参与。</div></div>
+      <div class="rules-row"><div class="rules-dot">4</div><div class="rules-txt">奖品以实际派发为准，实物奖品将另行通知配送事宜。</div></div>
+      <div class="rules-row"><div class="rules-dot">5</div><div class="rules-txt">积分余额不足时无法购券，请确认余额后再操作。</div></div>
+    </div>
+  </div></div>
+  <div class="overlay js-overlay"><div class="result">
+    <div class="result-head serif js-rhead">开奖结果</div>
+    <div class="result-body js-rbody"></div>
+    <div class="result-foot"><button class="btn-ok js-ok">收下</button></div></div></div>`;}
+
+function createApp(rootId){
+  const root=document.getElementById(rootId);
+  root.innerHTML=deviceHTML();
+  const $=s=>root.querySelector(s);
+  const tiers=TIERS.map(t=>({...t})); const last={...LAST};
+  let points=316149, drawN=1;
+
+  const normalLeft=()=>tiers.reduce((s,t)=>s+t.left,0);
+  const totalLeft=()=>normalLeft()+last.left;
+  const grand=()=>tiers.reduce((s,t)=>s+t.total,0)+last.total;
+  const curN=()=>drawN==='all'?normalLeft():drawN;
+
+  function featB(t,ribbon,note){return `<div class="gfeat"><div class="r-ribbon serif">${ribbon}</div>
+    <div class="g-img">${artImg(t.art)}</div><div class="info">${badge(t,true)}
+      <div class="f-name serif">Last赏 · ${t.name}</div><span class="f-type">${t.type}</span>
+      <div class="f-note">${note}</div><div class="f-zan">剩 <b>${t.left}</b> / ${t.total} 张</div></div></div>`;}
+  function cardB(t,{hi,mid}={}){
+    const sold=t.left<=0, low=t.left>0&&t.left/t.total<=.34;
+    return `<div class="gcard ${hi?'hi':''} ${mid?'mid':''} ${sold?'sold':''}"><div class="g-top">${badge(t,false,hi)}
+      ${hi?'<span class="uptag">★ 上位赏</span>':''}${mid?'<span class="midtag">人气</span>':''}<div class="g-zan">${sold?'<span class="sold-chip serif">售罄</span>':
+        `<span class="lbl">剩</span><span class="num ${low?'low':''}">${t.left}</span><span class="tot">/${t.total}</span>`}</div></div>
+      <div class="g-img">${artImg(t.art)}</div><div class="g-name">${t.name}</div><div class="g-type">${t.type}</div></div>`;
+  }
+  function renderPool(){
+    $('.js-pool').innerHTML=`<div class="grid">${featB(last,'压轴大奖','抽走最后一张券者自动获得')}
+      ${tiers.map(t=>cardB(t,{hi:t.hi,mid:t.mid})).join('')}</div>`;
+    updateStock();
+  }
+  function updateStock(){
+    const left=totalLeft(),tot=grand();
+    $('.js-zan').textContent=left;
+    $('.js-fill').style.width=(left/tot*100)+'%';
+    $('.js-pts2').textContent=points.toLocaleString();
+    $('.js-cost').textContent=(COST*curN()).toLocaleString()+' 积分';
+  }
+  function showResult(results,lastTriggered){
+    $('.js-rhead').textContent='抽出 '+results.length+' 张';
+    let html=lastTriggered?'<div class="last-hit serif">★ 恭喜抽中 Last赏 ★</div>':'';
+    if(results.length>12){
+      const agg={};
+      results.forEach(r=>{const k=r.isLast?'L':r.tier.sho;(agg[k]=agg[k]||{tier:r.tier,isLast:r.isLast,n:0}).n++;});
+      const aggList=Object.values(agg).sort((a,b)=>a.isLast?-1:b.isLast?1:0);
+      aggList.forEach(g=>{html+=`<div class="sum-row">
+        <div class="nm">${badge(g.tier,g.isLast)} ${g.isLast?'Last赏 · ':''}${g.tier.name}</div><div class="cnt">×${g.n}</div></div>`;});
+      $('.js-rbody').innerHTML=html;
+    }else{
+      html+='<div class="rk-grid">';
+      results.forEach((r,i)=>{const t=r.tier;
+        html+=`<div class="rk" data-i="${i}"><div class="reveal">${revealBadge(t,r.isLast)}
+          <div class="r-txt"><div class="nm">${r.isLast?'Last赏·':''}${t.name}</div><div class="ty">${t.type}</div></div>
+          </div>
+          <div class="cover serif">一番赏 <span class="arrow">撕▶</span></div></div>`;});
+      html+='</div>';
+      $('.js-rbody').innerHTML=html;
+      results.forEach((r,i)=>setTimeout(()=>{const el=$(`.rk[data-i="${i}"]`);if(el)el.classList.add('torn');},300+i*280));
+    }
+    $('.js-overlay').classList.add('show');
+    root.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  function draw(){
+    if(totalLeft()<=0)return;
+    const want=Math.min(curN(),normalLeft()); if(want<=0)return;
+    const cost=COST*want; if(points<cost){alert('积分不足');return;}
+    let pool=[]; tiers.forEach((t,i)=>{for(let k=0;k<t.left;k++)pool.push(i);});
+    const results=[]; let lastTriggered=false;
+    for(let d=0;d<want;d++){
+      if(pool.length>0){
+        const idx=Math.floor(Math.random()*pool.length); const ti=pool.splice(idx,1)[0];
+        tiers[ti].left--; results.push({tier:tiers[ti]});
+        if(pool.length===0&&last.left>0){last.left--;lastTriggered=true;results.push({tier:last,isLast:true});}
+      }
+    }
+    points-=cost; renderPool(); showResult(results,lastTriggered);
+  }
+
+  $('.js-seg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+    $('.js-seg').querySelectorAll('button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on'); drawN=b.dataset.n==='all'?'all':parseInt(b.dataset.n); updateStock();});
+  $('.js-tear').addEventListener('click',draw);
+  $('.js-ok').addEventListener('click',()=>{$('.js-overlay').classList.remove('show');
+    if(totalLeft()<=0){const b=$('.js-tear');b.disabled=true;b.querySelector('.main').innerHTML='<span class="t2">已全部抽完</span>';}});
+
+  renderPool();
+}
+
+createApp('dev-B');
+</script>
+</body>
+</html>
