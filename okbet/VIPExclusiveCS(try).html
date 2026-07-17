@@ -1,0 +1,1635 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>规格文件 · VIP专属客服</title>
+<style>
+:root {
+  --bg: #080e1c;
+  --bg2: #0c1526;
+  --bg3: #101d35;
+  --card: #0d1a2e;
+  --card2: #111f38;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --gold: #F5BA35;
+  --gold2: #FFD166;
+  --gold-bg: rgba(245,186,53,0.1);
+  --gold-border: rgba(245,186,53,0.3);
+  --green: #2DDC7C;
+  --green-bg: rgba(45,220,124,0.1);
+  --green-border: rgba(45,220,124,0.3);
+  --red: #FF5757;
+  --red-bg: rgba(255,87,87,0.1);
+  --red-border: rgba(255,87,87,0.3);
+  --blue: #4B9FFF;
+  --blue-bg: rgba(75,159,255,0.1);
+  --blue-border: rgba(75,159,255,0.3);
+  --gray: #8BA3C0;
+  --gray-bg: rgba(139,163,192,0.08);
+  --text: #EFF4FA;
+  --text2: #8BA3C0;
+  --text3: #7C93AE;
+  --new-badge: #2DDC7C;
+  --change-badge: #F5BA35;
+  --nochange-badge: #4E6278;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Segoe UI','PingFang SC','Noto Sans SC','Microsoft YaHei',sans-serif;
+  font-size:14px;
+  line-height:1.65;
+  min-height:100vh;
+}
+
+/* ── NAV ── */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:999;
+  height:50px;display:flex;align-items:center;
+  background:rgba(8,14,28,0.92);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  padding:0 24px;gap:4px;
+}
+.nav-brand{
+  font-size:12px;font-weight:700;letter-spacing:1.2px;
+  color:var(--gold);margin-right:16px;white-space:nowrap;
+  display:flex;align-items:center;gap:6px;
+}
+.nav-sep{width:1px;height:20px;background:var(--border2);margin:0 4px;}
+.nav-links{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;}
+.nav-links::-webkit-scrollbar{display:none;}
+.nav-a{
+  font-size:12px;color:var(--text2);text-decoration:none;
+  padding:5px 11px;border-radius:6px;white-space:nowrap;
+  transition:all .18s;
+}
+.nav-a:hover{color:var(--text);background:rgba(255,255,255,0.06);}
+.nav-a.active{color:var(--gold);background:var(--gold-bg);}
+
+/* ── LAYOUT ── */
+.wrap{max-width:1080px;margin:0 auto;padding:68px 24px 80px;}
+
+/* ── DOC HEADER ── */
+.doc-header{
+  background:linear-gradient(135deg,#0d1a30 0%,#10213f 60%,#0c1829 100%);
+  border:1px solid var(--border2);border-radius:16px;
+  padding:36px 40px;margin-bottom:32px;position:relative;overflow:hidden;
+}
+.doc-header::after{
+  content:'';position:absolute;top:-60px;right:-60px;
+  width:320px;height:320px;border-radius:50%;
+  background:radial-gradient(circle,rgba(245,186,53,0.06) 0%,transparent 70%);
+  pointer-events:none;
+}
+.doc-eyebrow{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--gold);background:var(--gold-bg);
+  border:1px solid var(--gold-border);border-radius:4px;
+  padding:3px 10px;margin-bottom:16px;
+}
+.doc-title{
+  font-size:26px;font-weight:800;line-height:1.25;margin-bottom:8px;color:#fff;
+}
+.doc-title em{color:var(--gold);font-style:normal;}
+.doc-desc{font-size:14px;color:var(--text2);margin-bottom:24px;white-space:nowrap;}
+.doc-meta{display:flex;flex-wrap:wrap;gap:10px;}
+.meta-chip{
+  display:flex;align-items:center;gap:6px;
+  font-size:12px;color:var(--text2);
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);border-radius:6px;padding:5px 12px;
+}
+.meta-chip strong{color:var(--text);}
+
+/* ── SECTIONS ── */
+.section{margin-bottom:44px;}
+.sec-head{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:20px;padding-bottom:14px;
+  border-bottom:1px solid var(--border);
+}
+.sec-num{
+  width:30px;height:30px;flex-shrink:0;
+  background:var(--gold-bg);border:1px solid var(--gold-border);
+  border-radius:7px;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:800;color:var(--gold);
+}
+.sec-title{font-size:17px;font-weight:700;color:#fff;}
+.sec-sub{font-size:12px;color:var(--text2);margin-left:2px;}
+
+/* ── BADGES ── */
+.badge{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:12px;font-weight:700;padding:3px 9px;border-radius:4px;
+}
+.badge-new{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);}
+.badge-change{background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-border);}
+.badge-nochange{background:var(--gray-bg);color:var(--text2);border:1px solid var(--border);}
+.badge-high{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);}
+
+/* ── CARD ── */
+.card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:22px 24px;margin-bottom:14px;
+}
+.card-title{
+  font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
+  color:var(--text2);margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+}
+.card.gold-border{border-color:var(--gold-border);}
+.card.green-border{border-color:var(--green-border);}
+.card.blue-border{border-color:var(--blue-border);}
+
+/* ── SUMMARY TABLE ── */
+.sum-table{width:100%;border-collapse:collapse;}
+.sum-table th{
+  font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
+  color:var(--text2);text-align:left;
+  padding:10px 16px;border-bottom:1px solid var(--border);
+  background:rgba(255,255,255,0.02);
+}
+.sum-table td{
+  padding:11px 16px;border-bottom:1px solid var(--border);
+  font-size:13px;vertical-align:top;
+}
+.sum-table tr:last-child td{border-bottom:none;}
+.sum-table tr:hover td{background:rgba(255,255,255,0.02);}
+
+/* ── CALL OUT ── */
+.callout{
+  border-radius:10px;padding:14px 16px;margin-bottom:14px;
+  display:flex;gap:10px;align-items:flex-start;
+}
+.callout.info{background:var(--blue-bg);border:1px solid var(--blue-border);}
+.callout.warn{background:var(--gold-bg);border:1px solid var(--gold-border);}
+.callout.tip{background:var(--green-bg);border:1px solid var(--green-border);}
+.callout.danger{background:var(--red-bg);border:1px solid var(--red-border);}
+.callout-icon{font-size:16px;margin-top:1px;flex-shrink:0;}
+.callout-body{font-size:13px;color:var(--text);}
+.callout-body strong{font-weight:700;}
+
+/* ── RULE LIST ── */
+.rule-list{list-style:none;display:flex;flex-direction:column;gap:10px;}
+.rule-item{
+  display:flex;gap:12px;align-items:flex-start;
+  background:rgba(255,255,255,0.02);border:1px solid var(--border);
+  border-radius:9px;padding:12px 14px;font-size:13px;
+}
+.rule-item:hover{background:rgba(255,255,255,0.04);}
+.rule-num{
+  width:22px;height:22px;flex-shrink:0;
+  background:var(--card2);border:1px solid var(--border2);
+  border-radius:5px;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:var(--text2);margin-top:1px;
+}
+.rule-text{flex:1;color:var(--text);}
+.rule-text strong{color:var(--gold);}
+
+/* ── ADMIN MOCKUP ── */
+.admin-shell{
+  background:#0a1424;border:1px solid var(--border2);
+  border-radius:12px;overflow:hidden;font-size:12px;
+}
+.admin-topbar{
+  background:#0d1b30;border-bottom:1px solid var(--border);
+  padding:10px 16px;display:flex;align-items:center;gap:8px;
+}
+.admin-dot{width:10px;height:10px;border-radius:50%;}
+.admin-dot.r{background:#FF5F57;}
+.admin-dot.y{background:#FEBC2E;}
+.admin-dot.g{background:#28C840;}
+.admin-breadcrumb{
+  margin-left:12px;font-size:12px;color:var(--text2);
+  display:flex;align-items:center;gap:6px;
+}
+.admin-breadcrumb span{color:var(--text);}
+.admin-breadcrumb .sep{color:var(--text3);}
+.admin-body{padding:16px;}
+.admin-tabs{display:flex;gap:2px;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:0;}
+.admin-tab{
+  font-size:12px;padding:8px 16px;border-radius:6px 6px 0 0;
+  cursor:pointer;color:var(--text2);border:1px solid transparent;
+  border-bottom:none;transition:all .18s;
+}
+.admin-tab.active{
+  color:var(--gold);background:var(--card2);
+  border-color:var(--border);border-bottom-color:var(--card2);
+}
+
+/* Admin table */
+.admin-tbl-wrap{overflow-x:auto;}
+.admin-tbl{width:100%;border-collapse:collapse;min-width:780px;}
+.admin-tbl th{
+  font-size:12px;font-weight:600;color:var(--text2);text-align:left;
+  padding:9px 12px;background:#0c1828;border-bottom:1px solid var(--border);
+  white-space:nowrap;
+}
+.admin-tbl th.new-col{
+  background:rgba(45,220,124,0.08);
+  color:var(--green);border-bottom:2px solid var(--green);
+}
+.admin-tbl th.new-col .new-tag{
+  display:inline-block;margin-left:6px;
+  font-size:12px;font-weight:800;letter-spacing:.8px;
+  color:var(--green);background:var(--green-bg);
+  border:1px solid var(--green-border);border-radius:3px;
+  padding:1px 5px;vertical-align:middle;
+}
+.admin-tbl td{
+  padding:10px 12px;border-bottom:1px solid var(--border);
+  color:var(--text);white-space:nowrap;vertical-align:middle;
+}
+.admin-tbl td.new-col-cell{
+  background:rgba(45,220,124,0.04);
+  border-left:2px solid rgba(45,220,124,0.15);
+  border-right:2px solid rgba(45,220,124,0.15);
+}
+.admin-tbl tr:hover td{background:rgba(255,255,255,0.02);}
+.admin-tbl tr:hover td.new-col-cell{background:rgba(45,220,124,0.07);}
+
+.vip-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:12px;font-weight:700;padding:3px 8px;border-radius:5px;
+  background:rgba(139,163,192,0.15);color:var(--text);
+  border:1px solid var(--border2);
+}
+
+.cs-link-input{
+  background:#0a1424;border:1px solid var(--border2);
+  border-radius:5px;color:var(--text);font-size:12px;
+  padding:5px 9px;width:160px;
+  transition:all .18s;outline:none;
+}
+.cs-link-input:focus{border-color:var(--green);box-shadow:0 0 0 2px rgba(45,220,124,0.15);}
+.cs-link-input.filled{border-color:rgba(45,220,124,0.4);color:var(--green);}
+.cs-link-input::placeholder{color:var(--text3);}
+
+.btn-sm{
+  font-size:12px;font-weight:600;padding:5px 12px;border-radius:5px;
+  cursor:pointer;border:none;transition:all .18s;
+}
+.btn-primary{background:var(--gold);color:#000;}
+.btn-primary:hover{background:var(--gold2);}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2);}
+.btn-ghost:hover{background:rgba(255,255,255,0.06);color:var(--text);}
+.btn-success{background:var(--green);color:#000;}
+.btn-success:hover{background:#3de88a;}
+
+.pill{
+  display:inline-block;font-size:12px;padding:2px 8px;border-radius:20px;
+}
+.pill-on{background:rgba(45,220,124,0.15);color:var(--green);}
+.pill-off{background:rgba(139,163,192,0.1);color:var(--text2);}
+.pill-dash{color:var(--text2);}
+
+/* ── FIELD SPEC TABLE ── */
+.spec-table{width:100%;border-collapse:collapse;}
+.spec-table tr{border-bottom:1px solid var(--border);}
+.spec-table tr:last-child{border-bottom:none;}
+.spec-table td:first-child{
+  width:140px;font-size:12px;color:var(--text2);font-weight:600;
+  padding:11px 16px;white-space:nowrap;
+  background:rgba(255,255,255,0.02);
+}
+.spec-table td:last-child{padding:11px 16px;font-size:13px;}
+
+/* ── POSITION DIAGRAM ── */
+.pos-diagram{
+  background:#0a1424;border:1px solid var(--border2);
+  border-radius:10px;padding:20px;overflow-x:auto;
+}
+.pos-cols{display:flex;align-items:center;gap:0;flex-wrap:nowrap;min-width:600px;}
+.pos-col{
+  padding:10px 14px;font-size:12px;font-weight:600;
+  border:1px solid var(--border);text-align:center;
+  background:#0d1930;color:var(--text2);white-space:nowrap;
+  border-radius:0;flex:1;
+}
+.pos-col:first-child{border-radius:8px 0 0 8px;}
+.pos-col:last-child{border-radius:0 8px 8px 0;}
+.pos-col.highlight{
+  background:rgba(45,220,124,0.1);
+  border-color:var(--green);color:var(--green);
+  position:relative;
+}
+.pos-col.highlight::before{
+  content:'🆕 NEW';
+  position:absolute;top:-30px;left:50%;transform:translateX(-50%);
+  font-size:12px;font-weight:800;letter-spacing:.5px;line-height:1;
+  color:var(--green);background:var(--green-bg);
+  border:1px solid var(--green-border);border-radius:3px;padding:4px 6px;
+  white-space:nowrap;
+}
+.pos-col.right-of{
+  background:rgba(255,215,0,0.06);border-color:rgba(255,215,0,0.3);color:var(--gold2);
+  position:relative;
+}
+.pos-col.right-of::before{
+  content:'← 参照栏位';
+  position:absolute;top:-30px;left:50%;transform:translateX(-50%);
+  font-size:12px;line-height:1;color:var(--gold);background:var(--gold-bg);
+  border:1px solid var(--gold-border);border-radius:3px;padding:4px 7px;
+  white-space:nowrap;
+}
+.pos-arrow{
+  font-size:14px;color:var(--text3);flex-shrink:0;padding:0 4px;
+}
+
+/* ── PHONE MOCKUP ── */
+.phone-wrap{
+  display:flex;flex-direction:column;align-items:center;gap:16px;
+}
+.phone-frames{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;}
+.phone-frame{
+  width:230px;flex-shrink:0;
+  background:#0a0f1c;
+  border:2px solid var(--border2);
+  border-radius:36px;
+  padding:8px;
+  box-shadow:0 0 40px rgba(0,0,0,0.5);
+  position:relative;
+}
+.phone-notch{
+  width:70px;height:20px;background:#0a0f1c;
+  border-radius:0 0 10px 10px;margin:0 auto 0;
+  position:relative;z-index:2;
+}
+.phone-screen{
+  background:#0e1628;border-radius:28px;
+  overflow:hidden;min-height:380px;position:relative;
+}
+.phone-statusbar{
+  height:24px;background:#0a1020;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 14px;font-size:12px;color:var(--text2);
+}
+.phone-navbar{
+  background:#0b1525;border-bottom:1px solid var(--border);
+  padding:10px 14px;display:flex;align-items:center;gap:8px;
+}
+.phone-back{font-size:16px;color:var(--text2);}
+.phone-page-title{font-size:13px;font-weight:700;color:var(--text);}
+.phone-content{padding:12px;}
+.phone-content p{font-size:12px;color:var(--text2);margin-bottom:6px;}
+.phone-card{
+  background:#111f38;border:1px solid var(--border);
+  border-radius:8px;padding:10px 12px;margin-bottom:8px;
+}
+.phone-card h4{font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.phone-card p{font-size:12px;color:var(--text2);margin-bottom:0;}
+.phone-label{
+  position:absolute;bottom:-28px;left:50%;transform:translateX(-50%);
+  font-size:12px;color:var(--text2);white-space:nowrap;
+}
+
+/* CS float button */
+.cs-float{
+  position:absolute;bottom:56px;right:12px;
+  width:44px;height:44px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;cursor:pointer;
+  box-shadow:0 4px 14px rgba(0,0,0,0.4);
+  transition:transform .15s,box-shadow .15s;
+  border:none;
+}
+.cs-float:hover{transform:scale(1.07);box-shadow:0 6px 20px rgba(0,0,0,0.5);}
+.cs-float.cs-vip{background:linear-gradient(135deg,#F4B942,#FF8C00);}
+.cs-float.cs-default{background:linear-gradient(135deg,#4B9FFF,#5B5FFF);}
+.phone-tabbar{
+  position:absolute;bottom:0;left:0;right:0;
+  height:48px;background:#0a1020;border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-around;
+}
+.tab-icon{font-size:18px;color:var(--text3);}
+.tab-icon.active{color:var(--gold);}
+.phone-vip-tag{
+  position:absolute;top:10px;right:12px;
+  font-size:12px;font-weight:700;padding:3px 7px;border-radius:4px;
+}
+.phone-desc{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:10px;padding:14px 16px;
+  font-size:12px;color:var(--text);max-width:230px;
+  text-align:center;
+}
+.phone-desc strong{color:var(--gold);}
+.phone-desc .result{
+  margin-top:8px;padding:8px;border-radius:7px;font-size:12px;
+  background:rgba(45,220,124,0.1);border:1px solid var(--green-border);
+  color:var(--green);font-weight:600;
+}
+.phone-desc .result.fallback{
+  background:rgba(75,159,255,0.1);border:1px solid var(--blue-border);
+  color:var(--blue);
+}
+
+/* ── FLOWCHART ── */
+.flow-wrap{overflow-x:auto;display:flex;justify-content:center;}
+.flow-svg{display:block;}
+
+/* ── SCENARIO TABLE ── */
+.scenario-tbl{width:100%;border-collapse:collapse;}
+.scenario-tbl th{
+  font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+  color:var(--text2);text-align:left;padding:10px 14px;
+  background:rgba(255,255,255,0.02);border-bottom:1px solid var(--border);
+}
+.scenario-tbl td{
+  padding:11px 14px;border-bottom:1px solid var(--border);
+  font-size:13px;vertical-align:middle;
+}
+.scenario-tbl tr:last-child td{border-bottom:none;}
+.scenario-tbl tr:hover td{background:rgba(255,255,255,0.02);}
+.scenario-num{
+  width:22px;height:22px;background:var(--card2);
+  border:1px solid var(--border2);border-radius:5px;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:var(--text2);
+}
+.result-vip{
+  font-size:12px;font-weight:700;
+  color:var(--green);display:flex;align-items:center;gap:5px;
+}
+.result-default{
+  font-size:12px;color:var(--blue);display:flex;align-items:center;gap:5px;
+}
+
+/* ── INTERACTIVE DEMO ── */
+.demo-wrap{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;
+}
+.demo-controls{
+  padding:20px 24px;border-bottom:1px solid var(--border);
+  background:rgba(255,255,255,0.02);
+}
+.demo-controls h3{font-size:13px;font-weight:700;color:var(--text);margin-bottom:16px;}
+.ctrl-row{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;}
+.ctrl-group{display:flex;flex-direction:column;gap:6px;}
+.ctrl-label{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;}
+.ctrl-select{
+  background:#0a1424;border:1px solid var(--border2);
+  color:var(--text);font-size:13px;padding:8px 12px;
+  border-radius:7px;cursor:pointer;outline:none;min-width:160px;
+}
+.ctrl-select:focus{border-color:var(--gold);}
+.ctrl-toggle{display:flex;gap:0;border-radius:7px;overflow:hidden;border:1px solid var(--border2);}
+.ctrl-toggle button{
+  font-size:12px;font-weight:600;padding:8px 14px;
+  border:none;cursor:pointer;transition:all .18s;background:transparent;color:var(--text2);
+}
+.ctrl-toggle button.on{background:var(--green);color:#000;}
+.ctrl-toggle button.off{background:var(--red-bg);color:var(--red);}
+
+.demo-result{
+  padding:24px;display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start;
+}
+.demo-phone{position:relative;}
+.demo-output{flex:1;min-width:200px;}
+.output-box{
+  background:var(--card2);border-radius:10px;padding:18px;
+  border:1px solid var(--border);margin-bottom:12px;
+}
+.output-title{font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text2);margin-bottom:10px;}
+.output-val{font-size:20px;font-weight:800;margin-bottom:4px;}
+.output-val.green{color:var(--green);}
+.output-val.blue{color:var(--blue);}
+.output-sub{font-size:12px;color:var(--text2);}
+.output-reason{
+  border-radius:9px;padding:12px 14px;font-size:12px;
+}
+.output-reason.vip-route{background:var(--green-bg);border:1px solid var(--green-border);color:var(--text);}
+.output-reason.default-route{background:var(--blue-bg);border:1px solid var(--blue-border);color:var(--text);}
+.output-reason strong{font-weight:700;}
+
+/* ── TWO COL ── */
+.two-col{display:flex;gap:16px;flex-wrap:wrap;}
+.two-col > *{flex:1;min-width:260px;}
+
+/* ── DIVIDER ── */
+.divider{height:1px;background:var(--border);margin:28px 0;}
+
+/* ── PRIORITY INDICATOR ── */
+.priority-stack{display:flex;flex-direction:column;gap:8px;}
+.priority-item{
+  display:flex;align-items:center;gap:12px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:9px;padding:12px 14px;
+  transition:all .18s;
+}
+.priority-item:hover{border-color:var(--border2);}
+.priority-rank{
+  width:28px;height:28px;flex-shrink:0;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:800;
+}
+.rank-1{background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-border);}
+.rank-2{background:var(--gray-bg);color:var(--text2);border:1px solid var(--border);}
+.priority-body{flex:1;}
+.priority-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.priority-desc{font-size:12px;color:var(--text2);}
+.priority-badge{flex-shrink:0;}
+
+/* ── TOAST DEMO ── */
+.toast-demo{
+  background:#1a2840;border:1px solid var(--border2);
+  border-radius:12px;padding:16px;display:flex;gap:10px;align-items:center;
+}
+.toast-icon{font-size:20px;}
+.toast-body h4{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.toast-body p{font-size:12px;color:var(--text2);}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.2);}
+
+/* ── NOTE LABEL ── */
+.note-label{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:12px;color:var(--text2);
+  background:rgba(255,255,255,0.04);border:1px solid var(--border);
+  border-radius:4px;padding:2px 8px;margin-bottom:10px;
+}
+
+/* ── ANIMATION ── */
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+.pulse{animation:pulse 2s ease-in-out infinite;}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.fade-in{animation:fadeIn .3s ease forwards;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-brand">📋 规格文件</div>
+  <div class="nav-sep"></div>
+  <div class="nav-links">
+    <a href="#purpose" class="nav-a">需求目的</a>
+    <a href="#summary" class="nav-a">变更摘要</a>
+    <a href="#backend" class="nav-a">后台规则</a>
+    <a href="#frontend" class="nav-a">前台规则</a>
+    <a href="#flowchart" class="nav-a">判断逻辑</a>
+    <a href="#scenarios" class="nav-a">情境穷举</a>
+    <a href="#demo" class="nav-a">互动示意</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- DOC HEADER -->
+  <div class="doc-header">
+    <div class="doc-eyebrow">📋 需求规格文件</div>
+    <h1 class="doc-title">VIP <em>专属客服</em> 功能</h1>
+    <p class="doc-desc">依据用户VIP等级，在后台配置对应的专属客服链接，前台点击客服图标时自动导向对应客服渠道。</p>
+    <div class="doc-meta">
+      <div class="meta-chip"><span>版本</span><strong>v1.0</strong></div>
+      <div class="meta-chip"><span>日期</span><strong>2026.07.15</strong></div>
+      <div class="meta-chip"><span>后台页面</span><strong>VIP特权 › 福利金额</strong></div>
+      <div class="meta-chip"><span>前台影响</span><strong>全站客服 Icon 行为</strong></div>
+    </div>
+  </div>
+
+  <!-- SECTION 0: PURPOSE -->
+  <div id="purpose" class="section">
+    <div class="sec-head">
+      <div class="sec-num">1</div>
+      <h2 class="sec-title">需求目的</h2>
+    </div>
+    <div class="callout info">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <strong>核心目标：</strong>不同等级的 VIP 用户点击客服图标（CS Icon）时，能被自动导向该等级专属的客服渠道，提升 VIP 用户的服务体验与分级服务能力。
+      </div>
+    </div>
+    <div class="card">
+      <ul class="rule-list">
+        <li class="rule-item">
+          <div class="rule-num">1</div>
+          <div class="rule-text">后台运营人员可在「活动配置 › 活动列表 › VIP活动 › 福利金额」为每个 VIP 等级独立配置<strong>VIP客服链接</strong>。</div>
+        </li>
+        <li class="rule-item">
+          <div class="rule-num">2</div>
+          <div class="rule-text">「VIP客服链接」栏位显示于「福利金额」页面中「<strong>极速出款</strong>」右侧位置。</div>
+        </li>
+        <li class="rule-item">
+          <div class="rule-num">3</div>
+          <div class="rule-text">该链接配置后，前台用户点击客服图标时，<strong>直接开启对应的客服对话（权重最高，覆盖既有规则）</strong>。</div>
+        </li>
+        <li class="rule-item">
+          <div class="rule-num">4</div>
+          <div class="rule-text">若该 VIP 等级未配置链接，<strong>维持既有客服规则不变</strong>（向后兼容，不影响现有行为）。</div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SECTION 1: SUMMARY -->
+  <div id="summary" class="section">
+    <div class="sec-head">
+      <div class="sec-num">2</div>
+      <h2 class="sec-title">变更摘要</h2>
+      <span class="sec-sub">本次涉及异动的页面与功能</span>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <table class="sum-table">
+        <thead>
+          <tr>
+            <th>类别</th>
+            <th>页面 / 功能</th>
+            <th>异动内容</th>
+            <th>状态</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>后台</strong></td>
+            <td>VIP特权 › 福利金额</td>
+            <td>新增「VIP客服链接」编辑栏位，位于「极速出款」右侧</td>
+            <td><span class="badge badge-new">新增</span></td>
+          </tr>
+          <tr>
+            <td><strong>前台</strong></td>
+            <td>全站客服 Icon 点击行为</td>
+            <td>当 VIP等级有配置客服链接时，直接开启对应链接（权重最高）</td>
+            <td><span class="badge badge-change">异动</span></td>
+          </tr>
+          <tr>
+            <td><strong>前台</strong></td>
+            <td>客服 Icon 既有路由逻辑</td>
+            <td>VIP客服链接未配置时，维持既有规则不受影响</td>
+            <td><span class="badge badge-nochange">不异动</span></td>
+          </tr>
+          <tr>
+            <td><strong>前台</strong></td>
+            <td>VIP特权页面 / VIP等级展示</td>
+            <td>本次不涉及</td>
+            <td><span class="badge badge-nochange">不异动</span></td>
+          </tr>
+          <tr>
+            <td><strong>后台</strong></td>
+            <td>VIP特权 › 其他既有栏位</td>
+            <td>晋级礼金、生日礼金、每周红包等均不受影响</td>
+            <td><span class="badge badge-nochange">不异动</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 2: BACKEND -->
+  <div id="backend" class="section">
+    <div class="sec-head">
+      <div class="sec-num">3</div>
+      <h2 class="sec-title">后台规则</h2>
+      <span class="badge badge-new" style="margin-left:4px;">新增</span>
+    </div>
+
+    <!-- 3.1 Position annotation -->
+    <div class="note-label">📍 对应页签：后台 › VIP特权 › 福利金额</div>
+    <div class="card gold-border">
+      <div class="card-title">📐 3.1 栏位位置示意 — VIP客服链接 在「极速出款」右侧</div>
+      <div class="pos-diagram">
+        <div style="font-size:12px;color:var(--text2);margin-bottom:18px;">「福利金额」页面栏位顺序（左 → 右）</div>
+        <div class="pos-cols">
+          <div class="pos-col">VIP等级</div>
+          <div class="pos-col">晋级礼金</div>
+          <div class="pos-col">生日礼金</div>
+          <div class="pos-col">每周红包</div>
+          <div class="pos-col">专属红包</div>
+          <div class="pos-col">专属客服</div>
+          <div class="pos-col right-of">极速出款</div>
+          <div class="pos-col highlight">VIP客服链接</div>
+        </div>
+        <div style="font-size:12px;color:var(--text2);margin-top:16px;">
+          ← 灰色栏位为既有栏位（不异动）　
+          <span style="color:var(--green);">■ 绿色</span> = 本次新增　
+          <span style="color:var(--gold);">■ 金色</span> = 相邻参照栏位
+        </div>
+      </div>
+    </div>
+
+    <!-- 3.2 Admin panel mockup -->
+    <div class="card" style="padding:0;overflow:hidden;">
+      <div style="padding:16px 20px 12px;border-bottom:1px solid var(--border);">
+        <div class="card-title">🖥 3.2 后台页面示意图 — 福利金额设定页</div>
+        <div class="callout tip" style="margin-bottom:0;">
+          <span class="callout-icon">✅</span>
+          <div class="callout-body">绿色边框列为本次新增栏位「VIP客服链接」。每个VIP等级可独立设定对应的客服URL，可留空。</div>
+        </div>
+      </div>
+      <div style="padding:16px;">
+        <div class="admin-shell">
+          <div class="admin-topbar">
+            <div class="admin-dot r"></div>
+            <div class="admin-dot y"></div>
+            <div class="admin-dot g"></div>
+            <div class="admin-breadcrumb">
+              后台管理系统
+              <span class="sep">›</span> VIP特权
+              <span class="sep">›</span> <span>福利金额</span>
+            </div>
+          </div>
+          <div class="admin-body">
+            <div class="admin-tabs">
+              <div class="admin-tab">等级设定</div>
+              <div class="admin-tab active">福利金额</div>
+              <div class="admin-tab">活动设定</div>
+            </div>
+            <div class="admin-tbl-wrap">
+              <table class="admin-tbl">
+                <thead>
+                  <tr>
+                    <th>VIP等级</th>
+                    <th>晋级礼金</th>
+                    <th>生日礼金</th>
+                    <th>每周红包</th>
+                    <th>专属红包</th>
+                    <th>专属客服</th>
+                    <th>极速出款</th>
+                    <th class="new-col">VIP客服链接<span class="new-tag">NEW</span></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="vip-badge">VIP 0</span></td>
+                    <td><span class="pill pill-dash">—</span></td>
+                    <td><span class="pill pill-dash">—</span></td>
+                    <td><span class="pill pill-dash">—</span></td>
+                    <td><span class="pill pill-dash">—</span></td>
+                    <td><span class="pill pill-off">关</span></td>
+                    <td><span class="pill pill-off">关</span></td>
+                    <td class="new-col-cell"><input class="cs-link-input" placeholder="https://..." value="" id="link0" /></td>
+                  </tr>
+                  <tr>
+                    <td><span class="vip-badge">VIP 1</span></td>
+                    <td>₱500</td>
+                    <td>₱300</td>
+                    <td>₱100</td>
+                    <td>₱200</td>
+                    <td><span class="pill pill-on">开</span></td>
+                    <td><span class="pill pill-on">开</span></td>
+                    <td class="new-col-cell"><input class="cs-link-input filled" placeholder="https://..." value="https://chat.example.com/vip1" id="link1" /></td>
+                  </tr>
+                  <tr>
+                    <td><span class="vip-badge">VIP 2</span></td>
+                    <td>₱1,000</td>
+                    <td>₱600</td>
+                    <td>₱250</td>
+                    <td>₱500</td>
+                    <td><span class="pill pill-on">开</span></td>
+                    <td><span class="pill pill-on">开</span></td>
+                    <td class="new-col-cell"><input class="cs-link-input" placeholder="https://..." value="" id="link2" /></td>
+                  </tr>
+                  <tr>
+                    <td><span class="vip-badge">VIP 3</span></td>
+                    <td>₱3,000</td>
+                    <td>₱1,500</td>
+                    <td>₱600</td>
+                    <td>₱1,200</td>
+                    <td><span class="pill pill-on">开</span></td>
+                    <td><span class="pill pill-on">开</span></td>
+                    <td class="new-col-cell"><input class="cs-link-input filled" placeholder="https://..." value="https://chat.example.com/vip3" id="link3" /></td>
+                  </tr>
+                  <tr>
+                    <td><span class="vip-badge">VIP 4</span></td>
+                    <td>₱5,000</td>
+                    <td>₱3,000</td>
+                    <td>₱1,000</td>
+                    <td>₱2,000</td>
+                    <td><span class="pill pill-on">开</span></td>
+                    <td><span class="pill pill-on">开</span></td>
+                    <td class="new-col-cell"><input class="cs-link-input filled" placeholder="https://..." value="https://chat.example.com/vip4-exclusive" id="link4" /></td>
+                  </tr>
+                  <tr>
+                    <td><span class="vip-badge">VIP 5</span></td>
+                    <td>₱8,000</td>
+                    <td>₱4,000</td>
+                    <td>₱1,500</td>
+                    <td>₱3,000</td>
+                    <td><span class="pill pill-on">开</span></td>
+                    <td><span class="pill pill-on">开</span></td>
+                    <td class="new-col-cell"><input class="cs-link-input" placeholder="https://..." value="" id="link5" /></td>
+                  </tr>
+                  <tr>
+                    <td><span class="vip-badge">VIP 6</span></td>
+                    <td>₱12,000</td>
+                    <td>₱6,000</td>
+                    <td>₱2,000</td>
+                    <td>₱4,000</td>
+                    <td><span class="pill pill-on">开</span></td>
+                    <td><span class="pill pill-on">开</span></td>
+                    <td class="new-col-cell"><input class="cs-link-input filled" placeholder="https://..." value="https://chat.example.com/vip6" id="link6" /></td>
+                  </tr>
+                  <tr>
+                    <td><span class="vip-badge">VIP 7</span></td>
+                    <td>₱18,000</td>
+                    <td>₱9,000</td>
+                    <td>₱3,000</td>
+                    <td>₱6,000</td>
+                    <td><span class="pill pill-on">开</span></td>
+                    <td><span class="pill pill-on">开</span></td>
+                    <td class="new-col-cell"><input class="cs-link-input" placeholder="https://..." value="" id="link7" /></td>
+                  </tr>
+                  <tr>
+                    <td><span class="vip-badge">VIP 8</span></td>
+                    <td>₱25,000</td>
+                    <td>₱12,000</td>
+                    <td>₱4,000</td>
+                    <td>₱8,000</td>
+                    <td><span class="pill pill-on">开</span></td>
+                    <td><span class="pill pill-on">开</span></td>
+                    <td class="new-col-cell"><input class="cs-link-input filled" placeholder="https://..." value="https://chat.example.com/vip8" id="link8" /></td>
+                  </tr>
+                  <tr>
+                    <td><span class="vip-badge">VIP 9</span></td>
+                    <td>₱35,000</td>
+                    <td>₱18,000</td>
+                    <td>₱6,000</td>
+                    <td>₱12,000</td>
+                    <td><span class="pill pill-on">开</span></td>
+                    <td><span class="pill pill-on">开</span></td>
+                    <td class="new-col-cell"><input class="cs-link-input" placeholder="https://..." value="" id="link9" /></td>
+                  </tr>
+                  <tr>
+                    <td><span class="vip-badge">VIP 10</span></td>
+                    <td>₱50,000</td>
+                    <td>₱25,000</td>
+                    <td>₱10,000</td>
+                    <td>₱20,000</td>
+                    <td><span class="pill pill-on">开</span></td>
+                    <td><span class="pill pill-on">开</span></td>
+                    <td class="new-col-cell"><input class="cs-link-input filled" placeholder="https://..." value="https://chat.example.com/vip10-exclusive" id="link10" /></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3.3 Field spec -->
+    <div class="card green-border">
+      <div class="card-title">📋 3.3 「VIP客服链接」栏位规格</div>
+      <div style="padding:0;overflow:hidden;border:1px solid var(--border);border-radius:8px;">
+        <table class="spec-table">
+          <tbody>
+            <tr>
+              <td>栏位标签</td>
+              <td><strong>VIP客服链接</strong>（每个VIP等级独立设定）</td>
+            </tr>
+            <tr>
+              <td>栏位类型</td>
+              <td>单行文字输入框（Text Input）</td>
+            </tr>
+            <tr>
+              <td>是否必填</td>
+              <td><span style="color:var(--green);">否</span> — 可留空。留空时前台维持既有客服规则。</td>
+            </tr>
+            <tr>
+              <td>格式验证</td>
+              <td>输入值须以 <code style="background:var(--card2);padding:2px 6px;border-radius:3px;font-size:12px;">https://</code> 开头，符合 URL 格式</td>
+            </tr>
+            <tr>
+              <td>生效时机</td>
+              <td>储存后<strong>立即生效</strong>，前台实时读取</td>
+            </tr>
+            <tr>
+              <td>格式错误提示</td>
+              <td style="color:var(--red);">「链接格式不正确，请输入有效的URL（https://...）」</td>
+            </tr>
+            <tr>
+              <td>留空提示</td>
+              <td>无需提示；留空即表示该等级维持既有客服规则。</td>
+            </tr>
+            <tr>
+              <td>栏位位置</td>
+              <td>「专属客服」栏位右侧，「极速出款」栏位<strong>右侧</strong></td>
+            </tr>
+            <tr>
+              <td>适用等级</td>
+              <td>VIP 0 ～ VIP 10（各等级独立配置，互不影响）</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 3.4 Save behavior -->
+    <div class="two-col">
+      <div class="callout tip">
+        <span class="callout-icon">💾</span>
+        <div class="callout-body">
+          <strong>储存成功：</strong>显示成功提示「储存成功！」，配置立即在前台生效，无需额外操作。
+        </div>
+      </div>
+      <div class="callout danger">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <strong>格式错误：</strong>若输入内容不符合URL格式，储存时显示行内错误提示，不允许储存，需修正后方可储存。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: FRONTEND -->
+  <div id="frontend" class="section">
+    <div class="sec-head">
+      <div class="sec-num">4</div>
+      <h2 class="sec-title">前台规则</h2>
+      <span class="badge badge-change" style="margin-left:4px;">异动</span>
+    </div>
+
+    <div class="note-label">📍 对应功能：前台全站悬浮客服图标（CS Icon）</div>
+
+    <!-- Priority -->
+    <div class="card">
+      <div class="card-title">⚡ 4.1 客服路由优先级（权重）</div>
+      <div class="priority-stack">
+        <div class="priority-item" style="border-color:var(--gold-border);background:rgba(245,186,53,0.04);">
+          <div class="priority-rank rank-1">P1</div>
+          <div class="priority-body">
+            <div class="priority-name">🥇 VIP客服链接（新增）</div>
+            <div class="priority-desc">后台为该VIP等级配置了「VIP客服链接」URL，优先使用此链接，直接开启对应客服对话。</div>
+          </div>
+          <div class="priority-badge"><span class="badge badge-high">权重最高</span></div>
+        </div>
+        <div class="priority-item">
+          <div class="priority-rank rank-2">P2</div>
+          <div class="priority-body">
+            <div class="priority-name">🥈 既有客服规则（不异动）</div>
+            <div class="priority-desc">VIP客服链接未配置时，沿用现有的客服路由逻辑，行为完全不变。</div>
+          </div>
+          <div class="priority-badge"><span class="badge badge-nochange">不异动</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Frontend behavior -->
+    <div class="card">
+      <div class="card-title">📱 4.2 客服 Icon 点击行为示意</div>
+      <div class="phone-wrap">
+        <div class="phone-frames">
+          <!-- Phone 1: VIP with link -->
+          <div style="text-align:center;">
+            <div class="phone-frame">
+              <div class="phone-notch"></div>
+              <div class="phone-screen">
+                <div class="phone-statusbar">
+                  <span>12:30</span><span>📶 🔋</span>
+                </div>
+                <div class="phone-navbar">
+                  <span class="phone-back">‹</span>
+                  <span class="phone-page-title">首页</span>
+                </div>
+                <div class="phone-content">
+                  <div class="phone-card">
+                    <h4>🎰 游戏大厅</h4>
+                    <p>今日推荐…</p>
+                  </div>
+                  <div class="phone-card">
+                    <h4>🎁 最新活动</h4>
+                    <p>会员专属优惠…</p>
+                  </div>
+                </div>
+                <div class="phone-vip-tag vip-badge">VIP 1</div>
+                <!-- CS float with VIP link -->
+                <button class="cs-float cs-vip" title="点击客服图标" onclick="showCSResult('vip')">💬</button>
+                <div class="phone-tabbar">
+                  <span class="tab-icon">🎮</span>
+                  <span class="tab-icon">⚽</span>
+                  <span class="tab-icon active">🏠</span>
+                  <span class="tab-icon">🎁</span>
+                  <span class="tab-icon">👤</span>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:8px;font-size:12px;color:var(--text2);text-align:center;">
+              <span class="vip-badge" style="font-size:12px;">VIP 1</span><br>
+              <span style="color:var(--green);font-weight:600;">✓ 已配置VIP客服链接</span>
+            </div>
+          </div>
+
+          <!-- Arrow -->
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-width:80px;">
+            <div style="font-size:12px;color:var(--text2);">点击</div>
+            <div style="font-size:24px;color:var(--gold);">→</div>
+            <div style="font-size:12px;color:var(--gold);font-weight:600;">直接开启专属客服</div>
+          </div>
+
+          <!-- Phone 2: VIP without link -->
+          <div style="text-align:center;">
+            <div class="phone-frame">
+              <div class="phone-notch"></div>
+              <div class="phone-screen">
+                <div class="phone-statusbar">
+                  <span>12:30</span><span>📶 🔋</span>
+                </div>
+                <div class="phone-navbar">
+                  <span class="phone-back">‹</span>
+                  <span class="phone-page-title">首页</span>
+                </div>
+                <div class="phone-content">
+                  <div class="phone-card">
+                    <h4>🎰 游戏大厅</h4>
+                    <p>今日推荐…</p>
+                  </div>
+                  <div class="phone-card">
+                    <h4>🎁 最新活动</h4>
+                    <p>会员专属优惠…</p>
+                  </div>
+                </div>
+                <div class="phone-vip-tag vip-badge">VIP 2</div>
+                <!-- CS float default -->
+                <button class="cs-float cs-default" title="点击客服图标" onclick="showCSResult('default')">💬</button>
+                <div class="phone-tabbar">
+                  <span class="tab-icon">🎮</span>
+                  <span class="tab-icon">⚽</span>
+                  <span class="tab-icon active">🏠</span>
+                  <span class="tab-icon">🎁</span>
+                  <span class="tab-icon">👤</span>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:8px;font-size:12px;color:var(--text2);text-align:center;">
+              <span class="vip-badge" style="font-size:12px;">VIP 2</span><br>
+              <span style="color:var(--text2);">未配置VIP客服链接</span>
+            </div>
+          </div>
+
+          <!-- Arrow 2 -->
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-width:80px;">
+            <div style="font-size:12px;color:var(--text2);">点击</div>
+            <div style="font-size:24px;color:var(--blue);">→</div>
+            <div style="font-size:12px;color:var(--blue);font-weight:600;">维持既有规则</div>
+          </div>
+        </div>
+
+        <!-- CS result toast -->
+        <div id="cs-result" style="display:none;max-width:420px;width:100%;" class="fade-in">
+          <div id="cs-toast" class="toast-demo"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: FLOWCHART -->
+  <div id="flowchart" class="section">
+    <div class="sec-head">
+      <div class="sec-num">5</div>
+      <h2 class="sec-title">客服Icon点击判断逻辑流程图</h2>
+    </div>
+    <div class="card" style="overflow-x:auto;">
+      <div class="card-title">🔀 5.1 判断流程（前台执行顺序）</div>
+      <div class="flow-wrap">
+        <svg class="flow-svg" viewBox="0 0 640 584" width="640" height="584" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;">
+          <defs>
+            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="#4E6278"/>
+            </marker>
+            <marker id="arrowhead-gold" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="#F5BA35"/>
+            </marker>
+            <marker id="arrowhead-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="#2DDC7C"/>
+            </marker>
+            <marker id="arrowhead-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="#4B9FFF"/>
+            </marker>
+          </defs>
+
+          <!-- START: User clicks CS icon -->
+          <rect x="220" y="20" width="200" height="48" rx="24" fill="#111F38" stroke="#F5BA35" stroke-width="1.5"/>
+          <text x="320" y="40" text-anchor="middle" fill="#F5BA35" font-size="12" font-weight="700" font-family="sans-serif">用户点击客服图标</text>
+          <text x="320" y="56" text-anchor="middle" fill="#8BA3C0" font-size="12" font-family="sans-serif">CS Icon Click</text>
+
+          <!-- Arrow down -->
+          <line x1="320" y1="68" x2="320" y2="100" stroke="#4E6278" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+
+          <!-- Step 1: Get VIP level -->
+          <rect x="200" y="100" width="240" height="44" rx="8" fill="#0D1A2E" stroke="#4E6278" stroke-width="1.5"/>
+          <text x="320" y="120" text-anchor="middle" fill="#EFF4FA" font-size="12" font-weight="600" font-family="sans-serif">获取当前用户 VIP 等级</text>
+          <text x="320" y="135" text-anchor="middle" fill="#8BA3C0" font-size="12" font-family="sans-serif">VIP 0 ～ VIP 10</text>
+
+          <!-- Arrow down -->
+          <line x1="320" y1="144" x2="320" y2="176" stroke="#4E6278" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+
+          <!-- DECISION: VIP CS link configured? -->
+          <polygon points="320,176 490,236 320,296 150,236" fill="#0E2040" stroke="#F5BA35" stroke-width="1.5"/>
+          <text x="320" y="228" text-anchor="middle" fill="#F5BA35" font-size="12" font-weight="700" font-family="sans-serif">该VIP等级是否已配置</text>
+          <text x="320" y="244" text-anchor="middle" fill="#F5BA35" font-size="12" font-weight="700" font-family="sans-serif">「VIP客服链接」？</text>
+
+          <!-- YES arrow (right) -->
+          <line x1="490" y1="236" x2="548" y2="236" stroke="#2DDC7C" stroke-width="1.5" marker-end="url(#arrowhead-green)"/>
+          <text x="516" y="228" text-anchor="middle" fill="#2DDC7C" font-size="12" font-weight="700" font-family="sans-serif">是</text>
+
+          <!-- NO arrow (left) -->
+          <line x1="150" y1="236" x2="92" y2="236" stroke="#4B9FFF" stroke-width="1.5" marker-end="url(#arrowhead-blue)"/>
+          <text x="124" y="228" text-anchor="middle" fill="#4B9FFF" font-size="12" font-weight="700" font-family="sans-serif">否</text>
+
+          <!-- YES branch: VIP CS link -->
+          <rect x="548" y="196" width="72" height="0" rx="0" fill="none"/>
+          <rect x="540" y="300" width="90" height="104" rx="10" fill="rgba(45,220,124,0.1)" stroke="#2DDC7C" stroke-width="1.5"/>
+          <text x="585" y="325" text-anchor="middle" fill="#2DDC7C" font-size="12" font-weight="700" font-family="sans-serif">直接开启</text>
+          <text x="585" y="343" text-anchor="middle" fill="#EFF4FA" font-size="12" font-family="sans-serif">VIP专属</text>
+          <text x="585" y="361" text-anchor="middle" fill="#EFF4FA" font-size="12" font-family="sans-serif">客服对话</text>
+          <text x="585" y="379" text-anchor="middle" fill="#8BA3C0" font-size="12" font-family="sans-serif">（权重最高）</text>
+
+          <!-- Yes arrow down to box -->
+          <line x1="585" y1="236" x2="585" y2="300" stroke="#2DDC7C" stroke-width="1.5" marker-end="url(#arrowhead-green)"/>
+
+          <!-- NO branch: existing rules -->
+          <rect x="10" y="300" width="90" height="104" rx="10" fill="rgba(75,159,255,0.1)" stroke="#4B9FFF" stroke-width="1.5"/>
+          <text x="55" y="325" text-anchor="middle" fill="#4B9FFF" font-size="12" font-weight="700" font-family="sans-serif">维持既有</text>
+          <text x="55" y="343" text-anchor="middle" fill="#EFF4FA" font-size="12" font-family="sans-serif">客服规则</text>
+          <text x="55" y="361" text-anchor="middle" fill="#EFF4FA" font-size="12" font-family="sans-serif">（现有逻辑</text>
+          <text x="55" y="379" text-anchor="middle" fill="#EFF4FA" font-size="12" font-family="sans-serif">不变）</text>
+
+          <!-- No arrow down to box -->
+          <line x1="55" y1="236" x2="55" y2="300" stroke="#4B9FFF" stroke-width="1.5" marker-end="url(#arrowhead-blue)"/>
+
+          <!-- Results -->
+          <!-- Green result -->
+          <rect x="460" y="444" width="170" height="52" rx="8" fill="#0D1A2E" stroke="#2DDC7C" stroke-width="1"/>
+          <text x="545" y="467" text-anchor="middle" fill="#2DDC7C" font-size="12" font-weight="700" font-family="sans-serif">✅ 开启 VIP 专属客服</text>
+          <text x="545" y="483" text-anchor="middle" fill="#8BA3C0" font-size="12" font-family="sans-serif">URL = 后台配置的链接</text>
+          <line x1="585" y1="404" x2="585" y2="444" stroke="#2DDC7C" stroke-width="1.5" marker-end="url(#arrowhead-green)"/>
+
+          <!-- Blue result -->
+          <rect x="10" y="444" width="170" height="52" rx="8" fill="#0D1A2E" stroke="#4B9FFF" stroke-width="1"/>
+          <text x="95" y="467" text-anchor="middle" fill="#4B9FFF" font-size="12" font-weight="700" font-family="sans-serif">🔵 既有规则生效</text>
+          <text x="95" y="483" text-anchor="middle" fill="#8BA3C0" font-size="12" font-family="sans-serif">现有路由逻辑不受影响</text>
+          <line x1="55" y1="404" x2="55" y2="444" stroke="#4B9FFF" stroke-width="1.5" marker-end="url(#arrowhead-blue)"/>
+          <line x1="180" y1="470" x2="460" y2="470" stroke="#4E6278" stroke-width="1" stroke-dasharray="4,3"/>
+
+          <!-- Note: UX is same -->
+          <text x="320" y="536" text-anchor="middle" fill="#8BA3C0" font-size="12" font-family="sans-serif">—— 用户感知为「点击客服图标」，路由逻辑在后台自动判断，用户无感知 ——</text>
+
+          <!-- Key: weight label -->
+          <rect x="248" y="492" width="144" height="26" rx="6" fill="rgba(245,186,53,0.08)" stroke="rgba(245,186,53,0.25)" stroke-width="1"/>
+          <text x="320" y="509" text-anchor="middle" fill="#F5BA35" font-size="12" font-weight="700" font-family="sans-serif">⚡ P1 权重优先于 P2</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5: SCENARIOS -->
+  <div id="scenarios" class="section">
+    <div class="sec-head">
+      <div class="sec-num">6</div>
+      <h2 class="sec-title">情境穷举表</h2>
+      <span class="sec-sub">— 所有 VIP 等级 × 链接配置状态的完整组合</span>
+    </div>
+    <div class="callout info">
+      <span class="callout-icon">📌</span>
+      <div class="callout-body">以下穷举所有用户状态与后台配置组合，确保无遗漏分支。共 <strong>22 个情境</strong>，涵盖 VIP 0-10 × 链接配置（是/否）。</div>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <table class="scenario-tbl">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>用户VIP等级</th>
+            <th>该等级VIP客服链接</th>
+            <th>点击客服Icon 结果</th>
+            <th>路由规则</th>
+            <th>备注</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="scenario-num">1</span></td>
+            <td><span class="vip-badge">VIP 0</span></td>
+            <td><span style="color:var(--text2);">未配置（空值）</span></td>
+            <td><div class="result-default">🔵 维持既有规则</div></td>
+            <td>P2 - 既有规则</td>
+            <td style="color:var(--text2);font-size:12px;">VIP0会员，无专属客服</td>
+          </tr>
+          <tr>
+            <td><span class="scenario-num">2</span></td>
+            <td><span class="vip-badge">VIP 0</span></td>
+            <td><span style="color:var(--green);font-size:12px;">已配置 URL</span></td>
+            <td><div class="result-vip">✅ 直接开启VIP客服链接</div></td>
+            <td>P1 - VIP客服链接（最高权重）</td>
+            <td style="color:var(--text2);font-size:12px;">管理员可视需要为VIP0配置</td>
+          </tr>
+          <tr>
+            <td><span class="scenario-num">3</span></td>
+            <td><span class="vip-badge">VIP 1</span></td>
+            <td><span style="color:var(--text2);">未配置（空值）</span></td>
+            <td><div class="result-default">🔵 维持既有规则</div></td>
+            <td>P2 - 既有规则</td>
+            <td style="color:var(--text2);font-size:12px;">VIP1未设定专属链接</td>
+          </tr>
+          <tr>
+            <td><span class="scenario-num">4</span></td>
+            <td><span class="vip-badge">VIP 1</span></td>
+            <td><span style="color:var(--green);font-size:12px;">已配置 URL</span></td>
+            <td><div class="result-vip">✅ 直接开启VIP 1 专属客服</div></td>
+            <td>P1 - VIP客服链接（最高权重）</td>
+            <td style="color:var(--text2);font-size:12px;">VIP1专属客服渠道</td>
+          </tr>
+          <tr>
+            <td><span class="scenario-num">5</span></td>
+            <td><span class="vip-badge">VIP 2</span></td>
+            <td><span style="color:var(--text2);">未配置（空值）</span></td>
+            <td><div class="result-default">🔵 维持既有规则</div></td>
+            <td>P2 - 既有规则</td>
+            <td style="color:var(--text2);font-size:12px;">VIP2未设定专属链接</td>
+          </tr>
+          <tr>
+            <td><span class="scenario-num">6</span></td>
+            <td><span class="vip-badge">VIP 2</span></td>
+            <td><span style="color:var(--green);font-size:12px;">已配置 URL</span></td>
+            <td><div class="result-vip">✅ 直接开启VIP 2 专属客服</div></td>
+            <td>P1 - VIP客服链接（最高权重）</td>
+            <td style="color:var(--text2);font-size:12px;">VIP2专属客服渠道</td>
+          </tr>
+          <tr>
+            <td><span class="scenario-num">7</span></td>
+            <td><span class="vip-badge">VIP 3</span></td>
+            <td><span style="color:var(--text2);">未配置（空值）</span></td>
+            <td><div class="result-default">🔵 维持既有规则</div></td>
+            <td>P2 - 既有规则</td>
+            <td style="color:var(--text2);font-size:12px;">VIP3未设定专属链接</td>
+          </tr>
+          <tr>
+            <td><span class="scenario-num">8</span></td>
+            <td><span class="vip-badge">VIP 3</span></td>
+            <td><span style="color:var(--green);font-size:12px;">已配置 URL</span></td>
+            <td><div class="result-vip">✅ 直接开启VIP 3 专属客服</div></td>
+            <td>P1 - VIP客服链接（最高权重）</td>
+            <td style="color:var(--text2);font-size:12px;">VIP3专属客服渠道</td>
+          </tr>
+          <tr>
+            <td><span class="scenario-num">9</span></td>
+            <td><span class="vip-badge">VIP 4</span></td>
+            <td><span style="color:var(--text2);">未配置（空值）</span></td>
+            <td><div class="result-default">🔵 维持既有规则</div></td>
+            <td>P2 - 既有规则</td>
+            <td style="color:var(--text2);font-size:12px;">VIP4未设定专属链接</td>
+          </tr>
+          <tr>
+            <td><span class="scenario-num">10</span></td>
+            <td><span class="vip-badge">VIP 4</span></td>
+            <td><span style="color:var(--green);font-size:12px;">已配置 URL</span></td>
+            <td><div class="result-vip">✅ 直接开启VIP 4 专属客服</div></td>
+            <td>P1 - VIP客服链接（最高权重）</td>
+            <td style="color:var(--text2);font-size:12px;">VIP4专属客服渠道</td>
+          </tr>
+          <tr>
+            <td><span class="scenario-num">11</span></td>
+            <td><span class="vip-badge">VIP 5</span></td>
+            <td><span style="color:var(--text2);">未配置（空值）</span></td>
+            <td><div class="result-default">🔵 维持既有规则</div></td>
+            <td>P2 - 既有规则</td>
+            <td style="color:var(--text2);font-size:12px;">VIP5未设定专属链接</td>
+          </tr>
+          <tr>
+            <td><span class="scenario-num">12</span></td>
+            <td><span class="vip-badge">VIP 5</span></td>
+            <td><span style="color:var(--green);font-size:12px;">已配置 URL</span></td>
+            <td><div class="result-vip">✅ 直接开启VIP 5 专属客服</div></td>
+            <td>P1 - VIP客服链接（最高权重）</td>
+            <td style="color:var(--text2);font-size:12px;">VIP5专属客服渠道</td>
+          </tr>
+          <tr>
+            <td><span class="scenario-num">13</span></td>
+            <td><span class="vip-badge">VIP 6</span></td>
+            <td><span style="color:var(--text2);">未配置（空值）</span></td>
+            <td><div class="result-default">🔵 维持既有规则</div></td>
+            <td>P2 - 既有规则</td>
+            <td style="color:var(--text2);font-size:12px;">VIP6未设定专属链接</td>
+          </tr>
+          <tr>
+            <td><span class="scenario-num">14</span></td>
+            <td><span class="vip-badge">VIP 6</span></td>
+            <td><span style="color:var(--green);font-size:12px;">已配置 URL</span></td>
+            <td><div class="result-vip">✅ 直接开启VIP 6 专属客服</div></td>
+            <td>P1 - VIP客服链接（最高权重）</td>
+            <td style="color:var(--text2);font-size:12px;">VIP6专属客服渠道</td>
+          </tr>
+          <tr>
+            <td><span class="scenario-num">15</span></td>
+            <td><span class="vip-badge">VIP 7</span></td>
+            <td><span style="color:var(--text2);">未配置（空值）</span></td>
+            <td><div class="result-default">🔵 维持既有规则</div></td>
+            <td>P2 - 既有规则</td>
+            <td style="color:var(--text2);font-size:12px;">VIP7未设定专属链接</td>
+          </tr>
+          <tr>
+            <td><span class="scenario-num">16</span></td>
+            <td><span class="vip-badge">VIP 7</span></td>
+            <td><span style="color:var(--green);font-size:12px;">已配置 URL</span></td>
+            <td><div class="result-vip">✅ 直接开启VIP 7 专属客服</div></td>
+            <td>P1 - VIP客服链接（最高权重）</td>
+            <td style="color:var(--text2);font-size:12px;">VIP7专属客服渠道</td>
+          </tr>
+          <tr>
+            <td><span class="scenario-num">17</span></td>
+            <td><span class="vip-badge">VIP 8</span></td>
+            <td><span style="color:var(--text2);">未配置（空值）</span></td>
+            <td><div class="result-default">🔵 维持既有规则</div></td>
+            <td>P2 - 既有规则</td>
+            <td style="color:var(--text2);font-size:12px;">VIP8未设定专属链接</td>
+          </tr>
+          <tr>
+            <td><span class="scenario-num">18</span></td>
+            <td><span class="vip-badge">VIP 8</span></td>
+            <td><span style="color:var(--green);font-size:12px;">已配置 URL</span></td>
+            <td><div class="result-vip">✅ 直接开启VIP 8 专属客服</div></td>
+            <td>P1 - VIP客服链接（最高权重）</td>
+            <td style="color:var(--text2);font-size:12px;">VIP8专属客服渠道</td>
+          </tr>
+          <tr>
+            <td><span class="scenario-num">19</span></td>
+            <td><span class="vip-badge">VIP 9</span></td>
+            <td><span style="color:var(--text2);">未配置（空值）</span></td>
+            <td><div class="result-default">🔵 维持既有规则</div></td>
+            <td>P2 - 既有规则</td>
+            <td style="color:var(--text2);font-size:12px;">VIP9未设定专属链接</td>
+          </tr>
+          <tr>
+            <td><span class="scenario-num">20</span></td>
+            <td><span class="vip-badge">VIP 9</span></td>
+            <td><span style="color:var(--green);font-size:12px;">已配置 URL</span></td>
+            <td><div class="result-vip">✅ 直接开启VIP 9 专属客服</div></td>
+            <td>P1 - VIP客服链接（最高权重）</td>
+            <td style="color:var(--text2);font-size:12px;">VIP9专属客服渠道</td>
+          </tr>
+          <tr>
+            <td><span class="scenario-num">21</span></td>
+            <td><span class="vip-badge">VIP 10</span></td>
+            <td><span style="color:var(--text2);">未配置（空值）</span></td>
+            <td><div class="result-default">🔵 维持既有规则</div></td>
+            <td>P2 - 既有规则</td>
+            <td style="color:var(--text2);font-size:12px;">VIP10未设定专属链接</td>
+          </tr>
+          <tr>
+            <td><span class="scenario-num">22</span></td>
+            <td><span class="vip-badge">VIP 10</span></td>
+            <td><span style="color:var(--green);font-size:12px;">已配置 URL</span></td>
+            <td><div class="result-vip">✅ 直接开启VIP 10 专属客服</div></td>
+            <td>P1 - VIP客服链接（最高权重）</td>
+            <td style="color:var(--text2);font-size:12px;">最高级专属客服渠道</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Extra edge cases -->
+    <div class="card">
+      <div class="card-title">⚠️ 边界情境 / 补充说明</div>
+      <ul class="rule-list">
+        <li class="rule-item">
+          <div class="rule-num">边</div>
+          <div class="rule-text"><strong>未登录用户：</strong>未登录用户无VIP等级，不适用「VIP客服链接」逻辑，维持既有客服规则（不受本次影响）。</div>
+        </li>
+        <li class="rule-item">
+          <div class="rule-num">边</div>
+          <div class="rule-text"><strong>VIP等级降级：</strong>若用户VIP等级下降，前台立即使用新等级对应的VIP客服链接（或既有规则），实时生效。</div>
+        </li>
+        <li class="rule-item">
+          <div class="rule-num">边</div>
+          <div class="rule-text"><strong>后台清空链接：</strong>管理员将已配置的VIP客服链接清空并储存后，前台立即恢复为既有客服规则，无缓存延迟。</div>
+        </li>
+        <li class="rule-item">
+          <div class="rule-num">边</div>
+          <div class="rule-text"><strong>链接无法开启：</strong>若VIP客服链接的URL目标无法访问（链接失效），恢复为既有客服规则。</div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SECTION 6: INTERACTIVE DEMO -->
+  <div id="demo" class="section">
+    <div class="sec-head">
+      <div class="sec-num">7</div>
+      <h2 class="sec-title">互动示意模拟器</h2>
+      <span class="sec-sub">— 体验不同情境下点击客服图标的行为</span>
+    </div>
+    <div class="demo-wrap">
+      <div class="demo-controls">
+        <h3>🎮 选择情境，模拟点击客服图标后的行为</h3>
+        <div class="ctrl-row">
+          <div class="ctrl-group">
+            <div class="ctrl-label">用户 VIP 等级</div>
+            <select class="ctrl-select" id="demo-vip">
+              <option value="0">VIP 0</option>
+              <option value="1" selected>VIP 1</option>
+              <option value="2">VIP 2</option>
+              <option value="3">VIP 3</option>
+              <option value="4">VIP 4</option>
+              <option value="5">VIP 5</option>
+              <option value="6">VIP 6</option>
+              <option value="7">VIP 7</option>
+              <option value="8">VIP 8</option>
+              <option value="9">VIP 9</option>
+              <option value="10">VIP 10</option>
+            </select>
+          </div>
+          <div class="ctrl-group">
+            <div class="ctrl-label">该等级 VIP客服链接</div>
+            <div class="ctrl-toggle">
+              <button id="demo-link-on" class="on" onclick="setLink(true)">✓ 已配置 URL</button>
+              <button id="demo-link-off" onclick="setLink(false)">✗ 未配置（空）</button>
+            </div>
+          </div>
+          <div class="ctrl-group">
+            <div class="ctrl-label">&nbsp;</div>
+            <button class="btn-sm btn-primary" onclick="runDemo()" style="padding:9px 20px;font-size:13px;">▶ 点击客服图标</button>
+          </div>
+        </div>
+      </div>
+      <div class="demo-result">
+        <div class="demo-phone" style="position:relative;width:230px;flex-shrink:0;">
+          <div class="phone-frame" style="width:100%;">
+            <div class="phone-notch"></div>
+            <div class="phone-screen">
+              <div class="phone-statusbar">
+                <span>12:30</span><span>📶 🔋</span>
+              </div>
+              <div class="phone-navbar">
+                <span class="phone-back">‹</span>
+                <span class="phone-page-title">首页</span>
+              </div>
+              <div class="phone-content">
+                <div class="phone-card">
+                  <h4>🎰 今日推荐</h4>
+                  <p>查看最新游戏活动…</p>
+                </div>
+                <div class="phone-card">
+                  <h4>🎁 专属优惠</h4>
+                  <p>VIP 专享活动…</p>
+                </div>
+              </div>
+              <div id="demo-vip-tag" class="phone-vip-tag vip-badge">VIP 1</div>
+              <button id="demo-cs-btn" class="cs-float cs-vip" onclick="runDemo()">💬</button>
+              <div class="phone-tabbar">
+                <span class="tab-icon">🎮</span>
+                <span class="tab-icon">⚽</span>
+                <span class="tab-icon active">🏠</span>
+                <span class="tab-icon">🎁</span>
+                <span class="tab-icon">👤</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="demo-output">
+          <div class="output-box">
+            <div class="output-title">当前情境</div>
+            <div id="demo-current-vip" class="output-val green" style="font-size:16px;">VIP 1</div>
+            <div id="demo-current-link" class="output-sub" style="color:var(--green);margin-top:4px;">✓ 已配置 VIP 客服链接</div>
+          </div>
+          <div id="demo-result-box" class="output-box" style="display:none;">
+            <div class="output-title">点击结果</div>
+            <div id="demo-result-val" class="output-val green"></div>
+            <div id="demo-result-sub" class="output-sub" style="margin-top:4px;"></div>
+          </div>
+          <div id="demo-reason" class="output-reason vip-route" style="display:none;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div style="border-top:1px solid var(--border);padding-top:24px;margin-top:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+    <div style="font-size:12px;color:var(--text2);">规格文件 · VIP专属客服 · v1.0 · 2026.07.15</div>
+    <div style="display:flex;gap:8px;">
+      <span class="badge badge-new">新增 × 1</span>
+      <span class="badge badge-change">异动 × 1</span>
+      <span class="badge badge-nochange">不异动 × 3</span>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<script>
+// ── CS Icon demo in phone mockup ──
+function showCSResult(type){
+  const el = document.getElementById('cs-result');
+  const toast = document.getElementById('cs-toast');
+  el.style.display = 'block';
+  el.className = 'fade-in';
+  if(type === 'vip'){
+    toast.innerHTML = `
+      <div class="toast-icon">✅</div>
+      <div class="toast-body">
+        <h4 style="color:var(--green);">开启 VIP 专属客服</h4>
+        <p>直接跳转至后台配置的 VIP 1 专属客服渠道（权重最高）</p>
+      </div>`;
+    toast.style.borderColor = 'var(--green-border)';
+    toast.style.background = 'rgba(45,220,124,0.08)';
+  } else {
+    toast.innerHTML = `
+      <div class="toast-icon">🔵</div>
+      <div class="toast-body">
+        <h4 style="color:var(--blue);">维持既有规则</h4>
+        <p>该VIP等级未配置专属客服链接，沿用平台现有客服路由逻辑</p>
+      </div>`;
+    toast.style.borderColor = 'var(--blue-border)';
+    toast.style.background = 'rgba(75,159,255,0.08)';
+  }
+  setTimeout(()=>{ el.style.display='none'; },4000);
+}
+
+// ── Interactive Demo ──
+let demoLinkConfigured = true;
+
+function setLink(on){
+  demoLinkConfigured = on;
+  document.getElementById('demo-link-on').className = on ? 'on' : '';
+  document.getElementById('demo-link-off').className = on ? '' : 'off';
+  updateDemoState();
+}
+
+function updateDemoState(){
+  const vip = parseInt(document.getElementById('demo-vip').value);
+  const label = 'VIP ' + vip;
+
+  // Update phone VIP tag
+  const tag = document.getElementById('demo-vip-tag');
+  tag.textContent = label;
+  tag.className = 'phone-vip-tag vip-badge';
+
+  // Update CS button color
+  const btn = document.getElementById('demo-cs-btn');
+  btn.className = 'cs-float ' + (demoLinkConfigured ? 'cs-vip' : 'cs-default');
+
+  // Update summary
+  document.getElementById('demo-current-vip').textContent = label;
+  document.getElementById('demo-current-link').textContent = demoLinkConfigured
+    ? '✓ 已配置 VIP 客服链接' : '✗ 未配置（空值）';
+  document.getElementById('demo-current-link').style.color = demoLinkConfigured ? 'var(--green)' : 'var(--text2)';
+
+  // Hide result
+  document.getElementById('demo-result-box').style.display = 'none';
+  document.getElementById('demo-reason').style.display = 'none';
+}
+
+document.getElementById('demo-vip').addEventListener('change', updateDemoState);
+
+function runDemo(){
+  const vip = parseInt(document.getElementById('demo-vip').value);
+  const label = 'VIP ' + vip;
+  const resultBox = document.getElementById('demo-result-box');
+  const resultVal = document.getElementById('demo-result-val');
+  const resultSub = document.getElementById('demo-result-sub');
+  const reasonEl = document.getElementById('demo-reason');
+
+  resultBox.style.display = 'block';
+  reasonEl.style.display = 'block';
+  resultBox.className = 'output-box fade-in';
+  reasonEl.className = 'output-reason fade-in';
+
+  if(demoLinkConfigured){
+    resultVal.textContent = '✅ 直接开启 VIP 专属客服';
+    resultVal.className = 'output-val green';
+    resultSub.textContent = `开启 ${label} 专属客服对话 → URL 由后台配置决定`;
+    resultSub.style.color = 'var(--text2)';
+    reasonEl.className = 'output-reason vip-route fade-in';
+    reasonEl.innerHTML = `<strong>⚡ 路由规则 P1（最高权重）：</strong><br>该VIP等级已配置「VIP客服链接」，系统直接开启对应的专属客服对话，不经过既有规则判断。`;
+  } else {
+    resultVal.textContent = '🔵 维持既有客服规则';
+    resultVal.className = 'output-val blue';
+    resultSub.textContent = `${label} 未配置VIP客服链接，使用平台现有路由逻辑`;
+    resultSub.style.color = 'var(--text2)';
+    reasonEl.className = 'output-reason default-route fade-in';
+    reasonEl.innerHTML = `<strong>🔵 路由规则 P2（既有规则）：</strong><br>该VIP等级未配置「VIP客服链接」，沿用平台现有客服路由逻辑，本次不受影响。`;
+  }
+}
+
+// ── Nav active state on scroll ──
+const sections = ['purpose','summary','backend','frontend','flowchart','scenarios','demo'];
+const navLinks = document.querySelectorAll('.nav-a');
+window.addEventListener('scroll', ()=>{
+  let current = '';
+  sections.forEach(id=>{
+    const el = document.getElementById(id);
+    if(el && window.scrollY >= el.offsetTop - 80) current = id;
+  });
+  navLinks.forEach(a=>{
+    const href = a.getAttribute('href').replace('#','');
+    a.classList.toggle('active', href === current);
+  });
+}, {passive:true});
+
+// Init
+updateDemoState();
+</script>
+</body>
+</html>
