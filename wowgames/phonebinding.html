@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>规格文件 — 银行卡绑定手机门号</title>
+<title>规格文件 — eWallet绑定手机门号</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
 <style>
   :root {
@@ -180,7 +180,7 @@
 
 <div class="doc-header">
   <div class="doc-meta">
-    <span class="doc-title">银行卡 / eWallet 绑定手机门号自动带入</span>
+    <span class="doc-title">eWallet 绑定手机门号自动带入</span>
     <span class="doc-ver">v1.0</span>
   </div>
   <p class="doc-sub">规格文件 &nbsp;·&nbsp; 20260714 &nbsp;·&nbsp; 涉及端：后台 / 前台</p>
@@ -197,18 +197,18 @@
   <div class="sec-title"><i class="ti ti-clock-hour-3"></i> 文件版本记录</div>
   <table class="ver-table">
     <tr><th style="width:100px">日期</th><th style="width:80px">版本号</th><th style="width:90px">变更类型</th><th>摘要</th><th style="width:80px">记录人</th></tr>
-    <tr><td>20260714</td><td>v1.0</td><td><span class="tag tag-add">A 新增</span></td><td>文件初版 — 后台「充值提款」新增「银行卡绑定手机门号」开关</td><td>—</td></tr>
+    <tr><td>20260714</td><td>v1.0</td><td><span class="tag tag-add">A 新增</span></td><td>文件初版 — 后台「充值提款」新增「eWallet绑定手机门号」开关</td><td>—</td></tr>
   </table>
 
   <div class="sec-title"><i class="ti ti-target"></i> 需求目的</div>
   <div class="rule-block">
-    前台用户在绑定银行卡或 eWallet 时，「手机号码」栏位目前须用户自行手动输入。本次需求新增后台开关「银行卡绑定手机门号」，开启后系统自动将用户已绑定的手机门号带入该栏位。
+    前台用户在绑定eWallet 时，「手机号码」栏位目前须用户自行手动输入。本次需求新增后台开关「eWallet绑定手机门号」，开启后系统自动将用户已绑定的手机门号带入该栏位。
   </div>
 
   <div class="sec-title"><i class="ti ti-list-details"></i> 变更摘要</div>
   <table class="gen-table">
     <tr><th style="width:110px">类型</th><th style="width:300px">模块</th><th>说明</th></tr>
-    <tr><td><span class="tag tag-add">A 新增</span></td><td>后台 → 系统管理 → 系统参数管理 → 充值提款 → 提款参数配置</td><td>「是否可以修改及删除银行卡」下方新增「银行卡绑定手机门号」开关，预设关闭</td></tr>
+    <tr><td><span class="tag tag-add">A 新增</span></td><td>后台 → 系统管理 → 系统参数管理 → 充值提款 → 提款参数配置</td><td>「是否可以修改及删除银行卡」下方新增「eWallet绑定手机门号」开关，预设关闭</td></tr>
     <tr><td><span class="tag tag-keep">— 不变</span></td><td>其余所有后台页面与功能</td><td>无调整</td></tr>
   </table>
 
@@ -218,7 +218,7 @@
 
   <div class="callout info">
     <i class="ti ti-info-circle"></i>
-    <div><strong>功能位置：</strong>系统管理 → 系统参数管理 → 充值提款 → 提款参数配置，于「是否可以修改及删除银行卡」下方新增「银行卡绑定手机门号」开关。</div>
+    <div><strong>功能位置：</strong>系统管理 → 系统参数管理 → 充值提款 → 提款参数配置，于「是否可以修改及删除银行卡」下方新增「eWallet绑定手机门号」开关。</div>
   </div>
 
   <div class="sub-title"><i class="ti ti-layout-board"></i> 1.1.1 &nbsp;示意图</div>
@@ -235,7 +235,7 @@
         <!-- ★ NEW ROW ★ -->
         <div class="new-row" id="new-row">
           <div class="new-row-label">
-            银行卡绑定手机门号
+            eWallet绑定手机门号
             <span class="new-badge">NEW</span>
           </div>
           <div class="tgl-wrap">
@@ -254,7 +254,7 @@
 
   <div class="sub-title"><i class="ti ti-toggle-right"></i> 1.1.2 &nbsp;新增开关说明</div>
   <div class="rule-block">
-    <div class="rule-item"><span class="num">1</span><div>开关名称：<code>银行卡绑定手机门号</code>，位于「是否可以修改及删除银行卡」下方一行。</div></div>
+    <div class="rule-item"><span class="num">1</span><div>开关名称：<code>eWallet绑定手机门号</code>，位于「是否可以修改及删除银行卡」下方一行。</div></div>
     <div class="rule-item"><span class="num">2</span><div>样式与既有开关（如「是否可以修改及删除银行卡」）保持一致。</div></div>
     <div class="rule-item"><span class="num">3</span><div><strong>预设值为关闭。</strong></div></div>
   </div>
@@ -293,20 +293,20 @@
 
   <div class="sec-title"><i class="ti ti-target"></i> 需求目的</div>
   <div class="rule-block">
-    当后台开关「银行卡绑定手机门号」启用时，前台绑定银行卡或 eWallet 流程中的「手机号码」栏位，自动带入用户已绑定的手机门号且不可更改。
+    当后台开关「eWallet绑定手机门号」启用时，前台绑定eWallet 流程中的「手机号码」栏位，自动带入用户已绑定的手机门号且不可更改。
   </div>
 
   <div class="sec-title"><i class="ti ti-list-details"></i> 变更摘要</div>
   <table class="gen-table">
     <tr><th style="width:110px">类型</th><th style="width:240px">模块</th><th>说明</th></tr>
-    <tr><td><span class="tag tag-add">A 新增</span></td><td>前台 → 绑定银行卡 / eWallet</td><td>「手机号码」栏位依后台开关状态与用户绑定状态动态处理</td></tr>
+    <tr><td><span class="tag tag-add">A 新增</span></td><td>前台 → 绑定 eWallet</td><td>「手机号码」栏位依后台开关状态与用户绑定状态动态处理</td></tr>
     <tr><td><span class="tag tag-keep">— 不变</span></td><td>其余绑卡 / eWallet 流程栏位</td><td>无调整</td></tr>
   </table>
 
   <hr>
 
-  <div class="sec-title"><i class="ti ti-credit-card"></i> 2.1 &nbsp;绑定银行卡 / eWallet — 手机号码栏位</div>
-  <div class="callout info"><i class="ti ti-info-circle"></i><div><strong>影响页面：</strong>前台绑定银行卡页、绑定 eWallet 页均含「手机号码」输入栏位。其余栏位不受影响。</div></div>
+  <div class="sec-title"><i class="ti ti-credit-card"></i> 2.1 &nbsp;eWallet — 手机号码栏位</div>
+  <div class="callout info"><i class="ti ti-info-circle"></i><div><strong>影响页面：</strong>前台绑定 eWallet 页均含「手机号码」输入栏位。其余栏位不受影响。</div></div>
 
   <div class="sub-title"><i class="ti ti-list-check"></i> 2.1.1 &nbsp;逻辑规则</div>
   <div class="rule-block">
