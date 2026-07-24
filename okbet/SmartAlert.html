@@ -139,6 +139,7 @@ body{
 .input:focus,.select:focus{border-color:var(--primary)}
 .input::placeholder{color:var(--placeholder)}
 .input.is-error{border-color:var(--danger)}
+.input:disabled{background:#f5f7fa;color:var(--text-3);cursor:not-allowed}
 
 /* ===================== 表格 ===================== */
 .card{background:#fff;border:1px solid var(--border-2);border-radius:6px;overflow:hidden}
@@ -336,19 +337,30 @@ tbody tr:last-child td{border-bottom:none}
           <div class="eswitch" id="smartPushSwitch" onclick="toggleSmartPush()"></div>
         </div>
         <div class="field">
+          推播名称：
+          <input type="text" class="input" id="filterName" style="width:160px" placeholder="请输入关键字" onkeydown="if(event.key==='Enter')doSearch()">
+        </div>
+        <div class="field">
           目标主标签：
-          <select class="select" id="filterMain" onchange="renderTable()">
+          <select class="select" id="filterMain">
             <option value="">全部</option>
             <option>常贵客</option><option>低频客</option><option>新鲜客</option><option>沉默客</option>
           </select>
         </div>
         <div class="field">
           计算周期：
-          <select class="select" id="filterPeriod" onchange="renderTable()" style="width:130px">
+          <select class="select" id="filterPeriod" style="width:130px">
             <option value="">全部</option>
             <option>今日</option><option>昨日</option><option>近7日</option><option>近14日</option><option>近30日</option>
           </select>
         </div>
+        <div class="field">
+          时间：
+          <input type="date" class="input" id="filterStartDate" style="width:150px">
+          <span style="color:var(--text-3)">至</span>
+          <input type="date" class="input" id="filterEndDate" style="width:150px">
+        </div>
+        <button class="btn btn-primary" onclick="doSearch()">查询</button>
         <div class="spacer"></div>
         <button class="btn btn-primary" onclick="openForm()">＋ 新增推播</button>
       </div>
@@ -357,11 +369,13 @@ tbody tr:last-child td{border-bottom:none}
         <table>
           <thead>
             <tr>
-              <th style="width:210px">目标用户</th>
+              <th style="width:170px">推播名称</th>
+              <th style="width:190px">目标用户</th>
               <th style="width:90px">计算周期</th>
-              <th>账户余额</th>
-              <th>有效投注</th>
-              <th>用户净输赢(负数)</th>
+              <th>阶级1</th>
+              <th>阶级2</th>
+              <th>阶级3</th>
+              <th>阶级4</th>
               <th style="width:160px">新增/变更时间</th>
               <th style="width:120px">操作</th>
             </tr>
@@ -397,6 +411,19 @@ tbody tr:last-child td{border-bottom:none}
       <div class="notice">
         <span>⚠</span>
         <span>提示：保存后推播条件将立即生效并纳入排程计算。用户标签为必填单选；三项阈值条件「账户余额、有效投注、用户净输赢(负数)」需在同一阶级下同时配置，留空表示该项不启用，填写时不可为 0，最多可配置 4 个阶级（新增阶级为共用按钮，三项条件同步增减），且下一层目标值不可小于上一层。</span>
+      </div>
+
+      <!-- 区块 0：基本信息 -->
+      <div class="section">
+        <div class="section-title">基本信息</div>
+        <div class="form-row">
+          <div class="form-label"><span class="req">*</span>推播名称</div>
+          <div class="form-ctrl">
+            <input type="text" class="input" id="inpName" style="width:320px" maxlength="50"
+                   placeholder="请输入推播名称" oninput="onNameInput(this)">
+            <div class="row-error" id="err-name">请输入推播名称，不可留空</div>
+          </div>
+        </div>
       </div>
 
       <!-- 区块 1：推送目标用户 -->
@@ -512,17 +539,17 @@ const THRESHOLDS = [
    ============================================================ */
 let pushList = [
   {
-    id:1, main:'常贵客', sub:'大R', attr:'Slot', period:'近7日',
+    id:1, name:'常贵客大R Slot近7日推播', main:'常贵客', sub:'大R', attr:'Slot', period:'近7日',
     balance:[1000,3000], bet:[50000], ngr:[-2000],
     activities:[['充值活动','大奖池活动','幸运宝箱挑战赛'],[]], time:'2026-07-20 14:32:08'
   },
   {
-    id:2, main:'沉默客', sub:'无存', attr:'新用户', period:'近30日',
+    id:2, name:'沉默客回归召回推播', main:'沉默客', sub:'无存', attr:'新用户', period:'近30日',
     balance:[], bet:[10000,30000,60000], ngr:[],
     activities:[['新手/回归签到活动','新用户充值转盘活动'],[],[]], time:'2026-07-21 09:15:44'
   },
   {
-    id:3, main:'低频客', sub:'中NGR', attr:'Sports', period:'昨日',
+    id:3, name:'低频客净输赢风险监控推播', main:'低频客', sub:'中NGR', attr:'Sports', period:'昨日',
     balance:[500], bet:[], ngr:[-500,-1000,-2000,-5000],
     activities:[['每日特别返水','每日返水加码'],[],[],[]], time:'2026-07-22 18:47:21'
   },
@@ -544,7 +571,7 @@ function toggleSmartPush(){
 let form = null;
 function blankForm(){
   return {
-    main:'', sub:'', attr:'', period:'',
+    name:'', main:'', sub:'', attr:'', period:'',
     balance:['','','',''], bet:['','','',''], ngr:['','','',''],
     thrLv:1,   // 三项条件共用同一个阶级数（新增/删除阶级为共用按钮）
     activities:[[],[],[],[]]   // 每个阶级各自的推送活动清单，阶级数与 thrLv 共用
@@ -569,28 +596,46 @@ function switchSubtab(tab){
 /* ============================================================
    五、渲染表格
    ============================================================ */
-function fmtCond(arr, cmp){
-  // 把阶级数组显示成「＜1000 / ＜3000」这种；空数组显示「—」
-  if(!arr || arr.length===0) return '<span class="none">—</span>';
-  return arr.map(v=>`<span class="lv">${cmp}${Number(v).toLocaleString()}</span>`).join('');
+function fmtLevelCell(r, i){
+  // 同一阶级下账户余额/有效投注/用户净输赢(负数)三项一起显示；该阶级未配置任何条件则显示「—」
+  const lines=[];
+  if(r.balance[i]!==undefined) lines.push(`账户余额 ＜${Number(r.balance[i]).toLocaleString()}`);
+  if(r.bet[i]!==undefined) lines.push(`有效投注 ＜${Number(r.bet[i]).toLocaleString()}`);
+  if(r.ngr[i]!==undefined) lines.push(`净输赢 ≤${Number(r.ngr[i]).toLocaleString()}`);
+  if(lines.length===0) return '<span class="none">—</span>';
+  return `<div class="cond-val">${lines.map(l=>`<span class="lv">${l}</span>`).join('')}</div>`;
 }
+function doSearch(){ renderTable(); }
 function renderTable(){
   const fm = document.getElementById('filterMain').value;
   const fp = document.getElementById('filterPeriod').value;
-  const rows = pushList.filter(r=>(!fm||r.main===fm)&&(!fp||r.period===fp));
+  const fn = document.getElementById('filterName').value.trim().toLowerCase();
+  const fsd = document.getElementById('filterStartDate').value;   // 'YYYY-MM-DD' 或空
+  const fed = document.getElementById('filterEndDate').value;
+  const rows = pushList.filter(r=>{
+    if(fm && r.main!==fm) return false;
+    if(fp && r.period!==fp) return false;
+    if(fn && !r.name.toLowerCase().includes(fn)) return false;
+    const datePart = r.time.slice(0,10);
+    if(fsd && datePart<fsd) return false;
+    if(fed && datePart>fed) return false;
+    return true;
+  });
   const body = document.getElementById('tableBody');
 
   if(rows.length===0){
-    body.innerHTML = `<tr><td colspan="7"><div class="empty"><div class="big">📭</div>暂无符合条件的推播清单</div></td></tr>`;
+    body.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="big">📭</div>暂无符合条件的推播清单</div></td></tr>`;
     return;
   }
   body.innerHTML = rows.map(r=>`
     <tr>
+      <td>${r.name}</td>
       <td>${r.main}, ${r.sub}, ${r.attr}</td>
       <td><span class="period-pill">${r.period}</span></td>
-      <td><div class="cond-val">${fmtCond(r.balance,'＜')}</div></td>
-      <td><div class="cond-val">${fmtCond(r.bet,'＜')}</div></td>
-      <td><div class="cond-val">${fmtCond(r.ngr,'≤')}</div></td>
+      <td>${fmtLevelCell(r,0)}</td>
+      <td>${fmtLevelCell(r,1)}</td>
+      <td>${fmtLevelCell(r,2)}</td>
+      <td>${fmtLevelCell(r,3)}</td>
       <td>${r.time}</td>
       <td class="op">
         <a onclick="openForm(${r.id})">编辑</a>
@@ -608,7 +653,7 @@ function openForm(id){
 
   if(editingId!==null){
     const r = pushList.find(x=>x.id===editingId);
-    form.main=r.main; form.sub=r.sub; form.attr=r.attr; form.period=r.period;
+    form.name=r.name; form.main=r.main; form.sub=r.sub; form.attr=r.attr; form.period=r.period;
     form.activities=[[],[],[],[]];
     (r.activities||[]).forEach((arr,i)=>{ if(i<4) form.activities[i]=[...arr]; });
     // 把已保存的阶级数组回填进 4 格输入；三项条件共用同一阶级数，取三者最大值
@@ -622,6 +667,10 @@ function openForm(id){
     form.thrLv=maxLv;
   }
   document.getElementById('formTitle').textContent = editingId!==null ? '编辑推播条件' : '新增推播条件';
+
+  const nameInput = document.getElementById('inpName');
+  nameInput.value = form.name;
+  nameInput.disabled = editingId!==null;   // 推播名称在编辑页面下不可变更
 
   buildTagGroups();
   buildPeriod();
@@ -638,6 +687,7 @@ function closeForm(){
   document.getElementById('view-form').classList.add('hidden');
   document.getElementById('view-list').classList.remove('hidden');
 }
+function onNameInput(el){ form.name=el.value; hideError('err-name'); }
 
 /* ============================================================
    七、构建标签单选组（点一下选中，再点同一个可取消）
@@ -848,6 +898,7 @@ function collectThreshold(key){
 function saveForm(){
   clearErrors();
   let ok=true;
+  if(!form.name.trim()){ showError('err-name'); ok=false; }
   if(!form.main){ showError('err-main'); ok=false; }
   if(!form.sub){ showError('err-sub'); ok=false; }
   if(!form.attr){ showError('err-attr'); ok=false; }
@@ -882,7 +933,7 @@ function saveForm(){
   const now=new Date();
   const time=`${now.getFullYear()}-${p2(now.getMonth()+1)}-${p2(now.getDate())} ${p2(now.getHours())}:${p2(now.getMinutes())}:${p2(now.getSeconds())}`;
   const record={
-    main:form.main, sub:form.sub, attr:form.attr, period:form.period,
+    name:form.name.trim(), main:form.main, sub:form.sub, attr:form.attr, period:form.period,
     balance:res.balance, bet:res.bet, ngr:res.ngr,
     activities:form.activities.slice(0,form.thrLv).map(arr=>[...arr]), time
   };
