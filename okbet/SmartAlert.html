@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智能推播 · 后台示意页面</title>
+<style>
+/* ============================================================
+   颜色变量：全部取自现有后台截图（Element UI 风格）
+   这样示意页面看起来就跟你们现在的后台一模一样。
+   ============================================================ */
+:root{
+  --primary:#409EFF;          /* 主蓝：按钮、选中 */
+  --primary-hover:#66b1ff;
+  --primary-active:#3a8ee6;
+  --primary-light:#ecf5ff;    /* 浅蓝底 */
+  --menu-active-bg:#e8f1fc;   /* 左侧菜单选中底色 */
+  --menu-active-text:#2b6fe0;
+  --tab-active:#025BE8;       /* 顶部页签选中蓝 */
+  --success:#67C23A;          /* 开启绿 */
+  --danger:#F56C6C;           /* 关闭红 / 删除 / 必填 */
+  --warning-bg:#fef0f0;
+  --text:#303133;
+  --text-2:#606266;
+  --text-3:#909399;
+  --placeholder:#c0c4cc;
+  --border:#DCDFE6;
+  --border-2:#E4E7ED;
+  --bg-page:#f5f7fa;
+  --badge:#DE1818;
+  --radius:4px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+  color:var(--text);font-size:14px;background:var(--bg-page);
+  display:flex;overflow:hidden;
+}
+
+/* ===================== 左侧菜单 ===================== */
+.sidebar{
+  width:200px;flex:0 0 200px;background:#fff;height:100vh;overflow-y:auto;
+  border-right:1px solid var(--border-2);
+}
+.sidebar::-webkit-scrollbar{width:6px}
+.sidebar::-webkit-scrollbar-thumb{background:#d9d9d9;border-radius:3px}
+.menu-item{
+  display:flex;align-items:center;gap:10px;height:48px;padding:0 16px;
+  color:var(--text);cursor:pointer;position:relative;user-select:none;
+  border-bottom:1px solid #f4f6f9;
+}
+.menu-item:hover{background:#f5f7fa}
+.menu-item .ico{width:16px;text-align:center;color:#5a6270;font-size:15px}
+.menu-item .arrow{margin-left:auto;color:#c0c4cc;font-size:12px;transition:.2s}
+.menu-item.open .arrow{transform:rotate(90deg)}
+.menu-item .badge{
+  margin-left:auto;background:var(--badge);color:#fff;font-size:11px;
+  border-radius:9px;padding:1px 6px;line-height:1.4;
+}
+/* 二级菜单 */
+.submenu{display:none;background:#fafbfc}
+.submenu.show{display:block}
+.subitem{
+  display:flex;align-items:center;gap:8px;height:44px;padding:0 16px 0 40px;
+  color:var(--text-2);cursor:pointer;position:relative;
+}
+.subitem:hover{background:#f0f2f5}
+.subitem .dot{width:5px;height:5px;border-radius:50%;background:#c0c4cc}
+.subitem.active{
+  background:var(--menu-active-bg);color:var(--menu-active-text);font-weight:600;
+}
+.subitem.active::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--primary);
+}
+.subitem.active .dot{background:var(--primary)}
+.subitem .new-flag{
+  margin-left:auto;background:#fff0e6;color:#e6893b;font-size:10px;
+  padding:1px 5px;border-radius:3px;border:1px solid #ffd6b0;
+}
+
+/* ===================== 右侧主区 ===================== */
+.main{flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+/* 顶部页签栏 */
+.topbar{background:#fff;border-bottom:1px solid var(--border-2);padding:8px 14px 0}
+.breadcrumb{display:flex;align-items:center;gap:6px;color:var(--text-2);font-size:13px;padding:2px 4px 10px}
+.breadcrumb .cur{color:var(--text)}
+.breadcrumb .sep{color:#c0c4cc}
+.tabs-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:0}
+.tabs-row::-webkit-scrollbar{height:0}
+.tab{
+  display:flex;align-items:center;gap:6px;padding:6px 12px;font-size:13px;
+  border:1px solid var(--border-2);border-bottom:none;border-radius:4px 4px 0 0;
+  background:#f7f8fa;color:var(--text-2);white-space:nowrap;cursor:pointer;
+}
+.tab .x{color:#c0c4cc;font-size:12px}
+.tab.active{background:var(--tab-active);color:#fff;border-color:var(--tab-active)}
+.tab.active .x{color:#cfe0ff}
+
+/* 内容区 */
+.content{flex:1;overflow-y:auto;padding:16px}
+
+/* 二级页签（推播列表 / 推播奖励） */
+.subtabs{display:flex;gap:24px;border-bottom:1px solid var(--border-2);margin-bottom:16px}
+.subtab{
+  padding:10px 2px;font-size:15px;color:var(--text-2);cursor:pointer;
+  border-bottom:2px solid transparent;margin-bottom:-1px;font-weight:500;
+}
+.subtab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+
+/* 工具条 */
+.toolbar{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.toolbar .spacer{flex:1}
+.field{display:flex;align-items:center;gap:6px;color:var(--text-2);font-size:13px}
+
+/* 开关（智能推播总开关，预设关闭） */
+.eswitch{position:relative;display:inline-block;width:40px;height:20px;border-radius:10px;background:var(--border);cursor:pointer;transition:.2s;flex:0 0 auto}
+.eswitch::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.eswitch.on{background:var(--primary)}
+.eswitch.on::after{left:22px}
+
+/* 通用按钮 */
+.btn{
+  display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 15px;
+  border-radius:var(--radius);border:1px solid var(--border);background:#fff;
+  color:var(--text);font-size:13px;cursor:pointer;transition:.15s;white-space:nowrap;
+}
+.btn:hover{color:var(--primary);border-color:var(--primary-hover);background:var(--primary-light)}
+.btn-primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-hover);border-color:var(--primary-hover);color:#fff}
+.btn-plain-primary{color:var(--primary);border-color:#a0cfff;background:var(--primary-light)}
+.btn-sm{height:28px;padding:0 10px;font-size:12px}
+
+/* 表单控件外观 */
+.input,.select{
+  height:34px;border:1px solid var(--border);border-radius:var(--radius);
+  padding:0 10px;font-size:13px;color:var(--text);background:#fff;outline:none;width:180px;
+}
+.input:focus,.select:focus{border-color:var(--primary)}
+.input::placeholder{color:var(--placeholder)}
+.input.is-error{border-color:var(--danger)}
+
+/* ===================== 表格 ===================== */
+.card{background:#fff;border:1px solid var(--border-2);border-radius:6px;overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{
+  background:#f5f7fa;color:var(--text-2);font-weight:600;text-align:center;
+  padding:12px 10px;border-bottom:1px solid var(--border-2);white-space:nowrap;
+}
+tbody td{padding:14px 10px;text-align:center;border-bottom:1px solid #f0f2f5;color:var(--text-2);vertical-align:middle}
+tbody tr:hover{background:#fafcff}
+tbody tr:last-child td{border-bottom:none}
+
+/* 条件值展示 */
+.cond-val{display:flex;flex-direction:column;gap:3px;align-items:center}
+.cond-val .lv{font-size:12px;color:var(--text-2);white-space:nowrap}
+.cond-val .none{color:var(--placeholder)}
+.period-pill{display:inline-block;padding:2px 10px;background:#eef2f7;border-radius:12px;color:#5a6270;font-size:12px}
+
+/* 操作链接 */
+.op a{color:var(--primary);cursor:pointer;margin:0 4px;font-size:13px}
+.op a.del{color:var(--danger)}
+.op a:hover{text-decoration:underline}
+
+/* 空状态 */
+.empty{text-align:center;color:var(--text-3);padding:60px 0;font-size:14px}
+.empty .big{font-size:40px;margin-bottom:8px;opacity:.5}
+
+/* ===================== 表单页（推播条件） ===================== */
+.form-head{display:flex;align-items:center;margin-bottom:16px}
+.form-head .title{font-size:16px;font-weight:600;color:var(--primary)}
+.form-head .btns{margin-left:auto;display:flex;gap:10px}
+.notice{
+  display:flex;gap:8px;background:var(--warning-bg);border:1px solid #fcdada;
+  color:var(--danger);border-radius:var(--radius);padding:10px 14px;font-size:13px;margin-bottom:18px;line-height:1.6;
+}
+.section{background:#fff;border:1px solid var(--border-2);border-radius:6px;padding:18px 20px;margin-bottom:16px}
+.section-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:6px}
+.section-title::before{content:"";width:3px;height:14px;background:var(--primary);border-radius:2px}
+.hint{color:var(--danger);font-size:12px;margin-bottom:14px;line-height:1.7}
+
+.form-row{display:flex;align-items:flex-start;margin-bottom:18px}
+.form-row:last-child{margin-bottom:0}
+.form-label{width:130px;flex:0 0 130px;text-align:right;padding-right:16px;padding-top:7px;color:var(--text-2);font-size:13px}
+.form-label .req{color:var(--danger);margin-right:2px}
+.form-ctrl{flex:1}
+.row-error{color:var(--danger);font-size:12px;margin-top:6px;display:none}
+.row-error.show{display:block}
+
+/* 标签选择（单选，做成按钮组） */
+.taggroup{display:flex;flex-wrap:wrap;gap:8px}
+.tagopt{
+  padding:6px 14px;border:1px solid var(--border);border-radius:16px;background:#fff;
+  color:var(--text-2);font-size:13px;cursor:pointer;user-select:none;transition:.12s;
+}
+.tagopt:hover{border-color:var(--primary);color:var(--primary)}
+.tagopt.sel{background:var(--primary);border-color:var(--primary);color:#fff}
+
+/* 计算周期 单选 */
+.period-group{display:flex;gap:10px;flex-wrap:wrap}
+.period-opt{
+  padding:6px 18px;border:1px solid var(--border);border-radius:var(--radius);
+  cursor:pointer;font-size:13px;color:var(--text-2);background:#fff;
+}
+.period-opt.sel{background:var(--primary-light);border-color:var(--primary);color:var(--primary);font-weight:600}
+
+/* 三个阈值条件——同一阶级下三项目标值并排配置，新增阶级为共用的独立按钮 */
+.thr-grid-wrap{border:1px dashed var(--border);border-radius:6px;padding:16px;margin-bottom:14px}
+.thr-grid-row{display:grid;grid-template-columns:88px repeat(3,1fr);gap:10px 20px;align-items:center;margin-bottom:12px}
+.thr-grid-row:last-of-type{margin-bottom:0}
+.thr-grid-head{margin-bottom:14px}
+.thr-col-title{font-weight:600;color:var(--text);font-size:13px;text-align:center}
+.thr-col-title .cmp{display:block;font-weight:400;color:var(--text-3);font-size:12px;margin-top:3px}
+.thr-row-label{display:flex;flex-direction:column;gap:4px;color:var(--text-2);font-size:13px}
+.thr-row-label .rm{color:var(--danger);cursor:pointer;font-size:12px}
+.thr-row-label .rm:hover{text-decoration:underline}
+.thr-cell .input{width:100%}
+.thr-err-row{margin-top:-2px;margin-bottom:0}
+.thr-err-row .row-error{display:block!important;min-height:16px;margin-top:0;visibility:hidden}
+.thr-err-row .row-error.show{visibility:visible}
+.add-lv{color:var(--primary);cursor:pointer;font-size:13px;display:inline-flex;align-items:center;gap:4px;margin-top:2px}
+.add-lv.disabled{color:var(--placeholder);cursor:not-allowed}
+.add-lv:hover:not(.disabled){text-decoration:underline}
+
+/* 推送活动 多选下拉 */
+.msel{position:relative;width:520px;max-width:100%}
+.msel-control{
+  min-height:34px;border:1px solid var(--border);border-radius:var(--radius);
+  padding:4px 30px 4px 8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;
+  cursor:pointer;background:#fff;position:relative;
+}
+.msel-control:hover{border-color:var(--primary-hover)}
+.msel-control.open{border-color:var(--primary)}
+.msel-control .ph{color:var(--placeholder);font-size:13px;padding:3px 2px}
+.msel-control .caret{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#c0c4cc;transition:.2s;font-size:12px}
+.msel-control.open .caret{transform:translateY(-50%) rotate(180deg)}
+.msel-chip{
+  display:inline-flex;align-items:center;gap:4px;background:#f0f2f5;border:1px solid #e0e3e9;
+  border-radius:3px;padding:2px 6px;font-size:12px;color:var(--text-2);
+}
+.msel-chip .x{cursor:pointer;color:#a0a4ad;font-weight:bold}
+.msel-chip .x:hover{color:var(--danger)}
+.msel-panel{
+  display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:30;
+  background:#fff;border:1px solid var(--border-2);border-radius:var(--radius);
+  box-shadow:0 4px 16px rgba(0,0,0,.12);max-height:280px;overflow-y:auto;padding:6px 0;
+}
+.msel-panel.show{display:block}
+.msel-opt{display:flex;align-items:center;gap:8px;padding:8px 14px;cursor:pointer;font-size:13px;color:var(--text-2)}
+.msel-opt:hover{background:var(--primary-light)}
+.msel-opt.sel{color:var(--primary);font-weight:600}
+.msel-opt .ck{width:15px;height:15px;border:1px solid var(--border);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff}
+.msel-opt.sel .ck{background:var(--primary);border-color:var(--primary)}
+.msel-toolbar{display:flex;justify-content:space-between;padding:6px 14px;border-bottom:1px solid #f0f2f5;margin-bottom:4px}
+.msel-toolbar a{color:var(--primary);font-size:12px;cursor:pointer}
+
+/* ===================== 弹窗 / Toast ===================== */
+.mask{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:100}
+.mask.show{display:flex}
+.dialog{background:#fff;border-radius:8px;width:400px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,.2)}
+.dialog-head{padding:16px 20px;font-size:16px;font-weight:600;border-bottom:1px solid #f0f2f5;display:flex;align-items:center;gap:8px}
+.dialog-body{padding:22px 20px;color:var(--text-2);font-size:14px;line-height:1.6}
+.dialog-foot{padding:12px 20px 18px;display:flex;justify-content:flex-end;gap:10px}
+
+.toast-wrap{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;align-items:center}
+.toast{
+  display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:var(--radius);
+  font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,.12);animation:drop .25s ease;background:#fff;
+}
+.toast.success{background:#f0f9eb;color:#529b2e;border:1px solid #e1f3d8}
+.toast.error{background:#fef0f0;color:var(--danger);border:1px solid #fde2e2}
+.toast.info{background:#edf2fc;color:#606266;border:1px solid #e4e7ed}
+@keyframes drop{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<!-- ============================ 左侧菜单 ============================ -->
+<aside class="sidebar">
+  <div class="menu-item"><span class="ico">🎮</span>游戏管理<span class="arrow">›</span></div>
+  <div class="menu-item"><span class="ico">📢</span>公告管理<span class="arrow">›</span></div>
+  <div class="menu-item"><span class="ico">💳</span>充值配置<span class="arrow">›</span></div>
+  <div class="menu-item"><span class="ico">📄</span>日志管理<span class="arrow">›</span></div>
+  <div class="menu-item"><span class="ico">🎁</span>活动配置<span class="badge">99+</span></div>
+
+  <!-- 活动配置（新）——本次功能所在位置，默认展开 -->
+  <div class="menu-item open" onclick="toggleSub(this)" style="color:var(--menu-active-text);font-weight:600">
+    <span class="ico" style="color:var(--primary)">🗂️</span>活动配置（新）<span class="arrow">›</span>
+  </div>
+  <div class="submenu show">
+    <div class="subitem"><span class="dot"></span>活动列表</div>
+    <div class="subitem"><span class="dot"></span>派奖审核</div>
+    <div class="subitem"><span class="dot"></span>活动报表</div>
+    <!-- ★ 新增入口：显示在「活动报表」下方 -->
+    <div class="subitem active"><span class="dot"></span>智能推播<span class="new-flag">NEW</span></div>
+  </div>
+
+  <div class="menu-item"><span class="ico">👥</span>代理结算<span class="arrow">›</span></div>
+  <div class="menu-item"><span class="ico">💻</span>平台费用<span class="arrow">›</span></div>
+  <div class="menu-item"><span class="ico">🧧</span>红包雨管理<span class="arrow">›</span></div>
+  <div class="menu-item"><span class="ico">⚙️</span>系统管理<span class="arrow">›</span></div>
+  <div class="menu-item"><span class="ico">🎰</span>抽奖活动管理<span class="arrow">›</span></div>
+  <div class="menu-item"><span class="ico">🥚</span>复活节砸蛋管理<span class="arrow">›</span></div>
+</aside>
+
+<!-- ============================ 右侧主区 ============================ -->
+<div class="main">
+  <div class="topbar">
+    <div class="breadcrumb">
+      <span>位置</span><span class="sep">›</span>
+      <span>活动配置(新)</span><span class="sep">›</span>
+      <span class="cur">智能推播</span>
+    </div>
+    <div class="tabs-row">
+      <div class="tab">活动列表 <span class="x">✕</span></div>
+      <div class="tab">派奖审核 <span class="x">✕</span></div>
+      <div class="tab">活动报表 <span class="x">✕</span></div>
+      <div class="tab active">智能推播 <span class="x">✕</span></div>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- 二级页签 -->
+    <div class="subtabs">
+      <div class="subtab active" data-tab="list" onclick="switchSubtab('list')">推播列表</div>
+      <div class="subtab" data-tab="reward" onclick="switchSubtab('reward')">推播奖励</div>
+    </div>
+
+    <!-- ============ 页面 A：推播列表 ============ -->
+    <div id="view-list">
+      <div class="toolbar">
+        <div class="field">
+          智能推播：
+          <div class="eswitch" id="smartPushSwitch" onclick="toggleSmartPush()"></div>
+        </div>
+        <div class="field">
+          目标主标签：
+          <select class="select" id="filterMain" onchange="renderTable()">
+            <option value="">全部</option>
+            <option>常贵客</option><option>低频客</option><option>新鲜客</option><option>沉默客</option>
+          </select>
+        </div>
+        <div class="field">
+          计算周期：
+          <select class="select" id="filterPeriod" onchange="renderTable()" style="width:130px">
+            <option value="">全部</option>
+            <option>今日</option><option>昨日</option><option>近7日</option><option>近14日</option><option>近30日</option>
+          </select>
+        </div>
+        <div class="spacer"></div>
+        <button class="btn btn-primary" onclick="openForm()">＋ 新增推播</button>
+      </div>
+
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:210px">目标用户</th>
+              <th style="width:90px">计算周期</th>
+              <th>账户余额</th>
+              <th>有效投注</th>
+              <th>用户净输赢(负数)</th>
+              <th style="width:160px">新增/变更时间</th>
+              <th style="width:120px">操作</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"><!-- JS 渲染 --></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ 页面 B：推播奖励（规格未提供，暂以占位说明） ============ -->
+    <div id="view-reward" class="hidden">
+      <div class="card">
+        <div class="empty">
+          <div class="big">🎁</div>
+          <div>「推播奖励」页面规则尚未在本次需求中定义</div>
+          <div style="font-size:12px;color:var(--text-3);margin-top:6px">
+            此页签为需求第 1 点所列的两大区块之一，待补充详细规格后再于此处呈现奖励配置内容。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 页面 C：推播条件表单（新增 / 编辑） ============ -->
+    <div id="view-form" class="hidden">
+      <div class="form-head">
+        <div class="title" id="formTitle">新增推播条件</div>
+        <div class="btns">
+          <button class="btn" onclick="closeForm()">取消</button>
+          <button class="btn btn-primary" onclick="saveForm()">保存</button>
+        </div>
+      </div>
+
+      <div class="notice">
+        <span>⚠</span>
+        <span>提示：保存后推播条件将立即生效并纳入排程计算。用户标签为必填单选；三项阈值条件「账户余额、有效投注、用户净输赢(负数)」需在同一阶级下同时配置，留空表示该项不启用，填写时不可为 0，最多可配置 4 个阶级（新增阶级为共用按钮，三项条件同步增减），且下一层目标值不可小于上一层。</span>
+      </div>
+
+      <!-- 区块 1：推送目标用户 -->
+      <div class="section">
+        <div class="section-title">推送目标用户</div>
+
+        <div class="form-row">
+          <div class="form-label"><span class="req">*</span>主标签</div>
+          <div class="form-ctrl">
+            <div class="taggroup" id="grpMain"></div>
+            <div class="row-error" id="err-main">请选择主标签</div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-label"><span class="req">*</span>副标签</div>
+          <div class="form-ctrl">
+            <div class="taggroup" id="grpSub"></div>
+            <div class="row-error" id="err-sub">请选择副标签</div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-label"><span class="req">*</span>属性标签</div>
+          <div class="form-ctrl">
+            <div class="taggroup" id="grpAttr"></div>
+            <div class="row-error" id="err-attr">请选择属性标签</div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-label"></div>
+          <div class="form-ctrl">
+            <div class="row-error" id="err-dup">目标用户重复：已有其他推播条件使用相同的主标签、副标签、属性标签组合</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 区块 2：触发条件 -->
+      <div class="section">
+        <div class="section-title">触发条件</div>
+
+        <div class="form-row">
+          <div class="form-label"><span class="req">*</span>计算周期</div>
+          <div class="form-ctrl">
+            <div class="period-group" id="grpPeriod"></div>
+            <div class="row-error" id="err-period">请选择计算周期</div>
+          </div>
+        </div>
+
+        <div class="hint">
+          以下三项条件需同时配置（留空＝不启用该条件）；填写时不可为 0；最多 4 阶级，「新增阶级」为共用按钮，三项条件同步新增/删除阶级，且下一层目标值不可小于上一层。
+        </div>
+
+        <!-- 三个阈值条件由 JS 生成 -->
+        <div id="thrContainer"></div>
+      </div>
+
+      <!-- 区块 3：推送活动 -->
+      <div class="section">
+        <div class="section-title">推送活动</div>
+        <div class="hint">每个阶级需至少选择 1 个推送活动；阶级数与上方「触发条件」共用，新增/删除阶级请至触发条件区块操作。</div>
+        <div id="actContainer"></div>
+      </div>
+
+      <div class="form-head" style="margin-top:4px">
+        <div class="btns" style="margin-left:auto">
+          <button class="btn" onclick="closeForm()">取消</button>
+          <button class="btn btn-primary" onclick="saveForm()">保存</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- 删除确认弹窗 -->
+<div class="mask" id="delMask">
+  <div class="dialog">
+    <div class="dialog-head"><span style="color:#e6a23c">⚠</span> 删除确认</div>
+    <div class="dialog-body">确定要删除这条推播条件吗？删除后将立即停止对应用户的推播排程，且无法恢复。</div>
+    <div class="dialog-foot">
+      <button class="btn" onclick="closeDel()">取消</button>
+      <button class="btn btn-primary" style="background:var(--danger);border-color:var(--danger)" onclick="confirmDel()">确定删除</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+/* ============================================================
+   一、基础数据（下拉选单 / 标签来源）
+   —— 全部照需求文件列的内容，方便对照规格。
+   ============================================================ */
+const MAIN_TAGS = ['常贵客','低频客','新鲜客','沉默客'];
+const SUB_TAGS  = ['无存','小R','中R','大R','高流水','低GGR','中NGR','VIP 0 至 VIP 10','高投注天数','低充值天数'];
+const ATTR_TAGS = ['Slot','Casino','Sports','Perya','新用户','老用户','FTD','负净充'];
+const PERIODS   = ['今日','昨日','近7日','近14日','近30日'];
+const ACTIVITIES = ['充值活动','消费活动','Payday活动','盈利活动','新手/回归签到活动','签到活动',
+  '新用户充值转盘活动','每日特别返水','老用户回归活动','首存奖励和挑战赛活动',
+  '存款奖励和挑战赛活动','幸运宝箱挑战赛','大奖池活动','每日返水加码'];
+
+/* 三项阈值条件的定义：key、显示名、比较符（账户余额/有效投注是「小于」，净输赢是「小于等于」） */
+const THRESHOLDS = [
+  {key:'balance', name:'账户余额',        cmp:'＜',  cmpText:'小于',   neg:false},
+  {key:'bet',     name:'有效投注',        cmp:'＜',  cmpText:'小于',   neg:false},
+  {key:'ngr',     name:'用户净输赢(负数)', cmp:'≤',  cmpText:'小于等于', neg:true },
+];
+
+/* ============================================================
+   二、示范用列表数据（模拟已生成的推播清单）
+   ============================================================ */
+let pushList = [
+  {
+    id:1, main:'常贵客', sub:'大R', attr:'Slot', period:'近7日',
+    balance:[1000,3000], bet:[50000], ngr:[-2000],
+    activities:[['充值活动','大奖池活动','幸运宝箱挑战赛'],[]], time:'2026-07-20 14:32:08'
+  },
+  {
+    id:2, main:'沉默客', sub:'无存', attr:'新用户', period:'近30日',
+    balance:[], bet:[10000,30000,60000], ngr:[],
+    activities:[['新手/回归签到活动','新用户充值转盘活动'],[],[]], time:'2026-07-21 09:15:44'
+  },
+  {
+    id:3, main:'低频客', sub:'中NGR', attr:'Sports', period:'昨日',
+    balance:[500], bet:[], ngr:[-500,-1000,-2000,-5000],
+    activities:[['每日特别返水','每日返水加码'],[],[],[]], time:'2026-07-22 18:47:21'
+  },
+];
+let seqId = 4;              // 下一个新增的 id
+let editingId = null;      // 正在编辑的 id（null=新增）
+let pendingDelId = null;   // 待删除 id
+let smartPushOn = false;   // 智能推播总开关，预设关闭
+
+function toggleSmartPush(){
+  smartPushOn = !smartPushOn;
+  document.getElementById('smartPushSwitch').classList.toggle('on', smartPushOn);
+  toast(smartPushOn?'success':'info', smartPushOn?'智能推播已开启':'智能推播已关闭');
+}
+
+/* ============================================================
+   三、表单当前状态
+   ============================================================ */
+let form = null;
+function blankForm(){
+  return {
+    main:'', sub:'', attr:'', period:'',
+    balance:['','','',''], bet:['','','',''], ngr:['','','',''],
+    thrLv:1,   // 三项条件共用同一个阶级数（新增/删除阶级为共用按钮）
+    activities:[[],[],[],[]]   // 每个阶级各自的推送活动清单，阶级数与 thrLv 共用
+  };
+}
+
+/* ============================================================
+   四、侧栏 & 页签切换
+   ============================================================ */
+function toggleSub(el){
+  el.classList.toggle('open');
+  el.nextElementSibling.classList.toggle('show');
+}
+function switchSubtab(tab){
+  document.querySelectorAll('.subtab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
+  // 切页签时若在表单页，先退回列表
+  document.getElementById('view-form').classList.add('hidden');
+  document.getElementById('view-list').classList.toggle('hidden', tab!=='list');
+  document.getElementById('view-reward').classList.toggle('hidden', tab!=='reward');
+}
+
+/* ============================================================
+   五、渲染表格
+   ============================================================ */
+function fmtCond(arr, cmp){
+  // 把阶级数组显示成「＜1000 / ＜3000」这种；空数组显示「—」
+  if(!arr || arr.length===0) return '<span class="none">—</span>';
+  return arr.map(v=>`<span class="lv">${cmp}${Number(v).toLocaleString()}</span>`).join('');
+}
+function renderTable(){
+  const fm = document.getElementById('filterMain').value;
+  const fp = document.getElementById('filterPeriod').value;
+  const rows = pushList.filter(r=>(!fm||r.main===fm)&&(!fp||r.period===fp));
+  const body = document.getElementById('tableBody');
+
+  if(rows.length===0){
+    body.innerHTML = `<tr><td colspan="7"><div class="empty"><div class="big">📭</div>暂无符合条件的推播清单</div></td></tr>`;
+    return;
+  }
+  body.innerHTML = rows.map(r=>`
+    <tr>
+      <td>${r.main}, ${r.sub}, ${r.attr}</td>
+      <td><span class="period-pill">${r.period}</span></td>
+      <td><div class="cond-val">${fmtCond(r.balance,'＜')}</div></td>
+      <td><div class="cond-val">${fmtCond(r.bet,'＜')}</div></td>
+      <td><div class="cond-val">${fmtCond(r.ngr,'≤')}</div></td>
+      <td>${r.time}</td>
+      <td class="op">
+        <a onclick="openForm(${r.id})">编辑</a>
+        <a class="del" onclick="askDel(${r.id})">删除</a>
+      </td>
+    </tr>`).join('');
+}
+
+/* ============================================================
+   六、打开 / 关闭表单
+   ============================================================ */
+function openForm(id){
+  editingId = (typeof id==='number') ? id : null;
+  form = blankForm();
+
+  if(editingId!==null){
+    const r = pushList.find(x=>x.id===editingId);
+    form.main=r.main; form.sub=r.sub; form.attr=r.attr; form.period=r.period;
+    form.activities=[[],[],[],[]];
+    (r.activities||[]).forEach((arr,i)=>{ if(i<4) form.activities[i]=[...arr]; });
+    // 把已保存的阶级数组回填进 4 格输入；三项条件共用同一阶级数，取三者最大值
+    let maxLv=1;
+    ['balance','bet','ngr'].forEach(k=>{
+      const vals=r[k]||[];
+      form[k]=['','','',''];
+      vals.forEach((v,i)=>form[k][i]=v);
+      maxLv=Math.max(maxLv, vals.length);
+    });
+    form.thrLv=maxLv;
+  }
+  document.getElementById('formTitle').textContent = editingId!==null ? '编辑推播条件' : '新增推播条件';
+
+  buildTagGroups();
+  buildPeriod();
+  buildThresholds();
+  buildActivities();
+  clearErrors();
+
+  document.getElementById('view-list').classList.add('hidden');
+  document.getElementById('view-reward').classList.add('hidden');
+  document.getElementById('view-form').classList.remove('hidden');
+  document.querySelector('.content').scrollTop = 0;
+}
+function closeForm(){
+  document.getElementById('view-form').classList.add('hidden');
+  document.getElementById('view-list').classList.remove('hidden');
+}
+
+/* ============================================================
+   七、构建标签单选组（点一下选中，再点同一个可取消）
+   ============================================================ */
+function buildTagGroups(){
+  const map = [['grpMain',MAIN_TAGS,'main'],['grpSub',SUB_TAGS,'sub'],['grpAttr',ATTR_TAGS,'attr']];
+  map.forEach(([boxId,list,field])=>{
+    const box=document.getElementById(boxId);
+    box.innerHTML = list.map(t=>
+      `<div class="tagopt ${form[field]===t?'sel':''}" onclick="pickTag('${field}','${t.replace(/'/g,"\\'")}',this)">${t}</div>`
+    ).join('');
+  });
+}
+function pickTag(field,val,el){
+  // 单选：把同组其它清掉，再切换自己
+  const box=el.parentElement;
+  box.querySelectorAll('.tagopt').forEach(o=>o.classList.remove('sel'));
+  if(form[field]===val){ form[field]=''; }        // 再点一次＝取消
+  else { form[field]=val; el.classList.add('sel'); }
+  hideError('err-'+field);
+}
+
+/* 计算周期单选 */
+function buildPeriod(){
+  const box=document.getElementById('grpPeriod');
+  box.innerHTML = PERIODS.map(p=>
+    `<div class="period-opt ${form.period===p?'sel':''}" onclick="pickPeriod('${p}',this)">${p}</div>`
+  ).join('');
+}
+function pickPeriod(p,el){
+  el.parentElement.querySelectorAll('.period-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel'); form.period=p; hideError('err-period');
+}
+
+/* ============================================================
+   八、三项阈值条件——同一阶级下三项目标值需同时配置（并排显示）
+   「新增阶级」为共用的独立按钮，三项条件的阶级数一起增减，最多 4 阶
+   ============================================================ */
+function buildThresholds(){
+  const box=document.getElementById('thrContainer');
+  const lvCount=form.thrLv;
+
+  const head=`
+    <div class="thr-grid-row thr-grid-head">
+      <div></div>
+      ${THRESHOLDS.map(t=>`
+      <div class="thr-col-title">${t.name}<span class="cmp">${t.cmpText}目标值${t.neg?'（负数，例：-1000）':''}</span></div>`).join('')}
+    </div>`;
+
+  let rows='';
+  for(let i=0;i<lvCount;i++){
+    rows+=`
+    <div class="thr-grid-row">
+      <div class="thr-row-label">
+        阶级${i+1}
+        ${i>0?`<span class="rm" onclick="removeLv()">删除阶级</span>`:''}
+      </div>
+      ${THRESHOLDS.map(t=>`
+      <div class="thr-cell">
+        <input type="number" class="input" value="${form[t.key][i]}"
+               placeholder="${t.neg?'如 -1000（负数）':'请输入目标值'}"
+               oninput="onThrInput('${t.key}',${i},this)">
+      </div>`).join('')}
+    </div>`;
+  }
+
+  const errRow=`
+    <div class="thr-grid-row thr-err-row">
+      <div></div>
+      ${THRESHOLDS.map(t=>`<div class="row-error" id="err-${t.key}"></div>`).join('')}
+    </div>`;
+
+  const disabled = lvCount>=4;
+  box.innerHTML = `
+    <div class="thr-grid-wrap">
+      ${head}
+      ${rows}
+      ${errRow}
+    </div>
+    <div class="row-error" id="err-thr-all">账户余额、有效投注、用户净输赢(负数)，至少其中一个项目需要填入目标值</div>
+    <div class="add-lv ${disabled?'disabled':''}" onclick="${disabled?'':'addLv()'}">＋ 新增阶级（最多 4 阶）</div>`;
+}
+function onThrInput(key,idx,el){ form[key][idx]=el.value; hideError('err-'+key); el.classList.remove('is-error'); }
+function addLv(){
+  if(form.thrLv<4){
+    form.thrLv++;
+    buildThresholds();
+    buildActivities();   // 推送活动阶级数与触发条件共用，需同步增减
+  }
+}
+function removeLv(){
+  if(form.thrLv>1){
+    form.thrLv--;
+    ['balance','bet','ngr'].forEach(k=>{ form[k][form.thrLv]=''; });
+    form.activities[form.thrLv]=[];
+    buildThresholds();
+    buildActivities();
+  }
+}
+
+/* ============================================================
+   九、推送活动多选下拉——阶级数与触发条件共用，每个阶级各自一组多选
+   ============================================================ */
+function buildActivities(){
+  const box=document.getElementById('actContainer');
+  const lvCount=form.thrLv;
+  box.innerHTML = Array.from({length:lvCount}).map((_,i)=>`
+    <div class="form-row">
+      <div class="form-label"><span class="req">*</span>阶级${i+1}活动清单</div>
+      <div class="form-ctrl">
+        <div class="msel" id="mselActivity-${i}">
+          <div class="msel-control" id="mselControl-${i}" onclick="toggleMsel(event,${i})">
+            <span class="ph" id="mselPh-${i}">请选择推送活动（可复选）</span>
+            <span class="caret">▾</span>
+          </div>
+          <div class="msel-panel" id="mselPanel-${i}">
+            <div class="msel-toolbar">
+              <a onclick="mselAll(true,${i})">全选</a>
+              <a onclick="mselAll(false,${i})">清空</a>
+            </div>
+            <div id="mselOptions-${i}"></div>
+          </div>
+        </div>
+        <div class="row-error" id="err-act-${i}">请至少选择 1 个推送活动</div>
+      </div>
+    </div>`).join('');
+  for(let i=0;i<lvCount;i++) buildMselLevel(i);
+}
+function buildMselLevel(i){
+  const opts=document.getElementById('mselOptions-'+i);
+  opts.innerHTML = ACTIVITIES.map(a=>{
+    const sel=form.activities[i].includes(a);
+    return `<div class="msel-opt ${sel?'sel':''}" onclick="toggleAct(${i},'${a.replace(/'/g,"\\'")}',event)">
+      <span class="ck">${sel?'✓':''}</span>${a}</div>`;
+  }).join('');
+  refreshMselControl(i);
+}
+function refreshMselControl(i){
+  const ctrl=document.getElementById('mselControl-'+i);
+  const caret=ctrl.querySelector('.caret');
+  ctrl.querySelectorAll('.msel-chip,.ph').forEach(n=>n.remove());
+  if(form.activities[i].length===0){
+    const ph=document.createElement('span'); ph.className='ph'; ph.textContent='请选择推送活动（可复选）';
+    ctrl.insertBefore(ph,caret);
+  }else{
+    form.activities[i].forEach(a=>{
+      const c=document.createElement('span'); c.className='msel-chip';
+      c.innerHTML=`${a}<span class="x" onclick="removeAct(event,${i},'${a.replace(/'/g,"\\'")}')">✕</span>`;
+      ctrl.insertBefore(c,caret);
+    });
+  }
+}
+function toggleMsel(e,i){
+  e.stopPropagation();
+  document.getElementById('mselPanel-'+i).classList.toggle('show');
+  document.getElementById('mselControl-'+i).classList.toggle('open');
+}
+function toggleAct(i,a,e){
+  e.stopPropagation();
+  const arr=form.activities[i];
+  const idx=arr.indexOf(a);
+  if(idx>=0) arr.splice(idx,1); else arr.push(a);
+  buildMselLevel(i); hideError('err-act-'+i);
+}
+function removeAct(e,i,a){ e.stopPropagation(); const arr=form.activities[i]; const idx=arr.indexOf(a); if(idx>=0)arr.splice(idx,1); buildMselLevel(i); }
+function mselAll(all,i){ form.activities[i]= all?[...ACTIVITIES]:[]; buildMselLevel(i); hideError('err-act-'+i); }
+// 点击空白处关闭下拉（每个阶级各自的下拉框都要处理）
+document.addEventListener('click',e=>{
+  document.querySelectorAll('.msel').forEach(box=>{
+    if(!box.contains(e.target)){
+      const panel=box.querySelector('.msel-panel');
+      const ctrl=box.querySelector('.msel-control');
+      if(panel) panel.classList.remove('show');
+      if(ctrl) ctrl.classList.remove('open');
+    }
+  });
+});
+
+/* ============================================================
+   十、保存 —— 含各项校验
+   ============================================================ */
+function clearErrors(){ document.querySelectorAll('.row-error').forEach(e=>e.classList.remove('show')); }
+function showError(id,msg){ const e=document.getElementById(id); if(e){ if(msg)e.textContent=msg; e.classList.add('show'); } }
+function hideError(id){ const e=document.getElementById(id); if(e)e.classList.remove('show'); }
+
+function collectThreshold(key){
+  // 取出该项非空的阶级值，并做「不可为0 / 下一层不可小于上一层」校验
+  const t=THRESHOLDS.find(x=>x.key===key);
+  const raw=form[key].slice(0,form.thrLv);
+  const vals=[]; let err='';
+  for(let i=0;i<raw.length;i++){
+    const s=String(raw[i]).trim();
+    if(s==='') continue;                       // 允许中间留空？这里要求已填阶级连续，简单处理：收集所有已填
+    const n=Number(s);
+    if(isNaN(n)){ err='请输入数字'; break; }
+    if(n===0){ err='目标值不可为 0'; break; }
+    if(t.neg && n>=0){ err='净输赢须为负数'; break; }
+    vals.push(n);
+  }
+  if(err) return {err};
+  // 校验递增：下一层不可小于上一层
+  for(let i=1;i<vals.length;i++){
+    if(vals[i]<vals[i-1]){ return {err:'下一层目标值不可小于上一层'}; }
+  }
+  return {vals};
+}
+
+function saveForm(){
+  clearErrors();
+  let ok=true;
+  if(!form.main){ showError('err-main'); ok=false; }
+  if(!form.sub){ showError('err-sub'); ok=false; }
+  if(!form.attr){ showError('err-attr'); ok=false; }
+  if(!form.period){ showError('err-period'); ok=false; }
+
+  // 目标用户（主标签+副标签+属性标签）不可与其他推播条件重复
+  let isDup=false;
+  if(form.main && form.sub && form.attr){
+    isDup = pushList.some(x=>x.id!==editingId && x.main===form.main && x.sub===form.sub && x.attr===form.attr);
+    if(isDup){ showError('err-dup'); ok=false; }
+  }
+
+  const res={};
+  let thrFieldErr=false;
+  for(const k of ['balance','bet','ngr']){
+    const r=collectThreshold(k);
+    if(r.err){ showError('err-'+k, r.err); ok=false; thrFieldErr=true; }
+    else res[k]=r.vals;
+  }
+  // 账户余额、有效投注、用户净输赢(负数)三项至少要有一项填入目标值
+  let thrAllEmpty=false;
+  if(!thrFieldErr){
+    thrAllEmpty = res.balance.length===0 && res.bet.length===0 && res.ngr.length===0;
+    if(thrAllEmpty){ showError('err-thr-all'); ok=false; }
+  }
+  for(let i=0;i<form.thrLv;i++){
+    if(form.activities[i].length===0){ showError('err-act-'+i); ok=false; }
+  }
+
+  if(!ok){ toast('error', isDup?'目标用户重复':thrAllEmpty?'账户余额、有效投注、用户净输赢(负数)至少填写一项':'请修正表单中标红的项目'); return; }
+
+  const now=new Date();
+  const time=`${now.getFullYear()}-${p2(now.getMonth()+1)}-${p2(now.getDate())} ${p2(now.getHours())}:${p2(now.getMinutes())}:${p2(now.getSeconds())}`;
+  const record={
+    main:form.main, sub:form.sub, attr:form.attr, period:form.period,
+    balance:res.balance, bet:res.bet, ngr:res.ngr,
+    activities:form.activities.slice(0,form.thrLv).map(arr=>[...arr]), time
+  };
+
+  if(editingId!==null){
+    const idx=pushList.findIndex(x=>x.id===editingId);
+    pushList[idx]={...pushList[idx],...record};
+    toast('success','推播条件已更新');
+  }else{
+    pushList.unshift({id:seqId++,...record});
+    toast('success','推播条件新增成功');
+  }
+  renderTable();
+  closeForm();
+}
+function p2(n){ return String(n).padStart(2,'0'); }
+
+/* ============================================================
+   十一、删除
+   ============================================================ */
+function askDel(id){ pendingDelId=id; document.getElementById('delMask').classList.add('show'); }
+function closeDel(){ pendingDelId=null; document.getElementById('delMask').classList.remove('show'); }
+function confirmDel(){
+  pushList=pushList.filter(x=>x.id!==pendingDelId);
+  closeDel(); renderTable(); toast('info','已删除该推播条件');
+}
+
+/* ============================================================
+   十二、Toast 轻提示
+   ============================================================ */
+function toast(type,msg){
+  const wrap=document.getElementById('toastWrap');
+  const icon={success:'✔',error:'✕',info:'ℹ'}[type]||'';
+  const el=document.createElement('div');
+  el.className='toast '+type; el.innerHTML=`<span>${icon}</span>${msg}`;
+  wrap.appendChild(el);
+  setTimeout(()=>{ el.style.transition='.3s'; el.style.opacity='0'; el.style.transform='translateY(-10px)'; setTimeout(()=>el.remove(),300); },2200);
+}
+
+/* 初始渲染 */
+renderTable();
+</script>
+</body>
+</html>
