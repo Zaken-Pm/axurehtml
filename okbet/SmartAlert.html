@@ -385,16 +385,24 @@ tbody tr:last-child td{border-bottom:none}
       </div>
     </div>
 
-    <!-- ============ 页面 B：推播奖励（规格未提供，暂以占位说明） ============ -->
+    <!-- ============ 页面 B：推播奖励——表格标题参照推播列表 ============ -->
     <div id="view-reward" class="hidden">
       <div class="card">
-        <div class="empty">
-          <div class="big">🎁</div>
-          <div>「推播奖励」页面规则尚未在本次需求中定义</div>
-          <div style="font-size:12px;color:var(--text-3);margin-top:6px">
-            此页签为需求第 1 点所列的两大区块之一，待补充详细规格后再于此处呈现奖励配置内容。
-          </div>
-        </div>
+        <table>
+          <thead>
+            <tr>
+              <th style="width:170px">推播名称</th>
+              <th style="width:190px">目标用户</th>
+              <th>阶级1奖励</th>
+              <th>阶级2奖励</th>
+              <th>阶级3奖励</th>
+              <th>阶级4奖励</th>
+              <th style="width:160px">新增/变更时间</th>
+              <th style="width:120px">操作</th>
+            </tr>
+          </thead>
+          <tbody id="rewardTableBody"><!-- JS 渲染 --></tbody>
+        </table>
       </div>
     </div>
 
@@ -554,6 +562,47 @@ let pushList = [
     activities:[['每日特别返水','每日返水加码'],[],[],[]], time:'2026-07-22 18:47:21'
   },
 ];
+
+/* ============================================================
+   二之二、示范用推播奖励数据——与推播列表的推播名称/目标用户对应
+   ============================================================ */
+let rewardList = [
+  {
+    id:1, name:'常贵客大R Slot近7日推播', main:'常贵客', sub:'大R', attr:'Slot',
+    rewards:['彩金 100 元', '彩金 300 元 + 免费旋转 20 次', '', ''], time:'2026-07-20 14:32:08'
+  },
+  {
+    id:2, name:'沉默客回归召回推播', main:'沉默客', sub:'无存', attr:'新用户',
+    rewards:['召回礼包 50 元', '召回礼包 100 元 + 首存加码 10%', '召回礼包 200 元 + 首存加码 20%', ''], time:'2026-07-21 09:15:44'
+  },
+  {
+    id:3, name:'低频客净输赢风险监控推播', main:'低频客', sub:'中NGR', attr:'Sports',
+    rewards:['安慰彩金 20 元', '安慰彩金 50 元', '安慰彩金 100 元 + 免费投注券', '安慰彩金 200 元 + 客服关怀通话'], time:'2026-07-22 18:47:21'
+  },
+];
+function renderRewardTable(){
+  const body=document.getElementById('rewardTableBody');
+  if(rewardList.length===0){
+    body.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="big">🎁</div>暂无推播奖励设定</div></td></tr>`;
+    return;
+  }
+  body.innerHTML = rewardList.map(r=>`
+    <tr>
+      <td>${r.name}</td>
+      <td>${r.main}, ${r.sub}, ${r.attr}</td>
+      <td>${r.rewards[0]||'<span class="none">—</span>'}</td>
+      <td>${r.rewards[1]||'<span class="none">—</span>'}</td>
+      <td>${r.rewards[2]||'<span class="none">—</span>'}</td>
+      <td>${r.rewards[3]||'<span class="none">—</span>'}</td>
+      <td>${r.time}</td>
+      <td class="op">
+        <a onclick="rewardNotReady()">编辑</a>
+        <a class="del" onclick="rewardNotReady()">删除</a>
+      </td>
+    </tr>`).join('');
+}
+function rewardNotReady(){ toast('info','「推播奖励」编辑/删除规则尚未在本次需求中定义'); }
+
 let seqId = 4;              // 下一个新增的 id
 let editingId = null;      // 正在编辑的 id（null=新增）
 let pendingDelId = null;   // 待删除 id
@@ -591,6 +640,7 @@ function switchSubtab(tab){
   document.getElementById('view-form').classList.add('hidden');
   document.getElementById('view-list').classList.toggle('hidden', tab!=='list');
   document.getElementById('view-reward').classList.toggle('hidden', tab!=='reward');
+  if(tab==='reward') renderRewardTable();
 }
 
 /* ============================================================
@@ -975,6 +1025,7 @@ function toast(type,msg){
 
 /* 初始渲染 */
 renderTable();
+renderRewardTable();
 </script>
 </body>
 </html>
