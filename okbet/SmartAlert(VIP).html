@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智能推播 · 后台示意页面</title>
+<style>
+/* ============================================================
+   颜色变量：全部取自现有后台截图（Element UI 风格）
+   这样示意页面看起来就跟你们现在的后台一模一样。
+   ============================================================ */
+:root{
+  --primary:#409EFF;          /* 主蓝：按钮、选中 */
+  --primary-hover:#66b1ff;
+  --primary-active:#3a8ee6;
+  --primary-light:#ecf5ff;    /* 浅蓝底 */
+  --menu-active-bg:#e8f1fc;   /* 左侧菜单选中底色 */
+  --menu-active-text:#2b6fe0;
+  --tab-active:#025BE8;       /* 顶部页签选中蓝 */
+  --success:#67C23A;          /* 开启绿 */
+  --danger:#F56C6C;           /* 关闭红 / 删除 / 必填 */
+  --warning-bg:#fef0f0;
+  --text:#303133;
+  --text-2:#606266;
+  --text-3:#909399;
+  --placeholder:#c0c4cc;
+  --border:#DCDFE6;
+  --border-2:#E4E7ED;
+  --bg-page:#f5f7fa;
+  --badge:#DE1818;
+  --radius:4px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+  color:var(--text);font-size:14px;background:var(--bg-page);
+  display:flex;overflow:hidden;
+}
+
+/* ===================== 左侧菜单 ===================== */
+.sidebar{
+  width:200px;flex:0 0 200px;background:#fff;height:100vh;overflow-y:auto;
+  border-right:1px solid var(--border-2);
+}
+.sidebar::-webkit-scrollbar{width:6px}
+.sidebar::-webkit-scrollbar-thumb{background:#d9d9d9;border-radius:3px}
+.menu-item{
+  display:flex;align-items:center;gap:10px;height:48px;padding:0 16px;
+  color:var(--text);cursor:pointer;position:relative;user-select:none;
+  border-bottom:1px solid #f4f6f9;
+}
+.menu-item:hover{background:#f5f7fa}
+.menu-item .ico{width:16px;text-align:center;color:#5a6270;font-size:15px}
+.menu-item .arrow{margin-left:auto;color:#c0c4cc;font-size:12px;transition:.2s}
+.menu-item.open .arrow{transform:rotate(90deg)}
+.menu-item .badge{
+  margin-left:auto;background:var(--badge);color:#fff;font-size:11px;
+  border-radius:9px;padding:1px 6px;line-height:1.4;
+}
+/* 二级菜单 */
+.submenu{display:none;background:#fafbfc}
+.submenu.show{display:block}
+.subitem{
+  display:flex;align-items:center;gap:8px;height:44px;padding:0 16px 0 40px;
+  color:var(--text-2);cursor:pointer;position:relative;
+}
+.subitem:hover{background:#f0f2f5}
+.subitem .dot{width:5px;height:5px;border-radius:50%;background:#c0c4cc}
+.subitem.active{
+  background:var(--menu-active-bg);color:var(--menu-active-text);font-weight:600;
+}
+.subitem.active::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--primary);
+}
+.subitem.active .dot{background:var(--primary)}
+.subitem .new-flag{
+  margin-left:auto;background:#fff0e6;color:#e6893b;font-size:10px;
+  padding:1px 5px;border-radius:3px;border:1px solid #ffd6b0;
+}
+
+/* ===================== 右侧主区 ===================== */
+.main{flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+/* 顶部页签栏 */
+.topbar{background:#fff;border-bottom:1px solid var(--border-2);padding:8px 14px 0}
+.breadcrumb{display:flex;align-items:center;gap:6px;color:var(--text-2);font-size:13px;padding:2px 4px 10px}
+.breadcrumb .cur{color:var(--text)}
+.breadcrumb .sep{color:#c0c4cc}
+.tabs-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:0}
+.tabs-row::-webkit-scrollbar{height:0}
+.tab{
+  display:flex;align-items:center;gap:6px;padding:6px 12px;font-size:13px;
+  border:1px solid var(--border-2);border-bottom:none;border-radius:4px 4px 0 0;
+  background:#f7f8fa;color:var(--text-2);white-space:nowrap;cursor:pointer;
+}
+.tab .x{color:#c0c4cc;font-size:12px}
+.tab.active{background:var(--tab-active);color:#fff;border-color:var(--tab-active)}
+.tab.active .x{color:#cfe0ff}
+
+/* 内容区 */
+.content{flex:1;overflow-y:auto;padding:16px}
+
+/* 二级页签（推播列表 / 推播奖励） */
+.subtabs{display:flex;gap:24px;border-bottom:1px solid var(--border-2);margin-bottom:16px}
+.subtab{
+  padding:10px 2px;font-size:15px;color:var(--text-2);cursor:pointer;
+  border-bottom:2px solid transparent;margin-bottom:-1px;font-weight:500;
+}
+.subtab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+
+/* 工具条 */
+.toolbar{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.toolbar .spacer{flex:1}
+.field{display:flex;align-items:center;gap:6px;color:var(--text-2);font-size:13px}
+
+/* 开关（智能推播总开关，预设关闭） */
+.eswitch{position:relative;display:inline-block;width:40px;height:20px;border-radius:10px;background:var(--border);cursor:pointer;transition:.2s;flex:0 0 auto}
+.eswitch::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.eswitch.on{background:var(--primary)}
+.eswitch.on::after{left:22px}
+.eswitch.disabled{opacity:.5;cursor:not-allowed}
+
+/* 通用按钮 */
+.btn{
+  display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 15px;
+  border-radius:var(--radius);border:1px solid var(--border);background:#fff;
+  color:var(--text);font-size:13px;cursor:pointer;transition:.15s;white-space:nowrap;
+}
+.btn:hover{color:var(--primary);border-color:var(--primary-hover);background:var(--primary-light)}
+.btn-primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-hover);border-color:var(--primary-hover);color:#fff}
+.btn-plain-primary{color:var(--primary);border-color:#a0cfff;background:var(--primary-light)}
+.btn-sm{height:28px;padding:0 10px;font-size:12px}
+
+/* 表单控件外观 */
+.input,.select{
+  height:34px;border:1px solid var(--border);border-radius:var(--radius);
+  padding:0 10px;font-size:13px;color:var(--text);background:#fff;outline:none;width:180px;
+}
+.input:focus,.select:focus{border-color:var(--primary)}
+.input::placeholder{color:var(--placeholder)}
+.input.is-error{border-color:var(--danger)}
+.input:disabled,.select:disabled{background:#f5f7fa;color:var(--text-3);cursor:not-allowed}
+
+/* ===================== 表格 ===================== */
+.card{background:#fff;border:1px solid var(--border-2);border-radius:6px;overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{
+  background:#f5f7fa;color:var(--text-2);font-weight:600;text-align:center;
+  padding:12px 10px;border-bottom:1px solid var(--border-2);white-space:nowrap;
+}
+tbody td{padding:14px 10px;text-align:center;border-bottom:1px solid #f0f2f5;color:var(--text-2);vertical-align:middle}
+tbody tr:hover{background:#fafcff}
+tbody tr:last-child td{border-bottom:none}
+
+/* 条件值展示 */
+.cond-val{display:flex;flex-direction:column;gap:3px;align-items:center}
+.cond-val .lv{font-size:12px;color:var(--text-2);white-space:nowrap}
+.cond-val .none{color:var(--placeholder)}
+.period-pill{display:inline-block;padding:2px 10px;background:#eef2f7;border-radius:12px;color:#5a6270;font-size:12px}
+
+/* 操作链接 */
+.op a{color:var(--primary);cursor:pointer;margin:0 4px;font-size:13px}
+.op a.del{color:var(--danger)}
+.op a:hover{text-decoration:underline}
+
+/* 空状态 */
+.empty{text-align:center;color:var(--text-3);padding:60px 0;font-size:14px}
+.empty .big{font-size:40px;margin-bottom:8px;opacity:.5}
+
+/* ===================== 表单页（推播条件） ===================== */
+.form-head{display:flex;align-items:center;margin-bottom:16px}
+.form-head .title{font-size:16px;font-weight:600;color:var(--primary)}
+.form-head .btns{margin-left:auto;display:flex;gap:10px}
+.notice{
+  display:flex;gap:8px;background:var(--warning-bg);border:1px solid #fcdada;
+  color:var(--danger);border-radius:var(--radius);padding:10px 14px;font-size:13px;margin-bottom:18px;line-height:1.6;
+}
+.section{background:#fff;border:1px solid var(--border-2);border-radius:6px;padding:18px 20px;margin-bottom:16px}
+.section-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:6px}
+.section-title::before{content:"";width:3px;height:14px;background:var(--primary);border-radius:2px}
+.hint{color:var(--danger);font-size:12px;margin-bottom:14px;line-height:1.7}
+
+.form-row{display:flex;align-items:flex-start;margin-bottom:18px}
+.form-row:last-child{margin-bottom:0}
+.form-label{width:130px;flex:0 0 130px;text-align:right;padding-right:16px;padding-top:7px;color:var(--text-2);font-size:13px}
+.form-label .req{color:var(--danger);margin-right:2px}
+.form-ctrl{flex:1}
+.row-error{color:var(--danger);font-size:12px;margin-top:6px;display:none}
+.row-error.show{display:block}
+
+/* 标签选择（单选，做成按钮组） */
+.taggroup{display:flex;flex-wrap:wrap;gap:8px}
+.tagopt{
+  padding:6px 14px;border:1px solid var(--border);border-radius:16px;background:#fff;
+  color:var(--text-2);font-size:13px;cursor:pointer;user-select:none;transition:.12s;
+}
+.tagopt:hover{border-color:var(--primary);color:var(--primary)}
+.tagopt.sel{background:var(--primary);border-color:var(--primary);color:#fff}
+
+/* 计算周期 单选 */
+.period-group{display:flex;gap:10px;flex-wrap:wrap}
+.period-opt{
+  padding:6px 18px;border:1px solid var(--border);border-radius:var(--radius);
+  cursor:pointer;font-size:13px;color:var(--text-2);background:#fff;
+}
+.period-opt.sel{background:var(--primary-light);border-color:var(--primary);color:var(--primary);font-weight:600}
+
+/* 三个阈值条件——同一阶级下三项目标值并排配置，新增阶级为共用的独立按钮 */
+.thr-grid-wrap{border:1px dashed var(--border);border-radius:6px;padding:16px;margin-bottom:14px}
+.thr-grid-row{display:grid;grid-template-columns:88px repeat(3,1fr);gap:10px 20px;align-items:center;margin-bottom:12px}
+.thr-grid-row:last-of-type{margin-bottom:0}
+.thr-grid-head{margin-bottom:14px}
+.thr-col-title{font-weight:600;color:var(--text);font-size:13px;text-align:center}
+.thr-col-title .cmp{display:block;font-weight:400;color:var(--text-3);font-size:12px;margin-top:3px}
+.thr-row-label{display:flex;flex-direction:column;gap:4px;color:var(--text-2);font-size:13px}
+.thr-row-label .rm{color:var(--danger);cursor:pointer;font-size:12px}
+.thr-row-label .rm:hover{text-decoration:underline}
+.thr-cell .input{width:100%}
+.thr-err-row{margin-top:-2px;margin-bottom:0}
+.thr-err-row .row-error{display:block!important;min-height:16px;margin-top:0;visibility:hidden}
+.thr-err-row .row-error.show{visibility:visible}
+.add-lv{color:var(--primary);cursor:pointer;font-size:13px;display:inline-flex;align-items:center;gap:4px;margin-top:2px}
+.add-lv.disabled{color:var(--placeholder);cursor:not-allowed}
+.add-lv:hover:not(.disabled){text-decoration:underline}
+
+/* 推送活动 多选下拉 */
+.msel{position:relative;width:520px;max-width:100%}
+.msel-control{
+  min-height:34px;border:1px solid var(--border);border-radius:var(--radius);
+  padding:4px 30px 4px 8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;
+  cursor:pointer;background:#fff;position:relative;
+}
+.msel-control:hover{border-color:var(--primary-hover)}
+.msel-control.open{border-color:var(--primary)}
+.msel-control .ph{color:var(--placeholder);font-size:13px;padding:3px 2px}
+.msel-control .caret{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#c0c4cc;transition:.2s;font-size:12px}
+.msel-control.open .caret{transform:translateY(-50%) rotate(180deg)}
+.msel-chip{
+  display:inline-flex;align-items:center;gap:4px;background:#f0f2f5;border:1px solid #e0e3e9;
+  border-radius:3px;padding:2px 6px;font-size:12px;color:var(--text-2);
+}
+.msel-chip .x{cursor:pointer;color:#a0a4ad;font-weight:bold}
+.msel-chip .x:hover{color:var(--danger)}
+.msel-panel{
+  display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:30;
+  background:#fff;border:1px solid var(--border-2);border-radius:var(--radius);
+  box-shadow:0 4px 16px rgba(0,0,0,.12);max-height:280px;overflow-y:auto;padding:6px 0;
+}
+.msel-panel.show{display:block}
+.msel-opt{display:flex;align-items:center;gap:8px;padding:8px 14px;cursor:pointer;font-size:13px;color:var(--text-2)}
+.msel-opt:hover{background:var(--primary-light)}
+.msel-opt.sel{color:var(--primary);font-weight:600}
+.msel-opt .ck{width:15px;height:15px;border:1px solid var(--border);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff}
+.msel-opt.sel .ck{background:var(--primary);border-color:var(--primary)}
+.msel-toolbar{display:flex;justify-content:space-between;padding:6px 14px;border-bottom:1px solid #f0f2f5;margin-bottom:4px}
+.msel-toolbar a{color:var(--primary);font-size:12px;cursor:pointer}
+
+/* ===================== 弹窗 / Toast ===================== */
+.mask{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:100}
+.mask.show{display:flex}
+.dialog{background:#fff;border-radius:8px;width:400px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,.2)}
+.dialog-head{padding:16px 20px;font-size:16px;font-weight:600;border-bottom:1px solid #f0f2f5;display:flex;align-items:center;gap:8px}
+.dialog-body{padding:22px 20px;color:var(--text-2);font-size:14px;line-height:1.6}
+.dialog-foot{padding:12px 20px 18px;display:flex;justify-content:flex-end;gap:10px}
+
+.toast-wrap{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;align-items:center}
+.toast{
+  display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:var(--radius);
+  font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,.12);animation:drop .25s ease;background:#fff;
+}
+.toast.success{background:#f0f9eb;color:#529b2e;border:1px solid #e1f3d8}
+.toast.error{background:#fef0f0;color:var(--danger);border:1px solid #fde2e2}
+.toast.info{background:#edf2fc;color:#606266;border:1px solid #e4e7ed}
+@keyframes drop{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+
+.hidden{display:none!important}
+
+/* ===================== 前台「推播弹窗」示意 ===================== */
+.fe-demo-wrap{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+.fe-phone-col{display:flex;flex-direction:column;align-items:center;gap:12px}
+.fe-phone-label{font-size:13px;color:var(--text-2)}
+.fe-phone{width:280px;background:#1a1a1a;border-radius:32px;padding:10px;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.fe-screen{position:relative;background:#f0f4f8;border-radius:22px;overflow:hidden;height:580px}
+.fe-topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#fff}
+.fe-logo{font-weight:800;font-size:15px;color:#025be8}
+.fe-logo span{color:#ff8a00}
+.fe-login-btn{background:#eaf2ff;color:#025be8;font-size:11px;padding:5px 10px;border-radius:14px;font-weight:600;white-space:nowrap}
+.fe-search{margin-left:8px;font-size:14px;color:#5a6270}
+.fe-banner{margin:0 10px 8px;height:150px;border-radius:10px;background:linear-gradient(160deg,#5fb8ff,#1f7ee0);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;position:relative;overflow:hidden}
+.fe-banner .t1{font-size:20px;font-weight:800;letter-spacing:.5px}
+.fe-banner .t2{font-size:22px;font-weight:800}
+.fe-banner .dots{position:absolute;bottom:10px;display:flex;gap:4px}
+.fe-banner .dots i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.5);display:inline-block}
+.fe-banner .dots i.on{background:#fff;width:14px;border-radius:3px}
+.fe-ticker{margin:0 10px 10px;background:#eaf2ff;border-radius:6px;padding:6px 10px;font-size:11px;color:#5a6270;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px}
+.fe-sec-title{padding:0 12px;font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px}
+.fe-games{display:flex;gap:8px;padding:0 12px 10px;overflow-x:auto}
+.fe-games .g{flex:0 0 auto;width:52px;height:52px;border-radius:8px;background:#e4e9f0;display:flex;align-items:center;justify-content:center;font-size:20px}
+.fe-cats{display:flex;gap:14px;padding:0 12px 10px;overflow-x:auto}
+.fe-cats::-webkit-scrollbar{display:none}
+.fe-cat{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;color:#7a828e;white-space:nowrap}
+.fe-cat .ic{width:32px;height:32px;border-radius:50%;background:#eef1f5;display:flex;align-items:center;justify-content:center;font-size:15px}
+.fe-cat.on{color:#ff8a00;font-weight:700}
+.fe-cat.on .ic{background:#fff3e6}
+.fe-promo{margin:0 10px 10px;height:56px;border-radius:8px;background:linear-gradient(120deg,#132048,#1f3a7a);display:flex;align-items:center;justify-content:center;color:#ffd34d;font-weight:800;font-size:13px}
+.fe-tabbar{position:absolute;left:0;right:0;bottom:0;height:52px;background:#fff;border-top:1px solid #eee;display:flex;align-items:center;justify-content:space-around}
+.fe-tabitem{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;color:#9199a6}
+.fe-tabitem .ic{font-size:16px}
+.fe-tabitem.home .ic{width:26px;height:26px;border-radius:50%;background:#025be8;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px}
+
+/* 推播弹窗遮罩 + 卡片 */
+.fe-mask{position:absolute;inset:0;background:rgba(20,30,50,.55);display:none;align-items:flex-start;justify-content:center;padding-top:120px;z-index:5}
+.fe-mask.show{display:flex}
+.fe-popup{width:232px;background:#fff;border-radius:14px;padding:16px 14px 12px;box-shadow:0 10px 30px rgba(0,0,0,.3);position:relative}
+.fe-popup-close{position:absolute;top:10px;right:10px;width:20px;height:20px;border-radius:50%;background:#f0f2f5;display:flex;align-items:center;justify-content:center;font-size:11px;color:#606266;cursor:pointer}
+.fe-popup-title{font-size:15px;font-weight:800;text-align:center;margin-bottom:10px}
+.fe-popup-sub{font-size:11px;color:#909399;margin-bottom:6px}
+.fe-popup-list{max-height:190px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-right:2px}
+.fe-popup-item{position:relative;background:#eef4fb;border-radius:8px;padding:9px 10px;display:flex;align-items:center;justify-content:space-between;overflow:hidden;flex:0 0 auto}
+.fe-popup-item::before{content:"";position:absolute;left:0;bottom:0;width:100%;height:14px;background:linear-gradient(120deg,#2f8bf0,#5fb8ff);clip-path:polygon(0 100%,0 40%,50% 90%,100% 30%,100% 100%);opacity:.5}
+.fe-popup-item .name{font-size:12px;font-weight:700;color:var(--text);position:relative;z-index:1}
+.fe-popup-item .join{position:relative;z-index:1;background:#ff9a3d;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:12px;white-space:nowrap;cursor:pointer}
+.fe-popup-bonus{margin-top:10px;border-top:1px dashed #e4e7ed;padding-top:8px}
+.fe-popup-bonus .lb{font-size:11px;color:#909399;margin-bottom:4px}
+.fe-popup-bonus .txt{font-size:11px;color:var(--text);line-height:1.6}
+.fe-popup-bonus .txt strong{color:#025be8}
+.fe-rule-list{padding-left:18px;color:var(--text-2);font-size:13px;line-height:2}
+</style>
+</head>
+<body>
+
+<!-- ============================ 左侧菜单 ============================ -->
+<aside class="sidebar">
+  <div class="menu-item"><span class="ico">🎮</span>游戏管理<span class="arrow">›</span></div>
+  <div class="menu-item"><span class="ico">📢</span>公告管理<span class="arrow">›</span></div>
+  <div class="menu-item"><span class="ico">💳</span>充值配置<span class="arrow">›</span></div>
+  <div class="menu-item"><span class="ico">📄</span>日志管理<span class="arrow">›</span></div>
+  <div class="menu-item"><span class="ico">🎁</span>活动配置<span class="badge">99+</span></div>
+
+  <!-- 活动配置（新）——本次功能所在位置，默认展开 -->
+  <div class="menu-item open" onclick="toggleSub(this)" style="color:var(--menu-active-text);font-weight:600">
+    <span class="ico" style="color:var(--primary)">🗂️</span>活动配置（新）<span class="arrow">›</span>
+  </div>
+  <div class="submenu show">
+    <div class="subitem"><span class="dot"></span>活动列表</div>
+    <div class="subitem"><span class="dot"></span>派奖审核</div>
+    <div class="subitem"><span class="dot"></span>活动报表</div>
+    <!-- ★ 新增入口：显示在「活动报表」下方 -->
+    <div class="subitem active"><span class="dot"></span>智能推播<span class="new-flag">NEW</span></div>
+  </div>
+
+  <div class="menu-item"><span class="ico">👥</span>代理结算<span class="arrow">›</span></div>
+  <div class="menu-item"><span class="ico">💻</span>平台费用<span class="arrow">›</span></div>
+  <div class="menu-item"><span class="ico">🧧</span>红包雨管理<span class="arrow">›</span></div>
+  <div class="menu-item"><span class="ico">⚙️</span>系统管理<span class="arrow">›</span></div>
+  <div class="menu-item"><span class="ico">🎰</span>抽奖活动管理<span class="arrow">›</span></div>
+  <div class="menu-item"><span class="ico">🥚</span>复活节砸蛋管理<span class="arrow">›</span></div>
+</aside>
+
+<!-- ============================ 右侧主区 ============================ -->
+<div class="main">
+  <div class="topbar">
+    <div class="breadcrumb">
+      <span>位置</span><span class="sep">›</span>
+      <span>活动配置(新)</span><span class="sep">›</span>
+      <span class="cur">智能推播</span>
+    </div>
+    <div class="tabs-row">
+      <div class="tab">活动列表 <span class="x">✕</span></div>
+      <div class="tab">派奖审核 <span class="x">✕</span></div>
+      <div class="tab">活动报表 <span class="x">✕</span></div>
+      <div class="tab active">智能推播 <span class="x">✕</span></div>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- 二级页签 -->
+    <div class="subtabs">
+      <div class="subtab active" data-tab="list" onclick="switchSubtab('list')">推播列表</div>
+      <div class="subtab" data-tab="reward" onclick="switchSubtab('reward')">推播奖励</div>
+      <div class="subtab" data-tab="count" onclick="switchSubtab('count')">推播次数</div>
+      <div class="subtab" data-tab="popup" onclick="switchSubtab('popup')">推播弹窗</div>
+    </div>
+
+    <!-- ============ 页面 A：推播列表 ============ -->
+    <div id="view-list">
+      <div class="toolbar">
+        <div class="field">
+          智能推播：
+          <div class="eswitch" id="smartPushSwitch" onclick="toggleSmartPush()"></div>
+        </div>
+        <div class="field">
+          推播名称：
+          <input type="text" class="input" id="filterName" style="width:160px" placeholder="请输入关键字" onkeydown="if(event.key==='Enter')doSearch()">
+        </div>
+        <div class="field">
+          推送目标用户：
+          <select class="select" id="filterMain">
+            <option value="">全部</option>
+            <option>VIP 1</option><option>VIP 2</option><option>VIP 3</option><option>VIP 4</option><option>VIP 5</option>
+            <option>VIP 6</option><option>VIP 7</option><option>VIP 8</option><option>VIP 9</option><option>VIP 10</option>
+          </select>
+        </div>
+        <div class="field">
+          计算周期：
+          <select class="select" id="filterPeriod" style="width:130px">
+            <option value="">全部</option>
+            <option>今日</option><option>昨日</option><option>近7日</option><option>近14日</option><option>近30日</option>
+          </select>
+        </div>
+        <div class="field">
+          时间：
+          <input type="date" class="input" id="filterStartDate" style="width:150px">
+          <span style="color:var(--text-3)">至</span>
+          <input type="date" class="input" id="filterEndDate" style="width:150px">
+        </div>
+        <button class="btn btn-primary" onclick="doSearch()">查询</button>
+        <div class="spacer"></div>
+        <button class="btn btn-primary" onclick="openForm()">＋ 新增推播</button>
+      </div>
+
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:170px">推播名称</th>
+              <th style="width:190px">目标用户</th>
+              <th style="width:90px">计算周期</th>
+              <th>阶级1</th>
+              <th>阶级2</th>
+              <th>阶级3</th>
+              <th>阶级4</th>
+              <th style="width:160px">新增/变更时间</th>
+              <th style="width:120px">操作</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"><!-- JS 渲染 --></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ 页面 B：推播奖励——参照推播列表 ============ -->
+    <div id="view-reward" class="hidden">
+      <div class="toolbar">
+        <div class="field">
+          推播奖励：
+          <div class="eswitch" id="rewardSwitch" onclick="toggleRewardPush()"></div>
+        </div>
+        <div class="field">
+          推播名称：
+          <input type="text" class="input" id="filterRewardName" style="width:160px" placeholder="请输入关键字" onkeydown="if(event.key==='Enter')doRewardSearch()">
+        </div>
+        <div class="field">
+          推送目标用户：
+          <select class="select" id="filterRewardMain">
+            <option value="">全部</option>
+            <option>VIP 1</option><option>VIP 2</option><option>VIP 3</option><option>VIP 4</option><option>VIP 5</option>
+            <option>VIP 6</option><option>VIP 7</option><option>VIP 8</option><option>VIP 9</option><option>VIP 10</option>
+          </select>
+        </div>
+        <div class="field">
+          时间：
+          <input type="date" class="input" id="filterRewardStartDate" style="width:150px">
+          <span style="color:var(--text-3)">至</span>
+          <input type="date" class="input" id="filterRewardEndDate" style="width:150px">
+        </div>
+        <button class="btn btn-primary" onclick="doRewardSearch()">查询</button>
+        <div class="spacer"></div>
+        <button class="btn btn-primary" onclick="openRewardForm()">＋ 新增推播奖励</button>
+      </div>
+
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:170px">推播名称</th>
+              <th style="width:190px">目标用户</th>
+              <th>阶级1奖励</th>
+              <th>阶级2奖励</th>
+              <th>阶级3奖励</th>
+              <th>阶级4奖励</th>
+              <th style="width:160px">新增/变更时间</th>
+              <th style="width:120px">操作</th>
+            </tr>
+          </thead>
+          <tbody id="rewardTableBody"><!-- JS 渲染 --></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ 页面 C'：推播次数——参照推播列表/推播奖励 ============ -->
+    <div id="view-count" class="hidden">
+      <div class="toolbar">
+        <div class="field">
+          推播名称：
+          <input type="text" class="input" id="filterCountName" style="width:160px" placeholder="请输入关键字" onkeydown="if(event.key==='Enter')doCountSearch()">
+        </div>
+        <div class="field">
+          推送目标用户：
+          <select class="select" id="filterCountMain">
+            <option value="">全部</option>
+            <option>VIP 1</option><option>VIP 2</option><option>VIP 3</option><option>VIP 4</option><option>VIP 5</option>
+            <option>VIP 6</option><option>VIP 7</option><option>VIP 8</option><option>VIP 9</option><option>VIP 10</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="doCountSearch()">查询</button>
+        <div class="spacer"></div>
+      </div>
+
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:170px">推播名称</th>
+              <th style="width:190px">目标用户</th>
+              <th>阶级1推播</th>
+              <th>阶级2推播</th>
+              <th>阶级3推播</th>
+              <th>阶级4推播</th>
+            </tr>
+          </thead>
+          <tbody id="countTableBody"><!-- JS 渲染 --></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ 页面 E：推播弹窗——前台示意 ============ -->
+    <div id="view-popup" class="hidden">
+      <div class="fe-demo-wrap">
+        <div class="fe-phone-col">
+          <div class="fe-phone-label">首页示意（点击下方按钮模拟触发推播）</div>
+          <div class="fe-phone">
+            <div class="fe-screen">
+              <div class="fe-topbar">
+                <div class="fe-logo">OK<span>•</span>BET</div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div class="fe-login-btn">注册 / 登录</div>
+                  <div class="fe-search">🔍</div>
+                </div>
+              </div>
+              <div class="fe-banner">
+                <div class="t1">Weekly</div>
+                <div class="t2">Bonus Pass</div>
+                <div class="dots"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+              </div>
+              <div class="fe-ticker">🔊 －今晚打老虎－今晚打老虎－今晚打老虎－今晚…</div>
+              <div class="fe-sec-title">游戏集锦</div>
+              <div class="fe-games">
+                <div class="g">👑</div><div class="g">📋</div><div class="g">🐯</div><div class="g">🎯</div>
+              </div>
+              <div class="fe-cats">
+                <div class="fe-cat on"><div class="ic">🔥</div>热门</div>
+                <div class="fe-cat"><div class="ic">🏆</div>好赢</div>
+                <div class="fe-cat"><div class="ic">🏀</div>体育</div>
+                <div class="fe-cat"><div class="ic">🎰</div>老虎机</div>
+                <div class="fe-cat"><div class="ic">🎡</div>游乐场</div>
+                <div class="fe-cat"><div class="ic">🎲</div>娱乐城</div>
+                <div class="fe-cat"><div class="ic">♠️</div>扑克</div>
+                <div class="fe-cat"><div class="ic">🕹️</div>电玩</div>
+                <div class="fe-cat"><div class="ic">🔵</div>电子宾果</div>
+                <div class="fe-cat"><div class="ic">🔢</div>数字游戏</div>
+              </div>
+              <div class="fe-promo">DAILY EXTRA REBATE</div>
+
+              <div class="fe-mask" id="feMask">
+                <div class="fe-popup">
+                  <div class="fe-popup-close" onclick="closePushPopup()">✕</div>
+                  <div class="fe-popup-title">活动快报</div>
+                  <div class="fe-popup-sub">已符合资格活动</div>
+                  <div class="fe-popup-list">
+                    <div class="fe-popup-item"><span class="name">充值活动</span><span class="join" onclick="goActivityDetail('充值活动')">参加</span></div>
+                    <div class="fe-popup-item"><span class="name">盈利活动</span><span class="join" onclick="goActivityDetail('盈利活动')">参加</span></div>
+                    <div class="fe-popup-item"><span class="name">新手/回归签到活动</span><span class="join" onclick="goActivityDetail('新手/回归签到活动')">参加</span></div>
+                    <div class="fe-popup-item"><span class="name">每日特别返水</span><span class="join" onclick="goActivityDetail('每日特别返水')">参加</span></div>
+                    <div class="fe-popup-item"><span class="name">新用户充值转盘活动</span><span class="join" onclick="goActivityDetail('新用户充值转盘活动')">参加</span></div>
+                    <div class="fe-popup-item"><span class="name">Payday活动</span><span class="join" onclick="goActivityDetail('Payday活动')">参加</span></div>
+                    <div class="fe-popup-item"><span class="name">消费活动</span><span class="join" onclick="goActivityDetail('消费活动')">参加</span></div>
+                    <div class="fe-popup-item"><span class="name">签到活动</span><span class="join" onclick="goActivityDetail('签到活动')">参加</span></div>
+                    <div class="fe-popup-item"><span class="name">老用户回归活动</span><span class="join" onclick="goActivityDetail('老用户回归活动')">参加</span></div>
+                  </div>
+                  <div class="fe-popup-bonus">
+                    <div class="lb">福利加码</div>
+                    <div class="txt"><strong>【20% Loss Cashback】</strong>奖励已派发至【我的优惠券】</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="fe-tabbar">
+                <div class="fe-tabitem home"><div class="ic">⌂</div></div>
+                <div class="fe-tabitem"><div class="ic">🎁</div>奖励中心</div>
+                <div class="fe-tabitem"><div class="ic">🏬</div>积分商城</div>
+                <div class="fe-tabitem"><div class="ic">🏆</div>排行榜</div>
+                <div class="fe-tabitem"><div class="ic">👤</div>我的</div>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="showPushPopup()">模拟触发推播弹窗</button>
+        </div>
+
+        <div class="section" style="flex:1;min-width:280px;align-self:flex-start">
+          <div class="section-title">规则说明</div>
+          <ol class="fe-rule-list">
+            <li>「推播弹窗」仅在首页显示；首页涵盖「热门、好赢、体育、老虎机、游乐场、娱乐城、扑克、电玩、电子宾果、数字游戏」等分类页签，切换至其他非首页页面（如游戏详情页、个人中心等）时不显示。</li>
+            <li>弹窗标题固定文案为「活动快报」。</li>
+            <li>弹窗内容显示用户当前符合资格、可领取奖励的活动，例如：充值活动、消费活动、Payday活动、盈利活动、新手/回归签到活动、签到活动、新用户充值转盘活动、每日特别返水、老用户回归活动。</li>
+            <li>弹窗高度固定；活动清单内容过多时，清单区域可上下滑动查看，其余区域不随之滚动。</li>
+            <li>活动清单下方固定显示「福利加码」区块，依据后台配置显示对应的活动奖励文案。</li>
+            <li>点击活动清单中的「参加」按钮后，导向对应活动的详情页（下方示意以 Toast 模拟跳转效果）。</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 页面 C：推播条件表单（新增 / 编辑） ============ -->
+    <div id="view-form" class="hidden">
+      <div class="form-head">
+        <div class="title" id="formTitle">新增推播条件</div>
+        <div class="btns">
+          <button class="btn" onclick="closeForm()">取消</button>
+          <button class="btn btn-primary" onclick="saveForm()">保存</button>
+        </div>
+      </div>
+
+      <div class="notice">
+        <span>⚠</span>
+        <span>提示：保存后推播条件将立即生效并纳入排程计算。用户标签为必填单选；三项阈值条件「账户余额、有效投注、用户净输赢(负数)」需在同一阶级下同时配置，留空表示该项不启用，填写时不可为 0，最多可配置 4 个阶级（新增阶级为共用按钮，三项条件同步增减），且下一层目标值不可小于上一层。</span>
+      </div>
+
+      <!-- 区块 0：基本信息 -->
+      <div class="section">
+        <div class="section-title">基本信息</div>
+        <div class="form-row">
+          <div class="form-label"><span class="req">*</span>推播名称</div>
+          <div class="form-ctrl">
+            <input type="text" class="input" id="inpName" style="width:320px" maxlength="50"
+                   placeholder="请输入推播名称" oninput="onNameInput(this)">
+            <div class="row-error" id="err-name">请输入推播名称，不可留空</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 区块 1：推送目标用户 -->
+      <div class="section">
+        <div class="section-title">推送目标用户</div>
+
+        <div class="form-row">
+          <div class="form-label"><span class="req">*</span>VIP 等级</div>
+          <div class="form-ctrl">
+            <div class="taggroup" id="grpVip"></div>
+            <div class="row-error" id="err-vip">请选择推送目标用户</div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-label"></div>
+          <div class="form-ctrl">
+            <div class="row-error" id="err-dup">目标用户重复：已有其他推播条件使用相同的推送目标用户</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 区块 2：触发条件 -->
+      <div class="section">
+        <div class="section-title">触发条件</div>
+
+        <div class="form-row">
+          <div class="form-label"><span class="req">*</span>计算周期</div>
+          <div class="form-ctrl">
+            <div class="period-group" id="grpPeriod"></div>
+            <div class="row-error" id="err-period">请选择计算周期</div>
+          </div>
+        </div>
+
+        <div class="hint">
+          以下三项条件需同时配置（留空＝不启用该条件）；填写时不可为 0；最多 4 阶级，「新增阶级」为共用按钮，三项条件同步新增/删除阶级，且下一层目标值不可小于上一层。
+        </div>
+
+        <!-- 三个阈值条件由 JS 生成 -->
+        <div id="thrContainer"></div>
+      </div>
+
+      <!-- 区块 3：推送活动 -->
+      <div class="section">
+        <div class="section-title">推送活动</div>
+        <div class="hint">每个阶级需至少选择 1 个推送活动；阶级数与上方「触发条件」共用，新增/删除阶级请至触发条件区块操作。</div>
+        <div id="actContainer"></div>
+      </div>
+
+      <div class="form-head" style="margin-top:4px">
+        <div class="btns" style="margin-left:auto">
+          <button class="btn" onclick="closeForm()">取消</button>
+          <button class="btn btn-primary" onclick="saveForm()">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 页面 D：推播奖励表单（新增 / 编辑） ============ -->
+    <div id="view-reward-form" class="hidden">
+      <div class="form-head">
+        <div class="title" id="rewardFormTitle">新增推播奖励</div>
+        <div class="btns">
+          <button class="btn" onclick="closeRewardForm()">取消</button>
+          <button class="btn btn-primary" onclick="saveRewardForm()">保存</button>
+        </div>
+      </div>
+
+      <!-- 区块 0：基本信息 -->
+      <div class="section">
+        <div class="section-title">基本信息</div>
+        <div class="form-row">
+          <div class="form-label"><span class="req">*</span>推播名称</div>
+          <div class="form-ctrl">
+            <select class="select" id="rfPushName" style="width:320px" onchange="onRewardPushNameChange(this.value)">
+              <option value="">请选择推播名称</option>
+            </select>
+            <div class="row-error" id="err-rf-name">请选择推播名称</div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">推送目标用户</div>
+          <div class="form-ctrl" style="padding-top:7px"><span id="rfTargetUser" style="color:var(--text-2)">—</span></div>
+        </div>
+      </div>
+
+      <!-- 区块 1：触发条件——依所选推播名称带出，仅供参考 -->
+      <div class="section">
+        <div class="section-title">触发条件</div>
+        <div class="form-row">
+          <div class="form-label">计算周期</div>
+          <div class="form-ctrl" style="padding-top:5px"><span class="period-pill" id="rfPeriod">—</span></div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">阶级条件</div>
+          <div class="form-ctrl">
+            <div class="card" style="overflow-x:auto">
+              <table>
+                <thead><tr id="rfLevelHead"></tr></thead>
+                <tbody><tr id="rfLevelRow"></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 区块 2：推送奖励 -->
+      <div class="section">
+        <div class="section-title">推送奖励</div>
+        <div class="hint">请依各阶级选择推送奖励；先选择奖励项目（存送比例券／输返券），再选择对应的奖励内容。</div>
+        <div id="rfRewardContainer"></div>
+      </div>
+
+      <div class="form-head" style="margin-top:4px">
+        <div class="btns" style="margin-left:auto">
+          <button class="btn" onclick="closeRewardForm()">取消</button>
+          <button class="btn btn-primary" onclick="saveRewardForm()">保存</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- 删除确认弹窗 -->
+<div class="mask" id="delMask">
+  <div class="dialog">
+    <div class="dialog-head"><span style="color:#e6a23c">⚠</span> 删除确认</div>
+    <div class="dialog-body">确定要删除这条推播条件吗？删除后将立即停止对应用户的推播排程，且无法恢复。</div>
+    <div class="dialog-foot">
+      <button class="btn" onclick="closeDel()">取消</button>
+      <button class="btn btn-primary" style="background:var(--danger);border-color:var(--danger)" onclick="confirmDel()">确定删除</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+/* ============================================================
+   一、基础数据（下拉选单 / 标签来源）
+   —— 全部照需求文件列的内容，方便对照规格。
+   ============================================================ */
+const VIP_TAGS  = ['VIP 1','VIP 2','VIP 3','VIP 4','VIP 5','VIP 6','VIP 7','VIP 8','VIP 9','VIP 10'];
+const PERIODS   = ['今日','昨日','近7日','近14日','近30日'];
+const ACTIVITIES = ['充值活动','消费活动','Payday活动','盈利活动','新手/回归签到活动','签到活动',
+  '新用户充值转盘活动','每日特别返水','老用户回归活动','首存奖励和挑战赛活动',
+  '存款奖励和挑战赛活动','幸运宝箱挑战赛','大奖池活动','每日返水加码'];
+
+/* 三项阈值条件的定义：key、显示名、比较符（账户余额/有效投注是「小于」，净输赢是「小于等于」） */
+const THRESHOLDS = [
+  {key:'balance', name:'账户余额',        cmp:'＜',  cmpText:'小于',   neg:false},
+  {key:'bet',     name:'有效投注',        cmp:'＜',  cmpText:'小于',   neg:false},
+  {key:'ngr',     name:'用户净输赢(负数)', cmp:'≤',  cmpText:'小于等于', neg:true },
+];
+
+/* 推播奖励——奖励项目及其对应的奖励内容清单 */
+const REWARD_TYPES = ['存送比例券','输返券'];
+const REWARD_ITEMS = {
+  '存送比例券': ['存送券23%流水倍数3','10% Deposit Voucher (Max ₱500)','30% Deposit Voucher (Max ₱100)'],
+  '输返券':     ['20% Loss Cashback','10% Loss Cashback','输返券注单30天券60天无上限'],
+};
+
+/* ============================================================
+   二、示范用列表数据（模拟已生成的推播清单）
+   ============================================================ */
+let pushList = [
+  {
+    id:1, name:'VIP3大R Slot近7日推播', vip:'VIP 3', period:'近7日',
+    balance:[1000,3000], bet:[50000], ngr:[-2000],
+    activities:[['充值活动','大奖池活动','幸运宝箱挑战赛'],[]], time:'2026-07-20 14:32:08'
+  },
+  {
+    id:2, name:'VIP1回归召回推播', vip:'VIP 1', period:'近30日',
+    balance:[], bet:[10000,30000,60000], ngr:[],
+    activities:[['新手/回归签到活动','新用户充值转盘活动'],[],[]], time:'2026-07-21 09:15:44'
+  },
+  {
+    id:3, name:'VIP7净输赢风险监控推播', vip:'VIP 7', period:'昨日',
+    balance:[500], bet:[], ngr:[-500,-1000,-2000,-5000],
+    activities:[['每日特别返水','每日返水加码'],[],[],[]], time:'2026-07-22 18:47:21'
+  },
+];
+
+/* ============================================================
+   二之二、示范用推播奖励数据——与推播列表的推播名称/目标用户对应
+   ============================================================ */
+let rewardList = [
+  {
+    id:1, name:'VIP3大R Slot近7日推播', vip:'VIP 3',
+    rewards:['10% Loss Cashback', '20% Loss Cashback', '', ''], time:'2026-07-20 14:32:08'
+  },
+  {
+    id:2, name:'VIP1回归召回推播', vip:'VIP 1',
+    rewards:['10% Deposit Voucher (Max ₱500)', '20% Deposit Voucher (Max ₱500)', '20% Loss Cashback', ''], time:'2026-07-21 09:15:44'
+  },
+  {
+    id:3, name:'VIP7净输赢风险监控推播', vip:'VIP 7',
+    rewards:['5% Loss Cashback', '10% Loss Cashback', '10% Deposit Voucher (Max ₱300)', '15% Deposit Voucher (Max ₱300)'], time:'2026-07-22 18:47:21'
+  },
+];
+let rewardPushOn = false;   // 推播奖励开关，预设关闭；不可独立于智能推播开启
+function toggleRewardPush(){
+  if(!smartPushOn){
+    toast('info','请先开启「智能推播」，才能开启「推播奖励」');
+    return;
+  }
+  rewardPushOn = !rewardPushOn;
+  document.getElementById('rewardSwitch').classList.toggle('on', rewardPushOn);
+  toast(rewardPushOn?'success':'info', rewardPushOn?'推播奖励已开启':'推播奖励已关闭');
+}
+function syncRewardSwitchUI(){
+  document.getElementById('rewardSwitch').classList.toggle('disabled', !smartPushOn);
+}
+function doRewardSearch(){ renderRewardTable(); }
+function renderRewardTable(){
+  const fm = document.getElementById('filterRewardMain').value;
+  const fn = document.getElementById('filterRewardName').value.trim().toLowerCase();
+  const fsd = document.getElementById('filterRewardStartDate').value;
+  const fed = document.getElementById('filterRewardEndDate').value;
+  const rows = rewardList.filter(r=>{
+    if(fm && r.vip!==fm) return false;
+    if(fn && !r.name.toLowerCase().includes(fn)) return false;
+    const datePart = r.time.slice(0,10);
+    if(fsd && datePart<fsd) return false;
+    if(fed && datePart>fed) return false;
+    return true;
+  });
+  const body=document.getElementById('rewardTableBody');
+  if(rows.length===0){
+    body.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="big">🎁</div>暂无符合条件的推播奖励设定</div></td></tr>`;
+    return;
+  }
+  body.innerHTML = rows.map(r=>`
+    <tr>
+      <td>${r.name}</td>
+      <td>${r.vip}</td>
+      <td>${r.rewards[0]||'<span class="none">—</span>'}</td>
+      <td>${r.rewards[1]||'<span class="none">—</span>'}</td>
+      <td>${r.rewards[2]||'<span class="none">—</span>'}</td>
+      <td>${r.rewards[3]||'<span class="none">—</span>'}</td>
+      <td>${r.time}</td>
+      <td class="op">
+        <a onclick="openRewardForm(${r.id})">编辑</a>
+        <a class="del" onclick="rewardNotReady()">删除</a>
+      </td>
+    </tr>`).join('');
+}
+function rewardNotReady(){ toast('info','「推播奖励」删除规则尚未在本次需求中定义'); }
+
+/* ============================================================
+   二之三、推播奖励——新增 / 编辑表单
+   推播名称清单来源为「推播列表」(pushList)；选定后，推送目标用户、
+   计算周期、阶级条件皆依该笔推播条件带出，仅供参考、不可编辑。
+   ============================================================ */
+let rewardSeqId = 4;
+let rewardForm = null;
+let editingRewardId = null;
+let rewardEditingPushRecord = null;   // 目前所选推播名称对应的推播条件（pushList 内的记录）
+
+function blankRewardForm(){
+  return {
+    pushName:'',
+    levelRewards:[{type:'',item:''},{type:'',item:''},{type:'',item:''},{type:'',item:''}]
+  };
+}
+
+function openRewardForm(id){
+  editingRewardId = (typeof id==='number') ? id : null;
+  rewardForm = blankRewardForm();
+  document.getElementById('rewardFormTitle').textContent = editingRewardId!==null ? '编辑推播奖励' : '新增推播奖励';
+
+  const sel = document.getElementById('rfPushName');
+  sel.innerHTML = '<option value="">请选择推播名称</option>' +
+    pushList.map(p=>`<option value="${p.name}">${p.name}</option>`).join('');
+
+  if(editingRewardId!==null){
+    const r = rewardList.find(x=>x.id===editingRewardId);
+    rewardForm.pushName = r.name;
+    sel.value = r.name;
+    sel.disabled = true;   // 推播名称在编辑页面下不可变更，比照推播条件表单规则
+    // 尝试比对既有奖励文字为预设选项，无法比对（如示范用旧数据）则留空待重新选择
+    rewardForm.levelRewards = [0,1,2,3].map(i=>{
+      const text = (r.rewards||[])[i];
+      for(const type of REWARD_TYPES){
+        if(REWARD_ITEMS[type].includes(text)) return {type, item:text};
+      }
+      return {type:'', item:''};
+    });
+  } else {
+    sel.disabled = false;
+  }
+
+  syncRewardTrigger(rewardForm.pushName);
+  buildRewardLevels();
+  clearRewardErrors();
+
+  document.getElementById('view-list').classList.add('hidden');
+  document.getElementById('view-reward').classList.add('hidden');
+  document.getElementById('view-form').classList.add('hidden');
+  document.getElementById('view-count').classList.add('hidden');
+  document.getElementById('view-reward-form').classList.remove('hidden');
+  document.querySelector('.content').scrollTop = 0;
+}
+function closeRewardForm(){
+  document.getElementById('view-reward-form').classList.add('hidden');
+  document.getElementById('view-reward').classList.remove('hidden');
+}
+
+function onRewardPushNameChange(name){
+  rewardForm.pushName = name;
+  hideError('err-rf-name');
+  syncRewardTrigger(name);
+  buildRewardLevels();
+}
+
+/* 依所选推播名称，带出推送目标用户 / 计算周期 / 阶级条件（唯读参考） */
+function syncRewardTrigger(name){
+  const rec = pushList.find(p=>p.name===name) || null;
+  rewardEditingPushRecord = rec;
+  document.getElementById('rfTargetUser').textContent = rec ? rec.vip : '—';
+  document.getElementById('rfPeriod').textContent = rec ? rec.period : '—';
+
+  document.getElementById('rfLevelHead').innerHTML = ['阶级1','阶级2','阶级3','阶级4'].map(t=>`<th>${t}</th>`).join('');
+  document.getElementById('rfLevelRow').innerHTML = [0,1,2,3]
+    .map(i=> `<td>${rec ? fmtLevelCell(rec,i) : '<span style="color:var(--placeholder)">—</span>'}</td>`).join('');
+}
+
+/* 推送奖励——仅所选推播名称实际启用的阶级（与「触发条件」阶级数一致）才需要设定奖励 */
+function buildRewardLevels(){
+  const box = document.getElementById('rfRewardContainer');
+  const rec = rewardEditingPushRecord;
+  if(!rec){
+    box.innerHTML = '<div class="hint" style="color:var(--text-3)">请先选择推播名称</div>';
+    return;
+  }
+  const activeCount = rec.activities.length;
+  box.innerHTML = [0,1,2,3].map(i=>{
+    const lr = rewardForm.levelRewards[i];
+    if(i>=activeCount){
+      return `
+      <div class="form-row">
+        <div class="form-label">阶级${i+1}奖励</div>
+        <div class="form-ctrl" style="padding-top:7px"><span style="color:var(--placeholder)">该阶级未设置触发条件，无需设定奖励</span></div>
+      </div>`;
+    }
+    return `
+    <div class="form-row">
+      <div class="form-label"><span class="req">*</span>阶级${i+1}奖励</div>
+      <div class="form-ctrl" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start">
+        <select class="select" style="width:160px" onchange="onRewardTypeChange(${i},this.value)">
+          <option value="">请选择奖励项目</option>
+          ${REWARD_TYPES.map(t=>`<option value="${t}" ${lr.type===t?'selected':''}>${t}</option>`).join('')}
+        </select>
+        <select class="select" style="width:280px" onchange="onRewardItemChange(${i},this.value)" ${lr.type?'':'disabled'}>
+          <option value="">请选择奖励内容</option>
+          ${(REWARD_ITEMS[lr.type]||[]).map(it=>`<option value="${it}" ${lr.item===it?'selected':''}>${it}</option>`).join('')}
+        </select>
+        <div class="row-error" id="err-rf-lv-${i}">请选择奖励项目及奖励内容</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function onRewardTypeChange(i,type){
+  rewardForm.levelRewards[i] = {type, item:''};
+  buildRewardLevels();
+  hideError('err-rf-lv-'+i);
+}
+function onRewardItemChange(i,item){
+  rewardForm.levelRewards[i].item = item;
+  hideError('err-rf-lv-'+i);
+}
+
+function clearRewardErrors(){
+  hideError('err-rf-name');
+  [0,1,2,3].forEach(i=>hideError('err-rf-lv-'+i));
+}
+
+function saveRewardForm(){
+  clearRewardErrors();
+  let ok = true;
+  if(!rewardForm.pushName){ showError('err-rf-name'); ok=false; }
+
+  const rec = rewardEditingPushRecord;
+  const activeCount = rec ? rec.activities.length : 0;
+  if(rec){
+    for(let i=0;i<activeCount;i++){
+      const lr = rewardForm.levelRewards[i];
+      if(!lr.type || !lr.item){ showError('err-rf-lv-'+i); ok=false; }
+    }
+  }
+  if(!ok){ toast('error','请完整选择推播名称及各阶级推送奖励'); return; }
+
+  const rewards = [0,1,2,3].map(i=> i<activeCount ? rewardForm.levelRewards[i].item : '');
+  const record = { name:rec.name, vip:rec.vip, rewards, time:nowStr() };
+
+  if(editingRewardId!==null){
+    const idx = rewardList.findIndex(x=>x.id===editingRewardId);
+    rewardList[idx] = {...rewardList[idx], ...record};
+    toast('success','推播奖励已更新');
+  }else{
+    rewardList.unshift({id:rewardSeqId++, ...record});
+    toast('success','推播奖励新增成功');
+  }
+  renderRewardTable();
+  closeRewardForm();
+}
+function nowStr(){
+  const now=new Date();
+  return `${now.getFullYear()}-${p2(now.getMonth()+1)}-${p2(now.getDate())} ${p2(now.getHours())}:${p2(now.getMinutes())}:${p2(now.getSeconds())}`;
+}
+
+/* ============================================================
+   二之四、示范用推播次数数据——与推播列表的推播名称对应
+   目标用户 / 阶级数皆向推播列表 (pushList) 查询带出，本处只记录各阶级的推播次数
+   ============================================================ */
+let countList = [
+  { name:'VIP3大R Slot近7日推播',   counts:[128, 76, 0, 0] },
+  { name:'VIP1回归召回推播',        counts:[54, 31, 12, 0] },
+  { name:'VIP7净输赢风险监控推播',   counts:[210, 95, 40, 15] },
+];
+function doCountSearch(){ renderCountTable(); }
+function renderCountTable(){
+  const fn = document.getElementById('filterCountName').value.trim().toLowerCase();
+  const fm = document.getElementById('filterCountMain').value;
+  const rows = countList
+    .map(c=>({...c, rec: pushList.find(p=>p.name===c.name)}))
+    .filter(c=>c.rec)
+    .filter(c=>{
+      if(fn && !c.name.toLowerCase().includes(fn)) return false;
+      if(fm && c.rec.vip!==fm) return false;
+      return true;
+    });
+  const body = document.getElementById('countTableBody');
+  if(rows.length===0){
+    body.innerHTML = `<tr><td colspan="6"><div class="empty"><div class="big">📊</div>暂无符合条件的推播次数记录</div></td></tr>`;
+    return;
+  }
+  body.innerHTML = rows.map(c=>{
+    const lvCount = c.rec.activities.length;
+    const cell = i => i<lvCount ? Number(c.counts[i]||0).toLocaleString() : '<span class="none">—</span>';
+    return `
+    <tr>
+      <td>${c.name}</td>
+      <td>${c.rec.vip}</td>
+      <td>${cell(0)}</td>
+      <td>${cell(1)}</td>
+      <td>${cell(2)}</td>
+      <td>${cell(3)}</td>
+    </tr>`;
+  }).join('');
+}
+
+let seqId = 4;              // 下一个新增的 id
+let editingId = null;      // 正在编辑的 id（null=新增）
+let pendingDelId = null;   // 待删除 id
+let smartPushOn = false;   // 智能推播总开关，预设关闭
+
+function toggleSmartPush(){
+  smartPushOn = !smartPushOn;
+  document.getElementById('smartPushSwitch').classList.toggle('on', smartPushOn);
+  toast(smartPushOn?'success':'info', smartPushOn?'智能推播已开启':'智能推播已关闭');
+  if(!smartPushOn && rewardPushOn){
+    rewardPushOn = false;
+    document.getElementById('rewardSwitch').classList.toggle('on', false);
+  }
+  syncRewardSwitchUI();
+}
+
+/* ============================================================
+   三、表单当前状态
+   ============================================================ */
+let form = null;
+function blankForm(){
+  return {
+    name:'', vip:'', period:'',
+    balance:['','','',''], bet:['','','',''], ngr:['','','',''],
+    thrLv:1,   // 三项条件共用同一个阶级数（新增/删除阶级为共用按钮）
+    activities:[[],[],[],[]]   // 每个阶级各自的推送活动清单，阶级数与 thrLv 共用
+  };
+}
+
+/* ============================================================
+   四、侧栏 & 页签切换
+   ============================================================ */
+function toggleSub(el){
+  el.classList.toggle('open');
+  el.nextElementSibling.classList.toggle('show');
+}
+function switchSubtab(tab){
+  document.querySelectorAll('.subtab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
+  // 切页签时若在表单页，先退回列表
+  document.getElementById('view-form').classList.add('hidden');
+  document.getElementById('view-reward-form').classList.add('hidden');
+  document.getElementById('view-list').classList.toggle('hidden', tab!=='list');
+  document.getElementById('view-reward').classList.toggle('hidden', tab!=='reward');
+  document.getElementById('view-count').classList.toggle('hidden', tab!=='count');
+  document.getElementById('view-popup').classList.toggle('hidden', tab!=='popup');
+  if(tab==='reward') renderRewardTable();
+  if(tab==='count') renderCountTable();
+  if(tab!=='popup') closePushPopup();
+}
+function showPushPopup(){ document.getElementById('feMask').classList.add('show'); }
+function closePushPopup(){ document.getElementById('feMask').classList.remove('show'); }
+function goActivityDetail(name){
+  closePushPopup();
+  toast('info', `模拟跳转 → 进入「${name}」活动详情页`);
+}
+
+/* ============================================================
+   五、渲染表格
+   ============================================================ */
+function fmtLevelCell(r, i){
+  // 同一阶级下账户余额/有效投注/用户净输赢(负数)三项一起显示；该阶级未配置任何条件则显示「—」
+  const lines=[];
+  if(r.balance[i]!==undefined) lines.push(`账户余额 ＜${Number(r.balance[i]).toLocaleString()}`);
+  if(r.bet[i]!==undefined) lines.push(`有效投注 ＜${Number(r.bet[i]).toLocaleString()}`);
+  if(r.ngr[i]!==undefined) lines.push(`净输赢 ≤${Number(r.ngr[i]).toLocaleString()}`);
+  if(lines.length===0) return '<span class="none">—</span>';
+  return `<div class="cond-val">${lines.map(l=>`<span class="lv">${l}</span>`).join('')}</div>`;
+}
+function doSearch(){ renderTable(); }
+function renderTable(){
+  const fm = document.getElementById('filterMain').value;
+  const fp = document.getElementById('filterPeriod').value;
+  const fn = document.getElementById('filterName').value.trim().toLowerCase();
+  const fsd = document.getElementById('filterStartDate').value;   // 'YYYY-MM-DD' 或空
+  const fed = document.getElementById('filterEndDate').value;
+  const rows = pushList.filter(r=>{
+    if(fm && r.vip!==fm) return false;
+    if(fp && r.period!==fp) return false;
+    if(fn && !r.name.toLowerCase().includes(fn)) return false;
+    const datePart = r.time.slice(0,10);
+    if(fsd && datePart<fsd) return false;
+    if(fed && datePart>fed) return false;
+    return true;
+  });
+  const body = document.getElementById('tableBody');
+
+  if(rows.length===0){
+    body.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="big">📭</div>暂无符合条件的推播清单</div></td></tr>`;
+    return;
+  }
+  body.innerHTML = rows.map(r=>`
+    <tr>
+      <td>${r.name}</td>
+      <td>${r.vip}</td>
+      <td><span class="period-pill">${r.period}</span></td>
+      <td>${fmtLevelCell(r,0)}</td>
+      <td>${fmtLevelCell(r,1)}</td>
+      <td>${fmtLevelCell(r,2)}</td>
+      <td>${fmtLevelCell(r,3)}</td>
+      <td>${r.time}</td>
+      <td class="op">
+        <a onclick="openForm(${r.id})">编辑</a>
+        <a class="del" onclick="askDel(${r.id})">删除</a>
+      </td>
+    </tr>`).join('');
+}
+
+/* ============================================================
+   六、打开 / 关闭表单
+   ============================================================ */
+function openForm(id){
+  editingId = (typeof id==='number') ? id : null;
+  form = blankForm();
+
+  if(editingId!==null){
+    const r = pushList.find(x=>x.id===editingId);
+    form.name=r.name; form.vip=r.vip; form.period=r.period;
+    form.activities=[[],[],[],[]];
+    (r.activities||[]).forEach((arr,i)=>{ if(i<4) form.activities[i]=[...arr]; });
+    // 把已保存的阶级数组回填进 4 格输入；三项条件共用同一阶级数，取三者最大值
+    let maxLv=1;
+    ['balance','bet','ngr'].forEach(k=>{
+      const vals=r[k]||[];
+      form[k]=['','','',''];
+      vals.forEach((v,i)=>form[k][i]=v);
+      maxLv=Math.max(maxLv, vals.length);
+    });
+    form.thrLv=maxLv;
+  }
+  document.getElementById('formTitle').textContent = editingId!==null ? '编辑推播条件' : '新增推播条件';
+
+  const nameInput = document.getElementById('inpName');
+  nameInput.value = form.name;
+  nameInput.disabled = editingId!==null;   // 推播名称在编辑页面下不可变更
+
+  buildVipGroup();
+  buildPeriod();
+  buildThresholds();
+  buildActivities();
+  clearErrors();
+
+  document.getElementById('view-list').classList.add('hidden');
+  document.getElementById('view-reward').classList.add('hidden');
+  document.getElementById('view-reward-form').classList.add('hidden');
+  document.getElementById('view-count').classList.add('hidden');
+  document.getElementById('view-form').classList.remove('hidden');
+  document.querySelector('.content').scrollTop = 0;
+}
+function closeForm(){
+  document.getElementById('view-form').classList.add('hidden');
+  document.getElementById('view-list').classList.remove('hidden');
+}
+function onNameInput(el){ form.name=el.value; hideError('err-name'); }
+
+/* ============================================================
+   七、推送目标用户——VIP 等级单选（点一下选中，再点同一个可取消）
+   ============================================================ */
+function buildVipGroup(){
+  const box=document.getElementById('grpVip');
+  box.innerHTML = VIP_TAGS.map(t=>
+    `<div class="tagopt ${form.vip===t?'sel':''}" onclick="pickTag('vip','${t.replace(/'/g,"\\'")}',this)">${t}</div>`
+  ).join('');
+}
+function pickTag(field,val,el){
+  // 单选：把同组其它清掉，再切换自己
+  const box=el.parentElement;
+  box.querySelectorAll('.tagopt').forEach(o=>o.classList.remove('sel'));
+  if(form[field]===val){ form[field]=''; }        // 再点一次＝取消
+  else { form[field]=val; el.classList.add('sel'); }
+  hideError('err-'+field);
+}
+
+/* 计算周期单选 */
+function buildPeriod(){
+  const box=document.getElementById('grpPeriod');
+  box.innerHTML = PERIODS.map(p=>
+    `<div class="period-opt ${form.period===p?'sel':''}" onclick="pickPeriod('${p}',this)">${p}</div>`
+  ).join('');
+}
+function pickPeriod(p,el){
+  el.parentElement.querySelectorAll('.period-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel'); form.period=p; hideError('err-period');
+}
+
+/* ============================================================
+   八、三项阈值条件——同一阶级下三项目标值需同时配置（并排显示）
+   「新增阶级」为共用的独立按钮，三项条件的阶级数一起增减，最多 4 阶
+   ============================================================ */
+function buildThresholds(){
+  const box=document.getElementById('thrContainer');
+  const lvCount=form.thrLv;
+
+  const head=`
+    <div class="thr-grid-row thr-grid-head">
+      <div></div>
+      ${THRESHOLDS.map(t=>`
+      <div class="thr-col-title">${t.name}<span class="cmp">${t.cmpText}目标值${t.neg?'（负数，例：-1000）':''}</span></div>`).join('')}
+    </div>`;
+
+  let rows='';
+  for(let i=0;i<lvCount;i++){
+    rows+=`
+    <div class="thr-grid-row">
+      <div class="thr-row-label">
+        阶级${i+1}
+        ${i>0?`<span class="rm" onclick="removeLv()">删除阶级</span>`:''}
+      </div>
+      ${THRESHOLDS.map(t=>`
+      <div class="thr-cell">
+        <input type="number" class="input" value="${form[t.key][i]}"
+               placeholder="${t.neg?'如 -1000（负数）':'请输入目标值'}"
+               oninput="onThrInput('${t.key}',${i},this)">
+      </div>`).join('')}
+    </div>`;
+  }
+
+  const errRow=`
+    <div class="thr-grid-row thr-err-row">
+      <div></div>
+      ${THRESHOLDS.map(t=>`<div class="row-error" id="err-${t.key}"></div>`).join('')}
+    </div>`;
+
+  const disabled = lvCount>=4;
+  box.innerHTML = `
+    <div class="thr-grid-wrap">
+      ${head}
+      ${rows}
+      ${errRow}
+    </div>
+    <div class="row-error" id="err-thr-all">账户余额、有效投注、用户净输赢(负数)，至少其中一个项目需要填入目标值</div>
+    <div class="add-lv ${disabled?'disabled':''}" onclick="${disabled?'':'addLv()'}">＋ 新增阶级（最多 4 阶）</div>`;
+}
+function onThrInput(key,idx,el){ form[key][idx]=el.value; hideError('err-'+key); el.classList.remove('is-error'); }
+function addLv(){
+  if(form.thrLv<4){
+    form.thrLv++;
+    buildThresholds();
+    buildActivities();   // 推送活动阶级数与触发条件共用，需同步增减
+  }
+}
+function removeLv(){
+  if(form.thrLv>1){
+    form.thrLv--;
+    ['balance','bet','ngr'].forEach(k=>{ form[k][form.thrLv]=''; });
+    form.activities[form.thrLv]=[];
+    buildThresholds();
+    buildActivities();
+  }
+}
+
+/* ============================================================
+   九、推送活动多选下拉——阶级数与触发条件共用，每个阶级各自一组多选
+   ============================================================ */
+function buildActivities(){
+  const box=document.getElementById('actContainer');
+  const lvCount=form.thrLv;
+  box.innerHTML = Array.from({length:lvCount}).map((_,i)=>`
+    <div class="form-row">
+      <div class="form-label"><span class="req">*</span>阶级${i+1}活动清单</div>
+      <div class="form-ctrl">
+        <div class="msel" id="mselActivity-${i}">
+          <div class="msel-control" id="mselControl-${i}" onclick="toggleMsel(event,${i})">
+            <span class="ph" id="mselPh-${i}">请选择推送活动（可复选）</span>
+            <span class="caret">▾</span>
+          </div>
+          <div class="msel-panel" id="mselPanel-${i}">
+            <div class="msel-toolbar">
+              <a onclick="mselAll(true,${i})">全选</a>
+              <a onclick="mselAll(false,${i})">清空</a>
+            </div>
+            <div id="mselOptions-${i}"></div>
+          </div>
+        </div>
+        <div class="row-error" id="err-act-${i}">请至少选择 1 个推送活动</div>
+      </div>
+    </div>`).join('');
+  for(let i=0;i<lvCount;i++) buildMselLevel(i);
+}
+function buildMselLevel(i){
+  const opts=document.getElementById('mselOptions-'+i);
+  opts.innerHTML = ACTIVITIES.map(a=>{
+    const sel=form.activities[i].includes(a);
+    return `<div class="msel-opt ${sel?'sel':''}" onclick="toggleAct(${i},'${a.replace(/'/g,"\\'")}',event)">
+      <span class="ck">${sel?'✓':''}</span>${a}</div>`;
+  }).join('');
+  refreshMselControl(i);
+}
+function refreshMselControl(i){
+  const ctrl=document.getElementById('mselControl-'+i);
+  const caret=ctrl.querySelector('.caret');
+  ctrl.querySelectorAll('.msel-chip,.ph').forEach(n=>n.remove());
+  if(form.activities[i].length===0){
+    const ph=document.createElement('span'); ph.className='ph'; ph.textContent='请选择推送活动（可复选）';
+    ctrl.insertBefore(ph,caret);
+  }else{
+    form.activities[i].forEach(a=>{
+      const c=document.createElement('span'); c.className='msel-chip';
+      c.innerHTML=`${a}<span class="x" onclick="removeAct(event,${i},'${a.replace(/'/g,"\\'")}')">✕</span>`;
+      ctrl.insertBefore(c,caret);
+    });
+  }
+}
+function toggleMsel(e,i){
+  e.stopPropagation();
+  document.getElementById('mselPanel-'+i).classList.toggle('show');
+  document.getElementById('mselControl-'+i).classList.toggle('open');
+}
+function toggleAct(i,a,e){
+  e.stopPropagation();
+  const arr=form.activities[i];
+  const idx=arr.indexOf(a);
+  if(idx>=0) arr.splice(idx,1); else arr.push(a);
+  buildMselLevel(i); hideError('err-act-'+i);
+}
+function removeAct(e,i,a){ e.stopPropagation(); const arr=form.activities[i]; const idx=arr.indexOf(a); if(idx>=0)arr.splice(idx,1); buildMselLevel(i); }
+function mselAll(all,i){ form.activities[i]= all?[...ACTIVITIES]:[]; buildMselLevel(i); hideError('err-act-'+i); }
+// 点击空白处关闭下拉（每个阶级各自的下拉框都要处理）
+document.addEventListener('click',e=>{
+  document.querySelectorAll('.msel').forEach(box=>{
+    if(!box.contains(e.target)){
+      const panel=box.querySelector('.msel-panel');
+      const ctrl=box.querySelector('.msel-control');
+      if(panel) panel.classList.remove('show');
+      if(ctrl) ctrl.classList.remove('open');
+    }
+  });
+});
+
+/* ============================================================
+   十、保存 —— 含各项校验
+   ============================================================ */
+function clearErrors(){ document.querySelectorAll('.row-error').forEach(e=>e.classList.remove('show')); }
+function showError(id,msg){ const e=document.getElementById(id); if(e){ if(msg)e.textContent=msg; e.classList.add('show'); } }
+function hideError(id){ const e=document.getElementById(id); if(e)e.classList.remove('show'); }
+
+function collectThreshold(key){
+  // 取出该项非空的阶级值，并做「不可为0 / 下一层不可小于上一层」校验
+  const t=THRESHOLDS.find(x=>x.key===key);
+  const raw=form[key].slice(0,form.thrLv);
+  const vals=[]; let err='';
+  for(let i=0;i<raw.length;i++){
+    const s=String(raw[i]).trim();
+    if(s==='') continue;                       // 允许中间留空？这里要求已填阶级连续，简单处理：收集所有已填
+    const n=Number(s);
+    if(isNaN(n)){ err='请输入数字'; break; }
+    if(n===0){ err='目标值不可为 0'; break; }
+    if(t.neg && n>=0){ err='净输赢须为负数'; break; }
+    vals.push(n);
+  }
+  if(err) return {err};
+  // 校验递增：下一层不可小于上一层
+  for(let i=1;i<vals.length;i++){
+    if(vals[i]<vals[i-1]){ return {err:'下一层目标值不可小于上一层'}; }
+  }
+  return {vals};
+}
+
+function saveForm(){
+  clearErrors();
+  let ok=true;
+  if(!form.name.trim()){ showError('err-name'); ok=false; }
+  if(!form.vip){ showError('err-vip'); ok=false; }
+  if(!form.period){ showError('err-period'); ok=false; }
+
+  // 目标用户（VIP 等级）不可与其他推播条件重复
+  let isDup=false;
+  if(form.vip){
+    isDup = pushList.some(x=>x.id!==editingId && x.vip===form.vip);
+    if(isDup){ showError('err-dup'); ok=false; }
+  }
+
+  const res={};
+  let thrFieldErr=false;
+  for(const k of ['balance','bet','ngr']){
+    const r=collectThreshold(k);
+    if(r.err){ showError('err-'+k, r.err); ok=false; thrFieldErr=true; }
+    else res[k]=r.vals;
+  }
+  // 账户余额、有效投注、用户净输赢(负数)三项至少要有一项填入目标值
+  let thrAllEmpty=false;
+  if(!thrFieldErr){
+    thrAllEmpty = res.balance.length===0 && res.bet.length===0 && res.ngr.length===0;
+    if(thrAllEmpty){ showError('err-thr-all'); ok=false; }
+  }
+  for(let i=0;i<form.thrLv;i++){
+    if(form.activities[i].length===0){ showError('err-act-'+i); ok=false; }
+  }
+
+  if(!ok){ toast('error', isDup?'目标用户重复':thrAllEmpty?'账户余额、有效投注、用户净输赢(负数)至少填写一项':'请修正表单中标红的项目'); return; }
+
+  const now=new Date();
+  const time=`${now.getFullYear()}-${p2(now.getMonth()+1)}-${p2(now.getDate())} ${p2(now.getHours())}:${p2(now.getMinutes())}:${p2(now.getSeconds())}`;
+  const record={
+    name:form.name.trim(), vip:form.vip, period:form.period,
+    balance:res.balance, bet:res.bet, ngr:res.ngr,
+    activities:form.activities.slice(0,form.thrLv).map(arr=>[...arr]), time
+  };
+
+  if(editingId!==null){
+    const idx=pushList.findIndex(x=>x.id===editingId);
+    pushList[idx]={...pushList[idx],...record};
+    toast('success','推播条件已更新');
+  }else{
+    pushList.unshift({id:seqId++,...record});
+    toast('success','推播条件新增成功');
+  }
+  renderTable();
+  closeForm();
+}
+function p2(n){ return String(n).padStart(2,'0'); }
+
+/* ============================================================
+   十一、删除
+   ============================================================ */
+function askDel(id){ pendingDelId=id; document.getElementById('delMask').classList.add('show'); }
+function closeDel(){ pendingDelId=null; document.getElementById('delMask').classList.remove('show'); }
+function confirmDel(){
+  pushList=pushList.filter(x=>x.id!==pendingDelId);
+  closeDel(); renderTable(); toast('info','已删除该推播条件');
+}
+
+/* ============================================================
+   十二、Toast 轻提示
+   ============================================================ */
+function toast(type,msg){
+  const wrap=document.getElementById('toastWrap');
+  const icon={success:'✔',error:'✕',info:'ℹ'}[type]||'';
+  const el=document.createElement('div');
+  el.className='toast '+type; el.innerHTML=`<span>${icon}</span>${msg}`;
+  wrap.appendChild(el);
+  setTimeout(()=>{ el.style.transition='.3s'; el.style.opacity='0'; el.style.transform='translateY(-10px)'; setTimeout(()=>el.remove(),300); },2200);
+}
+
+/* 初始渲染 */
+renderTable();
+renderRewardTable();
+renderCountTable();
+syncRewardSwitchUI();
+</script>
+</body>
+</html>
