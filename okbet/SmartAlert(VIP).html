@@ -791,9 +791,9 @@ function renderTable(){
       ${[0,1,2,3,4,5,6,7,8,9].map(i=>`<td>${fmtLevelCell(r,i)}</td>`).join('')}
       <td>${r.time}</td>
       <td class="op">
+        <a onclick="toggleRowEnable(${r.id})">${r.enabled?'开启':'关闭'}</a>
         <a onclick="openForm(${r.id})">编辑</a>
         <a class="del" onclick="askDel(${r.id})">删除</a>
-        <a onclick="toggleRowEnable(${r.id})">${r.enabled?'开启':'关闭'}</a>
       </td>
     </tr>`).join('');
 }
@@ -958,7 +958,6 @@ function buildRewardsTable(){
           <option value="">请选择奖品类型</option>
           ${GIFT_TYPES.map(t=>`<option value="${t}" ${form.rewards[i].giftType===t?'selected':''}>${t}</option>`).join('')}
         </select>
-        <div class="row-error" id="err-rwtype-${i}">请选择奖品类型</div>
       </td>
       <td id="rwVal-${i}">${renderGiftValueCell(i)}</td>
     </tr>`;
@@ -1017,7 +1016,6 @@ function toggleRewardBadge(i,checked){
 function onGiftTypeChange(i,type){
   form.rewards[i] = {...form.rewards[i], giftType:type, giftValue:'', turnover:''};
   document.getElementById('rwVal-'+i).innerHTML = renderGiftValueCell(i);
-  hideError('err-rwtype-'+i);
 }
 function onGiftValueInput(i,val){ form.rewards[i].giftValue=val; hideError('err-rwval-'+i); }
 function onGiftValueSelect(i,val){ form.rewards[i].giftValue=val; hideError('err-rwval-'+i); }
@@ -1072,11 +1070,11 @@ function saveForm(){
     if(thrAllEmpty){ showError('err-thr-all'); ok=false; }
   }
 
-  // 各阶级的推送奖励：活动推送为选填（有勾选才推送，未勾选则不推送）；奖品类型、奖品/数量必填（依奖品类型而异）
+  // 各阶级的推送奖励：活动推送与奖品类型皆为选填、可各自单独设定；只有在选了奖品类型时，才需要填完该类型对应的奖品/数量
   for(let i=0;i<form.thrLv;i++){
     const rw=form.rewards[i];
-    if(!rw.giftType){ showError('err-rwtype-'+i); ok=false; }
-    else if(rw.giftType==='礼金' || rw.giftType==='积分'){
+    if(!rw.giftType) continue;
+    if(rw.giftType==='礼金' || rw.giftType==='积分'){
       const n=Number(rw.giftValue);
       if(rw.giftValue===''||isNaN(n)||n<=0){ showError('err-rwval-'+i); ok=false; }
       if(rw.giftType==='礼金'){
