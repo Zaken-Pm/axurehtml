@@ -118,6 +118,7 @@ body{
 .eswitch::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
 .eswitch.on{background:var(--primary)}
 .eswitch.on::after{left:22px}
+.eswitch.disabled{opacity:.5;cursor:not-allowed}
 
 /* 通用按钮 */
 .btn{
@@ -702,22 +703,29 @@ let pushList = [
 let rewardList = [
   {
     id:1, name:'常贵客大R Slot近7日推播', main:'常贵客', sub:'大R', attr:'Slot',
-    rewards:['彩金 100 元', '彩金 300 元 + 免费旋转 20 次', '', ''], time:'2026-07-20 14:32:08'
+    rewards:['10% Loss Cashback', '20% Loss Cashback', '', ''], time:'2026-07-20 14:32:08'
   },
   {
     id:2, name:'沉默客回归召回推播', main:'沉默客', sub:'无存', attr:'新用户',
-    rewards:['召回礼包 50 元', '召回礼包 100 元 + 首存加码 10%', '召回礼包 200 元 + 首存加码 20%', ''], time:'2026-07-21 09:15:44'
+    rewards:['10% Deposit Voucher (Max ₱500)', '20% Deposit Voucher (Max ₱500)', '20% Loss Cashback', ''], time:'2026-07-21 09:15:44'
   },
   {
     id:3, name:'低频客净输赢风险监控推播', main:'低频客', sub:'中NGR', attr:'Sports',
-    rewards:['安慰彩金 20 元', '安慰彩金 50 元', '安慰彩金 100 元 + 免费投注券', '安慰彩金 200 元 + 客服关怀通话'], time:'2026-07-22 18:47:21'
+    rewards:['5% Loss Cashback', '10% Loss Cashback', '10% Deposit Voucher (Max ₱300)', '15% Deposit Voucher (Max ₱300)'], time:'2026-07-22 18:47:21'
   },
 ];
-let rewardPushOn = false;   // 推播奖励开关，预设关闭
+let rewardPushOn = false;   // 推播奖励开关，预设关闭；不可独立于智能推播开启
 function toggleRewardPush(){
+  if(!smartPushOn){
+    toast('info','请先开启「智能推播」，才能开启「推播奖励」');
+    return;
+  }
   rewardPushOn = !rewardPushOn;
   document.getElementById('rewardSwitch').classList.toggle('on', rewardPushOn);
   toast(rewardPushOn?'success':'info', rewardPushOn?'推播奖励已开启':'推播奖励已关闭');
+}
+function syncRewardSwitchUI(){
+  document.getElementById('rewardSwitch').classList.toggle('disabled', !smartPushOn);
 }
 function doRewardSearch(){ renderRewardTable(); }
 function renderRewardTable(){
@@ -967,6 +975,11 @@ function toggleSmartPush(){
   smartPushOn = !smartPushOn;
   document.getElementById('smartPushSwitch').classList.toggle('on', smartPushOn);
   toast(smartPushOn?'success':'info', smartPushOn?'智能推播已开启':'智能推播已关闭');
+  if(!smartPushOn && rewardPushOn){
+    rewardPushOn = false;
+    document.getElementById('rewardSwitch').classList.toggle('on', false);
+  }
+  syncRewardSwitchUI();
 }
 
 /* ============================================================
@@ -1387,6 +1400,7 @@ function toast(type,msg){
 renderTable();
 renderRewardTable();
 renderCountTable();
+syncRewardSwitchUI();
 </script>
 </body>
 </html>
