@@ -275,6 +275,57 @@ tbody tr:last-child td{border-bottom:none}
 @keyframes drop{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
 
 .hidden{display:none!important}
+
+/* ===================== 前台「推播弹窗」示意 ===================== */
+.fe-demo-wrap{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+.fe-phone-col{display:flex;flex-direction:column;align-items:center;gap:12px}
+.fe-phone-label{font-size:13px;color:var(--text-2)}
+.fe-phone{width:280px;background:#1a1a1a;border-radius:32px;padding:10px;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.fe-screen{position:relative;background:#f0f4f8;border-radius:22px;overflow:hidden;height:580px}
+.fe-topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#fff}
+.fe-logo{font-weight:800;font-size:15px;color:#025be8}
+.fe-logo span{color:#ff8a00}
+.fe-login-btn{background:#eaf2ff;color:#025be8;font-size:11px;padding:5px 10px;border-radius:14px;font-weight:600;white-space:nowrap}
+.fe-search{margin-left:8px;font-size:14px;color:#5a6270}
+.fe-banner{margin:0 10px 8px;height:150px;border-radius:10px;background:linear-gradient(160deg,#5fb8ff,#1f7ee0);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;position:relative;overflow:hidden}
+.fe-banner .t1{font-size:20px;font-weight:800;letter-spacing:.5px}
+.fe-banner .t2{font-size:22px;font-weight:800}
+.fe-banner .dots{position:absolute;bottom:10px;display:flex;gap:4px}
+.fe-banner .dots i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.5);display:inline-block}
+.fe-banner .dots i.on{background:#fff;width:14px;border-radius:3px}
+.fe-ticker{margin:0 10px 10px;background:#eaf2ff;border-radius:6px;padding:6px 10px;font-size:11px;color:#5a6270;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px}
+.fe-sec-title{padding:0 12px;font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px}
+.fe-games{display:flex;gap:8px;padding:0 12px 10px;overflow-x:auto}
+.fe-games .g{flex:0 0 auto;width:52px;height:52px;border-radius:8px;background:#e4e9f0;display:flex;align-items:center;justify-content:center;font-size:20px}
+.fe-cats{display:flex;gap:14px;padding:0 12px 10px;overflow-x:auto}
+.fe-cats::-webkit-scrollbar{display:none}
+.fe-cat{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;color:#7a828e;white-space:nowrap}
+.fe-cat .ic{width:32px;height:32px;border-radius:50%;background:#eef1f5;display:flex;align-items:center;justify-content:center;font-size:15px}
+.fe-cat.on{color:#ff8a00;font-weight:700}
+.fe-cat.on .ic{background:#fff3e6}
+.fe-promo{margin:0 10px 10px;height:56px;border-radius:8px;background:linear-gradient(120deg,#132048,#1f3a7a);display:flex;align-items:center;justify-content:center;color:#ffd34d;font-weight:800;font-size:13px}
+.fe-tabbar{position:absolute;left:0;right:0;bottom:0;height:52px;background:#fff;border-top:1px solid #eee;display:flex;align-items:center;justify-content:space-around}
+.fe-tabitem{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;color:#9199a6}
+.fe-tabitem .ic{font-size:16px}
+.fe-tabitem.home .ic{width:26px;height:26px;border-radius:50%;background:#025be8;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px}
+
+/* 推播弹窗遮罩 + 卡片 */
+.fe-mask{position:absolute;inset:0;background:rgba(20,30,50,.55);display:none;align-items:flex-start;justify-content:center;padding-top:120px;z-index:5}
+.fe-mask.show{display:flex}
+.fe-popup{width:232px;background:#fff;border-radius:14px;padding:16px 14px 12px;box-shadow:0 10px 30px rgba(0,0,0,.3);position:relative}
+.fe-popup-close{position:absolute;top:10px;right:10px;width:20px;height:20px;border-radius:50%;background:#f0f2f5;display:flex;align-items:center;justify-content:center;font-size:11px;color:#606266;cursor:pointer}
+.fe-popup-title{font-size:15px;font-weight:800;text-align:center;margin-bottom:10px}
+.fe-popup-sub{font-size:11px;color:#909399;margin-bottom:6px}
+.fe-popup-list{max-height:190px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-right:2px}
+.fe-popup-item{position:relative;background:#eef4fb;border-radius:8px;padding:9px 10px;display:flex;align-items:center;justify-content:space-between;overflow:hidden;flex:0 0 auto}
+.fe-popup-item::before{content:"";position:absolute;left:0;bottom:0;width:100%;height:14px;background:linear-gradient(120deg,#2f8bf0,#5fb8ff);clip-path:polygon(0 100%,0 40%,50% 90%,100% 30%,100% 100%);opacity:.5}
+.fe-popup-item .name{font-size:12px;font-weight:700;color:var(--text);position:relative;z-index:1}
+.fe-popup-item .join{position:relative;z-index:1;background:#ff9a3d;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:12px;white-space:nowrap;cursor:pointer}
+.fe-popup-bonus{margin-top:10px;border-top:1px dashed #e4e7ed;padding-top:8px}
+.fe-popup-bonus .lb{font-size:11px;color:#909399;margin-bottom:4px}
+.fe-popup-bonus .txt{font-size:11px;color:var(--text);line-height:1.6}
+.fe-popup-bonus .txt strong{color:#025be8}
+.fe-rule-list{padding-left:18px;color:var(--text-2);font-size:13px;line-height:2}
 </style>
 </head>
 <body>
@@ -329,6 +380,7 @@ tbody tr:last-child td{border-bottom:none}
       <div class="subtab active" data-tab="list" onclick="switchSubtab('list')">推播列表</div>
       <div class="subtab" data-tab="reward" onclick="switchSubtab('reward')">推播奖励</div>
       <div class="subtab" data-tab="count" onclick="switchSubtab('count')">推播次数</div>
+      <div class="subtab" data-tab="popup" onclick="switchSubtab('popup')">推播弹窗</div>
     </div>
 
     <!-- ============ 页面 A：推播列表 ============ -->
@@ -467,6 +519,93 @@ tbody tr:last-child td{border-bottom:none}
           </thead>
           <tbody id="countTableBody"><!-- JS 渲染 --></tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- ============ 页面 E：推播弹窗——前台示意 ============ -->
+    <div id="view-popup" class="hidden">
+      <div class="fe-demo-wrap">
+        <div class="fe-phone-col">
+          <div class="fe-phone-label">首页示意（点击下方按钮模拟触发推播）</div>
+          <div class="fe-phone">
+            <div class="fe-screen">
+              <div class="fe-topbar">
+                <div class="fe-logo">OK<span>•</span>BET</div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div class="fe-login-btn">注册 / 登录</div>
+                  <div class="fe-search">🔍</div>
+                </div>
+              </div>
+              <div class="fe-banner">
+                <div class="t1">Weekly</div>
+                <div class="t2">Bonus Pass</div>
+                <div class="dots"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+              </div>
+              <div class="fe-ticker">🔊 －今晚打老虎－今晚打老虎－今晚打老虎－今晚…</div>
+              <div class="fe-sec-title">游戏集锦</div>
+              <div class="fe-games">
+                <div class="g">👑</div><div class="g">📋</div><div class="g">🐯</div><div class="g">🎯</div>
+              </div>
+              <div class="fe-cats">
+                <div class="fe-cat on"><div class="ic">🔥</div>热门</div>
+                <div class="fe-cat"><div class="ic">🏆</div>好赢</div>
+                <div class="fe-cat"><div class="ic">🏀</div>体育</div>
+                <div class="fe-cat"><div class="ic">🎰</div>老虎机</div>
+                <div class="fe-cat"><div class="ic">🎡</div>游乐场</div>
+                <div class="fe-cat"><div class="ic">🎲</div>娱乐城</div>
+                <div class="fe-cat"><div class="ic">♠️</div>扑克</div>
+                <div class="fe-cat"><div class="ic">🕹️</div>电玩</div>
+                <div class="fe-cat"><div class="ic">🔵</div>电子宾果</div>
+                <div class="fe-cat"><div class="ic">🔢</div>数字游戏</div>
+              </div>
+              <div class="fe-promo">DAILY EXTRA REBATE</div>
+
+              <div class="fe-mask" id="feMask">
+                <div class="fe-popup">
+                  <div class="fe-popup-close" onclick="closePushPopup()">✕</div>
+                  <div class="fe-popup-title">活动快报</div>
+                  <div class="fe-popup-sub">已符合资格活动</div>
+                  <div class="fe-popup-list">
+                    <div class="fe-popup-item"><span class="name">充值活动</span><span class="join" onclick="goActivityDetail('充值活动')">参加</span></div>
+                    <div class="fe-popup-item"><span class="name">盈利活动</span><span class="join" onclick="goActivityDetail('盈利活动')">参加</span></div>
+                    <div class="fe-popup-item"><span class="name">新手/回归签到活动</span><span class="join" onclick="goActivityDetail('新手/回归签到活动')">参加</span></div>
+                    <div class="fe-popup-item"><span class="name">每日特别返水</span><span class="join" onclick="goActivityDetail('每日特别返水')">参加</span></div>
+                    <div class="fe-popup-item"><span class="name">新用户充值转盘活动</span><span class="join" onclick="goActivityDetail('新用户充值转盘活动')">参加</span></div>
+                    <div class="fe-popup-item"><span class="name">Payday活动</span><span class="join" onclick="goActivityDetail('Payday活动')">参加</span></div>
+                    <div class="fe-popup-item"><span class="name">消费活动</span><span class="join" onclick="goActivityDetail('消费活动')">参加</span></div>
+                    <div class="fe-popup-item"><span class="name">签到活动</span><span class="join" onclick="goActivityDetail('签到活动')">参加</span></div>
+                    <div class="fe-popup-item"><span class="name">老用户回归活动</span><span class="join" onclick="goActivityDetail('老用户回归活动')">参加</span></div>
+                  </div>
+                  <div class="fe-popup-bonus">
+                    <div class="lb">福利加码</div>
+                    <div class="txt"><strong>【20% Loss Cashback】</strong>奖励已派发至【我的优惠券】</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="fe-tabbar">
+                <div class="fe-tabitem home"><div class="ic">⌂</div></div>
+                <div class="fe-tabitem"><div class="ic">🎁</div>奖励中心</div>
+                <div class="fe-tabitem"><div class="ic">🏬</div>积分商城</div>
+                <div class="fe-tabitem"><div class="ic">🏆</div>排行榜</div>
+                <div class="fe-tabitem"><div class="ic">👤</div>我的</div>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="showPushPopup()">模拟触发推播弹窗</button>
+        </div>
+
+        <div class="section" style="flex:1;min-width:280px;align-self:flex-start">
+          <div class="section-title">规则说明</div>
+          <ol class="fe-rule-list">
+            <li>「推播弹窗」仅在首页显示；首页涵盖「热门、好赢、体育、老虎机、游乐场、娱乐城、扑克、电玩、电子宾果、数字游戏」等分类页签，切换至其他非首页页面（如游戏详情页、个人中心等）时不显示。</li>
+            <li>弹窗标题固定文案为「活动快报」。</li>
+            <li>弹窗内容显示用户当前符合资格、可领取奖励的活动，例如：充值活动、消费活动、Payday活动、盈利活动、新手/回归签到活动、签到活动、新用户充值转盘活动、每日特别返水、老用户回归活动。</li>
+            <li>弹窗高度固定；活动清单内容过多时，清单区域可上下滑动查看，其余区域不随之滚动。</li>
+            <li>活动清单下方固定显示「福利加码」区块，依据后台配置显示对应的活动奖励文案。</li>
+            <li>点击活动清单中的「参加」按钮后，导向对应活动的详情页（下方示意以 Toast 模拟跳转效果）。</li>
+          </ol>
+        </div>
       </div>
     </div>
 
@@ -1010,8 +1149,16 @@ function switchSubtab(tab){
   document.getElementById('view-list').classList.toggle('hidden', tab!=='list');
   document.getElementById('view-reward').classList.toggle('hidden', tab!=='reward');
   document.getElementById('view-count').classList.toggle('hidden', tab!=='count');
+  document.getElementById('view-popup').classList.toggle('hidden', tab!=='popup');
   if(tab==='reward') renderRewardTable();
   if(tab==='count') renderCountTable();
+  if(tab!=='popup') closePushPopup();
+}
+function showPushPopup(){ document.getElementById('feMask').classList.add('show'); }
+function closePushPopup(){ document.getElementById('feMask').classList.remove('show'); }
+function goActivityDetail(name){
+  closePushPopup();
+  toast('info', `模拟跳转 → 进入「${name}」活动详情页`);
 }
 
 /* ============================================================
