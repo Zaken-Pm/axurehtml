@@ -327,6 +327,7 @@ tbody tr:last-child td{border-bottom:none}
     <div class="subtabs">
       <div class="subtab active" data-tab="list" onclick="switchSubtab('list')">推播列表</div>
       <div class="subtab" data-tab="reward" onclick="switchSubtab('reward')">推播奖励</div>
+      <div class="subtab" data-tab="count" onclick="switchSubtab('count')">推播次数</div>
     </div>
 
     <!-- ============ 页面 A：推播列表 ============ -->
@@ -385,8 +386,35 @@ tbody tr:last-child td{border-bottom:none}
       </div>
     </div>
 
-    <!-- ============ 页面 B：推播奖励——表格标题参照推播列表 ============ -->
+    <!-- ============ 页面 B：推播奖励——参照推播列表 ============ -->
     <div id="view-reward" class="hidden">
+      <div class="toolbar">
+        <div class="field">
+          推播奖励：
+          <div class="eswitch" id="rewardSwitch" onclick="toggleRewardPush()"></div>
+        </div>
+        <div class="field">
+          推播名称：
+          <input type="text" class="input" id="filterRewardName" style="width:160px" placeholder="请输入关键字" onkeydown="if(event.key==='Enter')doRewardSearch()">
+        </div>
+        <div class="field">
+          目标主标签：
+          <select class="select" id="filterRewardMain">
+            <option value="">全部</option>
+            <option>常贵客</option><option>低频客</option><option>新鲜客</option><option>沉默客</option>
+          </select>
+        </div>
+        <div class="field">
+          时间：
+          <input type="date" class="input" id="filterRewardStartDate" style="width:150px">
+          <span style="color:var(--text-3)">至</span>
+          <input type="date" class="input" id="filterRewardEndDate" style="width:150px">
+        </div>
+        <button class="btn btn-primary" onclick="doRewardSearch()">查询</button>
+        <div class="spacer"></div>
+        <button class="btn btn-primary" onclick="openRewardForm()">＋ 新增推播奖励</button>
+      </div>
+
       <div class="card">
         <table>
           <thead>
@@ -402,6 +430,41 @@ tbody tr:last-child td{border-bottom:none}
             </tr>
           </thead>
           <tbody id="rewardTableBody"><!-- JS 渲染 --></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ 页面 C'：推播次数——参照推播列表/推播奖励 ============ -->
+    <div id="view-count" class="hidden">
+      <div class="toolbar">
+        <div class="field">
+          推播名称：
+          <input type="text" class="input" id="filterCountName" style="width:160px" placeholder="请输入关键字" onkeydown="if(event.key==='Enter')doCountSearch()">
+        </div>
+        <div class="field">
+          目标主标签：
+          <select class="select" id="filterCountMain">
+            <option value="">全部</option>
+            <option>常贵客</option><option>低频客</option><option>新鲜客</option><option>沉默客</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="doCountSearch()">查询</button>
+        <div class="spacer"></div>
+      </div>
+
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:170px">推播名称</th>
+              <th style="width:190px">目标用户</th>
+              <th>阶级1推播</th>
+              <th>阶级2推播</th>
+              <th>阶级3推播</th>
+              <th>阶级4推播</th>
+            </tr>
+          </thead>
+          <tbody id="countTableBody"><!-- JS 渲染 --></tbody>
         </table>
       </div>
     </div>
@@ -505,6 +568,69 @@ tbody tr:last-child td{border-bottom:none}
       </div>
     </div>
 
+    <!-- ============ 页面 D：推播奖励表单（新增 / 编辑） ============ -->
+    <div id="view-reward-form" class="hidden">
+      <div class="form-head">
+        <div class="title" id="rewardFormTitle">新增推播奖励</div>
+        <div class="btns">
+          <button class="btn" onclick="closeRewardForm()">取消</button>
+          <button class="btn btn-primary" onclick="saveRewardForm()">保存</button>
+        </div>
+      </div>
+
+      <!-- 区块 0：基本信息 -->
+      <div class="section">
+        <div class="section-title">基本信息</div>
+        <div class="form-row">
+          <div class="form-label"><span class="req">*</span>推播名称</div>
+          <div class="form-ctrl">
+            <select class="select" id="rfPushName" style="width:320px" onchange="onRewardPushNameChange(this.value)">
+              <option value="">请选择推播名称</option>
+            </select>
+            <div class="row-error" id="err-rf-name">请选择推播名称</div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">推送目标用户</div>
+          <div class="form-ctrl" style="padding-top:7px"><span id="rfTargetUser" style="color:var(--text-2)">—</span></div>
+        </div>
+      </div>
+
+      <!-- 区块 1：触发条件——依所选推播名称带出，仅供参考 -->
+      <div class="section">
+        <div class="section-title">触发条件</div>
+        <div class="form-row">
+          <div class="form-label">计算周期</div>
+          <div class="form-ctrl" style="padding-top:5px"><span class="period-pill" id="rfPeriod">—</span></div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">阶级条件</div>
+          <div class="form-ctrl">
+            <div class="card" style="overflow-x:auto">
+              <table>
+                <thead><tr id="rfLevelHead"></tr></thead>
+                <tbody><tr id="rfLevelRow"></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 区块 2：推送奖励 -->
+      <div class="section">
+        <div class="section-title">推送奖励</div>
+        <div class="hint">请依各阶级选择推送奖励；先选择奖励项目（存送比例券／输返券），再选择对应的奖励内容。</div>
+        <div id="rfRewardContainer"></div>
+      </div>
+
+      <div class="form-head" style="margin-top:4px">
+        <div class="btns" style="margin-left:auto">
+          <button class="btn" onclick="closeRewardForm()">取消</button>
+          <button class="btn btn-primary" onclick="saveRewardForm()">保存</button>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /content -->
 </div><!-- /main -->
 
@@ -541,6 +667,13 @@ const THRESHOLDS = [
   {key:'bet',     name:'有效投注',        cmp:'＜',  cmpText:'小于',   neg:false},
   {key:'ngr',     name:'用户净输赢(负数)', cmp:'≤',  cmpText:'小于等于', neg:true },
 ];
+
+/* 推播奖励——奖励项目及其对应的奖励内容清单 */
+const REWARD_TYPES = ['存送比例券','输返券'];
+const REWARD_ITEMS = {
+  '存送比例券': ['存送券23%流水倍数3','10% Deposit Voucher (Max ₱500)','30% Deposit Voucher (Max ₱100)'],
+  '输返券':     ['20% Loss Cashback','10% Loss Cashback','输返券注单30天券60天无上限'],
+};
 
 /* ============================================================
    二、示范用列表数据（模拟已生成的推播清单）
@@ -580,13 +713,32 @@ let rewardList = [
     rewards:['安慰彩金 20 元', '安慰彩金 50 元', '安慰彩金 100 元 + 免费投注券', '安慰彩金 200 元 + 客服关怀通话'], time:'2026-07-22 18:47:21'
   },
 ];
+let rewardPushOn = false;   // 推播奖励开关，预设关闭
+function toggleRewardPush(){
+  rewardPushOn = !rewardPushOn;
+  document.getElementById('rewardSwitch').classList.toggle('on', rewardPushOn);
+  toast(rewardPushOn?'success':'info', rewardPushOn?'推播奖励已开启':'推播奖励已关闭');
+}
+function doRewardSearch(){ renderRewardTable(); }
 function renderRewardTable(){
+  const fm = document.getElementById('filterRewardMain').value;
+  const fn = document.getElementById('filterRewardName').value.trim().toLowerCase();
+  const fsd = document.getElementById('filterRewardStartDate').value;
+  const fed = document.getElementById('filterRewardEndDate').value;
+  const rows = rewardList.filter(r=>{
+    if(fm && r.main!==fm) return false;
+    if(fn && !r.name.toLowerCase().includes(fn)) return false;
+    const datePart = r.time.slice(0,10);
+    if(fsd && datePart<fsd) return false;
+    if(fed && datePart>fed) return false;
+    return true;
+  });
   const body=document.getElementById('rewardTableBody');
-  if(rewardList.length===0){
-    body.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="big">🎁</div>暂无推播奖励设定</div></td></tr>`;
+  if(rows.length===0){
+    body.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="big">🎁</div>暂无符合条件的推播奖励设定</div></td></tr>`;
     return;
   }
-  body.innerHTML = rewardList.map(r=>`
+  body.innerHTML = rows.map(r=>`
     <tr>
       <td>${r.name}</td>
       <td>${r.main}, ${r.sub}, ${r.attr}</td>
@@ -596,12 +748,215 @@ function renderRewardTable(){
       <td>${r.rewards[3]||'<span class="none">—</span>'}</td>
       <td>${r.time}</td>
       <td class="op">
-        <a onclick="rewardNotReady()">编辑</a>
+        <a onclick="openRewardForm(${r.id})">编辑</a>
         <a class="del" onclick="rewardNotReady()">删除</a>
       </td>
     </tr>`).join('');
 }
-function rewardNotReady(){ toast('info','「推播奖励」编辑/删除规则尚未在本次需求中定义'); }
+function rewardNotReady(){ toast('info','「推播奖励」删除规则尚未在本次需求中定义'); }
+
+/* ============================================================
+   二之三、推播奖励——新增 / 编辑表单
+   推播名称清单来源为「推播列表」(pushList)；选定后，推送目标用户、
+   计算周期、阶级条件皆依该笔推播条件带出，仅供参考、不可编辑。
+   ============================================================ */
+let rewardSeqId = 4;
+let rewardForm = null;
+let editingRewardId = null;
+let rewardEditingPushRecord = null;   // 目前所选推播名称对应的推播条件（pushList 内的记录）
+
+function blankRewardForm(){
+  return {
+    pushName:'',
+    levelRewards:[{type:'',item:''},{type:'',item:''},{type:'',item:''},{type:'',item:''}]
+  };
+}
+
+function openRewardForm(id){
+  editingRewardId = (typeof id==='number') ? id : null;
+  rewardForm = blankRewardForm();
+  document.getElementById('rewardFormTitle').textContent = editingRewardId!==null ? '编辑推播奖励' : '新增推播奖励';
+
+  const sel = document.getElementById('rfPushName');
+  sel.innerHTML = '<option value="">请选择推播名称</option>' +
+    pushList.map(p=>`<option value="${p.name}">${p.name}</option>`).join('');
+
+  if(editingRewardId!==null){
+    const r = rewardList.find(x=>x.id===editingRewardId);
+    rewardForm.pushName = r.name;
+    sel.value = r.name;
+    sel.disabled = true;   // 推播名称在编辑页面下不可变更，比照推播条件表单规则
+    // 尝试比对既有奖励文字为预设选项，无法比对（如示范用旧数据）则留空待重新选择
+    rewardForm.levelRewards = [0,1,2,3].map(i=>{
+      const text = (r.rewards||[])[i];
+      for(const type of REWARD_TYPES){
+        if(REWARD_ITEMS[type].includes(text)) return {type, item:text};
+      }
+      return {type:'', item:''};
+    });
+  } else {
+    sel.disabled = false;
+  }
+
+  syncRewardTrigger(rewardForm.pushName);
+  buildRewardLevels();
+  clearRewardErrors();
+
+  document.getElementById('view-list').classList.add('hidden');
+  document.getElementById('view-reward').classList.add('hidden');
+  document.getElementById('view-form').classList.add('hidden');
+  document.getElementById('view-count').classList.add('hidden');
+  document.getElementById('view-reward-form').classList.remove('hidden');
+  document.querySelector('.content').scrollTop = 0;
+}
+function closeRewardForm(){
+  document.getElementById('view-reward-form').classList.add('hidden');
+  document.getElementById('view-reward').classList.remove('hidden');
+}
+
+function onRewardPushNameChange(name){
+  rewardForm.pushName = name;
+  hideError('err-rf-name');
+  syncRewardTrigger(name);
+  buildRewardLevels();
+}
+
+/* 依所选推播名称，带出推送目标用户 / 计算周期 / 阶级条件（唯读参考） */
+function syncRewardTrigger(name){
+  const rec = pushList.find(p=>p.name===name) || null;
+  rewardEditingPushRecord = rec;
+  document.getElementById('rfTargetUser').textContent = rec ? `${rec.main}, ${rec.sub}, ${rec.attr}` : '—';
+  document.getElementById('rfPeriod').textContent = rec ? rec.period : '—';
+
+  document.getElementById('rfLevelHead').innerHTML = ['阶级1','阶级2','阶级3','阶级4'].map(t=>`<th>${t}</th>`).join('');
+  document.getElementById('rfLevelRow').innerHTML = [0,1,2,3]
+    .map(i=> `<td>${rec ? fmtLevelCell(rec,i) : '<span style="color:var(--placeholder)">—</span>'}</td>`).join('');
+}
+
+/* 推送奖励——仅所选推播名称实际启用的阶级（与「触发条件」阶级数一致）才需要设定奖励 */
+function buildRewardLevels(){
+  const box = document.getElementById('rfRewardContainer');
+  const rec = rewardEditingPushRecord;
+  if(!rec){
+    box.innerHTML = '<div class="hint" style="color:var(--text-3)">请先选择推播名称</div>';
+    return;
+  }
+  const activeCount = rec.activities.length;
+  box.innerHTML = [0,1,2,3].map(i=>{
+    const lr = rewardForm.levelRewards[i];
+    if(i>=activeCount){
+      return `
+      <div class="form-row">
+        <div class="form-label">阶级${i+1}奖励</div>
+        <div class="form-ctrl" style="padding-top:7px"><span style="color:var(--placeholder)">该阶级未设置触发条件，无需设定奖励</span></div>
+      </div>`;
+    }
+    return `
+    <div class="form-row">
+      <div class="form-label"><span class="req">*</span>阶级${i+1}奖励</div>
+      <div class="form-ctrl" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start">
+        <select class="select" style="width:160px" onchange="onRewardTypeChange(${i},this.value)">
+          <option value="">请选择奖励项目</option>
+          ${REWARD_TYPES.map(t=>`<option value="${t}" ${lr.type===t?'selected':''}>${t}</option>`).join('')}
+        </select>
+        <select class="select" style="width:280px" onchange="onRewardItemChange(${i},this.value)" ${lr.type?'':'disabled'}>
+          <option value="">请选择奖励内容</option>
+          ${(REWARD_ITEMS[lr.type]||[]).map(it=>`<option value="${it}" ${lr.item===it?'selected':''}>${it}</option>`).join('')}
+        </select>
+        <div class="row-error" id="err-rf-lv-${i}">请选择奖励项目及奖励内容</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function onRewardTypeChange(i,type){
+  rewardForm.levelRewards[i] = {type, item:''};
+  buildRewardLevels();
+  hideError('err-rf-lv-'+i);
+}
+function onRewardItemChange(i,item){
+  rewardForm.levelRewards[i].item = item;
+  hideError('err-rf-lv-'+i);
+}
+
+function clearRewardErrors(){
+  hideError('err-rf-name');
+  [0,1,2,3].forEach(i=>hideError('err-rf-lv-'+i));
+}
+
+function saveRewardForm(){
+  clearRewardErrors();
+  let ok = true;
+  if(!rewardForm.pushName){ showError('err-rf-name'); ok=false; }
+
+  const rec = rewardEditingPushRecord;
+  const activeCount = rec ? rec.activities.length : 0;
+  if(rec){
+    for(let i=0;i<activeCount;i++){
+      const lr = rewardForm.levelRewards[i];
+      if(!lr.type || !lr.item){ showError('err-rf-lv-'+i); ok=false; }
+    }
+  }
+  if(!ok){ toast('error','请完整选择推播名称及各阶级推送奖励'); return; }
+
+  const rewards = [0,1,2,3].map(i=> i<activeCount ? rewardForm.levelRewards[i].item : '');
+  const record = { name:rec.name, main:rec.main, sub:rec.sub, attr:rec.attr, rewards, time:nowStr() };
+
+  if(editingRewardId!==null){
+    const idx = rewardList.findIndex(x=>x.id===editingRewardId);
+    rewardList[idx] = {...rewardList[idx], ...record};
+    toast('success','推播奖励已更新');
+  }else{
+    rewardList.unshift({id:rewardSeqId++, ...record});
+    toast('success','推播奖励新增成功');
+  }
+  renderRewardTable();
+  closeRewardForm();
+}
+function nowStr(){
+  const now=new Date();
+  return `${now.getFullYear()}-${p2(now.getMonth()+1)}-${p2(now.getDate())} ${p2(now.getHours())}:${p2(now.getMinutes())}:${p2(now.getSeconds())}`;
+}
+
+/* ============================================================
+   二之四、示范用推播次数数据——与推播列表的推播名称对应
+   目标用户 / 阶级数皆向推播列表 (pushList) 查询带出，本处只记录各阶级的推播次数
+   ============================================================ */
+let countList = [
+  { name:'常贵客大R Slot近7日推播',    counts:[128, 76, 0, 0] },
+  { name:'沉默客回归召回推播',         counts:[54, 31, 12, 0] },
+  { name:'低频客净输赢风险监控推播',    counts:[210, 95, 40, 15] },
+];
+function doCountSearch(){ renderCountTable(); }
+function renderCountTable(){
+  const fn = document.getElementById('filterCountName').value.trim().toLowerCase();
+  const fm = document.getElementById('filterCountMain').value;
+  const rows = countList
+    .map(c=>({...c, rec: pushList.find(p=>p.name===c.name)}))
+    .filter(c=>c.rec)
+    .filter(c=>{
+      if(fn && !c.name.toLowerCase().includes(fn)) return false;
+      if(fm && c.rec.main!==fm) return false;
+      return true;
+    });
+  const body = document.getElementById('countTableBody');
+  if(rows.length===0){
+    body.innerHTML = `<tr><td colspan="6"><div class="empty"><div class="big">📊</div>暂无符合条件的推播次数记录</div></td></tr>`;
+    return;
+  }
+  body.innerHTML = rows.map(c=>{
+    const lvCount = c.rec.activities.length;
+    const cell = i => i<lvCount ? Number(c.counts[i]||0).toLocaleString() : '<span class="none">—</span>';
+    return `
+    <tr>
+      <td>${c.name}</td>
+      <td>${c.rec.main}, ${c.rec.sub}, ${c.rec.attr}</td>
+      <td>${cell(0)}</td>
+      <td>${cell(1)}</td>
+      <td>${cell(2)}</td>
+      <td>${cell(3)}</td>
+    </tr>`;
+  }).join('');
+}
 
 let seqId = 4;              // 下一个新增的 id
 let editingId = null;      // 正在编辑的 id（null=新增）
@@ -638,9 +993,12 @@ function switchSubtab(tab){
   document.querySelectorAll('.subtab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
   // 切页签时若在表单页，先退回列表
   document.getElementById('view-form').classList.add('hidden');
+  document.getElementById('view-reward-form').classList.add('hidden');
   document.getElementById('view-list').classList.toggle('hidden', tab!=='list');
   document.getElementById('view-reward').classList.toggle('hidden', tab!=='reward');
+  document.getElementById('view-count').classList.toggle('hidden', tab!=='count');
   if(tab==='reward') renderRewardTable();
+  if(tab==='count') renderCountTable();
 }
 
 /* ============================================================
@@ -730,6 +1088,8 @@ function openForm(id){
 
   document.getElementById('view-list').classList.add('hidden');
   document.getElementById('view-reward').classList.add('hidden');
+  document.getElementById('view-reward-form').classList.add('hidden');
+  document.getElementById('view-count').classList.add('hidden');
   document.getElementById('view-form').classList.remove('hidden');
   document.querySelector('.content').scrollTop = 0;
 }
@@ -1026,6 +1386,7 @@ function toast(type,msg){
 /* 初始渲染 */
 renderTable();
 renderRewardTable();
+renderCountTable();
 </script>
 </body>
 </html>
