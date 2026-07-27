@@ -100,7 +100,7 @@ body{
 /* 内容区 */
 .content{flex:1;overflow-y:auto;padding:16px}
 
-/* 二级页签（推播列表 / 推播奖励） */
+/* 二级页签 */
 .subtabs{display:flex;gap:24px;border-bottom:1px solid var(--border-2);margin-bottom:16px}
 .subtab{
   padding:10px 2px;font-size:15px;color:var(--text-2);cursor:pointer;
@@ -157,7 +157,9 @@ tbody tr:last-child td{border-bottom:none}
 .cond-val{display:flex;flex-direction:column;gap:3px;align-items:center}
 .cond-val .lv{font-size:12px;color:var(--text-2);white-space:nowrap}
 .cond-val .none{color:var(--placeholder)}
-.period-pill{display:inline-block;padding:2px 10px;background:#eef2f7;border-radius:12px;color:#5a6270;font-size:12px}
+
+/* 推播列表——「目标用户」至「阶级10」栏位平均栏宽，超出可左右滑动（.card 已设 overflow-x:auto） */
+.list-table{table-layout:fixed}
 
 /* 操作链接 */
 .op a{color:var(--primary);cursor:pointer;margin:0 4px;font-size:13px}
@@ -198,14 +200,6 @@ tbody tr:last-child td{border-bottom:none}
 .tagopt:hover{border-color:var(--primary);color:var(--primary)}
 .tagopt.sel{background:var(--primary);border-color:var(--primary);color:#fff}
 
-/* 计算周期 单选 */
-.period-group{display:flex;gap:10px;flex-wrap:wrap}
-.period-opt{
-  padding:6px 18px;border:1px solid var(--border);border-radius:var(--radius);
-  cursor:pointer;font-size:13px;color:var(--text-2);background:#fff;
-}
-.period-opt.sel{background:var(--primary-light);border-color:var(--primary);color:var(--primary);font-weight:600}
-
 /* 三个阈值条件——同一阶级下三项目标值并排配置，新增阶级为共用的独立按钮 */
 .thr-grid-wrap{border:1px dashed var(--border);border-radius:6px;padding:16px;margin-bottom:14px}
 .thr-grid-row{display:grid;grid-template-columns:88px repeat(3,1fr);gap:10px 20px;align-items:center;margin-bottom:12px}
@@ -224,37 +218,13 @@ tbody tr:last-child td{border-bottom:none}
 .add-lv.disabled{color:var(--placeholder);cursor:not-allowed}
 .add-lv:hover:not(.disabled){text-decoration:underline}
 
-/* 推送活动 多选下拉 */
-.msel{position:relative;width:520px;max-width:100%}
-.msel-control{
-  min-height:34px;border:1px solid var(--border);border-radius:var(--radius);
-  padding:4px 30px 4px 8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;
-  cursor:pointer;background:#fff;position:relative;
-}
-.msel-control:hover{border-color:var(--primary-hover)}
-.msel-control.open{border-color:var(--primary)}
-.msel-control .ph{color:var(--placeholder);font-size:13px;padding:3px 2px}
-.msel-control .caret{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#c0c4cc;transition:.2s;font-size:12px}
-.msel-control.open .caret{transform:translateY(-50%) rotate(180deg)}
-.msel-chip{
-  display:inline-flex;align-items:center;gap:4px;background:#f0f2f5;border:1px solid #e0e3e9;
-  border-radius:3px;padding:2px 6px;font-size:12px;color:var(--text-2);
-}
-.msel-chip .x{cursor:pointer;color:#a0a4ad;font-weight:bold}
-.msel-chip .x:hover{color:var(--danger)}
-.msel-panel{
-  display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:30;
-  background:#fff;border:1px solid var(--border-2);border-radius:var(--radius);
-  box-shadow:0 4px 16px rgba(0,0,0,.12);max-height:280px;overflow-y:auto;padding:6px 0;
-}
-.msel-panel.show{display:block}
-.msel-opt{display:flex;align-items:center;gap:8px;padding:8px 14px;cursor:pointer;font-size:13px;color:var(--text-2)}
-.msel-opt:hover{background:var(--primary-light)}
-.msel-opt.sel{color:var(--primary);font-weight:600}
-.msel-opt .ck{width:15px;height:15px;border:1px solid var(--border);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff}
-.msel-opt.sel .ck{background:var(--primary);border-color:var(--primary)}
-.msel-toolbar{display:flex;justify-content:space-between;padding:6px 14px;border-bottom:1px solid #f0f2f5;margin-bottom:4px}
-.msel-toolbar a{color:var(--primary);font-size:12px;cursor:pointer}
+/* 推送奖励表格——活动推送勾选（限定有角标的活动）；四栏位等宽 */
+.reward-table{table-layout:fixed}
+.reward-table th, .reward-table td{width:25%}
+.reward-acts{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:flex-start;text-align:left}
+.reward-act-chk{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--text-2);cursor:pointer;white-space:nowrap}
+.reward-act-chk input{cursor:pointer}
+.reward-val-extra{margin-top:8px}
 
 /* ===================== 弹窗 / Toast ===================== */
 .mask{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:100}
@@ -378,7 +348,6 @@ tbody tr:last-child td{border-bottom:none}
     <!-- 二级页签 -->
     <div class="subtabs">
       <div class="subtab active" data-tab="list" onclick="switchSubtab('list')">推播列表</div>
-      <div class="subtab" data-tab="reward" onclick="switchSubtab('reward')">推播奖励</div>
       <div class="subtab" data-tab="count" onclick="switchSubtab('count')">推播次数</div>
       <div class="subtab" data-tab="popup" onclick="switchSubtab('popup')">推播弹窗</div>
     </div>
@@ -403,13 +372,6 @@ tbody tr:last-child td{border-bottom:none}
           </select>
         </div>
         <div class="field">
-          计算周期：
-          <select class="select" id="filterPeriod" style="width:130px">
-            <option value="">全部</option>
-            <option>今日</option><option>昨日</option><option>近7日</option><option>近14日</option><option>近30日</option>
-          </select>
-        </div>
-        <div class="field">
           时间：
           <input type="date" class="input" id="filterStartDate" style="width:150px">
           <span style="color:var(--text-3)">至</span>
@@ -420,19 +382,16 @@ tbody tr:last-child td{border-bottom:none}
         <button class="btn btn-primary" onclick="openForm()">＋ 新增推播</button>
       </div>
 
-      <div class="card">
-        <table>
+      <div class="card" style="overflow-x:auto">
+        <table class="list-table">
           <thead>
             <tr>
               <th style="width:170px">推播名称</th>
-              <th style="width:190px">目标用户</th>
-              <th style="width:90px">计算周期</th>
-              <th>阶级1</th>
-              <th>阶级2</th>
-              <th>阶级3</th>
-              <th>阶级4</th>
+              <th style="width:170px">目标用户</th>
+              <th style="width:170px">阶级1</th><th style="width:170px">阶级2</th><th style="width:170px">阶级3</th><th style="width:170px">阶级4</th><th style="width:170px">阶级5</th>
+              <th style="width:170px">阶级6</th><th style="width:170px">阶级7</th><th style="width:170px">阶级8</th><th style="width:170px">阶级9</th><th style="width:170px">阶级10</th>
               <th style="width:160px">新增/变更时间</th>
-              <th style="width:120px">操作</th>
+              <th style="width:160px">操作</th>
             </tr>
           </thead>
           <tbody id="tableBody"><!-- JS 渲染 --></tbody>
@@ -440,56 +399,7 @@ tbody tr:last-child td{border-bottom:none}
       </div>
     </div>
 
-    <!-- ============ 页面 B：推播奖励——参照推播列表 ============ -->
-    <div id="view-reward" class="hidden">
-      <div class="toolbar">
-        <div class="field">
-          推播奖励：
-          <div class="eswitch" id="rewardSwitch" onclick="toggleRewardPush()"></div>
-        </div>
-        <div class="field">
-          推播名称：
-          <input type="text" class="input" id="filterRewardName" style="width:160px" placeholder="请输入关键字" onkeydown="if(event.key==='Enter')doRewardSearch()">
-        </div>
-        <div class="field">
-          推送目标用户：
-          <select class="select" id="filterRewardMain">
-            <option value="">全部</option>
-            <option>VIP 0</option><option>VIP 1</option><option>VIP 2</option><option>VIP 3</option><option>VIP 4</option><option>VIP 5</option>
-            <option>VIP 6</option><option>VIP 7</option><option>VIP 8</option><option>VIP 9</option><option>VIP 10</option>
-          </select>
-        </div>
-        <div class="field">
-          时间：
-          <input type="date" class="input" id="filterRewardStartDate" style="width:150px">
-          <span style="color:var(--text-3)">至</span>
-          <input type="date" class="input" id="filterRewardEndDate" style="width:150px">
-        </div>
-        <button class="btn btn-primary" onclick="doRewardSearch()">查询</button>
-        <div class="spacer"></div>
-        <button class="btn btn-primary" onclick="openRewardForm()">＋ 新增推播奖励</button>
-      </div>
-
-      <div class="card">
-        <table>
-          <thead>
-            <tr>
-              <th style="width:170px">推播名称</th>
-              <th style="width:190px">目标用户</th>
-              <th>阶级1奖励</th>
-              <th>阶级2奖励</th>
-              <th>阶级3奖励</th>
-              <th>阶级4奖励</th>
-              <th style="width:160px">新增/变更时间</th>
-              <th style="width:120px">操作</th>
-            </tr>
-          </thead>
-          <tbody id="rewardTableBody"><!-- JS 渲染 --></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============ 页面 C'：推播次数——参照推播列表/推播奖励 ============ -->
+    <!-- ============ 页面 C'：推播次数——参照推播列表 ============ -->
     <div id="view-count" class="hidden">
       <div class="toolbar">
         <div class="field">
@@ -508,16 +418,14 @@ tbody tr:last-child td{border-bottom:none}
         <div class="spacer"></div>
       </div>
 
-      <div class="card">
+      <div class="card" style="overflow-x:auto">
         <table>
           <thead>
             <tr>
               <th style="width:170px">推播名称</th>
               <th style="width:190px">目标用户</th>
-              <th>阶级1推播</th>
-              <th>阶级2推播</th>
-              <th>阶级3推播</th>
-              <th>阶级4推播</th>
+              <th>阶级1推播</th><th>阶级2推播</th><th>阶级3推播</th><th>阶级4推播</th><th>阶级5推播</th>
+              <th>阶级6推播</th><th>阶级7推播</th><th>阶级8推播</th><th>阶级9推播</th><th>阶级10推播</th>
             </tr>
           </thead>
           <tbody id="countTableBody"><!-- JS 渲染 --></tbody>
@@ -624,7 +532,7 @@ tbody tr:last-child td{border-bottom:none}
 
       <div class="notice">
         <span>⚠</span>
-        <span>提示：保存后推播条件将立即生效并纳入排程计算。用户标签为必填单选；三项阈值条件「账户余额、有效投注、用户净输赢(负数)」需在同一阶级下同时配置，留空表示该项不启用，填写时不可为 0，最多可配置 4 个阶级（新增阶级为共用按钮，三项条件同步增减），且下一层目标值不可小于上一层。</span>
+        <span>提示：保存后推播条件将立即生效并纳入排程计算，所有条件皆以「今日」为计算区间。用户标签为必填单选；三项阈值条件「账户余额、有效投注、用户净输赢(负数)」需在同一阶级下同时配置，留空表示该项不启用，填写时不可为 0，最多可配置 10 个阶级（新增阶级为共用按钮，三项条件同步增减），且下一层目标值不可小于上一层。</span>
       </div>
 
       <!-- 区块 0：基本信息 -->
@@ -651,109 +559,31 @@ tbody tr:last-child td{border-bottom:none}
             <div class="row-error" id="err-vip">请选择推送目标用户</div>
           </div>
         </div>
-
-        <div class="form-row">
-          <div class="form-label"></div>
-          <div class="form-ctrl">
-            <div class="row-error" id="err-dup">目标用户重复：已有其他推播条件使用相同的推送目标用户</div>
-          </div>
-        </div>
       </div>
 
-      <!-- 区块 2：触发条件 -->
+      <!-- 区块 2：触发条件——条件皆以「今日」为计算区间 -->
       <div class="section">
         <div class="section-title">触发条件</div>
 
-        <div class="form-row">
-          <div class="form-label"><span class="req">*</span>计算周期</div>
-          <div class="form-ctrl">
-            <div class="period-group" id="grpPeriod"></div>
-            <div class="row-error" id="err-period">请选择计算周期</div>
-          </div>
-        </div>
-
         <div class="hint">
-          以下三项条件需同时配置（留空＝不启用该条件）；填写时不可为 0；最多 4 阶级，「新增阶级」为共用按钮，三项条件同步新增/删除阶级，且下一层目标值不可小于上一层。
+          以下三项条件需同时配置（留空＝不启用该条件）；填写时不可为 0；最多 10 阶级，「新增阶级」为共用按钮，三项条件同步新增/删除阶级，且下一层目标值不可小于上一层。
         </div>
 
         <!-- 三个阈值条件由 JS 生成 -->
         <div id="thrContainer"></div>
       </div>
 
-      <!-- 区块 3：推送活动 -->
+      <!-- 区块 3：推送奖励 -->
       <div class="section">
-        <div class="section-title">推送活动</div>
-        <div class="hint">每个阶级需至少选择 1 个推送活动；阶级数与上方「触发条件」共用，新增/删除阶级请至触发条件区块操作。</div>
-        <div id="actContainer"></div>
+        <div class="section-title">推送奖励</div>
+        <div class="hint">阶级数与上方「触发条件」共用，新增/删除阶级请至触发条件区块操作。</div>
+        <div id="rewardsContainer"></div>
       </div>
 
       <div class="form-head" style="margin-top:4px">
         <div class="btns" style="margin-left:auto">
           <button class="btn" onclick="closeForm()">取消</button>
           <button class="btn btn-primary" onclick="saveForm()">保存</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ============ 页面 D：推播奖励表单（新增 / 编辑） ============ -->
-    <div id="view-reward-form" class="hidden">
-      <div class="form-head">
-        <div class="title" id="rewardFormTitle">新增推播奖励</div>
-        <div class="btns">
-          <button class="btn" onclick="closeRewardForm()">取消</button>
-          <button class="btn btn-primary" onclick="saveRewardForm()">保存</button>
-        </div>
-      </div>
-
-      <!-- 区块 0：基本信息 -->
-      <div class="section">
-        <div class="section-title">基本信息</div>
-        <div class="form-row">
-          <div class="form-label"><span class="req">*</span>推播名称</div>
-          <div class="form-ctrl">
-            <select class="select" id="rfPushName" style="width:320px" onchange="onRewardPushNameChange(this.value)">
-              <option value="">请选择推播名称</option>
-            </select>
-            <div class="row-error" id="err-rf-name">请选择推播名称</div>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-label">推送目标用户</div>
-          <div class="form-ctrl" style="padding-top:7px"><span id="rfTargetUser" style="color:var(--text-2)">—</span></div>
-        </div>
-      </div>
-
-      <!-- 区块 1：触发条件——依所选推播名称带出，仅供参考 -->
-      <div class="section">
-        <div class="section-title">触发条件</div>
-        <div class="form-row">
-          <div class="form-label">计算周期</div>
-          <div class="form-ctrl" style="padding-top:5px"><span class="period-pill" id="rfPeriod">—</span></div>
-        </div>
-        <div class="form-row">
-          <div class="form-label">阶级条件</div>
-          <div class="form-ctrl">
-            <div class="card" style="overflow-x:auto">
-              <table>
-                <thead><tr id="rfLevelHead"></tr></thead>
-                <tbody><tr id="rfLevelRow"></tr></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 区块 2：推送奖励 -->
-      <div class="section">
-        <div class="section-title">推送奖励</div>
-        <div class="hint">请依各阶级选择推送奖励；先选择奖励项目（存送比例券／输返券），再选择对应的奖励内容。</div>
-        <div id="rfRewardContainer"></div>
-      </div>
-
-      <div class="form-head" style="margin-top:4px">
-        <div class="btns" style="margin-left:auto">
-          <button class="btn" onclick="closeRewardForm()">取消</button>
-          <button class="btn btn-primary" onclick="saveRewardForm()">保存</button>
         </div>
       </div>
     </div>
@@ -781,10 +611,6 @@ tbody tr:last-child td{border-bottom:none}
    —— 全部照需求文件列的内容，方便对照规格。
    ============================================================ */
 const VIP_TAGS  = ['VIP 0','VIP 1','VIP 2','VIP 3','VIP 4','VIP 5','VIP 6','VIP 7','VIP 8','VIP 9','VIP 10'];
-const PERIODS   = ['今日','昨日','近7日','近14日','近30日'];
-const ACTIVITIES = ['充值活动','消费活动','Payday活动','盈利活动','新手/回归签到活动','签到活动',
-  '新用户充值转盘活动','每日特别返水','老用户回归活动','首存奖励和挑战赛活动',
-  '存款奖励和挑战赛活动','幸运宝箱挑战赛','大奖池活动','每日返水加码'];
 
 /* 三项阈值条件的定义：key、显示名、比较符（账户余额/有效投注是「小于」，净输赢是「小于等于」） */
 const THRESHOLDS = [
@@ -793,11 +619,14 @@ const THRESHOLDS = [
   {key:'ngr',     name:'用户净输赢(负数)', cmp:'≤',  cmpText:'小于等于', neg:true },
 ];
 
-/* 推播奖励——奖励项目及其对应的奖励内容清单 */
-const REWARD_TYPES = ['存送比例券','输返券'];
-const REWARD_ITEMS = {
-  '存送比例券': ['存送券23%流水倍数3','10% Deposit Voucher (Max ₱500)','30% Deposit Voucher (Max ₱100)'],
-  '输返券':     ['20% Loss Cashback','10% Loss Cashback','输返券注单30天券60天无上限'],
+/* 推送奖励——「活动推送」仅限定有角标的活动（有勾选才推送，未勾选则不推送） */
+const BADGE_ACTIVITIES = ['盈利活动','消费活动','每日特别返水','每日特别加码','游戏挑战赛'];
+/* 推送奖励——奖品类型；礼金/积分为输入数量，其余三种为下拉选择奖品内容 */
+const GIFT_TYPES = ['礼金','积分','免费旋转','免费投注','优惠券'];
+const GIFT_OPTIONS = {
+  '免费旋转': ['免费旋转JILI','免费旋转FKG','免费旋转FC'],
+  '免费投注': ['免费投注ONlive','免费投注Mini'],
+  '优惠券':   ['20% Loss Cashback','10% Loss Cashback','10% Deposit Voucher (Max ₱500)'],
 };
 
 /* ============================================================
@@ -805,249 +634,36 @@ const REWARD_ITEMS = {
    ============================================================ */
 let pushList = [
   {
-    id:1, name:'VIP3大R Slot近7日推播', vip:'VIP 3', period:'近7日',
-    balance:[1000,3000], bet:[50000], ngr:[-2000],
-    activities:[['充值活动','大奖池活动','幸运宝箱挑战赛'],[]], time:'2026-07-20 14:32:08'
-  },
-  {
-    id:2, name:'VIP1回归召回推播', vip:'VIP 1', period:'近30日',
-    balance:[], bet:[10000,30000,60000], ngr:[],
-    activities:[['新手/回归签到活动','新用户充值转盘活动'],[],[]], time:'2026-07-21 09:15:44'
-  },
-  {
-    id:3, name:'VIP7净输赢风险监控推播', vip:'VIP 7', period:'昨日',
-    balance:[500], bet:[], ngr:[-500,-1000,-2000,-5000],
-    activities:[['每日特别返水','每日返水加码'],[],[],[]], time:'2026-07-22 18:47:21'
-  },
-];
-
-/* ============================================================
-   二之二、示范用推播奖励数据——与推播列表的推播名称/目标用户对应
-   ============================================================ */
-let rewardList = [
-  {
     id:1, name:'VIP3大R Slot近7日推播', vip:'VIP 3',
-    rewards:['10% Loss Cashback', '20% Loss Cashback', '', ''], time:'2026-07-20 14:32:08'
+    balance:[1000,3000], bet:[50000], ngr:[-2000], thrLv:2,
+    rewards:[
+      {pushBadge:true, giftType:'礼金', giftValue:'100', turnover:'2000'},
+      {pushBadge:false, giftType:'免费旋转', giftValue:'免费旋转JILI', turnover:''}
+    ],
+    time:'2026-07-20 14:32:08', enabled:true
   },
   {
     id:2, name:'VIP1回归召回推播', vip:'VIP 1',
-    rewards:['10% Deposit Voucher (Max ₱500)', '20% Deposit Voucher (Max ₱500)', '20% Loss Cashback', ''], time:'2026-07-21 09:15:44'
+    balance:[], bet:[10000,30000,60000], ngr:[], thrLv:3,
+    rewards:[
+      {pushBadge:true, giftType:'积分', giftValue:'500', turnover:''},
+      {pushBadge:true, giftType:'优惠券', giftValue:'20% Loss Cashback', turnover:''},
+      {pushBadge:false, giftType:'免费投注', giftValue:'免费投注Mini', turnover:''}
+    ],
+    time:'2026-07-21 09:15:44', enabled:true
   },
   {
     id:3, name:'VIP7净输赢风险监控推播', vip:'VIP 7',
-    rewards:['5% Loss Cashback', '10% Loss Cashback', '10% Deposit Voucher (Max ₱300)', '15% Deposit Voucher (Max ₱300)'], time:'2026-07-22 18:47:21'
+    balance:[500], bet:[], ngr:[-500,-1000,-2000,-5000], thrLv:4,
+    rewards:[
+      {pushBadge:true, giftType:'礼金', giftValue:'50', turnover:'1000'},
+      {pushBadge:true, giftType:'积分', giftValue:'300', turnover:''},
+      {pushBadge:false, giftType:'优惠券', giftValue:'10% Loss Cashback', turnover:''},
+      {pushBadge:true, giftType:'免费旋转', giftValue:'免费旋转FC', turnover:''}
+    ],
+    time:'2026-07-22 18:47:21', enabled:true
   },
 ];
-let rewardPushOn = false;   // 推播奖励开关，预设关闭；不可独立于智能推播开启
-function toggleRewardPush(){
-  if(!smartPushOn){
-    toast('info','请先开启「智能推播」，才能开启「推播奖励」');
-    return;
-  }
-  rewardPushOn = !rewardPushOn;
-  document.getElementById('rewardSwitch').classList.toggle('on', rewardPushOn);
-  toast(rewardPushOn?'success':'info', rewardPushOn?'推播奖励已开启':'推播奖励已关闭');
-}
-function syncRewardSwitchUI(){
-  document.getElementById('rewardSwitch').classList.toggle('disabled', !smartPushOn);
-}
-function doRewardSearch(){ renderRewardTable(); }
-function renderRewardTable(){
-  const fm = document.getElementById('filterRewardMain').value;
-  const fn = document.getElementById('filterRewardName').value.trim().toLowerCase();
-  const fsd = document.getElementById('filterRewardStartDate').value;
-  const fed = document.getElementById('filterRewardEndDate').value;
-  const rows = rewardList.filter(r=>{
-    if(fm && r.vip!==fm) return false;
-    if(fn && !r.name.toLowerCase().includes(fn)) return false;
-    const datePart = r.time.slice(0,10);
-    if(fsd && datePart<fsd) return false;
-    if(fed && datePart>fed) return false;
-    return true;
-  });
-  const body=document.getElementById('rewardTableBody');
-  if(rows.length===0){
-    body.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="big">🎁</div>暂无符合条件的推播奖励设定</div></td></tr>`;
-    return;
-  }
-  body.innerHTML = rows.map(r=>`
-    <tr>
-      <td>${r.name}</td>
-      <td>${r.vip}</td>
-      <td>${r.rewards[0]||'<span class="none">—</span>'}</td>
-      <td>${r.rewards[1]||'<span class="none">—</span>'}</td>
-      <td>${r.rewards[2]||'<span class="none">—</span>'}</td>
-      <td>${r.rewards[3]||'<span class="none">—</span>'}</td>
-      <td>${r.time}</td>
-      <td class="op">
-        <a onclick="openRewardForm(${r.id})">编辑</a>
-        <a class="del" onclick="rewardNotReady()">删除</a>
-      </td>
-    </tr>`).join('');
-}
-function rewardNotReady(){ toast('info','「推播奖励」删除规则尚未在本次需求中定义'); }
-
-/* ============================================================
-   二之三、推播奖励——新增 / 编辑表单
-   推播名称清单来源为「推播列表」(pushList)；选定后，推送目标用户、
-   计算周期、阶级条件皆依该笔推播条件带出，仅供参考、不可编辑。
-   ============================================================ */
-let rewardSeqId = 4;
-let rewardForm = null;
-let editingRewardId = null;
-let rewardEditingPushRecord = null;   // 目前所选推播名称对应的推播条件（pushList 内的记录）
-
-function blankRewardForm(){
-  return {
-    pushName:'',
-    levelRewards:[{type:'',item:''},{type:'',item:''},{type:'',item:''},{type:'',item:''}]
-  };
-}
-
-function openRewardForm(id){
-  editingRewardId = (typeof id==='number') ? id : null;
-  rewardForm = blankRewardForm();
-  document.getElementById('rewardFormTitle').textContent = editingRewardId!==null ? '编辑推播奖励' : '新增推播奖励';
-
-  const sel = document.getElementById('rfPushName');
-  sel.innerHTML = '<option value="">请选择推播名称</option>' +
-    pushList.map(p=>`<option value="${p.name}">${p.name}</option>`).join('');
-
-  if(editingRewardId!==null){
-    const r = rewardList.find(x=>x.id===editingRewardId);
-    rewardForm.pushName = r.name;
-    sel.value = r.name;
-    sel.disabled = true;   // 推播名称在编辑页面下不可变更，比照推播条件表单规则
-    // 尝试比对既有奖励文字为预设选项，无法比对（如示范用旧数据）则留空待重新选择
-    rewardForm.levelRewards = [0,1,2,3].map(i=>{
-      const text = (r.rewards||[])[i];
-      for(const type of REWARD_TYPES){
-        if(REWARD_ITEMS[type].includes(text)) return {type, item:text};
-      }
-      return {type:'', item:''};
-    });
-  } else {
-    sel.disabled = false;
-  }
-
-  syncRewardTrigger(rewardForm.pushName);
-  buildRewardLevels();
-  clearRewardErrors();
-
-  document.getElementById('view-list').classList.add('hidden');
-  document.getElementById('view-reward').classList.add('hidden');
-  document.getElementById('view-form').classList.add('hidden');
-  document.getElementById('view-count').classList.add('hidden');
-  document.getElementById('view-reward-form').classList.remove('hidden');
-  document.querySelector('.content').scrollTop = 0;
-}
-function closeRewardForm(){
-  document.getElementById('view-reward-form').classList.add('hidden');
-  document.getElementById('view-reward').classList.remove('hidden');
-}
-
-function onRewardPushNameChange(name){
-  rewardForm.pushName = name;
-  hideError('err-rf-name');
-  syncRewardTrigger(name);
-  buildRewardLevels();
-}
-
-/* 依所选推播名称，带出推送目标用户 / 计算周期 / 阶级条件（唯读参考） */
-function syncRewardTrigger(name){
-  const rec = pushList.find(p=>p.name===name) || null;
-  rewardEditingPushRecord = rec;
-  document.getElementById('rfTargetUser').textContent = rec ? rec.vip : '—';
-  document.getElementById('rfPeriod').textContent = rec ? rec.period : '—';
-
-  document.getElementById('rfLevelHead').innerHTML = ['阶级1','阶级2','阶级3','阶级4'].map(t=>`<th>${t}</th>`).join('');
-  document.getElementById('rfLevelRow').innerHTML = [0,1,2,3]
-    .map(i=> `<td>${rec ? fmtLevelCell(rec,i) : '<span style="color:var(--placeholder)">—</span>'}</td>`).join('');
-}
-
-/* 推送奖励——仅所选推播名称实际启用的阶级（与「触发条件」阶级数一致）才需要设定奖励 */
-function buildRewardLevels(){
-  const box = document.getElementById('rfRewardContainer');
-  const rec = rewardEditingPushRecord;
-  if(!rec){
-    box.innerHTML = '<div class="hint" style="color:var(--text-3)">请先选择推播名称</div>';
-    return;
-  }
-  const activeCount = rec.activities.length;
-  box.innerHTML = [0,1,2,3].map(i=>{
-    const lr = rewardForm.levelRewards[i];
-    if(i>=activeCount){
-      return `
-      <div class="form-row">
-        <div class="form-label">阶级${i+1}奖励</div>
-        <div class="form-ctrl" style="padding-top:7px"><span style="color:var(--placeholder)">该阶级未设置触发条件，无需设定奖励</span></div>
-      </div>`;
-    }
-    return `
-    <div class="form-row">
-      <div class="form-label"><span class="req">*</span>阶级${i+1}奖励</div>
-      <div class="form-ctrl" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start">
-        <select class="select" style="width:160px" onchange="onRewardTypeChange(${i},this.value)">
-          <option value="">请选择奖励项目</option>
-          ${REWARD_TYPES.map(t=>`<option value="${t}" ${lr.type===t?'selected':''}>${t}</option>`).join('')}
-        </select>
-        <select class="select" style="width:280px" onchange="onRewardItemChange(${i},this.value)" ${lr.type?'':'disabled'}>
-          <option value="">请选择奖励内容</option>
-          ${(REWARD_ITEMS[lr.type]||[]).map(it=>`<option value="${it}" ${lr.item===it?'selected':''}>${it}</option>`).join('')}
-        </select>
-        <div class="row-error" id="err-rf-lv-${i}">请选择奖励项目及奖励内容</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-function onRewardTypeChange(i,type){
-  rewardForm.levelRewards[i] = {type, item:''};
-  buildRewardLevels();
-  hideError('err-rf-lv-'+i);
-}
-function onRewardItemChange(i,item){
-  rewardForm.levelRewards[i].item = item;
-  hideError('err-rf-lv-'+i);
-}
-
-function clearRewardErrors(){
-  hideError('err-rf-name');
-  [0,1,2,3].forEach(i=>hideError('err-rf-lv-'+i));
-}
-
-function saveRewardForm(){
-  clearRewardErrors();
-  let ok = true;
-  if(!rewardForm.pushName){ showError('err-rf-name'); ok=false; }
-
-  const rec = rewardEditingPushRecord;
-  const activeCount = rec ? rec.activities.length : 0;
-  if(rec){
-    for(let i=0;i<activeCount;i++){
-      const lr = rewardForm.levelRewards[i];
-      if(!lr.type || !lr.item){ showError('err-rf-lv-'+i); ok=false; }
-    }
-  }
-  if(!ok){ toast('error','请完整选择推播名称及各阶级推送奖励'); return; }
-
-  const rewards = [0,1,2,3].map(i=> i<activeCount ? rewardForm.levelRewards[i].item : '');
-  const record = { name:rec.name, vip:rec.vip, rewards, time:nowStr() };
-
-  if(editingRewardId!==null){
-    const idx = rewardList.findIndex(x=>x.id===editingRewardId);
-    rewardList[idx] = {...rewardList[idx], ...record};
-    toast('success','推播奖励已更新');
-  }else{
-    rewardList.unshift({id:rewardSeqId++, ...record});
-    toast('success','推播奖励新增成功');
-  }
-  renderRewardTable();
-  closeRewardForm();
-}
-function nowStr(){
-  const now=new Date();
-  return `${now.getFullYear()}-${p2(now.getMonth()+1)}-${p2(now.getDate())} ${p2(now.getHours())}:${p2(now.getMinutes())}:${p2(now.getSeconds())}`;
-}
 
 /* ============================================================
    二之四、示范用推播次数数据——与推播列表的推播名称对应
@@ -1072,20 +688,17 @@ function renderCountTable(){
     });
   const body = document.getElementById('countTableBody');
   if(rows.length===0){
-    body.innerHTML = `<tr><td colspan="6"><div class="empty"><div class="big">📊</div>暂无符合条件的推播次数记录</div></td></tr>`;
+    body.innerHTML = `<tr><td colspan="12"><div class="empty"><div class="big">📊</div>暂无符合条件的推播次数记录</div></td></tr>`;
     return;
   }
   body.innerHTML = rows.map(c=>{
-    const lvCount = c.rec.activities.length;
+    const lvCount = c.rec.thrLv;
     const cell = i => i<lvCount ? Number(c.counts[i]||0).toLocaleString() : '<span class="none">—</span>';
     return `
     <tr>
       <td>${c.name}</td>
       <td>${c.rec.vip}</td>
-      <td>${cell(0)}</td>
-      <td>${cell(1)}</td>
-      <td>${cell(2)}</td>
-      <td>${cell(3)}</td>
+      ${[0,1,2,3,4,5,6,7,8,9].map(i=>`<td>${cell(i)}</td>`).join('')}
     </tr>`;
   }).join('');
 }
@@ -1099,23 +712,19 @@ function toggleSmartPush(){
   smartPushOn = !smartPushOn;
   document.getElementById('smartPushSwitch').classList.toggle('on', smartPushOn);
   toast(smartPushOn?'success':'info', smartPushOn?'智能推播已开启':'智能推播已关闭');
-  if(!smartPushOn && rewardPushOn){
-    rewardPushOn = false;
-    document.getElementById('rewardSwitch').classList.toggle('on', false);
-  }
-  syncRewardSwitchUI();
 }
 
 /* ============================================================
    三、表单当前状态
    ============================================================ */
 let form = null;
+function blankRewardLv(){ return {pushBadge:false, giftType:'', giftValue:'', turnover:''}; }
 function blankForm(){
   return {
-    name:'', vip:'', period:'',
-    balance:['','','',''], bet:['','','',''], ngr:['','','',''],
-    thrLv:1,   // 三项条件共用同一个阶级数（新增/删除阶级为共用按钮）
-    activities:[[],[],[],[]]   // 每个阶级各自的推送活动清单，阶级数与 thrLv 共用
+    name:'', vip:'',
+    balance:Array(10).fill(''), bet:Array(10).fill(''), ngr:Array(10).fill(''),
+    thrLv:1,   // 三项条件共用同一个阶级数（新增/删除阶级为共用按钮），最多 10 阶
+    rewards:Array.from({length:10}, blankRewardLv)   // 每个阶级各自的推送奖励设定，阶级数与 thrLv 共用
   };
 }
 
@@ -1130,12 +739,9 @@ function switchSubtab(tab){
   document.querySelectorAll('.subtab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
   // 切页签时若在表单页，先退回列表
   document.getElementById('view-form').classList.add('hidden');
-  document.getElementById('view-reward-form').classList.add('hidden');
   document.getElementById('view-list').classList.toggle('hidden', tab!=='list');
-  document.getElementById('view-reward').classList.toggle('hidden', tab!=='reward');
   document.getElementById('view-count').classList.toggle('hidden', tab!=='count');
   document.getElementById('view-popup').classList.toggle('hidden', tab!=='popup');
-  if(tab==='reward') renderRewardTable();
   if(tab==='count') renderCountTable();
   if(tab!=='popup') closePushPopup();
 }
@@ -1161,13 +767,11 @@ function fmtLevelCell(r, i){
 function doSearch(){ renderTable(); }
 function renderTable(){
   const fm = document.getElementById('filterMain').value;
-  const fp = document.getElementById('filterPeriod').value;
   const fn = document.getElementById('filterName').value.trim().toLowerCase();
   const fsd = document.getElementById('filterStartDate').value;   // 'YYYY-MM-DD' 或空
   const fed = document.getElementById('filterEndDate').value;
   const rows = pushList.filter(r=>{
     if(fm && r.vip!==fm) return false;
-    if(fp && r.period!==fp) return false;
     if(fn && !r.name.toLowerCase().includes(fn)) return false;
     const datePart = r.time.slice(0,10);
     if(fsd && datePart<fsd) return false;
@@ -1177,24 +781,28 @@ function renderTable(){
   const body = document.getElementById('tableBody');
 
   if(rows.length===0){
-    body.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="big">📭</div>暂无符合条件的推播清单</div></td></tr>`;
+    body.innerHTML = `<tr><td colspan="14"><div class="empty"><div class="big">📭</div>暂无符合条件的推播清单</div></td></tr>`;
     return;
   }
   body.innerHTML = rows.map(r=>`
     <tr>
       <td>${r.name}</td>
       <td>${r.vip}</td>
-      <td><span class="period-pill">${r.period}</span></td>
-      <td>${fmtLevelCell(r,0)}</td>
-      <td>${fmtLevelCell(r,1)}</td>
-      <td>${fmtLevelCell(r,2)}</td>
-      <td>${fmtLevelCell(r,3)}</td>
+      ${[0,1,2,3,4,5,6,7,8,9].map(i=>`<td>${fmtLevelCell(r,i)}</td>`).join('')}
       <td>${r.time}</td>
       <td class="op">
         <a onclick="openForm(${r.id})">编辑</a>
         <a class="del" onclick="askDel(${r.id})">删除</a>
+        <a onclick="toggleRowEnable(${r.id})">${r.enabled?'开启':'关闭'}</a>
       </td>
     </tr>`).join('');
+}
+function toggleRowEnable(id){
+  const r = pushList.find(x=>x.id===id);
+  if(!r) return;
+  r.enabled = !r.enabled;
+  renderTable();
+  toast(r.enabled?'success':'info', r.enabled?'该推播条件已开启':'该推播条件已关闭');
 }
 
 /* ============================================================
@@ -1206,18 +814,20 @@ function openForm(id){
 
   if(editingId!==null){
     const r = pushList.find(x=>x.id===editingId);
-    form.name=r.name; form.vip=r.vip; form.period=r.period;
-    form.activities=[[],[],[],[]];
-    (r.activities||[]).forEach((arr,i)=>{ if(i<4) form.activities[i]=[...arr]; });
-    // 把已保存的阶级数组回填进 4 格输入；三项条件共用同一阶级数，取三者最大值
+    form.name=r.name; form.vip=r.vip;
+    // 把已保存的阶级数组回填进 10 格输入；三项条件共用同一阶级数，取三者最大值（并以已保存的 thrLv 为准）
     let maxLv=1;
     ['balance','bet','ngr'].forEach(k=>{
       const vals=r[k]||[];
-      form[k]=['','','',''];
-      vals.forEach((v,i)=>form[k][i]=v);
+      form[k]=Array(10).fill('');
+      vals.forEach((v,i)=>{ if(i<10) form[k][i]=v; });
       maxLv=Math.max(maxLv, vals.length);
     });
-    form.thrLv=maxLv;
+    form.thrLv = r.thrLv || maxLv;
+    form.rewards = Array.from({length:10}, blankRewardLv);
+    (r.rewards||[]).forEach((rw,i)=>{
+      if(i<10) form.rewards[i] = {pushBadge:!!rw.pushBadge, giftType:rw.giftType||'', giftValue:rw.giftValue||'', turnover:rw.turnover||''};
+    });
   }
   document.getElementById('formTitle').textContent = editingId!==null ? '编辑推播条件' : '新增推播条件';
 
@@ -1226,14 +836,11 @@ function openForm(id){
   nameInput.disabled = editingId!==null;   // 推播名称在编辑页面下不可变更
 
   buildVipGroup();
-  buildPeriod();
   buildThresholds();
-  buildActivities();
+  buildRewardsTable();
   clearErrors();
 
   document.getElementById('view-list').classList.add('hidden');
-  document.getElementById('view-reward').classList.add('hidden');
-  document.getElementById('view-reward-form').classList.add('hidden');
   document.getElementById('view-count').classList.add('hidden');
   document.getElementById('view-form').classList.remove('hidden');
   document.querySelector('.content').scrollTop = 0;
@@ -1262,21 +869,9 @@ function pickTag(field,val,el){
   hideError('err-'+field);
 }
 
-/* 计算周期单选 */
-function buildPeriod(){
-  const box=document.getElementById('grpPeriod');
-  box.innerHTML = PERIODS.map(p=>
-    `<div class="period-opt ${form.period===p?'sel':''}" onclick="pickPeriod('${p}',this)">${p}</div>`
-  ).join('');
-}
-function pickPeriod(p,el){
-  el.parentElement.querySelectorAll('.period-opt').forEach(o=>o.classList.remove('sel'));
-  el.classList.add('sel'); form.period=p; hideError('err-period');
-}
-
 /* ============================================================
    八、三项阈值条件——同一阶级下三项目标值需同时配置（并排显示）
-   「新增阶级」为共用的独立按钮，三项条件的阶级数一起增减，最多 4 阶
+   「新增阶级」为共用的独立按钮，三项条件的阶级数一起增减，最多 10 阶
    ============================================================ */
 function buildThresholds(){
   const box=document.getElementById('thrContainer');
@@ -1312,7 +907,7 @@ function buildThresholds(){
       ${THRESHOLDS.map(t=>`<div class="row-error" id="err-${t.key}"></div>`).join('')}
     </div>`;
 
-  const disabled = lvCount>=4;
+  const disabled = lvCount>=10;
   box.innerHTML = `
     <div class="thr-grid-wrap">
       ${head}
@@ -1320,103 +915,113 @@ function buildThresholds(){
       ${errRow}
     </div>
     <div class="row-error" id="err-thr-all">账户余额、有效投注、用户净输赢(负数)，至少其中一个项目需要填入目标值</div>
-    <div class="add-lv ${disabled?'disabled':''}" onclick="${disabled?'':'addLv()'}">＋ 新增阶级（最多 4 阶）</div>`;
+    <div class="add-lv ${disabled?'disabled':''}" onclick="${disabled?'':'addLv()'}">＋ 新增阶级（最多 10 阶）</div>`;
 }
 function onThrInput(key,idx,el){ form[key][idx]=el.value; hideError('err-'+key); el.classList.remove('is-error'); }
 function addLv(){
-  if(form.thrLv<4){
+  if(form.thrLv<10){
     form.thrLv++;
     buildThresholds();
-    buildActivities();   // 推送活动阶级数与触发条件共用，需同步增减
+    buildRewardsTable();   // 推送奖励阶级数与触发条件共用，需同步增减
   }
 }
 function removeLv(){
   if(form.thrLv>1){
     form.thrLv--;
     ['balance','bet','ngr'].forEach(k=>{ form[k][form.thrLv]=''; });
-    form.activities[form.thrLv]=[];
+    form.rewards[form.thrLv]=blankRewardLv();
     buildThresholds();
-    buildActivities();
+    buildRewardsTable();
   }
 }
 
 /* ============================================================
-   九、推送活动多选下拉——阶级数与触发条件共用，每个阶级各自一组多选
+   九、推送奖励表格——阶级数与触发条件共用，每个阶级设定活动推送/奖品类型/奖品数量
    ============================================================ */
-function buildActivities(){
-  const box=document.getElementById('actContainer');
+function buildRewardsTable(){
+  const box=document.getElementById('rewardsContainer');
   const lvCount=form.thrLv;
-  box.innerHTML = Array.from({length:lvCount}).map((_,i)=>`
-    <div class="form-row">
-      <div class="form-label"><span class="req">*</span>阶级${i+1}活动清单</div>
-      <div class="form-ctrl">
-        <div class="msel" id="mselActivity-${i}">
-          <div class="msel-control" id="mselControl-${i}" onclick="toggleMsel(event,${i})">
-            <span class="ph" id="mselPh-${i}">请选择推送活动（可复选）</span>
-            <span class="caret">▾</span>
-          </div>
-          <div class="msel-panel" id="mselPanel-${i}">
-            <div class="msel-toolbar">
-              <a onclick="mselAll(true,${i})">全选</a>
-              <a onclick="mselAll(false,${i})">清空</a>
-            </div>
-            <div id="mselOptions-${i}"></div>
-          </div>
-        </div>
-        <div class="row-error" id="err-act-${i}">请至少选择 1 个推送活动</div>
-      </div>
-    </div>`).join('');
-  for(let i=0;i<lvCount;i++) buildMselLevel(i);
-}
-function buildMselLevel(i){
-  const opts=document.getElementById('mselOptions-'+i);
-  opts.innerHTML = ACTIVITIES.map(a=>{
-    const sel=form.activities[i].includes(a);
-    return `<div class="msel-opt ${sel?'sel':''}" onclick="toggleAct(${i},'${a.replace(/'/g,"\\'")}',event)">
-      <span class="ck">${sel?'✓':''}</span>${a}</div>`;
-  }).join('');
-  refreshMselControl(i);
-}
-function refreshMselControl(i){
-  const ctrl=document.getElementById('mselControl-'+i);
-  const caret=ctrl.querySelector('.caret');
-  ctrl.querySelectorAll('.msel-chip,.ph').forEach(n=>n.remove());
-  if(form.activities[i].length===0){
-    const ph=document.createElement('span'); ph.className='ph'; ph.textContent='请选择推送活动（可复选）';
-    ctrl.insertBefore(ph,caret);
-  }else{
-    form.activities[i].forEach(a=>{
-      const c=document.createElement('span'); c.className='msel-chip';
-      c.innerHTML=`${a}<span class="x" onclick="removeAct(event,${i},'${a.replace(/'/g,"\\'")}')">✕</span>`;
-      ctrl.insertBefore(c,caret);
-    });
+
+  let rows='';
+  for(let i=0;i<lvCount;i++){
+    rows+=`
+    <tr>
+      <td style="white-space:nowrap">阶级${i+1}</td>
+      <td>
+        <label class="reward-act-chk">
+          <input type="checkbox" ${form.rewards[i].pushBadge?'checked':''}
+                 onchange="toggleRewardBadge(${i},this.checked)"> 推送角标相关活动
+        </label>
+      </td>
+      <td>
+        <select class="select" style="width:100%" onchange="onGiftTypeChange(${i},this.value)">
+          <option value="">请选择奖品类型</option>
+          ${GIFT_TYPES.map(t=>`<option value="${t}" ${form.rewards[i].giftType===t?'selected':''}>${t}</option>`).join('')}
+        </select>
+        <div class="row-error" id="err-rwtype-${i}">请选择奖品类型</div>
+      </td>
+      <td id="rwVal-${i}">${renderGiftValueCell(i)}</td>
+    </tr>`;
   }
+
+  box.innerHTML = `
+    <div class="card" style="overflow-x:auto">
+      <table class="reward-table">
+        <thead>
+          <tr>
+            <th>阶级</th>
+            <th>活动推送</th>
+            <th>奖品类型</th>
+            <th>奖品/数量</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div class="hint" style="margin-top:8px;margin-bottom:0;text-align:left">
+      仅限「角标」相关活动：盈利活动、消费活动、每日特别返水、每日特别加码、游戏挑战赛；有勾选才推送，未勾选则不推送
+    </div>`;
 }
-function toggleMsel(e,i){
-  e.stopPropagation();
-  document.getElementById('mselPanel-'+i).classList.toggle('show');
-  document.getElementById('mselControl-'+i).classList.toggle('open');
-}
-function toggleAct(i,a,e){
-  e.stopPropagation();
-  const arr=form.activities[i];
-  const idx=arr.indexOf(a);
-  if(idx>=0) arr.splice(idx,1); else arr.push(a);
-  buildMselLevel(i); hideError('err-act-'+i);
-}
-function removeAct(e,i,a){ e.stopPropagation(); const arr=form.activities[i]; const idx=arr.indexOf(a); if(idx>=0)arr.splice(idx,1); buildMselLevel(i); }
-function mselAll(all,i){ form.activities[i]= all?[...ACTIVITIES]:[]; buildMselLevel(i); hideError('err-act-'+i); }
-// 点击空白处关闭下拉（每个阶级各自的下拉框都要处理）
-document.addEventListener('click',e=>{
-  document.querySelectorAll('.msel').forEach(box=>{
-    if(!box.contains(e.target)){
-      const panel=box.querySelector('.msel-panel');
-      const ctrl=box.querySelector('.msel-control');
-      if(panel) panel.classList.remove('show');
-      if(ctrl) ctrl.classList.remove('open');
+function renderGiftValueCell(i){
+  const rw = form.rewards[i];
+  if(!rw.giftType){
+    return `<span style="color:var(--placeholder)">请先选择奖品类型</span>`;
+  }
+  if(rw.giftType==='礼金' || rw.giftType==='积分'){
+    let html = `
+      <input type="number" class="input" style="width:100%" value="${rw.giftValue}" min="1"
+             placeholder="请输入数量" oninput="onGiftValueInput(${i},this.value)">
+      <div class="row-error" id="err-rwval-${i}">请输入奖品数量，不可留空或小于等于 0</div>`;
+    if(rw.giftType==='礼金'){
+      html += `
+      <div class="reward-val-extra">
+        <input type="number" class="input" style="width:100%" value="${rw.turnover}" min="1"
+               placeholder="礼金所需流水" oninput="onTurnoverInput(${i},this.value)">
+        <div class="row-error" id="err-rwturn-${i}">请输入礼金所需流水，不可留空或小于等于 0</div>
+      </div>`;
     }
-  });
-});
+    return html;
+  }
+  // 免费旋转 / 免费投注 / 优惠券——下拉选择奖品内容
+  const opts = GIFT_OPTIONS[rw.giftType] || [];
+  return `
+    <select class="select" style="width:100%" onchange="onGiftValueSelect(${i},this.value)">
+      <option value="">请选择奖品内容</option>
+      ${opts.map(o=>`<option value="${o}" ${rw.giftValue===o?'selected':''}>${o}</option>`).join('')}
+    </select>
+    <div class="row-error" id="err-rwval-${i}">请选择奖品内容</div>`;
+}
+function toggleRewardBadge(i,checked){
+  form.rewards[i].pushBadge = checked;
+}
+function onGiftTypeChange(i,type){
+  form.rewards[i] = {...form.rewards[i], giftType:type, giftValue:'', turnover:''};
+  document.getElementById('rwVal-'+i).innerHTML = renderGiftValueCell(i);
+  hideError('err-rwtype-'+i);
+}
+function onGiftValueInput(i,val){ form.rewards[i].giftValue=val; hideError('err-rwval-'+i); }
+function onGiftValueSelect(i,val){ form.rewards[i].giftValue=val; hideError('err-rwval-'+i); }
+function onTurnoverInput(i,val){ form.rewards[i].turnover=val; hideError('err-rwturn-'+i); }
 
 /* ============================================================
    十、保存 —— 含各项校验
@@ -1452,14 +1057,6 @@ function saveForm(){
   let ok=true;
   if(!form.name.trim()){ showError('err-name'); ok=false; }
   if(!form.vip){ showError('err-vip'); ok=false; }
-  if(!form.period){ showError('err-period'); ok=false; }
-
-  // 目标用户（VIP 等级）不可与其他推播条件重复
-  let isDup=false;
-  if(form.vip){
-    isDup = pushList.some(x=>x.id!==editingId && x.vip===form.vip);
-    if(isDup){ showError('err-dup'); ok=false; }
-  }
 
   const res={};
   let thrFieldErr=false;
@@ -1474,18 +1071,33 @@ function saveForm(){
     thrAllEmpty = res.balance.length===0 && res.bet.length===0 && res.ngr.length===0;
     if(thrAllEmpty){ showError('err-thr-all'); ok=false; }
   }
+
+  // 各阶级的推送奖励：活动推送为选填（有勾选才推送，未勾选则不推送）；奖品类型、奖品/数量必填（依奖品类型而异）
   for(let i=0;i<form.thrLv;i++){
-    if(form.activities[i].length===0){ showError('err-act-'+i); ok=false; }
+    const rw=form.rewards[i];
+    if(!rw.giftType){ showError('err-rwtype-'+i); ok=false; }
+    else if(rw.giftType==='礼金' || rw.giftType==='积分'){
+      const n=Number(rw.giftValue);
+      if(rw.giftValue===''||isNaN(n)||n<=0){ showError('err-rwval-'+i); ok=false; }
+      if(rw.giftType==='礼金'){
+        const tn=Number(rw.turnover);
+        if(rw.turnover===''||isNaN(tn)||tn<=0){ showError('err-rwturn-'+i); ok=false; }
+      }
+    } else if(!rw.giftValue){ showError('err-rwval-'+i); ok=false; }
   }
 
-  if(!ok){ toast('error', isDup?'目标用户重复':thrAllEmpty?'账户余额、有效投注、用户净输赢(负数)至少填写一项':'请修正表单中标红的项目'); return; }
+  if(!ok){ toast('error', thrAllEmpty?'账户余额、有效投注、用户净输赢(负数)至少填写一项':'请修正表单中标红的项目'); return; }
 
   const now=new Date();
   const time=`${now.getFullYear()}-${p2(now.getMonth()+1)}-${p2(now.getDate())} ${p2(now.getHours())}:${p2(now.getMinutes())}:${p2(now.getSeconds())}`;
   const record={
-    name:form.name.trim(), vip:form.vip, period:form.period,
-    balance:res.balance, bet:res.bet, ngr:res.ngr,
-    activities:form.activities.slice(0,form.thrLv).map(arr=>[...arr]), time
+    name:form.name.trim(), vip:form.vip,
+    balance:res.balance, bet:res.bet, ngr:res.ngr, thrLv:form.thrLv,
+    rewards:form.rewards.slice(0,form.thrLv).map(rw=>({
+      pushBadge:!!rw.pushBadge, giftType:rw.giftType, giftValue:rw.giftValue,
+      turnover: rw.giftType==='礼金' ? rw.turnover : ''
+    })),
+    time
   };
 
   if(editingId!==null){
@@ -1493,7 +1105,7 @@ function saveForm(){
     pushList[idx]={...pushList[idx],...record};
     toast('success','推播条件已更新');
   }else{
-    pushList.unshift({id:seqId++,...record});
+    pushList.unshift({id:seqId++,...record,enabled:true});
     toast('success','推播条件新增成功');
   }
   renderTable();
@@ -1525,9 +1137,7 @@ function toast(type,msg){
 
 /* 初始渲染 */
 renderTable();
-renderRewardTable();
 renderCountTable();
-syncRewardSwitchUI();
 </script>
 </body>
 </html>
