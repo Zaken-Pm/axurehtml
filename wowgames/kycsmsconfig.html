@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KYC短信配置 — 规格文件</title>
+<style>
+  :root{
+    --ink:#1a2230;          /* 主文字 */
+    --ink-soft:#4a5568;     /* 次文字 */
+    --line:#e3e7ee;         /* 分隔线 */
+    --paper:#ffffff;        /* 纸面 */
+    --bg:#f2f4f8;           /* 页面底 */
+    --brand:#1f3a8a;        /* 品牌深蓝（呼应123GO/WOWGames）*/
+    --brand-soft:#eef2fd;   /* 品牌淡底 */
+    --accent:#d8a200;       /* 强调金 */
+    --green:#1f9d55;
+    --green-soft:#e7f6ee;
+    --red:#d64545;
+    --red-soft:#fbeaea;
+    --grey:#9aa3b2;
+    --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+    --sans:"Segoe UI","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:var(--sans);font-size:15px;line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:48px 24px 96px;}
+
+  /* ---------- 封面 ---------- */
+  .cover{
+    background:var(--paper);border:1px solid var(--line);border-radius:14px;
+    padding:40px 40px 34px;margin-bottom:28px;position:relative;overflow:hidden;
+  }
+  .cover::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--brand);
+  }
+  .eyebrow{
+    font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--brand);
+    font-weight:700;margin:0 0 10px;
+  }
+  h1{font-size:30px;line-height:1.25;margin:0 0 6px;font-weight:800;letter-spacing:-.01em;}
+  .path{
+    font-family:var(--mono);font-size:13px;color:var(--ink-soft);
+    background:var(--brand-soft);border:1px solid #dbe4fb;border-radius:8px;
+    display:inline-block;padding:6px 12px;margin-top:14px;
+  }
+  .path b{color:var(--brand);}
+
+  /* ---------- 区块 ---------- */
+  section{
+    background:var(--paper);border:1px solid var(--line);border-radius:14px;
+    padding:32px 36px;margin-bottom:24px;
+  }
+  h2{
+    font-size:20px;margin:0 0 4px;font-weight:800;display:flex;align-items:baseline;gap:12px;
+  }
+  h2 .num{
+    color:var(--brand);font-family:var(--mono);font-size:16px;font-weight:700;
+    background:var(--brand-soft);border-radius:6px;padding:2px 9px;flex:none;
+  }
+  h3{font-size:16px;margin:26px 0 8px;font-weight:700;color:var(--ink);}
+  h4{font-size:14px;margin:18px 0 6px;font-weight:700;color:var(--brand);}
+  p{margin:8px 0;color:var(--ink-soft);}
+  .lead{color:var(--ink);}
+  ul,ol{margin:8px 0;padding-left:22px;color:var(--ink-soft);}
+  li{margin:4px 0;}
+  code{font-family:var(--mono);font-size:.9em;background:#f0f2f6;padding:1px 6px;border-radius:5px;color:var(--brand);}
+  .tag{display:inline-block;font-size:12px;font-weight:700;border-radius:5px;padding:1px 8px;vertical-align:middle;}
+  .tag.add{background:var(--green-soft);color:var(--green);}
+  .tag.keep{background:#eef1f6;color:var(--ink-soft);}
+  .tag.mod{background:#fff4e0;color:#b7791f;}
+  .ref{font-family:var(--mono);font-size:12px;color:var(--grey);}
+
+  /* ---------- 表格 ---------- */
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px;}
+  th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+  th{background:#f6f8fb;font-weight:700;color:var(--ink);}
+  td{color:var(--ink-soft);}
+  td.yes{color:var(--green);font-weight:700;}
+  td.no{color:var(--red);font-weight:700;}
+  td.c{text-align:center;}
+
+  /* ---------- 顺序图 ---------- */
+  .order{display:flex;flex-direction:column;gap:0;margin:16px 0;}
+  .order .item{
+    border:1px solid var(--line);border-radius:10px;padding:14px 18px;background:#fbfcfe;
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+  }
+  .order .item.new{border:2px solid var(--brand);background:var(--brand-soft);}
+  .order .name{font-weight:700;color:var(--ink);}
+  .order .new .name{color:var(--brand);}
+  .order .arrow{align-self:center;color:var(--grey);font-size:13px;padding:5px 0;}
+
+  /* ---------- 后台面板示意图 ---------- */
+  .mock{
+    border:1px solid #d5dbe6;border-radius:12px;overflow:hidden;margin:16px 0 6px;
+    box-shadow:0 6px 22px rgba(26,34,48,.07);
+  }
+  .mock-bar{
+    background:var(--brand);color:#fff;padding:10px 16px;font-size:13px;font-weight:600;
+    display:flex;align-items:center;gap:8px;
+  }
+  .mock-bar .dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.55);}
+  .mock-crumb{background:#f6f8fb;border-bottom:1px solid var(--line);padding:8px 18px;font-size:12px;color:var(--ink-soft);font-family:var(--mono);}
+  .mock-body{background:#fff;padding:6px 0;}
+  .badge-new{font-size:11px;font-weight:700;background:var(--brand);color:#fff;border-radius:4px;padding:1px 7px;}
+  .badge-keep{font-size:11px;font-weight:600;background:#e7ebf2;color:var(--grey);border-radius:4px;padding:1px 7px;}
+  .hint{font-size:12px;color:var(--grey);margin-top:6px;}
+
+  /* ---------- 真实后台风格示意（参照现行后台 UI）---------- */
+  .real-block{padding:16px 20px 20px;}
+  .real-block + .real-block{border-top:8px solid #f2f4f8;}
+  .real-title{font-size:13px;color:var(--brand);font-weight:700;padding-bottom:10px;margin-bottom:2px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;}
+  .real-row{display:flex;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);font-size:13px;gap:16px;}
+  .real-row:last-child{border-bottom:none;}
+  .real-row .rlabel{width:170px;flex:none;color:var(--ink);font-weight:600;}
+  .real-row .rfields{flex:1;display:flex;flex-direction:column;gap:8px;}
+  .real-row textarea{width:100%;border:1px solid #d5dbe6;border-radius:4px;padding:8px 10px;font-size:12.5px;color:var(--ink);background:#fff;font-family:var(--sans);resize:vertical;min-height:32px;}
+  .real-row .rsave{flex:none;display:flex;align-items:center;gap:10px;}
+  .real-row .rswitch{flex:none;margin-left:auto;display:flex;align-items:center;gap:8px;}
+  .real-btn{border:none;background:var(--brand);color:#fff;font-size:12.5px;font-weight:600;border-radius:4px;padding:6px 16px;cursor:pointer;}
+  .real-btn:hover{background:#16296b;}
+  .real-toast-inline{font-size:12px;color:var(--green);font-weight:600;opacity:0;transition:opacity .25s;white-space:nowrap;}
+  .real-toast-inline.show{opacity:1;}
+  .real-switch{width:38px;height:20px;border-radius:12px;background:#c7cdd8;position:relative;cursor:pointer;transition:.2s;flex:none;}
+  .real-switch .knob{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:.2s;}
+  .real-switch.on{background:var(--green);}
+  .real-switch.on .knob{left:20px;}
+  .real-state{font-size:12.5px;color:var(--ink-soft);font-weight:600;}
+  .real-state.on{color:var(--green);}
+  .omit{font-size:12.5px;color:var(--grey);padding:10px 0;}
+
+  /* toast 示意 */
+  .toast{display:inline-flex;align-items:center;gap:8px;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;margin:6px 10px 6px 0;}
+  .toast.ok{background:var(--green-soft);color:var(--green);border:1px solid #bfe6cf;}
+  .toast.err{background:var(--red-soft);color:var(--red);border:1px solid #f2c9c9;}
+
+  .note{background:#fffdf5;border:1px solid #f0e2b8;border-radius:10px;padding:14px 18px;margin:16px 0;font-size:13.5px;color:#7a5b12;}
+  .note b{color:#8a6400;}
+
+  .flow{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:14px 0;font-size:13px;}
+  .flow .node{border:1px solid var(--line);border-radius:8px;padding:8px 14px;background:#fbfcfe;font-weight:600;color:var(--ink);}
+  .flow .node.cond{border-color:#dbe4fb;background:var(--brand-soft);color:var(--brand);}
+  .flow .node.end-yes{border-color:#bfe6cf;background:var(--green-soft);color:var(--green);}
+  .flow .node.end-no{border-color:#f2c9c9;background:var(--red-soft);color:var(--red);}
+  .flow .op{color:var(--ink-soft);font-weight:600;}
+
+  footer{text-align:center;color:var(--grey);font-size:12px;margin-top:40px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 封面 -->
+  <div class="cover">
+    <p class="eyebrow">后台功能规格 · Backend Spec</p>
+    <h1>KYC短信配置</h1>
+    <p class="lead">于后台 KYC 配置页面新增「KYC短信配置」，当人工 KYC 审核拒绝时，依设定自动发送短信通知用户。</p>
+    <span class="path">系统管理 &gt; 系统参数管理 &gt; <b>KYC配置</b> &gt; KYC短信配置</span>
+  </div>
+
+  <!-- 版本记录 -->
+  <section>
+    <h2><span class="num">目录</span>文件版本号 / 变更摘要</h2>
+    <table>
+      <thead>
+        <tr><th style="width:110px">日期</th><th style="width:90px">版本号</th><th style="width:150px">变更类型<br>(A新增 / M修改 / D删除)</th><th style="width:90px">记录人</th><th>新增、删除、修改内容摘要</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>2026/07/28</td>
+          <td>v1.0.0</td>
+          <td><span class="tag add">A 新增</span></td>
+          <td>（待填）</td>
+          <td>文件初版。后台「KYC配置」于「站内信相关配置」与「EKYC提交信息配置」之间新增「KYC短信配置」，提供「KYC短信不通过短信」开关与「KYC短信内容」编辑功能。</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 1. 需求目的 -->
+  <section>
+    <h2><span class="num">1</span>需求目的</h2>
+    <p>目前 KYC 人工审核拒绝后，缺少主动告知用户的短信渠道。本次于后台「KYC配置」新增「KYC短信配置」功能，让营运人员可自行：</p>
+    <ul>
+      <li>开关「人工 KYC 审核拒绝时是否发送短信」；</li>
+      <li>自行编辑发送予用户的短信内容。</li>
+    </ul>
+    <p>藉此提升 KYC 审核不通过时对用户的告知效率，并将短信触发与内容的控制权交由营运端管理。</p>
+  </section>
+
+  <!-- 2. 后台规则 -->
+  <section>
+    <h2><span class="num">2</span>规则文件内容 — 后台</h2>
+
+    <h3>2.1　功能位置 <span class="ref">（对应页签 2.1）</span></h3>
+    <p>于「KYC配置」页面，各配置区块由上至下顺序如下。本次仅新增中间的「KYC短信配置」区块，上下两个既有区块<b>不异动</b>。</p>
+    <div class="order">
+      <div class="item"><span class="name">站内信相关配置</span><span class="badge-keep">既有 · 不异动</span></div>
+      <div class="arrow">▼</div>
+      <div class="item new"><span class="name">KYC短信配置</span><span class="badge-new">本次新增</span></div>
+      <div class="arrow">▼</div>
+      <div class="item"><span class="name">EKYC提交信息配置</span><span class="badge-keep">既有 · 不异动</span></div>
+    </div>
+
+    <h3>2.2　页面示意图 <span class="ref">（版面语言参照现行后台既有样式；可点击开关 / 编辑内容 / 点击保存查看示意反馈）</span></h3>
+    <div class="mock">
+      <div class="mock-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>&nbsp;后台管理系统</div>
+      <div class="mock-crumb">系统管理 / 系统参数管理 / KYC配置</div>
+      <div class="mock-body" style="padding:0">
+        <div class="real-block">
+          <div class="real-title">站内信相关配置 <span class="badge-keep">既有 · 不异动</span></div>
+          <div class="omit">（既有区块，内容省略）</div>
+        </div>
+
+        <div class="real-block" style="background:var(--brand-soft)">
+          <div class="real-title">KYC短信配置 <span class="badge-new">本次新增</span></div>
+
+          <div class="real-row">
+            <div class="rlabel">KYC短信不通过短信</div>
+            <div class="rswitch">
+              <span class="real-switch" id="smsSwitch" onclick="toggleRealSwitch(this)"><span class="knob"></span></span>
+              <span class="real-state" id="smsSwitchState">关闭</span>
+            </div>
+          </div>
+
+          <div class="real-row" style="align-items:flex-start;margin-top:6px">
+            <div class="rlabel" style="padding-top:6px">KYC短信内容</div>
+            <div class="rfields">
+              <textarea id="smsContent" rows="3"></textarea>
+            </div>
+            <div class="rsave" style="padding-top:2px">
+              <button type="button" class="real-btn" onclick="saveRealContent('smsContentToast')">保存</button>
+              <span class="real-toast-inline" id="smsContentToast">✓ 保存成功</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="real-block">
+          <div class="real-title">EKYC提交信息配置 <span class="badge-keep">既有 · 不异动</span></div>
+          <div class="omit">（既有区块，内容省略）</div>
+        </div>
+      </div>
+    </div>
+    <script>
+      function toggleRealSwitch(el){
+        el.classList.toggle('on');
+        var on = el.classList.contains('on');
+        var row = el.closest('.rswitch');
+        var state = row.querySelector('.real-state');
+        state.textContent = on ? '开启' : '关闭（预设）';
+        state.classList.toggle('on', on);
+      }
+      function saveRealContent(toastId){
+        var toast = document.getElementById(toastId);
+        toast.classList.add('show');
+        clearTimeout(toast._t);
+        toast._t = setTimeout(function(){ toast.classList.remove('show'); }, 1600);
+      }
+    </script>
+
+    <!-- 2.3 规则说明 -->
+    <h3>2.3　规则说明</h3>
+
+    <h4>① 「KYC短信配置」区块　<span class="tag add">新增</span></h4>
+    <ul>
+      <li>区块位于「站内信相关配置」与「EKYC提交信息配置」之间。<span class="ref">（对应 2.1）</span></li>
+      <li>区块由上至下依序显示两个项目：「KYC短信不通过短信」开关、「KYC短信内容」输入框（含「保存」按钮）。</li>
+    </ul>
+
+    <h4>② 「KYC短信不通过短信」开关　<span class="tag add">新增</span> <span class="ref">（对应规范 3.1.7 开关状态说明）</span></h4>
+    <ul>
+      <li><b>预设关闭。</b></li>
+      <li>开关切换<b>即时生效，无需点击保存</b>；切换成功后显示对应提示（见 ④ 操作提示）。</li>
+      <li><b>开启前（关闭）：</b>人工 KYC 审核拒绝时，<b>不</b>发送短信。</li>
+      <li><b>开启后：</b>当人工 KYC 审核结果为「拒绝」时，系统即发送「KYC短信内容」所设定的短信予该用户。</li>
+      <li>本开关仅作用于「<b>人工审核拒绝</b>」情境；对审核通过、审核中、系统／自动判定等其他 KYC 状态<b>不产生任何作用</b>。</li>
+    </ul>
+
+    <h4>③ 「KYC短信内容」输入框 + 「保存」按钮　<span class="tag add">新增</span> <span class="ref">（对应规范 3.1.2 长度、3.1.6 输入限制）</span></h4>
+    <ul>
+      <li>多行文字输入框，可编辑，<b>无字数限制</b>；纯文字，<b>不支援</b>变量／参数占位符。</li>
+      <li><b>预设留空</b>，由营运人员自行填写。</li>
+      <li>内容更新后须点击「保存」才会生效；未点击「保存」即离开或刷新页面，变更<b>不会</b>保存。</li>
+      <li>「保存」按钮<b>仅保存「KYC短信内容」</b>，不含开关状态（开关为即时生效）。</li>
+      <li>输入内容超出输入框可视高度时，输入框内出现纵向滚动条，不撑高版面。</li>
+    </ul>
+
+    <h4>④ 操作成功 / 失败提示 <span class="ref">（对应规范 3.1.3 / 3.1.4）</span></h4>
+    <table>
+      <thead><tr><th style="width:200px">操作</th><th>结果</th><th>提示文案（示意）</th></tr></thead>
+      <tbody>
+        <tr><td>点击「保存」— 成功</td><td class="yes">成功</td><td><span class="toast ok">✓ 保存成功</span></td></tr>
+        <tr><td>点击「保存」— 失败</td><td class="no">失败</td><td><span class="toast err">✕ 保存失败，请稍后再试</span></td></tr>
+        <tr><td>切换开关（开启／关闭）— 成功</td><td class="yes">成功</td><td><span class="toast ok">✓ 设置已更新</span></td></tr>
+        <tr><td>切换开关 — 失败</td><td class="no">失败</td><td><span class="toast err">✕ 设置更新失败，请稍后再试</span>（开关回复切换前状态）</td></tr>
+      </tbody>
+    </table>
+    <p class="hint">※ 实际提示文案以既有后台文案风格 / 多语系配置为准，上表为交互行为示意。</p>
+  </section>
+
+  <!-- 3. 情境穷举 -->
+  <section>
+    <h2><span class="num">3</span>情境穷举与判断逻辑 <span class="ref">（对应规范 3.1.8 / 注意事项 2、4）</span></h2>
+
+    <h3>3.1　发送判断逻辑表：开关状态 × KYC 审核情境</h3>
+    <table>
+      <thead>
+        <tr><th style="width:150px">KYC短信不通过短信开关</th><th>KYC 审核情境</th><th style="width:130px" class="c">是否发送短信</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>关闭（预设）</td><td>人工审核 — 拒绝</td><td class="c no">否</td><td>开关未开启，任何情境皆不发送。</td></tr>
+        <tr><td>关闭（预设）</td><td>人工审核 — 通过</td><td class="c no">否</td><td>—</td></tr>
+        <tr><td>关闭（预设）</td><td>审核中 / 系统自动判定 / 其他状态</td><td class="c no">否</td><td>—</td></tr>
+        <tr><td><b>开启</b></td><td><b>人工审核 — 拒绝</b></td><td class="c yes">是</td><td>触发发送，内容取「KYC短信内容」当前已保存值。</td></tr>
+        <tr><td>开启</td><td>人工审核 — 通过</td><td class="c no">否</td><td>本功能仅针对「拒绝」情境。</td></tr>
+        <tr><td>开启</td><td>审核中 / 系统自动判定 / 其他状态</td><td class="c no">否</td><td>非「人工审核拒绝」，不触发。</td></tr>
+      </tbody>
+    </table>
+
+    <h3>3.2　内容生效逻辑表：编辑 × 保存</h3>
+    <table>
+      <thead>
+        <tr><th>用户操作</th><th style="width:150px" class="c">是否已点击保存</th><th>生效结果</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>编辑内容后点击「保存」</td><td class="c yes">是</td><td>新内容<b>生效</b>，后续发送采用新内容。</td></tr>
+        <tr><td>编辑内容后未点击「保存」即离开 / 刷新</td><td class="c no">否</td><td>变更<b>丢弃</b>，仍采用上一次已保存内容。</td></tr>
+        <tr><td>未做任何编辑</td><td class="c">—</td><td>维持现有已保存内容。</td></tr>
+      </tbody>
+    </table>
+
+    <h3>3.3　边界情境：开关开启但「短信内容」为空</h3>
+    <table>
+      <thead>
+        <tr><th style="width:150px">开关状态</th><th style="width:180px">短信内容</th><th>KYC 审核情境</th><th style="width:130px" class="c">是否发送短信</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><b>开启</b></td><td><b>为空（未填写）</b></td><td>人工审核 — 拒绝</td><td class="c no">否</td></tr>
+        <tr><td>开启</td><td>已填写内容</td><td>人工审核 — 拒绝</td><td class="c yes">是</td></tr>
+      </tbody>
+    </table>
+    <div class="note">
+      <b>规则定案：</b>功能开启时，若「KYC短信内容」为空，当人工审核拒绝时<b>仍不发送短信</b>（不发送空白短信）。即「开关开启」与「内容非空」<b>须同时成立</b>才会触发发送。
+    </div>
+
+    <h3>3.4　发送触发流程</h3>
+    <div class="flow">
+      <span class="node">人工 KYC 审核</span>
+      <span class="op">→</span>
+      <span class="node cond">结果 = 拒绝？</span>
+      <span class="op">是 →</span>
+      <span class="node cond">开关 = 开启？</span>
+      <span class="op">是 →</span>
+      <span class="node cond">短信内容非空？</span>
+      <span class="op">是 →</span>
+      <span class="node end-yes">发送短信予用户</span>
+    </div>
+    <div class="flow">
+      <span class="op">上述任一判断为「否」 →</span>
+      <span class="node end-no">不发送短信</span>
+    </div>
+  </section>
+
+  <!-- 4. 分类清单 -->
+  <section>
+    <h2><span class="num">4</span>变更分类与既有规则清单 <span class="ref">（对应注意事项 1）</span></h2>
+
+    <h3>4.1　新增 <span class="tag add">A</span></h3>
+    <ul>
+      <li>「KYC短信配置」区块（位于站内信相关配置与 EKYC 提交信息配置之间）。</li>
+      <li>「KYC短信不通过短信」开关（预设关闭、即时生效）。</li>
+      <li>「KYC短信内容」输入框（无字数限制、纯文字、预设留空）与「保存」按钮。</li>
+      <li>人工 KYC 审核拒绝时依开关发送短信的触发逻辑。</li>
+    </ul>
+
+    <h3>4.2　异动 <span class="tag mod">M</span></h3>
+    <ul>
+      <li>「KYC配置」页面版面：因插入新区块，站内信相关配置与 EKYC 提交信息配置之间的排版位置随之下移（内容本身不变）。</li>
+    </ul>
+
+    <h3>4.3　不异动（本次未涉及之既有规则）<span class="tag keep">—</span></h3>
+    <ul>
+      <li>站内信相关配置区块的内容与逻辑。</li>
+      <li>EKYC 提交信息配置区块的内容与逻辑。</li>
+      <li>KYC 人工审核流程、审核状态判定本身。</li>
+      <li>既有站内信 / 邮件 / App 推播等其他通知机制。</li>
+      <li>短信发送通道（SMS Gateway）本身的串接与设定。</li>
+      <li>KYC 各状态（未验证 / 未通过 / 验证中 / 通过 / 补充资料）于前台的显示规则。</li>
+    </ul>
+  </section>
+
+  <footer>KYC短信配置 · 后台功能规格 · v1.0.0 · 2026/07/28</footer>
+
+</div>
+</body>
+</html>

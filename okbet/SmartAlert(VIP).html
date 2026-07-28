@@ -161,27 +161,29 @@ tbody tr:last-child td{border-bottom:none}
 /* 推播列表——「目标用户」至「阶级10」栏位平均栏宽，超出可左右滑动（.card 已设 overflow-x:auto） */
 .list-table{table-layout:fixed}
 
-/* 推播次数——「阶级N奖励／次数」栏位平均栏宽，超出可左右滑动（.card 已设 overflow-x:auto） */
-.count-table{table-layout:fixed}
-.count-table th.col-reward, .count-table td.col-reward{width:140px}
-.count-table th.col-count, .count-table td.col-count{width:90px}
-
-/* 推播次数2——「推播名称／目标用户／推播总次数」栏位平均栏宽 */
-.count2-table{table-layout:fixed}
-.count2-table th, .count2-table td{width:33.33%}
+/* 推播记录——首三栏固定栏宽，「奖励内容」栏自适应剩余宽度 */
+.record-table{table-layout:fixed}
 
 /* 操作链接 */
 .op a{color:var(--primary);cursor:pointer;margin:0 4px;font-size:13px}
 .op a.del{color:var(--danger)}
 .op a:hover{text-decoration:underline}
 
-/* 推播次数2——推播总次数可点击 */
-.count2-total{color:var(--primary);cursor:pointer;font-weight:600}
-.count2-total:hover{text-decoration:underline}
-
 /* 空状态 */
 .empty{text-align:center;color:var(--text-3);padding:60px 0;font-size:14px}
 .empty .big{font-size:40px;margin-bottom:8px;opacity:.5}
+
+/* 优惠券记录——统计列（静态示意） */
+.stat-row{display:flex;gap:0;background:#fff;border:1px solid var(--border-2);border-radius:6px;margin-bottom:14px}
+.stat-item{flex:1;text-align:center;padding:18px 0;border-right:1px solid var(--border-2)}
+.stat-item:last-child{border-right:none}
+.stat-num{font-size:22px;font-weight:700;color:var(--text)}
+.stat-label{font-size:12px;color:var(--text-3);margin-top:6px}
+
+/* 优惠券记录——分页列（静态示意） */
+.pager{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:13px;color:var(--text-2)}
+.pager-btn{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border:1px solid var(--border-2);border-radius:4px;cursor:pointer;color:var(--text-2)}
+.pager-btn.active{background:var(--primary);border-color:var(--primary);color:#fff}
 
 /* ===================== 表单页（推播条件） ===================== */
 .form-head{display:flex;align-items:center;margin-bottom:16px}
@@ -363,9 +365,10 @@ tbody tr:last-child td{border-bottom:none}
     <!-- 二级页签 -->
     <div class="subtabs">
       <div class="subtab active" data-tab="list" onclick="switchSubtab('list')">推播列表</div>
-      <div class="subtab" data-tab="count" onclick="switchSubtab('count')">推播次数</div>
-      <div class="subtab" data-tab="count2" onclick="switchSubtab('count2')">推播次数2</div>
+      <div class="subtab" data-tab="record" onclick="switchSubtab('record')">推播记录</div>
       <div class="subtab" data-tab="popup" onclick="switchSubtab('popup')">推播弹窗</div>
+      <div class="subtab" data-tab="freerecord" onclick="switchSubtab('freerecord')">免费项目记录</div>
+      <div class="subtab" data-tab="couponrecord" onclick="switchSubtab('couponrecord')">优惠券记录</div>
     </div>
 
     <!-- ============ 页面 A：推播列表 ============ -->
@@ -415,69 +418,42 @@ tbody tr:last-child td{border-bottom:none}
       </div>
     </div>
 
-    <!-- ============ 页面 C'：推播次数——参照推播列表 ============ -->
-    <div id="view-count" class="hidden">
+    <!-- ============ 页面 C：推播记录——个别会员的推播领取记录 ============ -->
+    <div id="view-record" class="hidden">
       <div class="toolbar">
         <div class="field">
-          推播名称：
-          <input type="text" class="input" id="filterCountName" style="width:160px" placeholder="请输入关键字" onkeydown="if(event.key==='Enter')doCountSearch()">
+          会员账号：
+          <input type="text" class="input" id="filterRecordAccount" style="width:160px" placeholder="请输入会员账号" onkeydown="if(event.key==='Enter')doRecordSearch()">
         </div>
         <div class="field">
-          推送目标用户：
-          <select class="select" id="filterCountMain">
+          阶级：
+          <select class="select" id="filterRecordLevel">
             <option value="">全部</option>
-            <option>VIP 0</option><option>VIP 1</option><option>VIP 2</option><option>VIP 3</option><option>VIP 4</option><option>VIP 5</option>
-            <option>VIP 6</option><option>VIP 7</option><option>VIP 8</option><option>VIP 9</option><option>VIP 10</option>
+            <option value="1">阶级1</option><option value="2">阶级2</option><option value="3">阶级3</option><option value="4">阶级4</option><option value="5">阶级5</option>
+            <option value="6">阶级6</option><option value="7">阶级7</option><option value="8">阶级8</option><option value="9">阶级9</option><option value="10">阶级10</option>
           </select>
         </div>
-        <button class="btn btn-primary" onclick="doCountSearch()">查询</button>
+        <div class="field">
+          时间：
+          <input type="date" class="input" id="filterRecordStartDate" style="width:150px">
+          <span style="color:var(--text-3)">至</span>
+          <input type="date" class="input" id="filterRecordEndDate" style="width:150px">
+        </div>
+        <button class="btn btn-primary" onclick="doRecordSearch()">查询</button>
         <div class="spacer"></div>
       </div>
 
       <div class="card" style="overflow-x:auto">
-        <table class="count-table">
+        <table class="record-table">
           <thead>
             <tr>
-              <th style="width:170px">推播名称</th>
-              <th style="width:190px">目标用户</th>
-              <th class="col-reward">阶级1奖励</th><th class="col-count">次数</th><th class="col-reward">阶级2奖励</th><th class="col-count">次数</th><th class="col-reward">阶级3奖励</th><th class="col-count">次数</th><th class="col-reward">阶级4奖励</th><th class="col-count">次数</th><th class="col-reward">阶级5奖励</th><th class="col-count">次数</th>
-              <th class="col-reward">阶级6奖励</th><th class="col-count">次数</th><th class="col-reward">阶级7奖励</th><th class="col-count">次数</th><th class="col-reward">阶级8奖励</th><th class="col-count">次数</th><th class="col-reward">阶级9奖励</th><th class="col-count">次数</th><th class="col-reward">阶级10奖励</th><th class="col-count">次数</th>
+              <th style="width:25%">会员账号</th>
+              <th style="width:25%">时间</th>
+              <th style="width:25%">推送奖励阶级</th>
+              <th style="width:25%">奖励内容</th>
             </tr>
           </thead>
-          <tbody id="countTableBody"><!-- JS 渲染 --></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ============ 页面 C''：推播次数2——参照推播次数，仅显示推播总次数 ============ -->
-    <div id="view-count2" class="hidden">
-      <div class="toolbar">
-        <div class="field">
-          推播名称：
-          <input type="text" class="input" id="filterCount2Name" style="width:160px" placeholder="请输入关键字" onkeydown="if(event.key==='Enter')doCount2Search()">
-        </div>
-        <div class="field">
-          推送目标用户：
-          <select class="select" id="filterCount2Main">
-            <option value="">全部</option>
-            <option>VIP 0</option><option>VIP 1</option><option>VIP 2</option><option>VIP 3</option><option>VIP 4</option><option>VIP 5</option>
-            <option>VIP 6</option><option>VIP 7</option><option>VIP 8</option><option>VIP 9</option><option>VIP 10</option>
-          </select>
-        </div>
-        <button class="btn btn-primary" onclick="doCount2Search()">查询</button>
-        <div class="spacer"></div>
-      </div>
-
-      <div class="card" style="overflow-x:auto">
-        <table class="count2-table">
-          <thead>
-            <tr>
-              <th>推播名称</th>
-              <th>目标用户</th>
-              <th>推播总次数</th>
-            </tr>
-          </thead>
-          <tbody id="count2TableBody"><!-- JS 渲染 --></tbody>
+          <tbody id="recordTableBody"><!-- JS 渲染 --></tbody>
         </table>
       </div>
     </div>
@@ -588,6 +564,217 @@ tbody tr:last-child td{border-bottom:none}
       </div>
     </div>
 
+    <!-- ============ 页面 F：免费项目记录（静态示意，仅「全部来源」新增项「推播奖励」具互动） ============ -->
+    <div id="view-freerecord" class="hidden">
+      <div class="toolbar">
+        <div class="field">
+          <select class="select" style="width:140px">
+            <option>全部免费旋转</option>
+          </select>
+        </div>
+        <div class="field">
+          <select class="select" id="freeSourceSelect" style="width:140px" onchange="onFreeSourceChange(this.value)">
+            <option value="">全部来源</option>
+            <option>手动赠送</option>
+            <option>签到奖励</option>
+            <option>积分购买</option>
+            <option>兑换码</option>
+            <option>召回活动</option>
+            <option>邀请好友</option>
+            <option>邀请转盘</option>
+            <option>推播奖励</option>
+          </select>
+        </div>
+        <div class="field">
+          获得时间：
+          <input type="text" class="input" style="width:160px" value="2026-07-28 00:00:00" readonly>
+          <span style="color:var(--text-3)">～</span>
+          <input type="text" class="input" style="width:160px" value="2026-07-28 23:59:59" readonly>
+        </div>
+        <div class="field">
+          <select class="select" style="width:140px">
+            <option>全部免费类型</option>
+          </select>
+        </div>
+        <div class="field">
+          <select class="select" style="width:120px">
+            <option>Select</option>
+          </select>
+        </div>
+      </div>
+      <div class="toolbar">
+        <div class="field">
+          <input type="text" class="input" style="width:200px" placeholder="会员名/活动名称">
+        </div>
+        <button class="btn btn-primary">查询</button>
+        <button class="btn" style="background:#e6a23c;border-color:#e6a23c;color:#fff">导出</button>
+        <button class="btn btn-primary">赠送免费旋转</button>
+        <div class="spacer"></div>
+      </div>
+
+      <div class="card" style="overflow-x:auto">
+        <table style="table-layout:fixed;min-width:1360px">
+          <thead>
+            <tr>
+              <th style="width:130px">会员账号</th>
+              <th style="width:130px">获得时间</th>
+              <th style="width:120px">活动名称</th>
+              <th style="width:110px">获得方式</th>
+              <th style="width:280px">免费旋转名称</th>
+              <th style="width:90px">免费类型</th>
+              <th style="width:90px">获得次数</th>
+              <th style="width:80px">状态</th>
+              <th style="width:110px">操作人</th>
+              <th style="width:130px">操作时间</th>
+              <th style="width:80px">备注</th>
+            </tr>
+          </thead>
+          <tbody id="freeRecordBody">
+            <tr data-source="积分购买">
+              <td>okbet22377zkhn</td><td>2026-07-28 11:15:59</td><td><span class="none">—</span></td><td>积分购买</td>
+              <td>Playtech单个游戏</td><td>免费投注</td><td>10</td><td>未使用</td><td>SYSTEM</td><td><span class="none">–</span></td><td><span class="none">–</span></td>
+            </tr>
+            <tr data-source="积分购买">
+              <td>okbet22377zkhn</td><td>2026-07-28 11:15:43</td><td><span class="none">—</span></td><td>积分购买</td>
+              <td>Playtech单个游戏</td><td>免费投注</td><td>10</td><td>未使用</td><td>SYSTEM</td><td><span class="none">–</span></td><td><span class="none">–</span></td>
+            </tr>
+            <tr data-source="游戏挑战赛">
+              <td>okbet9991iyj72</td><td>2026-07-28 10:53:51</td><td>Frank测试活动</td><td>游戏挑战赛</td>
+              <td>免费旋转123456789A1234567 89B123456789C1234 89D123456789E1 56789F123456789G1234 56789H123456789I123456789J</td>
+              <td>免费旋转</td><td>3</td><td>未使用</td><td>okbet9991iyj72</td><td>2026-07-28 10:53:51</td><td><span class="none">–</span></td>
+            </tr>
+            <tr data-source="游戏挑战赛">
+              <td>okbet9991iyj72</td><td>2026-07-28 10:53:48</td><td>Frank测试活动</td><td>游戏挑战赛</td>
+              <td>超强力特色游戏卡勾选全部游戏免费旋转/投注次数:30单次旋转/投注金额:30中奖上限:700次数有效期:3H免费旋转券/投注有效期:3DAY</td>
+              <td>道具卡</td><td>30</td><td>未使用</td><td>okbet9991iyj72</td><td>2026-07-28 10:53:48</td><td><span class="none">–</span></td>
+            </tr>
+            <tr data-source="游戏挑战赛">
+              <td>okbet9991iyj72</td><td>2026-07-28 10:53:46</td><td>Frank测试活动</td><td>游戏挑战赛</td>
+              <td>ONLive单个游戏百家乐 (ID: 33)</td><td>免费投注</td><td>10</td><td>未使用</td><td>okbet9991iyj72</td><td>2026-07-28 10:53:46</td><td><span class="none">–</span></td>
+            </tr>
+            <tr data-source="推播奖励">
+              <td>okbet66201vip7</td><td>2026-07-28 09:12:30</td><td>推播奖励</td><td>推播奖励</td>
+              <td>免费旋转 JILI</td><td>免费旋转</td><td>5</td><td>未使用</td><td>SYSTEM</td><td><span class="none">–</span></td><td><span class="none">–</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ 页面 G：优惠券记录（静态示意，仅「全部来源」新增项「推播奖励」具互动） ============ -->
+    <div id="view-couponrecord" class="hidden">
+      <div class="toolbar">
+        <input type="text" class="input" style="width:160px" value="2026-07-28 00:00:00" readonly>
+        <span style="color:var(--text-3)">～</span>
+        <input type="text" class="input" style="width:160px" value="2026-07-28 23:59:59" readonly>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-item">
+          <div class="stat-num">0</div>
+          <div class="stat-label">优惠券发放总量</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">0%</div>
+          <div class="stat-label">优惠券使用率</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">₱0.00</div>
+          <div class="stat-label">优惠券累计发放彩金</div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="field">
+          <select class="select" style="width:120px">
+            <option>全部优惠</option>
+          </select>
+        </div>
+        <div class="field">
+          <select class="select" style="width:120px">
+            <option>全部状态</option>
+          </select>
+        </div>
+        <div class="field">
+          <select class="select" id="couponSourceSelect" style="width:120px" onchange="onCouponSourceChange(this.value)">
+            <option value="">全部来源</option>
+            <option>手动赠送</option>
+            <option>积分购买</option>
+            <option>周卡活动</option>
+            <option>召回活动</option>
+            <option>推播奖励</option>
+          </select>
+        </div>
+        <div class="field">
+          获得时间：
+          <input type="text" class="input" style="width:160px" value="2026-07-24 00:00:00" readonly>
+          <span style="color:var(--text-3)">～</span>
+          <input type="text" class="input" style="width:160px" value="2026-07-27 00:00:00" readonly>
+        </div>
+        <div class="field">
+          <select class="select" style="width:110px">
+            <option>会员名</option>
+          </select>
+        </div>
+        <div class="field">
+          <input type="text" class="input" style="width:200px" placeholder="会员名/活动名称/优惠券ID">
+        </div>
+      </div>
+      <div class="toolbar">
+        <button class="btn btn-primary">查询</button>
+        <button class="btn" style="background:#e6a23c;border-color:#e6a23c;color:#fff">导出</button>
+        <button class="btn btn-primary">赠送优惠券</button>
+        <div class="spacer"></div>
+      </div>
+
+      <div class="card" style="overflow-x:auto">
+        <table style="table-layout:fixed;min-width:1260px">
+          <thead>
+            <tr>
+              <th style="width:120px">会员账号</th>
+              <th style="width:110px">获得时间</th>
+              <th style="width:150px">活动名称</th>
+              <th style="width:100px">获取方式</th>
+              <th style="width:220px">优惠券名称</th>
+              <th style="width:90px">优惠券ID</th>
+              <th style="width:100px">优惠券类别</th>
+              <th style="width:80px">状态</th>
+              <th style="width:100px">操作人</th>
+              <th style="width:140px">操作时间</th>
+              <th style="width:70px">备注</th>
+            </tr>
+          </thead>
+          <tbody id="couponRecordBody">
+            <tr data-source="积分购买">
+              <td>vivian01</td><td>2026-07-24 17:08</td><td>盲盒2.0</td><td>积分购买</td>
+              <td>输返10%-有效期240小时 奖金流水5倍流水-注单有效期48</td><td>10536</td><td>输返券</td><td>未使用</td>
+              <td><span class="none">–</span></td><td><span class="none">–</span></td><td><span class="none">–</span></td>
+            </tr>
+            <tr data-source="积分购买">
+              <td>okbet3456uib6a</td><td>2026-07-24 12:13</td><td>OKF1910-v3-全奖励测试</td><td>积分购买</td>
+              <td>输返测试</td><td>10535</td><td>输返券</td><td>已过期</td>
+              <td>SYSTEM</td><td>2026-07-28 03:00:01</td><td><span class="none">–</span></td>
+            </tr>
+            <tr data-source="推播奖励">
+              <td>okbet66201vip7</td><td>2026-07-28 09:12</td><td>推播奖励</td><td>推播奖励</td>
+              <td>20% Loss Cashback</td><td>10600</td><td>输返券</td><td>未使用</td>
+              <td>SYSTEM</td><td><span class="none">–</span></td><td><span class="none">–</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pager">
+        <span>Total <span id="couponTotalCount">3</span></span>
+        <select class="select" style="width:90px;height:28px;font-size:12px">
+          <option>10/page</option>
+        </select>
+        <span class="pager-btn">‹</span>
+        <span class="pager-btn active">1</span>
+        <span class="pager-btn">›</span>
+        <span>Go to <input type="text" class="input" style="width:40px;height:28px;padding:0 6px" value="1"></span>
+      </div>
+    </div>
+
     <!-- ============ 页面 C：推播条件表单（新增 / 编辑） ============ -->
     <div id="view-form" class="hidden">
       <div class="form-head">
@@ -671,24 +858,6 @@ tbody tr:last-child td{border-bottom:none}
   </div>
 </div>
 
-<!-- 推播次数2——详细推播次数弹窗 -->
-<div class="mask" id="count2DetailMask">
-  <div class="dialog" style="width:360px">
-    <div class="dialog-head">推播次数详情</div>
-    <div class="dialog-body" style="padding:16px 20px">
-      <table>
-        <thead>
-          <tr><th style="width:70px">阶级</th><th>奖励</th><th style="width:90px">次数</th></tr>
-        </thead>
-        <tbody id="count2DetailBody"><!-- JS 渲染 --></tbody>
-      </table>
-    </div>
-    <div class="dialog-foot">
-      <button class="btn btn-primary" onclick="closeCount2Detail()">关闭</button>
-    </div>
-  </div>
-</div>
-
 <div class="toast-wrap" id="toastWrap"></div>
 
 <script>
@@ -752,96 +921,60 @@ let pushList = [
 ];
 
 /* ============================================================
-   二之四、示范用推播次数数据——与推播列表的推播名称对应
-   目标用户 / 阶级数皆向推播列表 (pushList) 查询带出，本处只记录各阶级的推播次数
+   二之四、示范用推播记录数据——个别会员每一次领取推播奖励的明细
+   pushBadge 为 true 表示该次推送同时勾选了「推送角标活动」
    ============================================================ */
-let countList = [
-  { name:'VIP3大R Slot近7日推播',   counts:[128, 76, 0, 0] },
-  { name:'VIP1回归召回推播',        counts:[54, 31, 12, 0] },
-  { name:'VIP7净输赢风险监控推播',   counts:[210, 95, 40, 15] },
+let pushRecords = [
+  { account:'okbet22377zkhn', time:'2026-07-20 14:32:08', level:1, giftType:'礼金',    giftValue:'100', turnover:'2000', pushBadge:true },
+  { account:'okbet22377zkhn', time:'2026-07-21 09:10:12', level:2, giftType:'免费旋转', giftValue:'免费旋转JILI', turnover:'', pushBadge:false },
+  { account:'okbet66201vip7', time:'2026-07-21 09:15:44', level:1, giftType:'积分',    giftValue:'500', turnover:'', pushBadge:true },
+  { account:'okbet66201vip7', time:'2026-07-22 10:02:33', level:2, giftType:'优惠券',  giftValue:'20% Loss Cashback', turnover:'', pushBadge:false },
+  { account:'okbet66201vip7', time:'2026-07-22 10:05:19', level:3, giftType:'',       giftValue:'', turnover:'', pushBadge:true },
+  { account:'okbet9991iyj72', time:'2026-07-22 18:47:21', level:1, giftType:'礼金',    giftValue:'50', turnover:'1000', pushBadge:true },
+  { account:'okbet9991iyj72', time:'2026-07-23 08:21:05', level:2, giftType:'积分',    giftValue:'300', turnover:'', pushBadge:false },
+  { account:'okbet9991iyj72', time:'2026-07-23 08:25:47', level:3, giftType:'优惠券',  giftValue:'10% Loss Cashback', turnover:'', pushBadge:true },
+  { account:'okbet9991iyj72', time:'2026-07-24 12:11:59', level:4, giftType:'免费旋转', giftValue:'免费旋转FC', turnover:'', pushBadge:false },
 ];
-function doCountSearch(){ renderCountTable(); }
-function renderCountTable(){
-  const fn = document.getElementById('filterCountName').value.trim().toLowerCase();
-  const fm = document.getElementById('filterCountMain').value;
-  const rows = countList
-    .map(c=>({...c, rec: pushList.find(p=>p.name===c.name)}))
-    .filter(c=>c.rec)
-    .filter(c=>{
-      if(fn && !c.name.toLowerCase().includes(fn)) return false;
-      if(fm && c.rec.vip!==fm) return false;
-      return true;
-    });
-  const body = document.getElementById('countTableBody');
+function doRecordSearch(){ renderRecordTable(); }
+function renderRecordTable(){
+  const fa = document.getElementById('filterRecordAccount').value.trim().toLowerCase();
+  const fl = document.getElementById('filterRecordLevel').value;
+  const fsd = document.getElementById('filterRecordStartDate').value;
+  const fed = document.getElementById('filterRecordEndDate').value;
+  const rows = pushRecords.filter(r=>{
+    if(fa && !r.account.toLowerCase().includes(fa)) return false;
+    if(fl && String(r.level)!==fl) return false;
+    const datePart = r.time.slice(0,10);
+    if(fsd && datePart<fsd) return false;
+    if(fed && datePart>fed) return false;
+    return true;
+  });
+  const body = document.getElementById('recordTableBody');
   if(rows.length===0){
-    body.innerHTML = `<tr><td colspan="22"><div class="empty"><div class="big">📊</div>暂无符合条件的推播次数记录</div></td></tr>`;
+    body.innerHTML = `<tr><td colspan="4"><div class="empty"><div class="big">📊</div>暂无符合条件的推播记录</div></td></tr>`;
     return;
   }
-  body.innerHTML = rows.map(c=>{
-    const lvCount = c.rec.thrLv;
-    const rewardCell = i => i<lvCount ? fmtRewardText(c.rec.rewards[i]) : '<span class="none">—</span>';
-    const countCell = i => i<lvCount ? Number(c.counts[i]||0).toLocaleString() : '<span class="none">—</span>';
-    return `
+  body.innerHTML = rows.map(r=>`
     <tr>
-      <td>${c.name}</td>
-      <td>${c.rec.vip}</td>
-      ${[0,1,2,3,4,5,6,7,8,9].map(i=>`<td>${rewardCell(i)}</td><td>${countCell(i)}</td>`).join('')}
-    </tr>`;
-  }).join('');
+      <td>${r.account}</td>
+      <td>${r.time}</td>
+      <td>阶级${r.level}</td>
+      <td>${fmtRecordReward(r)}</td>
+    </tr>`).join('');
 }
 function fmtRewardText(rw){
-  if(!rw || !rw.giftType) return '<span class="none">—</span>';
+  if(!rw || !rw.giftType) return '';
   if(rw.giftType==='礼金') return `礼金 ${Number(rw.giftValue).toLocaleString()}${rw.turnover?`（流水${Number(rw.turnover).toLocaleString()}）`:''}`;
   if(rw.giftType==='积分') return `积分 ${Number(rw.giftValue).toLocaleString()}`;
   return `${rw.giftType} ${rw.giftValue}`;
 }
-
-/* ============================================================
-   五之二、推播次数2——参照推播次数，仅显示推播总次数；点击总次数可查看各阶级明细
-   ============================================================ */
-function doCount2Search(){ renderCount2Table(); }
-function renderCount2Table(){
-  const fn = document.getElementById('filterCount2Name').value.trim().toLowerCase();
-  const fm = document.getElementById('filterCount2Main').value;
-  const rows = countList
-    .map(c=>({...c, rec: pushList.find(p=>p.name===c.name)}))
-    .filter(c=>c.rec)
-    .filter(c=>{
-      if(fn && !c.name.toLowerCase().includes(fn)) return false;
-      if(fm && c.rec.vip!==fm) return false;
-      return true;
-    });
-  const body = document.getElementById('count2TableBody');
-  if(rows.length===0){
-    body.innerHTML = `<tr><td colspan="3"><div class="empty"><div class="big">📊</div>暂无符合条件的推播次数记录</div></td></tr>`;
-    return;
-  }
-  body.innerHTML = rows.map(c=>{
-    const total = c.counts.slice(0, c.rec.thrLv).reduce((sum,n)=>sum+Number(n||0), 0);
-    return `
-    <tr>
-      <td>${c.name}</td>
-      <td>${c.rec.vip}</td>
-      <td><a class="count2-total" onclick="openCount2Detail('${c.name}')">${total.toLocaleString()}</a></td>
-    </tr>`;
-  }).join('');
+/* 奖励内容：有勾选「推送角标活动」时于最前加注「推送活动」；只有推送活动没有奖励时仅显示「推送活动」 */
+function fmtRecordReward(r){
+  const giftText = fmtRewardText(r);
+  let text = giftText;
+  if(r.pushBadge) text = giftText ? `推送活动、${giftText}` : '推送活动';
+  return text || '<span class="none">—</span>';
 }
-function openCount2Detail(name){
-  const c = countList.find(x=>x.name===name);
-  const rec = pushList.find(p=>p.name===name);
-  if(!c || !rec) return;
-  document.getElementById('count2DetailBody').innerHTML = [0,1,2,3,4,5,6,7,8,9].map(i=>{
-    const inLv = i<rec.thrLv;
-    return `
-    <tr>
-      <td>阶级${i+1}</td>
-      <td>${inLv ? fmtRewardText(rec.rewards[i]) : '<span class="none">—</span>'}</td>
-      <td>${inLv ? Number(c.counts[i]||0).toLocaleString() : '<span class="none">—</span>'}</td>
-    </tr>`;
-  }).join('');
-  document.getElementById('count2DetailMask').classList.add('show');
-}
-function closeCount2Detail(){ document.getElementById('count2DetailMask').classList.remove('show'); }
 
 let seqId = 4;              // 下一个新增的 id
 let editingId = null;      // 正在编辑的 id（null=新增）
@@ -880,12 +1013,25 @@ function switchSubtab(tab){
   // 切页签时若在表单页，先退回列表
   document.getElementById('view-form').classList.add('hidden');
   document.getElementById('view-list').classList.toggle('hidden', tab!=='list');
-  document.getElementById('view-count').classList.toggle('hidden', tab!=='count');
-  document.getElementById('view-count2').classList.toggle('hidden', tab!=='count2');
+  document.getElementById('view-record').classList.toggle('hidden', tab!=='record');
   document.getElementById('view-popup').classList.toggle('hidden', tab!=='popup');
-  if(tab==='count') renderCountTable();
-  if(tab==='count2') renderCount2Table();
+  document.getElementById('view-freerecord').classList.toggle('hidden', tab!=='freerecord');
+  document.getElementById('view-couponrecord').classList.toggle('hidden', tab!=='couponrecord');
+  if(tab==='record') renderRecordTable();
   if(tab!=='popup') closePushPopup();
+}
+/* 免费项目记录／优惠券记录——静态示意页面，仅「全部来源」新增项「推播奖励」具筛选互动，其余栏位/按钮维持静态展示 */
+function onFreeSourceChange(val){
+  document.querySelectorAll('#freeRecordBody tr[data-source]').forEach(tr=>{
+    const show = (val !== '推播奖励') || (tr.dataset.source === '推播奖励');
+    tr.style.display = show ? '' : 'none';
+  });
+}
+function onCouponSourceChange(val){
+  document.querySelectorAll('#couponRecordBody tr[data-source]').forEach(tr=>{
+    const show = (val !== '推播奖励') || (tr.dataset.source === '推播奖励');
+    tr.style.display = show ? '' : 'none';
+  });
 }
 function showPushPopup(scenario){
   scenario = scenario || 'full';
@@ -1023,7 +1169,7 @@ function openForm(id){
   clearErrors();
 
   document.getElementById('view-list').classList.add('hidden');
-  document.getElementById('view-count').classList.add('hidden');
+  document.getElementById('view-record').classList.add('hidden');
   document.getElementById('view-form').classList.remove('hidden');
   document.querySelector('.content').scrollTop = 0;
 }
@@ -1317,8 +1463,7 @@ function toast(type,msg){
 
 /* 初始渲染 */
 renderTable();
-renderCountTable();
-renderCount2Table();
+renderRecordTable();
 renderBonusCard();
 </script>
 </body>
