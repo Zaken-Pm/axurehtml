@@ -426,6 +426,10 @@ tbody tr:last-child td{border-bottom:none}
           <input type="text" class="input" id="filterRecordAccount" style="width:160px" placeholder="请输入会员账号" onkeydown="if(event.key==='Enter')doRecordSearch()">
         </div>
         <div class="field">
+          推播名称：
+          <input type="text" class="input" id="filterRecordName" style="width:160px" placeholder="请输入关键字" onkeydown="if(event.key==='Enter')doRecordSearch()">
+        </div>
+        <div class="field">
           阶级：
           <select class="select" id="filterRecordLevel">
             <option value="">全部</option>
@@ -441,16 +445,18 @@ tbody tr:last-child td{border-bottom:none}
         </div>
         <button class="btn btn-primary" onclick="doRecordSearch()">查询</button>
         <div class="spacer"></div>
+        <button class="btn" style="background:#e6a23c;border-color:#e6a23c;color:#fff">导出</button>
       </div>
 
       <div class="card" style="overflow-x:auto">
         <table class="record-table">
           <thead>
             <tr>
-              <th style="width:25%">会员账号</th>
-              <th style="width:25%">时间</th>
-              <th style="width:25%">推送奖励阶级</th>
-              <th style="width:25%">奖励内容</th>
+              <th style="width:20%">会员账号</th>
+              <th style="width:20%">推播名称</th>
+              <th style="width:20%">时间</th>
+              <th style="width:20%">推送奖励阶级</th>
+              <th style="width:20%">奖励内容</th>
             </tr>
           </thead>
           <tbody id="recordTableBody"><!-- JS 渲染 --></tbody>
@@ -925,24 +931,26 @@ let pushList = [
    pushBadge 为 true 表示该次推送同时勾选了「推送角标活动」
    ============================================================ */
 let pushRecords = [
-  { account:'okbet22377zkhn', time:'2026-07-20 14:32:08', level:1, giftType:'礼金',    giftValue:'100', turnover:'2000', pushBadge:true },
-  { account:'okbet22377zkhn', time:'2026-07-21 09:10:12', level:2, giftType:'免费旋转', giftValue:'免费旋转JILI', turnover:'', pushBadge:false },
-  { account:'okbet66201vip7', time:'2026-07-21 09:15:44', level:1, giftType:'积分',    giftValue:'500', turnover:'', pushBadge:true },
-  { account:'okbet66201vip7', time:'2026-07-22 10:02:33', level:2, giftType:'优惠券',  giftValue:'20% Loss Cashback', turnover:'', pushBadge:false },
-  { account:'okbet66201vip7', time:'2026-07-22 10:05:19', level:3, giftType:'',       giftValue:'', turnover:'', pushBadge:true },
-  { account:'okbet9991iyj72', time:'2026-07-22 18:47:21', level:1, giftType:'礼金',    giftValue:'50', turnover:'1000', pushBadge:true },
-  { account:'okbet9991iyj72', time:'2026-07-23 08:21:05', level:2, giftType:'积分',    giftValue:'300', turnover:'', pushBadge:false },
-  { account:'okbet9991iyj72', time:'2026-07-23 08:25:47', level:3, giftType:'优惠券',  giftValue:'10% Loss Cashback', turnover:'', pushBadge:true },
-  { account:'okbet9991iyj72', time:'2026-07-24 12:11:59', level:4, giftType:'免费旋转', giftValue:'免费旋转FC', turnover:'', pushBadge:false },
+  { account:'okbet22377zkhn', name:'VIP3大R Slot近7日推播',  time:'2026-07-20 14:32:08', level:1, giftType:'礼金',    giftValue:'100', turnover:'2000', pushBadge:true },
+  { account:'okbet22377zkhn', name:'VIP3大R Slot近7日推播',  time:'2026-07-21 09:10:12', level:2, giftType:'免费旋转', giftValue:'免费旋转JILI', turnover:'', pushBadge:false },
+  { account:'okbet66201vip7', name:'VIP1回归召回推播',       time:'2026-07-21 09:15:44', level:1, giftType:'积分',    giftValue:'500', turnover:'', pushBadge:true },
+  { account:'okbet66201vip7', name:'VIP1回归召回推播',       time:'2026-07-22 10:02:33', level:2, giftType:'优惠券',  giftValue:'20% Loss Cashback', turnover:'', pushBadge:false },
+  { account:'okbet66201vip7', name:'VIP1回归召回推播',       time:'2026-07-22 10:05:19', level:3, giftType:'',       giftValue:'', turnover:'', pushBadge:true },
+  { account:'okbet9991iyj72', name:'VIP7净输赢风险监控推播', time:'2026-07-22 18:47:21', level:1, giftType:'礼金',    giftValue:'50', turnover:'1000', pushBadge:true },
+  { account:'okbet9991iyj72', name:'VIP7净输赢风险监控推播', time:'2026-07-23 08:21:05', level:2, giftType:'积分',    giftValue:'300', turnover:'', pushBadge:false },
+  { account:'okbet9991iyj72', name:'VIP7净输赢风险监控推播', time:'2026-07-23 08:25:47', level:3, giftType:'优惠券',  giftValue:'10% Loss Cashback', turnover:'', pushBadge:true },
+  { account:'okbet9991iyj72', name:'VIP7净输赢风险监控推播', time:'2026-07-24 12:11:59', level:4, giftType:'免费旋转', giftValue:'免费旋转FC', turnover:'', pushBadge:false },
 ];
 function doRecordSearch(){ renderRecordTable(); }
 function renderRecordTable(){
   const fa = document.getElementById('filterRecordAccount').value.trim().toLowerCase();
+  const fn = document.getElementById('filterRecordName').value.trim().toLowerCase();
   const fl = document.getElementById('filterRecordLevel').value;
   const fsd = document.getElementById('filterRecordStartDate').value;
   const fed = document.getElementById('filterRecordEndDate').value;
   const rows = pushRecords.filter(r=>{
     if(fa && !r.account.toLowerCase().includes(fa)) return false;
+    if(fn && !r.name.toLowerCase().includes(fn)) return false;
     if(fl && String(r.level)!==fl) return false;
     const datePart = r.time.slice(0,10);
     if(fsd && datePart<fsd) return false;
@@ -951,12 +959,13 @@ function renderRecordTable(){
   });
   const body = document.getElementById('recordTableBody');
   if(rows.length===0){
-    body.innerHTML = `<tr><td colspan="4"><div class="empty"><div class="big">📊</div>暂无符合条件的推播记录</div></td></tr>`;
+    body.innerHTML = `<tr><td colspan="5"><div class="empty"><div class="big">📊</div>暂无符合条件的推播记录</div></td></tr>`;
     return;
   }
   body.innerHTML = rows.map(r=>`
     <tr>
       <td>${r.account}</td>
+      <td>${r.name}</td>
       <td>${r.time}</td>
       <td>阶级${r.level}</td>
       <td>${fmtRecordReward(r)}</td>
