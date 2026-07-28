@@ -217,7 +217,7 @@ tbody tr:last-child td{border-bottom:none}
 
 /* 三个阈值条件——同一阶级下三项目标值并排配置，新增阶级为共用的独立按钮 */
 .thr-grid-wrap{border:1px dashed var(--border);border-radius:6px;padding:16px;margin-bottom:14px}
-.thr-grid-row{display:grid;grid-template-columns:88px repeat(3,1fr);gap:10px 20px;align-items:center;margin-bottom:12px}
+.thr-grid-row{display:grid;grid-template-columns:88px repeat(2,1fr);gap:10px 20px;align-items:center;margin-bottom:12px}
 .thr-grid-row:last-of-type{margin-bottom:0}
 .thr-grid-head{margin-bottom:14px}
 .thr-col-title{font-weight:600;color:var(--text);font-size:13px;text-align:center}
@@ -793,7 +793,7 @@ tbody tr:last-child td{border-bottom:none}
 
       <div class="notice">
         <span>⚠</span>
-        <span>提示：保存后推播条件将立即生效并纳入排程计算，所有条件皆以「今日」为计算区间。用户标签为必填单选；「账户余额」为必填条件，「有效投注、用户负盈利」为选填条件（留空表示该项不启用），填写时不可为 0 或负数，最多可配置 10 个阶级（新增阶级为共用按钮，三项条件同步增减），且下一层目标值不可小于上一层。</span>
+        <span>提示：保存后推播条件将立即生效并纳入排程计算，所有条件皆以「今日」为计算区间。用户标签为必填单选；「账户余额」为必填条件，采单一目标值设置，不分阶级；「有效投注、用户负盈利」为选填条件（留空表示该项不启用），可依阶级各自设置，填写时不可为 0 或负数，最多可配置 10 个阶级（新增阶级为共用按钮，两项条件同步增减），且下一层目标值不可小于上一层。</span>
       </div>
 
       <!-- 区块 0：基本信息 -->
@@ -827,10 +827,20 @@ tbody tr:last-child td{border-bottom:none}
         <div class="section-title">触发条件</div>
 
         <div class="hint">
-          「账户余额」为必填条件；「有效投注、用户负盈利」留空＝不启用该条件；填写时不可为 0 或负数（输入负号将自动去除）；最多 10 阶级，「新增阶级」为共用按钮，三项条件同步新增/删除阶级，且下一层目标值不可小于上一层。
+          「账户余额」为必填条件，采单一目标值设置，不分阶级；「有效投注、用户负盈利」为选填条件，可依阶级各自设置（留空＝不启用该条件）；填写时不可为 0 或负数（输入负号将自动去除）；最多 10 阶级，「新增阶级」为共用按钮，两项条件同步新增/删除阶级，且下一层目标值不可小于上一层。
         </div>
 
-        <!-- 三个阈值条件由 JS 生成 -->
+        <div class="form-row">
+          <div class="form-label"><span class="req">*</span>账户余额</div>
+          <div class="form-ctrl">
+            <input type="number" min="0" class="input" id="inpBalance" style="width:220px"
+                   placeholder="请输入目标值" oninput="onBalanceInput(this)">
+            <span style="color:var(--text-2);font-size:12px;margin-left:8px">小于等于目标值</span>
+            <div class="row-error" id="err-balance">请输入账户余额目标值，不可为 0 或负数</div>
+          </div>
+        </div>
+
+        <!-- 两项阈值条件（有效投注、用户负盈利）由 JS 生成 -->
         <div id="thrContainer"></div>
       </div>
 
@@ -873,11 +883,11 @@ tbody tr:last-child td{border-bottom:none}
    ============================================================ */
 const VIP_TAGS  = ['VIP 0','VIP 1','VIP 2','VIP 3','VIP 4','VIP 5','VIP 6','VIP 7','VIP 8','VIP 9','VIP 10'];
 
-/* 三项阈值条件的定义：key、显示名、比较符（账户余额为必填，皆不可输入负数） */
+/* 两项按阶级配置的阈值条件：key、显示名、比较符；皆为选填，皆不可输入负数。
+   账户余额为独立配置的单一目标值（必填，小于等于目标值），不列入此阶级化阵列 */
 const THRESHOLDS = [
-  {key:'balance', name:'账户余额',   cmp:'≤', cmpText:'小于等于', required:true},
-  {key:'bet',     name:'有效投注',   cmp:'≥', cmpText:'大于等于', required:false},
-  {key:'ngr',     name:'用户负盈利', cmp:'≥', cmpText:'大于等于', required:false},
+  {key:'bet', name:'有效投注',   cmp:'≥', cmpText:'大于等于'},
+  {key:'ngr', name:'用户负盈利', cmp:'≥', cmpText:'大于等于'},
 ];
 
 /* 推送奖励——「活动推送」仅限定有角标的活动（有勾选才推送，未勾选则不推送） */
@@ -896,7 +906,7 @@ const GIFT_OPTIONS = {
 let pushList = [
   {
     id:1, name:'VIP3大R Slot近7日推播', vip:'VIP 3',
-    balance:[1000,3000], bet:[50000], ngr:[2000], thrLv:2,
+    balance:3000, bet:[50000], ngr:[2000], thrLv:2,
     rewards:[
       {pushBadge:true, giftType:'礼金', giftValue:'100', turnover:'2000'},
       {pushBadge:false, giftType:'免费旋转', giftValue:'免费旋转JILI', turnover:''}
@@ -905,7 +915,7 @@ let pushList = [
   },
   {
     id:2, name:'VIP1回归召回推播', vip:'VIP 1',
-    balance:[2000,5000,10000], bet:[10000,30000,60000], ngr:[], thrLv:3,
+    balance:10000, bet:[10000,30000,60000], ngr:[], thrLv:3,
     rewards:[
       {pushBadge:true, giftType:'积分', giftValue:'500', turnover:''},
       {pushBadge:true, giftType:'优惠券', giftValue:'20% Loss Cashback', turnover:''},
@@ -915,7 +925,7 @@ let pushList = [
   },
   {
     id:3, name:'VIP7净输赢风险监控推播', vip:'VIP 7',
-    balance:[500,1000,2000,4000], bet:[], ngr:[500,1000,2000,5000], thrLv:4,
+    balance:4000, bet:[], ngr:[500,1000,2000,5000], thrLv:4,
     rewards:[
       {pushBadge:true, giftType:'礼金', giftValue:'50', turnover:'1000'},
       {pushBadge:true, giftType:'积分', giftValue:'300', turnover:''},
@@ -1004,8 +1014,9 @@ function blankRewardLv(){ return {pushBadge:false, giftType:'', giftValue:'', tu
 function blankForm(){
   return {
     name:'', vip:'',
-    balance:Array(10).fill(''), bet:Array(10).fill(''), ngr:Array(10).fill(''),
-    thrLv:1,   // 三项条件共用同一个阶级数（新增/删除阶级为共用按钮），最多 10 阶
+    balance:'',   // 账户余额——独立配置，单一目标值，不分阶级
+    bet:Array(10).fill(''), ngr:Array(10).fill(''),
+    thrLv:1,   // 两项按阶级配置的条件共用同一个阶级数（新增/删除阶级为共用按钮），最多 10 阶
     rewards:Array.from({length:10}, blankRewardLv)   // 每个阶级各自的推送奖励设定，阶级数与 thrLv 共用
   };
 }
@@ -1093,12 +1104,11 @@ function claimBonus(){
    五、渲染表格
    ============================================================ */
 function fmtLevelCell(r, i){
-  // 同一阶级下账户余额/有效投注/用户负盈利三项一起显示；该阶级未配置任何条件则显示「—」
-  const lines=[];
-  if(r.balance[i]!==undefined) lines.push(`账户余额 ≤${Number(r.balance[i]).toLocaleString()}`);
+  // 账户余额为独立配置的单一目标值，每个已配置的阶级皆共用同一数值；有效投注/用户负盈利按阶级各自配置
+  if(i>=r.thrLv) return '<span class="none">—</span>';
+  const lines=[`账户余额 ≤${Number(r.balance).toLocaleString()}`];
   if(r.bet[i]!==undefined) lines.push(`有效投注 ≥${Number(r.bet[i]).toLocaleString()}`);
   if(r.ngr[i]!==undefined) lines.push(`负盈利 ≥${Number(r.ngr[i]).toLocaleString()}`);
-  if(lines.length===0) return '<span class="none">—</span>';
   return `<div class="cond-val">${lines.map(l=>`<span class="lv">${l}</span>`).join('')}</div>`;
 }
 function doSearch(){ renderTable(); }
@@ -1152,9 +1162,10 @@ function openForm(id){
   if(editingId!==null){
     const r = pushList.find(x=>x.id===editingId);
     form.name=r.name; form.vip=r.vip;
-    // 把已保存的阶级数组回填进 10 格输入；三项条件共用同一阶级数，取三者最大值（并以已保存的 thrLv 为准）
+    form.balance = r.balance!==undefined && r.balance!==null ? r.balance : '';
+    // 把已保存的阶级数组回填进 10 格输入；两项条件共用同一阶级数，取两者最大值（并以已保存的 thrLv 为准）
     let maxLv=1;
-    ['balance','bet','ngr'].forEach(k=>{
+    ['bet','ngr'].forEach(k=>{
       const vals=r[k]||[];
       form[k]=Array(10).fill('');
       vals.forEach((v,i)=>{ if(i<10) form[k][i]=v; });
@@ -1171,6 +1182,8 @@ function openForm(id){
   const nameInput = document.getElementById('inpName');
   nameInput.value = form.name;
   nameInput.disabled = editingId!==null;   // 推播名称在编辑页面下不可变更
+
+  document.getElementById('inpBalance').value = form.balance;
 
   buildVipGroup();
   buildThresholds();
@@ -1218,7 +1231,7 @@ function buildThresholds(){
     <div class="thr-grid-row thr-grid-head">
       <div></div>
       ${THRESHOLDS.map(t=>`
-      <div class="thr-col-title">${t.required?'<span class="req">*</span>':''}${t.name}<span class="cmp">${t.cmpText}目标值</span></div>`).join('')}
+      <div class="thr-col-title">${t.name}<span class="cmp">${t.cmpText}目标值</span></div>`).join('')}
     </div>`;
 
   let rows='';
@@ -1253,8 +1266,13 @@ function buildThresholds(){
     </div>
     <div class="add-lv ${disabled?'disabled':''}" onclick="${disabled?'':'addLv()'}">＋ 新增阶级（最多 10 阶）</div>`;
 }
+function onBalanceInput(el){
+  if(el.value.includes('-')) el.value=el.value.replace(/-/g,'');   // 账户余额不可为负数，输入负号直接去除
+  form.balance=el.value;
+  hideError('err-balance');
+}
 function onThrInput(key,idx,el){
-  if(el.value.includes('-')) el.value=el.value.replace(/-/g,'');   // 三项目标值皆不可为负数，输入负号直接去除
+  if(el.value.includes('-')) el.value=el.value.replace(/-/g,'');   // 两项目标值皆不可为负数，输入负号直接去除
   form[key][idx]=el.value;
   hideError('err-'+key);
   el.classList.remove('is-error');
@@ -1269,7 +1287,7 @@ function addLv(){
 function removeLv(){
   if(form.thrLv>1){
     form.thrLv--;
-    ['balance','bet','ngr'].forEach(k=>{ form[k][form.thrLv]=''; });
+    ['bet','ngr'].forEach(k=>{ form[k][form.thrLv]=''; });
     form.rewards[form.thrLv]=blankRewardLv();
     buildThresholds();
     buildRewardsTable();
@@ -1372,17 +1390,23 @@ function clearErrors(){ document.querySelectorAll('.row-error').forEach(e=>e.cla
 function showError(id,msg){ const e=document.getElementById(id); if(e){ if(msg)e.textContent=msg; e.classList.add('show'); } }
 function hideError(id){ const e=document.getElementById(id); if(e)e.classList.remove('show'); }
 
+function collectBalance(){
+  // 账户余额——独立配置的单一目标值，必填，且不可为 0 或负数
+  const s=String(form.balance).trim();
+  if(s===''){ return {err:'请输入账户余额目标值，不可为 0 或负数'}; }
+  const n=Number(s);
+  if(isNaN(n)){ return {err:'请输入数字'}; }
+  if(n===0){ return {err:'目标值不可为 0'}; }
+  if(n<0){ return {err:'目标值不可为负数'}; }
+  return {val:n};
+}
 function collectThreshold(key){
-  // 取出该项非空的阶级值，并做「必填（账户余额）/ 不可为0或负数 / 下一层不可小于上一层」校验
-  const t=THRESHOLDS.find(x=>x.key===key);
+  // 取出该项非空的阶级值，并做「不可为0或负数 / 下一层不可小于上一层」校验；留空＝不启用该阶级的此条件
   const raw=form[key].slice(0,form.thrLv);
   const vals=[]; let err='';
   for(let i=0;i<raw.length;i++){
     const s=String(raw[i]).trim();
-    if(s===''){
-      if(t.required){ err='账户余额为必填，请输入目标值'; break; }
-      continue;                                // 选填条件允许留空＝不启用该阶级的此条件
-    }
+    if(s==='') continue;
     const n=Number(s);
     if(isNaN(n)){ err='请输入数字'; break; }
     if(n===0){ err='目标值不可为 0'; break; }
@@ -1404,7 +1428,10 @@ function saveForm(){
   if(!form.vip){ showError('err-vip'); ok=false; }
 
   const res={};
-  for(const k of ['balance','bet','ngr']){
+  const balanceRes=collectBalance();
+  if(balanceRes.err){ showError('err-balance', balanceRes.err); ok=false; }
+  else res.balance=balanceRes.val;
+  for(const k of ['bet','ngr']){
     const r=collectThreshold(k);
     if(r.err){ showError('err-'+k, r.err); ok=false; }
     else res[k]=r.vals;
