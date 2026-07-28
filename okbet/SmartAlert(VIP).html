@@ -161,10 +161,23 @@ tbody tr:last-child td{border-bottom:none}
 /* 推播列表——「目标用户」至「阶级10」栏位平均栏宽，超出可左右滑动（.card 已设 overflow-x:auto） */
 .list-table{table-layout:fixed}
 
+/* 推播次数——「阶级N奖励／次数」栏位平均栏宽，超出可左右滑动（.card 已设 overflow-x:auto） */
+.count-table{table-layout:fixed}
+.count-table th.col-reward, .count-table td.col-reward{width:140px}
+.count-table th.col-count, .count-table td.col-count{width:90px}
+
+/* 推播次数2——「推播名称／目标用户／推播总次数」栏位平均栏宽 */
+.count2-table{table-layout:fixed}
+.count2-table th, .count2-table td{width:33.33%}
+
 /* 操作链接 */
 .op a{color:var(--primary);cursor:pointer;margin:0 4px;font-size:13px}
 .op a.del{color:var(--danger)}
 .op a:hover{text-decoration:underline}
+
+/* 推播次数2——推播总次数可点击 */
+.count2-total{color:var(--primary);cursor:pointer;font-weight:600}
+.count2-total:hover{text-decoration:underline}
 
 /* 空状态 */
 .empty{text-align:center;color:var(--text-3);padding:60px 0;font-size:14px}
@@ -286,15 +299,17 @@ tbody tr:last-child td{border-bottom:none}
 .fe-popup-close{position:absolute;top:10px;right:10px;width:20px;height:20px;border-radius:50%;background:#f0f2f5;display:flex;align-items:center;justify-content:center;font-size:11px;color:#606266;cursor:pointer}
 .fe-popup-title{font-size:15px;font-weight:800;text-align:center;margin-bottom:10px}
 .fe-popup-sub{font-size:11px;color:#909399;margin-bottom:6px}
-.fe-popup-list{max-height:190px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-right:2px}
+.fe-popup-list{max-height:221px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-right:2px}
 .fe-popup-item{position:relative;background:#eef4fb;border-radius:8px;padding:9px 10px;display:flex;align-items:center;justify-content:space-between;overflow:hidden;flex:0 0 auto}
 .fe-popup-item::before{content:"";position:absolute;left:0;bottom:0;width:100%;height:14px;background:linear-gradient(120deg,#2f8bf0,#5fb8ff);clip-path:polygon(0 100%,0 40%,50% 90%,100% 30%,100% 100%);opacity:.5}
 .fe-popup-item .name{font-size:12px;font-weight:700;color:var(--text);position:relative;z-index:1}
 .fe-popup-item .join{position:relative;z-index:1;background:#ff9a3d;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:12px;white-space:nowrap;cursor:pointer}
 .fe-popup-bonus{margin-top:10px;border-top:1px dashed #e4e7ed;padding-top:8px}
-.fe-popup-bonus .lb{font-size:11px;color:#909399;margin-bottom:4px}
-.fe-popup-bonus .txt{font-size:11px;color:var(--text);line-height:1.6}
-.fe-popup-bonus .txt strong{color:#025be8}
+.fe-popup-bonus.no-top-border{margin-top:0;border-top:none;padding-top:0}
+.fe-popup-bonus .fe-popup-sub{margin-bottom:6px}
+.fe-bonus-card .name{display:flex;align-items:center;gap:6px}
+.fe-bonus-icon{width:22px;height:22px;flex:0 0 auto;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ffb057,#ff6a3d);color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center}
+.fe-bonus-turnover{margin-top:6px;font-size:11px;color:var(--text-2)}
 .fe-rule-list{padding-left:18px;color:var(--text-2);font-size:13px;line-height:2}
 </style>
 </head>
@@ -349,6 +364,7 @@ tbody tr:last-child td{border-bottom:none}
     <div class="subtabs">
       <div class="subtab active" data-tab="list" onclick="switchSubtab('list')">推播列表</div>
       <div class="subtab" data-tab="count" onclick="switchSubtab('count')">推播次数</div>
+      <div class="subtab" data-tab="count2" onclick="switchSubtab('count2')">推播次数2</div>
       <div class="subtab" data-tab="popup" onclick="switchSubtab('popup')">推播弹窗</div>
     </div>
 
@@ -419,16 +435,49 @@ tbody tr:last-child td{border-bottom:none}
       </div>
 
       <div class="card" style="overflow-x:auto">
-        <table>
+        <table class="count-table">
           <thead>
             <tr>
               <th style="width:170px">推播名称</th>
               <th style="width:190px">目标用户</th>
-              <th>阶级1推播</th><th>阶级2推播</th><th>阶级3推播</th><th>阶级4推播</th><th>阶级5推播</th>
-              <th>阶级6推播</th><th>阶级7推播</th><th>阶级8推播</th><th>阶级9推播</th><th>阶级10推播</th>
+              <th class="col-reward">阶级1奖励</th><th class="col-count">次数</th><th class="col-reward">阶级2奖励</th><th class="col-count">次数</th><th class="col-reward">阶级3奖励</th><th class="col-count">次数</th><th class="col-reward">阶级4奖励</th><th class="col-count">次数</th><th class="col-reward">阶级5奖励</th><th class="col-count">次数</th>
+              <th class="col-reward">阶级6奖励</th><th class="col-count">次数</th><th class="col-reward">阶级7奖励</th><th class="col-count">次数</th><th class="col-reward">阶级8奖励</th><th class="col-count">次数</th><th class="col-reward">阶级9奖励</th><th class="col-count">次数</th><th class="col-reward">阶级10奖励</th><th class="col-count">次数</th>
             </tr>
           </thead>
           <tbody id="countTableBody"><!-- JS 渲染 --></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ 页面 C''：推播次数2——参照推播次数，仅显示推播总次数 ============ -->
+    <div id="view-count2" class="hidden">
+      <div class="toolbar">
+        <div class="field">
+          推播名称：
+          <input type="text" class="input" id="filterCount2Name" style="width:160px" placeholder="请输入关键字" onkeydown="if(event.key==='Enter')doCount2Search()">
+        </div>
+        <div class="field">
+          推送目标用户：
+          <select class="select" id="filterCount2Main">
+            <option value="">全部</option>
+            <option>VIP 0</option><option>VIP 1</option><option>VIP 2</option><option>VIP 3</option><option>VIP 4</option><option>VIP 5</option>
+            <option>VIP 6</option><option>VIP 7</option><option>VIP 8</option><option>VIP 9</option><option>VIP 10</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="doCount2Search()">查询</button>
+        <div class="spacer"></div>
+      </div>
+
+      <div class="card" style="overflow-x:auto">
+        <table class="count2-table">
+          <thead>
+            <tr>
+              <th>推播名称</th>
+              <th>目标用户</th>
+              <th>推播总次数</th>
+            </tr>
+          </thead>
+          <tbody id="count2TableBody"><!-- JS 渲染 --></tbody>
         </table>
       </div>
     </div>
@@ -475,21 +524,23 @@ tbody tr:last-child td{border-bottom:none}
                 <div class="fe-popup">
                   <div class="fe-popup-close" onclick="closePushPopup()">✕</div>
                   <div class="fe-popup-title">活动快报</div>
-                  <div class="fe-popup-sub">已符合资格活动</div>
-                  <div class="fe-popup-list">
-                    <div class="fe-popup-item"><span class="name">充值活动</span><span class="join" onclick="goActivityDetail('充值活动')">参加</span></div>
-                    <div class="fe-popup-item"><span class="name">盈利活动</span><span class="join" onclick="goActivityDetail('盈利活动')">参加</span></div>
-                    <div class="fe-popup-item"><span class="name">新手/回归签到活动</span><span class="join" onclick="goActivityDetail('新手/回归签到活动')">参加</span></div>
-                    <div class="fe-popup-item"><span class="name">每日特别返水</span><span class="join" onclick="goActivityDetail('每日特别返水')">参加</span></div>
-                    <div class="fe-popup-item"><span class="name">新用户充值转盘活动</span><span class="join" onclick="goActivityDetail('新用户充值转盘活动')">参加</span></div>
-                    <div class="fe-popup-item"><span class="name">Payday活动</span><span class="join" onclick="goActivityDetail('Payday活动')">参加</span></div>
-                    <div class="fe-popup-item"><span class="name">消费活动</span><span class="join" onclick="goActivityDetail('消费活动')">参加</span></div>
-                    <div class="fe-popup-item"><span class="name">签到活动</span><span class="join" onclick="goActivityDetail('签到活动')">参加</span></div>
-                    <div class="fe-popup-item"><span class="name">老用户回归活动</span><span class="join" onclick="goActivityDetail('老用户回归活动')">参加</span></div>
+                  <div id="popupRewardsBlock">
+                    <div class="fe-popup-sub">待领取奖励</div>
+                    <div class="fe-popup-list">
+                      <div class="fe-popup-item"><span class="name">盈利活动</span><span class="join" onclick="goActivityDetail('盈利活动')">领取</span></div>
+                      <div class="fe-popup-item"><span class="name">消费活动</span><span class="join" onclick="goActivityDetail('消费活动')">领取</span></div>
+                      <div class="fe-popup-item"><span class="name">每日特别返水</span><span class="join" onclick="goActivityDetail('每日特别返水')">领取</span></div>
+                      <div class="fe-popup-item"><span class="name">每日特别加码</span><span class="join" onclick="goActivityDetail('每日特别加码')">领取</span></div>
+                      <div class="fe-popup-item"><span class="name">游戏挑战赛</span><span class="join" onclick="goActivityDetail('游戏挑战赛')">领取</span></div>
+                    </div>
                   </div>
-                  <div class="fe-popup-bonus">
-                    <div class="lb">福利加码</div>
-                    <div class="txt"><strong>【20% Loss Cashback】</strong>奖励已派发至【我的优惠券】</div>
+                  <div class="fe-popup-bonus" id="popupBonusBlock">
+                    <div class="fe-popup-sub">福利加码</div>
+                    <div class="fe-popup-item fe-bonus-card">
+                      <span class="name"><span class="fe-bonus-icon" id="bonusIcon">₱</span><span id="bonusText">1,000</span></span>
+                      <span class="join" onclick="claimBonus()">领取</span>
+                    </div>
+                    <div class="fe-bonus-turnover" id="bonusTurnover">流水倍数：2倍</div>
                   </div>
                 </div>
               </div>
@@ -503,7 +554,21 @@ tbody tr:last-child td{border-bottom:none}
               </div>
             </div>
           </div>
-          <button class="btn btn-primary btn-sm" onclick="showPushPopup()">模拟触发推播弹窗</button>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
+            <button class="btn btn-primary btn-sm" onclick="showPushPopup('full')">情境①：待领取奖励＋福利加码</button>
+            <button class="btn btn-plain-primary btn-sm" onclick="showPushPopup('rewardsOnly')">情境②：仅待领取奖励</button>
+            <button class="btn btn-plain-primary btn-sm" onclick="showPushPopup('bonusOnly')">情境③：仅福利加码</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-2)">
+            福利加码奖励类型（示意）：
+            <select class="select" id="bonusTypeSelect" style="width:120px;height:28px;font-size:12px" onchange="onBonusTypeChange(this.value)">
+              <option value="礼金">礼金</option>
+              <option value="积分">积分</option>
+              <option value="免费旋转">免费旋转</option>
+              <option value="免费投注">免费投注</option>
+              <option value="优惠券">优惠券</option>
+            </select>
+          </div>
         </div>
 
         <div class="section" style="flex:1;min-width:280px;align-self:flex-start">
@@ -511,10 +576,13 @@ tbody tr:last-child td{border-bottom:none}
           <ol class="fe-rule-list">
             <li>「推播弹窗」仅在首页显示；首页涵盖「热门、好赢、体育、老虎机、游乐场、娱乐城、扑克、电玩、电子宾果、数字游戏」等分类页签，切换至其他非首页页面（如游戏详情页、个人中心等）时不显示。</li>
             <li>弹窗标题固定文案为「活动快报」。</li>
-            <li>弹窗内容显示用户当前符合资格、可领取奖励的活动，例如：充值活动、消费活动、Payday活动、盈利活动、新手/回归签到活动、签到活动、新用户充值转盘活动、每日特别返水、老用户回归活动。</li>
+            <li>弹窗内容显示用户当前符合资格、待领取奖励的活动，共 5 种：盈利活动、消费活动、每日特别返水、每日特别加码、游戏挑战赛。</li>
             <li>弹窗高度固定；活动清单内容过多时，清单区域可上下滑动查看，其余区域不随之滚动。</li>
-            <li>活动清单下方固定显示「福利加码」区块，依据后台配置显示对应的活动奖励文案。</li>
-            <li>点击活动清单中的「参加」按钮后，导向对应活动的详情页（下方示意以 Toast 模拟跳转效果）。</li>
+            <li>活动清单下方固定显示「福利加码」区块，标题样式与「待领取奖励」一致；下方以卡片显示对应的奖励图示、金额与「领取」按钮，依后台配置的奖励内容带出。</li>
+            <li>当「福利加码」奖励类型为「礼金」时，卡片下方需额外显示「流水倍数」提示（例：流水倍数：2倍）；其余奖励类型（积分、优惠券、免费旋转、免费投注）则不显示此提示。</li>
+            <li>「待领取奖励」与「福利加码」两区块依用户当下实际资格显示，可能同时存在、也可能只存在其中一种（下方情境①～③示意；两区块皆无内容时不触发弹窗）。</li>
+            <li>「待领取奖励」点击活动清单中的「领取」按钮后，导向对应活动的详情页（下方示意以 Toast 模拟跳转效果）。</li>
+            <li>「福利加码」点击「领取」按钮后依奖励类型导向不同页面：奖励为「礼金」时，仅关闭弹窗、不做任何页面导向；奖励为「积分」时，导向「积分商城」；奖励为「免费旋转、免费投注、优惠券」时，导向「我的优惠券」（下方可切换奖励类型示意）。</li>
           </ol>
         </div>
       </div>
@@ -599,6 +667,24 @@ tbody tr:last-child td{border-bottom:none}
     <div class="dialog-foot">
       <button class="btn" onclick="closeDel()">取消</button>
       <button class="btn btn-primary" style="background:var(--danger);border-color:var(--danger)" onclick="confirmDel()">确定删除</button>
+    </div>
+  </div>
+</div>
+
+<!-- 推播次数2——详细推播次数弹窗 -->
+<div class="mask" id="count2DetailMask">
+  <div class="dialog" style="width:360px">
+    <div class="dialog-head">推播次数详情</div>
+    <div class="dialog-body" style="padding:16px 20px">
+      <table>
+        <thead>
+          <tr><th style="width:70px">阶级</th><th>奖励</th><th style="width:90px">次数</th></tr>
+        </thead>
+        <tbody id="count2DetailBody"><!-- JS 渲染 --></tbody>
+      </table>
+    </div>
+    <div class="dialog-foot">
+      <button class="btn btn-primary" onclick="closeCount2Detail()">关闭</button>
     </div>
   </div>
 </div>
@@ -688,20 +774,74 @@ function renderCountTable(){
     });
   const body = document.getElementById('countTableBody');
   if(rows.length===0){
-    body.innerHTML = `<tr><td colspan="12"><div class="empty"><div class="big">📊</div>暂无符合条件的推播次数记录</div></td></tr>`;
+    body.innerHTML = `<tr><td colspan="22"><div class="empty"><div class="big">📊</div>暂无符合条件的推播次数记录</div></td></tr>`;
     return;
   }
   body.innerHTML = rows.map(c=>{
     const lvCount = c.rec.thrLv;
-    const cell = i => i<lvCount ? Number(c.counts[i]||0).toLocaleString() : '<span class="none">—</span>';
+    const rewardCell = i => i<lvCount ? fmtRewardText(c.rec.rewards[i]) : '<span class="none">—</span>';
+    const countCell = i => i<lvCount ? Number(c.counts[i]||0).toLocaleString() : '<span class="none">—</span>';
     return `
     <tr>
       <td>${c.name}</td>
       <td>${c.rec.vip}</td>
-      ${[0,1,2,3,4,5,6,7,8,9].map(i=>`<td>${cell(i)}</td>`).join('')}
+      ${[0,1,2,3,4,5,6,7,8,9].map(i=>`<td>${rewardCell(i)}</td><td>${countCell(i)}</td>`).join('')}
     </tr>`;
   }).join('');
 }
+function fmtRewardText(rw){
+  if(!rw || !rw.giftType) return '<span class="none">—</span>';
+  if(rw.giftType==='礼金') return `礼金 ${Number(rw.giftValue).toLocaleString()}${rw.turnover?`（流水${Number(rw.turnover).toLocaleString()}）`:''}`;
+  if(rw.giftType==='积分') return `积分 ${Number(rw.giftValue).toLocaleString()}`;
+  return `${rw.giftType} ${rw.giftValue}`;
+}
+
+/* ============================================================
+   五之二、推播次数2——参照推播次数，仅显示推播总次数；点击总次数可查看各阶级明细
+   ============================================================ */
+function doCount2Search(){ renderCount2Table(); }
+function renderCount2Table(){
+  const fn = document.getElementById('filterCount2Name').value.trim().toLowerCase();
+  const fm = document.getElementById('filterCount2Main').value;
+  const rows = countList
+    .map(c=>({...c, rec: pushList.find(p=>p.name===c.name)}))
+    .filter(c=>c.rec)
+    .filter(c=>{
+      if(fn && !c.name.toLowerCase().includes(fn)) return false;
+      if(fm && c.rec.vip!==fm) return false;
+      return true;
+    });
+  const body = document.getElementById('count2TableBody');
+  if(rows.length===0){
+    body.innerHTML = `<tr><td colspan="3"><div class="empty"><div class="big">📊</div>暂无符合条件的推播次数记录</div></td></tr>`;
+    return;
+  }
+  body.innerHTML = rows.map(c=>{
+    const total = c.counts.slice(0, c.rec.thrLv).reduce((sum,n)=>sum+Number(n||0), 0);
+    return `
+    <tr>
+      <td>${c.name}</td>
+      <td>${c.rec.vip}</td>
+      <td><a class="count2-total" onclick="openCount2Detail('${c.name}')">${total.toLocaleString()}</a></td>
+    </tr>`;
+  }).join('');
+}
+function openCount2Detail(name){
+  const c = countList.find(x=>x.name===name);
+  const rec = pushList.find(p=>p.name===name);
+  if(!c || !rec) return;
+  document.getElementById('count2DetailBody').innerHTML = [0,1,2,3,4,5,6,7,8,9].map(i=>{
+    const inLv = i<rec.thrLv;
+    return `
+    <tr>
+      <td>阶级${i+1}</td>
+      <td>${inLv ? fmtRewardText(rec.rewards[i]) : '<span class="none">—</span>'}</td>
+      <td>${inLv ? Number(c.counts[i]||0).toLocaleString() : '<span class="none">—</span>'}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('count2DetailMask').classList.add('show');
+}
+function closeCount2Detail(){ document.getElementById('count2DetailMask').classList.remove('show'); }
 
 let seqId = 4;              // 下一个新增的 id
 let editingId = null;      // 正在编辑的 id（null=新增）
@@ -741,15 +881,57 @@ function switchSubtab(tab){
   document.getElementById('view-form').classList.add('hidden');
   document.getElementById('view-list').classList.toggle('hidden', tab!=='list');
   document.getElementById('view-count').classList.toggle('hidden', tab!=='count');
+  document.getElementById('view-count2').classList.toggle('hidden', tab!=='count2');
   document.getElementById('view-popup').classList.toggle('hidden', tab!=='popup');
   if(tab==='count') renderCountTable();
+  if(tab==='count2') renderCount2Table();
   if(tab!=='popup') closePushPopup();
 }
-function showPushPopup(){ document.getElementById('feMask').classList.add('show'); }
+function showPushPopup(scenario){
+  scenario = scenario || 'full';
+  const showRewards = scenario !== 'bonusOnly';
+  const showBonus = scenario !== 'rewardsOnly';
+  document.getElementById('popupRewardsBlock').style.display = showRewards ? '' : 'none';
+  document.getElementById('popupBonusBlock').style.display = showBonus ? '' : 'none';
+  document.getElementById('popupBonusBlock').classList.toggle('no-top-border', !showRewards);
+  document.getElementById('feMask').classList.add('show');
+}
 function closePushPopup(){ document.getElementById('feMask').classList.remove('show'); }
 function goActivityDetail(name){
   closePushPopup();
   toast('info', `模拟跳转 → 进入「${name}」活动详情页`);
+}
+
+/* 福利加码——奖励类型示意数据；礼金/积分/其余三种(免费旋转、免费投注、优惠券)导向行为各不相同 */
+const BONUS_DEMO = {
+  '礼金':    {icon:'₱',  text:'1,000',            turnover:'流水倍数：2倍'},
+  '积分':    {icon:'★',  text:'500 积分',          turnover:''},
+  '免费旋转': {icon:'🎰', text:'免费旋转 JILI',      turnover:''},
+  '免费投注': {icon:'🎯', text:'免费投注 Mini',      turnover:''},
+  '优惠券':  {icon:'🎟', text:'20% Loss Cashback', turnover:''}
+};
+let bonusType = '礼金';
+function onBonusTypeChange(type){
+  bonusType = type;
+  renderBonusCard();
+}
+function renderBonusCard(){
+  const d = BONUS_DEMO[bonusType];
+  document.getElementById('bonusIcon').textContent = d.icon;
+  document.getElementById('bonusText').textContent = d.text;
+  const turnoverEl = document.getElementById('bonusTurnover');
+  turnoverEl.textContent = d.turnover;
+  turnoverEl.style.display = d.turnover ? '' : 'none';
+}
+function claimBonus(){
+  closePushPopup();
+  if(bonusType==='礼金'){
+    toast('info', '礼金奖励已领取，弹窗关闭');
+  } else if(bonusType==='积分'){
+    toast('info', '模拟跳转 → 进入「积分商城」');
+  } else {
+    toast('info', '模拟跳转 → 进入「我的优惠券」');
+  }
 }
 
 /* ============================================================
@@ -1136,6 +1318,8 @@ function toast(type,msg){
 /* 初始渲染 */
 renderTable();
 renderCountTable();
+renderCount2Table();
+renderBonusCard();
 </script>
 </body>
 </html>
