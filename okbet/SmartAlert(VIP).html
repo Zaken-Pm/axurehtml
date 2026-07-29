@@ -98,7 +98,7 @@ body{
 .tab.active .x{color:#cfe0ff}
 
 /* 内容区 */
-.content{flex:1;overflow-y:auto;padding:16px}
+.content{flex:1;overflow:auto;padding:16px}
 
 /* 二级页签 */
 .subtabs{display:flex;gap:24px;border-bottom:1px solid var(--border-2);margin-bottom:16px}
@@ -109,9 +109,9 @@ body{
 .subtab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
 
 /* 工具条 */
-.toolbar{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.toolbar{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:nowrap;min-width:max-content}
 .toolbar .spacer{flex:1}
-.field{display:flex;align-items:center;gap:6px;color:var(--text-2);font-size:13px}
+.field{display:flex;align-items:center;gap:6px;color:var(--text-2);font-size:13px;flex-shrink:0}
 
 /* 开关（智能推播总开关，预设关闭） */
 .eswitch{position:relative;display:inline-block;width:40px;height:20px;border-radius:10px;background:var(--border);cursor:pointer;transition:.2s;flex:0 0 auto}
@@ -122,7 +122,7 @@ body{
 
 /* 通用按钮 */
 .btn{
-  display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 15px;
+  display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 15px;flex-shrink:0;
   border-radius:var(--radius);border:1px solid var(--border);background:#fff;
   color:var(--text);font-size:13px;cursor:pointer;transition:.15s;white-space:nowrap;
 }
@@ -1357,11 +1357,11 @@ function renderGiftValueCell(i){
       html += `
       <div class="reward-val-extra">
         <div style="display:flex;align-items:center;gap:6px">
-          <input type="number" class="input" style="width:100%" value="${rw.turnover}" min="1"
+          <input type="number" class="input" style="width:100%" value="${rw.turnover}" min="0"
                  placeholder="礼金所需流水" oninput="onTurnoverInput(${i},this.value)">
           <span style="color:var(--text-2);white-space:nowrap">倍</span>
         </div>
-        <div class="row-error" id="err-rwturn-${i}">请输入礼金所需流水，不可留空或小于等于 0</div>
+        <div class="row-error" id="err-rwturn-${i}">礼金所需流水不可为负数</div>
       </div>`;
     }
     return html;
@@ -1449,7 +1449,7 @@ function saveForm(){
       if(rw.giftValue===''||isNaN(n)||n<=0){ showError('err-rwval-'+i); ok=false; }
       if(rw.giftType==='礼金'){
         const tn=Number(rw.turnover);
-        if(rw.turnover===''||isNaN(tn)||tn<=0){ showError('err-rwturn-'+i); ok=false; }
+        if(rw.turnover!==''&&(isNaN(tn)||tn<0)){ showError('err-rwturn-'+i); ok=false; }
       }
     } else if(!rw.giftValue){ showError('err-rwval-'+i); ok=false; }
   }

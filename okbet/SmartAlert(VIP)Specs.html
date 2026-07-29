@@ -1,0 +1,2958 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智能推播 · 原型图 + 规格说明</title>
+<style>
+
+/* ---------- 颜色变量：取自前台 logo 蓝与后台 Element UI 风，确保高对比 ---------- */
+:root{
+  --c-text:#1f2733;        /* 主文字：深灰蓝 */
+  --c-text-2:#4a5568;      /* 次要文字 */
+  --c-muted:#8a94a6;       /* 弱化文字 */
+  --c-line:#dfe3ea;        /* 主要分隔线 */
+  --c-line-2:#eef1f5;      /* 次要分隔线 */
+  --c-bg:#ffffff;
+  --c-bg-soft:#eef1f6;     /* 页面底色 */
+  --c-primary:#025be8;     /* 主蓝 */
+  --c-primary-soft:#eaf2ff;
+  --c-green:#2f9e44;       /* 开启／成功／新增 */
+  --c-green-soft:#e9f8ee;
+  --c-red:#e03131;         /* 关闭／失败／必填 */
+  --c-red-soft:#fdecec;
+  --c-amber:#e08a00;       /* 提醒／异动 */
+  --c-amber-soft:#fff5e6;
+  --c-purple:#6741d9;      /* 逻辑／流程 */
+  --c-purple-soft:#f0ecfb;
+}
+
+/* ---------- 归零：一律 px，不使用百分比 padding/margin ---------- */
+*{box-sizing:border-box;margin:0;padding:0}
+
+/* ---------- body：flex 垂直置中，页面可横向滚动（nowrap 长行的必要退路） ---------- */
+body{
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+  color:var(--c-text);
+  background:var(--c-bg-soft);
+  font-size:14px;
+  line-height:22px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:28px;
+}
+
+/* ============================================================================
+   全域文字规则（防折行核心）
+   ============================================================================ */
+p, li, span, h1, h2, h3, h4, h5, h6, b, code, a, label, dt, dd, em, strong, small{
+  white-space:nowrap;      /* 铁律 1：永不折行 */
+  width:max-content;       /* 铁律 2：宽度贴着文字 */
+  font-size:14px;          /* 铁律 5：字级写死 px */
+  line-height:22px;        /* 铁律 5：行高写死 px */
+}
+/* 行内标签补 inline-block（铁律 3），防止 Axure 9 断行 */
+b, code, a, strong, em{
+  display:inline-block;
+  white-space:nowrap;
+  width:max-content;
+}
+/* 表格储存格：nowrap；宽度改由 table-layout:fixed + 栏宽 px 决定（见文件顶端取舍说明） */
+th, td{
+  white-space:nowrap;
+  font-size:14px;
+  line-height:22px;
+}
+
+/* ============================================================================
+   外层文件框：固定宽度（铁律 4）
+   ============================================================================ */
+.spec-doc{
+  width:1440px;
+  flex-shrink:0;
+  display:flex;
+  flex-direction:column;
+  gap:22px;
+}
+
+/* ---------- 文件页首 ---------- */
+.spec-header{
+  width:1440px;flex-shrink:0;
+  background:var(--c-bg);
+  border:1px solid var(--c-line);
+  border-radius:12px;
+  padding:26px 32px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.doc-title{font-size:24px;line-height:32px;font-weight:800;color:var(--c-text)}
+.doc-sub{font-size:14px;line-height:22px;color:var(--c-text-2)}
+.meta-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.meta-chip{
+  display:inline-flex;align-items:center;gap:6px;flex-shrink:0;
+  height:26px;padding:0 12px;border-radius:13px;
+  background:var(--c-bg-soft);border:1px solid var(--c-line);
+  font-size:13px;line-height:20px;color:var(--c-text-2);
+}
+.meta-chip b{font-size:13px;line-height:20px;color:var(--c-text);font-weight:700}
+
+/* ---------- 目录导航 ---------- */
+.spec-nav{
+  width:1440px;flex-shrink:0;
+  background:var(--c-bg);border:1px solid var(--c-line);border-radius:12px;
+  padding:20px 32px;display:flex;flex-direction:column;gap:12px;
+}
+.nav-title{font-size:15px;line-height:22px;font-weight:700;color:var(--c-text)}
+.nav-list{display:flex;flex-wrap:wrap;gap:8px 10px}
+.nav-list a{
+  display:inline-flex;align-items:center;flex-shrink:0;
+  height:30px;padding:0 14px;border-radius:15px;
+  background:var(--c-primary-soft);border:1px solid #cfe0ff;
+  color:var(--c-primary);font-size:13px;line-height:20px;text-decoration:none;
+  width:max-content;
+}
+
+/* ============================================================================
+   区块（section）：固定宽度（铁律 4）
+   ============================================================================ */
+.spec-section{
+  width:1440px;flex-shrink:0;
+  background:var(--c-bg);border:1px solid var(--c-line);border-radius:12px;
+  padding:26px 32px;display:flex;flex-direction:column;gap:18px;
+}
+.sec-head{display:flex;align-items:center;gap:12px}
+.sec-no{
+  display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;
+  width:44px;height:28px;border-radius:6px;
+  background:var(--c-primary);color:#fff;font-size:14px;line-height:20px;font-weight:800;
+}
+.sec-title{font-size:20px;line-height:28px;font-weight:800;color:var(--c-text)}
+.sec-side{
+  display:inline-flex;align-items:center;flex-shrink:0;
+  height:24px;padding:0 10px;border-radius:12px;margin-left:6px;
+  font-size:12px;line-height:18px;
+}
+.side-front{background:var(--c-green-soft);color:var(--c-green);border:1px solid #b7e6c4}
+.side-back{background:var(--c-primary-soft);color:var(--c-primary);border:1px solid #cfe0ff}
+.side-logic{background:var(--c-purple-soft);color:var(--c-purple);border:1px solid #d9cdf6}
+
+/* ---------- 功能区块：图 + 文 并排（Flex，非 absolute） ---------- */
+.func-block{
+  width:1376px;flex-shrink:0;
+  border:1px solid var(--c-line);border-radius:10px;overflow:visible;
+  display:flex;flex-direction:column;
+}
+.fb-head{
+  width:1376px;flex-shrink:0;
+  display:flex;align-items:center;gap:10px;
+  background:var(--c-bg-soft);border-bottom:1px solid var(--c-line);
+  padding:12px 18px;
+}
+.fb-code{
+  display:inline-flex;align-items:center;flex-shrink:0;
+  height:24px;padding:0 10px;border-radius:6px;
+  background:#fff;border:1px solid var(--c-line);
+  font-size:13px;line-height:20px;font-weight:700;color:var(--c-primary);
+}
+.fb-name{font-size:16px;line-height:24px;font-weight:700;color:var(--c-text)}
+.fb-body{
+  width:1376px;flex-shrink:0;
+  display:flex;gap:26px;align-items:flex-start;
+  padding:20px 18px;
+}
+.fig-col{width:360px;flex-shrink:0;display:flex;flex-direction:column;gap:10px}
+.text-col{width:930px;flex-shrink:0;display:flex;flex-direction:column;gap:14px}
+.fig-cap{font-size:12px;line-height:18px;color:var(--c-muted)}
+
+/* ---------- 规则群组（每群一小标 + 条列） ---------- */
+.rule-group{display:flex;flex-direction:column;gap:8px}
+.rg-title{
+  display:inline-flex;align-items:center;gap:8px;flex-shrink:0;
+  font-size:14px;line-height:22px;font-weight:700;color:var(--c-text);
+  width:max-content;
+}
+.rg-title::before{content:"";width:4px;height:14px;background:var(--c-primary);border-radius:2px;flex-shrink:0}
+.rg-title.ok::before{background:var(--c-green)}
+.rg-title.err::before{background:var(--c-red)}
+.rg-title.src::before{background:var(--c-amber)}
+.rule-list{display:flex;flex-direction:column;gap:6px;padding-left:2px}
+.rule-list li{
+  list-style:none;position:static;
+  display:flex;align-items:flex-start;gap:8px;
+  white-space:nowrap;width:max-content;
+  font-size:14px;line-height:22px;color:var(--c-text-2);
+}
+.rule-list li::before{
+  content:"›";flex-shrink:0;display:inline-block;
+  color:var(--c-primary);font-size:14px;line-height:22px;font-weight:800;width:max-content;
+}
+.rule-list.ok li::before{content:"✓";color:var(--c-green)}
+.rule-list.err li::before{content:"✕";color:var(--c-red)}
+
+/* ---------- 内文强调用色块 ---------- */
+.k{display:inline-block;white-space:nowrap;width:max-content;color:var(--c-text);font-weight:700;font-size:14px;line-height:22px}
+.k-blue{display:inline-block;white-space:nowrap;width:max-content;color:var(--c-primary);font-weight:700;font-size:14px;line-height:22px}
+.k-red{display:inline-block;white-space:nowrap;width:max-content;color:var(--c-red);font-weight:700;font-size:14px;line-height:22px}
+.k-green{display:inline-block;white-space:nowrap;width:max-content;color:var(--c-green);font-weight:700;font-size:14px;line-height:22px}
+
+/* ---------- 提示条（notice） ---------- */
+.notice{
+  width:1376px;flex-shrink:0;
+  display:flex;gap:10px;align-items:flex-start;
+  border-radius:8px;padding:12px 16px;
+}
+.notice .ni{flex-shrink:0;font-size:16px;line-height:22px;width:max-content}
+.notice .nt{display:flex;flex-direction:column;gap:4px}
+.notice .nt span{font-size:13px;line-height:20px;white-space:nowrap;width:max-content}
+.notice-amber{background:var(--c-amber-soft);border:1px solid #f6dfae}
+.notice-amber .ni,.notice-amber .nt span{color:#a15c00}
+.notice-red{background:var(--c-red-soft);border:1px solid #f6c9c9}
+.notice-red .ni,.notice-red .nt span{color:var(--c-red)}
+.notice-blue{background:var(--c-primary-soft);border:1px solid #cfe0ff}
+.notice-blue .ni,.notice-blue .nt span{color:#0b4fc0}
+
+/* ============================================================================
+   表格通用（table-layout:fixed + 每栏固定 px）
+   ============================================================================ */
+.tbl-wrap{
+  flex-shrink:0;border:1px solid var(--c-line);border-radius:8px;overflow:visible;
+  display:flex;flex-direction:column;
+}
+table{border-collapse:collapse;table-layout:fixed}
+thead th{
+  background:var(--c-bg-soft);color:var(--c-text);font-weight:700;
+  text-align:left;padding:10px 12px;border-bottom:1px solid var(--c-line);
+  border-right:1px solid var(--c-line-2);
+}
+thead th:last-child{border-right:none}
+tbody td{
+  padding:10px 12px;border-bottom:1px solid var(--c-line-2);
+  border-right:1px solid var(--c-line-2);color:var(--c-text-2);vertical-align:top;
+}
+tbody td:last-child{border-right:none}
+tbody tr:last-child td{border-bottom:none}
+.cell-c{text-align:center}
+.tag-cell{
+  display:inline-flex;align-items:center;flex-shrink:0;height:22px;padding:0 8px;border-radius:11px;
+  font-size:12px;line-height:18px;width:max-content;
+}
+.tc-new{background:var(--c-green-soft);color:var(--c-green);border:1px solid #b7e6c4}
+.tc-chg{background:var(--c-amber-soft);color:#a15c00;border:1px solid #f6dfae}
+.tc-keep{background:var(--c-bg-soft);color:var(--c-muted);border:1px solid var(--c-line)}
+.tc-yes{background:var(--c-green-soft);color:var(--c-green);border:1px solid #b7e6c4}
+.tc-no{background:var(--c-red-soft);color:var(--c-red);border:1px solid #f6c9c9}
+
+/* ============================================================================
+   ★ 组件样式（依需求：按钮／输入框／页签／卡片 各有独立 class、可被 Figma/Axure 当原生元件）
+   ============================================================================ */
+
+/* 按钮 */
+.c-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;flex-shrink:0;
+  height:34px;padding:0 16px;border-radius:6px;
+  border:1px solid var(--c-line);background:#fff;color:var(--c-text);
+  font-size:13px;line-height:20px;width:max-content;
+}
+.c-btn-primary{background:var(--c-primary);border-color:var(--c-primary);color:#fff}
+.c-btn-amber{background:var(--c-amber);border-color:var(--c-amber);color:#fff}
+.c-btn-danger{background:var(--c-red);border-color:var(--c-red);color:#fff}
+.c-btn-sm{height:28px;padding:0 12px;font-size:12px;line-height:18px}
+
+/* 输入框 / 下拉 */
+.c-input,.c-select{
+  display:inline-flex;align-items:center;flex-shrink:0;
+  height:34px;padding:0 12px;border-radius:6px;
+  border:1px solid var(--c-line);background:#fff;color:var(--c-text-2);
+  font-size:13px;line-height:20px;
+}
+.c-input.ph,.c-select.ph{color:var(--c-muted)}
+.c-input.is-error{border-color:var(--c-red)}
+.c-select::after{content:"▾";margin-left:10px;color:var(--c-muted);font-size:12px;line-height:18px;display:inline-block;width:max-content}
+.c-w120{width:120px}.c-w140{width:140px}.c-w160{width:160px}.c-w180{width:180px}.c-w220{width:220px}.c-w320{width:320px}
+
+/* 页签（导览） */
+.c-tabs{display:flex;gap:20px;flex-shrink:0;border-bottom:1px solid var(--c-line);width:max-content}
+.c-tab{
+  display:inline-flex;align-items:center;flex-shrink:0;height:38px;padding:0 2px;
+  color:var(--c-text-2);font-size:14px;line-height:20px;
+  border-bottom:2px solid transparent;width:max-content;
+}
+.c-tab.active{color:var(--c-primary);border-bottom-color:var(--c-primary);font-weight:700}
+
+/* 开关 */
+.c-switch{
+  display:inline-flex;align-items:center;flex-shrink:0;
+  width:44px;height:22px;border-radius:11px;background:var(--c-line);padding:2px;
+}
+.c-switch .knob{width:18px;height:18px;border-radius:50%;background:#fff;flex-shrink:0}
+.c-switch.on{background:var(--c-primary);justify-content:flex-end}
+
+/* VIP 标签（单选按钮组） */
+.c-tag{
+  display:inline-flex;align-items:center;flex-shrink:0;
+  height:30px;padding:0 14px;border-radius:15px;
+  border:1px solid var(--c-line);background:#fff;color:var(--c-text-2);
+  font-size:13px;line-height:20px;width:max-content;
+}
+.c-tag.sel{background:var(--c-primary);border-color:var(--c-primary);color:#fff}
+
+/* 必填星号 / 表单标签 */
+.req{display:inline-block;color:var(--c-red);width:max-content;margin-right:2px;font-size:14px;line-height:22px}
+.c-form-label{
+  display:inline-flex;align-items:center;flex-shrink:0;
+  width:max-content;color:var(--c-text-2);font-size:13px;line-height:20px;
+}
+.c-error{display:inline-block;color:var(--c-red);font-size:12px;line-height:18px;width:max-content}
+.c-newflag{
+  display:inline-flex;align-items:center;flex-shrink:0;height:18px;padding:0 6px;border-radius:4px;
+  background:#fff0e6;color:var(--c-new);border:1px solid #ffd6b0;
+  font-size:10px;line-height:14px;width:max-content;
+}
+
+/* ============================================================================
+   Mockup 图（重建版：全部 Flex/Grid，零 absolute）
+   ============================================================================ */
+
+/* --- 后台侧栏入口 mockup --- */
+.mk-side{width:360px;flex-shrink:0;border:1px solid var(--c-line);border-radius:8px;overflow:visible;display:flex;flex-direction:column;background:#fff}
+.mk-side .row{display:flex;align-items:center;gap:8px;flex-shrink:0;height:38px;padding:0 14px;border-bottom:1px solid var(--c-line-2)}
+.mk-side .row:last-child{border-bottom:none}
+.mk-side .row span{font-size:13px;line-height:20px;color:var(--c-text-2);white-space:nowrap;width:max-content}
+.mk-side .row.sub{padding-left:30px}
+.mk-side .row.on{background:var(--c-primary-soft)}
+.mk-side .row.on span{color:var(--c-primary);font-weight:700}
+.mk-dot{width:5px;height:5px;border-radius:50%;background:var(--c-muted);flex-shrink:0}
+.mk-side .row.on .mk-dot{background:var(--c-primary)}
+
+/* --- 后台表单 mockup（迷你四区块） --- */
+.mk-form{width:360px;flex-shrink:0;border:1px solid var(--c-line);border-radius:8px;background:#fff;display:flex;flex-direction:column}
+.mk-fsec{width:358px;flex-shrink:0;border-bottom:1px solid var(--c-line-2);padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.mk-fsec:last-child{border-bottom:none}
+.mk-fsec .h{display:inline-flex;align-items:center;gap:6px;font-size:13px;line-height:20px;font-weight:700;color:var(--c-text);width:max-content}
+.mk-fsec .h::before{content:"";width:3px;height:13px;background:var(--c-primary);border-radius:2px;flex-shrink:0}
+.mk-inline{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+
+/* --- 后台条件 grid mockup（阶级 × 两项目标值） --- */
+.mk-thr{width:332px;flex-shrink:0;border:1px dashed var(--c-line);border-radius:6px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.mk-thr .gr{display:grid;grid-template-columns:64px 120px 120px;gap:6px 10px;align-items:center}
+.mk-thr .gh{font-size:11px;line-height:16px;color:var(--c-muted);font-weight:700;white-space:nowrap;width:max-content}
+.mk-thr .gl{font-size:12px;line-height:18px;color:var(--c-text-2);white-space:nowrap;width:max-content}
+.mk-mini-input{display:inline-flex;align-items:center;flex-shrink:0;height:26px;padding:0 8px;border:1px solid var(--c-line);border-radius:5px;background:#fff;color:var(--c-muted);font-size:11px;line-height:16px;width:120px}
+
+/* --- 前台手机弹窗 mockup（Flex 版，无 absolute） --- */
+.mk-phone{width:300px;flex-shrink:0;background:#12203a;border-radius:26px;padding:10px;display:flex;flex-direction:column}
+.mk-screen{width:280px;flex-shrink:0;background:#eef2f8;border-radius:18px;overflow:visible;display:flex;flex-direction:column}
+.mk-status{width:280px;flex-shrink:0;height:26px;display:flex;align-items:center;justify-content:space-between;padding:0 14px}
+.mk-status span{font-size:10px;line-height:14px;color:#12203a;white-space:nowrap;width:max-content}
+.mk-fetop{width:280px;flex-shrink:0;height:40px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 12px}
+.mk-logo{display:inline-flex;align-items:center;font-size:14px;line-height:20px;font-weight:800;color:var(--c-primary);width:max-content}
+.mk-logo em{color:var(--c-amber);font-style:normal;display:inline-block;width:max-content}
+.mk-login{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:12px;background:var(--c-primary-soft);color:var(--c-primary);font-size:10px;line-height:14px;font-weight:700;width:max-content;flex-shrink:0}
+.mk-cats{width:280px;flex-shrink:0;display:flex;gap:10px;padding:8px 12px;overflow:visible}
+.mk-cat{display:inline-flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;width:max-content}
+.mk-cat .ic{width:26px;height:26px;border-radius:50%;background:#dfe6f0;display:flex;align-items:center;justify-content:center;font-size:13px;line-height:18px;flex-shrink:0}
+.mk-cat span{font-size:9px;line-height:12px;color:#7a828e;white-space:nowrap;width:max-content}
+.mk-cat.on .ic{background:#fff3e6}
+.mk-cat.on span{color:var(--c-amber);font-weight:700}
+.mk-popwrap{width:280px;flex-shrink:0;background:rgba(18,32,58,.5);padding:14px 24px;display:flex;justify-content:center}
+.mk-pop{width:216px;flex-shrink:0;background:#fff;border-radius:14px;padding:14px 12px;display:flex;flex-direction:column;gap:8px}
+.mk-pop-title{font-size:15px;line-height:22px;font-weight:800;color:var(--c-text);text-align:center;white-space:nowrap;width:max-content;align-self:center}
+.mk-pop-sub{font-size:11px;line-height:16px;color:var(--c-muted);white-space:nowrap;width:max-content}
+.mk-pop-list{display:flex;flex-direction:column;gap:6px}
+.mk-pop-item{width:192px;flex-shrink:0;background:#eef4fb;border-radius:8px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between}
+.mk-pop-item .nm{font-size:12px;line-height:18px;font-weight:700;color:var(--c-text);white-space:nowrap;width:max-content}
+.mk-pop-item .jn{display:inline-flex;align-items:center;height:22px;padding:0 10px;border-radius:11px;background:var(--c-amber);color:#fff;font-size:11px;line-height:16px;font-weight:700;white-space:nowrap;width:max-content;flex-shrink:0}
+.mk-pop-div{width:192px;flex-shrink:0;border-top:1px dashed var(--c-line);padding-top:6px;display:flex;flex-direction:column;gap:6px}
+.mk-bonus-ic{width:20px;height:20px;border-radius:50%;background:#ff8a3d;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;line-height:14px;font-weight:800;flex-shrink:0}
+.mk-turn{font-size:10px;line-height:14px;color:var(--c-text-2);white-space:nowrap;width:max-content}
+.mk-tabbar{width:280px;flex-shrink:0;height:40px;background:#fff;border-top:1px solid var(--c-line-2);display:flex;align-items:center;justify-content:space-around}
+.mk-tabbar span{font-size:9px;line-height:12px;color:var(--c-muted);white-space:nowrap;width:max-content}
+
+/* --- 简易流程图（HTML 版，文字可编辑） --- */
+.flow{display:flex;flex-direction:column;gap:10px}
+.flow-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.flow-node{
+  display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;
+  min-height:44px;padding:8px 16px;border-radius:8px;width:max-content;
+  border:1px solid #cfe0ff;background:var(--c-primary-soft);color:#0b4fc0;
+  font-size:13px;line-height:19px;text-align:center;
+}
+.flow-node.start{background:var(--c-green-soft);border-color:#b7e6c4;color:var(--c-green)}
+.flow-node.dec{background:var(--c-amber-soft);border-color:#f6dfae;color:#a15c00}
+.flow-node.end{background:var(--c-purple-soft);border-color:#d9cdf6;color:var(--c-purple)}
+.flow-arrow{display:inline-flex;align-items:center;flex-shrink:0;color:var(--c-muted);font-size:18px;line-height:22px;width:max-content}
+.flow-label{display:inline-flex;align-items:center;flex-shrink:0;font-size:12px;line-height:18px;color:var(--c-text-2);width:max-content}
+
+/* ---------- 文件页尾 ---------- */
+.spec-footer{
+  width:1440px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 32px;color:var(--c-muted);
+}
+.spec-footer span{font-size:12px;line-height:18px;white-space:nowrap;width:max-content;color:var(--c-muted)}
+
+
+/* ====== 双页签外壳（原型图 / 规格说明）—— 同样遵守防折行规范 ====== */
+.doc-shell{width:1540px;flex-shrink:0;display:flex;flex-direction:column;gap:16px}
+.doc-tabs{
+  width:1540px;flex-shrink:0;display:flex;gap:8px;
+  background:#fff;border:1px solid var(--c-line);border-radius:12px;padding:8px;
+}
+.doc-tab{
+  display:inline-flex;align-items:center;gap:8px;flex-shrink:0;
+  height:44px;padding:0 24px;border-radius:8px;cursor:pointer;
+  color:var(--c-text-2);font-size:15px;line-height:22px;width:max-content;
+  border:1px solid transparent;background:transparent;
+}
+.doc-tab:hover{background:var(--c-bg-soft)}
+.doc-tab.active{background:var(--c-primary);color:#fff;font-weight:700}
+.doc-tab .dt-ic{font-size:16px;line-height:22px;display:inline-block;width:max-content}
+.doc-tab.active .dt-ic{color:#fff}
+.tab-panel{display:none;width:1540px;flex-shrink:0}
+.tab-panel.active{display:flex;flex-direction:column;gap:22px}
+.proto-cap{
+  display:flex;align-items:center;gap:8px;width:1540px;flex-shrink:0;
+  background:var(--c-primary-soft);border:1px solid #cfe0ff;border-radius:10px;padding:10px 16px;
+}
+.proto-cap span{font-size:13px;line-height:20px;color:#0b4fc0;white-space:nowrap;width:max-content}
+.proto-frame{
+  width:1540px;height:920px;flex-shrink:0;
+  border:1px solid var(--c-line);border-radius:12px;background:#fff;
+}
+
+/* ====== 规格说明内的二级分页（前台 / 后台 / 逻辑与情境）—— 同样遵守防折行规范 ====== */
+.spec-subtabs{display:flex;gap:8px;flex-wrap:wrap}
+.spec-subtab{
+  display:inline-flex;align-items:center;flex-shrink:0;
+  height:38px;padding:0 20px;border-radius:8px;cursor:pointer;width:max-content;
+  border:1px solid var(--c-line);background:#fff;
+  color:var(--c-text-2);font-size:14px;line-height:20px;
+}
+.spec-subtab:hover{background:var(--c-bg-soft)}
+.spec-subtab.active{background:var(--c-primary);border-color:var(--c-primary);color:#fff;font-weight:700}
+.spec-subpanel{display:none;width:1440px;flex-shrink:0}
+.spec-subpanel.active{display:flex;flex-direction:column;gap:22px}
+
+/* ====== 拟真后台画面 mockup（示意截图风）—— 遵守 px / nowrap / 固定宽，全 Flex 无 absolute ====== */
+.mk-scr{width:1340px;flex-shrink:0;border:1px solid var(--c-line);border-radius:8px;background:#fff;display:flex;flex-direction:column;overflow:visible}
+.mk-scr-tb{width:1340px;flex-shrink:0;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px;border-bottom:1px solid var(--c-line);background:var(--c-bg-soft)}
+.mk-scr-tb .lbl{display:inline-flex;align-items:center;flex-shrink:0;width:max-content;color:var(--c-text-2);font-size:12px;line-height:18px}
+.mk-scr-tb .grow{display:inline-flex;flex-shrink:0;width:max-content;height:12px}
+.mk-op{display:inline-flex;gap:12px;flex-shrink:0;width:max-content}
+.mk-op a{color:var(--c-primary);font-size:13px;line-height:20px;text-decoration:none;display:inline-block;width:max-content;white-space:nowrap}
+.mk-op a.del{color:var(--c-red)}
+.mk-lv{display:inline-flex;flex-direction:column;gap:2px;flex-shrink:0;width:max-content}
+.mk-lv span{font-size:12px;line-height:17px;color:var(--c-text-2);white-space:nowrap;width:max-content}
+.mk-none{display:inline-block;color:var(--c-muted);width:max-content}
+.mk-badge{display:inline-flex;align-items:center;flex-shrink:0;height:20px;padding:0 8px;border-radius:10px;background:var(--c-primary-soft);color:var(--c-primary);font-size:11px;line-height:16px;width:max-content}
+
+</style>
+</head>
+<body>
+<div class="doc-shell">
+  <nav class="doc-tabs">
+    <div class="doc-tab active" id="tab-proto" onclick="showDocTab('proto')"><span class="dt-ic">🖥️</span>原型图</div>
+    <div class="doc-tab" id="tab-spec" onclick="showDocTab('spec')"><span class="dt-ic">📋</span>规格说明</div>
+  </nav>
+  <div class="tab-panel active" id="panel-proto">
+    <div class="proto-cap"><span>ℹ 原型互动示意（SmartAlert VIP）— 可直接点选操作；此页为独立隔离环境，样式与规格说明互不影响。</span></div>
+    <iframe class="proto-frame" title="SmartAlert VIP 原型" srcdoc="<!DOCTYPE html>
+<html lang=&quot;zh-CN&quot;>
+<head>
+<meta charset=&quot;UTF-8&quot;>
+<meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+<title>智能推播 · 后台示意页面</title>
+<style>
+/* ============================================================
+   颜色变量：全部取自现有后台截图（Element UI 风格）
+   这样示意页面看起来就跟你们现在的后台一模一样。
+   ============================================================ */
+:root{
+  --primary:#409EFF;          /* 主蓝：按钮、选中 */
+  --primary-hover:#66b1ff;
+  --primary-active:#3a8ee6;
+  --primary-light:#ecf5ff;    /* 浅蓝底 */
+  --menu-active-bg:#e8f1fc;   /* 左侧菜单选中底色 */
+  --menu-active-text:#2b6fe0;
+  --tab-active:#025BE8;       /* 顶部页签选中蓝 */
+  --success:#67C23A;          /* 开启绿 */
+  --danger:#F56C6C;           /* 关闭红 / 删除 / 必填 */
+  --warning-bg:#fef0f0;
+  --text:#303133;
+  --text-2:#606266;
+  --text-3:#909399;
+  --placeholder:#c0c4cc;
+  --border:#DCDFE6;
+  --border-2:#E4E7ED;
+  --bg-page:#f5f7fa;
+  --badge:#DE1818;
+  --radius:4px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:-apple-system,&quot;PingFang SC&quot;,&quot;Microsoft YaHei&quot;,&quot;Helvetica Neue&quot;,Arial,sans-serif;
+  color:var(--text);font-size:14px;background:var(--bg-page);
+  display:flex;overflow:hidden;
+}
+
+/* ===================== 左侧菜单 ===================== */
+.sidebar{
+  width:200px;flex:0 0 200px;background:#fff;height:100vh;overflow-y:auto;
+  border-right:1px solid var(--border-2);
+}
+.sidebar::-webkit-scrollbar{width:6px}
+.sidebar::-webkit-scrollbar-thumb{background:#d9d9d9;border-radius:3px}
+.menu-item{
+  display:flex;align-items:center;gap:10px;height:48px;padding:0 16px;
+  color:var(--text);cursor:pointer;position:relative;user-select:none;
+  border-bottom:1px solid #f4f6f9;
+}
+.menu-item:hover{background:#f5f7fa}
+.menu-item .ico{width:16px;text-align:center;color:#5a6270;font-size:15px}
+.menu-item .arrow{margin-left:auto;color:#c0c4cc;font-size:12px;transition:.2s}
+.menu-item.open .arrow{transform:rotate(90deg)}
+.menu-item .badge{
+  margin-left:auto;background:var(--badge);color:#fff;font-size:11px;
+  border-radius:9px;padding:1px 6px;line-height:1.4;
+}
+/* 二级菜单 */
+.submenu{display:none;background:#fafbfc}
+.submenu.show{display:block}
+.subitem{
+  display:flex;align-items:center;gap:8px;height:44px;padding:0 16px 0 40px;
+  color:var(--text-2);cursor:pointer;position:relative;
+}
+.subitem:hover{background:#f0f2f5}
+.subitem .dot{width:5px;height:5px;border-radius:50%;background:#c0c4cc}
+.subitem.active{
+  background:var(--menu-active-bg);color:var(--menu-active-text);font-weight:600;
+}
+.subitem.active::before{
+  content:&quot;&quot;;position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--primary);
+}
+.subitem.active .dot{background:var(--primary)}
+.subitem .new-flag{
+  margin-left:auto;background:#fff0e6;color:#e6893b;font-size:10px;
+  padding:1px 5px;border-radius:3px;border:1px solid #ffd6b0;
+}
+
+/* ===================== 右侧主区 ===================== */
+.main{flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+/* 顶部页签栏 */
+.topbar{background:#fff;border-bottom:1px solid var(--border-2);padding:8px 14px 0}
+.breadcrumb{display:flex;align-items:center;gap:6px;color:var(--text-2);font-size:13px;padding:2px 4px 10px}
+.breadcrumb .cur{color:var(--text)}
+.breadcrumb .sep{color:#c0c4cc}
+.tabs-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:0}
+.tabs-row::-webkit-scrollbar{height:0}
+.tab{
+  display:flex;align-items:center;gap:6px;padding:6px 12px;font-size:13px;
+  border:1px solid var(--border-2);border-bottom:none;border-radius:4px 4px 0 0;
+  background:#f7f8fa;color:var(--text-2);white-space:nowrap;cursor:pointer;
+}
+.tab .x{color:#c0c4cc;font-size:12px}
+.tab.active{background:var(--tab-active);color:#fff;border-color:var(--tab-active)}
+.tab.active .x{color:#cfe0ff}
+
+/* 内容区 */
+.content{flex:1;overflow:auto;padding:16px}
+
+/* 二级页签 */
+.subtabs{display:flex;gap:24px;border-bottom:1px solid var(--border-2);margin-bottom:16px}
+.subtab{
+  padding:10px 2px;font-size:15px;color:var(--text-2);cursor:pointer;
+  border-bottom:2px solid transparent;margin-bottom:-1px;font-weight:500;
+}
+.subtab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+
+/* 工具条 */
+.toolbar{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:nowrap;min-width:max-content}
+.toolbar .spacer{flex:1}
+.field{display:flex;align-items:center;gap:6px;color:var(--text-2);font-size:13px;flex-shrink:0}
+
+/* 开关（智能推播总开关，预设关闭） */
+.eswitch{position:relative;display:inline-block;width:40px;height:20px;border-radius:10px;background:var(--border);cursor:pointer;transition:.2s;flex:0 0 auto}
+.eswitch::after{content:&quot;&quot;;position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.eswitch.on{background:var(--primary)}
+.eswitch.on::after{left:22px}
+.eswitch.disabled{opacity:.5;cursor:not-allowed}
+
+/* 通用按钮 */
+.btn{
+  display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 15px;flex-shrink:0;
+  border-radius:var(--radius);border:1px solid var(--border);background:#fff;
+  color:var(--text);font-size:13px;cursor:pointer;transition:.15s;white-space:nowrap;
+}
+.btn:hover{color:var(--primary);border-color:var(--primary-hover);background:var(--primary-light)}
+.btn-primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-hover);border-color:var(--primary-hover);color:#fff}
+.btn-plain-primary{color:var(--primary);border-color:#a0cfff;background:var(--primary-light)}
+.btn-sm{height:28px;padding:0 10px;font-size:12px}
+
+/* 表单控件外观 */
+.input,.select{
+  height:34px;border:1px solid var(--border);border-radius:var(--radius);
+  padding:0 10px;font-size:13px;color:var(--text);background:#fff;outline:none;width:180px;
+}
+.input:focus,.select:focus{border-color:var(--primary)}
+.input::placeholder{color:var(--placeholder)}
+.input.is-error{border-color:var(--danger)}
+.input:disabled,.select:disabled{background:#f5f7fa;color:var(--text-3);cursor:not-allowed}
+
+/* ===================== 表格 ===================== */
+.card{background:#fff;border:1px solid var(--border-2);border-radius:6px;overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{
+  background:#f5f7fa;color:var(--text-2);font-weight:600;text-align:center;
+  padding:12px 10px;border-bottom:1px solid var(--border-2);white-space:nowrap;
+}
+tbody td{padding:14px 10px;text-align:center;border-bottom:1px solid #f0f2f5;color:var(--text-2);vertical-align:middle}
+tbody tr:hover{background:#fafcff}
+tbody tr:last-child td{border-bottom:none}
+
+/* 条件值展示 */
+.cond-val{display:flex;flex-direction:column;gap:3px;align-items:center}
+.cond-val .lv{font-size:12px;color:var(--text-2);white-space:nowrap}
+.cond-val .none{color:var(--placeholder)}
+
+/* 推播列表——「目标用户」至「阶级10」栏位平均栏宽，超出可左右滑动（.card 已设 overflow-x:auto） */
+.list-table{table-layout:fixed}
+
+/* 推播记录——首三栏固定栏宽，「奖励内容」栏自适应剩余宽度 */
+.record-table{table-layout:fixed}
+
+/* 操作链接 */
+.op a{color:var(--primary);cursor:pointer;margin:0 4px;font-size:13px}
+.op a.del{color:var(--danger)}
+.op a:hover{text-decoration:underline}
+
+/* 空状态 */
+.empty{text-align:center;color:var(--text-3);padding:60px 0;font-size:14px}
+.empty .big{font-size:40px;margin-bottom:8px;opacity:.5}
+
+/* 优惠券记录——统计列（静态示意） */
+.stat-row{display:flex;gap:0;background:#fff;border:1px solid var(--border-2);border-radius:6px;margin-bottom:14px}
+.stat-item{flex:1;text-align:center;padding:18px 0;border-right:1px solid var(--border-2)}
+.stat-item:last-child{border-right:none}
+.stat-num{font-size:22px;font-weight:700;color:var(--text)}
+.stat-label{font-size:12px;color:var(--text-3);margin-top:6px}
+
+/* 优惠券记录——分页列（静态示意） */
+.pager{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:13px;color:var(--text-2)}
+.pager-btn{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border:1px solid var(--border-2);border-radius:4px;cursor:pointer;color:var(--text-2)}
+.pager-btn.active{background:var(--primary);border-color:var(--primary);color:#fff}
+
+/* ===================== 表单页（推播条件） ===================== */
+.form-head{display:flex;align-items:center;margin-bottom:16px}
+.form-head .title{font-size:16px;font-weight:600;color:var(--primary)}
+.form-head .btns{margin-left:auto;display:flex;gap:10px}
+.notice{
+  display:flex;gap:8px;background:var(--warning-bg);border:1px solid #fcdada;
+  color:var(--danger);border-radius:var(--radius);padding:10px 14px;font-size:13px;margin-bottom:18px;line-height:1.6;
+}
+.section{background:#fff;border:1px solid var(--border-2);border-radius:6px;padding:18px 20px;margin-bottom:16px}
+.section-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:6px}
+.section-title::before{content:&quot;&quot;;width:3px;height:14px;background:var(--primary);border-radius:2px}
+.hint{color:var(--danger);font-size:12px;margin-bottom:14px;line-height:1.7}
+
+.form-row{display:flex;align-items:flex-start;margin-bottom:18px}
+.form-row:last-child{margin-bottom:0}
+.form-label{width:130px;flex:0 0 130px;text-align:right;padding-right:16px;padding-top:7px;color:var(--text-2);font-size:13px}
+.form-label .req, .thr-col-title .req{color:var(--danger);margin-right:2px}
+.form-ctrl{flex:1}
+.row-error{color:var(--danger);font-size:12px;margin-top:6px;display:none}
+.row-error.show{display:block}
+
+/* 标签选择（单选，做成按钮组） */
+.taggroup{display:flex;flex-wrap:wrap;gap:8px}
+.tagopt{
+  padding:6px 14px;border:1px solid var(--border);border-radius:16px;background:#fff;
+  color:var(--text-2);font-size:13px;cursor:pointer;user-select:none;transition:.12s;
+}
+.tagopt:hover{border-color:var(--primary);color:var(--primary)}
+.tagopt.sel{background:var(--primary);border-color:var(--primary);color:#fff}
+
+/* 三个阈值条件——同一阶级下三项目标值并排配置，新增阶级为共用的独立按钮 */
+.thr-grid-wrap{border:1px dashed var(--border);border-radius:6px;padding:16px;margin-bottom:14px}
+.thr-grid-row{display:grid;grid-template-columns:88px repeat(2,1fr);gap:10px 20px;align-items:center;margin-bottom:12px}
+.thr-grid-row:last-of-type{margin-bottom:0}
+.thr-grid-head{margin-bottom:14px}
+.thr-col-title{font-weight:600;color:var(--text);font-size:13px;text-align:center}
+.thr-col-title .cmp{display:block;font-weight:400;color:var(--text-3);font-size:12px;margin-top:3px}
+.thr-row-label{display:flex;flex-direction:column;gap:4px;color:var(--text-2);font-size:13px}
+.thr-row-label .rm{color:var(--danger);cursor:pointer;font-size:12px}
+.thr-row-label .rm:hover{text-decoration:underline}
+.thr-cell .input{width:100%}
+.thr-err-row{margin-top:-2px;margin-bottom:0}
+.thr-err-row .row-error{display:block!important;min-height:16px;margin-top:0;visibility:hidden}
+.thr-err-row .row-error.show{visibility:visible}
+.add-lv{color:var(--primary);cursor:pointer;font-size:13px;display:inline-flex;align-items:center;gap:4px;margin-top:2px}
+.add-lv.disabled{color:var(--placeholder);cursor:not-allowed}
+.add-lv:hover:not(.disabled){text-decoration:underline}
+
+/* 推送奖励表格——活动推送勾选（限定有角标的活动）；四栏位等宽 */
+.reward-table{table-layout:fixed}
+.reward-table th, .reward-table td{width:25%}
+.reward-acts{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:flex-start;text-align:left}
+.reward-act-chk{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--text-2);cursor:pointer;white-space:nowrap}
+.reward-act-chk input{cursor:pointer}
+.reward-val-extra{margin-top:8px}
+
+/* ===================== 弹窗 / Toast ===================== */
+.mask{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:100}
+.mask.show{display:flex}
+.dialog{background:#fff;border-radius:8px;width:400px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,.2)}
+.dialog-head{padding:16px 20px;font-size:16px;font-weight:600;border-bottom:1px solid #f0f2f5;display:flex;align-items:center;gap:8px}
+.dialog-body{padding:22px 20px;color:var(--text-2);font-size:14px;line-height:1.6}
+.dialog-foot{padding:12px 20px 18px;display:flex;justify-content:flex-end;gap:10px}
+
+.toast-wrap{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;align-items:center}
+.toast{
+  display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:var(--radius);
+  font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,.12);animation:drop .25s ease;background:#fff;
+}
+.toast.success{background:#f0f9eb;color:#529b2e;border:1px solid #e1f3d8}
+.toast.error{background:#fef0f0;color:var(--danger);border:1px solid #fde2e2}
+.toast.info{background:#edf2fc;color:#606266;border:1px solid #e4e7ed}
+@keyframes drop{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+
+.hidden{display:none!important}
+
+/* ===================== 前台「推播弹窗」示意 ===================== */
+.fe-demo-wrap{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+.fe-phone-col{display:flex;flex-direction:column;align-items:center;gap:12px}
+.fe-phone-label{font-size:13px;color:var(--text-2)}
+.fe-phone{width:280px;background:#1a1a1a;border-radius:32px;padding:10px;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.fe-screen{position:relative;background:#f0f4f8;border-radius:22px;overflow:hidden;height:580px}
+.fe-topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#fff}
+.fe-logo{font-weight:800;font-size:15px;color:#025be8}
+.fe-logo span{color:#ff8a00}
+.fe-login-btn{background:#eaf2ff;color:#025be8;font-size:11px;padding:5px 10px;border-radius:14px;font-weight:600;white-space:nowrap}
+.fe-search{margin-left:8px;font-size:14px;color:#5a6270}
+.fe-banner{margin:0 10px 8px;height:150px;border-radius:10px;background:linear-gradient(160deg,#5fb8ff,#1f7ee0);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;position:relative;overflow:hidden}
+.fe-banner .t1{font-size:20px;font-weight:800;letter-spacing:.5px}
+.fe-banner .t2{font-size:22px;font-weight:800}
+.fe-banner .dots{position:absolute;bottom:10px;display:flex;gap:4px}
+.fe-banner .dots i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.5);display:inline-block}
+.fe-banner .dots i.on{background:#fff;width:14px;border-radius:3px}
+.fe-ticker{margin:0 10px 10px;background:#eaf2ff;border-radius:6px;padding:6px 10px;font-size:11px;color:#5a6270;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px}
+.fe-sec-title{padding:0 12px;font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px}
+.fe-games{display:flex;gap:8px;padding:0 12px 10px;overflow-x:auto}
+.fe-games .g{flex:0 0 auto;width:52px;height:52px;border-radius:8px;background:#e4e9f0;display:flex;align-items:center;justify-content:center;font-size:20px}
+.fe-cats{display:flex;gap:14px;padding:0 12px 10px;overflow-x:auto}
+.fe-cats::-webkit-scrollbar{display:none}
+.fe-cat{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;color:#7a828e;white-space:nowrap}
+.fe-cat .ic{width:32px;height:32px;border-radius:50%;background:#eef1f5;display:flex;align-items:center;justify-content:center;font-size:15px}
+.fe-cat.on{color:#ff8a00;font-weight:700}
+.fe-cat.on .ic{background:#fff3e6}
+.fe-promo{margin:0 10px 10px;height:56px;border-radius:8px;background:linear-gradient(120deg,#132048,#1f3a7a);display:flex;align-items:center;justify-content:center;color:#ffd34d;font-weight:800;font-size:13px}
+.fe-tabbar{position:absolute;left:0;right:0;bottom:0;height:52px;background:#fff;border-top:1px solid #eee;display:flex;align-items:center;justify-content:space-around}
+.fe-tabitem{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;color:#9199a6}
+.fe-tabitem .ic{font-size:16px}
+.fe-tabitem.home .ic{width:26px;height:26px;border-radius:50%;background:#025be8;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px}
+
+/* 推播弹窗遮罩 + 卡片 */
+.fe-mask{position:absolute;inset:0;background:rgba(20,30,50,.55);display:none;align-items:flex-start;justify-content:center;padding-top:120px;z-index:5}
+.fe-mask.show{display:flex}
+.fe-popup{width:232px;background:#fff;border-radius:14px;padding:16px 14px 12px;box-shadow:0 10px 30px rgba(0,0,0,.3);position:relative}
+.fe-popup-close{position:absolute;top:10px;right:10px;width:20px;height:20px;border-radius:50%;background:#f0f2f5;display:flex;align-items:center;justify-content:center;font-size:11px;color:#606266;cursor:pointer}
+.fe-popup-title{font-size:15px;font-weight:800;text-align:center;margin-bottom:10px}
+.fe-popup-sub{font-size:11px;color:#909399;margin-bottom:6px}
+.fe-popup-list{max-height:221px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-right:2px}
+.fe-popup-item{position:relative;background:#eef4fb;border-radius:8px;padding:9px 10px;display:flex;align-items:center;justify-content:space-between;overflow:hidden;flex:0 0 auto}
+.fe-popup-item::before{content:&quot;&quot;;position:absolute;left:0;bottom:0;width:100%;height:14px;background:linear-gradient(120deg,#2f8bf0,#5fb8ff);clip-path:polygon(0 100%,0 40%,50% 90%,100% 30%,100% 100%);opacity:.5}
+.fe-popup-item .name{font-size:12px;font-weight:700;color:var(--text);position:relative;z-index:1}
+.fe-popup-item .join{position:relative;z-index:1;background:#ff9a3d;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:12px;white-space:nowrap;cursor:pointer}
+.fe-popup-bonus{margin-top:10px;border-top:1px dashed #e4e7ed;padding-top:8px}
+.fe-popup-bonus.no-top-border{margin-top:0;border-top:none;padding-top:0}
+.fe-popup-bonus .fe-popup-sub{margin-bottom:6px}
+.fe-bonus-card .name{display:flex;align-items:center;gap:6px}
+.fe-bonus-icon{width:22px;height:22px;flex:0 0 auto;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ffb057,#ff6a3d);color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center}
+.fe-bonus-turnover{margin-top:6px;font-size:11px;color:var(--text-2)}
+.fe-rule-list{padding-left:18px;color:var(--text-2);font-size:13px;line-height:2}
+</style>
+</head>
+<body>
+
+<!-- ============================ 左侧菜单 ============================ -->
+<aside class=&quot;sidebar&quot;>
+  <div class=&quot;menu-item&quot;><span class=&quot;ico&quot;>🎮</span>游戏管理<span class=&quot;arrow&quot;>›</span></div>
+  <div class=&quot;menu-item&quot;><span class=&quot;ico&quot;>📢</span>公告管理<span class=&quot;arrow&quot;>›</span></div>
+  <div class=&quot;menu-item&quot;><span class=&quot;ico&quot;>💳</span>充值配置<span class=&quot;arrow&quot;>›</span></div>
+  <div class=&quot;menu-item&quot;><span class=&quot;ico&quot;>📄</span>日志管理<span class=&quot;arrow&quot;>›</span></div>
+  <div class=&quot;menu-item&quot;><span class=&quot;ico&quot;>🎁</span>活动配置<span class=&quot;badge&quot;>99+</span></div>
+
+  <!-- 活动配置（新）——本次功能所在位置，默认展开 -->
+  <div class=&quot;menu-item open&quot; onclick=&quot;toggleSub(this)&quot; style=&quot;color:var(--menu-active-text);font-weight:600&quot;>
+    <span class=&quot;ico&quot; style=&quot;color:var(--primary)&quot;>🗂️</span>活动配置（新）<span class=&quot;arrow&quot;>›</span>
+  </div>
+  <div class=&quot;submenu show&quot;>
+    <div class=&quot;subitem&quot;><span class=&quot;dot&quot;></span>活动列表</div>
+    <div class=&quot;subitem&quot;><span class=&quot;dot&quot;></span>派奖审核</div>
+    <div class=&quot;subitem&quot;><span class=&quot;dot&quot;></span>活动报表</div>
+    <!-- ★ 新增入口：显示在「活动报表」下方 -->
+    <div class=&quot;subitem active&quot;><span class=&quot;dot&quot;></span>智能推播<span class=&quot;new-flag&quot;>NEW</span></div>
+  </div>
+
+  <div class=&quot;menu-item&quot;><span class=&quot;ico&quot;>👥</span>代理结算<span class=&quot;arrow&quot;>›</span></div>
+  <div class=&quot;menu-item&quot;><span class=&quot;ico&quot;>💻</span>平台费用<span class=&quot;arrow&quot;>›</span></div>
+  <div class=&quot;menu-item&quot;><span class=&quot;ico&quot;>🧧</span>红包雨管理<span class=&quot;arrow&quot;>›</span></div>
+  <div class=&quot;menu-item&quot;><span class=&quot;ico&quot;>⚙️</span>系统管理<span class=&quot;arrow&quot;>›</span></div>
+  <div class=&quot;menu-item&quot;><span class=&quot;ico&quot;>🎰</span>抽奖活动管理<span class=&quot;arrow&quot;>›</span></div>
+  <div class=&quot;menu-item&quot;><span class=&quot;ico&quot;>🥚</span>复活节砸蛋管理<span class=&quot;arrow&quot;>›</span></div>
+</aside>
+
+<!-- ============================ 右侧主区 ============================ -->
+<div class=&quot;main&quot;>
+  <div class=&quot;topbar&quot;>
+    <div class=&quot;breadcrumb&quot;>
+      <span>位置</span><span class=&quot;sep&quot;>›</span>
+      <span>活动配置(新)</span><span class=&quot;sep&quot;>›</span>
+      <span class=&quot;cur&quot;>智能推播</span>
+    </div>
+    <div class=&quot;tabs-row&quot;>
+      <div class=&quot;tab&quot;>活动列表 <span class=&quot;x&quot;>✕</span></div>
+      <div class=&quot;tab&quot;>派奖审核 <span class=&quot;x&quot;>✕</span></div>
+      <div class=&quot;tab&quot;>活动报表 <span class=&quot;x&quot;>✕</span></div>
+      <div class=&quot;tab active&quot;>智能推播 <span class=&quot;x&quot;>✕</span></div>
+    </div>
+  </div>
+
+  <div class=&quot;content&quot;>
+    <!-- 二级页签 -->
+    <div class=&quot;subtabs&quot;>
+      <div class=&quot;subtab active&quot; data-tab=&quot;list&quot; onclick=&quot;switchSubtab('list')&quot;>推播列表</div>
+      <div class=&quot;subtab&quot; data-tab=&quot;record&quot; onclick=&quot;switchSubtab('record')&quot;>推播记录</div>
+      <div class=&quot;subtab&quot; data-tab=&quot;popup&quot; onclick=&quot;switchSubtab('popup')&quot;>推播弹窗</div>
+      <div class=&quot;subtab&quot; data-tab=&quot;freerecord&quot; onclick=&quot;switchSubtab('freerecord')&quot;>免费项目记录</div>
+      <div class=&quot;subtab&quot; data-tab=&quot;couponrecord&quot; onclick=&quot;switchSubtab('couponrecord')&quot;>优惠券记录</div>
+    </div>
+
+    <!-- ============ 页面 A：推播列表 ============ -->
+    <div id=&quot;view-list&quot;>
+      <div class=&quot;toolbar&quot;>
+        <div class=&quot;field&quot;>
+          智能推播：
+          <div class=&quot;eswitch&quot; id=&quot;smartPushSwitch&quot; onclick=&quot;toggleSmartPush()&quot;></div>
+        </div>
+        <div class=&quot;field&quot;>
+          推播名称：
+          <input type=&quot;text&quot; class=&quot;input&quot; id=&quot;filterName&quot; style=&quot;width:160px&quot; placeholder=&quot;请输入关键字&quot; onkeydown=&quot;if(event.key==='Enter')doSearch()&quot;>
+        </div>
+        <div class=&quot;field&quot;>
+          推送目标用户：
+          <select class=&quot;select&quot; id=&quot;filterMain&quot;>
+            <option value=&quot;&quot;>全部</option>
+            <option>VIP 0</option><option>VIP 1</option><option>VIP 2</option><option>VIP 3</option><option>VIP 4</option><option>VIP 5</option>
+            <option>VIP 6</option><option>VIP 7</option><option>VIP 8</option><option>VIP 9</option><option>VIP 10</option>
+          </select>
+        </div>
+        <div class=&quot;field&quot;>
+          时间：
+          <input type=&quot;date&quot; class=&quot;input&quot; id=&quot;filterStartDate&quot; style=&quot;width:150px&quot;>
+          <span style=&quot;color:var(--text-3)&quot;>至</span>
+          <input type=&quot;date&quot; class=&quot;input&quot; id=&quot;filterEndDate&quot; style=&quot;width:150px&quot;>
+        </div>
+        <button class=&quot;btn btn-primary&quot; onclick=&quot;doSearch()&quot;>查询</button>
+        <div class=&quot;spacer&quot;></div>
+        <button class=&quot;btn btn-primary&quot; onclick=&quot;openForm()&quot;>＋ 新增推播</button>
+      </div>
+
+      <div class=&quot;card&quot; style=&quot;overflow-x:auto&quot;>
+        <table class=&quot;list-table&quot;>
+          <thead>
+            <tr>
+              <th style=&quot;width:170px&quot;>推播名称</th>
+              <th style=&quot;width:170px&quot;>目标用户</th>
+              <th style=&quot;width:170px&quot;>账户余额</th>
+              <th style=&quot;width:170px&quot;>阶级1</th><th style=&quot;width:170px&quot;>阶级2</th><th style=&quot;width:170px&quot;>阶级3</th><th style=&quot;width:170px&quot;>阶级4</th><th style=&quot;width:170px&quot;>阶级5</th>
+              <th style=&quot;width:170px&quot;>阶级6</th><th style=&quot;width:170px&quot;>阶级7</th><th style=&quot;width:170px&quot;>阶级8</th><th style=&quot;width:170px&quot;>阶级9</th><th style=&quot;width:170px&quot;>阶级10</th>
+              <th style=&quot;width:160px&quot;>新增/变更时间</th>
+              <th style=&quot;width:160px&quot;>操作</th>
+            </tr>
+          </thead>
+          <tbody id=&quot;tableBody&quot;><!-- JS 渲染 --></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ 页面 C：推播记录——个别会员的推播领取记录 ============ -->
+    <div id=&quot;view-record&quot; class=&quot;hidden&quot;>
+      <div class=&quot;toolbar&quot;>
+        <div class=&quot;field&quot;>
+          会员账号：
+          <input type=&quot;text&quot; class=&quot;input&quot; id=&quot;filterRecordAccount&quot; style=&quot;width:160px&quot; placeholder=&quot;请输入会员账号&quot; onkeydown=&quot;if(event.key==='Enter')doRecordSearch()&quot;>
+        </div>
+        <div class=&quot;field&quot;>
+          推播名称：
+          <input type=&quot;text&quot; class=&quot;input&quot; id=&quot;filterRecordName&quot; style=&quot;width:160px&quot; placeholder=&quot;请输入关键字&quot; onkeydown=&quot;if(event.key==='Enter')doRecordSearch()&quot;>
+        </div>
+        <div class=&quot;field&quot;>
+          阶级：
+          <select class=&quot;select&quot; id=&quot;filterRecordLevel&quot;>
+            <option value=&quot;&quot;>全部</option>
+            <option value=&quot;1&quot;>阶级1</option><option value=&quot;2&quot;>阶级2</option><option value=&quot;3&quot;>阶级3</option><option value=&quot;4&quot;>阶级4</option><option value=&quot;5&quot;>阶级5</option>
+            <option value=&quot;6&quot;>阶级6</option><option value=&quot;7&quot;>阶级7</option><option value=&quot;8&quot;>阶级8</option><option value=&quot;9&quot;>阶级9</option><option value=&quot;10&quot;>阶级10</option>
+          </select>
+        </div>
+        <div class=&quot;field&quot;>
+          时间：
+          <input type=&quot;date&quot; class=&quot;input&quot; id=&quot;filterRecordStartDate&quot; style=&quot;width:150px&quot;>
+          <span style=&quot;color:var(--text-3)&quot;>至</span>
+          <input type=&quot;date&quot; class=&quot;input&quot; id=&quot;filterRecordEndDate&quot; style=&quot;width:150px&quot;>
+        </div>
+        <button class=&quot;btn btn-primary&quot; onclick=&quot;doRecordSearch()&quot;>查询</button>
+        <div class=&quot;spacer&quot;></div>
+        <button class=&quot;btn&quot; style=&quot;background:#e6a23c;border-color:#e6a23c;color:#fff&quot;>导出</button>
+      </div>
+
+      <div class=&quot;card&quot; style=&quot;overflow-x:auto&quot;>
+        <table class=&quot;record-table&quot;>
+          <thead>
+            <tr>
+              <th style=&quot;width:20%&quot;>会员账号</th>
+              <th style=&quot;width:20%&quot;>推播名称</th>
+              <th style=&quot;width:20%&quot;>时间</th>
+              <th style=&quot;width:20%&quot;>推送奖励阶级</th>
+              <th style=&quot;width:20%&quot;>奖励内容</th>
+            </tr>
+          </thead>
+          <tbody id=&quot;recordTableBody&quot;><!-- JS 渲染 --></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ 页面 E：推播弹窗——前台示意 ============ -->
+    <div id=&quot;view-popup&quot; class=&quot;hidden&quot;>
+      <div class=&quot;fe-demo-wrap&quot;>
+        <div class=&quot;fe-phone-col&quot;>
+          <div class=&quot;fe-phone-label&quot;>首页示意（点击下方按钮模拟触发推播）</div>
+          <div class=&quot;fe-phone&quot;>
+            <div class=&quot;fe-screen&quot;>
+              <div class=&quot;fe-topbar&quot;>
+                <div class=&quot;fe-logo&quot;>OK<span>•</span>BET</div>
+                <div style=&quot;display:flex;align-items:center;gap:8px&quot;>
+                  <div class=&quot;fe-login-btn&quot;>注册 / 登录</div>
+                  <div class=&quot;fe-search&quot;>🔍</div>
+                </div>
+              </div>
+              <div class=&quot;fe-banner&quot;>
+                <div class=&quot;t1&quot;>Weekly</div>
+                <div class=&quot;t2&quot;>Bonus Pass</div>
+                <div class=&quot;dots&quot;><i class=&quot;on&quot;></i><i></i><i></i><i></i><i></i></div>
+              </div>
+              <div class=&quot;fe-ticker&quot;>🔊 －今晚打老虎－今晚打老虎－今晚打老虎－今晚…</div>
+              <div class=&quot;fe-sec-title&quot;>游戏集锦</div>
+              <div class=&quot;fe-games&quot;>
+                <div class=&quot;g&quot;>👑</div><div class=&quot;g&quot;>📋</div><div class=&quot;g&quot;>🐯</div><div class=&quot;g&quot;>🎯</div>
+              </div>
+              <div class=&quot;fe-cats&quot;>
+                <div class=&quot;fe-cat on&quot;><div class=&quot;ic&quot;>🔥</div>热门</div>
+                <div class=&quot;fe-cat&quot;><div class=&quot;ic&quot;>🏆</div>好赢</div>
+                <div class=&quot;fe-cat&quot;><div class=&quot;ic&quot;>🏀</div>体育</div>
+                <div class=&quot;fe-cat&quot;><div class=&quot;ic&quot;>🎰</div>老虎机</div>
+                <div class=&quot;fe-cat&quot;><div class=&quot;ic&quot;>🎡</div>游乐场</div>
+                <div class=&quot;fe-cat&quot;><div class=&quot;ic&quot;>🎲</div>娱乐城</div>
+                <div class=&quot;fe-cat&quot;><div class=&quot;ic&quot;>♠️</div>扑克</div>
+                <div class=&quot;fe-cat&quot;><div class=&quot;ic&quot;>🕹️</div>电玩</div>
+                <div class=&quot;fe-cat&quot;><div class=&quot;ic&quot;>🔵</div>电子宾果</div>
+                <div class=&quot;fe-cat&quot;><div class=&quot;ic&quot;>🔢</div>数字游戏</div>
+              </div>
+              <div class=&quot;fe-promo&quot;>DAILY EXTRA REBATE</div>
+
+              <div class=&quot;fe-mask&quot; id=&quot;feMask&quot;>
+                <div class=&quot;fe-popup&quot;>
+                  <div class=&quot;fe-popup-close&quot; onclick=&quot;closePushPopup()&quot;>✕</div>
+                  <div class=&quot;fe-popup-title&quot;>活动快报</div>
+                  <div id=&quot;popupRewardsBlock&quot;>
+                    <div class=&quot;fe-popup-sub&quot;>待领取奖励</div>
+                    <div class=&quot;fe-popup-list&quot;>
+                      <div class=&quot;fe-popup-item&quot;><span class=&quot;name&quot;>盈利活动</span><span class=&quot;join&quot; onclick=&quot;goActivityDetail('盈利活动')&quot;>领取</span></div>
+                      <div class=&quot;fe-popup-item&quot;><span class=&quot;name&quot;>消费活动</span><span class=&quot;join&quot; onclick=&quot;goActivityDetail('消费活动')&quot;>领取</span></div>
+                      <div class=&quot;fe-popup-item&quot;><span class=&quot;name&quot;>每日特别返水</span><span class=&quot;join&quot; onclick=&quot;goActivityDetail('每日特别返水')&quot;>领取</span></div>
+                      <div class=&quot;fe-popup-item&quot;><span class=&quot;name&quot;>每日特别加码</span><span class=&quot;join&quot; onclick=&quot;goActivityDetail('每日特别加码')&quot;>领取</span></div>
+                      <div class=&quot;fe-popup-item&quot;><span class=&quot;name&quot;>游戏挑战赛</span><span class=&quot;join&quot; onclick=&quot;goActivityDetail('游戏挑战赛')&quot;>领取</span></div>
+                    </div>
+                  </div>
+                  <div class=&quot;fe-popup-bonus&quot; id=&quot;popupBonusBlock&quot;>
+                    <div class=&quot;fe-popup-sub&quot;>福利加码</div>
+                    <div class=&quot;fe-popup-item fe-bonus-card&quot;>
+                      <span class=&quot;name&quot;><span class=&quot;fe-bonus-icon&quot; id=&quot;bonusIcon&quot;>₱</span><span id=&quot;bonusText&quot;>1,000</span></span>
+                      <span class=&quot;join&quot; onclick=&quot;claimBonus()&quot;>领取</span>
+                    </div>
+                    <div class=&quot;fe-bonus-turnover&quot; id=&quot;bonusTurnover&quot;>流水倍数：2倍</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class=&quot;fe-tabbar&quot;>
+                <div class=&quot;fe-tabitem home&quot;><div class=&quot;ic&quot;>⌂</div></div>
+                <div class=&quot;fe-tabitem&quot;><div class=&quot;ic&quot;>🎁</div>奖励中心</div>
+                <div class=&quot;fe-tabitem&quot;><div class=&quot;ic&quot;>🏬</div>积分商城</div>
+                <div class=&quot;fe-tabitem&quot;><div class=&quot;ic&quot;>🏆</div>排行榜</div>
+                <div class=&quot;fe-tabitem&quot;><div class=&quot;ic&quot;>👤</div>我的</div>
+              </div>
+            </div>
+          </div>
+          <div style=&quot;display:flex;flex-wrap:wrap;gap:8px;justify-content:center&quot;>
+            <button class=&quot;btn btn-primary btn-sm&quot; onclick=&quot;showPushPopup('full')&quot;>情境①：待领取奖励＋福利加码</button>
+            <button class=&quot;btn btn-plain-primary btn-sm&quot; onclick=&quot;showPushPopup('rewardsOnly')&quot;>情境②：仅待领取奖励</button>
+            <button class=&quot;btn btn-plain-primary btn-sm&quot; onclick=&quot;showPushPopup('bonusOnly')&quot;>情境③：仅福利加码</button>
+          </div>
+          <div style=&quot;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-2)&quot;>
+            福利加码奖励类型（示意）：
+            <select class=&quot;select&quot; id=&quot;bonusTypeSelect&quot; style=&quot;width:120px;height:28px;font-size:12px&quot; onchange=&quot;onBonusTypeChange(this.value)&quot;>
+              <option value=&quot;礼金&quot;>礼金</option>
+              <option value=&quot;积分&quot;>积分</option>
+              <option value=&quot;免费旋转&quot;>免费旋转</option>
+              <option value=&quot;免费投注&quot;>免费投注</option>
+              <option value=&quot;优惠券&quot;>优惠券</option>
+            </select>
+          </div>
+        </div>
+
+        <div class=&quot;section&quot; style=&quot;flex:1;min-width:280px;align-self:flex-start&quot;>
+          <div class=&quot;section-title&quot;>规则说明</div>
+          <ol class=&quot;fe-rule-list&quot;>
+            <li>「推播弹窗」仅在首页显示；首页涵盖「热门、好赢、体育、老虎机、游乐场、娱乐城、扑克、电玩、电子宾果、数字游戏」等分类页签，切换至其他非首页页面（如游戏详情页、个人中心等）时不显示。</li>
+            <li>弹窗标题固定文案为「活动快报」。</li>
+            <li>弹窗内容显示用户当前符合资格、待领取奖励的活动，共 5 种：盈利活动、消费活动、每日特别返水、每日特别加码、游戏挑战赛。</li>
+            <li>弹窗高度固定；活动清单内容过多时，清单区域可上下滑动查看，其余区域不随之滚动。</li>
+            <li>活动清单下方固定显示「福利加码」区块，标题样式与「待领取奖励」一致；下方以卡片显示对应的奖励图示、金额与「领取」按钮，依后台配置的奖励内容带出。</li>
+            <li>当「福利加码」奖励类型为「礼金」时，卡片下方需额外显示「流水倍数」提示（例：流水倍数：2倍）；其余奖励类型（积分、优惠券、免费旋转、免费投注）则不显示此提示。</li>
+            <li>「待领取奖励」与「福利加码」两区块依用户当下实际资格显示，可能同时存在、也可能只存在其中一种（下方情境①～③示意；两区块皆无内容时不触发弹窗）。</li>
+            <li>「待领取奖励」点击活动清单中的「领取」按钮后，导向对应活动的详情页（下方示意以 Toast 模拟跳转效果）。</li>
+            <li>「福利加码」点击「领取」按钮后依奖励类型导向不同页面：奖励为「礼金」时，仅关闭弹窗、不做任何页面导向；奖励为「积分」时，导向「积分商城」；奖励为「免费旋转、免费投注、优惠券」时，导向「我的优惠券」（下方可切换奖励类型示意）。</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 页面 F：免费项目记录（静态示意，仅「全部来源」新增项「推播奖励」具互动） ============ -->
+    <div id=&quot;view-freerecord&quot; class=&quot;hidden&quot;>
+      <div class=&quot;toolbar&quot;>
+        <div class=&quot;field&quot;>
+          <select class=&quot;select&quot; style=&quot;width:140px&quot;>
+            <option>全部免费旋转</option>
+          </select>
+        </div>
+        <div class=&quot;field&quot;>
+          <select class=&quot;select&quot; id=&quot;freeSourceSelect&quot; style=&quot;width:140px&quot; onchange=&quot;onFreeSourceChange(this.value)&quot;>
+            <option value=&quot;&quot;>全部来源</option>
+            <option>手动赠送</option>
+            <option>签到奖励</option>
+            <option>积分购买</option>
+            <option>兑换码</option>
+            <option>召回活动</option>
+            <option>邀请好友</option>
+            <option>邀请转盘</option>
+            <option>推播奖励</option>
+          </select>
+        </div>
+        <div class=&quot;field&quot;>
+          获得时间：
+          <input type=&quot;text&quot; class=&quot;input&quot; style=&quot;width:160px&quot; value=&quot;2026-07-28 00:00:00&quot; readonly>
+          <span style=&quot;color:var(--text-3)&quot;>～</span>
+          <input type=&quot;text&quot; class=&quot;input&quot; style=&quot;width:160px&quot; value=&quot;2026-07-28 23:59:59&quot; readonly>
+        </div>
+        <div class=&quot;field&quot;>
+          <select class=&quot;select&quot; style=&quot;width:140px&quot;>
+            <option>全部免费类型</option>
+          </select>
+        </div>
+        <div class=&quot;field&quot;>
+          <select class=&quot;select&quot; style=&quot;width:120px&quot;>
+            <option>Select</option>
+          </select>
+        </div>
+      </div>
+      <div class=&quot;toolbar&quot;>
+        <div class=&quot;field&quot;>
+          <input type=&quot;text&quot; class=&quot;input&quot; style=&quot;width:200px&quot; placeholder=&quot;会员名/活动名称&quot;>
+        </div>
+        <button class=&quot;btn btn-primary&quot;>查询</button>
+        <button class=&quot;btn&quot; style=&quot;background:#e6a23c;border-color:#e6a23c;color:#fff&quot;>导出</button>
+        <button class=&quot;btn btn-primary&quot;>赠送免费旋转</button>
+        <div class=&quot;spacer&quot;></div>
+      </div>
+
+      <div class=&quot;card&quot; style=&quot;overflow-x:auto&quot;>
+        <table style=&quot;table-layout:fixed;min-width:1360px&quot;>
+          <thead>
+            <tr>
+              <th style=&quot;width:130px&quot;>会员账号</th>
+              <th style=&quot;width:130px&quot;>获得时间</th>
+              <th style=&quot;width:120px&quot;>活动名称</th>
+              <th style=&quot;width:110px&quot;>获得方式</th>
+              <th style=&quot;width:280px&quot;>免费旋转名称</th>
+              <th style=&quot;width:90px&quot;>免费类型</th>
+              <th style=&quot;width:90px&quot;>获得次数</th>
+              <th style=&quot;width:80px&quot;>状态</th>
+              <th style=&quot;width:110px&quot;>操作人</th>
+              <th style=&quot;width:130px&quot;>操作时间</th>
+              <th style=&quot;width:80px&quot;>备注</th>
+            </tr>
+          </thead>
+          <tbody id=&quot;freeRecordBody&quot;>
+            <tr data-source=&quot;积分购买&quot;>
+              <td>okbet22377zkhn</td><td>2026-07-28 11:15:59</td><td><span class=&quot;none&quot;>—</span></td><td>积分购买</td>
+              <td>Playtech单个游戏</td><td>免费投注</td><td>10</td><td>未使用</td><td>SYSTEM</td><td><span class=&quot;none&quot;>–</span></td><td><span class=&quot;none&quot;>–</span></td>
+            </tr>
+            <tr data-source=&quot;积分购买&quot;>
+              <td>okbet22377zkhn</td><td>2026-07-28 11:15:43</td><td><span class=&quot;none&quot;>—</span></td><td>积分购买</td>
+              <td>Playtech单个游戏</td><td>免费投注</td><td>10</td><td>未使用</td><td>SYSTEM</td><td><span class=&quot;none&quot;>–</span></td><td><span class=&quot;none&quot;>–</span></td>
+            </tr>
+            <tr data-source=&quot;游戏挑战赛&quot;>
+              <td>okbet9991iyj72</td><td>2026-07-28 10:53:51</td><td>Frank测试活动</td><td>游戏挑战赛</td>
+              <td>免费旋转123456789A1234567 89B123456789C1234 89D123456789E1 56789F123456789G1234 56789H123456789I123456789J</td>
+              <td>免费旋转</td><td>3</td><td>未使用</td><td>okbet9991iyj72</td><td>2026-07-28 10:53:51</td><td><span class=&quot;none&quot;>–</span></td>
+            </tr>
+            <tr data-source=&quot;游戏挑战赛&quot;>
+              <td>okbet9991iyj72</td><td>2026-07-28 10:53:48</td><td>Frank测试活动</td><td>游戏挑战赛</td>
+              <td>超强力特色游戏卡勾选全部游戏免费旋转/投注次数:30单次旋转/投注金额:30中奖上限:700次数有效期:3H免费旋转券/投注有效期:3DAY</td>
+              <td>道具卡</td><td>30</td><td>未使用</td><td>okbet9991iyj72</td><td>2026-07-28 10:53:48</td><td><span class=&quot;none&quot;>–</span></td>
+            </tr>
+            <tr data-source=&quot;游戏挑战赛&quot;>
+              <td>okbet9991iyj72</td><td>2026-07-28 10:53:46</td><td>Frank测试活动</td><td>游戏挑战赛</td>
+              <td>ONLive单个游戏百家乐 (ID: 33)</td><td>免费投注</td><td>10</td><td>未使用</td><td>okbet9991iyj72</td><td>2026-07-28 10:53:46</td><td><span class=&quot;none&quot;>–</span></td>
+            </tr>
+            <tr data-source=&quot;推播奖励&quot;>
+              <td>okbet66201vip7</td><td>2026-07-28 09:12:30</td><td>推播奖励</td><td>推播奖励</td>
+              <td>免费旋转 JILI</td><td>免费旋转</td><td>5</td><td>未使用</td><td>SYSTEM</td><td><span class=&quot;none&quot;>–</span></td><td><span class=&quot;none&quot;>–</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ 页面 G：优惠券记录（静态示意，仅「全部来源」新增项「推播奖励」具互动） ============ -->
+    <div id=&quot;view-couponrecord&quot; class=&quot;hidden&quot;>
+      <div class=&quot;toolbar&quot;>
+        <input type=&quot;text&quot; class=&quot;input&quot; style=&quot;width:160px&quot; value=&quot;2026-07-28 00:00:00&quot; readonly>
+        <span style=&quot;color:var(--text-3)&quot;>～</span>
+        <input type=&quot;text&quot; class=&quot;input&quot; style=&quot;width:160px&quot; value=&quot;2026-07-28 23:59:59&quot; readonly>
+      </div>
+
+      <div class=&quot;stat-row&quot;>
+        <div class=&quot;stat-item&quot;>
+          <div class=&quot;stat-num&quot;>0</div>
+          <div class=&quot;stat-label&quot;>优惠券发放总量</div>
+        </div>
+        <div class=&quot;stat-item&quot;>
+          <div class=&quot;stat-num&quot;>0%</div>
+          <div class=&quot;stat-label&quot;>优惠券使用率</div>
+        </div>
+        <div class=&quot;stat-item&quot;>
+          <div class=&quot;stat-num&quot;>₱0.00</div>
+          <div class=&quot;stat-label&quot;>优惠券累计发放彩金</div>
+        </div>
+      </div>
+
+      <div class=&quot;toolbar&quot;>
+        <div class=&quot;field&quot;>
+          <select class=&quot;select&quot; style=&quot;width:120px&quot;>
+            <option>全部优惠</option>
+          </select>
+        </div>
+        <div class=&quot;field&quot;>
+          <select class=&quot;select&quot; style=&quot;width:120px&quot;>
+            <option>全部状态</option>
+          </select>
+        </div>
+        <div class=&quot;field&quot;>
+          <select class=&quot;select&quot; id=&quot;couponSourceSelect&quot; style=&quot;width:120px&quot; onchange=&quot;onCouponSourceChange(this.value)&quot;>
+            <option value=&quot;&quot;>全部来源</option>
+            <option>手动赠送</option>
+            <option>积分购买</option>
+            <option>周卡活动</option>
+            <option>召回活动</option>
+            <option>推播奖励</option>
+          </select>
+        </div>
+        <div class=&quot;field&quot;>
+          获得时间：
+          <input type=&quot;text&quot; class=&quot;input&quot; style=&quot;width:160px&quot; value=&quot;2026-07-24 00:00:00&quot; readonly>
+          <span style=&quot;color:var(--text-3)&quot;>～</span>
+          <input type=&quot;text&quot; class=&quot;input&quot; style=&quot;width:160px&quot; value=&quot;2026-07-27 00:00:00&quot; readonly>
+        </div>
+        <div class=&quot;field&quot;>
+          <select class=&quot;select&quot; style=&quot;width:110px&quot;>
+            <option>会员名</option>
+          </select>
+        </div>
+        <div class=&quot;field&quot;>
+          <input type=&quot;text&quot; class=&quot;input&quot; style=&quot;width:200px&quot; placeholder=&quot;会员名/活动名称/优惠券ID&quot;>
+        </div>
+      </div>
+      <div class=&quot;toolbar&quot;>
+        <button class=&quot;btn btn-primary&quot;>查询</button>
+        <button class=&quot;btn&quot; style=&quot;background:#e6a23c;border-color:#e6a23c;color:#fff&quot;>导出</button>
+        <button class=&quot;btn btn-primary&quot;>赠送优惠券</button>
+        <div class=&quot;spacer&quot;></div>
+      </div>
+
+      <div class=&quot;card&quot; style=&quot;overflow-x:auto&quot;>
+        <table style=&quot;table-layout:fixed;min-width:1260px&quot;>
+          <thead>
+            <tr>
+              <th style=&quot;width:120px&quot;>会员账号</th>
+              <th style=&quot;width:110px&quot;>获得时间</th>
+              <th style=&quot;width:150px&quot;>活动名称</th>
+              <th style=&quot;width:100px&quot;>获取方式</th>
+              <th style=&quot;width:220px&quot;>优惠券名称</th>
+              <th style=&quot;width:90px&quot;>优惠券ID</th>
+              <th style=&quot;width:100px&quot;>优惠券类别</th>
+              <th style=&quot;width:80px&quot;>状态</th>
+              <th style=&quot;width:100px&quot;>操作人</th>
+              <th style=&quot;width:140px&quot;>操作时间</th>
+              <th style=&quot;width:70px&quot;>备注</th>
+            </tr>
+          </thead>
+          <tbody id=&quot;couponRecordBody&quot;>
+            <tr data-source=&quot;积分购买&quot;>
+              <td>vivian01</td><td>2026-07-24 17:08</td><td>盲盒2.0</td><td>积分购买</td>
+              <td>输返10%-有效期240小时 奖金流水5倍流水-注单有效期48</td><td>10536</td><td>输返券</td><td>未使用</td>
+              <td><span class=&quot;none&quot;>–</span></td><td><span class=&quot;none&quot;>–</span></td><td><span class=&quot;none&quot;>–</span></td>
+            </tr>
+            <tr data-source=&quot;积分购买&quot;>
+              <td>okbet3456uib6a</td><td>2026-07-24 12:13</td><td>OKF1910-v3-全奖励测试</td><td>积分购买</td>
+              <td>输返测试</td><td>10535</td><td>输返券</td><td>已过期</td>
+              <td>SYSTEM</td><td>2026-07-28 03:00:01</td><td><span class=&quot;none&quot;>–</span></td>
+            </tr>
+            <tr data-source=&quot;推播奖励&quot;>
+              <td>okbet66201vip7</td><td>2026-07-28 09:12</td><td>推播奖励</td><td>推播奖励</td>
+              <td>20% Loss Cashback</td><td>10600</td><td>输返券</td><td>未使用</td>
+              <td>SYSTEM</td><td><span class=&quot;none&quot;>–</span></td><td><span class=&quot;none&quot;>–</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class=&quot;pager&quot;>
+        <span>Total <span id=&quot;couponTotalCount&quot;>3</span></span>
+        <select class=&quot;select&quot; style=&quot;width:90px;height:28px;font-size:12px&quot;>
+          <option>10/page</option>
+        </select>
+        <span class=&quot;pager-btn&quot;>‹</span>
+        <span class=&quot;pager-btn active&quot;>1</span>
+        <span class=&quot;pager-btn&quot;>›</span>
+        <span>Go to <input type=&quot;text&quot; class=&quot;input&quot; style=&quot;width:40px;height:28px;padding:0 6px&quot; value=&quot;1&quot;></span>
+      </div>
+    </div>
+
+    <!-- ============ 页面 C：推播条件表单（新增 / 编辑） ============ -->
+    <div id=&quot;view-form&quot; class=&quot;hidden&quot;>
+      <div class=&quot;form-head&quot;>
+        <div class=&quot;title&quot; id=&quot;formTitle&quot;>新增推播条件</div>
+        <div class=&quot;btns&quot;>
+          <button class=&quot;btn&quot; onclick=&quot;closeForm()&quot;>取消</button>
+          <button class=&quot;btn btn-primary&quot; onclick=&quot;saveForm()&quot;>保存</button>
+        </div>
+      </div>
+
+      <div class=&quot;notice&quot;>
+        <span>⚠</span>
+        <span>提示：保存后推播条件将立即生效并纳入排程计算，所有条件皆以「今日」为计算区间。用户标签为必填单选；「账户余额」为必填条件，采单一目标值设置，不分阶级；「有效投注、用户负盈利」为选填条件（留空表示该项不启用），可依阶级各自设置，填写时不可为 0 或负数，最多可配置 10 个阶级（新增阶级为共用按钮，两项条件同步增减），且下一层目标值不可小于上一层。</span>
+      </div>
+
+      <!-- 区块 0：基本信息 -->
+      <div class=&quot;section&quot;>
+        <div class=&quot;section-title&quot;>基本信息</div>
+        <div class=&quot;form-row&quot;>
+          <div class=&quot;form-label&quot;><span class=&quot;req&quot;>*</span>推播名称</div>
+          <div class=&quot;form-ctrl&quot;>
+            <input type=&quot;text&quot; class=&quot;input&quot; id=&quot;inpName&quot; style=&quot;width:320px&quot; maxlength=&quot;50&quot;
+                   placeholder=&quot;请输入推播名称&quot; oninput=&quot;onNameInput(this)&quot;>
+            <div class=&quot;row-error&quot; id=&quot;err-name&quot;>请输入推播名称，不可留空</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 区块 1：推送目标用户 -->
+      <div class=&quot;section&quot;>
+        <div class=&quot;section-title&quot;>推送目标用户</div>
+
+        <div class=&quot;form-row&quot;>
+          <div class=&quot;form-label&quot;><span class=&quot;req&quot;>*</span>VIP 等级</div>
+          <div class=&quot;form-ctrl&quot;>
+            <div class=&quot;taggroup&quot; id=&quot;grpVip&quot;></div>
+            <div class=&quot;row-error&quot; id=&quot;err-vip&quot;>请选择推送目标用户</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 区块 2：触发条件——条件皆以「今日」为计算区间 -->
+      <div class=&quot;section&quot;>
+        <div class=&quot;section-title&quot;>触发条件</div>
+
+        <div class=&quot;hint&quot;>
+          「账户余额」为必填条件，采单一目标值设置，不分阶级；「有效投注、用户负盈利」为选填条件，可依阶级各自设置（留空＝不启用该条件）；填写时不可为 0 或负数（输入负号将自动去除）；最多 10 阶级，「新增阶级」为共用按钮，两项条件同步新增/删除阶级，且下一层目标值不可小于上一层。
+        </div>
+
+        <div class=&quot;form-row&quot;>
+          <div class=&quot;form-label&quot;><span class=&quot;req&quot;>*</span>账户余额</div>
+          <div class=&quot;form-ctrl&quot;>
+            <input type=&quot;number&quot; min=&quot;0&quot; class=&quot;input&quot; id=&quot;inpBalance&quot; style=&quot;width:220px&quot;
+                   placeholder=&quot;请输入目标值&quot; oninput=&quot;onBalanceInput(this)&quot;>
+            <span style=&quot;color:var(--text-2);font-size:12px;margin-left:8px&quot;>小于等于目标值</span>
+            <div class=&quot;row-error&quot; id=&quot;err-balance&quot;>请输入账户余额目标值，不可为 0 或负数</div>
+          </div>
+        </div>
+
+        <!-- 两项阈值条件（有效投注、用户负盈利）由 JS 生成 -->
+        <div id=&quot;thrContainer&quot;></div>
+      </div>
+
+      <!-- 区块 3：推送奖励 -->
+      <div class=&quot;section&quot;>
+        <div class=&quot;section-title&quot;>推送奖励</div>
+        <div class=&quot;hint&quot;>阶级数与上方「触发条件」共用，新增/删除阶级请至触发条件区块操作。</div>
+        <div id=&quot;rewardsContainer&quot;></div>
+      </div>
+
+      <div class=&quot;form-head&quot; style=&quot;margin-top:4px&quot;>
+        <div class=&quot;btns&quot; style=&quot;margin-left:auto&quot;>
+          <button class=&quot;btn&quot; onclick=&quot;closeForm()&quot;>取消</button>
+          <button class=&quot;btn btn-primary&quot; onclick=&quot;saveForm()&quot;>保存</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- 删除确认弹窗 -->
+<div class=&quot;mask&quot; id=&quot;delMask&quot;>
+  <div class=&quot;dialog&quot;>
+    <div class=&quot;dialog-head&quot;><span style=&quot;color:#e6a23c&quot;>⚠</span> 删除确认</div>
+    <div class=&quot;dialog-body&quot;>确定要删除这条推播条件吗？删除后将立即停止对应用户的推播排程，且无法恢复。</div>
+    <div class=&quot;dialog-foot&quot;>
+      <button class=&quot;btn&quot; onclick=&quot;closeDel()&quot;>取消</button>
+      <button class=&quot;btn btn-primary&quot; style=&quot;background:var(--danger);border-color:var(--danger)&quot; onclick=&quot;confirmDel()&quot;>确定删除</button>
+    </div>
+  </div>
+</div>
+
+<div class=&quot;toast-wrap&quot; id=&quot;toastWrap&quot;></div>
+
+<script>
+/* ============================================================
+   一、基础数据（下拉选单 / 标签来源）
+   —— 全部照需求文件列的内容，方便对照规格。
+   ============================================================ */
+const VIP_TAGS  = ['VIP 0','VIP 1','VIP 2','VIP 3','VIP 4','VIP 5','VIP 6','VIP 7','VIP 8','VIP 9','VIP 10'];
+
+/* 两项按阶级配置的阈值条件：key、显示名、比较符；皆为选填，皆不可输入负数。
+   账户余额为独立配置的单一目标值（必填，小于等于目标值），不列入此阶级化阵列 */
+const THRESHOLDS = [
+  {key:'bet', name:'有效投注',   cmp:'≥', cmpText:'大于等于'},
+  {key:'ngr', name:'用户负盈利', cmp:'≥', cmpText:'大于等于'},
+];
+
+/* 推送奖励——「活动推送」仅限定有角标的活动（有勾选才推送，未勾选则不推送） */
+const BADGE_ACTIVITIES = ['盈利活动','消费活动','每日特别返水','每日特别加码','游戏挑战赛'];
+/* 推送奖励——奖品类型；礼金/积分为输入数量，其余三种为下拉选择奖品内容 */
+const GIFT_TYPES = ['礼金','积分','免费旋转','免费投注','优惠券'];
+const GIFT_OPTIONS = {
+  '免费旋转': ['免费旋转JILI','免费旋转FKG','免费旋转FC'],
+  '免费投注': ['免费投注ONlive','免费投注Mini'],
+  '优惠券':   ['20% Loss Cashback','10% Loss Cashback','10% Deposit Voucher (Max ₱500)'],
+};
+
+/* ============================================================
+   二、示范用列表数据（模拟已生成的推播清单）
+   ============================================================ */
+let pushList = [
+  {
+    id:1, name:'VIP3大R Slot近7日推播', vip:'VIP 3',
+    balance:3000, bet:[50000], ngr:[2000], thrLv:2,
+    rewards:[
+      {pushBadge:true, giftType:'礼金', giftValue:'100', turnover:'2000'},
+      {pushBadge:false, giftType:'免费旋转', giftValue:'免费旋转JILI', turnover:''}
+    ],
+    time:'2026-07-20 14:32:08', enabled:true
+  },
+  {
+    id:2, name:'VIP1回归召回推播', vip:'VIP 1',
+    balance:10000, bet:[10000,30000,60000], ngr:[], thrLv:3,
+    rewards:[
+      {pushBadge:true, giftType:'积分', giftValue:'500', turnover:''},
+      {pushBadge:true, giftType:'优惠券', giftValue:'20% Loss Cashback', turnover:''},
+      {pushBadge:false, giftType:'免费投注', giftValue:'免费投注Mini', turnover:''}
+    ],
+    time:'2026-07-21 09:15:44', enabled:true
+  },
+  {
+    id:3, name:'VIP7净输赢风险监控推播', vip:'VIP 7',
+    balance:4000, bet:[], ngr:[500,1000,2000,5000], thrLv:4,
+    rewards:[
+      {pushBadge:true, giftType:'礼金', giftValue:'50', turnover:'1000'},
+      {pushBadge:true, giftType:'积分', giftValue:'300', turnover:''},
+      {pushBadge:false, giftType:'优惠券', giftValue:'10% Loss Cashback', turnover:''},
+      {pushBadge:true, giftType:'免费旋转', giftValue:'免费旋转FC', turnover:''}
+    ],
+    time:'2026-07-22 18:47:21', enabled:true
+  },
+];
+
+/* ============================================================
+   二之四、示范用推播记录数据——个别会员每一次领取推播奖励的明细
+   pushBadge 为 true 表示该次推送同时勾选了「推送角标活动」
+   ============================================================ */
+let pushRecords = [
+  { account:'okbet22377zkhn', name:'VIP3大R Slot近7日推播',  time:'2026-07-20 14:32:08', level:1, giftType:'礼金',    giftValue:'100', turnover:'2000', pushBadge:true },
+  { account:'okbet22377zkhn', name:'VIP3大R Slot近7日推播',  time:'2026-07-21 09:10:12', level:2, giftType:'免费旋转', giftValue:'免费旋转JILI', turnover:'', pushBadge:false },
+  { account:'okbet66201vip7', name:'VIP1回归召回推播',       time:'2026-07-21 09:15:44', level:1, giftType:'积分',    giftValue:'500', turnover:'', pushBadge:true },
+  { account:'okbet66201vip7', name:'VIP1回归召回推播',       time:'2026-07-22 10:02:33', level:2, giftType:'优惠券',  giftValue:'20% Loss Cashback', turnover:'', pushBadge:false },
+  { account:'okbet66201vip7', name:'VIP1回归召回推播',       time:'2026-07-22 10:05:19', level:3, giftType:'',       giftValue:'', turnover:'', pushBadge:true },
+  { account:'okbet9991iyj72', name:'VIP7净输赢风险监控推播', time:'2026-07-22 18:47:21', level:1, giftType:'礼金',    giftValue:'50', turnover:'1000', pushBadge:true },
+  { account:'okbet9991iyj72', name:'VIP7净输赢风险监控推播', time:'2026-07-23 08:21:05', level:2, giftType:'积分',    giftValue:'300', turnover:'', pushBadge:false },
+  { account:'okbet9991iyj72', name:'VIP7净输赢风险监控推播', time:'2026-07-23 08:25:47', level:3, giftType:'优惠券',  giftValue:'10% Loss Cashback', turnover:'', pushBadge:true },
+  { account:'okbet9991iyj72', name:'VIP7净输赢风险监控推播', time:'2026-07-24 12:11:59', level:4, giftType:'免费旋转', giftValue:'免费旋转FC', turnover:'', pushBadge:false },
+];
+function doRecordSearch(){ renderRecordTable(); }
+function renderRecordTable(){
+  const fa = document.getElementById('filterRecordAccount').value.trim().toLowerCase();
+  const fn = document.getElementById('filterRecordName').value.trim().toLowerCase();
+  const fl = document.getElementById('filterRecordLevel').value;
+  const fsd = document.getElementById('filterRecordStartDate').value;
+  const fed = document.getElementById('filterRecordEndDate').value;
+  const rows = pushRecords.filter(r=>{
+    if(fa &amp;&amp; !r.account.toLowerCase().includes(fa)) return false;
+    if(fn &amp;&amp; !r.name.toLowerCase().includes(fn)) return false;
+    if(fl &amp;&amp; String(r.level)!==fl) return false;
+    const datePart = r.time.slice(0,10);
+    if(fsd &amp;&amp; datePart<fsd) return false;
+    if(fed &amp;&amp; datePart>fed) return false;
+    return true;
+  });
+  const body = document.getElementById('recordTableBody');
+  if(rows.length===0){
+    body.innerHTML = `<tr><td colspan=&quot;5&quot;><div class=&quot;empty&quot;><div class=&quot;big&quot;>📊</div>暂无符合条件的推播记录</div></td></tr>`;
+    return;
+  }
+  body.innerHTML = rows.map(r=>`
+    <tr>
+      <td>${r.account}</td>
+      <td>${r.name}</td>
+      <td>${r.time}</td>
+      <td>阶级${r.level}</td>
+      <td>${fmtRecordReward(r)}</td>
+    </tr>`).join('');
+}
+function fmtRewardText(rw){
+  if(!rw || !rw.giftType) return '';
+  if(rw.giftType==='礼金') return `礼金 ${Number(rw.giftValue).toLocaleString()}${rw.turnover?`（流水${Number(rw.turnover).toLocaleString()}）`:''}`;
+  if(rw.giftType==='积分') return `积分 ${Number(rw.giftValue).toLocaleString()}`;
+  return `${rw.giftType} ${rw.giftValue}`;
+}
+/* 奖励内容：有勾选「推送角标活动」时于最前加注「推送活动」；只有推送活动没有奖励时仅显示「推送活动」 */
+function fmtRecordReward(r){
+  const giftText = fmtRewardText(r);
+  let text = giftText;
+  if(r.pushBadge) text = giftText ? `推送活动、${giftText}` : '推送活动';
+  return text || '<span class=&quot;none&quot;>—</span>';
+}
+
+let seqId = 4;              // 下一个新增的 id
+let editingId = null;      // 正在编辑的 id（null=新增）
+let pendingDelId = null;   // 待删除 id
+let smartPushOn = false;   // 智能推播总开关，预设关闭
+
+function toggleSmartPush(){
+  smartPushOn = !smartPushOn;
+  document.getElementById('smartPushSwitch').classList.toggle('on', smartPushOn);
+  toast(smartPushOn?'success':'info', smartPushOn?'智能推播已开启':'智能推播已关闭');
+}
+
+/* ============================================================
+   三、表单当前状态
+   ============================================================ */
+let form = null;
+function blankRewardLv(){ return {pushBadge:false, giftType:'', giftValue:'', turnover:''}; }
+function blankForm(){
+  return {
+    name:'', vip:'',
+    balance:'',   // 账户余额——独立配置，单一目标值，不分阶级
+    bet:Array(10).fill(''), ngr:Array(10).fill(''),
+    thrLv:1,   // 两项按阶级配置的条件共用同一个阶级数（新增/删除阶级为共用按钮），最多 10 阶
+    rewards:Array.from({length:10}, blankRewardLv)   // 每个阶级各自的推送奖励设定，阶级数与 thrLv 共用
+  };
+}
+
+/* ============================================================
+   四、侧栏 &amp; 页签切换
+   ============================================================ */
+function toggleSub(el){
+  el.classList.toggle('open');
+  el.nextElementSibling.classList.toggle('show');
+}
+function switchSubtab(tab){
+  document.querySelectorAll('.subtab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
+  // 切页签时若在表单页，先退回列表
+  document.getElementById('view-form').classList.add('hidden');
+  document.getElementById('view-list').classList.toggle('hidden', tab!=='list');
+  document.getElementById('view-record').classList.toggle('hidden', tab!=='record');
+  document.getElementById('view-popup').classList.toggle('hidden', tab!=='popup');
+  document.getElementById('view-freerecord').classList.toggle('hidden', tab!=='freerecord');
+  document.getElementById('view-couponrecord').classList.toggle('hidden', tab!=='couponrecord');
+  if(tab==='record') renderRecordTable();
+  if(tab!=='popup') closePushPopup();
+}
+/* 免费项目记录／优惠券记录——静态示意页面，仅「全部来源」新增项「推播奖励」具筛选互动，其余栏位/按钮维持静态展示 */
+function onFreeSourceChange(val){
+  document.querySelectorAll('#freeRecordBody tr[data-source]').forEach(tr=>{
+    const show = (val !== '推播奖励') || (tr.dataset.source === '推播奖励');
+    tr.style.display = show ? '' : 'none';
+  });
+}
+function onCouponSourceChange(val){
+  document.querySelectorAll('#couponRecordBody tr[data-source]').forEach(tr=>{
+    const show = (val !== '推播奖励') || (tr.dataset.source === '推播奖励');
+    tr.style.display = show ? '' : 'none';
+  });
+}
+function showPushPopup(scenario){
+  scenario = scenario || 'full';
+  const showRewards = scenario !== 'bonusOnly';
+  const showBonus = scenario !== 'rewardsOnly';
+  document.getElementById('popupRewardsBlock').style.display = showRewards ? '' : 'none';
+  document.getElementById('popupBonusBlock').style.display = showBonus ? '' : 'none';
+  document.getElementById('popupBonusBlock').classList.toggle('no-top-border', !showRewards);
+  document.getElementById('feMask').classList.add('show');
+}
+function closePushPopup(){ document.getElementById('feMask').classList.remove('show'); }
+function goActivityDetail(name){
+  closePushPopup();
+  toast('info', `模拟跳转 → 进入「${name}」活动详情页`);
+}
+
+/* 福利加码——奖励类型示意数据；礼金/积分/其余三种(免费旋转、免费投注、优惠券)导向行为各不相同 */
+const BONUS_DEMO = {
+  '礼金':    {icon:'₱',  text:'1,000',            turnover:'流水倍数：2倍'},
+  '积分':    {icon:'★',  text:'500 积分',          turnover:''},
+  '免费旋转': {icon:'🎰', text:'免费旋转 JILI',      turnover:''},
+  '免费投注': {icon:'🎯', text:'免费投注 Mini',      turnover:''},
+  '优惠券':  {icon:'🎟', text:'20% Loss Cashback', turnover:''}
+};
+let bonusType = '礼金';
+function onBonusTypeChange(type){
+  bonusType = type;
+  renderBonusCard();
+}
+function renderBonusCard(){
+  const d = BONUS_DEMO[bonusType];
+  document.getElementById('bonusIcon').textContent = d.icon;
+  document.getElementById('bonusText').textContent = d.text;
+  const turnoverEl = document.getElementById('bonusTurnover');
+  turnoverEl.textContent = d.turnover;
+  turnoverEl.style.display = d.turnover ? '' : 'none';
+}
+function claimBonus(){
+  closePushPopup();
+  if(bonusType==='礼金'){
+    toast('info', '礼金奖励已领取，弹窗关闭');
+  } else if(bonusType==='积分'){
+    toast('info', '模拟跳转 → 进入「积分商城」');
+  } else {
+    toast('info', '模拟跳转 → 进入「我的优惠券」');
+  }
+}
+
+/* ============================================================
+   五、渲染表格
+   ============================================================ */
+function fmtLevelCell(r, i){
+  // 账户余额已独立于「目标用户」右侧单独列示，此处只显示按阶级配置的有效投注/用户负盈利
+  if(i>=r.thrLv) return '<span class=&quot;none&quot;>—</span>';
+  const lines=[];
+  if(r.bet[i]!==undefined) lines.push(`有效投注 ≥${Number(r.bet[i]).toLocaleString()}`);
+  if(r.ngr[i]!==undefined) lines.push(`负盈利 ≥${Number(r.ngr[i]).toLocaleString()}`);
+  if(lines.length===0) return '<span class=&quot;none&quot;>—</span>';
+  return `<div class=&quot;cond-val&quot;>${lines.map(l=>`<span class=&quot;lv&quot;>${l}</span>`).join('')}</div>`;
+}
+function doSearch(){ renderTable(); }
+function renderTable(){
+  const fm = document.getElementById('filterMain').value;
+  const fn = document.getElementById('filterName').value.trim().toLowerCase();
+  const fsd = document.getElementById('filterStartDate').value;   // 'YYYY-MM-DD' 或空
+  const fed = document.getElementById('filterEndDate').value;
+  const rows = pushList.filter(r=>{
+    if(fm &amp;&amp; r.vip!==fm) return false;
+    if(fn &amp;&amp; !r.name.toLowerCase().includes(fn)) return false;
+    const datePart = r.time.slice(0,10);
+    if(fsd &amp;&amp; datePart<fsd) return false;
+    if(fed &amp;&amp; datePart>fed) return false;
+    return true;
+  });
+  const body = document.getElementById('tableBody');
+
+  if(rows.length===0){
+    body.innerHTML = `<tr><td colspan=&quot;15&quot;><div class=&quot;empty&quot;><div class=&quot;big&quot;>📭</div>暂无符合条件的推播清单</div></td></tr>`;
+    return;
+  }
+  body.innerHTML = rows.map(r=>`
+    <tr>
+      <td>${r.name}</td>
+      <td>${r.vip}</td>
+      <td>≤${Number(r.balance).toLocaleString()}</td>
+      ${[0,1,2,3,4,5,6,7,8,9].map(i=>`<td>${fmtLevelCell(r,i)}</td>`).join('')}
+      <td>${r.time}</td>
+      <td class=&quot;op&quot;>
+        <a onclick=&quot;toggleRowEnable(${r.id})&quot;>${r.enabled?'开启':'关闭'}</a>
+        <a onclick=&quot;openForm(${r.id})&quot;>编辑</a>
+        <a class=&quot;del&quot; onclick=&quot;askDel(${r.id})&quot;>删除</a>
+      </td>
+    </tr>`).join('');
+}
+function toggleRowEnable(id){
+  const r = pushList.find(x=>x.id===id);
+  if(!r) return;
+  r.enabled = !r.enabled;
+  renderTable();
+  toast(r.enabled?'success':'info', r.enabled?'该推播条件已开启':'该推播条件已关闭');
+}
+
+/* ============================================================
+   六、打开 / 关闭表单
+   ============================================================ */
+function openForm(id){
+  editingId = (typeof id==='number') ? id : null;
+  form = blankForm();
+
+  if(editingId!==null){
+    const r = pushList.find(x=>x.id===editingId);
+    form.name=r.name; form.vip=r.vip;
+    form.balance = r.balance!==undefined &amp;&amp; r.balance!==null ? r.balance : '';
+    // 把已保存的阶级数组回填进 10 格输入；两项条件共用同一阶级数，取两者最大值（并以已保存的 thrLv 为准）
+    let maxLv=1;
+    ['bet','ngr'].forEach(k=>{
+      const vals=r[k]||[];
+      form[k]=Array(10).fill('');
+      vals.forEach((v,i)=>{ if(i<10) form[k][i]=v; });
+      maxLv=Math.max(maxLv, vals.length);
+    });
+    form.thrLv = r.thrLv || maxLv;
+    form.rewards = Array.from({length:10}, blankRewardLv);
+    (r.rewards||[]).forEach((rw,i)=>{
+      if(i<10) form.rewards[i] = {pushBadge:!!rw.pushBadge, giftType:rw.giftType||'', giftValue:rw.giftValue||'', turnover:rw.turnover||''};
+    });
+  }
+  document.getElementById('formTitle').textContent = editingId!==null ? '编辑推播条件' : '新增推播条件';
+
+  const nameInput = document.getElementById('inpName');
+  nameInput.value = form.name;
+  nameInput.disabled = editingId!==null;   // 推播名称在编辑页面下不可变更
+
+  document.getElementById('inpBalance').value = form.balance;
+
+  buildVipGroup();
+  buildThresholds();
+  buildRewardsTable();
+  clearErrors();
+
+  document.getElementById('view-list').classList.add('hidden');
+  document.getElementById('view-record').classList.add('hidden');
+  document.getElementById('view-form').classList.remove('hidden');
+  document.querySelector('.content').scrollTop = 0;
+}
+function closeForm(){
+  document.getElementById('view-form').classList.add('hidden');
+  document.getElementById('view-list').classList.remove('hidden');
+}
+function onNameInput(el){ form.name=el.value; hideError('err-name'); }
+
+/* ============================================================
+   七、推送目标用户——VIP 等级单选（点一下选中，再点同一个可取消）
+   ============================================================ */
+function buildVipGroup(){
+  const box=document.getElementById('grpVip');
+  box.innerHTML = VIP_TAGS.map(t=>
+    `<div class=&quot;tagopt ${form.vip===t?'sel':''}&quot; onclick=&quot;pickTag('vip','${t.replace(/'/g,&quot;\\'&quot;)}',this)&quot;>${t}</div>`
+  ).join('');
+}
+function pickTag(field,val,el){
+  // 单选：把同组其它清掉，再切换自己
+  const box=el.parentElement;
+  box.querySelectorAll('.tagopt').forEach(o=>o.classList.remove('sel'));
+  if(form[field]===val){ form[field]=''; }        // 再点一次＝取消
+  else { form[field]=val; el.classList.add('sel'); }
+  hideError('err-'+field);
+}
+
+/* ============================================================
+   八、三项阈值条件——同一阶级下三项目标值需同时配置（并排显示）
+   「新增阶级」为共用的独立按钮，三项条件的阶级数一起增减，最多 10 阶
+   ============================================================ */
+function buildThresholds(){
+  const box=document.getElementById('thrContainer');
+  const lvCount=form.thrLv;
+
+  const head=`
+    <div class=&quot;thr-grid-row thr-grid-head&quot;>
+      <div></div>
+      ${THRESHOLDS.map(t=>`
+      <div class=&quot;thr-col-title&quot;>${t.name}<span class=&quot;cmp&quot;>${t.cmpText}目标值</span></div>`).join('')}
+    </div>`;
+
+  let rows='';
+  for(let i=0;i<lvCount;i++){
+    rows+=`
+    <div class=&quot;thr-grid-row&quot;>
+      <div class=&quot;thr-row-label&quot;>
+        阶级${i+1}
+        ${i>0?`<span class=&quot;rm&quot; onclick=&quot;removeLv()&quot;>删除阶级</span>`:''}
+      </div>
+      ${THRESHOLDS.map(t=>`
+      <div class=&quot;thr-cell&quot;>
+        <input type=&quot;number&quot; min=&quot;0&quot; class=&quot;input&quot; value=&quot;${form[t.key][i]}&quot;
+               placeholder=&quot;请输入目标值&quot;
+               oninput=&quot;onThrInput('${t.key}',${i},this)&quot;>
+      </div>`).join('')}
+    </div>`;
+  }
+
+  const errRow=`
+    <div class=&quot;thr-grid-row thr-err-row&quot;>
+      <div></div>
+      ${THRESHOLDS.map(t=>`<div class=&quot;row-error&quot; id=&quot;err-${t.key}&quot;></div>`).join('')}
+    </div>`;
+
+  const disabled = lvCount>=10;
+  box.innerHTML = `
+    <div class=&quot;thr-grid-wrap&quot;>
+      ${head}
+      ${rows}
+      ${errRow}
+    </div>
+    <div class=&quot;add-lv ${disabled?'disabled':''}&quot; onclick=&quot;${disabled?'':'addLv()'}&quot;>＋ 新增阶级（最多 10 阶）</div>`;
+}
+function onBalanceInput(el){
+  if(el.value.includes('-')) el.value=el.value.replace(/-/g,'');   // 账户余额不可为负数，输入负号直接去除
+  form.balance=el.value;
+  hideError('err-balance');
+}
+function onThrInput(key,idx,el){
+  if(el.value.includes('-')) el.value=el.value.replace(/-/g,'');   // 两项目标值皆不可为负数，输入负号直接去除
+  form[key][idx]=el.value;
+  hideError('err-'+key);
+  el.classList.remove('is-error');
+}
+function addLv(){
+  if(form.thrLv<10){
+    form.thrLv++;
+    buildThresholds();
+    buildRewardsTable();   // 推送奖励阶级数与触发条件共用，需同步增减
+  }
+}
+function removeLv(){
+  if(form.thrLv>1){
+    form.thrLv--;
+    ['bet','ngr'].forEach(k=>{ form[k][form.thrLv]=''; });
+    form.rewards[form.thrLv]=blankRewardLv();
+    buildThresholds();
+    buildRewardsTable();
+  }
+}
+
+/* ============================================================
+   九、推送奖励表格——阶级数与触发条件共用，每个阶级设定活动推送/奖品类型/奖品数量
+   ============================================================ */
+function buildRewardsTable(){
+  const box=document.getElementById('rewardsContainer');
+  const lvCount=form.thrLv;
+
+  let rows='';
+  for(let i=0;i<lvCount;i++){
+    rows+=`
+    <tr>
+      <td style=&quot;white-space:nowrap&quot;>阶级${i+1}</td>
+      <td>
+        <label class=&quot;reward-act-chk&quot;>
+          <input type=&quot;checkbox&quot; ${form.rewards[i].pushBadge?'checked':''}
+                 onchange=&quot;toggleRewardBadge(${i},this.checked)&quot;> 推送角标相关活动
+        </label>
+      </td>
+      <td>
+        <select class=&quot;select&quot; style=&quot;width:100%&quot; onchange=&quot;onGiftTypeChange(${i},this.value)&quot;>
+          <option value=&quot;&quot;>请选择奖品类型</option>
+          ${GIFT_TYPES.map(t=>`<option value=&quot;${t}&quot; ${form.rewards[i].giftType===t?'selected':''}>${t}</option>`).join('')}
+        </select>
+      </td>
+      <td id=&quot;rwVal-${i}&quot;>${renderGiftValueCell(i)}</td>
+    </tr>`;
+  }
+
+  box.innerHTML = `
+    <div class=&quot;card&quot; style=&quot;overflow-x:auto&quot;>
+      <table class=&quot;reward-table&quot;>
+        <thead>
+          <tr>
+            <th>阶级</th>
+            <th>活动推送</th>
+            <th>奖品类型</th>
+            <th>奖品/数量</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div class=&quot;hint&quot; style=&quot;margin-top:8px;margin-bottom:0;text-align:left&quot;>
+      仅限「角标」相关活动：盈利活动、消费活动、每日特别返水、每日特别加码、游戏挑战赛；有勾选才推送，未勾选则不推送
+    </div>`;
+}
+function renderGiftValueCell(i){
+  const rw = form.rewards[i];
+  if(!rw.giftType){
+    return `<span style=&quot;color:var(--placeholder)&quot;>请先选择奖品类型</span>`;
+  }
+  if(rw.giftType==='礼金' || rw.giftType==='积分'){
+    let html = `
+      <input type=&quot;number&quot; class=&quot;input&quot; style=&quot;width:100%&quot; value=&quot;${rw.giftValue}&quot; min=&quot;1&quot;
+             placeholder=&quot;请输入数量&quot; oninput=&quot;onGiftValueInput(${i},this.value)&quot;>
+      <div class=&quot;row-error&quot; id=&quot;err-rwval-${i}&quot;>请输入奖品数量，不可留空或小于等于 0</div>`;
+    if(rw.giftType==='礼金'){
+      html += `
+      <div class=&quot;reward-val-extra&quot;>
+        <div style=&quot;display:flex;align-items:center;gap:6px&quot;>
+          <input type=&quot;number&quot; class=&quot;input&quot; style=&quot;width:100%&quot; value=&quot;${rw.turnover}&quot; min=&quot;0&quot;
+                 placeholder=&quot;礼金所需流水&quot; oninput=&quot;onTurnoverInput(${i},this.value)&quot;>
+          <span style=&quot;color:var(--text-2);white-space:nowrap&quot;>倍</span>
+        </div>
+        <div class=&quot;row-error&quot; id=&quot;err-rwturn-${i}&quot;>礼金所需流水不可为负数</div>
+      </div>`;
+    }
+    return html;
+  }
+  // 免费旋转 / 免费投注 / 优惠券——下拉选择奖品内容
+  const opts = GIFT_OPTIONS[rw.giftType] || [];
+  return `
+    <select class=&quot;select&quot; style=&quot;width:100%&quot; onchange=&quot;onGiftValueSelect(${i},this.value)&quot;>
+      <option value=&quot;&quot;>请选择奖品内容</option>
+      ${opts.map(o=>`<option value=&quot;${o}&quot; ${rw.giftValue===o?'selected':''}>${o}</option>`).join('')}
+    </select>
+    <div class=&quot;row-error&quot; id=&quot;err-rwval-${i}&quot;>请选择奖品内容</div>`;
+}
+function toggleRewardBadge(i,checked){
+  form.rewards[i].pushBadge = checked;
+}
+function onGiftTypeChange(i,type){
+  form.rewards[i] = {...form.rewards[i], giftType:type, giftValue:'', turnover:''};
+  document.getElementById('rwVal-'+i).innerHTML = renderGiftValueCell(i);
+}
+function onGiftValueInput(i,val){ form.rewards[i].giftValue=val; hideError('err-rwval-'+i); }
+function onGiftValueSelect(i,val){ form.rewards[i].giftValue=val; hideError('err-rwval-'+i); }
+function onTurnoverInput(i,val){ form.rewards[i].turnover=val; hideError('err-rwturn-'+i); }
+
+/* ============================================================
+   十、保存 —— 含各项校验
+   ============================================================ */
+function clearErrors(){ document.querySelectorAll('.row-error').forEach(e=>e.classList.remove('show')); }
+function showError(id,msg){ const e=document.getElementById(id); if(e){ if(msg)e.textContent=msg; e.classList.add('show'); } }
+function hideError(id){ const e=document.getElementById(id); if(e)e.classList.remove('show'); }
+
+function collectBalance(){
+  // 账户余额——独立配置的单一目标值，必填，且不可为 0 或负数
+  const s=String(form.balance).trim();
+  if(s===''){ return {err:'请输入账户余额目标值，不可为 0 或负数'}; }
+  const n=Number(s);
+  if(isNaN(n)){ return {err:'请输入数字'}; }
+  if(n===0){ return {err:'目标值不可为 0'}; }
+  if(n<0){ return {err:'目标值不可为负数'}; }
+  return {val:n};
+}
+function collectThreshold(key){
+  // 取出该项非空的阶级值，并做「不可为0或负数 / 下一层不可小于上一层」校验；留空＝不启用该阶级的此条件
+  const raw=form[key].slice(0,form.thrLv);
+  const vals=[]; let err='';
+  for(let i=0;i<raw.length;i++){
+    const s=String(raw[i]).trim();
+    if(s==='') continue;
+    const n=Number(s);
+    if(isNaN(n)){ err='请输入数字'; break; }
+    if(n===0){ err='目标值不可为 0'; break; }
+    if(n<0){ err='目标值不可为负数'; break; }
+    vals.push(n);
+  }
+  if(err) return {err};
+  // 校验递增：下一层不可小于上一层
+  for(let i=1;i<vals.length;i++){
+    if(vals[i]<vals[i-1]){ return {err:'下一层目标值不可小于上一层'}; }
+  }
+  return {vals};
+}
+
+function saveForm(){
+  clearErrors();
+  let ok=true;
+  if(!form.name.trim()){ showError('err-name'); ok=false; }
+  if(!form.vip){ showError('err-vip'); ok=false; }
+
+  const res={};
+  const balanceRes=collectBalance();
+  if(balanceRes.err){ showError('err-balance', balanceRes.err); ok=false; }
+  else res.balance=balanceRes.val;
+  for(const k of ['bet','ngr']){
+    const r=collectThreshold(k);
+    if(r.err){ showError('err-'+k, r.err); ok=false; }
+    else res[k]=r.vals;
+  }
+
+  // 各阶级的推送奖励：活动推送与奖品类型皆为选填、可各自单独设定；只有在选了奖品类型时，才需要填完该类型对应的奖品/数量
+  for(let i=0;i<form.thrLv;i++){
+    const rw=form.rewards[i];
+    if(!rw.giftType) continue;
+    if(rw.giftType==='礼金' || rw.giftType==='积分'){
+      const n=Number(rw.giftValue);
+      if(rw.giftValue===''||isNaN(n)||n<=0){ showError('err-rwval-'+i); ok=false; }
+      if(rw.giftType==='礼金'){
+        const tn=Number(rw.turnover);
+        if(rw.turnover!==''&&(isNaN(tn)||tn<0)){ showError('err-rwturn-'+i); ok=false; }
+      }
+    } else if(!rw.giftValue){ showError('err-rwval-'+i); ok=false; }
+  }
+
+  if(!ok){ toast('error', '请修正表单中标红的项目'); return; }
+
+  const now=new Date();
+  const time=`${now.getFullYear()}-${p2(now.getMonth()+1)}-${p2(now.getDate())} ${p2(now.getHours())}:${p2(now.getMinutes())}:${p2(now.getSeconds())}`;
+  const record={
+    name:form.name.trim(), vip:form.vip,
+    balance:res.balance, bet:res.bet, ngr:res.ngr, thrLv:form.thrLv,
+    rewards:form.rewards.slice(0,form.thrLv).map(rw=>({
+      pushBadge:!!rw.pushBadge, giftType:rw.giftType, giftValue:rw.giftValue,
+      turnover: rw.giftType==='礼金' ? rw.turnover : ''
+    })),
+    time
+  };
+
+  if(editingId!==null){
+    const idx=pushList.findIndex(x=>x.id===editingId);
+    pushList[idx]={...pushList[idx],...record};
+    toast('success','推播条件已更新');
+  }else{
+    pushList.unshift({id:seqId++,...record,enabled:true});
+    toast('success','推播条件新增成功');
+  }
+  renderTable();
+  closeForm();
+}
+function p2(n){ return String(n).padStart(2,'0'); }
+
+/* ============================================================
+   十一、删除
+   ============================================================ */
+function askDel(id){ pendingDelId=id; document.getElementById('delMask').classList.add('show'); }
+function closeDel(){ pendingDelId=null; document.getElementById('delMask').classList.remove('show'); }
+function confirmDel(){
+  pushList=pushList.filter(x=>x.id!==pendingDelId);
+  closeDel(); renderTable(); toast('info','已删除该推播条件');
+}
+
+/* ============================================================
+   十二、Toast 轻提示
+   ============================================================ */
+function toast(type,msg){
+  const wrap=document.getElementById('toastWrap');
+  const icon={success:'✔',error:'✕',info:'ℹ'}[type]||'';
+  const el=document.createElement('div');
+  el.className='toast '+type; el.innerHTML=`<span>${icon}</span>${msg}`;
+  wrap.appendChild(el);
+  setTimeout(()=>{ el.style.transition='.3s'; el.style.opacity='0'; el.style.transform='translateY(-10px)'; setTimeout(()=>el.remove(),300); },2200);
+}
+
+/* 初始渲染 */
+renderTable();
+renderRecordTable();
+renderBonusCard();
+</script>
+</body>
+</html>
+"></iframe>
+  </div>
+  <div class="tab-panel" id="panel-spec">
+
+<div class="spec-doc">
+
+  <!-- ======================= 文件页首 ======================= -->
+  <header class="spec-header">
+    <div class="doc-title">智能推播（Smart Alert）· Specs 规格文件</div>
+    <div class="doc-sub">功能位置：后台〔活动配置（新）→ 智能推播〕</div>
+    <div class="meta-row">
+      <span class="meta-chip">版本号　<b>v1.0</b></span>
+      <span class="meta-chip">日期　<b>2026-07-29</b></span>
+      <span class="meta-chip">类型　<b>新功能 + 既有页面异动</b></span>
+      <span class="meta-chip">变更摘要　<b>新增「智能推播」全功能</b></span>
+    </div>
+  </header>
+
+  <!-- ======================= 目录 ======================= -->
+  <nav class="spec-nav">
+    <div class="nav-title">规格说明 · 分页导览（前台 / 后台 / 逻辑与情境 各自独立分页，不放在同一页）</div>
+    <div class="spec-subtabs">
+      <div class="spec-subtab active" id="stab-front" onclick="showSpecTab('front')">前台规格　§1～§2</div>
+      <div class="spec-subtab" id="stab-back" onclick="showSpecTab('back')">后台规格　§3</div>
+      <div class="spec-subtab" id="stab-logic" onclick="showSpecTab('logic')">逻辑与情境　§4～§6</div>
+    </div>
+  </nav>
+
+  <!-- ===== 前台分页（§1 需求目的 + §2 前台推播弹窗） ===== -->
+  <div class="spec-subpanel active" id="sp-front">
+
+  <!-- ============================================================
+       1. 需求目的
+       ============================================================ -->
+  <section class="spec-section" id="s1">
+    <div class="sec-head">
+      <span class="sec-no">1</span>
+      <span class="sec-title">需求目的</span>
+    </div>
+    <div class="func-block">
+      <div class="fb-body" style="padding:20px 22px">
+        <div class="text-col" style="width:1330px">
+          <div class="rule-group">
+            <span class="rg-title">目的说明</span>
+            <ul class="rule-list">
+              <li>建立一套<span class="k-blue">「智能推播」</span>机制：依后台设定的<span class="k">VIP 等级</span>与<span class="k">触发条件</span>（账户余额、有效投注、用户负盈利），在符合资格时于<span class="k">前台首页</span>弹出<span class="k-blue">「活动快报」</span>弹窗。</li>
+              <li>弹窗内含两大区块：<span class="k">待领取奖励</span>（导流至对应活动）与<span class="k">福利加码</span>（直接发放后台配置的奖励）。</li>
+              <li>后台提供<span class="k">新增／编辑／删除</span>推播条件、总开关、以及推播列表（见 3.4）与推播记录（见 3.5）。</li>
+              <li>既有的<span class="k">免费项目记录</span>与<span class="k">优惠券记录</span>页面，来源筛选新增<span class="k-green">「推播奖励」</span>选项，用于追踪由推播发出的奖励（异动）。</li>
+            </ul>
+          </div>
+          <div class="notice notice-blue" style="width:1330px">
+            <span class="ni">ℹ</span>
+            <div class="nt">
+              <span>本文拆分为「前台（第 2 节）」与「后台（第 3 节）」，每一功能区块以「图 + 文」呈现。</span>
+              <span>凡涉及判断／状态切换／多选项组合之规则，统一在第 4、5 节以表格穷举，第 6 节列出变更分类与本次未涉及之既有规则。</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       2. 前台规格 · 推播弹窗
+       ============================================================ -->
+  <section class="spec-section" id="s2">
+    <div class="sec-head">
+      <span class="sec-no">2</span>
+      <span class="sec-title">前台规格 · 推播弹窗</span>
+      <span class="sec-side side-front">前台</span>
+    </div>
+
+    <!-- 2.1 弹窗整体 -->
+    <div class="func-block">
+      <div class="fb-head">
+        <span class="fb-code">2.1</span>
+        <span class="fb-name">推播弹窗「活动快报」— 显示位置、结构与触发</span>
+      </div>
+      <div class="fb-body">
+        <!-- 图 -->
+        <div class="fig-col">
+          <div class="mk-phone">
+            <div class="mk-screen">
+              <div class="mk-status"><span>9:41</span><span>📶 🔋</span></div>
+              <div class="mk-fetop">
+                <span class="mk-logo">OK<em>•</em>BET</span>
+                <span class="mk-login">注册 / 登录</span>
+              </div>
+              <div class="mk-cats">
+                <div class="mk-cat on"><div class="ic">🔥</div><span>Popular</span></div>
+                <div class="mk-cat"><div class="ic">🏆</div><span>OKWIN</span></div>
+                <div class="mk-cat"><div class="ic">🎰</div><span>Slot</span></div>
+                <div class="mk-cat"><div class="ic">🎡</div><span>Perya</span></div>
+              </div>
+              <div class="mk-popwrap">
+                <div class="mk-pop">
+                  <span class="mk-pop-title">活动快报</span>
+                  <span class="mk-pop-sub">待领取奖励</span>
+                  <div class="mk-pop-list">
+                    <div class="mk-pop-item"><span class="nm">盈利活动</span><span class="jn">领取</span></div>
+                    <div class="mk-pop-item"><span class="nm">消费活动</span><span class="jn">领取</span></div>
+                    <div class="mk-pop-item"><span class="nm">每日特别返水</span><span class="jn">领取</span></div>
+                  </div>
+                  <div class="mk-pop-div">
+                    <span class="mk-pop-sub">福利加码</span>
+                    <div class="mk-pop-item">
+                      <span class="nm"><span class="mk-bonus-ic">₱</span> 1,000</span>
+                      <span class="jn">领取</span>
+                    </div>
+                    <span class="mk-turn">流水倍数：2倍</span>
+                  </div>
+                </div>
+              </div>
+              <div class="mk-tabbar"><span>⌂ 首页</span><span>🎁 奖励</span><span>🏬 商城</span><span>🏆 排行</span><span>👤 我的</span></div>
+            </div>
+          </div>
+          <span class="fig-cap">图 2.1　情境①：待领取奖励 + 福利加码（示意，实际清单依资格带出）</span>
+        </div>
+        <!-- 文 -->
+        <div class="text-col">
+          <div class="rule-group">
+            <span class="rg-title">显示位置（对应规则 B）</span>
+            <ul class="rule-list">
+              <li>推播弹窗<span class="k-red">仅在「首页」显示</span>；离开首页（进入游戏详情页、个人中心等）一律不显示。</li>
+              <li>首页涵盖以下 tab，任一 tab 皆属首页范围：<span class="k">Popular</span>、<span class="k">OKWIN</span>、<span class="k">Slot</span>、<span class="k">Perya</span>、<span class="k">Casino</span>、<span class="k">Poker</span>、<span class="k">Arcade</span>、<span class="k">E-Bingo</span>、<span class="k">Numeric</span>。</li>
+            </ul>
+          </div>
+          <div class="rule-group">
+            <span class="rg-title err">风控名单排除（一律不显示）</span>
+            <ul class="rule-list err">
+              <li>当用户账号出现在后台<span class="k-red">「风控黑名单」</span>或<span class="k-red">「NDRP 名单」</span>清单时，<span class="k-red">一律不显示推播弹窗</span>。</li>
+              <li>此为<span class="k">最优先的排除条件</span>：命中任一名单即直接结束，<span class="k">不再判断资格、优先顺序或每日次数</span>。</li>
+              <li>名单以<span class="k">触发当下（时机 A）</span>的即时状态为准；触发后才被移出名单者，需下一次触发时机才可能显示。</li>
+            </ul>
+          </div>
+          <div class="rule-group">
+            <span class="rg-title">弹窗结构与文案</span>
+            <ul class="rule-list">
+              <li>标题固定文案：<span class="k-blue">「活动快报」</span>（不可变动）。</li>
+              <li>由上而下：标题 → <span class="k">待领取奖励</span>区（清单）→ <span class="k">福利加码</span>区（卡片）。两区小标样式一致。</li>
+              <li>弹窗高度<span class="k">固定</span>；当待领取奖励清单过多时，<span class="k">仅清单区可上下滑动</span>，其余区块不随之滚动。</li>
+              <li>右上角提供<span class="k">关闭（✕）</span>；点击关闭当次不再显示（当日再次触发的判断见规则 D）。</li>
+              <li><span class="k">待领取奖励</span>显示对应活动横版Banner；仅显示有「未领取」奖励的活动。</li>
+              <li><span class="k">福利加码</span>显示奖励icon及奖励内容；仅「礼金」需额外显示<span class="k">流水倍数</span>。</li>
+              <li><span class="k">流水倍数</span>依后台配置显示对应标目值，数值为空或0即不显示此文提示。</li>
+            </ul>
+          </div>
+          <div class="rule-group">
+            <span class="rg-title">文案长度限制</span>
+            <ul class="rule-list">
+              <li>「领取」按钮文案固定 2 字，靠右不换行。</li>
+            </ul>
+          </div>
+          <div class="rule-group">
+            <span class="rg-title">情境（对应第 5 节穷举）</span>
+            <ul class="rule-list">
+              <li>情境①：待领取奖励 + 福利加码　｜　情境②：仅待领取奖励　｜　情境③：仅福利加码。</li>
+              <li><span class="k-red">两区块皆无内容时不触发弹窗</span>（不显示空窗）。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2.2 待领取奖励区 -->
+    <div class="func-block">
+      <div class="fb-head">
+        <span class="fb-code">2.2</span>
+        <span class="fb-name">待领取奖励区 — 清单与导流</span>
+      </div>
+      <div class="fb-body">
+        <div class="fig-col">
+          <div class="mk-pop" style="width:340px">
+            <span class="mk-pop-sub">待领取奖励</span>
+            <div class="mk-pop-list">
+              <div class="mk-pop-item" style="width:316px"><span class="nm">盈利活动</span><span class="jn">领取</span></div>
+              <div class="mk-pop-item" style="width:316px"><span class="nm">消费活动</span><span class="jn">领取</span></div>
+              <div class="mk-pop-item" style="width:316px"><span class="nm">每日特别返水</span><span class="jn">领取</span></div>
+              <div class="mk-pop-item" style="width:316px"><span class="nm">每日特别加码</span><span class="jn">领取</span></div>
+              <div class="mk-pop-item" style="width:316px"><span class="nm">游戏挑战赛</span><span class="jn">领取</span></div>
+            </div>
+          </div>
+          <span class="fig-cap">图 2.2　待领取奖励清单（最多 5 种活动）</span>
+        </div>
+        <div class="text-col">
+          <div class="rule-group">
+            <span class="rg-title">清单内容</span>
+            <ul class="rule-list">
+              <li>显示用户<span class="k">当下符合资格、待领取</span>的活动，共 5 种：<span class="k">盈利活动</span>、<span class="k">消费活动</span>、<span class="k">每日特别返水</span>、<span class="k">每日特别加码</span>、<span class="k">游戏挑战赛</span>。</li>
+              <li>此 5 种活动<span class="k">对应后台「活动推送（角标相关活动）」</span>勾选项：有勾选才推送，未勾选则不出现（见后台 3.2.4）。</li>
+              <li>无任何符合资格活动或没有待领取的奖励时，本区<span class="k">整块不显示</span>（可能仅显示福利加码，即情境③）。</li>
+            </ul>
+          </div>
+          <div class="rule-group ">
+            <span class="rg-title ok">交互 · 点击「领取」</span>
+            <ul class="rule-list ok">
+              <li>点击某活动的「领取」→ <span class="k-blue">导向该活动的详情页</span>（不直接发奖，由活动页流程处理）。</li>
+              <li>导向后弹窗关闭。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2.3 福利加码区 -->
+    <div class="func-block">
+      <div class="fb-head">
+        <span class="fb-code">2.3</span>
+        <span class="fb-name">福利加码区 — 奖励卡片与导向</span>
+      </div>
+      <div class="fb-body">
+        <div class="fig-col">
+          <div class="mk-pop" style="width:340px">
+            <span class="mk-pop-sub">福利加码</span>
+            <div class="mk-pop-item" style="width:316px"><span class="nm"><span class="mk-bonus-ic">₱</span> 1,000</span><span class="jn">领取</span></div>
+            <span class="mk-turn">流水倍数：2倍　（仅「礼金」显示）</span>
+          </div>
+          <span class="fig-cap">图 2.3　福利加码卡片（依后台配置带出图示／金额）</span>
+        </div>
+        <div class="text-col">
+          <div class="rule-group">
+            <span class="rg-title">卡片内容</span>
+            <ul class="rule-list">
+              <li>依后台该阶级配置的<span class="k">奖品类型 / 奖品内容 / 数量</span>带出对应图示与文案。</li>
+              <li>奖品类型为<span class="k-red">「礼金」</span>时，卡片下方额外显示<span class="k">「流水倍数：N倍」</span>提示。</li>
+              <li>奖品类型为<span class="k">积分 / 优惠券 / 免费旋转 / 免费投注</span>时，<span class="k-red">不显示</span>流水倍数提示。</li>
+            </ul>
+          </div>
+          <div class="rule-group">
+            <span class="rg-title ok">交互 · 点击「领取」（依奖品类型导向不同）</span>
+            <ul class="rule-list ok">
+              <li><span class="k">礼金</span> → <span class="k-blue">仅关闭弹窗、不做页面导向</span>。</li>
+              <li><span class="k">积分</span> → 导向<span class="k-blue">「积分商城」</span>。</li>
+              <li><span class="k">免费旋转 / 免费投注 / 优惠券</span> → 导向<span class="k-blue">「我的优惠券」</span>。</li>
+            </ul>
+          </div>
+          <div class="rule-group">
+            <span class="rg-title">发奖后处理（对应规则 E、H）</span>
+            <ul class="rule-list">
+              <li>领取福利加码奖励后，<span class="k-red">重新计算</span>触发条件（详第 4 节）。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  </div><!-- /sp-front -->
+
+  <!-- ===== 后台分页（§3 后台设定与记录） ===== -->
+  <div class="spec-subpanel" id="sp-back">
+
+  <!-- ============================================================
+       3. 后台规格
+       ============================================================ -->
+  <section class="spec-section" id="s3">
+    <div class="sec-head">
+      <span class="sec-no">3</span>
+      <span class="sec-title">后台规格 · 设定与记录</span>
+      <span class="sec-side side-back">后台</span>
+    </div>
+
+    <!-- 3.1 功能入口 + 总开关 -->
+    <div class="func-block">
+      <div class="fb-head">
+        <span class="fb-code">3.1</span>
+        <span class="fb-name">功能入口与「智能推播」总开关</span>
+      </div>
+      <div class="fb-body">
+        <div class="fig-col">
+          <div class="mk-side">
+            <div class="row"><span>🗂️ 活动配置（新）</span></div>
+            <div class="row sub"><span class="mk-dot"></span><span>活动列表</span></div>
+            <div class="row sub"><span class="mk-dot"></span><span>派奖审核</span></div>
+            <div class="row sub"><span class="mk-dot"></span><span>活动报表</span></div>
+            <div class="row sub on"><span class="mk-dot"></span><span>智能推播</span><span class="c-newflag">NEW</span></div>
+          </div>
+          <div class="mk-form" style="width:360px">
+            <div class="mk-fsec">
+              <div class="mk-inline">
+                <span class="c-form-label">智能推播：</span>
+                <span class="c-switch"><span class="knob"></span></span>
+                <span class="c-form-label">（预设关闭）</span>
+              </div>
+            </div>
+          </div>
+          <span class="fig-cap">图 3.1　左侧入口（活动报表下方，NEW）＋ 列表页顶端总开关</span>
+        </div>
+        <div class="text-col">
+          <div class="rule-group">
+            <span class="rg-title">功能入口</span>
+            <ul class="rule-list">
+              <li>位置：<span class="k">活动配置（新）→ 活动报表</span>下方，新增入口<span class="k-green">「智能推播」</span>。</li>
+            </ul>
+          </div>
+          <div class="rule-group">
+            <span class="rg-title">总开关状态（对应规范 3.1.7）</span>
+            <ul class="rule-list">
+              <li><span class="k">预设＝关闭</span>。</li>
+              <li><span class="k-red">关闭时</span>：整体智能推播机制停用，前台<span class="k">不触发</span>任何推播弹窗（后台仍可设定条件）。</li>
+              <li><span class="k-green">开启时</span>：已启用的推播条件纳入排程，前台依资格触发弹窗。</li>
+            </ul>
+          </div>
+          <div class="rule-group">
+            <span class="rg-title ok">操作提示文案</span>
+            <ul class="rule-list ok">
+              <li>切换为开启 → Toast：<span class="k-green">「智能推播已开启」</span>。</li>
+              <li>切换为关闭 → Toast：<span class="k">「智能推播已关闭」</span>。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="notice notice-blue">
+        <span class="ni">ℹ</span>
+        <div class="nt">
+          <span>「智能推播总开关」显示于推播列表顶端，与列表页共用同一状态；列表与记录的完整规则详见 3.4（推播列表）与 3.5（推播记录）。</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3.2 表单：新增/编辑推播条件 -->
+    <div class="func-block">
+      <div class="fb-head">
+        <span class="fb-code">3.2</span>
+        <span class="fb-name">新增 / 编辑推播条件（表单）</span>
+      </div>
+      <div class="fb-body">
+        <div class="fig-col">
+          <div class="mk-form">
+            <div class="mk-fsec">
+              <span class="h">基本信息</span>
+              <div class="mk-inline"><span class="req">*</span><span class="c-form-label">推播名称</span><span class="c-input c-w220 ph">请输入推播名称</span></div>
+            </div>
+            <div class="mk-fsec">
+              <span class="h">推送目标用户</span>
+              <div class="mk-inline">
+                <span class="c-tag sel">VIP 0</span><span class="c-tag">VIP 1</span><span class="c-tag">VIP 2</span><span class="c-tag">…</span><span class="c-tag">VIP 10</span>
+              </div>
+            </div>
+            <div class="mk-fsec">
+              <span class="h">触发条件</span>
+              <div class="mk-inline"><span class="req">*</span><span class="c-form-label">账户余额 ≤</span><span class="c-input c-w120 ph">目标值</span></div>
+              <div class="mk-thr">
+                <div class="gr"><span class="gh"></span><span class="gh">有效投注 ≥</span><span class="gh">用户负盈利 ≥</span></div>
+                <div class="gr"><span class="gl">阶级1</span><span class="mk-mini-input">目标值</span><span class="mk-mini-input">目标值</span></div>
+                <div class="gr"><span class="gl">阶级2</span><span class="mk-mini-input">目标值</span><span class="mk-mini-input">目标值</span></div>
+              </div>
+            </div>
+            <div class="mk-fsec">
+              <span class="h">推送奖励（每阶）</span>
+              <div class="mk-inline"><span class="c-form-label">☑ 推送角标相关活动</span></div>
+              <div class="mk-inline"><span class="c-select c-w140">选择奖品类型</span><span class="c-input c-w120 ph">数量 / 内容</span></div>
+            </div>
+          </div>
+          <span class="fig-cap">图 3.2　表单四区块：基本信息 / 目标用户 / 触发条件 / 推送奖励</span>
+        </div>
+        <div class="text-col">
+          <div class="notice notice-red" style="width:906px">
+            <span class="ni">⚠</span>
+            <div class="nt">
+              <span>保存后立即生效并纳入排程；所有条件皆以<span class="k-red">「今日」</span>为计算区间。</span>
+              <span>用户标签必填单选；账户余额必填、单一目标值不分阶级；有效投注、用户负盈利为选填、可依阶级各自设置。</span>
+            </div>
+          </div>
+          <div class="rule-group">
+            <span class="rg-title src">3.2.1 基本信息</span>
+            <ul class="rule-list">
+              <li>推播名称：<span class="k-red">必填</span>，最长 <span class="k">50 字</span>。</li>
+              <li><span class="k-red">编辑模式下推播名称不可变更</span>（栏位置灰、不可编辑）。</li>
+            </ul>
+          </div>
+          <div class="rule-group">
+            <span class="rg-title src">3.2.2 推送目标用户（下拉/标签来源）</span>
+            <ul class="rule-list">
+              <li>VIP 等级：<span class="k">单选、必填</span>；来源固定 11 项：<span class="k">VIP 0 ~ VIP 10</span>。</li>
+              <li>再次点击已选项＝取消选取。</li>
+            </ul>
+          </div>
+          <div class="rule-group">
+            <span class="rg-title src">3.2.3 触发条件（输入框限制 · 规范 3.1.6）</span>
+            <ul class="rule-list">
+              <li><span class="k">账户余额</span>：必填、单一目标值、<span class="k">不分阶级</span>；判断为<span class="k">「小于等于（≤）目标值」</span>；不可为 0 或负数。</li>
+              <li><span class="k">有效投注（≥）</span>、<span class="k">用户负盈利（≥）</span>：选填、可依阶级各自设置；<span class="k">留空＝该阶不启用此条件</span>；不可为 0 或负数（输入负号自动去除）。</li>
+              <li>最多 <span class="k">10 阶</span>；「新增阶级」为<span class="k">共用按钮</span>，两项条件<span class="k">同步</span>增减阶级。</li>
+              <li>递增校验：<span class="k-red">下一层目标值不可小于上一层</span>。</li>
+            </ul>
+          </div>
+          <div class="rule-group">
+            <span class="rg-title src">3.2.4 推送奖励（每阶，下拉来源）</span>
+            <ul class="rule-list">
+              <li>阶级数<span class="k">与触发条件共用</span>（在触发条件区新增／删除阶级）。</li>
+              <li><span class="k">活动推送</span>：勾选「推送角标相关活动」才推送；限角标活动：<span class="k">盈利活动 / 消费活动 / 每日特别返水 / 每日特别加码 / 游戏挑战赛</span>。</li>
+              <li><span class="k">奖品类型</span>（选填，下拉）：<span class="k">礼金 / 积分 / 免费旋转 / 免费投注 / 优惠券</span>。</li>
+              <li>礼金、积分 → <span class="k">输入数量</span>；礼金另需输入<span class="k">「所需流水倍数」</span>。</li>
+              <li>免费旋转 / 免费投注 / 优惠券 → <span class="k">下拉选奖品内容</span>（来源：JILI／FKG／FC；ONlive／Mini；20%／10% Loss Cashback、10% Deposit Voucher 等）。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3.2.5 保存/删除校验 -->
+    <div class="func-block">
+      <div class="fb-head">
+        <span class="fb-code">3.2.5</span>
+        <span class="fb-name">保存校验、成功／失败提示与删除</span>
+      </div>
+      <div class="fb-body">
+        <div class="fig-col">
+          <div class="mk-form" style="width:360px">
+            <div class="mk-fsec">
+              <div class="mk-inline"><span class="c-input c-w220 is-error ph">请输入推播名称</span></div>
+              <span class="c-error">请输入推播名称，不可留空</span>
+            </div>
+            <div class="mk-fsec">
+              <div class="mk-inline"><span class="c-btn c-btn-sm">取消</span><span class="c-btn c-btn-primary c-btn-sm">保存</span></div>
+            </div>
+          </div>
+          <span class="fig-cap">图 3.2.5　字段校验（标红 + 红字）与页尾操作</span>
+        </div>
+        <div class="text-col">
+          <div class="rule-group">
+            <span class="rg-title err">失败提示（规范 3.1.3；字段标红 + 下方红字）</span>
+            <ul class="rule-list err">
+              <li>推播名称留空：<span class="k-red">「请输入推播名称，不可留空」</span></li>
+              <li>未选 VIP：<span class="k-red">「请选择推送目标用户」</span></li>
+              <li>账户余额：<span class="k-red">「请输入账户余额目标值，不可为 0 或负数」</span>／「请输入数字」／「目标值不可为 0」／「目标值不可为负数」</li>
+              <li>阈值项：<span class="k-red">「请输入数字」／「目标值不可为 0」／「目标值不可为负数」／「下一层目标值不可小于上一层」</span></li>
+              <li>奖励数量（礼金／积分）：<span class="k-red">「请输入奖品数量，不可留空或小于等于 0」</span></li>
+              <li>礼金流水：可留空或为 0；仅在填入负数或非数字时提示 <span class="k-red">「礼金所需流水不可为负数」</span></li>
+              <li>奖品内容（免费旋转／投注／优惠券）：<span class="k-red">「请选择奖品内容」</span></li>
+              <li>存在任一错误时，顶部 Toast：<span class="k-red">「请修正表单中标红的项目」</span>，并停留在表单。</li>
+            </ul>
+          </div>
+          <div class="rule-group">
+            <span class="rg-title ok">成功提示（规范 3.1.4）</span>
+            <ul class="rule-list ok">
+              <li>新增成功 → Toast：<span class="k-green">「推播条件新增成功」</span>，返回列表并刷新。</li>
+              <li>编辑成功 → Toast：<span class="k-green">「推播条件已更新」</span>，返回列表并刷新。</li>
+            </ul>
+          </div>
+          <div class="rule-group">
+            <span class="rg-title err">删除</span>
+            <ul class="rule-list err">
+              <li>点「删除」→ 确认弹窗文案：<span class="k-red">「确定要删除这条推播条件吗？删除后将立即停止对应用户的推播排程，且无法恢复。」</span></li>
+              <li>确认后 → Toast：<span class="k">「已删除该推播条件」</span>。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3.3 记录页异动 -->
+    <div class="func-block">
+      <div class="fb-head">
+        <span class="fb-code">3.3</span>
+        <span class="fb-name">免费项目记录 / 优惠券记录 — 来源新增「推播奖励」（异动）</span>
+      </div>
+      <div class="fb-body">
+        <div class="fig-col">
+          <div class="mk-form" style="width:360px">
+            <div class="mk-fsec">
+              <span class="h">全部来源（下拉）</span>
+              <div class="mk-inline"><span class="c-form-label">手动赠送</span></div>
+              <div class="mk-inline"><span class="c-form-label">签到奖励 / 积分购买 / 兑换码</span></div>
+              <div class="mk-inline"><span class="c-form-label">召回活动 / 邀请好友 / 邀请转盘</span></div>
+              <div class="mk-inline"><span class="c-form-label">周卡活动</span></div>
+              <div class="mk-inline"><span class="c-tag sel">推播奖励　← 新增</span></div>
+            </div>
+          </div>
+          <span class="fig-cap">图 3.3　来源下拉新增「推播奖励」（其余栏位／按钮维持既有）</span>
+        </div>
+        <div class="text-col">
+          <div class="rule-group">
+            <span class="rg-title src">异动内容（规范 3.1.5 下拉来源）</span>
+            <ul class="rule-list">
+              <li>两页面「全部来源」下拉<span class="k-green">新增一项「推播奖励」</span>。</li>
+              <li>免费项目记录来源清单：手动赠送、签到奖励、积分购买、兑换码、召回活动、邀请好友、邀请转盘、<span class="k-green">推播奖励（新增）</span>。</li>
+              <li>优惠券记录来源清单：手动赠送、积分购买、周卡活动、召回活动、<span class="k-green">推播奖励（新增）</span>。</li>
+            </ul>
+          </div>
+          <div class="rule-group ">
+            <span class="rg-title ok">交互与显示</span>
+            <ul class="rule-list ok">
+              <li>选「推播奖励」→ 仅显示获取方式＝<span class="k">推播奖励</span>的记录。</li>
+              <li>由推播发出的记录，操作人显示 <span class="k">SYSTEM</span>；活动名称显示<span class="k">「推播奖励」</span>。</li>
+              <li>其余栏位、统计列、分页、导出等<span class="k">维持既有</span>（本次不异动）。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3.4 推播列表 -->
+    <div class="func-block">
+      <div class="fb-head">
+        <span class="fb-code">3.4</span>
+        <span class="fb-name">推播列表 — 条件清单、查询与行操作</span>
+      </div>
+      <!-- 示意画面：拟真列表页 -->
+      <div class="fb-body" style="padding:20px 18px;flex-direction:column;gap:10px;align-items:flex-start">
+        <div class="mk-scr">
+          <div class="mk-scr-tb">
+            <span class="lbl">智能推播</span><span class="c-switch"><span class="knob"></span></span>
+            <span class="lbl">推播名称</span><span class="c-input c-w140 ph">请输入关键字</span>
+            <span class="lbl">目标用户</span><span class="c-select c-w120">全部</span>
+            <span class="lbl">时间</span><span class="c-input c-w120 ph">开始</span><span class="lbl">至</span><span class="c-input c-w120 ph">结束</span>
+            <span class="c-btn c-btn-primary c-btn-sm">查询</span>
+            <span class="c-btn c-btn-primary c-btn-sm">＋ 新增推播</span>
+          </div>
+          <table style="width:1340px">
+            <colgroup><col style="width:210px"><col style="width:110px"><col style="width:120px"><col style="width:190px"><col style="width:190px"><col style="width:50px"><col style="width:210px"><col style="width:260px"></colgroup>
+            <thead><tr><th>推播名称</th><th>目标用户</th><th>账户余额</th><th>阶级1</th><th>阶级2</th><th class="cell-c">…</th><th>新增/变更时间</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>VIP3大R Slot近7日推播</td><td>VIP 3</td><td>≤5,000</td>
+                <td><span class="mk-lv"><span>有效投注 ≥2,000</span><span>负盈利 ≥1,000</span></span></td>
+                <td><span class="mk-lv"><span>有效投注 ≥8,000</span><span>负盈利 ≥3,000</span></span></td>
+                <td class="cell-c"><span class="mk-none">→</span></td>
+                <td>2026-07-20 14:30:11</td>
+                <td><span class="mk-op"><a>开启</a><a>编辑</a><a class="del">删除</a></span></td>
+              </tr>
+              <tr>
+                <td>VIP1回归召回推播</td><td>VIP 1</td><td>≤1,000</td>
+                <td><span class="mk-lv"><span>有效投注 ≥500</span><span class="mk-none">负盈利 —</span></span></td>
+                <td><span class="mk-none">—</span></td>
+                <td class="cell-c"><span class="mk-none">→</span></td>
+                <td>2026-07-19 09:02:40</td>
+                <td><span class="mk-op"><a>关闭</a><a>编辑</a><a class="del">删除</a></span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <span class="fig-cap">图 3.4　推播列表示意画面（阶级3～10 于表格向右延伸，超出可左右滑动；此处以「→」表示后续栏位）</span>
+      </div>
+      <!-- 文字规格 -->
+      <div class="fb-body" style="padding:0 18px 20px;flex-direction:column;gap:14px">
+        <div class="notice notice-blue" style="width:1300px">
+          <span class="ni">ℹ</span>
+          <div class="nt">
+            <span>说明范围切分：<b>本节（3.4）只说明「推播列表」页面本身</b>——浏览、查询、行状态与删除等清单管理行为。</span>
+            <span><b>「新增/编辑」推播配置项目</b>（基本信息、目标用户、触发条件、推送奖励等字段与校验）<b>独立于 3.2、3.2.5 说明</b>，两者分开撰写、互不重复。</span>
+          </div>
+        </div>
+        <div class="text-col" style="width:1300px">
+          <div class="rule-group">
+            <span class="rg-title">页面用途</span>
+            <ul class="rule-list">
+              <li>集中<span class="k">浏览与管理</span>所有已建立的推播条件；列表顶端即 3.1 的<span class="k">智能推播总开关</span>（联动同一状态）。</li>
+              <li>本页<span class="k-red">不含</span>配置字段规则；新增／编辑之字段与校验请见 <span class="k-blue">3.2</span>（表单）与 <span class="k-blue">3.2.5</span>（校验与删除）。</li>
+            </ul>
+          </div>
+          <div class="rule-group">
+            <span class="rg-title src">工具列与查询（输入框/下拉来源）</span>
+            <ul class="rule-list">
+              <li><span class="k">推播名称</span>：关键字<span class="k">模糊</span>查询；按 Enter 触发查询。</li>
+              <li><span class="k">推送目标用户</span>：下拉<span class="k">精确</span>筛选；来源＝全部、VIP 0 ～ VIP 10（共 12 项）。</li>
+              <li><span class="k">时间</span>：起～迄日期区间，比对栏位为<span class="k">「新增/变更时间」</span>的日期部分。</li>
+              <li>多条件为<span class="k">同时成立（AND）</span>；点「查询」套用。</li>
+            </ul>
+          </div>
+          <div class="rule-group ok">
+            <span class="rg-title ok">行操作</span>
+            <ul class="rule-list ok">
+              <li><span class="k">开启 / 关闭</span>：切换<span class="k">该行</span>启用状态；开启 → Toast「该推播条件已开启」；关闭 → Toast「该推播条件已关闭」。</li>
+              <li><span class="k">编辑</span>：进入编辑表单（带入原设定）；<span class="k-red">推播名称不可变更</span>（见 3.2.1）。</li>
+              <li><span class="k">删除</span>：弹出确认框，确认后删除（文案与结果见 3.2.5）。</li>
+              <li><span class="k">＋ 新增推播</span>：开启空白表单进行新增（见 3.2）。</li>
+            </ul>
+          </div>
+          <div class="rule-group">
+            <span class="rg-title err">空状态</span>
+            <ul class="rule-list">
+              <li>无符合条件资料时显示：<span class="k-red">「暂无符合条件的推播清单」</span>。</li>
+            </ul>
+          </div>
+          <div class="notice notice-amber" style="width:1276px">
+            <span class="ni">⚠</span>
+            <div class="nt">
+              <span>行状态（开启/关闭）与总开关的关系：总开关关闭时，前台一律不触发；单行关闭仅停用该条推播（见 3.1）。</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 栏位穷举表 -->
+      <div class="fb-body" style="padding:0 18px 20px;flex-direction:column;gap:0">
+        <div class="tbl-wrap" style="width:1340px">
+          <table style="width:1340px">
+            <colgroup><col style="width:200px"><col style="width:1140px"></colgroup>
+            <thead><tr><th>栏位</th><th>内容与规则</th></tr></thead>
+            <tbody>
+              <tr><td>推播名称</td><td>该条推播条件名称（建立时填写，最长 50 字）。</td></tr>
+              <tr><td>目标用户</td><td>该条推播的 VIP 目标等级（VIP 0 ～ VIP 10 其一）。</td></tr>
+              <tr><td>账户余额</td><td>显示为「≤ 目标值」（必填、不分阶级；判断为小于等于）。</td></tr>
+              <tr><td>阶级1 ～ 阶级10</td><td>各阶显示该阶启用的条件：「有效投注 ≥N」「负盈利 ≥N」；未启用该阶或该项则显示「—」；栏位随该推播阶级数向右延伸，最多至阶级10（超出可左右滑动）。</td></tr>
+              <tr><td>新增/变更时间</td><td>该条推播最近一次建立或异动的时间（YYYY-MM-DD HH:mm:ss）。</td></tr>
+              <tr><td>操作</td><td>开启/关闭、编辑、删除（见上方「行操作」）。</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3.5 推播记录 -->
+    <div class="func-block">
+      <div class="fb-head">
+        <span class="fb-code">3.5</span>
+        <span class="fb-name">推播记录 — 会员领取明细、查询与导出</span>
+      </div>
+      <!-- 示意画面：拟真记录页 -->
+      <div class="fb-body" style="padding:20px 18px;flex-direction:column;gap:10px;align-items:flex-start">
+        <div class="mk-scr">
+          <div class="mk-scr-tb">
+            <span class="lbl">会员账号</span><span class="c-input c-w140 ph">请输入账号</span>
+            <span class="lbl">推播名称</span><span class="c-input c-w140 ph">关键字</span>
+            <span class="lbl">阶级</span><span class="c-select c-w120">全部</span>
+            <span class="lbl">时间</span><span class="c-input c-w120 ph">开始</span><span class="lbl">至</span><span class="c-input c-w120 ph">结束</span>
+            <span class="c-btn c-btn-primary c-btn-sm">查询</span>
+            <span class="c-btn c-btn-amber c-btn-sm">导出</span>
+          </div>
+          <table style="width:1340px">
+            <colgroup><col style="width:210px"><col style="width:310px"><col style="width:220px"><col style="width:160px"><col style="width:440px"></colgroup>
+            <thead><tr><th>会员账号</th><th>推播名称</th><th>时间</th><th>推送奖励阶级</th><th>奖励内容</th></tr></thead>
+            <tbody>
+              <tr><td>okbet22377zkhn</td><td>VIP3大R Slot近7日推播</td><td>2026-07-20 14:32:08</td><td>阶级1</td><td>推送活动、礼金 100（流水 2,000）</td></tr>
+              <tr><td>okbet22377zkhn</td><td>VIP3大R Slot近7日推播</td><td>2026-07-21 09:10:12</td><td>阶级2</td><td>免费旋转 JILI</td></tr>
+              <tr><td>okbet66201vip7</td><td>VIP1回归召回推播</td><td>2026-07-22 10:05:19</td><td>阶级3</td><td>推送活动</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <span class="fig-cap">图 3.5　推播记录示意画面（每次领取一列；奖励内容依显示格式组合，含「推送活动」前缀与礼金流水）</span>
+      </div>
+      <!-- 文字规格 -->
+      <div class="fb-body" style="padding:0 18px 20px;flex-direction:column;gap:14px">
+        <div class="text-col" style="width:1300px">
+          <div class="rule-group">
+            <span class="rg-title">页面用途</span>
+            <ul class="rule-list">
+              <li>记录<span class="k">个别会员每一次领取推播奖励</span>的明细；<span class="k">一次领取一列</span>。</li>
+            </ul>
+          </div>
+          <div class="rule-group">
+            <span class="rg-title src">工具列与查询（输入框/下拉来源）</span>
+            <ul class="rule-list">
+              <li><span class="k">会员账号</span>：关键字<span class="k">模糊</span>查询；按 Enter 触发。</li>
+              <li><span class="k">推播名称</span>：关键字<span class="k">模糊</span>查询。</li>
+              <li><span class="k">阶级</span>：下拉<span class="k">精确</span>筛选；来源＝全部、阶级1 ～ 阶级10（共 11 项）。</li>
+              <li><span class="k">时间</span>：起～迄日期区间，比对栏位为该笔<span class="k">推送/领取时间</span>的日期部分。</li>
+              <li>多条件为<span class="k">同时成立（AND）</span>。</li>
+            </ul>
+          </div>
+          <div class="rule-group">
+            <span class="rg-title">奖励内容显示格式</span>
+            <ul class="rule-list">
+              <li>该次有勾选<span class="k">「推送角标活动」</span>时，最前方加注<span class="k-blue">「推送活动、」</span>。</li>
+              <li><span class="k">礼金</span>：显示「礼金 N（流水 N）」。</li>
+              <li><span class="k">积分</span>：显示「积分 N」。</li>
+              <li><span class="k">免费旋转 / 免费投注 / 优惠券</span>：显示「类型 + 奖品内容」（如：免费旋转 JILI、优惠券 20% Loss Cashback）。</li>
+              <li>仅推送活动、无奖品：仅显示<span class="k-blue">「推送活动」</span>；两者皆无：显示「—」。</li>
+            </ul>
+          </div>
+          <div class="rule-group ok">
+            <span class="rg-title ok">导出与关联</span>
+            <ul class="rule-list ok">
+              <li><span class="k">导出</span>：导出<span class="k">当前查询结果</span>（依上方筛选条件）。</li>
+              <li>由推播发出的奖励，另可于<span class="k">免费项目记录 / 优惠券记录</span>以来源＝<span class="k-green">「推播奖励」</span>查询，操作人显示 <span class="k">SYSTEM</span>（见 3.3）。</li>
+            </ul>
+          </div>
+          <div class="rule-group">
+            <span class="rg-title err">空状态</span>
+            <ul class="rule-list">
+              <li>无符合条件资料时显示：<span class="k-red">「暂无符合条件的推播记录」</span>。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <!-- 栏位穷举表 -->
+      <div class="fb-body" style="padding:0 18px 20px;flex-direction:column;gap:0">
+        <div class="tbl-wrap" style="width:1340px">
+          <table style="width:1340px">
+            <colgroup><col style="width:200px"><col style="width:1140px"></colgroup>
+            <thead><tr><th>栏位</th><th>内容与规则</th></tr></thead>
+            <tbody>
+              <tr><td>会员账号</td><td>领取该次推播奖励的会员账号。</td></tr>
+              <tr><td>推播名称</td><td>该次推播条件的名称。</td></tr>
+              <tr><td>时间</td><td>该次推送/领取时间（YYYY-MM-DD HH:mm:ss）。</td></tr>
+              <tr><td>推送奖励阶级</td><td>本次命中并发放的阶级，显示为「阶级N」。</td></tr>
+              <tr><td>奖励内容</td><td>依上方「奖励内容显示格式」组合呈现（含「推送活动」前缀、礼金流水等）。</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  </div><!-- /sp-back -->
+
+  <!-- ===== 逻辑与情境分页（§4 逻辑判断 + §5 情境穷举 + §6 变更分类） ===== -->
+  <div class="spec-subpanel" id="sp-logic">
+
+  <!-- ============================================================
+       4. 逻辑判断 · 触发与发奖（A–I）
+       ============================================================ -->
+  <section class="spec-section" id="s4">
+    <div class="sec-head">
+      <span class="sec-no">4</span>
+      <span class="sec-title">逻辑判断 · 触发与发奖（含 A–I 规则穷举）</span>
+      <span class="sec-side side-logic">逻辑</span>
+    </div>
+
+    <!-- 4.1 规则 A–I 明细表 -->
+    <div class="func-block">
+      <div class="fb-head">
+        <span class="fb-code">4.1</span>
+        <span class="fb-name">客户提供规则 A–I（逐条明列）</span>
+      </div>
+      <div class="fb-body" style="padding:18px">
+        <div class="tbl-wrap" style="width:1340px">
+          <table style="width:1340px">
+            <colgroup><col style="width:60px"><col style="width:280px"><col style="width:1000px"></colgroup>
+            <thead>
+              <tr><th class="cell-c">编号</th><th>规则主题</th><th>规则内容</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="cell-c"><b>A</b></td><td>触发时机</td><td>登录、重整页面、返回首页、离开三方游戏，四种时机检查并可触发推播。</td></tr>
+              <tr><td class="cell-c"><b>B</b></td><td>显示页面</td><td>弹窗仅于首页显示；首页 tab：Popular、OKWIN、Slot、Perya、Casino、Poker、Arcade、E-Bingo、Numeric。</td></tr>
+              <tr><td class="cell-c"><b>C</b></td><td>显示优先顺序</td><td>21岁提示 ＞ 兴趣爱好 ＞ 召回活动 ＞ 智能推播（前者存在时，智能推播延后）。</td></tr>
+              <tr><td class="cell-c"><b>D</b></td><td>每日次数</td><td>每项推播 1 天只推 1 次，00:00 重置；不同推播 ID 不受此限（各自独立计次）。</td></tr>
+              <tr><td class="cell-c"><b>E</b></td><td>阶级重算</td><td>用户获得「阶级1」推播奖励时，「阶级2」的有效投注、负盈利需归 0 重新计算。</td></tr>
+              <tr><td class="cell-c"><b>F</b></td><td>首次即达顶阶</td><td>用户第一次推播就满足最高阶级条件 → 推送最高奖励。</td></tr>
+              <tr><td class="cell-c"><b>G</b></td><td>再次又达顶阶</td><td>用户第二次推播又满足最高阶级条件 → 推送次高奖励。</td></tr>
+              <tr><td class="cell-c"><b>H</b></td><td>数据口径</td><td>账户余额以「当前余额」计；有效投注、用户负盈利仅计「今日」；每次领奖后皆需重新计算。</td></tr>
+              <tr><td class="cell-c"><b>I</b></td><td>风控名单排除（补充）</td><td>用户账号命中后台「风控黑名单」或「NDRP 名单」时，一律不显示推播弹窗；为最优先排除条件，命中即结束、不再判断其余规则。</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4.2 触发时机 & 优先顺序 -->
+    <div class="func-block">
+      <div class="fb-head">
+        <span class="fb-code">4.2</span>
+        <span class="fb-name">触发时机（A）与显示优先顺序（C）判断表</span>
+      </div>
+      <div class="fb-body" style="padding:18px;gap:20px;flex-direction:column">
+        <div class="tbl-wrap" style="width:1340px">
+          <table style="width:1340px">
+            <colgroup><col style="width:220px"><col style="width:280px"><col style="width:840px"></colgroup>
+            <thead><tr><th>触发时机（A）</th><th>是否检查推播</th><th>说明</th></tr></thead>
+            <tbody>
+              <tr><td>登录</td><td class="cell-c"><span class="tag-cell tc-yes">检查</span></td><td>登录完成进入首页时检查。</td></tr>
+              <tr><td>重整页面</td><td class="cell-c"><span class="tag-cell tc-yes">检查</span></td><td>于首页重整时检查（非首页重整不触发，见 B）。</td></tr>
+              <tr><td>返回首页</td><td class="cell-c"><span class="tag-cell tc-yes">检查</span></td><td>由其他页面返回首页时检查。</td></tr>
+              <tr><td>离开三方游戏</td><td class="cell-c"><span class="tag-cell tc-yes">检查</span></td><td>关闭／退出三方游戏并回到首页时检查。</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="tbl-wrap" style="width:1340px">
+          <table style="width:1340px">
+            <colgroup><col style="width:80px"><col style="width:260px"><col style="width:1000px"></colgroup>
+            <thead><tr><th class="cell-c">优先序</th><th>弹窗类型（C）</th><th>规则</th></tr></thead>
+            <tbody>
+              <tr><td class="cell-c"><b>1</b></td><td>21岁提示</td><td>最优先；存在时先显示，其后弹窗依序延后。</td></tr>
+              <tr><td class="cell-c"><b>2</b></td><td>兴趣爱好</td><td>次优先。</td></tr>
+              <tr><td class="cell-c"><b>3</b></td><td>召回活动</td><td>第三顺位。</td></tr>
+              <tr><td class="cell-c"><b>4</b></td><td class="cell-c"><span class="tag-cell tc-new">智能推播</span></td><td>最后顺位；仅在前三者当次皆不显示时才显示智能推播弹窗。</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="notice notice-amber" style="width:1340px">
+          <span class="ni">⚠</span>
+          <div class="nt">
+            <span>待确认：当高优先弹窗关闭后，智能推播是否于「同一次触发」立即补显示，或顺延至下一次触发时机（A）；请 PM 确认串接行为。</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4.3 发奖阶级逻辑 -->
+    <div class="func-block">
+      <div class="fb-head">
+        <span class="fb-code">4.3</span>
+        <span class="fb-name">发奖阶级判断流程（I / D / E / F / G / H）</span>
+      </div>
+      <div class="fb-body" style="padding:18px;flex-direction:column;gap:18px">
+        <!-- 流程图（HTML 版，文字可编辑） -->
+        <div class="flow" style="width:1340px">
+          <div class="flow-row">
+            <span class="flow-node start">触发时机 A</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-node dec">总开关开启？</span>
+            <span class="flow-label">否 → 结束（不弹窗）</span>
+          </div>
+          <div class="flow-row">
+            <span class="flow-node dec">在风控黑名单<br>或 NDRP 名单？（I）</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-label">是 → 结束（不弹窗，最优先排除）　｜　否 ↓</span>
+          </div>
+          <div class="flow-row">
+            <span class="flow-node dec">当日此推播ID<br>已推过？（D）</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-label">是 → 结束　｜　否 ↓</span>
+          </div>
+          <div class="flow-row">
+            <span class="flow-node">读取数据（H）：<br>当前余额 / 今日有效投注 / 今日负盈利</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-node dec">VIP 与条件<br>符合到第几阶？</span>
+          </div>
+          <div class="flow-row">
+            <span class="flow-node dec">首次即达最高阶？（F）</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-node">是 → 推送「最高阶」奖励</span>
+          </div>
+          <div class="flow-row">
+            <span class="flow-node dec">再次又达最高阶？（G）</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-node">是 → 推送「次高阶」奖励</span>
+          </div>
+          <div class="flow-row">
+            <span class="flow-node">显示对应阶级弹窗 → 用户领取</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-node end">领奖后重算（E/H）：<br>下一阶有效投注/负盈利归 0 重算</span>
+          </div>
+        </div>
+
+        <!-- 发奖逻辑穷举表 -->
+        <div class="tbl-wrap" style="width:1340px">
+          <table style="width:1340px">
+            <colgroup><col style="width:180px"><col style="width:360px"><col style="width:800px"></colgroup>
+            <thead><tr><th>情形</th><th>条件（示例：最高阶＝阶级N）</th><th>发奖结果（对应规则）</th></tr></thead>
+            <tbody>
+              <tr><td>命中风控/NDRP 名单</td><td>账号在「风控黑名单」或「NDRP 名单」内</td><td><span class="k-red">不显示弹窗、不发奖</span>；最优先排除，不再判断其余条件（<span class="k-blue">规则 I</span>）</td></tr>
+              <tr><td>第 1 次推播即达顶阶</td><td>首次触发即同时满足最高阶所有启用条件</td><td>推送<span class="k">最高阶（阶级N）</span>奖励（<span class="k-blue">规则 F</span>）</td></tr>
+              <tr><td>第 2 次推播又达顶阶</td><td>再次触发又满足最高阶条件</td><td>推送<span class="k">次高阶（阶级N-1）</span>奖励（<span class="k-blue">规则 G</span>）</td></tr>
+              <tr><td>逐阶达标</td><td>先满足阶级1，之后再满足阶级2…</td><td>依序发放；领阶级1后，<span class="k-red">阶级2 的有效投注、负盈利归 0 重算</span>（<span class="k-blue">规则 E</span>）</td></tr>
+              <tr><td>当日重复触发</td><td>同一推播 ID 当日已推过 1 次</td><td><span class="k-red">不再推送</span>，00:00 重置后可再推（<span class="k-blue">规则 D</span>）</td></tr>
+              <tr><td>多个推播条件并存</td><td>不同推播 ID 皆符合</td><td>各自<span class="k">独立计次</span>，不共用当日 1 次限制（<span class="k-blue">规则 D</span>）</td></tr>
+              <tr><td>领奖后再触发</td><td>再次触发时</td><td>以<span class="k">当前余额、今日投注/负盈利</span>重新计算资格（<span class="k-blue">规则 H</span>）</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="notice notice-amber" style="width:1340px">
+          <span class="ni">⚠</span>
+          <div class="nt">
+            <span>待 PM 确认（规则 E/F/G 交互）：F「首次达顶发最高」、G「再次达顶发次高」为「由高往低逐次发放」策略；</span>
+            <span>而 E 描述「逐阶达标、领阶1后阶2归0重算」为「由低往高逐阶发放」策略。两者需厘清适用前提（例如：是否依用户首次达标的阶级高低分流），以免逻辑冲突。</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       5. 情境穷举表（前台弹窗组合）
+       ============================================================ -->
+  <section class="spec-section" id="s5">
+    <div class="sec-head">
+      <span class="sec-no">5</span>
+      <span class="sec-title">情境穷举表 · 前台弹窗组合</span>
+      <span class="sec-side side-logic">逻辑</span>
+    </div>
+    <div class="func-block">
+      <div class="fb-head">
+        <span class="fb-code">5.1</span>
+        <span class="fb-name">待领取奖励 × 福利加码 — 全组合穷举（对应 2.1～2.3）</span>
+      </div>
+      <div class="fb-body" style="padding:18px;flex-direction:column;gap:18px">
+        <div class="tbl-wrap" style="width:1340px">
+          <table style="width:1340px">
+            <colgroup><col style="width:90px"><col style="width:190px"><col style="width:170px"><col style="width:170px"><col style="width:720px"></colgroup>
+            <thead>
+              <tr><th class="cell-c">情境</th><th>名称</th><th class="cell-c">待领取奖励</th><th class="cell-c">福利加码</th><th>弹窗行为</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="cell-c"><b>①</b></td><td>两者皆有</td><td class="cell-c"><span class="tag-cell tc-yes">有</span></td><td class="cell-c"><span class="tag-cell tc-yes">有</span></td><td>显示：标题 + 待领取奖励清单 + 福利加码卡片（含流水提示视类型）。</td></tr>
+              <tr><td class="cell-c"><b>②</b></td><td>仅待领取奖励</td><td class="cell-c"><span class="tag-cell tc-yes">有</span></td><td class="cell-c"><span class="tag-cell tc-no">无</span></td><td>显示：标题 + 待领取奖励清单；福利加码区整块不显示。</td></tr>
+              <tr><td class="cell-c"><b>③</b></td><td>仅福利加码</td><td class="cell-c"><span class="tag-cell tc-no">无</span></td><td class="cell-c"><span class="tag-cell tc-yes">有</span></td><td>显示：标题 + 福利加码卡片；福利加码区移除顶部分隔线并上移。</td></tr>
+              <tr><td class="cell-c"><b>④</b></td><td>两者皆无</td><td class="cell-c"><span class="tag-cell tc-no">无</span></td><td class="cell-c"><span class="tag-cell tc-no">无</span></td><td><span class="k-red">不触发弹窗</span>（不显示空窗）。</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="tbl-wrap" style="width:1340px">
+          <table style="width:1340px">
+            <colgroup><col style="width:220px"><col style="width:280px"><col style="width:400px"><col style="width:440px"></colgroup>
+            <thead><tr><th>福利加码奖品类型</th><th>是否显示流水倍数</th><th>点「领取」导向</th><th>备注</th></tr></thead>
+            <tbody>
+              <tr><td>礼金</td><td class="cell-c"><span class="tag-cell tc-yes">显示（N倍）</span></td><td>不导向，仅关闭弹窗</td><td>直接发放礼金。</td></tr>
+              <tr><td>积分</td><td class="cell-c"><span class="tag-cell tc-no">不显示</span></td><td>积分商城</td><td>—</td></tr>
+              <tr><td>免费旋转</td><td class="cell-c"><span class="tag-cell tc-no">不显示</span></td><td>我的优惠券</td><td>—</td></tr>
+              <tr><td>免费投注</td><td class="cell-c"><span class="tag-cell tc-no">不显示</span></td><td>我的优惠券</td><td>—</td></tr>
+              <tr><td>优惠券</td><td class="cell-c"><span class="tag-cell tc-no">不显示</span></td><td>我的优惠券</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       6. 变更分类
+       ============================================================ -->
+  <section class="spec-section" id="s6">
+    <div class="sec-head">
+      <span class="sec-no">6</span>
+      <span class="sec-title">变更分类（新增 / 异动 / 不异动）</span>
+    </div>
+    <div class="func-block">
+      <div class="fb-head">
+        <span class="fb-code">6.1</span>
+        <span class="fb-name">规则分类总表</span>
+      </div>
+      <div class="fb-body" style="padding:18px;flex-direction:column;gap:18px">
+        <div class="tbl-wrap" style="width:1340px">
+          <table style="width:1340px">
+            <colgroup><col style="width:120px"><col style="width:340px"><col style="width:880px"></colgroup>
+            <thead><tr><th class="cell-c">分类</th><th>项目</th><th>说明 / 对应页签</th></tr></thead>
+            <tbody>
+              <tr><td class="cell-c"><span class="tag-cell tc-new">新增</span></td><td>智能推播总开关</td><td>列表页顶端，预设关闭（对应 3.1）</td></tr>
+              <tr><td class="cell-c"><span class="tag-cell tc-new">新增</span></td><td>新增／编辑推播条件表单</td><td>基本信息、目标用户、触发条件、推送奖励（对应 3.2）</td></tr>
+              <tr><td class="cell-c"><span class="tag-cell tc-new">新增</span></td><td>推播列表页面</td><td>条件清单、查询、开启/关闭、编辑、删除、新增（对应 3.4）</td></tr>
+              <tr><td class="cell-c"><span class="tag-cell tc-new">新增</span></td><td>推播记录页面</td><td>会员领取明细、查询、导出（对应 3.5）</td></tr>
+              <tr><td class="cell-c"><span class="tag-cell tc-new">新增</span></td><td>前台推播弹窗「活动快报」</td><td>待领取奖励 + 福利加码（对应 2.1～2.3）</td></tr>
+              <tr><td class="cell-c"><span class="tag-cell tc-new">新增</span></td><td>触发与发奖逻辑</td><td>规则 A～I（对应第 4 节）</td></tr>
+              <tr><td class="cell-c"><span class="tag-cell tc-new">新增</span></td><td>风控名单排除逻辑</td><td>命中「风控黑名单」或「NDRP 名单」即不显示弹窗（规则 I；对应 2.1、4.1、4.3）</td></tr>
+              <tr><td class="cell-c"><span class="tag-cell tc-chg">异动</span></td><td>免费项目记录 · 来源筛选</td><td>「全部来源」新增「推播奖励」（对应 3.3）</td></tr>
+              <tr><td class="cell-c"><span class="tag-cell tc-chg">异动</span></td><td>优惠券记录 · 来源筛选</td><td>「全部来源」新增「推播奖励」（对应 3.3）</td></tr>
+              <tr><td class="cell-c"><span class="tag-cell tc-keep">不异动</span></td><td>免费项目记录 / 优惠券记录 其余栏位</td><td>统计列、分页、导出、既有来源与栏位维持原样</td></tr>
+              <tr><td class="cell-c"><span class="tag-cell tc-keep">不异动</span></td><td>盈利活动 / 消费活动 / 每日特别返水 / 每日特别加码 / 游戏挑战赛</td><td>各活动本身规则不变，仅由推播弹窗导流至其详情页</td></tr>
+              <tr><td class="cell-c"><span class="tag-cell tc-keep">不异动</span></td><td>积分商城 / 我的优惠券 页面</td><td>仅作为福利加码领取后的导向目标，页面本身不变</td></tr>
+              <tr><td class="cell-c"><span class="tag-cell tc-keep">不异动</span></td><td>21岁提示 / 兴趣爱好 / 召回活动 弹窗</td><td>本身逻辑不变，仅纳入优先顺序（规则 C）</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="rule-group">
+          <span class="rg-title">本次未涉及之既有规则（清单）</span>
+          <ul class="rule-list">
+            <li>三方游戏本身的进出场逻辑（仅借用「离开三方游戏」作为推播触发时机 A，不改动游戏流程）。</li>
+            <li>VIP 等级的判定与升降级规则（仅取用等级作为推送目标筛选）。</li>
+            <li>各活动（盈利／消费／返水／加码／挑战赛）的资格与派奖规则（推播仅导流，不改派奖）。</li>
+            <li>积分商城、我的优惠券的既有功能与列表规则。</li>
+            <li>登录、页面重整、返回首页等系统行为本身（仅作为触发检查时机）。</li>
+            <li>「风控黑名单」「NDRP 名单」的名单建立、加入／移出与维护规则（本次仅「读取」名单作为排除判断，不改动名单本身机制）。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  </div><!-- /sp-logic -->
+
+  <footer class="spec-footer">
+    <span>智能推播 Specs · v1.0 · 2026-07-29</span>
+    <span>排版遵循「跨软体防折行」规范，适用 html.to.design 汇入 Figma 与 Axure 9 贴入</span>
+  </footer>
+
+</div>
+
+  </div>
+</div>
+
+<script>
+/* 双页签切换：只切换外壳面板显示，不干涉 iframe 内原型的任何逻辑 */
+function showDocTab(which){
+  var isProto = (which === 'proto');
+  document.getElementById('panel-proto').classList.toggle('active', isProto);
+  document.getElementById('panel-spec').classList.toggle('active', !isProto);
+  document.getElementById('tab-proto').classList.toggle('active', isProto);
+  document.getElementById('tab-spec').classList.toggle('active', !isProto);
+}
+
+/* 规格说明内的二级分页切换：前台 / 后台 / 逻辑与情境，各自独立成页 */
+function showSpecTab(which){
+  var map = {front:'sp-front', back:'sp-back', logic:'sp-logic'};
+  var tab = {front:'stab-front', back:'stab-back', logic:'stab-logic'};
+  for (var k in map){
+    document.getElementById(map[k]).classList.toggle('active', k === which);
+    document.getElementById(tab[k]).classList.toggle('active', k === which);
+  }
+}
+</script>
+
+</body>
+</html>
