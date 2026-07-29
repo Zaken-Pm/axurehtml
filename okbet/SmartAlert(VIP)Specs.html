@@ -2136,6 +2136,7 @@ renderBonusCard();
             <span class="rg-title">发奖后处理（对应规则 E、H）</span>
             <ul class="rule-list">
               <li>领取福利加码奖励后，<span class="k-red">重新计算</span>触发条件（详第 4 节）。</li>
+              <li>没有福利加码奖励仅推送活动活动时，<span class="k-red">重新计算</span>触发条件（详第 4 节）。</li>
             </ul>
           </div>
         </div>
@@ -2631,7 +2632,7 @@ renderBonusCard();
               <tr><td class="cell-c"><b>B</b></td><td>显示页面</td><td>弹窗仅于首页显示；首页 tab：Popular、OKWIN、Slot、Perya、Casino、Poker、Arcade、E-Bingo、Numeric。</td></tr>
               <tr><td class="cell-c"><b>C</b></td><td>弹窗显示优先顺序</td><td>21岁提示 ＞ 兴趣爱好 ＞ 召回活动 ＞ 智能推播。</td></tr>
               <tr><td class="cell-c"><b>D</b></td><td>每日次数</td><td>「每项推播 1 天只推 1 次」<b>主要指「推播奖励」，且以「阶级」计次</b>——<b>同一阶级</b>的推播奖励当日至多发放 1 次；奖励发放后，当日若再满足<b>其他（更高）阶级</b>条件，仍会<b>再次显示弹窗并发放该阶级奖励</b>（配合规则 E/F/G 递进）。00:00 重置；不同推播 ID 各自独立计次。</td></tr>
-              <tr><td class="cell-c"><b>E</b></td><td>阶级重算</td><td>当用户获得推播奖励时，下次推播奖励的有效投注、负盈利需归 0 重新计算（主要对象：一般中、小 R 用户；由低往高逐阶发放）。</td></tr>
+              <tr><td class="cell-c"><b>E</b></td><td>阶级重算</td><td>当用户获得推播奖励(或仅只提示待领取活动)时，下次推播奖励的有效投注、负盈利需归 0 重新计算（主要对象：一般中、小 R 用户；由低往高逐阶发放）。</td></tr>
               <tr><td class="cell-c"><b>F</b></td><td>首次即达顶阶</td><td>用户第一次推播就满足最高阶级条件 → 推送最高奖励。</td></tr>
               <tr><td class="cell-c"><b>G</b></td><td>再次又达顶阶</td><td>用户第二次推播又满足最高阶级条件 → 推送次高奖励。</td></tr>
               <tr><td class="cell-c"><b>H</b></td><td>数据口径</td><td>账户余额以「当前余额」计；有效投注、用户负盈利仅计「今日」；每次领奖后皆需重新计算。</td></tr>
