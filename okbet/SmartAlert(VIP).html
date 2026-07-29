@@ -867,7 +867,7 @@ tbody tr:last-child td{border-bottom:none}
 <div class="mask" id="delMask">
   <div class="dialog">
     <div class="dialog-head"><span style="color:#e6a23c">⚠</span> 删除确认</div>
-    <div class="dialog-body">确定要删除这条推播条件吗？删除后将立即停止对应用户的推播排程，且无法恢复。</div>
+    <div class="dialog-body">确定要删除这条推播条件吗？</div>
     <div class="dialog-foot">
       <button class="btn" onclick="closeDel()">取消</button>
       <button class="btn btn-primary" style="background:var(--danger);border-color:var(--danger)" onclick="confirmDel()">确定删除</button>
@@ -970,7 +970,7 @@ function renderRecordTable(){
   });
   const body = document.getElementById('recordTableBody');
   if(rows.length===0){
-    body.innerHTML = `<tr><td colspan="5"><div class="empty"><div class="big">📊</div>暂无符合条件的推播记录</div></td></tr>`;
+    body.innerHTML = `<tr><td colspan="5"><div class="empty"><div class="big">📊</div>No Data</div></td></tr>`;
     return;
   }
   body.innerHTML = rows.map(r=>`
@@ -1130,7 +1130,7 @@ function renderTable(){
   const body = document.getElementById('tableBody');
 
   if(rows.length===0){
-    body.innerHTML = `<tr><td colspan="15"><div class="empty"><div class="big">📭</div>暂无符合条件的推播清单</div></td></tr>`;
+    body.innerHTML = `<tr><td colspan="15"><div class="empty"><div class="big">📭</div>No Data</div></td></tr>`;
     return;
   }
   body.innerHTML = rows.map(r=>`
@@ -1454,7 +1454,7 @@ function saveForm(){
     } else if(!rw.giftValue){ showError('err-rwval-'+i); ok=false; }
   }
 
-  if(!ok){ toast('error', '请修正表单中标红的项目'); return; }
+  if(!ok){ toast('error', '请修正红字提示的项目'); return; }
 
   const now=new Date();
   const time=`${now.getFullYear()}-${p2(now.getMonth()+1)}-${p2(now.getDate())} ${p2(now.getHours())}:${p2(now.getMinutes())}:${p2(now.getSeconds())}`;
