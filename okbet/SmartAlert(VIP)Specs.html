@@ -1693,7 +1693,7 @@ function buildRewardsTable(){
   for(let i=0;i<lvCount;i++){
     rows+=`
     <tr>
-      <td style=&quot;white-space:nowrap&quot;>阶级${i+1}</td>
+      <td style=&quot;white-space:nowrap&quot;>阶级${i+1}<div class=&quot;row-error&quot; id=&quot;err-rwcfg-${i}&quot;>活动推送、活动奖励必须配置其中一项</div></td>
       <td>
         <label class=&quot;reward-act-chk&quot;>
           <input type=&quot;checkbox&quot; ${form.rewards[i].pushBadge?'checked':''}
@@ -1726,6 +1726,9 @@ function buildRewardsTable(){
     </div>
     <div class=&quot;hint&quot; style=&quot;margin-top:8px;margin-bottom:0;text-align:left&quot;>
       仅限「角标」相关活动：盈利活动、消费活动、每日特别返水、每日特别加码、游戏挑战赛；有勾选才推送，未勾选则不推送
+    </div>
+    <div class=&quot;hint&quot; style=&quot;margin-top:4px;margin-bottom:0;text-align:left;color:var(--danger)&quot;>
+      每个阶级的「活动推送」及「奖品类型」至少需择一配置，不可两者皆空
     </div>`;
 }
 function renderGiftValueCell(i){
@@ -1828,13 +1831,15 @@ function saveForm(){
   // 各阶级的推送奖励：活动推送与奖品类型皆为选填、可各自单独设定；只有在选了奖品类型时，才需要填完该类型对应的奖品/数量
   for(let i=0;i<form.thrLv;i++){
     const rw=form.rewards[i];
+    // 新增限制：活动推送与奖品类型至少择一，不可两者皆空
+    if(!rw.pushBadge &amp;&amp; !rw.giftType){ showError('err-rwcfg-'+i); ok=false; continue; }
     if(!rw.giftType) continue;
     if(rw.giftType==='礼金' || rw.giftType==='积分'){
       const n=Number(rw.giftValue);
       if(rw.giftValue===''||isNaN(n)||n<=0){ showError('err-rwval-'+i); ok=false; }
       if(rw.giftType==='礼金'){
         const tn=Number(rw.turnover);
-        if(rw.turnover!==''&&(isNaN(tn)||tn<0)){ showError('err-rwturn-'+i); ok=false; }
+        if(rw.turnover!==''&amp;&amp;(isNaN(tn)||tn<0)){ showError('err-rwturn-'+i); ok=false; }
       }
     } else if(!rw.giftValue){ showError('err-rwval-'+i); ok=false; }
   }
@@ -2292,6 +2297,7 @@ renderBonusCard();
               <li><span class="k">奖品类型</span>（选填，下拉）：<span class="k">礼金 / 积分 / 免费旋转 / 免费投注 / 优惠券</span>。</li>
               <li>礼金、积分 → <span class="k">输入数量</span>；礼金另需输入<span class="k">「所需流水倍数」</span>。</li>
               <li>免费旋转 / 免费投注 / 优惠券 → <span class="k">下拉选奖品内容</span>（来源：JILI／FKG／FC；ONlive／Mini；20%／10% Loss Cashback、10% Deposit Voucher 等）。</li>
+              <li>每个阶级的<span class="k">「活动推送」</span>与<span class="k">「奖品类型」</span>至少需择一配置，不可两者皆空。</li>
             </ul>
           </div>
         </div>
@@ -2328,6 +2334,7 @@ renderBonusCard();
               <li>奖励数量（礼金／积分）：<span class="k-red">「请输入奖品数量，不可留空或小于等于 0」</span></li>
               <li>礼金流水：可留空或为 0；仅在填入负数或非数字时提示 <span class="k-red">「礼金所需流水不可为负数」</span></li>
               <li>奖品内容（免费旋转／投注／优惠券）：<span class="k-red">「请选择奖品内容」</span></li>
+              <li>阶级配置皆空（活动推送与奖品类型皆未配置）：于该<span class="k">阶级N</span>下方显示 <span class="k-red">「活动推送、活动奖励必须配置其中一项」</span></li>
               <li>存在任一错误时，顶部 Toast：<span class="k-red">「请修正红字提示的项目」</span>，并停留在表单。</li>
             </ul>
           </div>
