@@ -109,7 +109,7 @@
   .mock-body{background:#fff;padding:6px 0;}
   .badge-new{font-size:11px;font-weight:700;background:var(--brand);color:#fff;border-radius:4px;padding:1px 7px;}
   .badge-keep{font-size:11px;font-weight:600;background:#e7ebf2;color:var(--grey);border-radius:4px;padding:1px 7px;}
-  .hint{font-size:12px;color:var(--grey);margin-top:6px;}
+  .hint{font-size:12px;color:var(--ink-soft);margin-top:6px;}
 
   /* ---------- 真实后台风格示意（参照现行后台 UI）---------- */
   .real-block{padding:16px 20px 20px;}
@@ -133,6 +133,41 @@
   .real-state{font-size:12.5px;color:var(--ink-soft);font-weight:600;}
   .real-state.on{color:var(--green);}
   .omit{font-size:12.5px;color:var(--grey);padding:10px 0;}
+
+  /* ---------- 忠实还原后台截图之示意图 ---------- */
+  .bo{padding:14px 18px 18px;}
+  .bo + .bo{border-top:1px solid var(--line);}
+  .bo.hl{background:var(--brand-soft);}
+  .bo-title{font-size:13px;color:var(--brand);font-weight:700;padding-bottom:10px;display:flex;align-items:center;gap:8px;}
+  /* 单纯开关列（总开关）*/
+  .swline{display:flex;align-items:center;padding:9px 0;border-top:1px solid var(--line);font-size:13px;}
+  .swline .swlbl{color:var(--ink);}
+  .swline .swright{margin-left:auto;display:flex;align-items:center;gap:8px;}
+  /* 讯息列：label + (标题/内容) + 保存 */
+  .mrow{display:flex;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line);font-size:13px;gap:14px;}
+  .mrow .mlbl{width:150px;flex:none;color:var(--ink);padding-top:4px;}
+  .mrow .mflds{flex:1;display:flex;flex-direction:column;gap:8px;}
+  .mrow .fld{display:flex;align-items:flex-start;gap:8px;}
+  .mrow .ftag{width:34px;flex:none;color:var(--ink-soft);padding-top:6px;}
+  .mrow input,.mrow textarea{flex:1;border:1px solid #d5dbe6;border-radius:3px;padding:6px 9px;font-size:12.5px;color:var(--ink);background:#fff;font-family:var(--sans);}
+  .mrow textarea{resize:vertical;min-height:30px;line-height:1.5;}
+  .mrow .msave{flex:none;padding-top:2px;display:flex;align-items:center;gap:10px;}
+  /* EKYC 双开关列 */
+  .erow{display:flex;align-items:center;padding:11px 0;border-top:1px solid var(--line);font-size:13px;}
+  .erow .elbl{color:var(--ink);}
+  .erow .ectrls{margin-left:auto;display:flex;align-items:center;gap:28px;}
+  .erow .eitem{display:flex;align-items:center;gap:8px;color:var(--ink-soft);}
+  /* 蓝色开关（对齐现行后台）*/
+  .bsw{width:38px;height:20px;border-radius:12px;background:#c7cdd8;position:relative;cursor:pointer;transition:.2s;flex:none;display:inline-block;vertical-align:middle;}
+  .bsw .knob{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:.2s;}
+  .bsw.on{background:#4d8cf5;}
+  .bsw.on .knob{left:20px;}
+  .swtext{font-size:12.5px;color:var(--ink-soft);font-weight:600;}
+  .swtext.on{color:#4d8cf5;}
+  .mock-btn{border:none;background:#4d8cf5;color:#fff;font-size:12.5px;font-weight:600;border-radius:3px;padding:6px 18px;cursor:pointer;}
+  .mock-btn:hover{background:#3a7ae4;}
+  .save-toast{font-size:12px;color:var(--green);font-weight:600;opacity:0;transition:opacity .25s;white-space:nowrap;}
+  .save-toast.show{opacity:1;}
 
   /* toast 示意 */
   .toast{display:inline-flex;align-items:center;gap:8px;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;margin:6px 10px 6px 0;}
@@ -175,8 +210,8 @@
           <td>2026/07/28</td>
           <td>v1.0.0</td>
           <td><span class="tag add">A 新增</span></td>
-          <td>（待填）</td>
-          <td>文件初版。后台「KYC配置」于「站内信相关配置」与「EKYC提交信息配置」之间新增「KYC短信配置」，提供「KYC短信不通过短信」开关与「KYC短信内容」编辑功能。</td>
+          <td>Zaken</td>
+          <td>文件初版。后台「KYC配置」新增「KYC短信配置」，提供「KYC短信不通过短信」开关与「KYC短信内容」编辑功能。</td>
         </tr>
       </tbody>
     </table>
@@ -207,52 +242,98 @@
       <div class="item"><span class="name">EKYC提交信息配置</span><span class="badge-keep">既有 · 不异动</span></div>
     </div>
 
-    <h3>2.2　页面示意图 <span class="ref">（版面语言参照现行后台既有样式；可点击开关 / 编辑内容 / 点击保存查看示意反馈）</span></h3>
+    <h3>2.2　页面示意图 <span class="ref">（依现行后台实际画面还原；中间蓝底区块为本次新增，可点击开关 / 编辑内容 / 点击保存查看示意反馈）</span></h3>
     <div class="mock">
       <div class="mock-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>&nbsp;后台管理系统</div>
       <div class="mock-crumb">系统管理 / 系统参数管理 / KYC配置</div>
       <div class="mock-body" style="padding:0">
-        <div class="real-block">
-          <div class="real-title">站内信相关配置 <span class="badge-keep">既有 · 不异动</span></div>
-          <div class="omit">（既有区块，内容省略）</div>
+
+        <!-- 既有：站内信相关配置 -->
+        <div class="bo">
+          <div class="bo-title">站内信相关配置 <span class="badge-keep">既有 · 不异动</span></div>
+          <div class="swline">
+            <span class="swlbl">KYC验证结果站内信开关</span>
+            <span class="swright"><span class="bsw on"><span class="knob"></span></span><span class="swtext on">开启</span></span>
+          </div>
+          <div class="mrow">
+            <div class="mlbl">通过KYC验证信息内容</div>
+            <div class="mflds">
+              <div class="fld"><span class="ftag">标题</span><input type="text" readonly></div>
+              <div class="fld"><span class="ftag">内容</span><textarea rows="1" readonly>kyc approved 33</textarea></div>
+            </div>
+            <div class="msave"><button type="button" class="mock-btn" tabindex="-1">保存</button></div>
+          </div>
+          <div class="mrow">
+            <div class="mlbl">拒绝KYC验证信息内容</div>
+            <div class="mflds">
+              <div class="fld"><span class="ftag">标题</span><input type="text" readonly></div>
+              <div class="fld"><span class="ftag">内容</span><textarea rows="1" readonly>kyc fail 44</textarea></div>
+            </div>
+            <div class="msave"><button type="button" class="mock-btn" tabindex="-1">保存</button></div>
+          </div>
+          <div class="mrow">
+            <div class="mlbl">KYC须补充材料信息内容</div>
+            <div class="mflds">
+              <div class="fld"><span class="ftag">标题</span><input type="text" readonly></div>
+              <div class="fld"><span class="ftag">内容</span><textarea rows="1" readonly></textarea></div>
+            </div>
+            <div class="msave"><button type="button" class="mock-btn" tabindex="-1">保存</button></div>
+          </div>
         </div>
 
-        <div class="real-block" style="background:var(--brand-soft)">
-          <div class="real-title">KYC短信配置 <span class="badge-new">本次新增</span></div>
-
-          <div class="real-row">
-            <div class="rlabel">KYC短信不通过短信</div>
-            <div class="rswitch">
-              <span class="real-switch" id="smsSwitch" onclick="toggleRealSwitch(this)"><span class="knob"></span></span>
-              <span class="real-state" id="smsSwitchState">关闭</span>
+        <!-- 本次新增：KYC短信配置 -->
+        <div class="bo hl">
+          <div class="bo-title">KYC短信配置 <span class="badge-new">本次新增</span></div>
+          <div class="swline" style="border-top:none">
+            <span class="swlbl">KYC短信不通过短信</span>
+            <span class="swright"><span class="bsw" id="smsSwitch" onclick="toggleRealSwitch(this)"><span class="knob"></span></span><span class="swtext" id="smsSwitchState">关闭</span></span>
+          </div>
+          <div class="mrow">
+            <div class="mlbl">KYC短信内容</div>
+            <div class="mflds">
+              <div class="fld"><textarea id="smsContent" rows="2"></textarea></div>
+            </div>
+            <div class="msave">
+              <button type="button" class="mock-btn" onclick="saveRealContent('smsContentToast')">保存</button>
+              <span class="save-toast" id="smsContentToast">✓ 保存成功</span>
             </div>
           </div>
+        </div>
 
-          <div class="real-row" style="align-items:flex-start;margin-top:6px">
-            <div class="rlabel" style="padding-top:6px">KYC短信内容</div>
-            <div class="rfields">
-              <textarea id="smsContent" rows="3"></textarea>
-            </div>
-            <div class="rsave" style="padding-top:2px">
-              <button type="button" class="real-btn" onclick="saveRealContent('smsContentToast')">保存</button>
-              <span class="real-toast-inline" id="smsContentToast">✓ 保存成功</span>
-            </div>
+        <!-- 既有：EKYC提交信息配置 -->
+        <div class="bo">
+          <div class="bo-title">EKYC提交信息配置 <span class="badge-keep">既有 · 不异动</span></div>
+          <div class="erow">
+            <span class="elbl">国籍</span>
+            <span class="ectrls">
+              <span class="eitem">是否显示 <span class="bsw on"><span class="knob"></span></span> <span class="swtext on">开启</span></span>
+              <span class="eitem">该项必填 <span class="bsw on"><span class="knob"></span></span> <span class="swtext on">开启</span></span>
+            </span>
+          </div>
+          <div class="erow">
+            <span class="elbl">出生地</span>
+            <span class="ectrls">
+              <span class="eitem">是否显示 <span class="bsw on"><span class="knob"></span></span> <span class="swtext on">开启</span></span>
+              <span class="eitem">该项必填 <span class="bsw on"><span class="knob"></span></span> <span class="swtext on">开启</span></span>
+            </span>
           </div>
         </div>
 
-        <div class="real-block">
-          <div class="real-title">EKYC提交信息配置 <span class="badge-keep">既有 · 不异动</span></div>
-          <div class="omit">（既有区块，内容省略）</div>
-        </div>
       </div>
+    </div>
+    <div class="note" style="background:#f2f6ff;border-color:#cfdcfb;color:#274690">
+      <b>示意图设计说明（对照现行后台）：</b>
+      <ul style="margin:8px 0 0;color:#365291">
+        <li>既有「站内信相关配置」每则讯息为「<b>标题＋内容</b>」双栏；<b>KYC短信配置仅有「内容」、无「标题」</b>——因短信无主旨栏位，此为刻意差异。</li>
+        <li>既有「KYC验证结果站内信开关」是站内信整区总开关（同时管控通过／拒绝／补件站内信）；本次新增的「KYC短信不通过短信」<b>仅针对「拒绝」情境发送短信</b>，与既有开关<b>各自独立、互不影响</b>。</li>
+      </ul>
     </div>
     <script>
       function toggleRealSwitch(el){
         el.classList.toggle('on');
         var on = el.classList.contains('on');
-        var row = el.closest('.rswitch');
-        var state = row.querySelector('.real-state');
-        state.textContent = on ? '开启' : '关闭（预设）';
+        var state = document.getElementById('smsSwitchState');
+        state.textContent = on ? '开启' : '关闭';
         state.classList.toggle('on', on);
       }
       function saveRealContent(toastId){
@@ -294,9 +375,9 @@
     <table>
       <thead><tr><th style="width:200px">操作</th><th>结果</th><th>提示文案（示意）</th></tr></thead>
       <tbody>
-        <tr><td>点击「保存」— 成功</td><td class="yes">成功</td><td><span class="toast ok">✓ 保存成功</span></td></tr>
+        <tr><td>点击「保存」— 成功</td><td class="yes">成功</td><td><span class="toast ok">✓ ok</span></td></tr>
         <tr><td>点击「保存」— 失败</td><td class="no">失败</td><td><span class="toast err">✕ 保存失败，请稍后再试</span></td></tr>
-        <tr><td>切换开关（开启／关闭）— 成功</td><td class="yes">成功</td><td><span class="toast ok">✓ 设置已更新</span></td></tr>
+        <tr><td>切换开关（开启／关闭）— 成功</td><td class="yes">成功</td><td><span class="toast ok">✓ ok</span></td></tr>
         <tr><td>切换开关 — 失败</td><td class="no">失败</td><td><span class="toast err">✕ 设置更新失败，请稍后再试</span>（开关回复切换前状态）</td></tr>
       </tbody>
     </table>
@@ -385,7 +466,7 @@
 
     <h3>4.3　不异动（本次未涉及之既有规则）<span class="tag keep">—</span></h3>
     <ul>
-      <li>站内信相关配置区块的内容与逻辑。</li>
+      <li>站内信相关配置区块的内容与逻辑（含「KYC验证结果站内信开关」总开关，及通过／拒绝／补件三则站内信的标题与内容）；与本次新增之短信功能各自独立。</li>
       <li>EKYC 提交信息配置区块的内容与逻辑。</li>
       <li>KYC 人工审核流程、审核状态判定本身。</li>
       <li>既有站内信 / 邮件 / App 推播等其他通知机制。</li>
@@ -394,7 +475,7 @@
     </ul>
   </section>
 
-  <footer>KYC短信配置 · 后台功能规格 · v1.0.0 · 2026/07/28</footer>
+  <footer>KYC短信配置 · 后台功能规格 · v1.0.0 · 2026/07/30</footer>
 
 </div>
 </body>
