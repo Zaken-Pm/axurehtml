@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>周卡活动规格书 v2</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #f5f7fa;
+  color: #333;
+  font-family: 'PingFang SC','Microsoft YaHei',sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  padding: 0 32px 64px;
+}
+.page { max-width: 1280px; margin: 0 auto; padding-top: 76px; }
+
+
+/* tab fixed wrapper */
+.tab-fixed-wrap {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: #fff;
+  padding: 0 32px;
+  border-bottom: 1px solid #e4e8f0;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+  height: 60px;
+  display: flex;
+  align-items: center;
+}
+.tab-fixed-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.tab-doc-title { font-size: 16px; font-weight: 700; color: #1a1a1a; }
+.tab-doc-meta { font-size: 12px; color: #aaa; margin-top: 2px; }
+
+/* tabs */
+.tab-bar {
+  display: flex;
+  gap: 0;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  padding: 5px;
+  width: fit-content;
+}
+.tab-btn {
+  padding: 9px 36px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #888;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all .15s;
+  font-family: inherit;
+  white-space: nowrap;
+}
+.tab-btn:hover { background: #f5f7fa; color: #555; }
+.tab-btn.active { background: #1677ff; color: #fff; }
+
+/* panels */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* empty state placeholder */
+.empty-state {
+  background: #fff;
+  border: 1px dashed #d9d9d9;
+  border-radius: 10px;
+  padding: 60px 24px;
+  text-align: center;
+  color: #999;
+}
+.empty-state .es-title { font-size: 16px; font-weight: 600; color: #666; margin-bottom: 8px; }
+.empty-state .es-desc { font-size: 14px; color: #aaa; }
+
+.doc-footer { text-align:center; font-size:14px; color:#bbb; margin-top:32px; }
+
+/* ── shared spec styles ── */
+.step { background:#fff; border:1px solid #e8e8e8; border-radius:8px; margin-bottom:20px; overflow:hidden; }
+.step-header { display:flex; align-items:center; gap:12px; padding:16px 22px; background:#f8faff; border-bottom:1px solid #e8e8e8; }
+.step-num { width:30px; height:30px; border-radius:50%; background:#1677ff; color:#fff; font-size:14px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.step-title { font-size:16px; font-weight:600; color:#1a1a1a; }
+.step-desc { font-size:14px; color:#888; margin-left:auto; }
+.step-body { padding:22px 26px; }
+.sec { margin-bottom:24px; }
+.sec:last-child { margin-bottom:0; }
+.sec-label { font-size:16px; font-weight:700; color:#1677ff; border-left:4px solid #1677ff; padding-left:10px; margin-bottom:14px; }
+.sub-title { font-size:15px; font-weight:600; color:#333; margin:20px 0 10px; padding-bottom:6px; border-bottom:1px dashed #d0d7e8; }
+table { width:100%; border-collapse:collapse; font-size:14px; }
+thead tr { background:#f0f4ff; }
+th { padding:12px 16px; text-align:left; font-weight:600; color:#444; border:1px solid #dde3f0; white-space:nowrap; font-size:14px; letter-spacing:.02em; }
+td { padding:12px 16px; border:1px solid #e4e9f5; vertical-align:top; color:#333; line-height:1.7; }
+td.req-y { color:#1677ff; font-weight:500; text-align:center; }
+td.req-n { color:#bbb; text-align:center; }
+td code { background:#f5f5f5; border-radius:3px; padding:1px 5px; font-size:13px; color:#c7254e; font-family:monospace; }
+tr:hover { background:#f8faff; }
+.note { background:#fffbe6; border:1px solid #ffe58f; border-radius:6px; padding:13px 16px; font-size:14px; color:#876800; margin-top:12px; line-height:1.8; }
+.note-r { background:#fff2f0; border:1px solid #ffccc7; color:#cf1322; }
+.note-b { background:#e6f7ff; border:1px solid #91d5ff; color:#0958d9; }
+.badge { display:inline-flex; align-items:center; padding:3px 10px; border-radius:10px; font-size:12px; font-weight:600; }
+.b-classic { background:#fff7e6; color:#d46b08; border:1px solid #ffd591; }
+.b-premium { background:#f9f0ff; color:#722ed1; border:1px solid #d3adf7; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="tab-fixed-wrap">
+    <div class="tab-fixed-inner">
+      <div style="display:flex;align-items:center;gap:16px;">
+        <div class="tab-doc-title">周卡活动规格书 v2</div>
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="switchTab('front', this)">前台规格</button>
+          <button class="tab-btn" onclick="switchTab('back', this)">后台规格</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 前台 -->
+  <div id="panel-front" class="tab-panel active">
+
+    <!-- ── STEP 1 未购买用户 · 红点提醒 ── -->
+    <div class="step" id="s-redot-unpurchased">
+      <div class="step-header">
+        <div class="step-num">1</div>
+        <div class="step-title">未购买用户 · 红点长期提醒</div>
+        <div class="step-desc">后台开关「未购买用户：购买提醒」开启时生效</div>
+      </div>
+      <div class="step-body">
+        <div style="display:grid;grid-template-columns:400px 1fr;gap:24px;align-items:start;">
+          <div style="border:1px solid #e8e8e8;border-radius:8px;overflow:hidden;background:#fff;">
+            <iframe src="front_s1_preview.html" scrolling="no" style="width:100%;height:480px;border:none;display:block;"></iframe>
+          </div>
+          <div>
+            <div class="sec">
+              <div class="sec-label">触发条件</div>
+              <table>
+                <thead><tr><th>条件</th><th>说明</th></tr></thead>
+                <tbody>
+                  <tr><td>后台开关状态</td><td>「未购买用户：购买提醒」开关须为<strong>开启</strong></td></tr>
+                  <tr><td>用户状态</td><td>当前用户<strong>尚未购买</strong>本期周卡</td></tr>
+                  <tr><td>触发时机</td><td>用户进入前台（打开 App / 回到前台）时</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="sec">
+              <div class="sec-label">红点展示位置（共 3 处）</div>
+              <table>
+                <thead><tr><th>#</th><th>位置</th><th>红点位置描述</th></tr></thead>
+                <tbody>
+                  <tr><td>①</td><td>首页浮窗（小猴子）</td><td>浮窗图标右上角显示红点</td></tr>
+                  <tr><td>②</td><td>活动入口卡片（Weekly Bonus Pass）</td><td>卡片右上角显示红点</td></tr>
+                  <tr><td>③</td><td>Elite 页面 → Prime Tab</td><td>Prime Pass 标签右上角显示红点</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="sec">
+              <div class="sec-label">红点消失逻辑</div>
+              <table>
+                <thead><tr><th>情境</th><th>当天行为</th><th>次日行为</th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td><strong>用户点击任一红点入口</strong>（未购买）</td>
+                    <td>当天 3 处红点全部消失，不再提示</td>
+                    <td>红点<strong>重新出现</strong>（次日 00:00:00 后台重置）</td>
+                  </tr>
+                  <tr>
+                    <td><strong>用户完成购买周卡</strong></td>
+                    <td>红点立即消失</td>
+                    <td>次日起<strong>不再显示</strong>购买提醒红点（已购买状态）</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="sec">
+              <div class="sec-label">状态流转</div>
+              <table>
+                <thead><tr><th>用户状态</th><th>红点是否显示</th><th>备注</th></tr></thead>
+                <tbody>
+                  <tr><td>未购买 · 当日未点击</td><td>✅ 显示</td><td>进入前台即展示</td></tr>
+                  <tr><td>未购买 · 当日已点击过</td><td>❌ 不显示</td><td>当日不再提示，次日 00:00:00 后台重置后重新显示</td></tr>
+                  <tr><td>已购买本期周卡</td><td>❌ 不显示</td><td>转为已购买提醒逻辑（另见「已购买用户：奖励领取提醒」）</td></tr>
+                  <tr><td>后台开关关闭</td><td>❌ 不显示</td><td>无论用户状态，全部隐藏</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STEP 2 置顶 Banner 改版 ── -->
+    <div class="step" id="s-banner">
+      <div class="step-header">
+        <div class="step-num">2</div>
+        <div class="step-title">置顶 Banner 改版</div>
+        <div class="step-desc">落地页顶部图改为用户引导教学图</div>
+      </div>
+      <div class="step-body">
+        <div style="display:grid;grid-template-columns:400px 1fr;gap:24px;align-items:start;">
+          <div style="border:1px solid #e8e8e8;border-radius:8px;overflow:hidden;background:#fff;">
+            <iframe src="front_s2_preview.html" scrolling="no" style="width:100%;height:320px;border:none;display:block;"></iframe>
+          </div>
+          <div>
+            <div class="sec">
+              <div class="sec-label">改动说明</div>
+              <table>
+                <thead><tr><th>项目</th><th>现况</th><th>改动后</th></tr></thead>
+                <tbody>
+                  <tr><td>用途</td><td>活动主视觉 Banner</td><td>改为用户引导 / 教学图</td></tr>
+                  <tr><td>尺寸</td><td>占版较大</td><td>适度缩减，不需占太多空间</td></tr>
+                  <tr><td>配色</td><td>—</td><td>沿用 Elite Pass 页面现有风格（蓝天云朵配色）</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="sec">
+              <div class="sec-label">文案内容</div>
+              <table>
+                <thead><tr><th>元素</th><th>文案</th></tr></thead>
+                <tbody>
+                  <tr><td>标题</td><td>WEEKLY BONUS PASS</td></tr>
+                  <tr><td>副标</td><td>100% Back, Rewards All Week!</td></tr>
+                  <tr><td>步骤 1</td><td>Activate the Weekly Bonus Pass</td></tr>
+                  <tr><td>步骤 2</td><td>Claim 100% instant payment return</td></tr>
+                  <tr><td>步骤 3</td><td>Claim rewards daily for 7 days</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STEP 3 购买页排版调整 ── -->
+    <div class="step" id="s-purchase">
+      <div class="step-header">
+        <div class="step-num">3</div>
+        <div class="step-title">购买页排版调整</div>
+        <div class="step-desc">左右两栏表格改为堆叠卡片，同步领取页风格</div>
+      </div>
+      <div class="step-body">
+        <div style="display:grid;grid-template-columns:400px 1fr;gap:24px;align-items:start;">
+          <div style="border:1px solid #e8e8e8;border-radius:8px;overflow:hidden;background:#fff;">
+            <iframe src="front_s3_preview.html" scrolling="no" style="width:100%;height:560px;border:none;display:block;"></iframe>
+          </div>
+          <div>
+            <div class="sec">
+              <div class="sec-label">改动项目</div>
+              <table>
+                <thead><tr><th>#</th><th>改动项目</th><th>说明</th></tr></thead>
+                <tbody>
+                  <tr><td>①</td><td>排版结构</td><td>左右两栏表格改为堆叠卡片，与领取页排版保持一致，减少割裂感</td></tr>
+                  <tr><td>②</td><td>奖励名称展示</td><td>需保留完整展示空间，Free Spins 等长名称不可截断</td></tr>
+                  <tr><td>③</td><td>券类数量</td><td>券类奖励不显示数量（例：Free Spins 不标注 ×N）</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="sec">
+              <div class="sec-label">保留的促购元素</div>
+              <table>
+                <thead><tr><th>元素</th><th>说明</th></tr></thead>
+                <tbody>
+                  <tr><td>价格</td><td>视觉放大，需够醒目</td></tr>
+                  <tr><td>Buy Now 按钮</td><td>保持显眼，不可弱化</td></tr>
+                  <tr><td>7 天奖励总览</td><td>保留，让玩家感受「划算」</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STEP 4 领取页修改项目 ── -->
+    <div class="step" id="s-claim">
+      <div class="step-header">
+        <div class="step-num">4</div>
+        <div class="step-title">签到页 / 领取页修改</div>
+        <div class="step-desc">共 8 项改动</div>
+      </div>
+      <div class="step-body">
+        <div style="display:grid;grid-template-columns:400px 1fr;gap:24px;align-items:start;">
+          <div style="border:1px solid #e8e8e8;border-radius:8px;overflow:hidden;background:#fff;">
+            <iframe src="front_s4_preview.html" scrolling="no" style="width:100%;height:700px;border:none;display:block;"></iframe>
+          </div>
+          <div>
+            <div class="sec">
+              <div class="sec-label">改动清单</div>
+              <table>
+                <thead><tr><th>#</th><th>改动项目</th><th>说明</th></tr></thead>
+                <tbody>
+                  <tr><td>①</td><td>奖励名称不截断</td><td>需保留完整展示空间，Free Spins 等长名称不可截断</td></tr>
+                  <tr><td>②</td><td>券类不显示数量</td><td>券类奖励不标注 ×N 数量</td></tr>
+                  <tr><td>③</td><td>按钮改为 Play Now</td><td>任务未完成时，按钮文案由现有文案改为「Play Now」</td></tr>
+                  <tr><td>④</td><td>Day 1 加徽章</td><td>第一天已领取时，Day 1 格显示特殊徽章标记</td></tr>
+                  <tr><td>⑤</td><td>日期动态读取</td><td>Event Period 日期读取后台活动时间配置，非固定文字</td></tr>
+                  <tr><td>⑥</td><td>流水条款动态显示</td><td>依后台流水倍数动态带入文案；倍数为空或 0 时整行隐藏</td></tr>
+                  <tr><td>⑦</td><td>卡片改为运营结构</td><td>每日卡片改为堆叠卡片结构（运营指定行结构）</td></tr>
+                  <tr><td>⑧</td><td>General Mechanics 独立区块</td><td>新增独立展示区块，置于活动页面下方（详见 Step 5）</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="sec">
+              <div class="sec-label">流水条款文案</div>
+              <table>
+                <thead><tr><th>状态</th><th>显示内容</th></tr></thead>
+                <tbody>
+                  <tr><td>后台有设定流水倍数</td><td>All E-Credits received from this activity or promotion are subject to a【Nx】turnover requirement.<br><span style="color:#888;">（N 为后台设定值，动态带入）</span></td></tr>
+                  <tr><td>后台倍数为空或 0</td><td>整行隐藏，不显示流水条款</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STEP 5 General Mechanics 独立区块 ── -->
+    <div class="step" id="s-gm">
+      <div class="step-header">
+        <div class="step-num">5</div>
+        <div class="step-title">General Mechanics 独立区块</div>
+        <div class="step-desc">活动页面下方的独立展示区块（非从其他区块拆出）</div>
+      </div>
+      <div class="step-body">
+        <div style="display:grid;grid-template-columns:400px 1fr;gap:24px;align-items:start;">
+          <div style="border:1px solid #e8e8e8;border-radius:8px;overflow:hidden;background:#fff;">
+            <iframe src="front_s5_preview.html" scrolling="no" style="width:100%;height:480px;border:none;display:block;"></iframe>
+          </div>
+          <div>
+            <div class="sec">
+              <div class="sec-label">改动说明</div>
+              <table>
+                <thead><tr><th>项目</th><th>说明</th></tr></thead>
+                <tbody>
+                  <tr><td>结构</td><td>新增独立展示区块，置于活动页面下方；非内嵌于领取页，亦非从其他区块拆出</td></tr>
+                  <tr><td>字体</td><td>改用圆体游戏字（Baloo 2），字级放大</td></tr>
+                  <tr><td>Event Period</td><td>读取后台活动时间配置，非固定文字</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="sec">
+              <div class="sec-label">规则条文动态逻辑</div>
+              <table>
+                <thead><tr><th>条文</th><th>显示逻辑</th></tr></thead>
+                <tbody>
+                  <tr><td>Turnover Requirement 条款</td><td>依后台流水倍数动态带入；倍数为空或 0 时整条隐藏</td></tr>
+                  <tr><td>其余条文</td><td>固定展示，不受后台开关影响</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 后台 -->
+  <div id="panel-back" class="tab-panel">
+
+    <!-- ── STEP 4 活动条件 ── -->
+    <div class="step" id="s4">
+      <div class="step-header">
+        <div class="step-num">4</div>
+        <div class="step-title">活动条件</div>
+        <div class="step-desc">配置各卡型奖励规则与通用活动参数</div>
+      </div>
+      <div class="step-body">
+
+        <!-- 通用设置：左规格 右示意图 -->
+        <div class="sec">
+          <div class="sec-label">通用设置</div>
+          <div style="display:grid;grid-template-columns:400px 1fr;gap:24px;align-items:start;">
+
+            <!-- 左：示意圖 -->
+            <div style="border:1px solid #e8e8e8;border-radius:8px;overflow:hidden;background:#fff;">
+              <iframe src="admin_step4_preview.html" scrolling="no" style="width:100%;height:620px;border:none;display:block;"></iframe>
+            </div>
+
+            <!-- 右：規格說明表 -->
+            <table>
+              <thead><tr><th>字段名称</th><th>控件类型</th><th>必填</th><th>选项 / 规则</th><th>备注</th></tr></thead>
+              <tbody>
+                <tr style="background:#f5f7fa;">
+                  <td colspan="5" style="font-size:12px;font-weight:600;color:#555;padding:8px 12px;border-bottom:1px solid #ebeef5;">前台红点提示</td>
+                </tr>
+                <tr><td>未购买用户：购买提醒</td><td>开关（Toggle）</td><td class="req-n">否</td><td>关闭（预设）/ 开启</td><td>开启后，对尚未购买周卡的用户，在前台入口持续显示红点，引导购买</td></tr>
+                <tr><td>已购买用户：奖励领取提醒</td><td>开关（Toggle）</td><td class="req-n">否</td><td>关闭（预设）/ 开启</td><td>开启后，当用户有可领取的每日奖励或任务奖励时，前台入口显示红点提示；领取完毕后消失</td></tr>
+              </tbody>
+            </table>
+
+          </div>
+        </div>
+
+        <!-- 前台红点提醒 · 行为规格（合并） -->
+        <div class="sec">
+          <div class="sec-label">前台红点提醒 — 行为规格</div>
+
+          <!-- 展示位置总览 -->
+          <div class="sub-title">红点展示位置（共 3 处，两个开关共用）</div>
+          <table>
+            <thead><tr><th>#</th><th>位置</th><th>红点位置描述</th></tr></thead>
+            <tbody>
+              <tr><td>①</td><td>首页浮窗（小猴子）</td><td>浮窗图标右上角</td></tr>
+              <tr><td>②</td><td>活动入口卡片（Weekly Bonus Pass）</td><td>卡片右上角</td></tr>
+              <tr><td>③</td><td>活动入口内 · 卡片 Tab</td><td>未购买用户：Prime Pass Tab 右上角；已购买用户：当前持有卡片的 Tab 右上角</td></tr>
+            </tbody>
+          </table>
+
+          <!-- 两个开关对照 -->
+          <div class="sub-title">触发条件 · 红点逻辑对照</div>
+          <table>
+            <thead>
+              <tr>
+                <th style="width:130px;">项目</th>
+                <th style="background:#fff7e6;color:#d46b08;border-color:#ffd591;">未购买用户：购买提醒</th>
+                <th style="background:#f0f7ff;color:#0958d9;border-color:#91c8ff;">已购买用户：奖励领取提醒</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:600;color:#555;background:#fafbff;">适用用户</td>
+                <td>尚未购买本期周卡</td>
+                <td>已购买本期周卡</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:#555;background:#fafbff;">触发时机</td>
+                <td>用户进入前台时</td>
+                <td>当日有可领取但尚未领取的奖励</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:#555;background:#fafbff;">红点消失条件</td>
+                <td>当日点击任一入口 → 当日消失<br>次日 00:00:00 后台重置后重新显示</td>
+                <td>当日奖励全数领取完毕 → 立即消失</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:#555;background:#fafbff;">购买后行为</td>
+                <td>完成购买后立即消失，次日不再显示</td>
+                <td style="color:#aaa;">— 此开关仅对已购买用户生效</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:#555;background:#fafbff;">开关关闭时</td>
+                <td colspan="2" style="text-align:center;">无论用户状态，全部隐藏</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:#555;background:#fafbff;">后端记录</td>
+                <td>记录用户当日是否已点击；每日 00:00:00 后台重置，购买完成后立即清除标记</td>
+                <td>以实时奖励状态为准，无需额外记录点击</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- 状态流转总表 -->
+          <div class="sub-title">状态流转总表</div>
+          <table>
+            <thead>
+              <tr>
+                <th style="width:220px;">用户状态</th>
+                <th style="background:#fff7e6;color:#d46b08;border-color:#ffd591;">未购买用户：购买提醒</th>
+                <th style="background:#f0f7ff;color:#0958d9;border-color:#91c8ff;">已购买用户：奖励领取提醒</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>未购买 · 当日未点击</td><td style="color:#389e0d;font-weight:600;">✅ 显示</td><td style="color:#aaa;">❌ 不适用</td></tr>
+              <tr><td>未购买 · 当日已点击</td><td style="color:#cf1322;">❌ 不显示（次日 00:00:00 后台重置）</td><td style="color:#aaa;">❌ 不适用</td></tr>
+              <tr><td>已购买 · 有未领取奖励</td><td style="color:#aaa;">❌ 不显示</td><td style="color:#389e0d;font-weight:600;">✅ 显示</td></tr>
+              <tr><td>已购买 · 当日奖励已全数领取</td><td style="color:#aaa;">❌ 不显示</td><td style="color:#cf1322;">❌ 不显示</td></tr>
+              <tr><td>任一开关关闭</td><td colspan="2" style="text-align:center;">对应红点隐藏</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <div class="doc-footer">周卡活动规格书 v2　·　2026-07-23</div>
+</div>
+<script>
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
