@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekly Bonus Pass — 规格书 v1</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #1E2030;
+  color: #CDD6F4;
+  font-family: 'SF Mono', 'Cascadia Code', Menlo, 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.8;
+  padding: 40px 24px 100px;
+}
+.wrap { max-width: 1080px; margin: 0 auto; }
+
+/* topbar */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 32px; padding-bottom: 16px;
+  border-bottom: 1px solid #1E1E2E;
+}
+.topbar-title { font-size: 13px; color: #A6ADC8; }
+.copy-btn {
+  font-family: inherit; font-size: 12px; font-weight: 600;
+  padding: 5px 14px; border-radius: 6px; cursor: pointer;
+  background: #1E1E2E; color: #CDD6F4; border: 1px solid #313244;
+  transition: all .15s;
+}
+.copy-btn:hover { background: #313244; }
+.copy-btn.ok { background: rgba(166,227,161,.12); color: #A6E3A1; border-color: rgba(166,227,161,.3); }
+
+/* disclaimer */
+.disclaimer {
+  background: rgba(249,226,175,.06);
+  border-left: 3px solid rgba(249,226,175,.5);
+  padding: 10px 16px;
+  border-radius: 0 6px 6px 0;
+  margin-bottom: 40px;
+  color: #F9E2AF;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* section row = iframe + spec text */
+.s-row {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 36px;
+  margin-bottom: 60px;
+  align-items: start;
+}
+.s-row.full { grid-template-columns: 1fr; }
+
+/* sticky phone */
+.phone-wrap {
+  position: sticky;
+  top: 24px;
+}
+.phone-frame {
+  background: #13131F;
+  border-radius: 34px;
+  border: 2px solid #2A2A3E;
+  overflow: hidden;
+  width: 340px;
+  height: 680px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.6);
+}
+.phone-frame iframe {
+  width: 390px;
+  height: 780px;
+  transform: scale(0.872);
+  transform-origin: top left;
+  border: none;
+  display: block;
+}
+.phone-label {
+  text-align: center;
+  font-size: 12px;
+  color: #A6ADC8;
+  margin-top: 10px;
+  letter-spacing: .05em;
+}
+
+/* spec text block */
+.spec-text { white-space: pre-wrap; word-break: break-word; }
+
+/* syntax colors */
+.t-h2   { color: #89B4FA; font-weight: 700; display: block; margin-bottom: 2px; }
+.t-h3   { color: #89DCEB; font-weight: 600; display: block; margin-top: 14px; }
+.t-note { color: #F9E2AF; display: block; }
+.t-warn { color: #FAB387; display: block; }
+.t-li   { color: #CDD6F4; display: block; }
+.t-tbl  { color: #CDD6F4; display: block; }
+.t-sep  { color: #A6ADC8; display: block; }
+.t-ctx    { color: #CDD6F4; display: block; }
+.t-update { color: #F9E2AF; display: block; font-weight: 600; }
+
+/* Popup phone frames — shorter, scroll into popup area */
+.phone-frame.popup {
+  height: 480px;
+  position: relative;
+  overflow: hidden;
+}
+.phone-frame.popup iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 390px;
+  height: 780px;
+  transform: scale(0.872);
+  transform-origin: top left;
+  border: none;
+  display: block;
+}
+
+/* divider */
+.s-divider { border: none; border-top: 1px solid #1E1E2E; margin-bottom: 60px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span class="topbar-title">Weekly Bonus Pass · 规格书 v1 · 2026-05-22</span>
+    <button class="copy-btn" id="copyBtn" onclick="copySpec()">Copy All</button>
+  </div>
+
+  <div class="disclaimer">前台数据仅供演示，所有金额 / 条件 / 方案以后台设置为准。<br>视觉样式、文案、进度图表由 UI 设计出图。</div>
+
+  <!-- 全局规则 -->
+  <div class="s-row full" style="margin-bottom:40px">
+    <div id="s-global" class="spec-text"></div>
+  </div>
+  <hr class="s-divider">
+
+  <!-- 1. 购买页 -->
+  <div class="s-row">
+    <div class="phone-wrap">
+      <div class="phone-frame">
+        <iframe src="weekly-card-h5-v1.html?col=0" title="购买页"></iframe>
+      </div>
+      <div class="phone-label">购买页 — Elite Pass</div>
+    </div>
+    <div>
+      <div id="s-buy" class="spec-text"></div>
+    </div>
+  </div>
+  <hr class="s-divider">
+
+  <!-- 2. 领取页 -->
+  <div class="s-row">
+    <div class="phone-wrap">
+      <div class="phone-frame">
+        <iframe src="weekly-card-h5-v1.html?col=1" title="领取页"></iframe>
+      </div>
+      <div class="phone-label">领取页</div>
+    </div>
+    <div>
+      <div id="s-claim" class="spec-text"></div>
+    </div>
+  </div>
+  <hr class="s-divider">
+
+  <!-- 3. 弹窗区 header -->
+  <div class="s-row full" style="margin-bottom:40px">
+    <div id="s-popup-hd" class="spec-text"></div>
+  </div>
+
+  <!-- 3-1 登录自动派发 -->
+  <div class="s-row">
+    <div class="phone-wrap">
+      <div class="phone-frame popup">
+        <iframe src="weekly-card-h5-v1.html?col=2" title="登录自动派发弹窗"></iframe>
+      </div>
+      <div class="phone-label">3-1 自动领取弹窗</div>
+
+    </div>
+    <div>
+      <div id="s-p1" class="spec-text"></div>
+    </div>
+  </div>
+
+  <!-- 3-2 提示 Banner -->
+  <div class="s-row">
+    <div class="phone-wrap">
+      <div class="phone-frame popup">
+        <iframe src="weekly-card-h5-v1.html?col=3" title="提示 Banner" style="top:230px"></iframe>
+      </div>
+      <div class="phone-label">3-2 提示底部弹窗</div>
+    </div>
+    <div>
+      <div id="s-p2" class="spec-text"></div>
+    </div>
+  </div>
+
+  <!-- 3-3 存款页面弹窗 -->
+  <div class="s-row">
+    <div class="phone-wrap">
+      <div class="phone-frame popup">
+        <iframe src="weekly-card-h5-v1.html?col=4" title="存款页面弹窗"></iframe>
+      </div>
+      <div class="phone-label">3-3 存款页面弹窗</div>
+    </div>
+    <div>
+      <div id="s-p3" class="spec-text"></div>
+    </div>
+  </div>
+
+  <!-- 3-4 Buy Confirm Modal -->
+  <div class="s-row">
+    <div class="phone-wrap">
+      <div class="phone-frame popup" style="height:580px">
+        <iframe src="weekly-card-h5-v1.html?col=0&modal=buy-mask" title="Buy Confirm Modal"></iframe>
+      </div>
+      <div class="phone-label">3-4 Buy Confirm Modal</div>
+    </div>
+    <div>
+      <div id="s-p4" class="spec-text"></div>
+    </div>
+  </div>
+
+  <!-- 3-5 Insufficient Balance Modal -->
+  <div class="s-row">
+    <div class="phone-wrap">
+      <div class="phone-frame popup" style="height:520px">
+        <iframe src="weekly-card-h5-v1.html?col=0&modal=balance-mask" title="Insufficient Balance Modal"></iframe>
+      </div>
+      <div class="phone-label">3-5 Insufficient Balance Modal</div>
+    </div>
+    <div>
+      <div id="s-p5" class="spec-text"></div>
+    </div>
+  </div>
+
+  <!-- 3-6 Rules Modal -->
+  <div class="s-row">
+    <div class="phone-wrap">
+      <div class="phone-frame">
+        <iframe src="weekly-card-h5-v1.html?col=0&modal=rules-mask" title="Rules Modal"></iframe>
+      </div>
+      <div class="phone-label">3-6 Rules Modal（T&amp;C）</div>
+    </div>
+    <div>
+      <div id="s-p6" class="spec-text"></div>
+    </div>
+  </div>
+
+  <!-- 3-7 Claim Popup -->
+  <div class="s-row">
+    <div class="phone-wrap">
+      <div class="phone-frame">
+        <iframe src="weekly-card-h5-v1.html?col=1&modal=claim-popup" title="Claim Popup"></iframe>
+      </div>
+      <div class="phone-label">3-7 Claim Popup</div>
+    </div>
+    <div>
+      <div id="s-p7" class="spec-text"></div>
+    </div>
+  </div>
+  <hr class="s-divider">
+
+  <!-- 奖励数据表 -->
+  <div class="s-row full">
+    <div id="s-rewards" class="spec-text"></div>
+  </div>
+
+</div>
+<script>
+const SECTIONS = {
+  global: `## 全局规则
+
+- 活动时间：所有时间显示读取后台活动时间配置
+  备注：General Mechanics 规则第一点 — Event Period（时间展示读取后台活动时间配置，event period: TBD）
+- 每周限购一张：7 天周期完全结束后才可重购
+- 两种卡互斥：Elite Pass 与 Prime Pass，持有任一卡时另一张不可购买
+- 每日重置：每日 00:00:00 AM 重置当日签到状态、任务与未领奖励，当天未领取即失效不补发
+  同步重置：3-1 当日弹出状态 / 3-3「今日不再显示」状态
+- 派发模式：后台设定「自动派发」或「手动领取」两种模式
+- 弹窗显示优先顺序：每次仅显示最高优先级弹窗，前一条件未触发才依序进入下一层
+  ① 21 岁验证弹窗
+  ② KYC 弹窗
+  ③ 首存系列弹窗
+  ④ 活动弹窗（依各活动开发先后顺序排列）`,
+
+  buy: `## 1. 购买页
+
+⚠ 规格说明：时间显示读取后台活动时间配置
+  备注：购买页上方 Banner 亦显示活动时间（读取后台活动时间配置）
+
+  玩家通过活动入口进入此页面选购周卡。
+  页面包含两张方案卡（Elite Pass / Prime Pass），点击切换后文案与价格同步更新。
+  页面下方有 7 天奖励总预览，由上往下排列。
+  右上角有「规则」侧边 Tab，点击弹出 Rules Modal。
+
+  总预览奖励计算方式：
+  - 彩金、积分：显示 7 天累计总数值
+  - 旋转卷、免费投注、免费旋转、道具卡：显示 7 天累计总张数
+  备注：后台未配置某奖励时，前台不显示该奖励项目
+
+  ⚠ 注意：右上角「规则」弹窗内文为 Terms & Conditions，
+     页面下方嵌入区块文案为 General Mechanics，两者独立，需分开提供。（详见 3-7）
+
+### 情境 A｜会员尚未购买（首次进入）
+- 进入活动入口 → 显示购买页
+- 卡片名称固定为 Elite Pass 与 Prime Pass（写死，不可更改）
+- 卡片价格由后台设定（动态读取）
+- 点击 Elite Pass 或 Prime Pass Tab → 切换选中卡，价格即时更新
+- 点击「Buy Now」→ 开启购买确认弹窗（3-5）
+- 弹窗内确认购买 → 购买成功，关闭弹窗，直接跳转领取页
+
+### 情境 B｜会员已购买（持卡中）
+- 进入活动入口 → 直接跳转领取页，购买页不会显示
+- 已购买会员不存在进入购买页的路径
+
+### 情境 C｜点击「规则」
+- 点击右上角规则侧边 Tab → 开启 Rules Modal（3-7）
+- Rules Modal 内文为 T&C 条款，与页面下方 General Mechanics 文案不同`,
+
+  claim: `## 2. 领取页
+
+  购买成功后玩家的主要操作页面，显示 7 天进度。
+  上方 Banner 样式依持有卡别不同而有所差异（Elite Pass / Prime Pass）。
+  每一天包含两个奖励栏位：
+  - 日常签到：每日登录即可触发（自动或手动，后台设定）
+  - 额外奖励：需完成当日任务条件（存款或投注达标）才可领取
+  视觉样式、文案、进度图表由 UI 设计出图。
+
+  通则｜天数显示亮度
+  当天卡片正常显示；其余天数（未到达 / 已完成）套用遮罩降低亮度。
+
+### 情境 A｜日常签到 — 后台设置「自动派发」
+- 玩家当日首次登录后，在当前所在页面自动弹出「自动领取弹窗」（3-1）
+- 系统同步自动派发日常奖励
+[6/17] ✎ 6/17 调整
+[6/17] ✓ 仅显示于「已过完的天数」；当天完成自动派发后，当天不显示 ✓，当天无按钮
+
+### 情境 B｜日常签到 — 后台设置「手动领取」
+- 玩家当日登录后，前台当前页面下方显示「日常签到提示 Banner」（3-2，显示方式同大奖池）
+- 玩家须至领取页手动点击「Claim」→ 开启 Claim Popup（3-7）完成领取
+- 领取完成 → 按钮改为「Claimed」disabled
+- 过了当日 00:00:00 → 按钮消失，不显示任何状态
+
+### 情境 C｜额外奖励 — 按钮状态说明
+  备注：按钮状态读取后台额外奖励条件逻辑
+  备注：按钮状态仅显示于当天；过了 00:00:00，该天所有按钮消失，其余天数不显示按钮
+
+  当天共四种按钮状态：
+- 条件未达标，任务为存款 → 显示「Deposit」按钮，点击导至存款页面
+[6/17] ✎ 6/17 调整
+[6/17] - 条件未达标，任务为投注 → 显示「Play Now」按钮，点击导至首页热门
+- 条件已达标，尚未领取 → 显示「Claim」按钮，点击开启 Claim Popup（3-7）
+- 已领取（手动领取或自动派发）→ 显示「Claimed」disabled
+
+### 情境 D｜天数排列顺序（今日置顶）
+  当日天数固定显示在最上方，其后依序为剩余天数，最后为已完成天数。
+  示例：今日为 Day 4，列表排序为 Day 4 → Day 5 → Day 6 → Day 7 → Day 1 → Day 2 → Day 3`,
+
+  popupHd: `## 3. 弹窗区
+
+  本活动共涉及以下 7 个弹窗，依触发时机分别说明。`,
+
+  p1: `### 3-1  自动领取弹窗
+  后台设定「自动领取」时触发。
+  内容：当日天数标题、已派发奖励（Credited）、额外奖励条件与对应按钮。
+  奖励金额与条件数值动态读取后台该天配置。
+  已派发奖励（Credited）为不可点击的展示图标，仅供显示，无交互行为。
+
+[6/18] 情境 A｜首次购买完成 → 签到页（Day 1）
+[6/18] - 会员购买周卡完成，系统跳转至签到页时，直接在签到页弹出本弹窗
+[6/18] - 签到页 Day 1 日常签到按钮同步显示为「Claimed」disabled 状态
+[6/18] - 点击「Confirm」→ 关闭弹窗，停留签到页
+
+  情境 B｜每日首次登录（Day 2–7）
+  仅在「首页」弹出；若玩家登录时所在页面为「我的」、「积分商城」或「排行榜」，则暂不弹出，
+  待玩家进入首页时才触发。
+- 点击「Confirm」→ 关闭弹窗
+[6/17] ✎ 6/17 调整
+[6/17] - 点击「Play Now」→ 导至首页热门
+- 额外奖励条件按钮交互（情境 A / B 通用）：
+    · 任务为存款 → 显示 Deposit 图标按钮，点击导至存款页面
+[6/17]     · 任务为投注 → 显示「Play Now」按钮，点击导至首页热门`,
+
+  p2: `### 3-2  提示底部弹窗
+[6/17] ✎ 6/17 调整：3-2 更名为「提示底部弹窗」（原名：提示 Banner）
+  从页面底部滑出，不阻断主画面操作。两种触发时机独立，可同时存在。
+  底部弹窗左侧 icon 对应本次奖励图标，动态读取后台该天奖励配置。
+
+[6/16] ✎ 6/16 调整
+[6/16] 奖励显示规则（两种奖励类别）：
+[6/16]   - 奖励类别 A｜免费投注、免费旋转、优惠券、道具卡 → 显示「{奖励类别} ×{数量}」
+[6/16]   - 奖励类别 B｜积分、彩金 → 显示「{金额} {奖励类别}」
+
+- 触发 A：玩家完成当日任务条件后触发，不限当前所在页面
+  > 标题：Weekly Card Task Completed!
+  > 说明（奖励类别 A）：Today's task has been completed. {奖励类别} ×{数量} is ready to claim.
+  > 说明（奖励类别 B）：Today's task has been completed. {金额} {奖励类别} is ready to claim.
+  奖励显示依上方奖励类别规则，读取后台该天额外奖励配置
+
+- 触发 B：后台设定「手动领取」，玩家当日登录且尚未领取日常签到时触发
+  页面触发逻辑同 3-1：仅在「首页」弹出；「我的」／「积分商城」／「排行榜」不弹出，待进入首页时触发
+  > 标题：Weekly Card Daily Reward Available!
+  > 说明（奖励类别 A）：Today's reward: {奖励类别} ×{数量}. Please go to the rewards page to claim it.
+  > 说明（奖励类别 B）：Today's reward: {金额} {奖励类别}. Please go to the rewards page to claim it.
+  奖励显示依上方奖励类别规则，读取后台该天日常签到奖励配置
+
+[6/17] ✎ 6/17 调整
+[6/17] - 点击关闭 → 弹窗消失，当日不再显示
+[6/17]   逻辑同步任务中心`,
+
+  p3: `### 3-3  存款页面弹窗
+  玩家点击离开存款页面时，若尚未购买周卡，则触发此推广弹窗（exit-intent 拦截）。
+- 触发时机：玩家点击「离开存款页面」的操作时触发
+- 显示条件：玩家尚未购买周卡
+- 不显示：玩家已购买周卡 / 已勾选「Don't Show Again Today」
+- 弹窗内显示 Elite Pass 与 Prime Pass 两张方案，各自列出卡名、价格与奖励总量
+  奖励总量：总彩金、总积分、总旋转卷、总优惠券
+  数值为后台该卡型 7 天配置中，日常签到＋额外奖励的加总
+- 点击「View Now」→ 导至购买页
+- 点击「X」→ 关闭弹窗，离开存款页，回到首页
+- 点击「Leave」→ 关闭弹窗，离开存款页，回到首页
+- 勾选「Don't Show Again Today」→ 关闭弹窗，今日不再显示`,
+
+  p4: `### 3-4  Buy Confirm Modal
+  玩家在购买页点击「Buy Now」后弹出，带背景遮罩，让玩家再次确认购买信息。
+- 内容：所选方案名称、价格（动态带入）、购买须知
+- 点击「Confirm Purchase」→
+    · 余额充足：购买成功，关闭 Modal 与遮罩，跳转领取页
+    · 余额不足：关闭本 Modal，触发 3-5 余额不足弹窗
+- 点击「Cancel」或点击背景遮罩 → 关闭 Modal，留在购买页`,
+
+  p5: `### 3-5  Insufficient Funds Modal — 余额不足提示
+  玩家在 3-4 Buy Confirm Modal 点击「Confirm Purchase」时，
+  若钱包余额不足，自动关闭 3-4 并弹出此 Modal。
+- 触发条件：钱包余额 < 所选周卡售价
+- 内容：提示 icon、标题「Insufficient Funds」、说明文字
+  ⚠ 不显示当前余额，不显示所需金额
+- 点击「Leave」→ 关闭 Modal，停留购买页
+- 点击「Deposit」→ 关闭 Modal，跳转充值页`,
+
+  p6: `### 3-6  Rules Modal — Terms & Conditions
+  点击任一页面右上角的「规则」侧边 Tab 触发，带背景遮罩，弹出 Terms & Conditions 完整条款内文。
+- 关闭：点击 X 或背景遮罩
+
+  ⚠ 文案注意事项：以下两份内容独立，不可共用，请分别提供
+  Terms & Conditions：点击「规则」按钮后弹出的 Modal 内文
+  General Mechanics：购买页 / 领取页下方嵌入的区块说明文字`,
+
+  p7: `### 3-7  Claim Popup（Bottom Sheet）
+  玩家点击「Claim」按钮后从底部弹出，带背景遮罩，显示本次领取的奖励内容。
+  日常签到与额外奖励共用同一个 Popup 组件，内容动态带入。
+- 关闭：点击 X 或背景遮罩
+
+[6/16] ✎ 6/16 调整
+[6/16] 奖励显示规则（两种奖励类别）：
+[6/16]   - 奖励类别 A｜免费投注、免费旋转、优惠券、道具卡 → {奖励 icon} ×{数量}（如 ×2）
+[6/16]   - 奖励类别 B｜彩金、积分 → {奖励 icon} + {金额}（如 500.00）
+
+### 情境 A｜日常签到弹窗
+  > 标题：Day X Daily Reward
+  > 说明文字：Your reward has been credited to your account.
+  奖励内容读取后台该天日常签到奖励配置
+
+### 情境 B｜每日任务弹窗
+  > 标题：Day X Task Reward
+  > 说明文字：Your reward has been credited to your account.
+  奖励内容读取后台该天额外奖励配置`,
+
+  rewards: `## 奖励数据表（演示数值，以后台设置为准）
+
+### Elite Pass — 500 PHP / 7 天
+| 天    | 日常签到      | 任务条件       | 任务奖励             |
+|-------|---------------|----------------|----------------------|
+| Day 1 | Cash 50 PHP   | 存款 ≥ 200 PHP | Points 80 pts        |
+| Day 2 | Points 100    | 存款 ≥ 200 PHP | Free Spins x5        |
+| Day 3 | Free Spins x8 | 存款 ≥ 300 PHP | Cash 30 PHP          |
+| Day 4 | Cash 70 PHP   | 投注 ≥ 500 PHP | Acewin Free Spins x1 |
+| Day 5 | Coupon x1     | 存款 ≥ 400 PHP | Cash 60 PHP          |
+| Day 6 | Points 150    | 投注 ≥ 400 PHP | Acewin Free Spins x1 |
+| Day 7 | Cash 120 PHP  | 存款 ≥ 500 PHP | Free Spins x15       |
+
+### Prime Pass — 2,000 PHP / 7 天
+| 天    | 日常签到       | 任务条件         | 任务奖励             |
+|-------|----------------|------------------|----------------------|
+| Day 1 | Cash 200 PHP   | 存款 ≥ 500 PHP   | Points 300           |
+| Day 2 | Points 500     | 存款 ≥ 500 PHP   | Free Spins x15       |
+| Day 3 | Free Spins x20 | 存款 ≥ 800 PHP   | Cash 100 PHP         |
+| Day 4 | Cash 250 PHP   | 存款 ≥ 1,000 PHP | Acewin Free Spins x2 |
+| Day 5 | Coupon x2      | 存款 ≥ 1,000 PHP | Cash 150 PHP         |
+| Day 6 | Points 800     | 存款 ≥ 1,500 PHP | Acewin Free Spins x1 |
+| Day 7 | Cash 500 PHP   | 存款 ≥ 2,000 PHP | Free Spins x30       |`
+};
+
+// ── Renderer ──
+function render(text) {
+  return text.split('\n').map(line => {
+    const esc = line
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;');
+    if (line.startsWith('[6/16] ') || line.startsWith('[6/17] ') || line.startsWith('[6/18] '))   return `<span class="t-update">${esc.slice(7)}</span>`;
+    if (/^## /.test(line))         return `<span class="t-h2">${esc}</span>`;
+    if (/^### /.test(line))        return `<span class="t-h3">${esc}</span>`;
+    if (/^&gt; /.test(esc))        return `<span class="t-note">${esc}</span>`;
+    if (/⚠/.test(line))            return `<span class="t-warn">${esc}</span>`;
+    if (/^- /.test(line))          return `<span class="t-li">${esc}</span>`;
+    if (/^\|[-| ]+\|$/.test(line)) return `<span class="t-sep">${esc}</span>`;
+    if (/^\|.+\|$/.test(line))     return `<span class="t-tbl">${esc}</span>`;
+    if (/^  /.test(line) && line.trim()) return `<span class="t-ctx">${esc}</span>`;
+    return esc;
+  }).join('\n');
+}
+
+// Render all sections
+[
+  ['global','s-global'],['buy','s-buy'],['claim','s-claim'],
+  ['popupHd','s-popup-hd'],
+  ['p1','s-p1'],['p2','s-p2'],['p3','s-p3'],
+  ['p4','s-p4'],['p5','s-p5'],['p6','s-p6'],['p7','s-p7'],['rewards','s-rewards']
+].forEach(([key, id]) => {
+  document.getElementById(id).innerHTML = render(SECTIONS[key]);
+});
+
+// ── Copy All ──
+function copySpec() {
+  const text = Object.values(SECTIONS).join('\n\n---\n\n');
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ Copied';
+    btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = 'Copy All'; btn.classList.remove('ok'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>

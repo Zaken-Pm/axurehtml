@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>功能规格书 · 周卡活动后台配置</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;font-size:14px;color:#333;background:#f5f7fa;line-height:1.6;}
+.page{max-width:960px;margin:0 auto;padding:32px 24px 64px;}
+/* header */
+.doc-header{background:#1677ff;border-radius:8px;padding:28px 32px;margin-bottom:28px;color:#fff;}
+.doc-header h1{font-size:22px;font-weight:700;margin-bottom:6px;}
+.doc-header p{font-size:13px;opacity:.85;}
+.meta-row{display:flex;gap:24px;margin-top:14px;font-size:12px;opacity:.8;}
+.meta-row span strong{opacity:1;font-weight:600;}
+/* toc */
+.toc{background:#fff;border:1px solid #e8e8e8;border-radius:6px;padding:16px 20px;margin-bottom:24px;}
+.toc-title{font-size:13px;font-weight:600;color:#666;margin-bottom:10px;letter-spacing:.5px;}
+.toc ol{padding-left:18px;}
+.toc li{font-size:13px;margin-bottom:4px;}
+.toc a{color:#1677ff;text-decoration:none;}
+.toc a:hover{text-decoration:underline;}
+/* step block */
+.step{background:#fff;border:1px solid #e8e8e8;border-radius:8px;margin-bottom:20px;overflow:hidden;}
+.step-header{display:flex;align-items:center;gap:12px;padding:14px 20px;background:#f8faff;border-bottom:1px solid #e8e8e8;}
+.step-num{width:28px;height:28px;border-radius:50%;background:#1677ff;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.step-title{font-size:15px;font-weight:600;color:#1a1a1a;}
+.step-desc{font-size:12px;color:#888;margin-left:auto;}
+.step-body{padding:20px 24px;}
+/* section */
+.sec{margin-bottom:22px;}
+.sec:last-child{margin-bottom:0;}
+.sec-label{font-size:13px;font-weight:600;color:#1677ff;border-left:3px solid #1677ff;padding-left:8px;margin-bottom:12px;}
+/* field table */
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead tr{background:#f5f7fa;}
+th{padding:9px 12px;text-align:left;font-weight:500;color:#555;border:1px solid #ebeef5;white-space:nowrap;}
+td{padding:9px 12px;border:1px solid #ebeef5;vertical-align:top;color:#333;}
+td.req-y{color:#1677ff;font-weight:500;text-align:center;}
+td.req-n{color:#bbb;text-align:center;}
+td code{background:#f5f5f5;border-radius:3px;padding:1px 5px;font-size:12px;color:#c7254e;font-family:monospace;}
+tr:hover{background:#fafbff;}
+/* note box */
+.note{background:#fffbe6;border:1px solid #ffe58f;border-radius:5px;padding:10px 14px;font-size:12px;color:#876800;margin-top:10px;line-height:1.8;}
+.note-r{background:#fff2f0;border:1px solid #ffccc7;color:#cf1322;}
+.note-b{background:#e6f7ff;border:1px solid #91d5ff;color:#0958d9;}
+/* sub-section */
+.sub-title{font-size:13px;font-weight:600;color:#333;margin:14px 0 8px;padding-bottom:5px;border-bottom:1px dashed #e8e8e8;}
+/* badge */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;}
+.b-classic{background:#fff7e6;color:#d46b08;border:1px solid #ffd591;}
+.b-premium{background:#f9f0ff;color:#722ed1;border:1px solid #d3adf7;}
+/* footer */
+.doc-footer{text-align:center;font-size:12px;color:#bbb;margin-top:32px;}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- 文档头 -->
+  <div class="doc-header">
+    <h1>功能规格书 · 周卡活动后台配置</h1>
+    <p>后台新增周卡活动的完整配置流程，共 6 个步骤，供前后端开发参考实现。</p>
+    <div class="meta-row">
+      <span><strong>版本</strong>：v1.0</span>
+      <span><strong>日期</strong>：2026-05-21</span>
+      <span><strong>撰写</strong>：PM</span>
+      <span><strong>状态</strong>：待开发</span>
+    </div>
+  </div>
+
+  <!-- 目录 -->
+  <div class="toc">
+    <div class="toc-title">目录</div>
+    <ol start="0">
+      <li><a href="#s0">全局导航规则（操作按钮 & 下一步校验）</a></li>
+      <li><a href="#s1">活动模板设置</a></li>
+      <li><a href="#s2">活动图片</a></li>
+      <li><a href="#s3">参与对象与名单</a></li>
+      <li><a href="#s4">活动条件（卡型配置 + 通用设置）</a></li>
+      <li><a href="#s5">风控条件</a></li>
+      <li><a href="#s6">提交预览</a></li>
+      <li><a href="#s7">关联后台页面影响</a></li>
+    </ol>
+  </div>
+
+  <!-- ── 全局导航规则 ── -->
+  <div class="step" id="s0">
+    <div class="step-header">
+      <div class="step-num" style="background:#595959;">✦</div>
+      <div class="step-title">全局导航规则</div>
+      <div class="step-desc">适用于所有步骤的操作按钮行为</div>
+    </div>
+    <div class="step-body">
+      <div class="sec">
+        <div class="sec-label">操作按钮</div>
+        <table>
+          <thead><tr><th>按钮</th><th>出现位置</th><th>行为</th></tr></thead>
+          <tbody>
+            <tr><td>下一步 ›</td><td>步骤 1–5</td><td>点击后进行必填字段验证；<strong>验证通过才可跳转至下一步骤</strong>；有未填项则阻止跳转，高亮标示缺失字段，提示补齐后再继续</td></tr>
+            <tr><td>‹ 上一步</td><td>步骤 2–6</td><td>返回前一步骤，<strong>保留已填写数据</strong></td></tr>
+            <tr>
+              <td>退出编辑 ↩</td><td>全步骤</td>
+              <td>
+                点击后弹出确认弹窗，提示文案：「确定要退出编辑吗？」<br>
+                · 点击「<strong>确定</strong>」→ 返回活动列表页，已填数据不保存<br>
+                · 点击「<strong>取消</strong>」→ 关闭弹窗，继续编辑
+              </td>
+            </tr>
+            <tr><td>✓ 确认送出</td><td>步骤 6</td><td>执行必填验证，通过后送出并跳转回活动列表</td></tr>
+          </tbody>
+        </table>
+        <div class="note note-b" style="margin-top:10px;">
+          <strong>下一步校验逻辑：</strong>每个步骤点击「下一步」时，仅校验当前步骤的必填字段；有未填项则阻止跳转并高亮提示。所有步骤逐一通过后，进入步骤 6 时必填项已全部完成，<strong>步骤 6 不再重复显示必填提醒</strong>。
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-label">步骤点击导航</div>
+        <table>
+          <thead><tr><th>操作</th><th>行为</th></tr></thead>
+          <tbody>
+            <tr><td>点击步骤编号 / 步骤名称</td><td>只能点击<strong>已编辑完成且通过验证</strong>的步骤；尚未到达或未通过验证的步骤不可点击跳转</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 1 ── -->
+  <div class="step" id="s1">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div class="step-title">活动模板设置</div>
+      <div class="step-desc">配置活动基本信息与时间范围</div>
+    </div>
+    <div class="step-body">
+
+      <div class="sec">
+        <div class="sec-label">活动模板</div>
+        <table>
+          <thead><tr><th>字段名称</th><th>控件类型</th><th>必填</th><th>选项 / 规则</th><th>备注</th></tr></thead>
+          <tbody>
+            <tr><td>活动类型</td><td>下拉选单</td><td class="req-y">是</td><td>预约活动 / 周卡活动；无默认选项，需手动选择</td><td>选择「预约活动」将切换为预约活动模板样式</td></tr>
+            <tr><td>活动名称</td><td>文本输入</td><td class="req-y">是</td><td>最多 30 字</td><td>仅供后台辨识，不显示给前台用户</td></tr>
+            <tr><td>活动币种</td><td>下拉选单</td><td class="req-y">是</td><td>PHP（当前仅支持 PHP）</td><td>—</td></tr>
+            <tr><td>活动状态</td><td>单选</td><td class="req-n">否</td><td>关闭（预选）/ 开启</td><td>新建时默认关闭，避免误上线；操作员手动关闭时，视同强制终止整个活动，已购买会员亦无法继续领取剩余奖励周期</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sec">
+        <div class="sec-label">时间设定</div>
+        <table>
+          <thead><tr><th>字段名称</th><th>控件类型</th><th>必填</th><th>格式</th><th>备注</th></tr></thead>
+          <tbody>
+            <tr><td>进行时间</td><td>日期时间范围选择器</td><td class="req-y">是</td><td>yyyy-mm-dd hh:mm ～ yyyy-mm-dd hh:mm</td><td>此「進行時間」為購買開放的區間，不是領取的截止時間。會員只要在這段期間內購買，就能完整領完該筆周卡的 7 天周期。<br>範例：（周卡領取周期為 7 天）：<br>活動「進行時間」設定為 2026-07-01 00:00 ~ 2026-07-31 23:59。<br>會員 A 在 7/01 購買，領取周期為 7/01 ～ 7/07，在活動期間內領完。<br>會員 B 在 7/28 購買，領取周期為 7/28 ～ 8/03。仍可在7/28~8/03 领取奖励</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── STEP 2 ── -->
+  <div class="step" id="s2">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div class="step-title">活动图片</div>
+      <div class="step-desc">设置首页浮窗图片及备注</div>
+    </div>
+    <div class="step-body">
+
+      <div class="sec">
+        <div class="sec-label">首页浮窗设置</div>
+        <table>
+          <thead><tr><th>字段名称</th><th>控件类型</th><th>必填</th><th>选项 / 规则</th><th>备注</th></tr></thead>
+          <tbody>
+            <tr><td>浮窗开关</td><td>单选</td><td class="req-n">否</td><td>关闭（预选）/ 开启</td><td>—</td></tr>
+            <tr><td>PC 图片</td><td>图片上传</td><td class="req-n">否</td><td>格式：png / bmp / jpg / gif；大小 ≤ 5 MB</td><td>首页 PC 端浮窗图</td></tr>
+            <tr><td>H5 图片</td><td>图片上传</td><td class="req-n">否</td><td>格式：png / bmp / jpg / gif；大小 ≤ 5 MB</td><td>首页 H5 端浮窗图</td></tr>
+            <tr><td>排序</td><td>数字输入</td><td class="req-n">否</td><td>整数，默认值 <code>0</code></td><td>数字越小越靠前</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sec">
+        <div class="sec-label">备注</div>
+        <table>
+          <thead><tr><th>字段名称</th><th>控件类型</th><th>必填</th><th>规则</th><th>备注</th></tr></thead>
+          <tbody>
+            <tr><td>备注</td><td>多行文本输入</td><td class="req-n">否</td><td>自由输入</td><td>仅后台可见，不对玩家展示</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── STEP 3 ── -->
+  <div class="step" id="s3">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div class="step-title">参与对象与名单</div>
+      <div class="step-desc">定义可参与活动的会员范围及黑名单规则</div>
+    </div>
+    <div class="step-body">
+
+      <div class="sec">
+        <div class="sec-label">参与对象设置</div>
+        <div class="note note-b" style="margin-bottom:10px;">此区块全部为系统预设值，<strong>不可修改</strong>。</div>
+        <table>
+          <thead><tr><th>字段名称</th><th>控件类型</th><th>必填</th><th>预设值</th><th>备注</th></tr></thead>
+          <tbody>
+            <tr><td>1. 充值层级</td><td>只读文本</td><td class="req-n">否</td><td>全选（固定）</td><td>不可更改</td></tr>
+            <tr><td>2. 指定代理线</td><td>只读文本</td><td class="req-n">否</td><td>不指定（固定）</td><td>不可更改</td></tr>
+            <tr><td>3. 新会员限制</td><td>只读文本</td><td class="req-n">否</td><td>关闭（固定）</td><td>不可更改</td></tr>
+            <tr><td>4. 会员等级</td><td>只读文本</td><td class="req-n">否</td><td>全选 VIP0–VIP10（固定）</td><td>不可更改</td></tr>
+            <tr><td>用户标签</td><td>只读文本</td><td class="req-n">否</td><td>不限制（固定）</td><td>不可更改</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sec">
+        <div class="sec-label">黑名单设置</div>
+        <table>
+          <thead><tr><th>字段名称</th><th>控件类型</th><th>必填</th><th>规则</th><th>备注</th></tr></thead>
+          <tbody>
+            <tr><td>黑名单限制类型</td><td>文本输入</td><td class="req-n">否</td><td>自由输入</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── STEP 4 ── -->
+  <div class="step" id="s4">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div class="step-title">活动条件</div>
+      <div class="step-desc">配置各卡型奖励规则与通用活动参数</div>
+    </div>
+    <div class="step-body">
+
+      <div class="note note-r" style="margin-bottom:18px;">⚠ 修改奖励配置后将<strong>立即生效</strong>，已购买但尚未结算的奖励将按最新规则执行，请谨慎操作。</div>
+
+      <!-- 卡型 -->
+      <div class="sec">
+        <div class="sec-label">卡型配置</div>
+        <p style="font-size:13px;color:#555;margin-bottom:12px;">系统内建两种卡型，每种卡型包含 7 天签到奖励配置。</p>
+
+        <div class="sub-title"><span class="badge b-classic">Elite Pass</span>　标准周卡</div>
+        <table>
+          <thead><tr><th>字段名称</th><th>控件类型</th><th>必填</th><th>规则</th><th>备注</th></tr></thead>
+          <tbody>
+            <tr><td>卡型名称</td><td>只读文本</td><td class="req-n">—</td><td>固定显示 <code>Elite Pass</code></td><td>不可修改</td></tr>
+            <tr><td>周卡费用（PHP）</td><td>数字输入</td><td class="req-y">是</td><td>正整数</td><td>默认值 <code>0</code></td></tr>
+            <tr><td>签到奖励（第 1–7 天）</td><td>下拉 + 数字输入</td><td class="req-y">是</td><td>类型见「奖励类型」表；数量为正整数</td><td>无门槛，签到即可领</td></tr>
+            <tr><td>额外奖励（第 1–7 天）</td><td>下拉 + 数字输入</td><td class="req-n">否</td><td>类型见「奖励类型」表；数量留空 = 该天不开放额外奖励；<strong>填入数量后，同行「额外奖励条件」栏位自动启用并标为必填</strong></td><td>奖励类型下拉须选择；数量为正整数</td></tr>
+            <tr><td>额外奖励条件（第 1–7 天）<br><span style="font-size:11px;color:#cf1322;font-weight:600;">🔴 6/16 调整</span></td><td>条件选择 + 数字输入</td><td style="color:#d46b08;font-weight:500;text-align:center;">条件必填</td><td>充值（Deposit）≥ N 或 投注（Turnover）≥ N；<strong>当该天额外奖励数量 &gt; 0 时，本栏标示「* 必填」，且条件数值须为正整数（&gt; 0），不可填 0 或留空</strong></td><td>额外奖励无数量时，栏位呈禁用状态（灰色不可操作）；点击「下一步」时逐天校验，未填或填 0 则阻止跳转并高亮提示</td></tr>
+          </tbody>
+        </table>
+
+        <div class="sub-title" style="margin-top:18px;"><span class="badge b-premium">Prime Pass</span>　豪华周卡</div>
+        <table>
+          <thead><tr><th>字段名称</th><th>控件类型</th><th>必填</th><th>规则</th><th>备注</th></tr></thead>
+          <tbody>
+            <tr><td>卡型名称</td><td>只读文本</td><td class="req-n">—</td><td>固定显示 <code>Prime Pass</code></td><td>不可修改</td></tr>
+            <tr><td>周卡费用（PHP）</td><td>数字输入</td><td class="req-y">是</td><td>正整数</td><td>默认值 <code>0</code></td></tr>
+            <tr><td>签到奖励（第 1–7 天）</td><td>下拉 + 数字输入</td><td class="req-y">是</td><td>类型见「奖励类型」表</td><td>无门槛，签到即可领</td></tr>
+            <tr><td>额外奖励（第 1–7 天）</td><td>下拉 + 数字输入</td><td class="req-n">否</td><td>类型见「奖励类型」表；数量留空 = 该天不开放额外奖励；<strong>填入数量后，同行「额外奖励条件」栏位自动启用并标为必填</strong></td><td>奖励类型下拉须选择；数量为正整数</td></tr>
+            <tr><td>额外奖励条件（第 1–7 天）<br><span style="font-size:11px;color:#cf1322;font-weight:600;">🔴 6/16 调整</span></td><td>条件选择 + 数字输入</td><td style="color:#d46b08;font-weight:500;text-align:center;">条件必填</td><td>充值（Deposit）≥ N 或 投注（Turnover）≥ N；<strong>当该天额外奖励数量 &gt; 0 时，本栏标示「* 必填」，且条件数值须为正整数（&gt; 0），不可填 0 或留空</strong></td><td>额外奖励无数量时，栏位呈禁用状态（灰色不可操作）；点击「下一步」时逐天校验，未填或填 0 则阻止跳转并高亮提示</td></tr>
+          </tbody>
+        </table>
+
+        <div class="note" style="margin-top:12px;">
+          <strong>奖励类型选项（签到奖励 & 额外奖励共用）：</strong><br>
+          彩金（Cash）／积分（Point）／免费旋转（Free Spin）／优惠券（Coupon）／免费投注（Free Bet）／道具卡（Prop Card）
+        </div>
+        <div class="note note-b" style="margin-top:8px;">
+          <strong>额外奖励条件选项：</strong>充值（Deposit）≥ N　／　投注（Turnover）≥ N　<strong>（N 须为正整数且 &gt; 0，不可填 0）</strong>
+        </div>
+        <div class="note note-r" style="margin-top:8px;">
+          <span style="font-size:11px;font-weight:600;">🔴 6/16 调整</span>　<strong>校验触发时机：</strong>点击「下一步」时，系统逐天检查——凡额外奖励数量 &gt; 0 但条件未填或条件数值 ≤ 0 者，阻止跳转并以红框高亮该栏位；所有天皆通过后方可进入下一步骤。
+        </div>
+      </div>
+
+      <!-- 通用设置 -->
+      <div class="sec">
+        <div class="sec-label">通用设置</div>
+        <table>
+          <thead><tr><th>字段名称</th><th>控件类型</th><th>必填</th><th>选项 / 规则</th><th>备注</th></tr></thead>
+          <tbody>
+            <tr><td>存款强制弹窗</td><td>开关（Toggle）</td><td class="req-n">否</td><td>关闭（预设）/ 开启</td><td>开启后，玩家存款成功弹出周卡购买提示；弹窗含「今日不再显示」；点击关闭时二次确认</td></tr>
+            <tr><td>彩金所需流水倍数</td><td>数字输入</td><td class="req-n">否</td><td>正整数</td><td>仅适用于彩金（Cash）奖励的流水稽核倍数</td></tr>
+            <tr><td>审核方式</td><td>单选</td><td class="req-n">否</td><td>人工审核 / 自动审核（预选）</td><td>—</td></tr>
+            <tr><td>领取方式</td><td>单选</td><td class="req-n">否</td><td>自动领取（预选）/ 手动领取</td><td>额外奖励无论此设定，均须满足条件后由玩家手动领取</td></tr>
+            <tr><td>已验证手机号</td><td>单选</td><td class="req-n">否</td><td>是 / 否（预选）</td><td>限制仅绑定手机号的会员可参与</td></tr>
+            <tr><td>限制使用设备</td><td>只读文本</td><td class="req-n">否</td><td>无限制（固定，不可更改）</td><td>—</td></tr>
+            <tr style="background:#fff2f0;">
+              <td style="color:#cf1322;font-weight:600;">适用游戏范围 <span style="font-size:11px;font-weight:400;">🔴 5/25 调整</span></td>
+              <td style="color:#cf1322;">弹窗多选</td>
+              <td class="req-n" style="color:#cf1322;">否</td>
+              <td style="color:#cf1322;">点击按钮开启游戏选择弹窗；弹窗中支持依游戏类别全选 / 单选；按钮上显示已选数量，例：「已选择 35 个游戏」；<strong>预设全选</strong>（含体育）<br>※ 弹窗内需新增「体育」勾选项</td>
+              <td style="color:#cf1322;">指定本活动奖励条件中有效投注（Turnover）的游戏范围；玩家须在所选游戏内完成投注，才计入奖励条件达成；未选择时不限制游戏范围<br>※ 体育类别不细分项目，选取即整页全部计入</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── STEP 5 ── -->
+  <div class="step" id="s5">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <div class="step-title">风控条件</div>
+      <div class="step-desc">设置多账号检测规则，防止刷活动行为</div>
+    </div>
+    <div class="step-body">
+
+      <div class="sec">
+        <div class="sec-label">风险检测设置 <span style="font-size:11px;font-weight:400;color:#888;margin-left:6px;">（此区逻辑为 OR）</span></div>
+        <table>
+          <thead><tr><th>字段名称</th><th>控件类型</th><th>必填</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>同 IP 检测</td><td>开关（Toggle）</td><td class="req-n">否</td><td>检测相同 IP 地址的多个账号</td></tr>
+            <tr><td>同手机号检测</td><td>开关（Toggle）</td><td class="req-n">否</td><td>检测绑定相同手机号的账号</td></tr>
+            <tr><td>同姓名检测</td><td>开关（Toggle）</td><td class="req-n">否</td><td>检测实名认证姓名相同的账号</td></tr>
+            <tr><td>同 email 检测</td><td>开关（Toggle）</td><td class="req-n">否</td><td>检测绑定相同电子邮件的账号</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sec">
+        <div class="sec-label">自动拒绝 <span style="font-size:11px;font-weight:400;color:#888;margin-left:6px;">（此区逻辑为 OR）</span></div>
+        <div class="note" style="margin-bottom:12px;">上方任一检测开关开启后，自动拒绝区块才可编辑；否则呈灰色不可操作。</div>
+        <table>
+          <thead><tr><th>字段名称</th><th>控件类型</th><th>必填</th><th>规则</th><th>备注</th></tr></thead>
+          <tbody>
+            <tr><td>自动拒绝开关</td><td>开关（Toggle）</td><td class="req-n">否</td><td>任一检测开启时自动打开；<strong>不可手动关闭</strong></td><td>须将所有检测关闭，自动拒绝开关才会随之关闭</td></tr>
+            <tr><td>触发条件（笔数）</td><td>数字输入</td><td class="req-n">否</td><td>正整数；当违规笔数超过 N 笔时自动拒绝派奖</td><td>自动拒绝开启后可输入；关闭后清空并禁用</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── STEP 6 ── -->
+  <div class="step" id="s6">
+    <div class="step-header">
+      <div class="step-num">6</div>
+      <div class="step-title">提交预览</div>
+      <div class="step-desc">汇总展示所有步骤的配置内容，确认后送出</div>
+    </div>
+    <div class="step-body">
+
+      <div class="sec">
+        <div class="sec-label">页面结构</div>
+        <p style="font-size:13px;color:#555;margin-bottom:10px;">页面由上至下依序为：步骤汇总表（步骤 1–5）。进入本步骤时，必填项已于前置步骤逐一校验完毕，本页不显示必填提醒。</p>
+        <table>
+          <thead><tr><th>区块</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>步骤汇总表</td><td>共 5 行，对应步骤 1–5，每行左侧显示步骤编号与名称，右侧以二栏网格列出该步骤的关键字段与值</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sec">
+        <div class="sec-label">字段显示规则</div>
+        <table>
+          <thead><tr><th>状态</th><th>显示方式</th></tr></thead>
+          <tbody>
+            <tr><td>必填字段</td><td>字段名称前标注 <code>*</code></td></tr>
+            <tr><td>已填写</td><td>正常黑色文字显示值</td></tr>
+            <tr><td>未填写（非必填）</td><td>显示「–」，字色灰色</td></tr>
+            <tr><td>未填写（必填）</td><td>显示「–」，字色红色，提示需补填</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sec">
+        <div class="sec-label">各步骤显示字段明细</div>
+        <div class="sub-title">步骤 1　活动模板设置</div>
+        <table>
+          <thead><tr><th>字段</th><th>必填</th><th>预览值来源</th></tr></thead>
+          <tbody>
+            <tr><td>活动类型</td><td class="req-n">否</td><td>显示选择的活动类型名称</td></tr>
+            <tr><td>活动状态</td><td class="req-n">否</td><td>显示「开启」或「关闭」</td></tr>
+            <tr><td>活动币种</td><td class="req-n">否</td><td>显示选择的币种（如 PHP）</td></tr>
+            <tr><td>活动名称</td><td class="req-y">是</td><td>显示输入的名称；未填则红色「–」</td></tr>
+            <tr><td>进行时间</td><td class="req-y">是</td><td>显示起讫时间区间；未填则红色「–」</td></tr>
+          </tbody>
+        </table>
+
+        <div class="sub-title" style="margin-top:14px;">步骤 2　活动图片</div>
+        <table>
+          <thead><tr><th>字段</th><th>必填</th><th>预览值来源</th></tr></thead>
+          <tbody>
+            <tr><td>首页浮窗</td><td class="req-n">否</td><td>显示「开启」或「关闭」</td></tr>
+            <tr><td>排序</td><td class="req-n">否</td><td>显示输入的数字，默认「0」</td></tr>
+            <tr><td>备注</td><td class="req-n">否</td><td>显示输入内容；未填则灰色「–」</td></tr>
+          </tbody>
+        </table>
+
+        <div class="sub-title" style="margin-top:14px;">步骤 3　参与对象与名单</div>
+        <table>
+          <thead><tr><th>字段</th><th>必填</th><th>预览值来源</th></tr></thead>
+          <tbody>
+            <tr><td>充值层级</td><td class="req-n">否</td><td>显示已选层数，例：「全选（7 层）」</td></tr>
+            <tr><td>指定代理线</td><td class="req-n">否</td><td>显示代理线名称；未指定则显示「不指定」</td></tr>
+            <tr><td>新会员限制</td><td class="req-n">否</td><td>显示「是」或「否」</td></tr>
+            <tr><td>会员等级</td><td class="req-n">否</td><td>显示已选范围，例：「全选（VIP0–VIP10）」</td></tr>
+            <tr><td>黑名单</td><td class="req-n">否</td><td>显示已设定内容；未填则灰色「–」</td></tr>
+          </tbody>
+        </table>
+
+        <div class="sub-title" style="margin-top:14px;">步骤 4　活动条件</div>
+        <table>
+          <thead><tr><th>字段</th><th>必填</th><th>预览值来源</th></tr></thead>
+          <tbody>
+            <tr><td>存款强制弹窗</td><td class="req-n">否</td><td>显示「开启」或「关闭」</td></tr>
+            <tr><td>彩金流水倍数</td><td class="req-n">否</td><td>显示输入数字；未填则灰色「–」</td></tr>
+            <tr><td>审核方式</td><td class="req-n">否</td><td>显示「人工审核」或「自动审核」</td></tr>
+            <tr><td>领取方式</td><td class="req-n">否</td><td>显示「自动领取」或「手动领取」</td></tr>
+            <tr><td>已验证手机号</td><td class="req-n">否</td><td>显示「是」或「否」</td></tr>
+            <tr><td>限制使用设备</td><td class="req-n">否</td><td>固定显示「无限制」</td></tr>
+            <tr><td>适用游戏范围</td><td class="req-n">否</td><td>显示已选游戏数量，例：「26 个」；未选则灰色「–」</td></tr>
+            <tr><td>卡型奖励摘要</td><td class="req-n">—</td><td>每张卡型独立一行，显示：卡名 · 费用（PHP）· 有额外奖励的天数，例：「Elite Pass · 500 PHP · 3 天有额外奖励」</td></tr>
+          </tbody>
+        </table>
+
+        <div class="sub-title" style="margin-top:14px;">步骤 5　风控条件</div>
+        <table>
+          <thead><tr><th>字段</th><th>必填</th><th>预览值来源</th></tr></thead>
+          <tbody>
+            <tr><td>同 IP 检测</td><td class="req-n">否</td><td>显示「开启」或「关闭」</td></tr>
+            <tr><td>同手机号检测</td><td class="req-n">否</td><td>显示「开启」或「关闭」</td></tr>
+            <tr><td>同姓名检测</td><td class="req-n">否</td><td>显示「开启」或「关闭」</td></tr>
+            <tr><td>同 email 检测</td><td class="req-n">否</td><td>显示「开启」或「关闭」</td></tr>
+            <tr><td>自动拒绝</td><td class="req-n">否</td><td>显示「开启 · 触发 N 笔以上」或「关闭」；未设定则灰色「–」</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sec">
+        <div class="sec-label">确认送出行为</div>
+        <table>
+          <thead><tr><th>情境</th><th>系统行为</th></tr></thead>
+          <tbody>
+            <tr><td>提交成功</td><td>提交活动配置至后端，成功后跳转至活动列表页</td></tr>
+            <tr><td>提交失败（后端异常）</td><td>显示错误提示，页面停留在步骤 6，不清空已填内容</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── 关联后台页面影响 ── -->
+  <div class="step" id="s7">
+    <div class="step-header">
+      <div class="step-num" style="background:#595959;">★</div>
+      <div class="step-title">关联后台页面影响</div>
+      <div class="step-desc">周卡活动资料将影响以下后台页面</div>
+    </div>
+    <div class="step-body">
+      <div class="sec">
+        <div class="sec-label">影响页面一览</div>
+        <table>
+          <thead><tr><th>后台路径</th><th>影响说明</th><th>参考图</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>活动配置（新）&gt; 派奖审核</td>
+              <td>
+                当周卡活动「审核方式」设为「人工审核」时，派奖记录进入此页面，由后台人员手动审核后再派发<br>
+                <span style="color:#888;font-size:12px;">※ 备注：目前该活动运营预设为自动审核</span>
+              </td>
+              <td>图一</td>
+            </tr>
+            <tr>
+              <td>活动配置（新）&gt; 活动报表（奖励统计、数据统计）</td>
+              <td>活动报表需支持以「周卡活动」为条件进行查询，奖励统计与数据统计两个维度均须涵盖周卡活动数据</td>
+              <td>图二</td>
+            </tr>
+            <tr>
+              <td>活动配置（新）&gt; 活动报表（数据统计）</td>
+              <td>
+                新增「天数」维度栏位，直接以活动天数名称展现：<code>Day 1</code>、<code>Day 2</code>…<br>
+                <span style="color:#888;font-size:12px;">范例：若该会员当日同时领取日常奖励与额外奖励，此列表将显示两笔记录</span>
+              </td>
+              <td>图三</td>
+            </tr>
+            <tr>
+              <td>财务管理 &gt; 资金明细</td>
+              <td>
+                <span style="font-size:11px;color:#cf1322;font-weight:600;">🔴 6/8 调整</span><br>
+                交易类型下拉选单选择「活动金额」（现有）；子类型新增「周卡活动」<br><br>
+                <strong>列表中「备注」栏位格式（由后端写入，共三种状态）：</strong><br>
+                · 购卡：<code>[Elite Pass][Elite Pass Purchase]</code> 或 <code>[Prime Pass][Prime Pass Purchase]</code><br>
+                · 每日签到奖励：<code>[Elite Pass][D{N} Signin {Bonus}]</code><br>
+                · 每日任务奖励：<code>[Elite Pass][D{N} Task {Bonus}]</code><br>
+                <span style="color:#888;font-size:12px;">※ {N} 为天数变量（如 D1、D2…）；{Bonus} 为奖励内容变量（如奖励类型或金额）；Elite Pass 依实际卡型替换为 Prime Pass</span>
+              </td>
+              <td>图四</td>
+            </tr>
+            <tr>
+              <td>积分商城 &gt; 用户积分记录</td>
+              <td>
+                <span style="font-size:11px;color:#cf1322;font-weight:600;">🔴 6/8 新增</span><br>
+                归属下拉选单选择「<strong>活动赠送积分</strong>」（现有分类），对应周卡活动派发的积分记录<br><br>
+                <strong>列表中「原因」栏位格式（由后端写入）：</strong><br>
+                · 取活动名称写入<br><br>
+                <strong>列表中「备注」栏位格式（由后端写入，共三种状态）：</strong><br>
+                · 购卡：<code>[Elite Pass][Elite Pass Purchase]</code> 或 <code>[Prime Pass][Prime Pass Purchase]</code><br>
+                · 每日签到奖励：<code>[Elite Pass][D{N} Signin {Bonus}]</code><br>
+                · 每日任务奖励：<code>[Elite Pass][D{N} Task {Bonus}]</code><br>
+                <span style="color:#888;font-size:12px;">※ {N} 为天数变量（如 D1、D2…）；{Bonus} 为奖励内容变量（如奖励类型或金额）；Elite Pass 依实际卡型替换为 Prime Pass</span>
+              </td>
+              <td>图五</td>
+            </tr>
+            <tr>
+              <td>积分商城 &gt; 免费旋转管理</td>
+              <td>
+                <span style="font-size:11px;color:#cf1322;font-weight:600;">🔴 6/8 新增</span><br>
+                Tab「免费旋转发送记录」需支持显示由周卡活动派发的免费旋转记录<br><br>
+                <strong>列表中「备注」栏位格式（由后端写入，共三种状态）：</strong><br>
+                · 购卡：<code>[Elite Pass][Elite Pass Purchase]</code> 或 <code>[Prime Pass][Prime Pass Purchase]</code><br>
+                · 每日签到奖励：<code>[Elite Pass][D{N} Signin {Bonus}]</code><br>
+                · 每日任务奖励：<code>[Elite Pass][D{N} Task {Bonus}]</code><br>
+                <span style="color:#888;font-size:12px;">※ {N} 为天数变量（如 D1、D2…）；{Bonus} 为奖励内容变量（如奖励类型或金额）；Elite Pass 依实际卡型替换为 Prime Pass</span>
+              </td>
+              <td>图六</td>
+            </tr>
+            <tr>
+              <td>提现管理 &gt; 即时流水稽核查询</td>
+              <td>
+                <span style="font-size:11px;color:#cf1322;font-weight:600;">🔴 6/9 新增</span><br>
+                类别名称「<strong>週卡活動歸屬 活動金額</strong>」；对应充值类型新增「<strong>&amp;活动名称&amp;</strong>」（取活动名称动态写入）
+              </td>
+              <td>图七</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-footer">周卡活动后台配置规格书 v1.0　·　2026-05-21</div>
+</div>
+</body>
+</html>

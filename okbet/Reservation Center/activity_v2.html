@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>预约活动 v2 - 整合模拟稿</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;font-size:14px;color:#333;background:#f0f2f5;min-width:1280px;display:flex;height:100vh;overflow:hidden;}
+.doc-ref{background:#fffbe6;border-bottom:1px solid #ffe58f;padding:10px 24px;font-size:12px;color:#ad6800;}
+.doc-ref b{color:#874d00;}
+
+/* ── 左：示意图；右：规格书，两者并存，比例约 3:2，规格书可收合以物尽其用 ── */
+.app-main{flex:1;min-width:0;height:100vh;overflow-y:auto;}
+.spec-panel{position:relative;width:40%;min-width:480px;flex-shrink:0;height:100vh;overflow-y:auto;background:#fff;border-left:1px solid #e2e2e2;padding:22px 32px 60px;transition:width .18s ease;}
+.spec-panel.collapsed{width:0;min-width:0;padding-left:0;padding-right:0;overflow:hidden;}
+.spec-toggle{position:fixed;top:50%;right:40%;transform:translateY(-50%);width:28px;padding:12px 0 10px;background:#1677ff;color:#fff;border:none;border-radius:8px 0 0 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;z-index:60;transition:right .18s ease;box-shadow:-2px 0 8px rgba(0,0,0,.15);}
+.spec-toggle:hover{background:#4096ff;}
+.spec-toggle.collapsed{right:0;}
+.spec-toggle-label{writing-mode:vertical-rl;text-orientation:upright;font-size:13px;letter-spacing:3px;line-height:1;white-space:nowrap;}
+.spec-toggle-arrow{font-size:11px;line-height:1;}
+.spec-panel h2{font-size:20px;color:#1677ff;margin:0 0 14px;padding-bottom:10px;border-bottom:2px solid #1677ff;}
+.spec-panel h3{font-size:17px;color:#333;margin:26px 0 10px;padding-left:10px;border-left:4px solid #1677ff;}
+.spec-panel h3:first-of-type{margin-top:16px;}
+.spec-panel p{font-size:16px;color:#444;line-height:2;margin-bottom:10px;}
+.spec-panel .req-tag{display:inline-block;font-size:14px;font-weight:600;color:#1677ff;background:#e6f4ff;border-radius:4px;padding:2px 8px;margin-right:6px;}
+.spec-panel .rule-list{margin:0 0 14px;padding-left:22px;}
+.spec-panel .rule-list li{font-size:16px;color:#444;line-height:1.95;margin-bottom:6px;}
+.spec-panel .tpl-block{background:#f8faff;border:1px solid #d6e4ff;border-radius:6px;padding:16px 18px;font-size:15.5px;color:#333;margin:10px 0 14px;line-height:2;}
+.spec-panel .tpl-block b{color:#1677ff;}
+.spec-panel .default-tag{display:inline-block;font-size:14px;color:#ad6800;background:#fffbe6;border:1px solid #ffe58f;border-radius:4px;padding:4px 10px;margin-bottom:12px;line-height:1.7;}
+.spec-panel code{background:#f5f5f5;border-radius:3px;padding:2px 6px;font-size:14.5px;}
+
+/* ── 顶层页签切换 ── */
+.top-switch{display:flex;background:#001529;padding:0 20px;}
+.top-switch .item{padding:14px 20px;font-size:13px;color:rgba(255,255,255,.65);cursor:pointer;border-bottom:2px solid transparent;}
+.top-switch .item.active{color:#fff;border-bottom-color:#1677ff;background:rgba(255,255,255,.06);}
+.top-switch .item:hover{color:#fff;}
+.page-wrap{display:none;}
+.page-wrap.show{display:block;}
+
+/* ── 共用：后台版式 ── */
+.layout{display:flex;min-height:calc(100vh - 90px);}
+.sidebar{width:180px;flex-shrink:0;background:#fff;border-right:0.5px solid #e8e8e8;}
+.menu-parent{display:flex;align-items:center;justify-content:space-between;padding:0 14px;height:44px;font-size:13px;font-weight:500;background:#e8f0fe;color:#333;}
+.menu-parent .label{display:flex;align-items:center;gap:6px;}
+.menu-icon-box{width:20px;height:20px;border-radius:4px;background:#1677ff;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.new-badge{font-size:11px;color:#1677ff;font-weight:400;}
+.submenu-item{display:flex;align-items:center;padding:0 14px 0 40px;height:38px;font-size:13px;color:#555;text-decoration:none;border-left:3px solid transparent;cursor:pointer;}
+.submenu-item:hover{background:#f5f5f5;color:#1677ff;}
+.submenu-item.active{color:#1677ff;background:#e6f4ff;border-left-color:#1677ff;}
+.right{flex:1;display:flex;flex-direction:column;min-width:0;}
+.topbar{background:#fff;border-bottom:0.5px solid #e8e8e8;height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0;}
+.top-left{font-size:12px;color:#666;}
+.top-right{display:flex;align-items:center;gap:8px;font-size:13px;color:#555;}
+.avatar{width:26px;height:26px;border-radius:50%;background:#ff4d4f;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:500;}
+.content-area{flex:1;padding:12px 16px;}
+.bc-bar{font-size:13px;color:#999;display:flex;align-items:center;gap:6px;margin-bottom:10px;}
+.bc-bar .cur{color:#333;}
+.br-banner{background:#fffbe6;border:1px solid #ffe58f;border-radius:6px;padding:10px 16px;font-size:12px;color:#ad6800;margin-bottom:10px;}
+.br-banner b{color:#874d00;}
+.page-card{background:#fff;border-radius:4px;border:0.5px solid #e8e8e8;}
+.tab-bar{display:flex;border-bottom:0.5px solid #e8e8e8;padding:0 16px;}
+.tab{padding:11px 4px;font-size:13px;color:#1677ff;border-bottom:2px solid #1677ff;margin-right:20px;}
+.filter-area{padding:12px 16px;border-bottom:0.5px solid #f0f0f0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.fl{font-size:13px;color:#333;white-space:nowrap;}
+.fi-input{height:32px;border:1px solid #d9d9d9;border-radius:4px;padding:0 10px;font-size:13px;color:#333;background:#fff;outline:none;}
+.fi-select{height:32px;border:1px solid #d9d9d9;border-radius:4px;padding:0 8px;font-size:13px;color:#333;background:#fff;outline:none;}
+.btn-search{height:32px;padding:0 18px;background:#1677ff;color:#fff;border:none;border-radius:4px;font-size:13px;cursor:pointer;}
+.btn-new{height:32px;padding:0 18px;background:#1677ff;color:#fff;border:none;border-radius:4px;font-size:13px;cursor:pointer;}
+.list-area{padding:12px 16px 0;overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:1200px;}
+th{background:#fafafa;padding:9px 8px;text-align:left;font-weight:500;color:#888;border-bottom:1px solid #f0f0f0;white-space:nowrap;}
+td{padding:11px 8px;border-bottom:0.5px solid #f0f0f0;color:#333;vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#fafafa;}
+.status-on{color:#52c41a;font-size:12px;}
+.status-off{color:#999;font-size:12px;}
+.alink{font-size:12px;color:#1677ff;cursor:pointer;background:none;border:none;padding:0;white-space:nowrap;}
+.alink:hover{color:#4096ff;}
+.acts-row{display:flex;gap:12px;}
+.pill{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:500;}
+.pill.on{background:#e6f4ff;color:#1677ff;}
+.pill.off{background:#f5f5f5;color:#bbb;}
+.pill.dot{background:#fff1f0;color:#ff4d4f;}
+.pri-badge{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#1677ff;color:#fff;font-size:11px;font-weight:700;}
+.pri-badge.low{background:#e8e8e8;color:#999;}
+.pagination{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:10px 16px 14px;font-size:13px;color:#666;}
+.pg-btn{width:28px;height:28px;border-radius:4px;border:1px solid #d9d9d9;background:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;}
+.pg-btn.active{background:#1677ff;color:#fff;border-color:#1677ff;}
+
+/* 新增活动 步骤 */
+.step-page{display:flex;gap:12px;}
+.step-nav{width:190px;flex-shrink:0;background:#fff;border-radius:4px;border:0.5px solid #e8e8e8;padding:8px 0;}
+.step-nav-item{display:flex;align-items:center;gap:8px;padding:9px 14px;cursor:pointer;font-size:13px;color:#666;border-left:3px solid transparent;}
+.step-nav-item.active{color:#1677ff;background:#e6f4ff;border-left-color:#1677ff;}
+.step-nav-item.new .snum{background:#faad14;border-color:#faad14;color:#fff;}
+.snum{width:20px;height:20px;border-radius:50%;border:1.5px solid #d9d9d9;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0;color:#999;}
+.step-nav-item.active .snum{background:#1677ff;border-color:#1677ff;color:#fff;}
+.new-tag{font-size:10px;background:#faad14;color:#fff;border-radius:3px;padding:1px 4px;margin-left:auto;}
+.step-main{flex:1;display:flex;flex-direction:column;gap:10px;}
+.step-topbar{background:#fff;border-radius:4px;border:0.5px solid #e8e8e8;padding:10px 16px;font-size:14px;font-weight:500;color:#1677ff;}
+.step-content{background:#fff;border-radius:4px;border:0.5px solid #e8e8e8;padding:20px 24px;}
+.step-desc{font-size:12px;color:#999;margin-bottom:16px;}
+.sec-title{font-size:14px;font-weight:500;color:#1677ff;border-left:3px solid #1677ff;padding-left:8px;margin-bottom:14px;}
+.sec-block{margin-bottom:24px;}
+.field-row{display:flex;align-items:flex-start;margin-bottom:14px;}
+.field-label{font-size:13px;color:#333;min-width:130px;padding-top:7px;flex-shrink:0;}
+.req{color:#ff4d4f;margin-right:2px;}
+.field-ctrl{flex:1;}
+.f-input{height:34px;border:1px solid #d9d9d9;border-radius:4px;padding:0 10px;font-size:13px;color:#333;background:#fff;outline:none;width:100%;max-width:300px;}
+.f-select{height:34px;border:1px solid #d9d9d9;border-radius:4px;padding:0 10px;font-size:13px;color:#333;background:#fff;outline:none;width:100%;max-width:300px;}
+.f-textarea{border:1px solid #d9d9d9;border-radius:4px;padding:8px 10px;font-size:13px;color:#333;background:#fff;outline:none;width:100%;max-width:520px;resize:vertical;min-height:60px;}
+.hint{font-size:12px;color:#999;margin-top:4px;}
+.toggle{width:40px;height:22px;border-radius:11px;background:#d9d9d9;position:relative;cursor:pointer;flex-shrink:0;transition:background .2s;display:inline-block;}
+.toggle.on{background:#1677ff;}
+.toggle::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:2px;left:2px;transition:left .2s;}
+.toggle.on::after{left:20px;}
+.info-box{background:#f8faff;border:1px solid #d6e4ff;border-radius:6px;padding:14px 18px;font-size:12px;color:#555;line-height:1.7;margin-bottom:16px;}
+.info-box b{color:#1677ff;}
+.tpl-box{border:1px solid #e8e8e8;border-radius:6px;padding:16px 18px;}
+.var-tag{display:inline-block;background:#f0f0f0;border-radius:3px;padding:2px 6px;font-size:11px;color:#666;margin-right:4px;}
+.placeholder-note{background:#fafafa;border:1px dashed #d9d9d9;border-radius:6px;padding:30px;text-align:center;color:#bbb;font-size:13px;}
+.pv-row{display:flex;gap:6px;font-size:13px;padding:7px 0;border-bottom:0.5px solid #f5f5f5;}
+.pk{color:#999;min-width:150px;flex-shrink:0;}
+.pv{color:#333;}
+
+/* ── 前台 ── */
+.front-body{background:#eef1f6;min-height:calc(100vh - 90px);}
+.front-page{max-width:1040px;width:100%;margin:0 auto;padding:20px 24px 60px;}
+.front-topbar{display:flex;align-items:center;justify-content:space-between;background:#fff;border-radius:10px;padding:12px 18px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06);}
+.front-brand{font-size:16px;font-weight:700;color:#1677ff;}
+.front-top-right{display:flex;align-items:center;gap:16px;}
+.bell-wrap{position:relative;cursor:pointer;}
+.bell-icn{width:30px;height:30px;border-radius:50%;background:#f0f4ff;display:flex;align-items:center;justify-content:center;}
+.dot-badge{position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:#ff4d4f;border:2px solid #fff;display:none;}
+.dot-badge.show{display:block;}
+.front-avatar{width:30px;height:30px;border-radius:50%;background:#1677ff;color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.switch-card{background:#fff;border-radius:10px;padding:16px 16px 0;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06);}
+.switch-title{font-size:13px;color:#999;margin-bottom:10px;}
+.switch-row{display:flex;gap:10px;overflow-x:auto;padding-bottom:16px;}
+.entry{position:relative;flex-shrink:0;width:150px;border:1.5px solid #e8e8e8;border-radius:8px;padding:10px 12px;cursor:pointer;}
+.entry:hover{border-color:#91caff;}
+.entry.active{border-color:#1677ff;background:#f0f7ff;}
+.entry-name{font-size:13px;font-weight:600;color:#333;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.entry-state{font-size:11px;}
+.entry-state.unreg{color:#999;}.entry-state.reg{color:#1677ff;}
+.entry-state.claimable{color:#ff4d4f;font-weight:600;}.entry-state.claimed{color:#52c41a;}.entry-state.ended{color:#bbb;}
+.entry-badge{position:absolute;top:-6px;right:-6px;min-width:16px;height:16px;padding:0 3px;border-radius:8px;background:#ff4d4f;color:#fff;font-size:10px;font-weight:700;display:none;align-items:center;justify-content:center;}
+.entry-badge.show{display:flex;}
+.entry-new-tag{font-size:10px;color:#fff;background:#faad14;border-radius:3px;padding:1px 4px;margin-left:4px;vertical-align:1px;}
+.stage{background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.06);}
+.banner{height:220px;background:linear-gradient(135deg,#4096ff,#1677ff);display:flex;align-items:center;justify-content:center;color:#fff;position:relative;}
+.banner .hint{position:absolute;top:8px;left:12px;font-size:11px;color:rgba(255,255,255,.75);}
+.banner-title{font-size:22px;font-weight:700;text-align:center;}
+.banner-sub{font-size:12px;color:rgba(255,255,255,.85);margin-top:6px;text-align:center;}
+.body-area{background:#f6f9ff;padding:24px;}
+.copy-block{background:#fff;border-radius:8px;padding:18px 20px;margin-bottom:16px;}
+.copy-block .t{font-size:14px;font-weight:600;color:#1677ff;margin-bottom:8px;}
+.copy-block .d{font-size:13px;color:#666;line-height:1.7;}
+.phase-row{display:flex;gap:12px;margin-bottom:16px;}
+.phase{flex:1;background:#fff;border-radius:8px;padding:14px 16px;border:1px solid #eee;}
+.phase.on{border-color:#1677ff;background:#f0f7ff;}
+.phase-name{font-size:12px;color:#999;margin-bottom:4px;}
+.phase-time{font-size:12px;color:#333;}
+.status-line{display:flex;align-items:center;gap:10px;margin-bottom:18px;font-size:13px;}
+.status-pill{padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;}
+.status-pill.unreg{background:#f5f5f5;color:#999;}.status-pill.reg{background:#e6f4ff;color:#1677ff;}
+.status-pill.claimable{background:#fff1f0;color:#ff4d4f;}.status-pill.claimed{background:#f6ffed;color:#52c41a;}.status-pill.ended{background:#f5f5f5;color:#bbb;}
+.actions{display:flex;gap:10px;}
+.btn{height:40px;padding:0 26px;border-radius:20px;font-size:14px;font-weight:600;cursor:pointer;border:none;}
+.btn-primary{background:#1677ff;color:#fff;}
+.btn-primary:disabled{background:#d9d9d9;color:#fff;cursor:not-allowed;}
+.btn-claim{background:#ff4d4f;color:#fff;}
+.btn-ghost{background:#fff;color:#666;border:1px solid #d9d9d9;}
+.promo-card{background:#fff;border-radius:10px;padding:16px 18px;margin-top:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06);}
+.promo-title{font-size:14px;font-weight:600;margin-bottom:10px;}
+.promo-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:0.5px solid #f0f0f0;font-size:13px;}
+.promo-row:last-child{border-bottom:none;}
+.promo-left{display:flex;align-items:center;gap:8px;}
+.promo-dot{width:8px;height:8px;border-radius:50%;background:#ff4d4f;}
+.promo-dot.hidden2{visibility:hidden;}
+.promo-state{font-size:12px;color:#999;}
+.msg-panel{position:absolute;top:42px;right:0;width:320px;background:#fff;border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.15);z-index:50;display:none;overflow:hidden;}
+.msg-panel.show{display:block;}
+.msg-head{padding:12px 16px;font-size:13px;font-weight:600;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;}
+.msg-head .close{cursor:pointer;color:#999;}
+.msg-list{max-height:360px;overflow-y:auto;}
+.msg-item{padding:14px 16px;border-bottom:0.5px solid #f5f5f5;}
+.msg-title{font-size:13px;font-weight:600;color:#333;margin-bottom:4px;}
+.msg-content{font-size:12px;color:#666;line-height:1.5;margin-bottom:8px;}
+.msg-cta{display:inline-block;height:26px;line-height:26px;padding:0 14px;background:#1677ff;color:#fff;border-radius:13px;font-size:12px;cursor:pointer;}
+.msg-empty{padding:40px 16px;text-align:center;color:#bbb;font-size:12px;}
+.note{font-size:11px;color:#999;margin-top:6px;}
+
+/* 总入口设置 */
+.entry-card{border:1px solid #e8e8e8;border-radius:6px;padding:18px 20px;max-width:720px;}
+.img-card2{border:1px solid #e8e8e8;border-radius:6px;overflow:hidden;}
+.img-card2-head{background:#f5f7fa;padding:8px 14px;border-bottom:1px solid #e8e8e8;font-size:13px;font-weight:500;color:#333;}
+.img-dashed2{cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:1.5px dashed #d9d9d9;border-radius:4px;background:#fafafa;padding:20px 12px;min-height:100px;}
+.img-dashed2:hover{border-color:#1677ff;background:#f0f7ff;}
+.sidebar-plus{width:16px;height:16px;border-radius:50%;background:#1677ff;color:#fff;font-size:11px;display:inline-flex;align-items:center;justify-content:center;margin-left:auto;flex-shrink:0;}
+</style>
+</head>
+<body>
+<div class="app-main">
+
+<div class="doc-ref">此整合稿严格对应 <b>BR-20260712 预约活动公版迭代 1.1</b>：Requirement 1 同期活动入口切换 / Requirement 2 红点提醒（Case A + Case B）/ Requirement 3 站内信提醒。第一版原有页面（活动列表 / 新增活动 / 派奖审核 / 活动报表）内容与逻辑不变，仅在此基础上标示 v2 新增部分；所有交互均为前端模拟，用于评审，非实际接口。左侧为示意图（可操作），右侧为对应的文字规格书。</div>
+
+<div class="top-switch">
+  <div class="item active" data-page="list" onclick="switchPage('list')">後台・活动列表（含總入口設置）</div>
+  <div class="item" data-page="add" onclick="switchPage('add')">後台・新增/编辑活动</div>
+  <div class="item" data-page="front" onclick="switchPage('front')">前台・预约中心</div>
+</div>
+
+<!-- ══════════════════════════ 页面一：活动列表 ══════════════════════════ -->
+<div class="page-wrap show" id="page-list">
+  <div class="layout">
+    <div class="sidebar">
+      <div class="menu-parent"><div class="label"><div class="menu-icon-box"><svg viewBox="0 0 12 12" fill="none" width="12" height="12"><circle cx="6" cy="6" r="4" stroke="#fff" stroke-width="1.3"/><path d="M4 6h4M6 4v4" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg></div><span>活动配置<span class="new-badge">（新）</span></span></div></div>
+      <div class="submenu-item active">活动列表</div>
+      <div class="submenu-item" onclick="switchPage('add')">新增活动</div>
+      <div class="submenu-item">派奖审核</div>
+      <div class="submenu-item">活动报表</div>
+    </div>
+    <div class="right">
+      <div class="topbar"><div class="top-left">当前时间：2026/07/29 14:40:12 +08:00</div><div class="top-right"><div class="avatar">CN</div>vivianadmin ▾</div></div>
+      <div class="content-area">
+        <div class="bc-bar">位置 <span>›</span> 活动配置 <span>›</span> <span class="cur">活动列表</span></div>
+        <div class="br-banner">对应 <b>Requirement 1</b>：支持多个「预约活动」同时开启，用户于预约中心可自由切换。新增「<b>优先级</b>」栏位决定默认展示活动；新增「<b>提醒设置</b>」栏位标示红点 Case B 与站内信配置状态（对应 <b>Requirement 2 / 3</b>）。原本每个活动各自的「首页浮窗设置」已合并为「總入口設置」，全站共用同一份，见右侧第二个分页。</div>
+        <div class="page-card">
+          <div class="tab-bar">
+            <div class="tab" id="listTab1" onclick="switchListTab(1)">活动列表</div>
+            <div class="tab" id="listTab2" onclick="switchListTab(2)" style="color:#666;border-bottom-color:transparent;">總入口設置<span class="sidebar-plus" style="margin-left:4px;">新</span></div>
+          </div>
+
+          <div id="listPanel1">
+          <div class="filter-area">
+            <span class="fl">活动模板：</span><select class="fi-select"><option>预约活动</option></select>
+            <span class="fl">活动ID：</span><input type="text" class="fi-input" style="width:110px;">
+            <span class="fl">活动名称：</span><input type="text" class="fi-input" style="width:140px;">
+            <span class="fl">状态：</span><select class="fi-select"><option value="">全部</option><option>开启</option><option>关闭</option></select>
+            <button class="btn-search">搜索</button>
+            <button class="btn-new" onclick="switchPage('add')">新增活动</button>
+          </div>
+          <div class="list-area">
+            <table>
+              <thead><tr>
+                <th>ID</th><th>优先级<br><span style="font-weight:400;color:#bbb;">(默认展示)</span></th><th>状态</th>
+                <th>入口模式<br><span style="font-weight:400;color:#bbb;">(a/b 情境)</span></th>
+                <th>起止时间</th><th>活动名称</th>
+                <th>红点-Case A<br><span style="font-weight:400;color:#bbb;">可领取奖励</span></th>
+                <th>红点-Case B<br><span style="font-weight:400;color:#bbb;">新活动提醒</span></th>
+                <th>同步 Rewards<br>promotion</th><th>站内信提醒</th><th>参与／领取人数</th><th>操作</th>
+              </tr></thead>
+              <tbody id="listBody"></tbody>
+            </table>
+          </div>
+          <div class="pagination"><span>Total 4</span><div class="pg-btn active">1</div></div>
+          </div>
+
+          <div id="listPanel2" style="display:none;padding:20px 24px;">
+            <div class="info-box" style="max-width:760px;">运营确认逻辑：v2 新增「總入口設置」，与各活动原有的「首页浮窗设置」<b>并存、二选一</b>，形成两种情境——<b>情境 a</b>：活动在「新增活动」第 2 步选择「加入總入口」，即可自由配置进这个共用的统一浮窗，由下方设置控制图片与开关；<b>情境 b</b>：活动若想保留自己独立的入口，第 2 步选「獨立入口」，前台就不经过總入口，走自己专属的首页浮窗，与第一版做法一致。</div>
+            <div class="entry-card" style="margin-top:16px;">
+              <div class="field-row"><div class="field-label">启用总入口：</div><div class="field-ctrl"><div style="display:flex;align-items:center;gap:10px;"><div class="toggle on" id="entryToggle" onclick="this.classList.toggle('on')"></div><span style="font-size:13px;color:#666;">开启后于首页显示统一浮窗，点击进入「预约中心」多活动切换器</span></div></div></div>
+              <div class="field-row"><div class="field-label">跳转目标：</div><div class="field-ctrl"><input type="text" class="f-input" value="预约中心（多活动切换页）" disabled style="background:#f5f5f5;color:#999;"></div></div>
+              <div class="field-row"><div class="field-label">排序：</div><div class="field-ctrl"><input type="number" class="f-input" style="max-width:140px;" value="0"><div class="hint">与各獨立入口活动的浮窗共用同一套显示顺序</div></div></div>
+              <div class="field-row"><div class="field-label">浮窗图片：</div><div class="field-ctrl">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                  <div class="img-card2"><div class="img-card2-head">PC 图片</div><div style="padding:12px;"><div class="img-dashed2"><span style="font-size:12px;color:#bbb;">点击上传图片</span></div></div></div>
+                  <div class="img-card2"><div class="img-card2-head">H5 图片</div><div style="padding:12px;"><div class="img-dashed2"><span style="font-size:12px;color:#bbb;">点击上传图片</span></div></div></div>
+                </div>
+                <div class="hint">图片格式：png、bmp、jpg、gif；大小限制 5MB 内</div>
+              </div></div>
+            </div>
+            <div class="note" style="margin-top:10px;">此浮窗仅显示「情境 a／加入總入口」的活动；「情境 b／獨立入口」活动的浮窗请至各活动「新增活动」第 2 步单独设置。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ 页面二：新增/编辑活动 ══════════════════════════ -->
+<div class="page-wrap" id="page-add">
+  <div class="layout">
+    <div class="sidebar">
+      <div class="menu-parent"><div class="label"><div class="menu-icon-box"><svg viewBox="0 0 12 12" fill="none" width="12" height="12"><circle cx="6" cy="6" r="4" stroke="#fff" stroke-width="1.3"/><path d="M4 6h4M6 4v4" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg></div><span>活动配置<span class="new-badge">（新）</span></span></div></div>
+      <div class="submenu-item" onclick="switchPage('list')">活动列表</div>
+      <div class="submenu-item active">新增活动</div>
+      <div class="submenu-item">派奖审核</div>
+      <div class="submenu-item">活动报表</div>
+    </div>
+    <div class="right">
+      <div class="topbar"><div class="top-left">当前时间：2026/07/29 14:40:12 +08:00</div><div class="top-right"><div class="avatar">CN</div>vivianadmin ▾</div></div>
+      <div class="content-area">
+        <div class="bc-bar">位置 <span>›</span> 活动配置 <span>›</span> <span class="cur" style="cursor:pointer;" onclick="switchPage('list')">活动列表</span> <span>›</span> <span class="cur">新增活动</span></div>
+        <div class="br-banner">第一版原有「活动模板设置 / 活动图片 / 参与对象与名单 / 活动条件 / 风控条件 / 提交预览」6 个步骤维持不变。v2 新增第 2 步「<b>入口模式</b>」（加入總入口 或 保留獨立入口＋专属首页浮窗），选择「加入總入口」后同步在本步骤内设置「<b>优先级</b>」，决定總入口的默认展示顺序（Requirement 1）。红点提醒与站内信提醒（Requirement 2 / 3）为系统默认行为，<b>不再作为可编辑步骤</b>，规则说明请见页面右侧「規格書」面板。</div>
+        <div class="step-page">
+          <div class="step-nav" id="stepNav"></div>
+          <div class="step-main">
+            <div class="step-topbar" id="stepTitle">活动配置步骤</div>
+            <div class="step-content" id="stepContent"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ 页面三：前台预约中心 ══════════════════════════ -->
+<div class="page-wrap" id="page-front">
+  <div class="front-body">
+    <div class="front-page">
+      <div class="front-topbar">
+        <div class="front-brand">预约中心</div>
+        <div class="front-top-right">
+          <div class="bell-wrap" onclick="Front.toggleMsgPanel(event)">
+            <div class="bell-icn"><svg viewBox="0 0 16 16" fill="none" width="15" height="15"><path d="M8 2a5 5 0 0 0-5 5v2l-1 2h12l-1-2V7a5 5 0 0 0-5-5z" stroke="#1677ff" stroke-width="1.3"/><path d="M6.5 13a1.5 1.5 0 0 0 3 0" stroke="#1677ff" stroke-width="1.3"/></svg></div>
+            <div class="dot-badge" id="bellDot"></div>
+            <div class="msg-panel" id="msgPanel" onclick="event.stopPropagation()">
+              <div class="msg-head"><span>站内信</span><span class="close" onclick="Front.toggleMsgPanel()">×</span></div>
+              <div class="msg-list" id="msgList"></div>
+            </div>
+          </div>
+          <div class="front-avatar">VC</div>
+        </div>
+      </div>
+      <div class="switch-card">
+        <div class="switch-title">情境 a・總入口（进行中的预约活动，默认展示优先级最高活动）</div>
+        <div class="switch-row" id="entryRow"></div>
+      </div>
+      <div class="switch-card" id="standaloneCard">
+        <div class="switch-title">情境 b・獨立入口（前台各自专属浮窗，不进入總入口切换器）</div>
+        <div class="switch-row" id="standaloneRow"></div>
+      </div>
+      <div class="stage" id="stage"></div>
+      <div class="promo-card">
+        <div class="promo-title">🎁 Rewards promotion</div>
+        <div id="promoList"></div>
+        <div class="note">红点状态与上方活动入口实时同步；用户首次进入对应活动后，两处红点同时消失。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /app-main -->
+
+<!-- ══════════════════════════ 規格書（右側，與左側示意圖並存）══════════════════════════ -->
+<div class="spec-panel" id="specPanel">
+  <h2>規格書 · BR-20260712 预约活动公版迭代 1.1</h2>
+
+  <div class="default-tag">以下 Requirement 2 / 3 内容为系统默认行为，不提供活动层级的开关设置，故不在「新增活动」流程中出现，仅以文字规格呈现。</div>
+
+  <h3><span class="req-tag">Requirement 1</span>同期活动入口切换</h3>
+  <p>当后台配置多个进行中的预约活动时，用户进入预约中心后可自由切换不同活动。</p>
+  <ul class="rule-list">
+    <li>支持展示多个进行中的预约活动</li>
+    <li>默认展示后台配置<b>优先级</b>最高的活动</li>
+    <li>点击不同入口即可切换对应活动，切换后无需退出页面</li>
+    <li>每个活动保留独立状态：已预约／未预约／已领取／已结束</li>
+  </ul>
+  <p><b>v2 补充逻辑（入口模式 a / b）：</b>每个预约活动新增流程第 2 步可选择：</p>
+  <ul class="rule-list">
+    <li><b>情境 a・加入總入口</b>：活动出现在總入口的统一浮窗切换器内，与其他加入總入口的活动共用一套排序，无需单独设置首页浮窗；總入口本身的图片／开关／排序集中在「活动列表 › 總入口設置」分页管理。</li>
+    <li><b>情境 b・獨立入口</b>：活动不进入總入口切换器，保留第一版做法，自行配置专属首页浮窗（PC/H5 图片、开关、排序），用户点击后直接进入该活动页面。</li>
+  </ul>
+
+  <h3><span class="req-tag">Requirement 2</span>红点提醒</h3>
+  <p>入口新增红点提示，触发条件分为两种情境：</p>
+  <p><b>Case A · 存在可领取奖励</b>　<span style="color:#ff4d4f;font-weight:600;">优先级 Highest</span></p>
+  <ul class="rule-list">
+    <li>触发条件：已完成预约 ＋ 已达成领奖条件 ＋ 尚未领取奖励</li>
+    <li>系统自动判断，<b>不可关闭</b>，非活动层级可配置项</li>
+  </ul>
+  <p><b>Case B · 存在未查看的新预约活动</b></p>
+  <ul class="rule-list">
+    <li>触发条件：后台新增活动，用户尚未进入查看过</li>
+    <li>用户首次进入对应活动后，红点自动消失</li>
+  </ul>
+  <p>两种情境的红点状态均需<b>同步至 Rewards promotion 列表</b>，与活动入口红点保持一致，用户进入后两处同时消失。</p>
+
+  <h3><span class="req-tag">Requirement 3</span>站内信提醒</h3>
+  <p>当用户存在可领取但尚未领取的预约活动奖励时，系统自动发送站内信提醒，引导用户前往领取奖励。</p>
+  <ul class="rule-list">
+    <li>触发条件（Case A）：已完成预约 ＋ 已达成领奖条件 ＋ 奖励尚未领取</li>
+    <li>每个奖励仅发送一次站内信</li>
+    <li>点击站内信后，跳转至对应预约活动页面</li>
+    <li>奖励已领取后，不再发送提醒</li>
+  </ul>
+  <p>站内信默认文案模板：</p>
+  <div class="tpl-block">
+    <b>Title</b>：🎁 {活动名称} Reward Ready<br>
+    <b>Content</b>：Your {奖励} reward is ready to claim! Don't miss out—claim it now.<br>
+    <b>CTA</b>：Claim Now
+  </div>
+  <p style="color:#999;">可用变量：<code>{活动名称}</code>　<code>{奖励}</code></p>
+
+  <h3>與示意圖的對應關係</h3>
+  <p>左侧「後台・活动列表」的「红点-Case A / Case B / 同步 Rewards promotion / 站内信提醒」栏位为<b>状态展示</b>，反映系统依上述规则自动判断的结果，非人工逐一开关；左侧「前台・预约中心」的切换器、红点与站内信面板，均依本规格书的规则渲染。</p>
+</div>
+<button class="spec-toggle" id="specToggle" onclick="toggleSpecPanel()">
+  <span class="spec-toggle-label">規格書</span>
+  <span class="spec-toggle-arrow" id="specToggleArrow">◂</span>
+</button>
+
+<script>
+function toggleSpecPanel(){
+  var collapsed=document.getElementById('specPanel').classList.toggle('collapsed');
+  document.getElementById('specToggle').classList.toggle('collapsed',collapsed);
+  document.getElementById('specToggleArrow').textContent=collapsed?'▸':'◂';
+}
+function switchPage(name){
+  document.querySelectorAll('.page-wrap').forEach(function(el){el.classList.remove('show');});
+  document.getElementById('page-'+name).classList.add('show');
+  document.querySelectorAll('.top-switch .item').forEach(function(el){el.classList.toggle('active',el.dataset.page===name);});
+}
+
+/* 活动列表页内 2 个分页：活动列表 ／ 總入口設置（归属于预约活动配置内，非独立菜单） */
+function switchListTab(n){
+  document.getElementById('listTab1').style.borderBottomColor = n===1?'#1677ff':'transparent';
+  document.getElementById('listTab1').style.color = n===1?'#1677ff':'#666';
+  document.getElementById('listTab2').style.borderBottomColor = n===2?'#1677ff':'transparent';
+  document.getElementById('listTab2').style.color = n===2?'#1677ff':'#666';
+  document.getElementById('listPanel1').style.display = n===1?'block':'none';
+  document.getElementById('listPanel2').style.display = n===2?'block':'none';
+}
+switchListTab(1);
+
+/* ══════════════════════ 页面一 JS ══════════════════════ */
+(function(){
+  var rawData=[
+    {id:60001,priority:1,status:1,entryMode:'shared',timeStart:'26/07/25',timeEnd:'26/08/05',name:'夏季预约活动',caseA:true,caseB:false,syncPromo:true,msgOn:true,winCount:'182/64'},
+    {id:60002,priority:2,status:1,entryMode:'shared',timeStart:'26/07/28',timeEnd:'26/08/02',name:'新游戏预约·龙城霸业',caseA:false,caseB:true,syncPromo:true,msgOn:true,winCount:'0/0'},
+    {id:60003,priority:3,status:1,entryMode:'standalone',timeStart:'26/07/20',timeEnd:'26/08/10',name:'周年庆预约活动',caseA:false,caseB:false,syncPromo:true,msgOn:false,winCount:'340/0'},
+    {id:60004,priority:4,status:0,entryMode:'standalone',timeStart:'26/06/01',timeEnd:'26/06/30',name:'国庆节预约活动',caseA:false,caseB:false,syncPromo:false,msgOn:false,winCount:'910/887'}
+  ];
+  function pill(on,label,dotStyle){
+    if(dotStyle) return '<span class="pill '+(on?'dot':'off')+'">'+(on?label:'未触发')+'</span>';
+    return '<span class="pill '+(on?'on':'off')+'">'+(on?label:'未启用')+'</span>';
+  }
+  function entryModeTag(m){
+    return m==='shared'
+      ? '<span class="pill on">情境a・總入口</span>'
+      : '<span class="pill off">情境b・獨立入口</span>';
+  }
+  document.getElementById('listBody').innerHTML=rawData.map(function(r){
+    return '<tr>'+
+      '<td>'+r.id+'</td>'+
+      '<td><span class="pri-badge '+(r.priority>2?'low':'')+'">'+r.priority+'</span></td>'+
+      '<td class="'+(r.status?'status-on':'status-off')+'">'+(r.status?'开启':'关闭')+'</td>'+
+      '<td>'+entryModeTag(r.entryMode)+'</td>'+
+      '<td style="font-size:11px;">'+r.timeStart+'~'+r.timeEnd+'</td>'+
+      '<td>'+r.name+'</td>'+
+      '<td>'+pill(r.caseA,'触发中',true)+'</td>'+
+      '<td>'+pill(r.caseB,'开启')+'</td>'+
+      '<td>'+pill(r.syncPromo,'已同步')+'</td>'+
+      '<td>'+pill(r.msgOn,'已开启')+'</td>'+
+      '<td style="text-align:center;">'+r.winCount+'</td>'+
+      '<td><div class="acts-row"><button class="alink" onclick="switchPage(\'add\')">编辑</button><button class="alink" style="color:#ff4d4f;">删除</button></div></td>'+
+    '</tr>';
+  }).join('');
+})();
+
+/* ══════════════════════ 页面二 JS ══════════════════════ */
+var Add=(function(){
+  var stepNames=['活动模板设置','活动图片','参与对象与名单','活动条件','风控条件','提交预览'];
+  var cur=1;
+  var entryMode='shared'; // 'shared'=加入總入口　'standalone'=獨立入口，各自首頁浮窗
+
+  function renderNav(){
+    document.getElementById('stepNav').innerHTML=stepNames.map(function(n,i){
+      var num=i+1,isA=num===cur;
+      return '<div class="step-nav-item '+(isA?'active':'')+'" onclick="Add.goStep('+num+')">'+
+        '<div class="snum">'+num+'</div><span>'+n+'</span>'+
+      '</div>';
+    }).join('');
+  }
+  function goStep(n){cur=n;document.getElementById('stepTitle').textContent=stepNames[n-1];renderNav();renderStep();}
+  function renderStep(){
+    var el=document.getElementById('stepContent');
+    if(cur===1)el.innerHTML=step1();
+    else if(cur===2)el.innerHTML=step2();
+    else if(cur===6)el.innerHTML=step6();
+    else el.innerHTML='<div class="placeholder-note">此步骤内容与第一版一致，未变更（参考原「新增活动」步骤 '+cur+'）。</div>';
+  }
+  function step1(){
+    return '<div class="step-desc">将活动模板配置保存至系统，系统将自动配置相关功能</div>'+
+    '<div class="sec-block"><div class="sec-title">活动模板</div>'+
+    '<div class="field-row"><div class="field-label"><span class="req">*</span>活动类型：</div><div class="field-ctrl"><select class="f-select"><option>周卡活动</option><option selected>预约活动</option></select></div></div>'+
+    '<div class="field-row"><div class="field-label"><span class="req">*</span>活动名称：</div><div class="field-ctrl"><input type="text" class="f-input" placeholder="请输入"></div></div>'+
+    '<div class="field-row"><div class="field-label"><span class="req">*</span>活动币种：</div><div class="field-ctrl"><select class="f-select"><option>PHP</option></select></div></div>'+
+    '<div class="field-row"><div class="field-label">状态：</div><div class="field-ctrl"><label><input type="radio" name="as" checked> 关闭</label> <label style="margin-left:14px;"><input type="radio" name="as"> 开启</label></div></div>'+
+    '</div>'+
+    '<div class="sec-block"><div class="sec-title">时间设定</div>'+
+    '<div style="background:#f8faff;border:1px solid #d6e4ff;border-radius:6px;padding:16px 20px;margin-bottom:12px;"><div style="font-size:13px;font-weight:500;color:#1677ff;margin-bottom:12px;">第一阶段：预约活动</div><div class="field-row"><div class="field-label"><span class="req">*</span>进行时间：</div><div class="field-ctrl"><input type="text" class="f-input" placeholder="开始～结束时间"></div></div></div>'+
+    '<div style="background:#f8faff;border:1px solid #d6e4ff;border-radius:6px;padding:16px 20px;"><div style="font-size:13px;font-weight:500;color:#1677ff;margin-bottom:12px;">第二阶段：奖励领取</div><div class="field-row"><div class="field-label"><span class="req">*</span>进行时间：</div><div class="field-ctrl"><input type="text" class="f-input" placeholder="开始～结束时间"></div></div></div>'+
+    '</div>';
+  }
+  function step2(){
+    return '<div class="step-desc">上传活动相关图片，用于展示在不同平台和位置。</div>'+
+    '<div class="placeholder-note" style="text-align:left;padding:16px 20px;">Banner 图／活动页底图／文案底图／规则弹窗图／按钮底图等配置与第一版一致，未变更。</div>'+
+
+    '<div class="sec-block">'+
+      '<div class="sec-title">入口模式<span style="font-size:11px;color:#999;font-weight:400;">（v2 新增）</span></div>'+
+      '<div class="field-row"><div class="field-label">前台展示方式：</div><div class="field-ctrl">'+
+        '<div style="display:flex;flex-direction:column;gap:10px;">'+
+          '<label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;"><input type="radio" name="entryMode" '+(entryMode==='shared'?'checked':'')+' onchange="Add.setEntryMode(\'shared\')" style="margin-top:3px;"><span><b>加入總入口</b>（推荐）<br><span style="font-size:12px;color:#999;">本活动出现在「總入口設置」统一浮窗内的多活动切换器里，与其他加入總入口的活动共用一个入口、一套优先级排序，无需单独设置首页浮窗。</span></span></label>'+
+          (entryMode==='shared'?
+            '<div style="margin:2px 0 4px 26px;padding:16px 20px;background:#f8faff;border:1px solid #d6e4ff;border-radius:6px;">'+
+              '<div class="field-row" style="margin-bottom:0;"><div class="field-label" style="min-width:70px;"><span class="req">*</span>优先级：</div><div class="field-ctrl"><input type="number" class="f-input" style="max-width:120px;" value="1" min="1"><div class="hint">数字越小优先级越高；多个「加入總入口」的活动同时开启时，用户进入预约中心默认展示优先级最高的活动（Requirement 1）。本活动将出现在「活动列表 › 總入口設置」分页配置的统一浮窗切换器中，无需再单独设置首页浮窗。</div></div></div>'+
+            '</div>'
+          :'')+
+          '<label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;"><input type="radio" name="entryMode" '+(entryMode==='standalone'?'checked':'')+' onchange="Add.setEntryMode(\'standalone\')" style="margin-top:3px;"><span><b>獨立入口</b><br><span style="font-size:12px;color:#999;">本活动不进入總入口切换器，前台自行显示专属首页浮窗，与第一版做法相同，独立配置图片、开关与排序。</span></span></label>'+
+          (entryMode==='standalone'?
+            '<div style="margin:2px 0 4px 26px;padding:16px 20px;background:#f8faff;border:1px solid #d6e4ff;border-radius:6px;">'+
+              '<div class="field-row"><div class="field-label">浮窗开关：</div><div class="field-ctrl"><div style="display:flex;align-items:center;gap:10px;"><div class="toggle on" onclick="this.classList.toggle(\'on\')"></div><span style="font-size:13px;color:#666;">开启后于首页独立显示本活动专属浮窗</span></div></div></div>'+
+              '<div class="field-row"><div class="field-label">排序：</div><div class="field-ctrl"><input type="number" class="f-input" style="max-width:140px;" value="0"><div class="hint">与總入口及其他獨立入口活动的浮窗共用同一套显示顺序</div></div></div>'+
+              '<div class="field-row" style="margin-bottom:0;"><div class="field-label">浮窗图片：</div><div class="field-ctrl">'+
+                '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">'+
+                  '<div class="img-card2"><div class="img-card2-head">PC 图片</div><div style="padding:12px;"><div class="img-dashed2"><span style="font-size:12px;color:#bbb;">点击上传图片</span></div></div></div>'+
+                  '<div class="img-card2"><div class="img-card2-head">H5 图片</div><div style="padding:12px;"><div class="img-dashed2"><span style="font-size:12px;color:#bbb;">点击上传图片</span></div></div></div>'+
+                '</div>'+
+                '<div class="hint">图片格式：png、bmp、jpg、gif；大小限制 5MB 内；用户点击本浮窗将直接进入本活动专属页面，不经过總入口的多活动切换器。</div>'+
+              '</div></div>'+
+            '</div>'
+          :'')+
+        '</div>'+
+      '</div></div>'+
+    '</div>';
+  }
+  function step6(){
+    return '<div class="step-desc">请确认以下活动配置信息，确认无误后点击提交按钮</div>'+
+    '<div style="border:0.5px solid #e8e8e8;border-radius:4px;overflow:hidden;">'+
+    '<div style="display:grid;grid-template-columns:150px 1fr;background:#f5f7fa;border-bottom:0.5px solid #e8e8e8;"><div style="padding:10px 16px;font-size:13px;font-weight:500;color:#666;border-right:0.5px solid #e8e8e8;">步骤</div><div style="padding:10px 16px;font-size:13px;font-weight:500;color:#666;">相关字段</div></div>'+
+    '<div style="display:grid;grid-template-columns:150px 1fr;border-bottom:0.5px solid #e8e8e8;"><div style="padding:14px 16px;border-right:0.5px solid #e8e8e8;font-size:13px;color:#333;">1 活动模板设置</div><div style="padding:14px 16px;font-size:13px;color:#999;">与第一版一致</div></div>'+
+    '<div style="display:grid;grid-template-columns:150px 1fr;border-bottom:0.5px solid #e8e8e8;"><div style="padding:14px 16px;border-right:0.5px solid #e8e8e8;font-size:13px;color:#1677ff;font-weight:500;">2 活动图片（新）</div><div style="padding:14px 16px;"><div class="pv-row"><span class="pk">入口模式</span><span class="pv">'+(entryMode==='shared'?'加入總入口':'獨立入口（自设首页浮窗）')+'</span></div>'+(entryMode==='shared'?'<div class="pv-row"><span class="pk">优先级</span><span class="pv">依總入口排序</span></div>':'')+'</div></div>'+
+    '<div style="display:grid;grid-template-columns:150px 1fr;"><div style="padding:14px 16px;border-right:0.5px solid #e8e8e8;font-size:13px;color:#333;">3～5 步骤</div><div style="padding:14px 16px;font-size:13px;color:#999;">与第一版一致</div></div>'+
+    '</div>'+
+    '<div class="info-box" style="margin-top:14px;">红点提醒（Case A / Case B）与站内信提醒为<b>系统默认行为</b>，不需要在活动新增流程中逐一设置，完整规则请见页面右侧「規格書」面板。</div>';
+  }
+  function setEntryMode(v){ entryMode=v; renderStep(); }
+  return {goStep:goStep,setEntryMode:setEntryMode,init:function(){goStep(1);}};
+})();
+Add.init();
+
+/* ══════════════════════ 页面三 JS ══════════════════════ */
+var Front=(function(){
+  var activities=[
+    {id:1,name:'夏季预约活动',priority:1,entryMode:'shared',state:'claimable',reward:'PHP 500 彩金',viewed:true,phase:'奖励领取',phaseTime:'07/25 00:00 ~ 08/05 23:59'},
+    {id:2,name:'新游戏预约·龙城霸业',priority:2,entryMode:'shared',state:'unreg',reward:'免费旋转券 ×5',viewed:false,phase:'预约进行中',phaseTime:'07/28 10:00 ~ 08/02 23:59'},
+    {id:3,name:'周年庆预约活动',priority:3,entryMode:'standalone',state:'reg',reward:'积分 300',viewed:true,phase:'预约进行中',phaseTime:'07/20 00:00 ~ 08/10 23:59'},
+    {id:4,name:'国庆节预约活动',priority:4,entryMode:'standalone',state:'ended',reward:'—',viewed:true,phase:'活动已结束',phaseTime:'06/01 00:00 ~ 06/30 23:59'}
+  ];
+  var cur=null;
+  function hasBadgeCaseA(a){return a.state==='claimable';}
+  function hasBadgeCaseB(a){return !a.viewed;}
+  function hasBadge(a){return hasBadgeCaseA(a)||hasBadgeCaseB(a);}
+  function stateLabel(s){return {unreg:'未预约',reg:'已预约',claimable:'待领取',claimed:'已领取',ended:'已结束'}[s];}
+
+  function render(){renderEntries();renderStandalone();renderStage();renderPromo();renderMsgList();renderBell();}
+  function renderEntries(){
+    // 情境 a：只有「加入總入口」的活动出现在切换器里，默认展示优先级最高的一个
+    var shared=activities.filter(function(a){return a.entryMode==='shared';}).sort(function(a,b){return a.priority-b.priority;});
+    document.getElementById('entryRow').innerHTML=shared.map(function(a){
+      var badge=hasBadge(a);
+      return '<div class="entry '+(a.id===cur?'active':'')+'" onclick="Front.switchActivity('+a.id+')">'+
+        '<div class="entry-badge '+(badge?'show':'')+'">'+(hasBadgeCaseA(a)?'!':'N')+'</div>'+
+        '<div class="entry-name">'+a.name+(hasBadgeCaseB(a)?'<span class="entry-new-tag">新</span>':'')+'</div>'+
+        '<div class="entry-state '+a.state+'">'+stateLabel(a.state)+'</div>'+
+      '</div>';
+    }).join('');
+  }
+  function renderStandalone(){
+    // 情境 b：獨立入口活动，各自专属浮窗，不进入上方總入口切换器
+    var standalone=activities.filter(function(a){return a.entryMode==='standalone';}).sort(function(a,b){return a.priority-b.priority;});
+    document.getElementById('standaloneRow').innerHTML=standalone.map(function(a){
+      var badge=hasBadge(a);
+      return '<div class="entry '+(a.id===cur?'active':'')+'" onclick="Front.switchActivity('+a.id+')" style="border-style:dashed;">'+
+        '<div class="entry-badge '+(badge?'show':'')+'">'+(hasBadgeCaseA(a)?'!':'N')+'</div>'+
+        '<div class="entry-name">'+a.name+(hasBadgeCaseB(a)?'<span class="entry-new-tag">新</span>':'')+'</div>'+
+        '<div class="entry-state '+a.state+'">'+stateLabel(a.state)+'</div>'+
+      '</div>';
+    }).join('');
+  }
+  function switchActivity(id){
+    cur=id;
+    var a=activities.find(function(x){return x.id===id;});
+    if(!a.viewed){a.viewed=true;}
+    render();
+  }
+  function renderStage(){
+    var a=activities.find(function(x){return x.id===cur;});
+    var el=document.getElementById('stage');
+    var actionsHtml='';
+    if(a.state==='unreg') actionsHtml='<button class="btn btn-primary" onclick="Front.doRegister()">立即预约</button>';
+    else if(a.state==='reg') actionsHtml='<button class="btn btn-ghost" disabled>已预约，等待达成领奖条件</button>';
+    else if(a.state==='claimable') actionsHtml='<button class="btn btn-claim" onclick="Front.doClaim()">领取奖励：'+a.reward+'</button>';
+    else if(a.state==='claimed') actionsHtml='<button class="btn btn-ghost" disabled>奖励已领取</button>';
+    else actionsHtml='<button class="btn btn-ghost" disabled>活动已结束</button>';
+    el.innerHTML=
+      '<div class="banner"><span class="hint">Banner 图 PC 1400×800 / H5 390×320</span><div><div class="banner-title">'+a.name+'</div><div class="banner-sub">'+a.phase+'　'+a.phaseTime+'</div></div></div>'+
+      '<div class="body-area">'+
+        '<div class="phase-row">'+
+          '<div class="phase '+(a.phase==='预约进行中'?'on':'')+'"><div class="phase-name">第一阶段·预约活动</div><div class="phase-time">进行中判断依后台配置</div></div>'+
+          '<div class="phase '+(a.phase==='奖励领取'?'on':'')+'"><div class="phase-name">第二阶段·奖励领取</div><div class="phase-time">'+a.phaseTime+'</div></div>'+
+        '</div>'+
+        '<div class="copy-block"><div class="t">活动说明（文案底图 946×543）</div><div class="d">完成预约并达成领奖条件后，即可在此页面领取对应奖励。每个预约活动状态各自独立，互不影响。</div></div>'+
+        '<div class="status-line">当前状态：<span class="status-pill '+a.state+'">'+stateLabel(a.state)+'</span></div>'+
+        '<div class="actions">'+actionsHtml+'</div>'+
+      '</div>';
+  }
+  function doRegister(){activities.find(function(x){return x.id===cur;}).state='reg';render();}
+  function doClaim(){activities.find(function(x){return x.id===cur;}).state='claimed';render();}
+  function renderPromo(){
+    document.getElementById('promoList').innerHTML=activities.map(function(a){
+      var badge=hasBadge(a);
+      var tag=a.entryMode==='shared'?'<span style="font-size:10px;color:#1677ff;background:#e6f4ff;border-radius:3px;padding:0 4px;margin-left:6px;">a</span>':'<span style="font-size:10px;color:#999;background:#f5f5f5;border-radius:3px;padding:0 4px;margin-left:6px;">b</span>';
+      return '<div class="promo-row"><div class="promo-left"><span class="promo-dot '+(badge?'':'hidden2')+'"></span><span>'+a.name+tag+'</span></div><span class="promo-state">'+stateLabel(a.state)+'</span></div>';
+    }).join('');
+  }
+  function pendingMessages(){return activities.filter(function(a){return a.state==='claimable';});}
+  function renderMsgList(){
+    var msgs=pendingMessages();
+    var el=document.getElementById('msgList');
+    if(!msgs.length){el.innerHTML='<div class="msg-empty">暂无待领取奖励提醒</div>';return;}
+    el.innerHTML=msgs.map(function(a){
+      return '<div class="msg-item"><div class="msg-title">🎁 '+a.name+' Reward Ready</div><div class="msg-content">Your '+a.reward+' reward is ready to claim! Don\'t miss out—claim it now.</div><div class="msg-cta" onclick="Front.jumpFromMessage('+a.id+')">Claim Now</div></div>';
+    }).join('');
+  }
+  function jumpFromMessage(id){toggleMsgPanel();switchActivity(id);}
+  function renderBell(){document.getElementById('bellDot').classList.toggle('show',pendingMessages().length>0);}
+  function toggleMsgPanel(){document.getElementById('msgPanel').classList.toggle('show');}
+  return {switchActivity:switchActivity,doRegister:doRegister,doClaim:doClaim,jumpFromMessage:jumpFromMessage,toggleMsgPanel:toggleMsgPanel,
+    init:function(){
+      // 默认展示總入口（情境a）中优先级最高的活动
+      var shared=activities.filter(function(a){return a.entryMode==='shared';}).sort(function(a,b){return a.priority-b.priority;});
+      cur=shared.length?shared[0].id:activities[0].id;
+      render();
+    }};
+})();
+Front.init();
+</script>
+</body>
+</html>

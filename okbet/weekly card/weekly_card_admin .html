@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>新增活动 · 周卡活动</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;font-size:14px;color:#333;background:#f0f2f5;min-width:1280px;}
+.layout{display:flex;min-height:100vh;}
+.sidebar{width:180px;flex-shrink:0;background:#fff;border-right:1px solid #e8e8e8;}
+.menu-top{display:flex;align-items:center;padding:0 14px;height:44px;font-size:13px;font-weight:500;background:#e8f0fe;gap:6px;}
+.menu-icon{width:20px;height:20px;border-radius:4px;background:#1677ff;display:flex;align-items:center;justify-content:center;}
+.sub-a{display:flex;align-items:center;padding:0 14px 0 40px;height:38px;font-size:13px;color:#666;text-decoration:none;}
+.sub-a.on{color:#1677ff;background:#e6f4ff;}
+.sub-a:hover{background:#f5f5f5;}
+.right{flex:1;display:flex;flex-direction:column;min-width:0;}
+.topbar{background:#fff;border-bottom:1px solid #e8e8e8;height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0;}
+.tl{font-size:12px;color:#666;}
+.tc{display:flex;align-items:center;flex:1;justify-content:center;}
+.ts{font-size:11px;color:#666;padding:0 8px;}
+.ts .n{color:#1677ff;font-weight:500;}
+.ts .w{color:#ff4d4f;font-weight:500;}
+.tdiv{width:1px;height:12px;background:#e0e0e0;}
+.tr2{display:flex;align-items:center;gap:8px;font-size:13px;color:#555;}
+.av{width:26px;height:26px;border-radius:50%;background:#ff4d4f;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:600;}
+.wrap{flex:1;padding:12px 16px;}
+.bc{font-size:13px;color:#999;display:flex;align-items:center;gap:4px;margin-bottom:10px;}
+.bc a{color:#999;text-decoration:none;}
+.bc a:hover{color:#1677ff;}
+.bc .cur{color:#333;}
+.pg{display:flex;gap:12px;}
+.snav{width:168px;flex-shrink:0;background:#fff;border-radius:4px;border:1px solid #e8e8e8;padding:8px 0;}
+.si{display:flex;align-items:center;gap:8px;padding:9px 14px;cursor:pointer;font-size:13px;color:#666;border-left:3px solid transparent;}
+.si:hover{background:#f5f5f5;}
+.si.act{color:#1677ff;background:#e6f4ff;border-left-color:#1677ff;}
+.si.dn .sn,.si.act .sn{background:#1677ff;border-color:#1677ff;color:#fff;}
+.sn{width:20px;height:20px;border-radius:50%;border:1.5px solid #d9d9d9;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;color:#999;}
+.smain{flex:1;display:flex;flex-direction:column;gap:10px;}
+.stbar{background:#fff;border-radius:4px;border:1px solid #e8e8e8;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;}
+.st-ttl{font-size:14px;font-weight:500;color:#1677ff;}
+.stbtns{display:flex;gap:8px;align-items:center;}
+.b-prev{height:32px;padding:0 18px;border:1px solid #d9d9d9;border-radius:16px;background:#fff;font-size:13px;cursor:pointer;color:#666;}
+.b-prev:hover{border-color:#1677ff;color:#1677ff;}
+.b-next{height:32px;padding:0 20px;border:none;border-radius:16px;background:#1677ff;color:#fff;font-size:13px;cursor:pointer;font-weight:500;}
+.b-exit{height:32px;padding:0 16px;border:1px solid #ff4d4f;border-radius:16px;background:#fff;font-size:13px;cursor:pointer;color:#ff4d4f;text-decoration:none;display:inline-flex;align-items:center;}
+.b-sub{height:32px;padding:0 20px;border:none;border-radius:16px;background:#1677ff;color:#fff;font-size:13px;cursor:pointer;font-weight:500;}
+.sbox{background:#fff;border-radius:4px;border:1px solid #e8e8e8;padding:20px 24px;}
+.sdesc{font-size:12px;color:#999;margin-bottom:16px;}
+.sec-t{font-size:14px;font-weight:500;color:#1677ff;border-left:3px solid #1677ff;padding-left:8px;margin-bottom:14px;}
+.sb{margin-bottom:24px;}
+.fr{display:flex;align-items:flex-start;margin-bottom:14px;}
+.fl{font-size:13px;color:#333;min-width:130px;padding-top:7px;flex-shrink:0;}
+.fc{flex:1;}
+.req{color:#ff4d4f;margin-right:2px;}
+.hint{font-size:12px;color:#999;margin-top:4px;}
+.fi{height:34px;border:1px solid #d9d9d9;border-radius:4px;padding:0 10px;font-size:13px;color:#333;background:#fff;outline:none;width:100%;}
+.fi::placeholder{color:#bbb;font-size:12px;}
+.fi:focus{border-color:#1677ff;}
+.fi[type=number]{-moz-appearance:textfield;}
+.fi[type=number]::-webkit-outer-spin-button,.fi[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
+.fi[type=time]{padding:0 8px;}
+.fi-dis{background:#f5f5f5;color:#555;cursor:not-allowed;}
+.fsel{height:34px;border:1px solid #d9d9d9;border-radius:4px;padding:0 8px;font-size:13px;color:#333;background:#fff;outline:none;width:100%;}
+.rg{display:flex;gap:16px;align-items:center;padding-top:6px;flex-wrap:wrap;}
+.ri{display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;}
+.ri input{accent-color:#1677ff;}
+.tog{width:40px;height:22px;border-radius:11px;background:#d9d9d9;position:relative;cursor:pointer;flex-shrink:0;transition:background .2s;display:inline-block;}
+.tog.on{background:#1677ff;}
+.tog::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:2px;left:2px;transition:left .2s;}
+.tog.on::after{left:20px;}
+.dt-range{display:flex;align-items:center;gap:6px;padding:0 10px;height:34px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;max-width:440px;}
+.dt-range input[type=datetime-local]{border:none;outline:none;font-size:12px;color:#555;background:transparent;width:160px;}
+.tsep{color:#bbb;font-size:12px;}
+.tip-b{background:#e6f7ff;border:1px solid #91d5ff;border-radius:6px;padding:10px 14px;font-size:12px;color:#0958d9;margin-bottom:14px;line-height:1.8;}
+.tip-y{background:#fffbe6;border:1px solid #ffe58f;border-radius:6px;padding:10px 14px;font-size:12px;color:#ad6800;margin-bottom:14px;line-height:1.8;}
+.tip-r{background:#fff2f0;border:1px solid #ffccc7;border-radius:6px;padding:10px 14px;font-size:12px;color:#cf1322;margin-bottom:14px;line-height:1.8;}
+.imgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.imgcard{border:1px solid #e8e8e8;border-radius:6px;overflow:hidden;}
+.imghead{background:#f5f7fa;padding:8px 12px;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;justify-content:space-between;}
+.imghead span{font-size:13px;font-weight:500;color:#333;}
+.imghead em{font-size:11px;color:#bbb;font-style:normal;}
+.imgbox{margin:12px;min-height:90px;border:1.5px dashed #d9d9d9;border-radius:4px;background:#fafafa;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;}
+.imgbox:hover{border-color:#1677ff;}
+.imgbox span{font-size:12px;color:#bbb;}
+.imgbox em{font-size:11px;color:#ccc;font-style:normal;}
+.plan-card{border:1px solid #e8e8e8;border-radius:8px;margin-bottom:14px;overflow:hidden;}
+.plan-card:hover{box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.pch{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#fafafa;border-bottom:1px solid #e8e8e8;cursor:pointer;user-select:none;}
+.pch:hover{background:#f0f7ff;}
+.pchl{display:flex;align-items:center;gap:10px;}
+.pbadge{display:inline-flex;align-items:center;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;}
+.bstd{background:#fff7e6;color:#ff4d4f;border:1px solid #ffd591;}
+.bprem{background:#f9f0ff;color:#722ed1;border:1px solid #d3adf7;}
+.bcustom{background:#f0f7ff;color:#1677ff;border:1px solid #91caff;}
+.pname{font-size:14px;font-weight:500;color:#333;}
+.pprice{font-size:14px;font-weight:700;color:#1677ff;}
+.pbody{padding:18px 20px;}
+.rtable{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px;}
+.rtable th{background:#f5f7fa;padding:10px 12px;text-align:center;font-weight:500;color:#555;border:1px solid #e8e8e8;white-space:nowrap;}
+.rtable td{padding:8px 12px;border:1px solid #e8e8e8;text-align:center;vertical-align:middle;}
+.td-day{font-size:13px;font-weight:500;color:#555;white-space:nowrap;background:#fafafa;width:72px;}
+.rsel{height:32px;border:1px solid #d9d9d9;border-radius:4px;padding:0 6px;font-size:12px;outline:none;background:#fff;width:100%;min-width:90px;}
+.rsel:focus{border-color:#1677ff;}
+.rinp{height:32px;border:1px solid #d9d9d9;border-radius:4px;padding:0 8px;font-size:12px;outline:none;background:#fff;width:100%;-moz-appearance:textfield;margin-top:5px;}
+.rinp::-webkit-inner-spin-button,.rinp::-webkit-outer-spin-button{-webkit-appearance:none;}
+.rinp:focus{border-color:#1677ff;}
+.cond-wrap{display:flex;align-items:center;gap:5px;}
+.cond-sel{height:32px;border:1px solid #d9d9d9;border-radius:4px;padding:0 5px;font-size:12px;outline:none;background:#fff;width:62px;}
+.cond-gte{font-size:13px;color:#999;}
+.cond-inp{height:32px;border:1px solid #d9d9d9;border-radius:4px;padding:0 6px;font-size:12px;outline:none;background:#fff;width:80px;-moz-appearance:textfield;}
+.cond-inp::-webkit-inner-spin-button,.cond-inp::-webkit-outer-spin-button{-webkit-appearance:none;}
+.cond-inp:focus{border-color:#1677ff;}
+.to-inp{height:32px;border:1px solid #d9d9d9;border-radius:4px;padding:0 6px;font-size:12px;outline:none;background:#fff;width:60px;-moz-appearance:textfield;text-align:center;}
+.to-inp::-webkit-inner-spin-button,.to-inp::-webkit-outer-spin-button{-webkit-appearance:none;}
+.to-inp:focus{border-color:#1677ff;}
+.b-addplan{height:36px;border:1.5px dashed #1677ff;border-radius:6px;background:#f0f7ff;color:#1677ff;font-size:13px;cursor:pointer;width:100%;margin-top:4px;}
+.b-addplan:hover{background:#e6f4ff;}
+.b-delplan{height:26px;padding:0 10px;border:1px solid #ff4d4f;border-radius:4px;background:#fff;color:#ff4d4f;font-size:12px;cursor:pointer;}
+.game-btn{height:32px;padding:0 16px;border:1px solid #1677ff;border-radius:16px;background:#fff;color:#1677ff;font-size:13px;cursor:pointer;}
+.risk-bl{border:1px solid #ffccc7;border-radius:6px;padding:14px;}
+.ptable{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px;}
+.ptable th{background:#f5f7fa;padding:9px 12px;text-align:left;font-weight:500;color:#666;border:1px solid #ebeef5;}
+.ptable td{padding:9px 12px;border:1px solid #ebeef5;vertical-align:top;color:#333;}
+.ptable td.mt{color:#bbb;}
+.ptable td.rd{color:#ff4d4f;}
+.pst{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:#333;padding:12px 0 8px;}
+.psn{width:22px;height:22px;border-radius:50%;background:#1677ff;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.mov{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:500;}
+.modal{background:#fff;border-radius:8px;width:620px;max-height:580px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.15);}
+.mhdr{padding:16px 24px;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;justify-content:space-between;}
+.mhdr span{font-size:15px;font-weight:500;}
+.mcl{cursor:pointer;color:#999;font-size:20px;background:none;border:none;}
+.mbody{flex:1;padding:16px 24px;overflow-y:auto;}
+.gcat{margin-bottom:12px;border:1px solid #e8e8e8;border-radius:6px;overflow:hidden;}
+.gcath{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#f9f9f9;border-bottom:1px solid #e8e8e8;}
+.gcath span{font-size:14px;font-weight:500;color:#1677ff;}
+.gck{width:16px;height:16px;accent-color:#1677ff;flex-shrink:0;}
+.ggames{padding:12px 14px;display:flex;flex-wrap:wrap;}
+.gi{display:flex;align-items:center;gap:6px;width:33%;font-size:13px;color:#333;padding:4px 0;cursor:pointer;}
+.gi input{width:15px;height:15px;accent-color:#1677ff;flex-shrink:0;}
+.mfoot{padding:12px 24px;border-top:1px solid #e8e8e8;display:flex;justify-content:flex-end;gap:8px;}
+.b-mc{height:32px;padding:0 20px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;font-size:13px;cursor:pointer;color:#666;}
+.b-mok{height:32px;padding:0 20px;border:none;border-radius:4px;background:#1677ff;color:#fff;font-size:13px;cursor:pointer;}
+.ms-wrap{border:1px solid #d9d9d9;border-radius:4px;padding:4px 8px;min-height:34px;display:flex;align-items:center;flex-wrap:wrap;gap:4px;cursor:pointer;background:#fff;position:relative;}
+.ms-tag{display:inline-flex;align-items:center;gap:4px;background:#f0f0f0;border-radius:3px;padding:2px 6px;font-size:12px;color:#333;}
+.ms-rm{cursor:pointer;color:#999;font-size:11px;background:none;border:none;padding:0;line-height:1;}
+.ms-rm:hover{color:#ff4d4f;}
+.ms-arr{margin-left:auto;color:#999;font-size:11px;flex-shrink:0;}
+.ms-dd{position:absolute;top:calc(100% + 2px);left:0;right:0;background:#fff;border:1px solid #d9d9d9;border-radius:4px;z-index:200;box-shadow:0 4px 12px rgba(0,0,0,.08);max-height:200px;overflow-y:auto;}
+.ms-opt{padding:8px 12px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;}
+.ms-opt:hover{background:#f5f5f5;}
+.ms-opt.sel{color:#1677ff;}
+.ms-ck{color:#1677ff;font-size:12px;}
+.ms-ph{color:#bbb;font-size:12px;}
+.hidden{display:none!important;}
+.preview-warn{background:#fff2f0;border:1px solid #ffccc7;border-radius:4px;padding:10px 14px;margin-bottom:16px;font-size:13px;color:#ff4d4f;}
+.preview-step-title{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:#333;}
+.preview-snum{width:22px;height:22px;border-radius:50%;background:#1677ff;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.preview-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 20px;}
+.preview-row{display:flex;gap:6px;font-size:13px;padding:7px 0;border-bottom:1px solid #f5f5f5;}
+.preview-row:last-child{border-bottom:none;}
+.pk{color:#999;min-width:90px;flex-shrink:0;}
+.pk.req::before{content:'*';color:#ff4d4f;margin-right:2px;}
+.pv{color:#333;}.pv.empty{color:#bbb;}.pv.red{color:#ff4d4f;}
+.prev-img-table{width:100%;border-collapse:collapse;font-size:13px;}
+.prev-img-table th{background:#f5f7fa;padding:8px 12px;text-align:center;font-weight:500;color:#666;border:1px solid #ebeef5;}
+.prev-img-table td{padding:8px 12px;border:1px solid #ebeef5;text-align:center;color:#bbb;}
+/* agent modal */
+.agent-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:4px 0;}
+.agent-item{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 10px;border:2px solid #e8e8e8;border-radius:8px;cursor:pointer;transition:border-color .15s,background .15s;}
+.agent-item:hover{border-color:#1677ff;background:#f0f7ff;}
+.agent-item.sel{border-color:#1677ff;background:#e6f4ff;}
+.agent-av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;font-weight:700;flex-shrink:0;}
+.agent-name{font-size:13px;color:#333;text-align:center;}
+.agent-sel-ck{font-size:11px;color:#1677ff;font-weight:500;}
+</style>
+</head>
+<body>
+<div class="layout">
+  <div class="sidebar">
+    <div class="menu-top">
+      <div class="menu-icon">
+        <svg viewBox="0 0 12 12" fill="none" width="12" height="12"><circle cx="6" cy="6" r="4" stroke="#fff" stroke-width="1.3"/><path d="M4 6h4M6 4v4" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg>
+      </div>
+      <span>活动配置<span style="font-size:11px;color:#1677ff;font-weight:400;">(新)</span></span>
+    </div>
+    <a href="#" class="sub-a on">活动列表</a>
+    <a href="#" class="sub-a">派奖审核</a>
+    <a href="#" class="sub-a">活动报表</a>
+  </div>
+  <div class="right">
+    <div class="topbar">
+      <div class="tl">当前时间：2026/05/13 10:00:00 +08:00</div>
+      <div class="tc">
+        <div class="ts">在线人数：<span class="n">28</span></div><div class="tdiv"></div>
+        <div class="ts">当日注册：<span class="n">7</span></div><div class="tdiv"></div>
+        <div class="ts">当日充值：<span class="n">2</span></div><div class="tdiv"></div>
+        <div class="ts">VIP派奖审核：<span class="w">1140</span></div>
+      </div>
+      <div class="tr2"><div class="av">CN</div>vivianadmin ▾</div>
+    </div>
+    <div class="wrap">
+      <div class="bc">位置 › 活动配置 › <a href="#">活动列表</a> › <span class="cur">新增活动 · 周卡活动</span></div>
+      <div class="pg">
+        <div class="snav" id="snav"></div>
+        <div class="smain">
+          <div class="stbar">
+            <div class="st-ttl">活动配置步骤</div>
+            <div class="stbtns" id="stbtns"></div>
+          </div>
+          <div class="sbox" id="sc"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- game modal -->
+<div class="mov hidden" id="gModal">
+  <div class="modal">
+    <div class="mhdr"><span>选择适用游戏范围</span><button class="mcl" id="mclBtn">&#215;</button></div>
+    <div class="mbody" id="mbody"></div>
+    <div class="mfoot">
+      <button class="b-mc" id="mCancel">取消</button>
+      <button class="b-mok" id="mOk">确定</button>
+    </div>
+  </div>
+</div>
+
+<!-- agent modal -->
+<div class="mov hidden" id="agentModal">
+  <div class="modal" style="width:520px;max-height:480px;">
+    <div class="mhdr"><span>选择代理线</span><button class="mcl" id="agMclBtn">&#215;</button></div>
+    <div class="mbody" id="agMbody"></div>
+    <div class="mfoot">
+      <button class="b-mc" id="agCancel">取消</button>
+      <button class="b-mok" id="agOk">确定</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+// ── data ────────────────────────────────────────────────────────
+const STEPS = ['活动模板设置','活动图片','参与对象与名单','活动条件','风控条件','提交预览'];
+let cur = 1;
+
+const LEVELS = [
+  {v:'d',l:'默认层'},{v:'1',l:'第一层'},{v:'2',l:'第二层'},{v:'3',l:'第三层'},
+  {v:'4',l:'第四层'},{v:'5',l:'第五层'},{v:'i',l:'内部充值'}
+];
+let selLevels = LEVELS.map(o => o.v), levelOpen = false;
+
+const VIPS = Array.from({length:11}, (_,i) => ({v:`vip${i}`, l:`VIP${i}`}));
+let selVips = VIPS.map(o => o.v), vipOpen = false;
+
+const AGENTS = [
+  {v:'agA', l:'代理线 A', color:'#1677ff'},
+  {v:'agB', l:'代理线 B', color:'#52c41a'},
+  {v:'agC', l:'代理线 C', color:'#fa8c16'},
+  {v:'agD', l:'代理线 D', color:'#722ed1'},
+  {v:'agE', l:'代理线 E', color:'#f5222d'},
+  {v:'agF', l:'代理线 F', color:'#13c2c2'},
+  {v:'agG', l:'代理线 G', color:'#eb2f96'},
+  {v:'agH', l:'代理线 H', color:'#faad14'},
+];
+let selAgentLine = null;
+let tmpAgentLine = null;
+
+const GCATS = [
+  {cat:'EVO Live', games:['Football Studio','Crazy Coin Flip','EvoLive Baccarat A','Crazy Time','Speed Baccarat A','Mega Ball']},
+  {cat:'TPG',      games:['Space Galaxy','Lucky Leprechaun','8 Dragons','Mahjong House','Sic-Bo']},
+  {cat:'CQ9 SLOT', games:['Money Tree','Hot Spin','Sky Lanterns','Lucky Bats','Fortune Dragon']},
+  {cat:'PG',       games:['Pinata Wins','Dead Man\'s Riches','Jack the Giant Hunter','Diner Frenzy']},
+  {cat:'电子游戏',  games:['老虎机A','老虎机B','老虎机C','经典水果机','幸运转盘']},
+  {cat:'体育',      games:['体育']}
+];
+let tmpSel = {}, confSel = {};
+GCATS.forEach((_,i) => { confSel[i] = new Set(GCATS[i].games); });
+
+const TC = {cash:'彩金', point:'积分', spin:'免费旋转', coupon:'优惠券', freeBet:'免费投注', propCard:'道具卡'};
+
+function mkDay(ft,fv,et,ev,ct,cv,to) {
+  return { free:{type:ft,val:fv}, extra:{type:et,val:ev,condType:ct,condVal:cv}, turnover:to };
+}
+function emptyDay() { return mkDay('cash','','spin','','deposit','',''); }
+
+let plans = [
+  { id:1, name:'Elite Pass', bt:'std', price:500, col:false, days:[
+    mkDay('cash','10','spin','','deposit','0','2'),
+    mkDay('spin','5','cash','12','deposit','200','3'),
+    mkDay('spin','8','cash','13','turnover','500','4'),
+    mkDay('cash','20','spin','','deposit','',''),
+    mkDay('cash','25','spin','','deposit','',''),
+    mkDay('cash','30','spin','','deposit','',''),
+    mkDay('cash','50','spin','30','turnover','1000','5')
+  ]},
+  { id:2, name:'Prime Pass', bt:'prem', price:2000, col:false, days:[
+    mkDay('cash','50','spin','10','deposit','0','2'),
+    mkDay('spin','10','cash','80','deposit','200','3'),
+    mkDay('spin','15','cash','100','turnover','500','4'),
+    mkDay('cash','80','spin','','deposit','',''),
+    mkDay('cash','100','spin','','deposit','',''),
+    mkDay('coupon','1','cash','150','deposit','300','4'),
+    mkDay('cash','200','spin','50','turnover','1000','5')
+  ]}
+];
+let planId = 3;
+
+// ── helpers ─────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+
+function typeOpts(sel) {
+  return Object.entries(TC).map(([k,v]) =>
+    `<option value="${k}"${sel===k?' selected':''}>${v}</option>`
+  ).join('');
+}
+function condOpts(sel) {
+  return [['deposit','充值'],['turnover','投注']].map(([k,v]) =>
+    `<option value="${k}"${sel===k?' selected':''}>${v}</option>`
+  ).join('');
+}
+function iAlt(l) {
+  return `<div class="imgcard">
+    <div class="imghead"><span>${l}</span></div>
+    <div class="imgbox">
+      <svg viewBox="0 0 24 24" fill="none" width="24" height="24"><path d="M12 16V8M12 8l-3 3M12 8l3 3" stroke="#bbb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 16.5A4.5 4.5 0 0 0 15.5 12H14a6 6 0 1 0-11.8 1.5" stroke="#bbb" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <span>点击上传图片</span>
+    </div></div>`;
+}
+function dtRange() {
+  return `<div class="dt-range">
+    <svg viewBox="0 0 14 14" fill="none" width="13" height="13"><circle cx="7" cy="7" r="5.5" stroke="#bbb" stroke-width="1.2"/><path d="M7 4v3l2 1.5" stroke="#bbb" stroke-width="1.2" stroke-linecap="round"/></svg>
+    <input type="datetime-local">
+    <span class="tsep">～</span>
+    <input type="datetime-local">
+  </div>`;
+}
+
+// ── nav ─────────────────────────────────────────────────────────
+function renderNav() {
+  $('snav').innerHTML = STEPS.map((n,i) => {
+    const num = i+1;
+    const cls = num===cur ? 'act' : num<cur ? 'dn' : '';
+    return `<div class="si ${cls}" data-step="${num}">
+      <div class="sn">${num<cur ? '✓' : num}</div><span>${n}</span></div>`;
+  }).join('');
+  $('snav').querySelectorAll('.si').forEach(el => {
+    el.addEventListener('click', () => goStep(+el.dataset.step));
+  });
+}
+function renderBtns() {
+  const isLast = cur === STEPS.length;
+  let h2 = cur > 1 ? `<button class="b-prev" id="bPrev">‹ 上一步</button>` : '';
+  if (isLast) {
+    h2 += `<a href="#" class="b-exit">退出编辑 ↩</a><button class="b-sub">✓ 确认送出</button>`;
+  } else {
+    h2 += `<button class="b-next" id="bNext">下一步 ›</button><a href="#" class="b-exit">退出编辑 ↩</a>`;
+  }
+  $('stbtns').innerHTML = h2;
+  $('bPrev') && $('bPrev').addEventListener('click', () => goStep(cur-1));
+  $('bNext') && $('bNext').addEventListener('click', () => goStep(cur+1));
+}
+function goStep(n) { cur=n; renderNav(); renderBtns(); renderStep(); }
+function renderStep() {
+  const el2 = $('sc');
+  const fns = [null, step1, step2, step3, step4, step5, step6];
+  el2.innerHTML = fns[cur]();
+  el2.querySelectorAll('.tog[data-tog]').forEach(t => {
+    t.addEventListener('click', () => t.classList.toggle('on'));
+  });
+  if (cur===3) bindDrops();
+  if (cur===4) bindPlanList();
+}
+
+// ── step 1 ──────────────────────────────────────────────────────
+function step1() {
+  return `
+  <div class="sdesc">将活动模板配置保存至系统，系统将自动配置相关功能。</div>
+  <div class="sb"><div class="sec-t">活动模板</div>
+    <div class="fr"><div class="fl"><span class="req">*</span>活动类型：</div><div class="fc">
+      <select class="fsel" style="max-width:300px;">
+        <option>预约活动</option>
+        <option selected>周卡活动</option>
+      </select>
+    </div></div>
+    <div class="fr"><div class="fl"><span class="req">*</span>活动名称：</div><div class="fc">
+      <input type="text" class="fi" placeholder="请输入" style="max-width:400px;">
+    </div></div>
+    <div class="fr"><div class="fl"><span class="req">*</span>活动币种：</div><div class="fc">
+      <select class="fsel" style="max-width:200px;"><option>PHP</option></select>
+    </div></div>
+    <div class="fr"><div class="fl">活动状态：</div><div class="fc"><div class="rg">
+      <label class="ri"><input type="radio" name="status" checked> 关闭</label>
+      <label class="ri"><input type="radio" name="status"> 开启</label>
+    </div></div></div>
+  </div>
+  <div class="sb"><div class="sec-t">时间设定</div>
+    <div style="background:#f8faff;border:1px solid #d6e4ff;border-radius:6px;padding:16px 20px;">
+      <div class="fr" style="margin-bottom:12px;"><div class="fl"><span class="req">*</span>进行时间：</div><div class="fc">
+        ${dtRange()}
+        <div class="hint">活动总时间</div>
+      </div></div>
+    </div>
+  </div>`;
+}
+
+// ── step 2 ──────────────────────────────────────────────────────
+function step2() {
+  return `
+  <div class="sdesc">设置首页浮窗图片及活动备注。</div>
+  <div class="sb" style="border:1px solid #e8e8e8;border-radius:6px;padding:16px 20px;">
+    <div class="sec-t">首页浮窗设置</div>
+    <div style="margin-bottom:16px;">
+      <div style="font-size:14px;font-weight:500;color:#333;margin-bottom:10px;">浮窗开关：
+        <label class="ri" style="margin-left:12px;display:inline-flex;"><input type="radio" name="floatWin" checked> 关闭</label>
+        <label class="ri" style="margin-left:12px;display:inline-flex;"><input type="radio" name="floatWin"> 开启</label>
+      </div>
+      <div class="imgrid" style="margin-bottom:6px;">${iAlt('PC 图片')}${iAlt('H5 图片')}</div>
+      <div style="font-size:12px;color:#999;">图片格式：png、bmp、jpg、gif；大小限制 5MB 内</div>
+    </div>
+    <div class="fr" style="margin-bottom:0;"><div class="fl">排序：</div><div class="fc">
+      <input type="number" class="fi" style="max-width:120px;" value="0">
+    </div></div>
+  </div>
+  <div class="sb" style="margin-top:16px;border:1px solid #e8e8e8;border-radius:6px;padding:16px 20px;">
+    <div class="sec-t">备注</div>
+    <textarea class="fi" style="height:80px;resize:vertical;padding-top:8px;" placeholder="请输入"></textarea>
+  </div>`;
+}
+
+// ── step 3 ──────────────────────────────────────────────────────
+function buildMsDd(items, selArr) {
+  const allSel = selArr.length === items.length;
+  let h2 = `<div class="ms-opt${allSel?' sel':''}" data-msAll>${allSel?'✓ ':''} 全选</div>`;
+  h2 += items.map(o => {
+    const sel = selArr.includes(o.v);
+    return `<div class="ms-opt${sel?' sel':''}" data-msV="${o.v}">${o.l}${sel?'<span class="ms-ck">✓</span>':''}</div>`;
+  }).join('');
+  return h2;
+}
+function buildMsTags(items, selArr) {
+  if (!selArr.length) return `<span class="ms-ph">请选择</span>`;
+  return selArr.map(v => {
+    const lb=(items.find(o=>o.v===v)||{l:v}).l;
+    return `<span class="ms-tag">${lb}<button class="ms-rm" data-rmV="${v}">×</button></span>`;
+  }).join('');
+}
+function agentBtnLabel() {
+  if (!selAgentLine) return '选择代理';
+  const ag = AGENTS.find(a => a.v === selAgentLine);
+  return `${ag ? ag.l : selAgentLine} &nbsp;<span style="font-size:11px;color:#999;">点击更改</span>`;
+}
+function step3() {
+  const lvlTags = buildMsTags(LEVELS, selLevels);
+  const vipTags = buildMsTags(VIPS, selVips);
+  const lvlDd   = buildMsDd(LEVELS, selLevels);
+  const vipDd   = buildMsDd(VIPS, selVips);
+  return `
+  <div class="sdesc">设置周卡活动的参与对象与黑名单规则。</div>
+  <div class="sb"><div class="sec-t">参与对象设置</div>
+    <div class="fr"><div class="fl">1. 充值层级：</div><div class="fc" style="position:relative;max-width:380px;">
+      <div class="ms-wrap" id="lvlWrap" style="pointer-events:none;background:#f5f5f5;cursor:not-allowed;"><span style="font-size:13px;color:#555;">全选</span><span class="ms-arr">▾</span></div>
+      <div class="ms-dd hidden" id="lvlDd">${lvlDd}</div>
+    </div></div>
+    <div class="fr"><div class="fl">2. 指定代理线：</div><div class="fc">
+      <div class="rg" style="flex-direction:column;align-items:flex-start;gap:10px;">
+        <label class="ri"><input type="radio" name="agent" value="none" checked disabled> 不指定</label>
+        <label class="ri"><input type="radio" name="agent" value="line" disabled> 指定代理线</label>
+      </div>
+    </div></div>
+    <div class="fr"><div class="fl">3. 新会员限制：</div><div class="fc">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="tog" style="pointer-events:none;opacity:0.45;"></div>
+        <span style="font-size:13px;color:#bbb;">活动开始后注册的新会员</span>
+      </div>
+    </div></div>
+    <div class="fr"><div class="fl">4. 会员等级：</div><div class="fc" style="position:relative;max-width:380px;">
+      <div class="ms-wrap" id="vipWrap" style="pointer-events:none;background:#f5f5f5;cursor:not-allowed;"><span style="font-size:13px;color:#555;">全选</span><span class="ms-arr">▾</span></div>
+      <div class="ms-dd hidden" id="vipDd">${vipDd}</div>
+    </div></div>
+    <div class="fr"><div class="fl">5. 用户标签：</div><div class="fc">
+      <select class="fsel" style="max-width:360px;" disabled><option value="">请选择用户标签</option></select>
+    </div></div>
+  </div>
+  <div class="sb"><div class="sec-t">黑名单设置</div>
+    <div class="fr"><div class="fl">黑名单：</div><div class="fc">
+      <textarea class="fi" style="height:80px;resize:vertical;padding-top:8px;max-width:560px;" placeholder="请输入，以逗号分隔多个用户名"></textarea>
+    </div></div>
+    <div class="fr" style="margin-bottom:0;"><div class="fl">用户标签：</div><div class="fc">
+      <select class="fsel" style="max-width:360px;" disabled><option value="">请选择用户标签</option></select>
+    </div></div>
+  </div>`;
+}
+function bindDrops() {
+  function bindMs(wrapId, ddId, selArr, items) {
+    const wrap = $(wrapId), dd = $(ddId);
+    if (!wrap || !dd) return;
+    let open = false;
+    wrap.addEventListener('click', e => {
+      e.stopPropagation();
+      open = !open;
+      dd.classList.toggle('hidden', !open);
+    });
+    document.addEventListener('click', function h2(e) {
+      if (!e.target.closest('#'+wrapId) && !e.target.closest('#'+ddId) && open) {
+        open = false; dd.classList.add('hidden');
+        document.removeEventListener('click', h2);
+      }
+    });
+    dd.querySelector('[data-msAll]') && dd.querySelector('[data-msAll]').addEventListener('click', () => {
+      if (selArr.length === items.length) selArr.splice(0); else { selArr.splice(0); items.forEach(o=>selArr.push(o.v)); }
+      renderStep(); bindDrops();
+    });
+    dd.querySelectorAll('[data-msV]').forEach(opt => {
+      opt.addEventListener('click', () => {
+        const v = opt.dataset.msv;
+        const idx = selArr.indexOf(v);
+        if (idx>=0) selArr.splice(idx,1); else selArr.push(v);
+        renderStep(); bindDrops();
+      });
+    });
+    wrap.querySelectorAll('[data-rmV]').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const v = btn.dataset.rmv;
+        const idx = selArr.indexOf(v);
+        if (idx>=0) selArr.splice(idx,1);
+        renderStep(); bindDrops();
+      });
+    });
+  }
+  bindMs('lvlWrap','lvlDd', selLevels, LEVELS);
+  bindMs('vipWrap','vipDd', selVips, VIPS);
+  // agent radio
+  $('sc').querySelectorAll('input[name=agent]').forEach(r => {
+    r.addEventListener('change', () => {
+      $('aLine') && $('aLine').classList.toggle('hidden', r.value !== 'line');
+    });
+  });
+  // agent modal button
+  $('bOpenAgentModal') && $('bOpenAgentModal').addEventListener('click', openAgentModal);
+  // togs
+  $('sc').querySelectorAll('.tog[data-tog]').forEach(t => {
+    t.addEventListener('click', () => t.classList.toggle('on'));
+  });
+}
+
+// ── step 4 ──────────────────────────────────────────────────────
+function renderPlanCard(p, pi) {
+  const rows = p.days.map((day,d) => {
+    const hasExtra = day.extra.val !== '' && day.extra.val != null;
+    return `<tr>
+      <td class="td-day">第${d+1}天</td>
+      <td>
+        <select class="rsel" style="margin-bottom:5px;" data-plan="${pi}" data-day="${d}" data-field="free.type">${typeOpts(day.free.type)}</select>
+        <input type="number" class="rinp" placeholder="数量" value="${day.free.val}" data-plan="${pi}" data-day="${d}" data-field="free.val">
+      </td>
+      <td>
+        <select class="rsel" style="margin-bottom:5px;" data-plan="${pi}" data-day="${d}" data-field="extra.type">${typeOpts(day.extra.type)}</select>
+        <input type="number" class="rinp" placeholder="留空=不开放" value="${day.extra.val}" data-plan="${pi}" data-day="${d}" data-field="extra.val">
+      </td>
+      <td>
+        ${hasExtra ? '<div style="font-size:11px;color:#ff4d4f;font-weight:500;margin-bottom:4px;text-align:left;"><span class="req">*</span>必填</div>' : ''}
+        <div class="cond-wrap" style="justify-content:flex-start;">
+          <select class="cond-sel" data-plan="${pi}" data-day="${d}" data-field="extra.condType">${condOpts(day.extra.condType)}</select>
+          <span class="cond-gte">≥</span>
+          <input type="number" class="cond-inp" placeholder="请输入" value="${day.extra.condVal}" data-plan="${pi}" data-day="${d}" data-field="extra.condVal">
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  return `<div class="plan-card" id="pc${pi}">
+    ${p.col ? '' : `
+    <div class="pbody">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;">
+        <div>
+          <div style="font-size:12px;color:#999;margin-bottom:6px;">卡型名称</div>
+          <div class="fi fi-dis" style="display:flex;align-items:center;">${p.name}</div>
+        </div>
+        <div><div style="font-size:12px;color:#999;margin-bottom:6px;"><span class="req">*</span>周卡费用（PHP）</div>
+          <input type="number" class="fi" value="${p.price}" data-plan="${pi}" data-field="price">
+        </div>
+      </div>
+      <div style="margin-bottom:14px;">
+        <div style="font-size:13px;font-weight:500;color:#333;margin-bottom:8px;"><span class="req">*</span>奖励配置：</div>
+        <div style="font-size:12px;color:#ff4d4f;margin-bottom:8px;">签到奖励无门槛可领；额外奖励数量留空=不开放；<span style="color:#ff4d4f;font-weight:500;">额外奖励有数量时，奖励条件为必填，不可留空。</span></div>
+        <table class="rtable"><thead><tr>
+          <th style="width:72px;">签到天数</th>
+          <th style="min-width:130px;">签到奖励</th>
+          <th style="min-width:160px;">额外奖励</th>
+          <th style="min-width:160px;">额外奖励条件</th>
+        </tr></thead><tbody>${rows}</tbody></table>
+      </div>
+    </div>`}
+  </div>`;
+}
+function renderPlanList() {
+  $('planList').innerHTML = plans.map((p,i) => renderPlanCard(p,i)).join('');
+  bindPlanList();
+}
+function step4() {
+  const allTotal = GCATS.reduce((s,c)=>s+c.games.length,0);
+  const total = Object.values(confSel).reduce((s,set)=>s+set.size,0);
+  const gameLabel = total === allTotal ? '已选择 全部 游戏' : `已选择 <strong>${total}</strong> 个游戏`;
+  return `
+  <div class="tip-r">⚠ <strong>注意：</strong>修改奖励配置后将<strong>立即生效</strong>，已购买但尚未结算的奖励将按最新规则执行，请谨慎操作。</div>
+  <div id="planList">${plans.map((p,i)=>renderPlanCard(p,i)).join('')}</div>
+  <div class="sb" style="margin-top:24px;border-top:1px solid #f0f0f0;padding-top:20px;"><div class="sec-t">通用设置</div>
+    <div class="fr"><div class="fl">存款强制弹窗：</div><div class="fc">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="tog" data-tog></div>
+        <span style="font-size:13px;color:#666;">玩家存款成功后弹出周卡购买提示</span>
+      </div>
+      <div class="hint">弹窗含「今日不再显示」选项；点击离开时将二次确认</div>
+    </div></div>
+    <div class="fr"><div class="fl">彩金所需流水倍数：</div><div class="fc">
+      <input type="number" class="fi" placeholder="请输入" style="max-width:200px;">
+    </div></div>
+    <div class="fr"><div class="fl">审核方式：</div><div class="fc"><div class="rg">
+      <label class="ri"><input type="radio" name="audit"> 人工审核</label>
+      <label class="ri"><input type="radio" name="audit" checked> 自动审核</label>
+    </div></div></div>
+    <div class="fr"><div class="fl">领取方式：</div><div class="fc"><div class="rg">
+      <label class="ri"><input type="radio" name="claim" checked> 自动领取</label>
+      <label class="ri"><input type="radio" name="claim"> 手动领取</label>
+    </div><div class="hint">额外奖励无论此设定，均须满足条件后手动领取</div></div></div>
+    <div class="fr"><div class="fl">已验证手机号：</div><div class="fc"><div class="rg">
+      <label class="ri"><input type="radio" name="phone"> 是</label>
+      <label class="ri"><input type="radio" name="phone" checked> 否</label>
+    </div></div></div>
+    <div class="fr"><div class="fl">限制使用设备：</div><div class="fc"><div class="rg" style="pointer-events:none;opacity:0.5;">
+      <label class="ri"><input type="radio" name="device" checked disabled> 无限制</label>
+      <label class="ri"><input type="radio" name="device" disabled> 仅 APP</label>
+    </div></div></div>
+    <div class="fr" style="margin-bottom:0;"><div class="fl">适用游戏范围：</div><div class="fc">
+      <button class="game-btn" id="bOpenModal">${gameLabel}</button>
+      <div class="hint">全选范围含体育</div>
+    </div></div>
+  </div>`;
+}
+function bindPlanList() {
+  const pl = $('planList');
+  if (!pl) return;
+  pl.querySelectorAll('[data-toggleCol]').forEach(el => {
+    el.addEventListener('click', () => {
+      const pi = +el.dataset.togglecol;
+      plans[pi].col = !plans[pi].col;
+      renderPlanList();
+    });
+  });
+  pl.querySelectorAll('[data-field]').forEach(inp => {
+    inp.addEventListener('change', () => {
+      const pi = inp.dataset.plan != null ? +inp.dataset.plan : null;
+      const d  = inp.dataset.day != null ? +inp.dataset.day : null;
+      const field = inp.dataset.field;
+      if (pi == null) return;
+      const p = plans[pi];
+      if (d == null) {
+        if (field==='price') p.price = Number(inp.value)||0;
+        else if (field==='bt') { p.bt = inp.value; renderPlanList(); }
+      } else {
+        const parts = field.split('.');
+        if (parts.length===1) p.days[d][parts[0]] = inp.value;
+        else p.days[d][parts[0]][parts[1]] = inp.value;
+      }
+    });
+  });
+  $('bOpenModal') && $('bOpenModal').addEventListener('click', openModal);
+  $('sc').querySelectorAll('.tog[data-tog]').forEach(t => {
+    t.addEventListener('click', () => t.classList.toggle('on'));
+  });
+}
+
+// ── step 5 ──────────────────────────────────────────────────────
+function step5() {
+  return `
+  <div class="sdesc">设置周卡活动的风险控制规则，防止多账号刷活动。</div>
+  <div class="sb"><div class="sec-t">风险检测设置</div>
+    <div class="fr"><div class="fl">同IP检测：</div><div class="fc"><div class="tog" id="rip" onclick="toggleRisk5(this)"></div></div></div>
+    <div class="fr"><div class="fl">同手机号检测：</div><div class="fc"><div class="tog" id="rph" onclick="toggleRisk5(this)"></div></div></div>
+    <div class="fr"><div class="fl">同姓名检测：</div><div class="fc"><div class="tog" id="rnm" onclick="toggleRisk5(this)"></div></div></div>
+    <div class="fr"><div class="fl">同email检测：</div><div class="fc"><div class="tog" id="rem" onclick="toggleRisk5(this)"></div></div></div>
+  </div>
+  <div id="rejectBlock" class="risk-bl" style="opacity:0.4;pointer-events:none;">
+    <div class="sec-t" style="color:#ff4d4f;border-left-color:#ff4d4f;">自动拒绝</div>
+    <div class="fr"><div class="fl">自动拒绝：</div><div class="fc"><div class="tog" id="rauto"></div></div></div>
+    <div class="fr" style="margin-bottom:0;"><div class="fl">触发条件：</div>
+      <div class="fc" style="display:flex;align-items:center;gap:8px;font-size:13px;">
+        当违反 <input type="number" id="rejN" class="fi" style="width:80px;" placeholder="0" disabled> 笔以上，将自动拒绝
+      </div>
+    </div>
+  </div>`;
+}
+function toggleRisk5(el) {
+  el.classList.toggle('on');
+  const anyOn = ['rip','rph','rnm','rem'].some(id => { const t=$(id); return t&&t.classList.contains('on'); });
+  const block=$('rejectBlock');
+  if (!block) return;
+  block.style.opacity = anyOn ? '1' : '0.4';
+  block.style.pointerEvents = anyOn ? 'auto' : 'none';
+  const rauto=$('rauto'), rejN=$('rejN');
+  if (anyOn) {
+    rauto && rauto.classList.add('on');
+    rejN && (rejN.disabled=false);
+  } else {
+    rauto && rauto.classList.remove('on');
+    rejN && (rejN.disabled=true, rejN.value='');
+  }
+}
+
+// ── step 6 ──────────────────────────────────────────────────────
+function step6() {
+  const total = Object.values(confSel).reduce((s,set)=>s+set.size,0);
+  function row(req,k,v,red) {
+    return `<div class="preview-row"><span class="pk${req?' req':''}">${k}：</span><span class="pv${red?' red':v==='–'?' empty':''}">${v}</span></div>`;
+  }
+  function pRow(num,title,body,last) {
+    return `<div style="display:grid;grid-template-columns:130px 1fr;border-bottom:${last?'none':'1px solid #e8e8e8'}">
+      <div style="padding:14px 16px;border-right:1px solid #e8e8e8;">
+        <div class="preview-step-title"><div class="preview-snum">${num}</div>${title}</div>
+      </div>
+      <div style="padding:14px 16px;">${body}</div>
+    </div>`;
+  }
+  const agentStr = selAgentLine ? (AGENTS.find(a=>a.v===selAgentLine)||{l:selAgentLine}).l : '不指定';
+  const planRows = plans.map(p => {
+    const ex = p.days.filter(d=>d.extra.val&&d.extra.val!=='').length;
+    return row(false, p.name, `${p.price.toLocaleString()} PHP · ${ex>0?ex+'天有额外奖励':'仅签到奖励'}`);
+  }).join('');
+  return `
+  <div class="sdesc">请确认以下活动配置信息，确认无误后点击「确认送出」。</div>
+  <div class="preview-warn">● 请填写以下必填字段：活动名称、进行时间、活动使用时间</div>
+  <div style="border:1px solid #e8e8e8;border-radius:4px;overflow:hidden;">
+    <div style="display:grid;grid-template-columns:130px 1fr;background:#f5f7fa;border-bottom:1px solid #e8e8e8;">
+      <div style="padding:10px 16px;font-size:13px;font-weight:500;color:#666;border-right:1px solid #e8e8e8;">步骤</div>
+      <div style="padding:10px 16px;font-size:13px;font-weight:500;color:#666;">相关字段</div>
+    </div>
+    ${pRow('1','活动模板设置',
+      `<div class="preview-grid">
+        ${row(false,'活动类型','周卡活动')}${row(true,'活动状态','关闭')}
+        ${row(true,'活动币种','PHP')}${row(true,'活动名称','–',true)}
+        ${row(true,'进行时间','–',true)}${row(true,'活动使用时间','–',true)}
+      </div>`
+    )}
+    ${pRow('2','活动图片',
+      `<div class="preview-grid">
+        ${row(false,'首页浮窗','关闭')}${row(false,'排序','0')}
+        ${row(false,'备注','–')}
+      </div>`
+    )}
+    ${pRow('3','参与对象与名单',
+      `<div class="preview-grid">
+        ${row(false,'充值层级',`全选（${selLevels.length} 层）`)}${row(false,'指定代理线',agentStr)}
+        ${row(false,'新会员限制','否')}${row(false,'会员等级','全选（VIP0–VIP10）')}
+        ${row(false,'黑名单','–')}
+      </div>`
+    )}
+    ${pRow('4','活动条件',
+      `<div class="preview-grid">
+        ${row(false,'存款强制弹窗','关闭')}${row(false,'彩金流水倍数','–')}
+        ${row(false,'审核方式','自动审核')}${row(false,'领取方式','自动领取')}
+        ${row(false,'已验证手机号','否')}${row(false,'限制使用设备','无限制')}
+        ${row(false,'适用游戏范围',total?total+'个':'–')}
+      </div>
+      <div style="margin-top:8px;border-top:1px solid #f0f0f0;padding-top:8px;">${planRows}</div>`
+    )}
+    ${pRow('5','风控条件',
+      `<div class="preview-grid">
+        ${row(false,'同IP检测','关闭')}${row(false,'同姓名检测','关闭')}
+        ${row(false,'同手机号检测','关闭')}${row(false,'同email检测','关闭')}
+        ${row(false,'自动拒绝','–')}
+      </div>`,
+      true
+    )}
+  </div>`;
+}
+
+// ── game modal ───────────────────────────────────────────────────
+function openModal() {
+  tmpSel = {};
+  GCATS.forEach((_,i) => { tmpSel[i] = new Set(confSel[i]||[]); });
+  renderModalBody();
+  $('gModal').classList.remove('hidden');
+}
+function renderModalBody() {
+  const all = GCATS.reduce((a,c)=>a.concat(c.games),[]);
+  const tot = Object.values(tmpSel).reduce((s,set)=>s+set.size,0);
+  let h2 = `<div style="padding:10px 14px;border-bottom:1px solid #e8e8e8;background:#f9f9f9;display:flex;align-items:center;gap:10px;">
+    <input type="checkbox" class="gck" id="allGames"${tot===all.length?' checked':''}> <span style="font-size:14px;font-weight:500;">全选</span></div>`;
+  GCATS.forEach((c,ci) => {
+    const sel = tmpSel[ci]||new Set();
+    h2 += `<div class="gcat"><div class="gcath"><input type="checkbox" class="gck" data-ci="${ci}"${sel.size===c.games.length?' checked':''}><span>${c.cat}</span></div><div class="ggames">`;
+    c.games.forEach(g => {
+      h2 += `<label class="gi"><input type="checkbox" data-ci="${ci}" data-g="${g}"${sel.has(g)?' checked':''}>${g}</label>`;
+    });
+    h2 += `</div></div>`;
+  });
+  $('mbody').innerHTML = h2;
+  $('allGames').addEventListener('change', function() {
+    GCATS.forEach((_,i) => {
+      if (!tmpSel[i]) tmpSel[i]=new Set();
+      if (this.checked) GCATS[i].games.forEach(g=>tmpSel[i].add(g)); else tmpSel[i].clear();
+    });
+    renderModalBody();
+  });
+  $('mbody').querySelectorAll('input[data-ci][data-g]').forEach(cb => {
+    cb.addEventListener('change', function() {
+      const ci=+this.dataset.ci, g=this.dataset.g;
+      if (!tmpSel[ci]) tmpSel[ci]=new Set();
+      if (this.checked) tmpSel[ci].add(g); else tmpSel[ci].delete(g);
+    });
+  });
+  $('mbody').querySelectorAll('input[data-ci]:not([data-g])').forEach(cb => {
+    cb.addEventListener('change', function() {
+      const ci=+this.dataset.ci;
+      if (!tmpSel[ci]) tmpSel[ci]=new Set();
+      if (this.checked) GCATS[ci].games.forEach(g=>tmpSel[ci].add(g)); else tmpSel[ci].clear();
+      renderModalBody();
+    });
+  });
+}
+function closeModal() { $('gModal').classList.add('hidden'); }
+function confirmModal() {
+  GCATS.forEach((_,i) => { confSel[i]=new Set(tmpSel[i]||[]); });
+  closeModal(); renderStep();
+}
+$('mclBtn').addEventListener('click', closeModal);
+$('mCancel').addEventListener('click', closeModal);
+$('mOk').addEventListener('click', confirmModal);
+
+// ── agent modal ──────────────────────────────────────────────────
+function openAgentModal() {
+  tmpAgentLine = selAgentLine;
+  renderAgentModalBody();
+  $('agentModal').classList.remove('hidden');
+}
+function renderAgentModalBody() {
+  let h2 = `<div class="agent-grid">`;
+  AGENTS.forEach(ag => {
+    const sel = tmpAgentLine === ag.v;
+    h2 += `<div class="agent-item${sel?' sel':''}" data-agV="${ag.v}">
+      <div class="agent-av" style="background:${ag.color};">${ag.l.slice(-1)}</div>
+      <span class="agent-name">${ag.l}</span>
+      ${sel ? '<span class="agent-sel-ck">✓ 已选择</span>' : ''}
+    </div>`;
+  });
+  h2 += `</div>`;
+  $('agMbody').innerHTML = h2;
+  $('agMbody').querySelectorAll('[data-agV]').forEach(item => {
+    item.addEventListener('click', () => {
+      tmpAgentLine = item.dataset.agv;
+      renderAgentModalBody();
+    });
+  });
+}
+function closeAgentModal() { $('agentModal').classList.add('hidden'); }
+function confirmAgentModal() {
+  selAgentLine = tmpAgentLine;
+  closeAgentModal();
+  renderStep();
+  bindDrops();
+  // re-check the line radio
+  const lineRadio = $('sc') && $('sc').querySelector('input[name=agent][value="line"]');
+  if (lineRadio) { lineRadio.checked = true; $('aLine') && $('aLine').classList.remove('hidden'); }
+}
+$('agMclBtn').addEventListener('click', closeAgentModal);
+$('agCancel').addEventListener('click', closeAgentModal);
+$('agOk').addEventListener('click', confirmAgentModal);
+
+// ── init ─────────────────────────────────────────────────────────
+goStep(1);
+</script>
+</body>
+</html>
