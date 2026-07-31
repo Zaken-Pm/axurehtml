@@ -73,7 +73,7 @@
   .tag.add{background:var(--green-soft);color:var(--green);}
   .tag.keep{background:#eef1f6;color:var(--ink-soft);}
   .tag.mod{background:#fff4e0;color:#b7791f;}
-  .ref{font-family:var(--mono);font-size:12px;color:var(--grey);}
+  .ref{font-family:var(--mono);font-size:12px;color:var(--ink-soft);}
 
   /* ---------- 表格 ---------- */
   table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px;}
@@ -107,8 +107,8 @@
   .mock-bar .dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.55);}
   .mock-crumb{background:#f6f8fb;border-bottom:1px solid var(--line);padding:8px 18px;font-size:12px;color:var(--ink-soft);font-family:var(--mono);}
   .mock-body{background:#fff;padding:6px 0;}
-  .badge-new{font-size:11px;font-weight:700;background:var(--brand);color:#fff;border-radius:4px;padding:1px 7px;}
-  .badge-keep{font-size:11px;font-weight:600;background:#e7ebf2;color:var(--grey);border-radius:4px;padding:1px 7px;}
+  .badge-new{font-size:12px;font-weight:700;background:var(--brand);color:#fff;border-radius:4px;padding:1px 7px;}
+  .badge-keep{font-size:12px;font-weight:600;background:#e7ebf2;color:var(--grey);border-radius:4px;padding:1px 7px;}
   .hint{font-size:12px;color:var(--ink-soft);margin-top:6px;}
 
   /* ---------- 真实后台风格示意（参照现行后台 UI）---------- */
@@ -169,6 +169,18 @@
   .save-toast{font-size:12px;color:var(--green);font-weight:600;opacity:0;transition:opacity .25s;white-space:nowrap;}
   .save-toast.show{opacity:1;}
 
+  /* 供应商单选示意 */
+  .rdrow{display:flex;align-items:center;padding:11px 0;border-top:1px solid var(--line);font-size:13px;gap:14px;}
+  .rdrow .rdlbl{width:130px;flex:none;color:var(--ink);}
+  .rdrow .rdopts{flex:1;display:flex;flex-wrap:wrap;gap:20px;align-items:center;}
+  .rdrow .opt{display:flex;align-items:center;gap:6px;color:var(--ink-soft);}
+  .rd{width:14px;height:14px;border-radius:50%;border:1.5px solid #c2c9d6;flex:none;position:relative;}
+  .rd.on{border-color:#4d8cf5;}
+  .rd.on::after{content:"";position:absolute;inset:2.5px;border-radius:50%;background:#4d8cf5;}
+  .opt.on{color:#4d8cf5;font-weight:600;}
+  .rdrow.hl{background:var(--brand-soft);border-radius:6px;padding:11px 10px;}
+  .pin{font-size:12px;font-weight:700;color:#fff;background:var(--brand);border-radius:4px;padding:1px 7px;margin-left:6px;white-space:nowrap;}
+
   /* toast 示意 */
   .toast{display:inline-flex;align-items:center;gap:8px;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;margin:6px 10px 6px 0;}
   .toast.ok{background:var(--green-soft);color:var(--green);border:1px solid #bfe6cf;}
@@ -212,6 +224,13 @@
           <td><span class="tag add">A 新增</span></td>
           <td>Zaken</td>
           <td>文件初版。后台「KYC配置」新增「KYC短信配置」，提供「KYC短信不通过短信」开关与「KYC短信内容」编辑功能。</td>
+        </tr>
+        <tr>
+          <td>2026/07/30</td>
+          <td>v1.0.1</td>
+          <td><span class="tag mod">M 修改</span></td>
+          <td>Zaken</td>
+          <td>示意图改为依现行后台实际画面还原；补充「短信发送供应商依据『短信相关配置』所勾选之营销短信供应商」之规则与示意。</td>
         </tr>
       </tbody>
     </table>
@@ -382,6 +401,47 @@
       </tbody>
     </table>
     <p class="hint">※ 实际提示文案以既有后台文案风格 / 多语系配置为准，上表为交互行为示意。</p>
+
+    <h4>⑤ 短信发送供应商 <span class="ref">（依赖既有「短信相关配置」设定）</span></h4>
+    <ul>
+      <li>KYC 拒绝短信的发送供应商，<b>依据「后台 &gt; 系统管理 &gt; 系统参数管理 &gt; 短信相关配置」中所勾选的「营销短信供应商」</b>发送。</li>
+      <li>本功能<b>不自行指定供应商</b>，跟随上述设定；若「营销短信供应商」被变更，KYC 拒绝短信亦随之改由新供应商发送。</li>
+      <li>采用的是「<b>营销短信供应商</b>」，<b>而非</b>「OTP短信供应商」。</li>
+      <li>该「短信相关配置」设定本身<b>非本次范围、不异动</b>。</li>
+    </ul>
+    <div class="mock" style="margin-top:12px">
+      <div class="mock-crumb">系统管理 / 系统参数管理 / 短信相关配置</div>
+      <div class="mock-body" style="padding:0">
+        <div class="bo">
+          <div class="bo-title">短信相关参数 <span class="badge-keep">既有 · 不异动</span></div>
+          <div class="rdrow">
+            <span class="rdlbl">OTP短信供应商</span>
+            <span class="rdopts">
+              <span class="opt on"><span class="rd on"></span>M360</span>
+              <span class="opt"><span class="rd"></span>ONBUKA</span>
+              <span class="opt"><span class="rd"></span>EngageLab极光</span>
+              <span class="opt"><span class="rd"></span>Buzzinga</span>
+              <span class="opt"><span class="rd"></span>Brandtxt</span>
+              <span class="opt"><span class="rd"></span>Laaffic</span>
+            </span>
+            <button type="button" class="mock-btn" tabindex="-1">保存</button>
+          </div>
+          <div class="rdrow hl">
+            <span class="rdlbl">营销短信供应商</span>
+            <span class="rdopts">
+              <span class="opt on"><span class="rd on"></span>M360</span>
+              <span class="opt"><span class="rd"></span>ONBUKA</span>
+              <span class="opt"><span class="rd"></span>EngageLab极光</span>
+              <span class="opt"><span class="rd"></span>Buzzinga</span>
+              <span class="opt"><span class="rd"></span>Brandtxt</span>
+              <span class="opt"><span class="rd"></span>Laaffic</span>
+              <span class="pin">← KYC拒绝短信依此项发送</span>
+            </span>
+            <button type="button" class="mock-btn" tabindex="-1">保存</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- 3. 情境穷举 -->
@@ -439,7 +499,7 @@
       <span class="op">是 →</span>
       <span class="node cond">短信内容非空？</span>
       <span class="op">是 →</span>
-      <span class="node end-yes">发送短信予用户</span>
+      <span class="node end-yes">发送短信予用户<br><span style="font-weight:400;font-size:11.5px">（经「营销短信供应商」）</span></span>
     </div>
     <div class="flow">
       <span class="op">上述任一判断为「否」 →</span>
@@ -471,6 +531,7 @@
       <li>KYC 人工审核流程、审核状态判定本身。</li>
       <li>既有站内信 / 邮件 / App 推播等其他通知机制。</li>
       <li>短信发送通道（SMS Gateway）本身的串接与设定。</li>
+      <li>「短信相关配置」之「营销短信供应商 / OTP短信供应商」设定：本功能依据「营销短信供应商」发送，但仅为<b>依赖引用，不修改</b>该设定。</li>
       <li>KYC 各状态（未验证 / 未通过 / 验证中 / 通过 / 补充资料）于前台的显示规则。</li>
     </ul>
   </section>
