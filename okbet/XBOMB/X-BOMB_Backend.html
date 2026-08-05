@@ -93,8 +93,7 @@ select.select{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg
 /* 表格 */
 .tbl{width:100%;border-collapse:collapse;font-size:13px;}
 .tbl th{background:#f5f7fa;color:var(--text-2);font-weight:600;padding:9px 8px;border:1px solid var(--border-l);text-align:center;white-space:nowrap;}
-.tbl td{padding:7px 8px;border:1px solid var(--border-l);text-align:center;vertical-align:top;}
-.tbl td>*:only-child{margin-top:5px;}
+.tbl td{padding:7px 8px;border:1px solid var(--border-l);text-align:center;vertical-align:middle;}
 .tbl .input,.tbl .select{height:30px;font-size:12.5px;}
 .prefix-wrap{display:flex;align-items:center;}
 .prefix-wrap .prefix{height:30px;line-height:30px;padding:0 8px;background:#f5f7fa;border:1px solid var(--border);border-right:none;border-radius:4px 0 0 4px;color:var(--text-3);font-size:12.5px;}
@@ -498,9 +497,9 @@ function toast(msg,err){const t=$('#toast');t.textContent=msg;t.className='toast
   clearTimeout(t._t);t._t=setTimeout(()=>t.className='toast'+(err?' err':''),2200);}
 
 /* ---------- 比例（%）输入超过 100 即时提示 ---------- */
-function pctHintHtml(cls){ return `<p class="hint hint--err ${cls}" style="display:none">比例配置不得超过100%</p>`; }
+function pctHintHtml(cls){ return `<p class="hint hint--err ${cls}" style="visibility:hidden">比例配置不得超过100%</p>`; }
 function attachPctGuard(input,hintEl){
-  const check=()=>{ const over=input.value!==''&&Number(input.value)>100; input.classList.toggle('is-error',over); if(hintEl) hintEl.style.display=over?'block':'none'; };
+  const check=()=>{ const over=input.value!==''&&Number(input.value)>100; input.classList.toggle('is-error',over); if(hintEl) hintEl.style.visibility=over?'visible':'hidden'; };
   input.addEventListener('input',check); check();
 }
 
@@ -609,10 +608,14 @@ $('#applyAll').addEventListener('change',()=>{ if($('#applyAll').checked) curVip
 let challengeRows=[{up:'20',appear:'35',win:'60'},{up:'50',appear:'21',win:'50'}];
 function challengeAppearSum(){ return challengeRows.reduce((s,r)=>s+(Number(r.appear)||0),0); }
 function updateChallengeAppearHint(){
-  const rows=[...$('#challengeBody').children]; const invalid=challengeAppearSum()!==100;
+  const rows=[...$('#challengeBody').children]; const totalInvalid=challengeAppearSum()!==100;
   rows.forEach((tr,idx)=>{
-    const hint=$('.js-appear-total-hint',tr);
-    if(hint) hint.style.display=(idx===rows.length-1&&invalid)?'block':'none';
+    const input=$('.js-appear',tr); const hint=$('.js-appear-hint',tr);
+    const over=input.value!==''&&Number(input.value)>100;
+    input.classList.toggle('is-error',over);
+    if(over){ hint.textContent='比例配置不得超过100%'; hint.style.visibility='visible'; }
+    else if(idx===rows.length-1&&totalInvalid){ hint.textContent='触发机率总计需为100%'; hint.style.visibility='visible'; }
+    else { hint.style.visibility='hidden'; }
   });
 }
 function renderChallenge(){
@@ -621,15 +624,13 @@ function renderChallenge(){
     const tr=document.createElement('tr');
     tr.innerHTML=`<td>挑战LV${i+1}</td>
       <td><div class="suffix-wrap"><input class="input js-up" value="${r.up}"><span class="suffix">%</span></div>${pctHintHtml('js-up-hint')}</td>
-      <td><div class="suffix-wrap"><input class="input js-appear" value="${r.appear}"><span class="suffix">%</span></div>${pctHintHtml('js-appear-hint')}
-        <p class="hint hint--err js-appear-total-hint" style="display:none">触发机率总计需为100%</p></td>
+      <td><div class="suffix-wrap"><input class="input js-appear" value="${r.appear}"><span class="suffix">%</span></div>${pctHintHtml('js-appear-hint')}</td>
       <td><div class="suffix-wrap"><input class="input js-win" value="${r.win}"><span class="suffix">%</span></div>${pctHintHtml('js-win-hint')}</td>
       <td><button class="btn--link red js-del">删除</button></td>`;
     $('.js-up',tr).addEventListener('input',e=>r.up=e.target.value);
     $('.js-appear',tr).addEventListener('input',e=>{ r.appear=e.target.value; updateChallengeAppearHint(); });
     $('.js-win',tr).addEventListener('input',e=>r.win=e.target.value);
     attachPctGuard($('.js-up',tr),$('.js-up-hint',tr));
-    attachPctGuard($('.js-appear',tr),$('.js-appear-hint',tr));
     attachPctGuard($('.js-win',tr),$('.js-win-hint',tr));
     $('.js-del',tr).addEventListener('click',()=>{ if(challengeRows.length<=1){toast('至少保留 1 个挑战',true);return;}
       challengeRows.splice(i,1); renderChallenge(); renderRebate(); });
@@ -690,10 +691,14 @@ let scratch={ N1:[{amt:'1',rate:'28',flash:false},{amt:'3',rate:'34',flash:false
   S2:[{amt:'100',rate:'5',flash:false},{amt:'1000',rate:'3',flash:false}] };
 function scratchSum(tier){ return scratch[tier].reduce((s,r)=>s+(Number(r.rate)||0),0); }
 function updateScratchHint(tier,body){
-  const rows=[...body.children]; const invalid=scratchSum(tier)!==100;
+  const rows=[...body.children]; const totalInvalid=scratchSum(tier)!==100;
   rows.forEach((tr,idx)=>{
-    const hint=$('.js-rate-hint',tr);
-    if(hint) hint.style.display=(idx===rows.length-1&&invalid)?'block':'none';
+    const input=$('.js-rate',tr); const hint=$('.js-rate-hint',tr);
+    const over=input.value!==''&&Number(input.value)>100;
+    input.classList.toggle('is-error',over);
+    if(over){ hint.textContent='比例配置不得超过100%'; hint.style.visibility='visible'; }
+    else if(idx===rows.length-1&&totalInvalid){ hint.textContent='获奖机率总计需为100%'; hint.style.visibility='visible'; }
+    else { hint.style.visibility='hidden'; }
   });
 }
 function renderScratch(){
@@ -717,15 +722,14 @@ function renderScratch(){
       tr.innerHTML=`<td>${i+1}</td>
         <td><input class="input js-amt" value="${r.amt}"></td>
         <td><div class="suffix-wrap"><input class="input js-rate" value="${r.rate}"><span class="suffix">%</span></div>
-          ${pctHintHtml('js-rate-pct-hint')}
-          <p class="hint hint--err js-rate-hint" style="display:none">获奖机率总计需为100%</p></td>
+          <p class="hint hint--err js-rate-hint" style="visibility:hidden">获奖机率总计需为100%</p></td>
         <td><label class="chk"><input type="checkbox" class="js-flash-row" ${r.flash?'checked':''}>是</label></td>
         <td><button class="btn--link red js-del">删除</button></td>`;
       $('.js-amt',tr).addEventListener('input',e=>r.amt=e.target.value);
       $('.js-rate',tr).addEventListener('input',e=>{ r.rate=e.target.value; updateScratchHint(tier,body); });
-      attachPctGuard($('.js-rate',tr),$('.js-rate-pct-hint',tr));
       $('.js-flash-row',tr).addEventListener('change',e=>{ r.flash=e.target.checked; syncFlashAll(); });
-      $('.js-del',tr).addEventListener('click',()=>{scratch[tier].splice(i,1);renderScratch();});
+      $('.js-del',tr).addEventListener('click',()=>{ if(scratch[tier].length<=1){toast(tier+' 至少保留 1 项',true);return;}
+        scratch[tier].splice(i,1);renderScratch(); });
       body.appendChild(tr);
     });
     syncFlashAll();
