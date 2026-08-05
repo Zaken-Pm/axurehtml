@@ -223,7 +223,7 @@
           <td>v1.0.0</td>
           <td><span class="tag add">A 新增</span></td>
           <td>Zaken</td>
-          <td>文件初版。后台「KYC配置」新增「KYC短信配置」，提供「KYC短信不通过短信」开关与「KYC短信内容」编辑功能。</td>
+          <td>文件初版。后台「KYC配置」新增「KYC短信配置」，提供「KYC不通过短信」开关与「KYC短信内容」编辑功能。</td>
         </tr>
         <tr>
           <td>2026/07/30</td>
@@ -304,7 +304,7 @@
         <div class="bo hl">
           <div class="bo-title">KYC短信配置 <span class="badge-new">本次新增</span></div>
           <div class="swline" style="border-top:none">
-            <span class="swlbl">KYC短信不通过短信</span>
+            <span class="swlbl">KYC不通过短信</span>
             <span class="swright"><span class="bsw" id="smsSwitch" onclick="toggleRealSwitch(this)"><span class="knob"></span></span><span class="swtext" id="smsSwitchState">关闭</span></span>
           </div>
           <div class="mrow">
@@ -344,7 +344,7 @@
       <b>示意图设计说明（对照现行后台）：</b>
       <ul style="margin:8px 0 0;color:#365291">
         <li>既有「站内信相关配置」每则讯息为「<b>标题＋内容</b>」双栏；<b>KYC短信配置仅有「内容」、无「标题」</b>——因短信无主旨栏位，此为刻意差异。</li>
-        <li>既有「KYC验证结果站内信开关」是站内信整区总开关（同时管控通过／拒绝／补件站内信）；本次新增的「KYC短信不通过短信」<b>仅针对「拒绝」情境发送短信</b>，与既有开关<b>各自独立、互不影响</b>。</li>
+        <li>既有「KYC验证结果站内信开关」是站内信整区总开关（同时管控通过／拒绝／补件站内信）；本次新增的「KYC不通过短信」<b>仅针对「拒绝」情境发送短信</b>，与既有开关<b>各自独立、互不影响</b>。</li>
       </ul>
     </div>
     <script>
@@ -369,10 +369,10 @@
     <h4>① 「KYC短信配置」区块　<span class="tag add">新增</span></h4>
     <ul>
       <li>区块位于「站内信相关配置」与「EKYC提交信息配置」之间。<span class="ref">（对应 2.1）</span></li>
-      <li>区块由上至下依序显示两个项目：「KYC短信不通过短信」开关、「KYC短信内容」输入框（含「保存」按钮）。</li>
+      <li>区块由上至下依序显示两个项目：「KYC不通过短信」开关、「KYC短信内容」输入框（含「保存」按钮）。</li>
     </ul>
 
-    <h4>② 「KYC短信不通过短信」开关　<span class="tag add">新增</span> <span class="ref">（对应规范 3.1.7 开关状态说明）</span></h4>
+    <h4>② 「KYC不通过短信」开关　<span class="tag add">新增</span> <span class="ref">（对应规范 3.1.7 开关状态说明）</span></h4>
     <ul>
       <li><b>预设关闭。</b></li>
       <li>开关切换<b>即时生效，无需点击保存</b>；切换成功后显示对应提示（见 ④ 操作提示）。</li>
@@ -451,7 +451,7 @@
     <h3>3.1　发送判断逻辑表：开关状态 × KYC 审核情境</h3>
     <table>
       <thead>
-        <tr><th style="width:150px">KYC短信不通过短信开关</th><th>KYC 审核情境</th><th style="width:130px" class="c">是否发送短信</th><th>说明</th></tr>
+        <tr><th style="width:150px">KYC不通过短信开关</th><th>KYC 审核情境</th><th style="width:130px" class="c">是否发送短信</th><th>说明</th></tr>
       </thead>
       <tbody>
         <tr><td>关闭（预设）</td><td>人工审核 — 拒绝</td><td class="c no">否</td><td>开关未开启，任何情境皆不发送。</td></tr>
@@ -514,7 +514,7 @@
     <h3>4.1　新增 <span class="tag add">A</span></h3>
     <ul>
       <li>「KYC短信配置」区块（位于站内信相关配置与 EKYC 提交信息配置之间）。</li>
-      <li>「KYC短信不通过短信」开关（预设关闭、即时生效）。</li>
+      <li>「KYC不通过短信」开关（预设关闭、即时生效）。</li>
       <li>「KYC短信内容」输入框（无字数限制、纯文字、预设留空）与「保存」按钮。</li>
       <li>人工 KYC 审核拒绝时依开关发送短信的触发逻辑。</li>
     </ul>
