@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>X-BOMB 活动原型图 v2</title>
+<style>
+/* =====================================================================
+   X-BOMB 活动原型图 v2
+   —— 依《需求确认与待补文案清单 v1.0》回覆调整：
+      · 返水隔日改「可补领」(2.2/6.1)
+      · 充值任务改固定配置 (3.1)
+      · 刮刮卡移除「过期刮开」、刮开即领取单步 (5.5)
+      · 套用 A/B/C/D 区回填文案
+   —— 单一 HTML；语义化、BEM、Design Token、rem、响应式、可见 focus。
+   —— 美术未定处以占位块标注（素材待美术）。
+   ===================================================================== */
+
+/* === Design Token === */
+:root {
+  --bg-deep:#0a0918; --bg-panel:#15112c; --bg-panel-2:#1d1740; --bg-card:#241b52;
+  --primary:#7c3aed; --neon-pink:#ff2d78; --neon-blue:#3b82f6; --neon-cyan:#22d3ee;
+  --gold:#ffd23f; --text:#f5f3ff; --text-dim:#a99fce; --good:#22c55e; --bad:#f0475b; --locked:#4338a8;
+  --space-1:.25rem; --space-2:.5rem; --space-3:.75rem; --space-4:1rem; --space-5:1.5rem; --space-6:2rem;
+  --radius:.75rem; --radius-lg:1.25rem; --radius-pill:999px;
+}
+html { font-size:18px; -webkit-text-size-adjust:100%; }
+* { box-sizing:border-box; }
+body {
+  margin:0; font-family:"Segoe UI","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  background:radial-gradient(120% 80% at 50% 0%,#1a1440 0%,var(--bg-deep) 60%);
+  color:var(--text); line-height:1.5; min-height:100vh; padding:var(--space-4);
+  display:flex; flex-direction:column; align-items:center; gap:var(--space-4);
+}
+:focus-visible { outline:3px solid var(--neon-cyan); outline-offset:2px; }
+
+/* === 原型导览工具条（非正式界面） === */
+.toolbar { width:100%; max-width:26rem; background:rgba(255,255,255,.04);
+  border:1px dashed var(--primary); border-radius:var(--radius); padding:var(--space-3); }
+.toolbar__title { margin:0 0 var(--space-2); font-size:.8rem; color:var(--text-dim); letter-spacing:.04em; }
+.toolbar__group { display:flex; flex-wrap:wrap; gap:var(--space-2); }
+.toolbar__btn { font-size:.76rem; padding:var(--space-1) var(--space-3); border-radius:var(--radius-pill);
+  border:1px solid var(--primary); background:transparent; color:var(--text); cursor:pointer; }
+.toolbar__btn:hover { background:var(--primary); }
+.toolbar__btn[aria-pressed="true"] { background:var(--primary); border-color:var(--neon-cyan); }
+.toolbar__hint { margin:var(--space-2) 0 0; font-size:.7rem; color:var(--text-dim); }
+
+/* === 手机外框 === */
+.phone { width:100%; max-width:26rem; background:var(--bg-deep); border-radius:var(--radius-lg);
+  overflow:hidden; box-shadow:0 1.5rem 4rem rgba(0,0,0,.6),0 0 0 1px rgba(124,58,237,.3); position:relative; }
+.spec-tag { display:inline-block; font-size:.62rem; letter-spacing:.05em; color:var(--neon-cyan);
+  background:rgba(34,211,238,.1); border:1px solid rgba(34,211,238,.3); border-radius:var(--radius-pill);
+  padding:1px var(--space-2); margin:var(--space-2) 0 0 var(--space-3); }
+
+/* === 活动信息展示区（对应规格：活动信息展示区） === */
+.hero { position:relative; background:linear-gradient(180deg,#000 0%,#120e2e 100%); padding-bottom:var(--space-3); }
+.hero__banner { height:8.5rem; display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(180deg,rgba(0,0,0,.1),rgba(0,0,0,.55)),
+    repeating-linear-gradient(90deg,#241455 0 8px,#1a0f45 8px 16px),
+    radial-gradient(60% 120% at 50% 0%,#3b1e7a,#0c0722);
+  border-bottom:1px solid rgba(124,58,237,.4); position:relative; overflow:hidden; }
+.hero__title { margin:0; font-size:2rem; font-weight:900; letter-spacing:.02em; color:#fff;
+  text-shadow:0 0 8px var(--neon-pink),0 0 18px var(--neon-pink),2px 3px 0 #7a1140; transform:skewX(-6deg); }
+.hero__placeholder-note { position:absolute; top:var(--space-2); left:50%; transform:translateX(-50%);
+  font-size:.6rem; color:var(--text-dim); background:rgba(0,0,0,.4); padding:1px var(--space-2); border-radius:var(--radius-pill); }
+.board-title { margin:var(--space-3) var(--space-3) 0; font-size:.72rem; letter-spacing:.14em;
+  color:#cbb8ff; font-weight:800; }
+.hero__info { display:grid; grid-template-columns:5.5rem 1fr; gap:var(--space-3); align-items:center;
+  margin:var(--space-2) var(--space-3) 0; background:linear-gradient(180deg,#3a1e86,#241463);
+  border:1px solid rgba(124,58,237,.5); border-radius:var(--radius); padding:var(--space-3); }
+.avatar { aspect-ratio:1; border-radius:var(--radius);
+  background:repeating-linear-gradient(45deg,#4c2aa0 0 6px,#3a2080 6px 12px);
+  display:grid; place-items:center; text-align:center; font-size:.56rem; color:#d9ccff; padding:var(--space-1);
+  border:1px dashed rgba(255,255,255,.35); }
+.stat { display:flex; flex-direction:column; gap:var(--space-1); }
+.stat__row { display:flex; align-items:center; justify-content:space-between;
+  background:rgba(0,0,0,.35); border-radius:var(--radius-pill); padding:var(--space-1) var(--space-3); }
+.stat__label { font-size:.74rem; color:#e8e2ff; letter-spacing:.04em; }
+.stat__value { font-size:1.1rem; font-weight:800; color:var(--gold); }
+
+/* 补领横幅（返水隔日可补领，2.2/6.1） */
+.makeup { display:none; margin:var(--space-3) var(--space-3) 0; padding:var(--space-2) var(--space-3);
+  background:linear-gradient(90deg,#7a1f8f,#c026d3); border:1px solid var(--gold); border-radius:var(--radius);
+  align-items:center; gap:var(--space-3); }
+.makeup.is-show { display:flex; }
+.makeup__txt { flex:1; min-width:0; font-size:.8rem; }
+.makeup__txt b { color:var(--gold); }
+.makeup__btn { flex:0 0 auto; background:linear-gradient(180deg,#ff6a8a,#c81e3f); border:none;
+  color:#fff; font-weight:800; font-size:.78rem; padding:var(--space-2) var(--space-3); border-radius:var(--radius-pill); cursor:pointer; }
+
+/* === 活动 TAB === */
+.tabs { display:grid; grid-template-columns:1fr 1fr; gap:var(--space-2); padding:var(--space-3); }
+.tab { position:relative; border:2px solid transparent; border-radius:var(--radius); padding:var(--space-3);
+  font-weight:800; font-size:.9rem; color:#fff; cursor:pointer; background:linear-gradient(180deg,#c026d3,#7a1f8f);
+  text-align:center; display:flex; align-items:center; justify-content:center; gap:var(--space-2); min-height:3.4rem; }
+.tab__icon { width:1.6rem; height:1.6rem; border-radius:6px;
+  background:repeating-linear-gradient(45deg,#ff7ac0 0 4px,#d24da0 4px 8px); flex:0 0 auto; }
+.tab[aria-selected="true"] { border-color:var(--neon-cyan);
+  box-shadow:0 0 0 2px rgba(34,211,238,.4),0 0 16px rgba(34,211,238,.5); animation:breathe 2.4s ease-in-out infinite; }
+@keyframes breathe { 0%,100%{box-shadow:0 0 0 2px rgba(34,211,238,.3),0 0 10px rgba(34,211,238,.35);}
+  50%{box-shadow:0 0 0 2px rgba(34,211,238,.6),0 0 22px rgba(34,211,238,.7);} }
+.tab__badge { position:absolute; top:-.5rem; right:-.4rem; min-width:1.3rem; height:1.3rem; padding:0 .3rem;
+  border-radius:var(--radius-pill); background:var(--bad); color:#fff; font-size:.78rem; font-weight:800;
+  display:grid; place-items:center; box-shadow:0 0 8px rgba(240,71,91,.8); }
+
+/* === 领取滚动条 === */
+.ticker { margin:0 var(--space-3) var(--space-3); background:#000; border:1px solid rgba(124,58,237,.5);
+  border-radius:var(--radius-pill); height:2.4rem; overflow:hidden; position:relative; }
+.ticker__track { position:absolute; inset:0; display:flex; flex-direction:column; }
+.ticker__item { height:2.4rem; flex:0 0 auto; display:flex; align-items:center; gap:var(--space-2);
+  padding:0 var(--space-3); font-size:.82rem; }
+.ticker__ava { width:1.5rem; height:1.5rem; border-radius:50%;
+  background:repeating-linear-gradient(45deg,#ff9d3d 0 4px,#e07f20 4px 8px); flex:0 0 auto; }
+.ticker__name { color:#fff; font-weight:700; }
+.ticker__act { color:var(--text-dim); }
+.ticker__amt { color:var(--gold); font-weight:800; margin-left:auto; }
+@keyframes tickerRoll { from{transform:translateY(0);} to{transform:translateY(-4.8rem);} }
+
+/* === 内容视图 === */
+.view { display:none; padding:0 var(--space-3) var(--space-5); }
+.view.is-active { display:block; }
+.section-title { font-size:1rem; margin:var(--space-4) 0 var(--space-2); color:#fff; font-weight:800; }
+
+/* 返水等级卡 */
+.level-card { position:relative; background:linear-gradient(180deg,var(--bg-card),#1a1440);
+  border:1px solid rgba(124,58,237,.4); border-radius:var(--radius-pill); padding:var(--space-3);
+  display:grid; grid-template-columns:1fr auto auto; align-items:center; gap:var(--space-3); margin-bottom:var(--space-3); }
+.level-card--challenge { border-color:var(--gold); box-shadow:0 0 14px rgba(255,210,63,.35); }
+.level-card--challenge::before { content:"Challenge"; position:absolute; top:-.75rem; left:var(--space-4);
+  font-size:.72rem; font-weight:800; color:var(--gold); text-shadow:0 0 6px rgba(255,210,63,.8); }
+.level-card--topup { border-color:var(--neon-pink); background:linear-gradient(180deg,#3a1140,#2a0f38); }
+.level-card--topup::before { content:"Top-up Challenge"; position:absolute; top:-.75rem; left:var(--space-4);
+  font-size:.72rem; font-weight:800; color:var(--neon-pink); }
+.level-card--claimed { opacity:.55; filter:grayscale(.4); }
+.level-card__main { min-width:0; }
+.level-card__progress-label { font-size:.82rem; color:#cfc6f5; margin-bottom:var(--space-1); }
+.level-card__bar { height:1.1rem; border-radius:var(--radius-pill); overflow:hidden; background:rgba(255,255,255,.08);
+  background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.06) 0 3px,transparent 3px 7px); }
+.level-card__bar-fill { height:100%; border-radius:var(--radius-pill);
+  background:linear-gradient(90deg,var(--neon-blue),var(--neon-pink),var(--gold)); }
+.level-card__reward { display:flex; flex-direction:column; align-items:center; gap:2px; }
+.level-card__coins { font-size:1.5rem; line-height:1; }
+.level-card__amt { font-weight:800; color:var(--gold); font-size:.95rem; }
+.level-card__ticket { margin-top:2px; font-size:.56rem; color:#fff; padding:1px var(--space-2); border-radius:4px;
+  background:linear-gradient(90deg,#2563eb,#7c3aed); border:1px solid rgba(255,255,255,.4); }
+.claim-btn { border:none; border-radius:var(--radius-pill); font-weight:800; cursor:pointer;
+  width:3.6rem; height:3.6rem; font-size:.7rem; color:#fff; padding:0; display:grid; place-items:center; text-align:center; }
+.claim-btn--claim { background:radial-gradient(circle at 50% 35%,#ff6a8a,#c81e3f); box-shadow:0 0 14px rgba(240,71,91,.6); }
+.claim-btn--claim:hover { filter:brightness(1.1); }
+.claim-btn--locked { background:radial-gradient(circle at 50% 35%,#5b73e6,#2c3aa0); color:#c7cdf5; cursor:not-allowed; }
+.claim-btn--topup { background:radial-gradient(circle at 50% 35%,#ff6a8a,#c81e3f); }
+.claim-btn--done { background:#2a2650; color:var(--text-dim); cursor:default; }
+.group-label { color:var(--neon-pink); font-weight:800; font-size:.86rem; margin:var(--space-4) 0 var(--space-2); }
+
+/* 空状态 */
+.empty { text-align:center; padding:var(--space-6) var(--space-4); color:var(--text-dim);
+  border:1px dashed rgba(255,255,255,.2); border-radius:var(--radius); margin-top:var(--space-4); }
+.empty__emoji { font-size:2.2rem; }
+.empty__title { color:#fff; font-weight:700; margin:var(--space-2) 0 var(--space-1); }
+
+/* 刮刮卡：奖品展示区 */
+.prize-show { position:relative; height:8rem; margin:var(--space-3) 0; border-radius:var(--radius);
+  border:1px solid rgba(124,58,237,.4); background:radial-gradient(80% 120% at 50% 20%,#241b52,#0c0722); overflow:hidden; }
+.prize-show__center { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  background:linear-gradient(90deg,#2563eb,#1d4ed8); color:var(--gold); font-weight:800; font-size:.82rem;
+  padding:var(--space-2) var(--space-3); border-radius:6px; border:2px solid #cbd5ff; text-align:center; z-index:2; }
+.bubble { position:absolute; border-radius:50%; display:grid; place-items:center; font-weight:800; color:#fff;
+  font-size:.8rem; animation:float 4s ease-in-out infinite; }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+/* 子页签 */
+.subtabs { display:flex; gap:var(--space-4); border-bottom:1px solid rgba(255,255,255,.12); margin:var(--space-3) 0; }
+.subtab { background:none; border:none; color:var(--text-dim); font-size:.9rem; padding:var(--space-2) 0;
+  cursor:pointer; border-bottom:2px solid transparent; }
+.subtab[aria-selected="true"] { color:#fff; border-bottom-color:var(--gold); }
+
+/* 刮刮卡票 */
+.ticket-row { display:grid; grid-template-columns:1fr auto; gap:var(--space-3); align-items:center; margin-bottom:var(--space-4); }
+.ticket { position:relative; border-radius:var(--radius); overflow:hidden; border:3px solid #d8d8e6;
+  aspect-ratio:16/7; display:flex; align-items:center; justify-content:center; background:linear-gradient(120deg,#1d4ed8,#3b82f6); }
+.ticket--super { background:linear-gradient(120deg,#f59e0b,#ea580c); }
+.ticket--grey { filter:grayscale(.85) brightness(.8); border-color:#7a7a8a; }
+.ticket--bigwin { border-color:var(--gold); box-shadow:0 0 16px var(--gold); }
+/* 闪卡（D2：后台勾选 → 前台显示全息炫彩） */
+.ticket--foil { border-color:#e8f0ff; box-shadow:0 0 14px rgba(180,220,255,.65),0 0 24px rgba(255,120,200,.4); }
+.ticket--foil::after { content:""; position:absolute; inset:0; z-index:2; pointer-events:none; border-radius:inherit;
+  background:linear-gradient(115deg,transparent 36%,rgba(255,255,255,.5) 50%,transparent 64%),
+    conic-gradient(from 0deg,rgba(255,45,120,.3),rgba(255,210,63,.3),rgba(34,211,238,.3),rgba(124,58,237,.3),rgba(255,45,120,.3));
+  background-size:250% 100%,100% 100%; animation:foilsweep 2.6s ease-in-out infinite; mix-blend-mode:screen; }
+@keyframes foilsweep { 0%{background-position:180% 0,0 0;} 100%{background-position:-80% 0,0 0;} }
+.ticket__foil-badge { position:absolute; top:4px; right:4px; z-index:3; font-size:.52rem; font-weight:800; color:#1a1a1a;
+  padding:1px .35rem; border-radius:var(--radius-pill); background:linear-gradient(90deg,#ffd23f,#22d3ee);
+  box-shadow:0 0 6px rgba(255,255,255,.6); letter-spacing:.05em; }
+.ticket__label { font-weight:900; font-size:1.02rem; color:var(--gold); text-shadow:2px 2px 0 rgba(0,0,0,.4); text-align:center; }
+.ticket__amount { display:block; font-size:1.3rem; color:#fff; }
+.ticket__dates { display:block; font-size:.55rem; color:#fff; margin-top:2px; }
+.ticket__ava { position:absolute; left:0; top:0; bottom:0; width:34%;
+  background:repeating-linear-gradient(45deg,rgba(255,255,255,.25) 0 6px,rgba(255,255,255,.1) 6px 12px);
+  display:grid; place-items:center; font-size:.55rem; color:#fff; text-align:center; }
+.ticket__scratch { position:absolute; right:6%; top:50%; transform:translateY(-50%); width:42%; height:34%;
+  border-radius:6px; background:repeating-linear-gradient(60deg,#c9c9d4 0 5px,#a9a9b8 5px 10px);
+  display:grid; place-items:center; color:#555; font-size:.6rem; cursor:pointer; transition:opacity .5s; }
+.ticket__scratch.is-scratched { opacity:0; pointer-events:none; }
+.ticket__kiss { position:absolute; right:8%; top:12%; font-size:1.4rem; }
+.ticket__stamp { position:absolute; inset:0; display:grid; place-items:center; color:#ff3b3b; font-weight:900;
+  font-size:1.05rem; letter-spacing:.08em; border:4px solid #ff3b3b; margin:12%; border-radius:8px;
+  transform:rotate(-12deg); text-shadow:0 0 4px rgba(0,0,0,.4); }
+.ticket-side { display:flex; flex-direction:column; align-items:center; gap:var(--space-1); width:5.5rem; }
+.ticket-side__count { font-size:.72rem; color:#fff; font-weight:700; text-align:center; }
+.ticket-side__btn { width:100%; padding:var(--space-2); border:none; border-radius:var(--radius);
+  font-weight:800; color:#fff; cursor:pointer; font-size:.85rem; }
+.ticket-side__btn--bless { background:linear-gradient(180deg,#ff5a5a,#c81e3f); }
+.ticket-side__btn--bless[disabled] { opacity:.45; cursor:default; }
+.ticket-side__btn--scratch { background:linear-gradient(180deg,#ff5a5a,#c81e3f); }
+.ticket-side__btn--done { background:#3a3a4a; color:#9a9ab0; cursor:default; }
+.ticket-side__btn--expired { background:#3a3a4a; color:#8a8a9a; cursor:not-allowed; }
+
+/* 翻牌挑战 Overlay */
+.overlay { position:absolute; inset:0; z-index:20; display:none;
+  background:radial-gradient(80% 80% at 50% 30%,#2a1466,#08040f 90%);
+  flex-direction:column; align-items:center; padding:var(--space-5) var(--space-4); }
+.overlay.is-open { display:flex; }
+/* 进入动画（Pili Card Challenge + GO） */
+.flip__entry { position:absolute; inset:0; z-index:6; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:var(--space-4);
+  background:radial-gradient(70% 70% at 50% 40%,#3a1c9a,#08040f); }
+.flip__entry.is-hidden { display:none; }
+.flip__entry-title { font-size:1.6rem; font-weight:900; color:var(--gold); text-align:center;
+  text-shadow:0 0 12px var(--neon-pink); }
+.flip__go { padding:var(--space-3) var(--space-6); font-size:1.2rem; font-weight:900;
+  background:linear-gradient(180deg,#ff5a5a,#c81e3f); color:#fff; border:none; border-radius:var(--radius-pill);
+  cursor:pointer; box-shadow:0 0 18px rgba(240,71,91,.6); }
+.flip__figure { width:7rem; height:7rem; border-radius:var(--radius);
+  background:repeating-linear-gradient(45deg,#5b2ad0 0 8px,#3a1c9a 8px 16px);
+  display:grid; place-items:center; text-align:center; font-size:.58rem; color:#e6dcff;
+  border:1px dashed rgba(255,255,255,.4); margin-bottom:var(--space-3); }
+.flip__bonus { text-align:center; margin-bottom:var(--space-3); }
+.flip__bonus b { display:block; color:var(--gold); font-size:1.4rem; }
+.flip__bonus .flip__boost { color:var(--good); font-weight:800; font-size:1.2rem; }
+.flip__cards { display:flex; gap:var(--space-4); margin:var(--space-4) 0; position:relative; }
+.card { width:6.2rem; aspect-ratio:2/3; border-radius:var(--radius); cursor:pointer; border:4px solid transparent;
+  background:#fff; position:relative; overflow:hidden; display:grid; place-items:center; font-size:2.4rem; color:#111; }
+.card__back { position:absolute; inset:0; background:repeating-linear-gradient(45deg,#1e3a8a 0 8px,#2547a8 8px 16px); }
+.card.is-selected { border-color:var(--neon-cyan); box-shadow:0 0 18px var(--neon-cyan); animation:breathe 1.6s infinite; }
+.card.is-flipped .card__back { display:none; }
+.card__suit--red { color:#e11d48; }
+.flip__center-msg { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  background:rgba(0,0,0,.75); color:var(--gold); font-weight:800; font-size:.9rem; padding:var(--space-2) var(--space-3);
+  border-radius:6px; text-align:center; z-index:3; max-width:14rem; }
+.flip__status { font-size:1.4rem; font-weight:900; margin:var(--space-2) 0; }
+.flip__status--win { color:var(--good); }
+.flip__status--lose { color:var(--bad); }
+.flip__countdown { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  font-size:3rem; font-weight:900; color:var(--gold); text-shadow:0 0 12px var(--neon-pink); z-index:5; }
+.btn-confirm { margin-top:var(--space-3); padding:var(--space-3) var(--space-6);
+  background:linear-gradient(180deg,#ff5a5a,#c81e3f); border:none; border-radius:var(--radius);
+  color:#fff; font-weight:800; font-size:1rem; cursor:pointer; }
+.btn-confirm[disabled] { opacity:.5; cursor:not-allowed; }
+
+/* toast */
+.toast { position:absolute; bottom:var(--space-5); left:50%; transform:translateX(-50%) translateY(1rem);
+  background:rgba(0,0,0,.85); color:#fff; padding:var(--space-2) var(--space-4); border-radius:var(--radius-pill);
+  font-size:.82rem; opacity:0; transition:.3s; z-index:30; border:1px solid var(--gold); max-width:20rem; text-align:center; }
+.toast.is-show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* 祝福动画 */
+.bless-anim { position:absolute; inset:0; z-index:25; display:none; place-items:center;
+  background:rgba(10,6,24,.9); text-align:center; }
+.bless-anim.is-open { display:grid; }
+.bless-anim__fig { font-size:3rem; animation:pop .6s ease; }
+@keyframes pop { 0%{transform:scale(.4);opacity:0} 100%{transform:scale(1);opacity:1} }
+
+@media (max-width:380px) { html{font-size:16px;} .hero__info{grid-template-columns:4.5rem 1fr;} }
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after{animation:none !important;} }
+</style>
+</head>
+<body>
+
+<!-- ===================== 原型导览（非正式界面） ===== -->
+<aside class="toolbar" aria-label="原型导览">
+  <p class="toolbar__title">🧭 原型导览（仅供预览各状态，非正式界面）</p>
+  <div class="toolbar__group">
+    <button class="toolbar__btn" data-nav="rebate" aria-pressed="true">① 投注返水页</button>
+    <button class="toolbar__btn" data-nav="makeup" aria-pressed="false">②ᐧ补领状态</button>
+    <button class="toolbar__btn" data-nav="raffle" aria-pressed="false">③ 刮刮卡页</button>
+    <button class="toolbar__btn" data-nav="flip" aria-pressed="false">④ 翻牌流程</button>
+    <button class="toolbar__btn" data-nav="empty-rebate" aria-pressed="false">⑤ 返水空状态</button>
+    <button class="toolbar__btn" data-nav="empty-raffle" aria-pressed="false">⑥ 刮刮卡空状态</button>
+  </div>
+  <p class="toolbar__hint">CLAIM / 一键领取 / GO / Bless / Scratch 皆可点击，演示对应动画与状态切换。</p>
+</aside>
+
+<!-- ============================== 手机界面 ======================= -->
+<div class="phone" id="phone">
+
+  <!-- ---------- 活动信息展示区 ---------- -->
+  <header class="hero">
+    <div class="hero__banner">
+      <span class="hero__placeholder-note">主视觉 Banner（三位看板娘，待美术）</span>
+      <h1 class="hero__title">X-BOMB IMPACT</h1>
+    </div>
+
+    <p class="board-title">TODAY'S REWARD BOARD</p>
+    <div class="hero__info">
+      <div class="avatar" id="heroAvatar">看板娘 A<br>待机动画<br>（随 TAB 切换<br>·待美术）</div>
+      <div class="stat">
+        <div class="stat__row"><span class="stat__label">BONUS CLAIMED</span><span class="stat__value">35,135.15p</span></div>
+        <div class="stat__row"><span class="stat__label">RAFFLE WINNINGS</span><span class="stat__value">35p</span></div>
+      </div>
+    </div>
+
+    <!-- 补领横幅：仅当有 T-1 未领奖励时出现（2.2 / 6.1） -->
+    <div class="makeup" id="makeupBanner">
+      <div class="makeup__txt">Yesterday's unclaimed rewards：<b>₱42</b>（示意）</div>
+      <button class="makeup__btn" id="makeupBtn">Claim All</button>
+    </div>
+
+    <span class="spec-tag">对应规格：活动信息展示区（含补领状态）</span>
+  </header>
+
+  <!-- ---------- 活动 TAB ---------- -->
+  <nav class="tabs" role="tablist" aria-label="活动玩法切换">
+    <button class="tab" id="tabRebate" role="tab" aria-selected="true" aria-controls="viewRebate">
+      <span class="tab__icon" aria-hidden="true"></span>Rebate-Challenge
+      <span class="tab__badge" id="badgeRebate">1</span>
+    </button>
+    <button class="tab" id="tabRaffle" role="tab" aria-selected="false" aria-controls="viewRaffle">
+      <span class="tab__icon" aria-hidden="true"></span>Bomb Ticket Reveal
+      <span class="tab__badge" id="badgeRaffle">1</span>
+    </button>
+  </nav>
+
+  <!-- ================== 视图一：投注返水 ================== -->
+  <main>
+  <section class="view is-active" id="viewRebate" role="tabpanel" aria-labelledby="tabRebate">
+    <div class="ticker" aria-label="用户领取动态（真实数据）" style="margin-top:0">
+      <div class="ticker__track" id="tickerRebate"></div>
+    </div>
+    <span class="spec-tag" style="margin-left:0">对应规格：领取展示区（仅真实数据）</span>
+
+    <div id="rebateList"></div>
+
+    <!-- 充值任务：固定配置（3.1） -->
+    <p class="group-label">Top-up Challenge　·　固定配置（每日 2 档，可扩充为 3 档）</p>
+    <div id="topupList"></div>
+
+    <div class="empty" id="emptyRebate" hidden>
+      <div class="empty__emoji">🎧</div>
+      <p class="empty__title">No rebate rewards yet</p>
+      <p>Place bets to unlock rebate rewards.<br><span style="font-size:.68rem;color:#7a7196">（返水空状态文案回填不清，暂用此句，待确认）</span></p>
+    </div>
+  </section>
+
+  <!-- ================== 视图二：刮刮卡 ================== -->
+  <section class="view" id="viewRaffle" role="tabpanel" aria-labelledby="tabRaffle">
+    <div class="prize-show" aria-label="奖品展示区">
+      <div class="prize-show__center">100% chance of winning</div>
+      <span class="bubble" style="width:3rem;height:3rem;background:#eab308;top:8%;left:8%;">10,000</span>
+      <span class="bubble" style="width:1.8rem;height:1.8rem;background:#2563eb;top:6%;left:52%;animation-delay:.6s">3</span>
+      <span class="bubble" style="width:1.8rem;height:1.8rem;background:#2563eb;top:14%;right:12%;animation-delay:1s">10</span>
+      <span class="bubble" style="width:1.6rem;height:1.6rem;background:#2563eb;bottom:20%;left:14%;animation-delay:.3s">5</span>
+      <span class="bubble" style="width:2.6rem;height:2.6rem;background:#9ca3af;bottom:8%;left:38%;font-size:.7rem;animation-delay:1.2s">1,000</span>
+      <span class="bubble" style="width:1.5rem;height:1.5rem;background:#2563eb;bottom:22%;left:60%;animation-delay:.8s">1</span>
+      <span class="bubble" style="width:2.4rem;height:2.4rem;background:#c2410c;bottom:10%;right:12%;animation-delay:.5s">100</span>
+    </div>
+
+    <div class="ticker" aria-label="用户刮奖动态（真实数据）">
+      <div class="ticker__track" id="tickerRaffle"></div>
+    </div>
+
+    <h2 class="section-title">My Scratch Ticket</h2>
+    <span class="spec-tag" style="margin-left:0">对应规格：刮刮卡玩法｜开奖＝获得次日 12:00；过期＝开奖日+3 自然日 23:59:59；刮开即领取</span>
+
+    <div class="subtabs" role="tablist" aria-label="刮刮卡筛选">
+      <button class="subtab" role="tab" aria-selected="true"  data-sub="all">All</button>
+      <button class="subtab" role="tab" aria-selected="false" data-sub="expired">Expired</button>
+      <button class="subtab" role="tab" aria-selected="false" data-sub="claimed">Claimed</button>
+    </div>
+
+    <div id="raffleList"></div>
+
+    <div class="empty" id="emptyRaffle" hidden>
+      <div class="empty__emoji">🎫</div>
+      <p class="empty__title">No Scratch Tickets Yet</p>
+      <p>Complete missions to earn your next ticket.</p>
+    </div>
+  </section>
+  </main>
+
+  <!-- ================== 翻牌挑战 Overlay ================== -->
+  <div class="overlay" id="flipOverlay" role="dialog" aria-modal="true" aria-label="Pili Card Challenge">
+    <!-- 进入动画：Pili Card Challenge + GO（B 区回填） -->
+    <div class="flip__entry" id="flipEntry">
+      <div class="flip__figure">看板娘 A<br>（挑战形象<br>·待美术）</div>
+      <p class="flip__entry-title">Pili Card Challenge</p>
+      <button class="flip__go" id="flipGo">GO</button>
+    </div>
+
+    <div class="flip__figure">看板娘 A<br>（挑战形象·待美术）</div>
+    <div class="flip__bonus">
+      <span>Your Bonus</span><b id="flipBase">200p</b>
+      <span>Win Boost</span><span class="flip__boost" id="flipBoost">+20%</span>
+    </div>
+
+    <div class="flip__cards" id="flipCards">
+      <div class="flip__countdown" id="flipCountdown">Ready</div>
+      <button class="card" data-card="0"><span class="card__back"></span></button>
+      <button class="card" data-card="1"><span class="card__back"></span></button>
+      <div class="flip__center-msg" id="flipMsg" hidden></div>
+    </div>
+
+    <div class="flip__status" id="flipStatus" aria-live="polite">Choose a card</div>
+    <button class="btn-confirm" id="flipConfirm" disabled>Confirm</button>
+  </div>
+
+  <!-- 祝福动画 -->
+  <div class="bless-anim" id="blessAnim" aria-hidden="true">
+    <div><div class="bless-anim__fig">💋✨</div><p style="color:#fff">Blessing…（祝福动画，待美术）</p></div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+/* =====================================================================
+   互动逻辑（白话注解）。数值/文案为示意，正式以规格为准。
+   ===================================================================== */
+const $  = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('is-show');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('is-show'),1900); }
+
+/* ---------- 领取滚动条（真实用户，格式：User ID Claimed XXP） ---------- */
+const claims = [
+  ['Okbet156…1dx','Claimed','15P'],
+  ['Juan…88','Claimed','35P'],
+  ['Maria…07','Claimed','7P'],
+  ['Okbet156…1dx','Scratched','1,000P'],
+];
+function buildTicker(el,rows){
+  const make=(r)=>`<div class="ticker__item"><span class="ticker__ava"></span>
+    <span class="ticker__name">${r[0]}</span><span class="ticker__act">${r[1]}</span>
+    <span class="ticker__amt">${r[2]}</span></div>`;
+  el.innerHTML = rows.map(make).join('') + rows.map(make).join('');
+  el.style.animation = `tickerRoll ${rows.length*0.8*2}s steps(${rows.length*2}) infinite`;
+}
+buildTicker($('#tickerRebate'),claims);
+buildTicker($('#tickerRaffle'),claims);
+
+/* ---------- 返水等级卡 ---------- */
+const levels = [
+  { lv:1, cur:500, max:500, amt:'₱7',  status:'claim',  challenge:true },
+  { lv:2, cur:887, max:1000, amt:'₱10', status:'locked', ticket:'N1' },
+  { lv:3, cur:910, max:2000, amt:'₱15', status:'locked', ticket:'N1' },
+  { lv:4, cur:2125, max:5000, amt:'₱25', status:'locked', challenge:true, ticket:'N2' },
+  { lv:5, cur:3010, max:10000, amt:'₱10', status:'locked' },
+  { lv:6, cur:4600, max:20000, amt:'₱50', status:'locked', challenge:true },
+  { lv:7, cur:6280, max:50000, amt:'₱150', status:'locked', ticket:'S1' },
+];
+function levelCard(d){
+  const pct=Math.min(100,Math.round(d.cur/d.max*100));
+  const cls=['level-card']; if(d.challenge)cls.push('level-card--challenge'); if(d.status==='done')cls.push('level-card--claimed');
+  let btn;
+  if(d.status==='claim') btn=`<button class="claim-btn claim-btn--claim" data-lv="${d.lv}">CLAIM</button>`;
+  else if(d.status==='done') btn=`<button class="claim-btn claim-btn--done" disabled>Claimed</button>`;
+  else btn=`<button class="claim-btn claim-btn--locked" disabled>LOCKED</button>`;
+  const ticket=d.ticket?`<span class="level-card__ticket">+ ${d.ticket} 卡</span>`:'';
+  return `<article class="${cls.join(' ')}">
+    <div class="level-card__main">
+      <div class="level-card__progress-label">${d.cur.toLocaleString()}/${d.max.toLocaleString()}</div>
+      <div class="level-card__bar"><div class="level-card__bar-fill" style="width:${pct}%"></div></div>
+    </div>
+    <div class="level-card__reward"><span class="level-card__coins">🪙</span>
+      <span class="level-card__amt">${d.amt}</span>${ticket}</div>${btn}</article>`;
+}
+$('#rebateList').innerHTML = levels.map(levelCard).join('');
+
+/* 充值任务（固定配置；一定双奖励；TOP-UP） */
+const topups = [
+  { need:'Top-up ₱200', cur:0, max:1000, amt:'₱10', ticket:'N1', status:'topup' },
+  { need:'Top-up ₱1,000', cur:0, max:500, amt:'₱250', ticket:'S1', status:'locked' },
+];
+function topupCard(d){
+  const pct=Math.min(100,Math.round(d.cur/d.max*100));
+  const btn=d.status==='topup'
+    ?`<button class="claim-btn claim-btn--topup" data-topup="1">TOP-UP</button>`
+    :`<button class="claim-btn claim-btn--locked" disabled>LOCKED</button>`;
+  return `<article class="level-card level-card--topup">
+    <div class="level-card__main">
+      <div class="level-card__progress-label">${d.cur.toLocaleString()} / ${d.max.toLocaleString()}</div>
+      <div class="level-card__bar"><div class="level-card__bar-fill" style="width:${pct}%"></div></div>
+    </div>
+    <div class="level-card__reward"><span class="level-card__coins">🪙</span>
+      <span class="level-card__amt">${d.amt}</span><span class="level-card__ticket">+ ${d.ticket} 卡</span></div>${btn}</article>`;
+}
+$('#topupList').innerHTML = topups.map(topupCard).join('');
+
+/* 返水点击 */
+$('#viewRebate').addEventListener('click',(e)=>{
+  const claimBtn=e.target.closest('.claim-btn--claim');
+  const topupBtn=e.target.closest('.claim-btn--topup');
+  if(topupBtn){ toast('跳转充值页；完成后回到本页领取奖励'); return; }
+  if(!claimBtn) return;
+  const lv=+claimBtn.dataset.lv; const data=levels.find(l=>l.lv===lv);
+  if(data.challenge){ openFlip(data); } else { doClaim(claimBtn,data); }
+});
+function doClaim(btn,data){
+  toast(`Claimed ${data.amt} 🪙 → Bonus Claimed`);
+  data.status='done'; btn.closest('.level-card').classList.add('level-card--claimed');
+  btn.outerHTML=`<button class="claim-btn claim-btn--done" disabled>Claimed</button>`;
+  bumpBadge('#badgeRebate',-1);
+}
+
+/* 补领：一键领取 */
+$('#makeupBtn').addEventListener('click',()=>{
+  toast('All yesterday\u2019s rewards claimed 🪙');
+  $('#makeupBanner').classList.remove('is-show');
+});
+
+/* ---------- 翻牌挑战 ---------- */
+let flipState={ boost:20, winRate:0.6, picked:null, done:false, data:null };
+function openFlip(data){
+  flipState={ boost:20, winRate:0.6, picked:null, done:false, data };
+  $('#flipBase').textContent=data.amt.replace('₱','')+'p';
+  $('#flipBoost').textContent='+'+flipState.boost+'%';
+  $$('#flipCards .card').forEach(c=>{ c.className='card'; const b=c.querySelector('.card__back'); if(b)b.style.display=''; });
+  $('#flipMsg').hidden=true;
+  $('#flipStatus').textContent='Choose a card'; $('#flipStatus').className='flip__status';
+  $('#flipConfirm').disabled=true; $('#flipConfirm').textContent='Confirm';
+  $('#flipEntry').classList.remove('is-hidden');   // 先显示进入动画
+  $('#flipOverlay').classList.add('is-open');
+}
+$('#flipGo').addEventListener('click',()=>{ $('#flipEntry').classList.add('is-hidden'); runCountdown(); });
+function runCountdown(){
+  const seq=['Ready','3','2','1']; const cd=$('#flipCountdown'); cd.style.display='block'; let i=0; cd.textContent=seq[0];
+  const timer=setInterval(()=>{ i++; if(i<seq.length){cd.textContent=seq[i];} else {clearInterval(timer); cd.style.display='none';} },300);
+}
+$$('#flipCards .card').forEach(card=>{
+  card.addEventListener('click',()=>{
+    if(flipState.done || $('#flipCountdown').style.display==='block' || !$('#flipEntry').classList.contains('is-hidden')) return;
+    $$('#flipCards .card').forEach(c=>c.classList.remove('is-selected'));
+    card.classList.add('is-selected'); flipState.picked=+card.dataset.card; $('#flipConfirm').disabled=false;
+  });
+});
+$('#flipConfirm').addEventListener('click',()=>{
+  if(flipState.done){ closeFlip(); return; }
+  if(flipState.picked===null) return;
+  const win=Math.random()<flipState.winRate;
+  $$('#flipCards .card').forEach((c,idx)=>{ c.classList.add('is-flipped'); const red=idx===0;
+    c.innerHTML=`<span class="card__suit${red?' card__suit--red':''}">${red?'♦':'♠'}</span>`; });
+  const msg=$('#flipMsg'); msg.hidden=false;
+  msg.textContent = win ? 'Congratulations!' : 'SO CLOSE—BETTER LUCK NEXT TIME!';
+  const st=$('#flipStatus'); st.textContent = win?'You Win':'You Lose';
+  st.className='flip__status '+(win?'flip__status--win':'flip__status--lose');
+  const base=parseInt(flipState.data.amt.replace(/\D/g,''));
+  const boosted=Math.round(base*(1+flipState.boost/100));
+  const final = win ? Math.round(boosted*(1+0.2)) : base;   // 赢：×(1+奖励加成)；输：原始奖金
+  flipState.done=true;
+  toast(win?`You Win! +${final}p（示意）`:`${final}p 原始奖金已发放`);
+});
+function closeFlip(){
+  $('#flipOverlay').classList.remove('is-open');
+  const d=flipState.data;
+  if(d){ d.status='done';
+    const card=[...$$('#rebateList .level-card')].find(c=>c.querySelector(`[data-lv="${d.lv}"]`));
+    if(card){ card.classList.add('level-card--claimed');
+      card.querySelector('.claim-btn').outerHTML=`<button class="claim-btn claim-btn--done" disabled>Claimed</button>`; }
+    bumpBadge('#badgeRebate',-1);
+  }
+}
+
+/* ---------- 刮刮卡（4 状态：等待 / 待刮奖 / 已刮(Scratched) / 过期） ---------- */
+/* state: wait=等待(可选Bless) / scratch=待刮奖 / scratched=已刮已领 / expired=过期未刮
+   刮开即领取（单步）；无「过期刮开」状态 (5.5) */
+const tickets = [
+  { id:'t2', tier:'good',  amount:'', dates:'Expiry Date: Jun 20', state:'scratch', foil:true, group:'all' },
+  { id:'t3', tier:'good',  amount:'', raffle:'Raffle Date: Jun 18', dates:'Expiry Date: Jun 21', state:'wait', blessed:false, count:'11:13:13 to open', group:'all' },
+  { id:'t4', tier:'super', amount:'', dates:'Expiry Date: Jun 22', state:'wait', blessed:true, count:'23:41:02 to open', foil:true, group:'all' },
+  { id:'t5', tier:'good',  amount:'50p', dates:'Scratched Jun 19', state:'scratched', group:'claimed' },
+  { id:'t6', tier:'super', amount:'1,000p', dates:'Scratched Jun 18', state:'scratched', bigwin:true, group:'claimed' },
+  { id:'t7', tier:'good',  amount:'', dates:'Expired Jun 17', state:'expired', group:'expired' },
+];
+function faceName(t){ return t.tier==='super' ? 'Lucky Bomb Ticket' : 'Bomb Ticket'; }
+function ticketRow(t){
+  const tierCls=t.tier==='super'?'ticket--super':'';
+  const grey=['scratched','expired'].includes(t.state)?'ticket--grey':'';
+  const big=t.bigwin?'ticket--bigwin':'';
+  const foil=t.foil?'ticket--foil':'';
+  const foilBadge=t.foil?'<span class="ticket__foil-badge">✦ FOIL</span>':'';
+  const face=`<div class="ticket__label">${faceName(t)}
+    ${t.amount?`<span class="ticket__amount">${t.amount}</span>`:''}
+    ${t.raffle?`<span class="ticket__dates">${t.raffle}</span>`:''}
+    <span class="ticket__dates">${t.dates}</span></div>`;
+  let overlay='';
+  if(t.state==='scratch') overlay=`<div class="ticket__scratch" data-scratch="${t.id}">Scratch here</div>`;
+  if(t.state==='wait' && t.blessed) overlay=`<div class="ticket__kiss">💋</div>`;
+  if(t.state==='scratched') overlay=`<div class="ticket__stamp">SCRATCHED</div>`;
+
+  let side='';
+  if(t.state==='wait') side=`<span class="ticket-side__count">${t.count}</span>
+    <button class="ticket-side__btn ticket-side__btn--bless" data-bless="${t.id}" ${t.blessed?'disabled':''}>Bless</button>`;
+  else if(t.state==='scratch') side=`<button class="ticket-side__btn ticket-side__btn--scratch" data-scratchbtn="${t.id}">Scratch</button>`;
+  else if(t.state==='scratched') side=`<button class="ticket-side__btn ticket-side__btn--done" disabled>Scratched</button>`;
+  else side=`<button class="ticket-side__btn ticket-side__btn--expired" disabled>Expired</button>`;
+
+  return `<div class="ticket-row" data-id="${t.id}">
+    <div class="ticket ${tierCls} ${grey} ${big} ${foil}">
+      <div class="ticket__ava">看板娘<br>（待美术）</div>${face}${overlay}${foilBadge}
+    </div>
+    <div class="ticket-side">${side}</div></div>`;
+}
+let currentSub='all';
+/* 排序优先级（Sid 5.5）：可领取(待刮) > 待开奖(等待) > 已领取 > 过期 */
+const SORT_PRIORITY={ scratch:0, wait:1, scratched:2, expired:3 };
+function renderTickets(){
+  const list=tickets.filter(t=> currentSub==='all'?true:t.group===currentSub )
+    .slice().sort((a,b)=>(SORT_PRIORITY[a.state]??9)-(SORT_PRIORITY[b.state]??9));
+  $('#raffleList').innerHTML = list.map(ticketRow).join('') ||
+    `<div class="empty"><div class="empty__emoji">🎫</div><p class="empty__title">Nothing here</p></div>`;
+}
+renderTickets();
+
+$$('.subtab').forEach(b=>b.addEventListener('click',()=>{
+  $$('.subtab').forEach(x=>x.setAttribute('aria-selected','false'));
+  b.setAttribute('aria-selected','true'); currentSub=b.dataset.sub; renderTickets();
+}));
+
+/* 刮刮卡互动：Bless（可选）/ Scratch（刮开即领取） */
+$('#raffleList').addEventListener('click',(e)=>{
+  const bless=e.target.closest('[data-bless]');
+  const scr  =e.target.closest('[data-scratch],[data-scratchbtn]');
+  if(bless){
+    const id=bless.dataset.bless; const anim=$('#blessAnim'); anim.classList.add('is-open');
+    setTimeout(()=>{ anim.classList.remove('is-open');
+      const t=tickets.find(x=>x.id===id); t.blessed=true; renderTickets(); toast('Blessed 💋'); },1100);
+  }
+  if(scr){
+    const id=scr.dataset.scratch||scr.dataset.scratchbtn; const t=tickets.find(x=>x.id===id);
+    t.amount = t.tier==='super'?'100p':'10p';   // 示意金额
+    t.state='scratched'; t.group='claimed'; renderTickets();
+    toast('✨ Scratched '+t.amount+' 🪙 → 已领取（刮开即领取）');
+    bumpBadge('#badgeRaffle',-1);
+  }
+});
+
+/* ---------- TAB 气泡数字 ---------- */
+function bumpBadge(sel,delta){ const b=$(sel); let n=Math.max(0,(+b.textContent||0)+delta);
+  if(n===0)b.style.display='none'; else {b.style.display='grid'; b.textContent=n;} }
+
+/* ---------- 主 TAB 切换（含看板娘随 TAB 切换占位） ---------- */
+function showView(which){
+  const isRebate=which==='rebate';
+  $('#tabRebate').setAttribute('aria-selected',isRebate);
+  $('#tabRaffle').setAttribute('aria-selected',!isRebate);
+  $('#viewRebate').classList.toggle('is-active',isRebate);
+  $('#viewRaffle').classList.toggle('is-active',!isRebate);
+  $('#heroAvatar').innerHTML = isRebate
+    ? '看板娘 A<br>待机动画<br>（随 TAB 切换<br>·待美术）'
+    : '看板娘 B<br>刮刮卡动作<br>（随 TAB 切换<br>·待美术）';
+}
+$('#tabRebate').addEventListener('click',()=>showView('rebate'));
+$('#tabRaffle').addEventListener('click',()=>showView('raffle'));
+
+/* ---------- 原型导览 ---------- */
+$$('.toolbar__btn').forEach(btn=>btn.addEventListener('click',()=>{
+  $$('.toolbar__btn').forEach(b=>b.setAttribute('aria-pressed','false'));
+  btn.setAttribute('aria-pressed','true');
+  const nav=btn.dataset.nav;
+  $('#emptyRebate').hidden=true; $('#emptyRaffle').hidden=true;
+  $('#rebateList').style.display=''; $('#topupList').style.display='';
+  $$('#viewRebate .group-label').forEach(el=>el.style.display='');
+  $('#raffleList').style.display=''; $('#flipOverlay').classList.remove('is-open');
+  $('#makeupBanner').classList.remove('is-show');
+
+  if(nav==='rebate'){ showView('rebate'); }
+  if(nav==='makeup'){ showView('rebate'); $('#makeupBanner').classList.add('is-show'); }
+  if(nav==='raffle'){ showView('raffle'); }
+  if(nav==='flip'){ showView('rebate'); openFlip(levels[0]); }
+  if(nav==='empty-rebate'){ showView('rebate');
+    $('#rebateList').style.display='none'; $('#topupList').style.display='none';
+    $$('#viewRebate .group-label').forEach(el=>el.style.display='none'); $('#emptyRebate').hidden=false; }
+  if(nav==='empty-raffle'){ showView('raffle'); $('#raffleList').style.display='none'; $('#emptyRaffle').hidden=false; }
+  $('#phone').scrollIntoView({behavior:'smooth',block:'start'});
+}));
+</script>
+</body>
+</html>
