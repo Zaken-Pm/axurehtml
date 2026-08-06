@@ -60,6 +60,7 @@ body{margin:0;font-family:"PingFang SC","Microsoft YaHei",system-ui,-apple-syste
 .btn--text{border:none;background:none;padding:2px 6px;}
 .btn--link{border:none;background:none;color:var(--primary);cursor:pointer;padding:2px 4px;font-size:13px;}
 .btn--link.red{color:var(--red);}
+.op-sep{color:var(--border);margin:0 3px;font-size:12px;}
 .input,.select{height:34px;border:1px solid var(--border);border-radius:var(--radius);padding:0 10px;font-size:13.5px;
   color:var(--text);background:#fff;width:100%;}
 .input::placeholder{color:var(--ph);}
@@ -95,6 +96,12 @@ select.select{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg
 .tbl th{background:#f5f7fa;color:var(--text-2);font-weight:600;padding:9px 8px;border:1px solid var(--border-l);text-align:center;white-space:nowrap;}
 .tbl td{padding:7px 8px;border:1px solid var(--border-l);text-align:center;vertical-align:middle;}
 .tbl .input,.tbl .select{height:30px;font-size:12.5px;}
+/* 表格内错误提示：绝对定位固定在储存格底部，出现/消失都不改变版面高度；
+   并为每一列 tbody 储存格统一预留提示位，确保有无错误、各栏输入框皆对齐不跑版。 */
+.tbl tbody td{position:relative;padding-bottom:22px;}
+.tbl .hint--err{position:absolute;left:8px;right:6px;bottom:3px;margin:0;padding:0;
+  font-size:11px;line-height:1.2;white-space:nowrap;text-align:left;
+  overflow:hidden;text-overflow:ellipsis;z-index:5;pointer-events:none;}
 .prefix-wrap{display:flex;align-items:center;}
 .prefix-wrap .prefix{height:30px;line-height:30px;padding:0 8px;background:#f5f7fa;border:1px solid var(--border);border-right:none;border-radius:4px 0 0 4px;color:var(--text-3);font-size:12.5px;}
 .prefix-wrap .input{border-radius:0 4px 4px 0;}
@@ -258,13 +265,13 @@ label.chk input{accent-color:var(--primary);}
         <tbody>
           <tr><td>190</td><td>26/08/21<br>26/10/31</td><td>PHP</td><td><b>联名挑战活动</b></td><td>X-Bomb Lucky Blast</td>
             <td class="tag-on">开启</td><td>0 / 0</td><td>1</td>
-            <td><button class="btn--link" data-edit>编辑</button> <button class="btn--link red" data-close>关闭</button></td></tr>
+            <td><button class="btn--link" data-edit>编辑</button><span class="op-sep">|</span><button class="btn--link red" data-del>删除</button><br><button class="btn--link red" data-close>关闭</button></td></tr>
           <tr><td>184</td><td>26/07/30<br>26/08/08</td><td>PHP</td><td>周卡活动</td><td>最新周卡</td>
             <td class="tag-off">关闭</td><td>4 / 4</td><td>—</td>
-            <td><button class="btn--link">编辑</button> <button class="btn--link">开启</button></td></tr>
+            <td><button class="btn--link">编辑</button><span class="op-sep">|</span><button class="btn--link red" data-del>删除</button><br><button class="btn--link">开启</button></td></tr>
           <tr><td>183</td><td>26/07/01<br>26/07/14</td><td>PHP</td><td>周卡活动</td><td>周卡时间到期测试</td>
             <td class="tag-on">开启</td><td>3 / 3</td><td>—</td>
-            <td><button class="btn--link">编辑</button> <button class="btn--link red">关闭</button></td></tr>
+            <td><button class="btn--link">编辑</button><span class="op-sep">|</span><button class="btn--link red" data-del>删除</button><br><button class="btn--link red">关闭</button></td></tr>
         </tbody>
       </table>
       <p class="mini-note">点「＋ 新增活动」或第一列「编辑」进入「联名挑战活动」配置向导。</p>
@@ -332,9 +339,9 @@ label.chk input{accent-color:var(--primary);}
                 <div class="block__body" style="text-align:center;color:var(--text-3);padding:32px">⬆<br>点击上传图片</div></div>
             </div>
             <p class="hint">图片格式：png、bmp、jpg、gif、webp；大小限制 5MB 内。</p>
-            <div class="form-row" style="margin-top:12px"><label>排序：</label><input class="input" value="0" style="max-width:120px"></div>
+            <div class="form-row" style="margin-top:12px"><label>排序：</label><input class="input" id="fSort" value="0" style="max-width:120px"></div>
             <div class="sec-title" style="margin-top:12px">备注</div>
-            <textarea class="input" style="height:80px;padding:8px 10px;max-width:820px" placeholder="请输入备注内容…（仅供内部参考，不显示给用户）"></textarea>
+            <textarea class="input" id="fRemark" style="height:80px;padding:8px 10px;max-width:820px" placeholder="请输入备注内容…（仅供内部参考，不显示给用户）"></textarea>
           </div>
 
           <!-- 步骤3 参与对象与名单 -->
@@ -373,28 +380,28 @@ label.chk input{accent-color:var(--primary);}
                   </tr></thead>
                   <tbody id="rebateBody"></tbody>
                 </table>
-                <p class="hint">任务目标／固定金额：不可为空、0 或小数点；比例：不可为空或 0，需另填「上限金额」。等级最低 LV1，最多 LV20。</p>
+                <p class="hint">任务目标／固定金额：不可为空、0 或小数点，任务目标需逐级递增（不可小于或等于较低等级）；比例：不可为空或 0；上限金额非必填，可留空。等级最低 LV1，最多 LV20。</p>
               </div>
             </div>
 
             <!-- 挑战任务配置 -->
             <div class="block">
-              <div class="block__head"><h4><span class="req">*</span>挑战任务配置</h4>
+              <div class="block__head"><h4>挑战任务配置</h4>
                 <button class="btn btn--primary btn--sm" id="btnAddChallenge">＋ 新增挑战</button></div>
               <div class="block__body">
                 <table class="tbl" style="min-width:520px">
                   <thead><tr><th style="width:70px">挑战</th><th>奖励提升</th><th>触发机率</th><th>获奖机率</th><th style="width:56px">操作</th></tr></thead>
                   <tbody id="challengeBody"></tbody>
                 </table>
-                <p class="hint">奖励提升／触发机率／获奖机率：不可为空或 0（单位 %）。挑战最低 LV1，最多 LV5。</p>
+                <p class="hint">非必填；可全部删除不设置挑战。如有设置：奖励提升／触发机率／获奖机率不可为空或 0（单位 %）；触发机率为 LV1～LV5 加总不得超过100%；获奖机率为各等级各自不得超过100%，奖励提升无上限。最多 LV5。</p>
               </div>
             </div>
 
             <!-- 刮刮卡配置 -->
             <div class="block">
-              <div class="block__head"><h4><span class="req">*</span>刮刮卡配置</h4></div>
+              <div class="block__head"><h4>刮刮卡配置</h4></div>
               <div class="block__body" id="scratchWrap"></div>
-              <p class="hint" style="padding:0 14px 12px">等级固定 N1／N2／S1／S2；每张卡可配置奖励与获奖机率，每个奖励皆需填「获奖机率」，每张卡最多 12 个奖励。</p>
+              <p class="hint" style="padding:0 14px 12px">非必填；等级固定 N1／N2／S1／S2，各卡可不设置奖励。如有设置：每个奖励皆需填「获奖机率」（不得超过100%），每张卡最多 12 个奖励。</p>
             </div>
 
             <!-- 流水倍数 + 游戏范围 -->
@@ -467,6 +474,18 @@ label.chk input{accent-color:var(--primary);}
   </div>
 </div>
 
+<!-- ============ 弹窗：删除活动确认 ============ -->
+<div class="mask" id="delMask">
+  <div class="modal modal--sm">
+    <div class="modal__head">删除确认 <button class="x" data-close-modal>×</button></div>
+    <div class="modal__body">⚠️ 确定要删除此活动吗？删除后该活动将从列表中移除，且无法复原。</div>
+    <div class="modal__foot">
+      <button class="btn" data-close-modal>取消</button>
+      <button class="btn btn--red" id="delConfirm">确定删除</button>
+    </div>
+  </div>
+</div>
+
 <div class="dp-pop" id="dpPop">
   <div class="dp-head">
     <input class="dp-input" id="dpStartDate" placeholder="Start Date" readonly>
@@ -512,27 +531,112 @@ function showWizard(on,label){
   $('#tabMain').firstChild.textContent=on?tag+' ':'活动列表 ';
   if(on){ gotoStep(1); }
 }
-function resetWizardFields(){
+function resetWizardFields(blank){
+  /* blank=true → 新增活动：动态表格全部留空，由用户自行填写；
+     blank=false → 编辑既有活动：带入该活动的示范配置。 */
+  /* ---- 步骤1 活动模板 ---- */
   $('#fType').value='联名挑战活动'; $('#fName').value=''; $('#fCur').value='PHP';
   $('input[name=status][value="关闭"]').checked=true;
   $('#fActTime').value=''; $('#fShowTime').value='';
+  ['#fName','#fActTime','#fShowTime'].forEach(s=>$(s).classList.remove('is-error'));
+
+  /* ---- 步骤2 活动图片 ---- */
+  const floatR=$$('input[name=float]'); if(floatR[0]) floatR[0].checked=true;
+  if($('#fSort')) $('#fSort').value='0';
+  if($('#fRemark')) $('#fRemark').value='';
+
+  /* ---- 步骤4 活动条件：依模式还原成「空白」或「示范值」再重画 ---- */
+  challengeRows = JSON.parse(JSON.stringify(blank?BLANK_CHALLENGE:SAMPLE_CHALLENGE));
+  rebateRows    = JSON.parse(JSON.stringify(blank?BLANK_REBATE   :SAMPLE_REBATE));
+  scratch       = JSON.parse(JSON.stringify(blank?BLANK_SCRATCH  :SAMPLE_SCRATCH));
+  curVip = 0; if($('#applyAll')) $('#applyAll').checked=false;
+  if($('#fWager')){ $('#fWager').value=''; $('#fWager').classList.remove('is-error'); }
+  renderVipTabs(); renderChallenge(); renderRebate(); renderScratch(); buildGameList();
+
+  /* ---- 步骤5 风控条件：还原默认开关（同手机号/同email 预设开） ---- */
+  const sw=$$('#pageWizard [data-panel="5"] .switch input');
+  if(sw[0]) sw[0].checked=false;  // 同 IP
+  if(sw[1]) sw[1].checked=true;   // 同手机号
+  if(sw[2]) sw[2].checked=false;  // 同姓名
+  if(sw[3]) sw[3].checked=true;   // 同 email
+  if($('#autoReject')) $('#autoReject').checked=false;
+  if($('#rejectN')){ $('#rejectN').disabled=true; $('#rejectN').value='0'; }
 }
-/* 既有活动的实际配置（示意：目前仅第一列「X-Bomb Lucky Blast」可编辑） */
+/* 既有活动的实际配置（示意：新增/编辑后的活动都会写入此表，供再次编辑读取） */
 const ACTIVITY_DATA={190:{type:'联名挑战活动',name:'X-Bomb Lucky Blast',cur:'PHP',status:'开启',
   actTime:'2026-08-21 00:00 ~ 2026-10-31 23:59',showTime:'2026-08-21 00:00 ~ 2026-11-03 23:59'}};
-$('#btnNew').addEventListener('click',()=>{ resetWizardFields(); showWizard(true,'新增活动'); });
-$$('[data-edit]').forEach(b=>b.addEventListener('click',e=>{
-  const tr=e.target.closest('tr'); const d=ACTIVITY_DATA[tr.children[0].textContent.trim()];
-  resetWizardFields();
+let editingActId=null;  // null=新增；否则为正在编辑的活动 ID
+let pendingDelRow=null; // 待删除的活动列表行
+
+/* 把「活动时间」字串（2026-08-21 00:00 ~ 2026-10-31 23:59）转成列表的两行 yy/mm/dd 显示 */
+function actTimeToCell(v){
+  const p=dpParse(v);
+  if(!p) return '—';
+  const f=d=>{const yy=String(d.getFullYear()).slice(2),mm=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');return `${yy}/${mm}/${dd}`;};
+  return `${f(p.start)}<br>${f(p.end)}`;
+}
+/* 取下一个活动 ID（现有最大值 +1） */
+function nextActId(){ let mx=0; $$('#pageList tbody tr').forEach(tr=>{const n=parseInt(tr.children[0].textContent,10); if(n>mx)mx=n;}); return mx+1; }
+
+/* 填充/更新一行活动（会保留原有「参与/中奖」数值），并重新绑定该行的操作按钮 */
+function fillRow(tr,a){
+  const prevJoin  = tr.children[6] ? tr.children[6].textContent.trim() : '0 / 0';
+  const wager     = (a.wager!==undefined) ? a.wager : (tr.children[7]?tr.children[7].textContent.trim():'—');
+  const actionBtn = a.status==='开启'
+      ? '<button class="btn--link red" data-close>关闭</button>'
+      : '<button class="btn--link" data-open>开启</button>';
+  tr.innerHTML=`<td>${a.id}</td><td>${actTimeToCell(a.actTime)}</td><td>${a.cur}</td><td><b>${a.type}</b></td><td>${a.name}</td>
+    <td class="${a.status==='开启'?'tag-on':'tag-off'}">${a.status}</td><td>${prevJoin}</td><td>${wager}</td>
+    <td><button class="btn--link" data-edit>编辑</button><span class="op-sep">|</span><button class="btn--link red" data-del>删除</button><br>${actionBtn}</td>`;
+  bindRowActions(tr);
+}
+
+/* 为一行绑定「编辑 / 开启 / 关闭」行为（静态示意行若无 data-edit 则维持原样、不绑定） */
+function bindRowActions(tr){
+  const eb=$('[data-edit]',tr);  if(eb) eb.onclick=()=>openEditRow(tr);
+  const cb=$('[data-close]',tr); if(cb) cb.onclick=()=>$('#closeMask').classList.add('is-open');
+  const db=$('[data-del]',tr);   if(db) db.onclick=()=>{ pendingDelRow=tr; $('#delMask').classList.add('is-open'); };
+  const ob=$('[data-open]',tr);  if(ob) ob.onclick=()=>{
+    const id=tr.children[0].textContent.trim(); const d=ACTIVITY_DATA[id];
+    if(d){ d.status='开启'; fillRow(tr,{id, ...d}); }
+    toast('活动已开启（示意）');
+  };
+}
+
+/* 进入编辑：先整体初始化，再把该活动资料回填到步骤1 */
+function openEditRow(tr){
+  const id=tr.children[0].textContent.trim();
+  editingActId=id;
+  resetWizardFields(false);   // 编辑既有活动 → 带入示范配置
+  const d=ACTIVITY_DATA[id];
   if(d){
     $('#fType').value=d.type; $('#fName').value=d.name; $('#fCur').value=d.cur;
-    $(`input[name=status][value="${d.status}"]`).checked=true;
+    const sr=$(`input[name=status][value="${d.status}"]`); if(sr) sr.checked=true;
     $('#fActTime').value=d.actTime; $('#fShowTime').value=d.showTime;
   }
   showWizard(true,'编辑活动');
-}));
-$$('[data-close]').forEach(b=>b.addEventListener('click',()=>$('#closeMask').classList.add('is-open')));
+}
+
+/* 新增：清空追踪 ID → 全部初始化 → 进向导 */
+$('#btnNew').addEventListener('click',()=>{ editingActId=null; resetWizardFields(true); showWizard(true,'新增活动'); });
+/* 初始为现有各行绑定操作（仅带 data-edit/data-close 的行会被接管） */
+$$('#pageList tbody tr').forEach(bindRowActions);
+
+/* 删除确认：确定后移除该行，并从资料表清掉，让列表即时更新 */
+$('#delConfirm').addEventListener('click',()=>{
+  if(pendingDelRow){
+    const id=pendingDelRow.children[0].textContent.trim();
+    if(ACTIVITY_DATA[id]) delete ACTIVITY_DATA[id];
+    pendingDelRow.remove();
+    pendingDelRow=null;
+    toast('活动已删除（示意）');
+  }
+  $('#delMask').classList.remove('is-open');
+});
 $('#btnExit').addEventListener('click',()=>showWizard(false));
+
+/* 步骤1 输入框：一旦填入有效值即清除红框（错误提示随修正而消失） */
+$('#fName').addEventListener('input',e=>{ if(e.target.value.trim()) e.target.classList.remove('is-error'); });
 
 /* ---------- 步骤导航 ---------- */
 let curStep=1; const LAST=6;
@@ -550,7 +654,35 @@ function gotoStep(n){
 $$('#stepRail .step').forEach(s=>s.addEventListener('click',()=>gotoStep(+s.dataset.step)));
 $('#btnPrev').addEventListener('click',()=>gotoStep(Math.max(1,curStep-1)));
 $('#btnNext').addEventListener('click',()=>{ if(validateStep(curStep)) gotoStep(Math.min(LAST,curStep+1)); });
-$('#btnSubmit').addEventListener('click',()=>toast('活动配置已提交（示意）'));
+$('#btnSubmit').addEventListener('click',()=>{
+  /* 提交前再把关键步骤校验一次，避免用户用左侧步骤条跳过必填 */
+  if(!validateStep(1)){ gotoStep(1); return; }
+  if(!validateStep(4)){ gotoStep(4); return; }
+
+  const a={
+    type:$('#fType').value, name:$('#fName').value.trim(), cur:$('#fCur').value,
+    status:$('input[name=status]:checked').value,
+    actTime:$('#fActTime').value, showTime:$('#fShowTime').value,
+    wager:($('#fWager').value.trim()||'—')
+  };
+
+  if(editingActId){
+    /* 编辑：更新对应行 + 同步资料表 */
+    ACTIVITY_DATA[editingActId]={type:a.type,name:a.name,cur:a.cur,status:a.status,actTime:a.actTime,showTime:a.showTime};
+    const tr=$$('#pageList tbody tr').find(r=>r.children[0].textContent.trim()===String(editingActId));
+    if(tr) fillRow(tr,{id:editingActId,...a});
+    toast('活动配置已保存（示意）');
+  }else{
+    /* 新增：产生新 ID，插到列表最上方，并写入资料表让它之后可编辑 */
+    const id=nextActId();
+    ACTIVITY_DATA[id]={type:a.type,name:a.name,cur:a.cur,status:a.status,actTime:a.actTime,showTime:a.showTime};
+    const tr=document.createElement('tr');
+    fillRow(tr,{id,...a});
+    const body=$('#pageList tbody'); body.insertBefore(tr,body.firstChild);
+    toast('活动新增成功（示意）');
+  }
+  showWizard(false);
+});
 
 /* ---------- 基本校验（示意：仅挡关键必填） ---------- */
 function dpTimeEnd(str){
@@ -570,21 +702,20 @@ function validateStep(n){
     showTime.classList.remove('is-error');
   }
   if(n===4){
-    // 校验返水表任务目标与固定金额不可为空/0
+    // 校验返水表任务目标与固定金额不可为空/0，且任务目标需逐级递增
     let bad=false;
+    const {orderBad:goalOrderBad,anyBad:goalBad}=validateGoalOrder(true);
+    if(goalBad) bad=true;
     $$('#rebateBody tr').forEach(tr=>{
-      const goal=$('.js-goal',tr); if(goal && (!goal.value || Number(goal.value)<=0 || /\./.test(goal.value))){goal.classList.add('is-error');bad=true;} else goal&&goal.classList.remove('is-error');
       const amtType=$('.js-amt-type',tr).value; const amt=$('.js-amt',tr);
       if(amtType==='固定金额'){ if(!amt.value||Number(amt.value)<=0||/\./.test(amt.value)){amt.classList.add('is-error');bad=true;} else amt.classList.remove('is-error'); }
       else { if(!amt.value||Number(amt.value)<=0){amt.classList.add('is-error');bad=true;} else amt.classList.remove('is-error');
-        const cap=$('.js-cap',tr); if(cap&&(!cap.value||Number(cap.value)<=0)){cap.classList.add('is-error');bad=true;} }
+        const cap=$('.js-cap',tr); if(cap&&cap.value&&Number(cap.value)<=0){cap.classList.add('is-error');bad=true;} else if(cap) cap.classList.remove('is-error'); }
     });
     const w=$('#fWager'); if(w.value!=='' && Number(w.value)===0){w.classList.add('is-error');bad=true;} else w.classList.remove('is-error');
+    if(goalOrderBad){toast('任务目标不可小于或等于较低等级，请检查红框',true);return false;}
     if(bad){toast('活动条件有必填/格式错误，请检查红框',true);return false;}
-    if(challengeAppearSum()!==100){toast('触发机率总计需为100%',true);return false;}
-    for(const tier of Object.keys(scratch)){
-      if(scratchSum(tier)!==100){toast(tier+' 获奖机率总计需为100%',true);return false;}
-    }
+    if(challengeAppearSum()>100){toast('触发机率总计不得超过100%',true);return false;}
   }
   return true;
 }
@@ -605,16 +736,18 @@ function renderVipTabs(){
 $('#applyAll').addEventListener('change',()=>{ if($('#applyAll').checked) curVip=0; renderVipTabs(); });
 
 /* ---------- 挑战任务表（最多 5） ---------- */
-let challengeRows=[{up:'20',appear:'35',win:'60'},{up:'50',appear:'21',win:'50'}];
+let challengeRows=[{up:'20',appear:'60',win:'60'},{up:'50',appear:'40',win:'50'}];
+const SAMPLE_CHALLENGE=JSON.parse(JSON.stringify(challengeRows));   // 编辑既有活动用的示范值
+const BLANK_CHALLENGE=[{up:'',appear:'',win:''}];                   // 新增活动用的空白值（保留最低 1 列）
 function challengeAppearSum(){ return challengeRows.reduce((s,r)=>s+(Number(r.appear)||0),0); }
 function updateChallengeAppearHint(){
-  const rows=[...$('#challengeBody').children]; const totalInvalid=challengeAppearSum()!==100;
+  const rows=[...$('#challengeBody').children]; const totalInvalid=challengeAppearSum()>100;
   rows.forEach((tr,idx)=>{
     const input=$('.js-appear',tr); const hint=$('.js-appear-hint',tr);
     const over=input.value!==''&&Number(input.value)>100;
     input.classList.toggle('is-error',over);
     if(over){ hint.textContent='比例配置不得超过100%'; hint.style.visibility='visible'; }
-    else if(idx===rows.length-1&&totalInvalid){ hint.textContent='触发机率总计需为100%'; hint.style.visibility='visible'; }
+    else if(idx===rows.length-1&&totalInvalid){ hint.textContent='触发机率总计不得超过100%'; hint.style.visibility='visible'; }
     else { hint.style.visibility='hidden'; }
   });
 }
@@ -623,16 +756,15 @@ function renderChallenge(){
   challengeRows.forEach((r,i)=>{
     const tr=document.createElement('tr');
     tr.innerHTML=`<td>挑战LV${i+1}</td>
-      <td><div class="suffix-wrap"><input class="input js-up" value="${r.up}"><span class="suffix">%</span></div>${pctHintHtml('js-up-hint')}</td>
+      <td><div class="suffix-wrap"><input class="input js-up" value="${r.up}"><span class="suffix">%</span></div></td>
       <td><div class="suffix-wrap"><input class="input js-appear" value="${r.appear}"><span class="suffix">%</span></div>${pctHintHtml('js-appear-hint')}</td>
       <td><div class="suffix-wrap"><input class="input js-win" value="${r.win}"><span class="suffix">%</span></div>${pctHintHtml('js-win-hint')}</td>
       <td><button class="btn--link red js-del">删除</button></td>`;
     $('.js-up',tr).addEventListener('input',e=>r.up=e.target.value);
     $('.js-appear',tr).addEventListener('input',e=>{ r.appear=e.target.value; updateChallengeAppearHint(); });
     $('.js-win',tr).addEventListener('input',e=>r.win=e.target.value);
-    attachPctGuard($('.js-up',tr),$('.js-up-hint',tr));
     attachPctGuard($('.js-win',tr),$('.js-win-hint',tr));
-    $('.js-del',tr).addEventListener('click',()=>{ if(challengeRows.length<=1){toast('至少保留 1 个挑战',true);return;}
+    $('.js-del',tr).addEventListener('click',()=>{
       challengeRows.splice(i,1); renderChallenge(); renderRebate(); });
     tb.appendChild(tr);
   });
@@ -648,6 +780,27 @@ let rebateRows=[
   {cond:'有效投注',goal:'200',amtType:'固定金额',amt:'3',cap:'',trigger:false,card:''},
   {cond:'充值',goal:'200',amtType:'固定金额',amt:'5',cap:'',trigger:true,card:'N1'},
 ];
+const SAMPLE_REBATE=JSON.parse(JSON.stringify(rebateRows));   // 编辑用示范值
+const BLANK_REBATE=[{cond:'有效投注',goal:'',amtType:'固定金额',amt:'',cap:'',trigger:false,card:''}];  // 新增用空白（保留 LV1）
+function validateGoalOrder(strict){
+  let orderBad=false, anyBad=false, prevGoal=null;
+  $$('#rebateBody tr').forEach(tr=>{
+    const goal=$('.js-goal',tr); if(!goal) return;
+    const hint=$('.js-goal-hint',tr);
+    const hasValue=goal.value!=='';
+    const val=Number(goal.value);
+    let invalid=false, orderInvalid=false;
+    if(hasValue){
+      invalid = val<=0 || /\./.test(goal.value);
+      if(!invalid && prevGoal!==null && val<=prevGoal){ invalid=true; orderInvalid=true; orderBad=true; }
+    } else if(strict){ invalid=true; }
+    if(invalid) anyBad=true;
+    goal.classList.toggle('is-error',invalid);
+    if(hint) hint.style.visibility=orderInvalid?'visible':'hidden';
+    if(hasValue && !/\./.test(goal.value) && !isNaN(val)) prevGoal=val;
+  });
+  return {orderBad,anyBad};
+}
 function renderRebate(){
   const tb=$('#rebateBody'); tb.innerHTML='';
   rebateRows.forEach((r,i)=>{
@@ -656,27 +809,33 @@ function renderRebate(){
     tr.innerHTML=`
       <td>LV${i+1}</td>
       <td><select class="select js-cond"><option ${r.cond==='有效投注'?'selected':''}>有效投注</option><option ${r.cond==='充值'?'selected':''}>充值</option></select></td>
-      <td><div class="prefix-wrap"><span class="prefix">≥</span><input class="input js-goal" value="${r.goal}"></div></td>
+      <td><div class="prefix-wrap"><span class="prefix">≥</span><input class="input js-goal" value="${r.goal}"></div>
+        <p class="hint hint--err js-goal-hint" style="visibility:hidden">任务目标不可小于或等于较低等级</p></td>
       <td>彩金</td>
       <td><div style="display:flex;gap:4px;align-items:center">
-        <select class="select js-amt-type" style="width:96px"><option ${!isRatio?'selected':''}>固定金额</option><option ${isRatio?'selected':''}>比例</option></select>
-        <div class="suffix-wrap" style="flex:1"><input class="input js-amt" value="${r.amt}">${isRatio?'<span class="suffix">%</span>':''}</div>
-        </div>${isRatio?`<input class="input js-cap" style="margin-top:4px" placeholder="上限金额" value="${r.cap}">`:''}${isRatio?pctHintHtml('js-amt-hint'):''}</td>
+        <select class="select js-amt-type" style="width:88px;flex:none"><option ${!isRatio?'selected':''}>固定金额</option><option ${isRatio?'selected':''}>比例</option></select>
+        ${isRatio
+          ? `<div class="suffix-wrap" style="flex:1;min-width:0"><input class="input js-amt" value="${r.amt}"><span class="suffix">%</span></div>`
+          : `<input class="input js-amt" value="${r.amt}" style="flex:1;min-width:0">`}
+        </div>${isRatio?`<input class="input js-cap" style="margin-top:4px" placeholder="上限金额（选填）" value="${r.cap}">`:''}${isRatio?pctHintHtml('js-amt-hint'):''}</td>
       <td><label class="chk"><input type="checkbox" class="js-trigger" ${r.trigger?'checked':''}>触发</label></td>
       <td><select class="select js-card">${SCRATCH_TIERS.map(t=>`<option ${r.card===t?'selected':''} value="${t}">${t||'无'}</option>`).join('')}</select></td>
       <td><button class="btn--link red js-del">删除</button></td>`;
     $('.js-cond',tr).addEventListener('change',e=>r.cond=e.target.value);
-    $('.js-goal',tr).addEventListener('input',e=>r.goal=e.target.value);
+    $('.js-goal',tr).addEventListener('input',e=>{ r.goal=e.target.value; validateGoalOrder(); });
     $('.js-amt-type',tr).addEventListener('change',e=>{r.amtType=e.target.value;renderRebate();});
-    $('.js-amt',tr).addEventListener('input',e=>r.amt=e.target.value);
+    $('.js-amt',tr).addEventListener('input',e=>{ r.amt=e.target.value;
+      if(e.target.value&&Number(e.target.value)>0) e.target.classList.remove('is-error'); });
     if(isRatio) attachPctGuard($('.js-amt',tr),$('.js-amt-hint',tr));
-    const cap=$('.js-cap',tr); if(cap)cap.addEventListener('input',e=>r.cap=e.target.value);
+    const cap=$('.js-cap',tr); if(cap)cap.addEventListener('input',e=>{ r.cap=e.target.value;
+      if(e.target.value&&Number(e.target.value)>0) cap.classList.remove('is-error'); });
     $('.js-trigger',tr).addEventListener('change',e=>r.trigger=e.target.checked);
     $('.js-card',tr).addEventListener('change',e=>r.card=e.target.value);
     $('.js-del',tr).addEventListener('click',()=>{ if(rebateRows.length<=1){toast('至少保留 LV1',true);return;}
       rebateRows.splice(i,1); renderRebate(); });
     tb.appendChild(tr);
   });
+  validateGoalOrder();
 }
 $('#btnAddLevel').addEventListener('click',()=>{
   if(rebateRows.length>=20){toast('等级最多 LV20',true);return;}
@@ -685,19 +844,20 @@ $('#btnAddLevel').addEventListener('click',()=>{
 });
 
 /* ---------- 刮刮卡配置（N1/N2/S1/S2，每张最多12奖励） ---------- */
-let scratch={ N1:[{amt:'1',rate:'28',flash:false},{amt:'3',rate:'34',flash:false},{amt:'5',rate:'30',flash:false}],
-  N2:[{amt:'3',rate:'30',flash:false},{amt:'10',rate:'12',flash:false}],
-  S1:[{amt:'25',rate:'31',flash:false},{amt:'50',rate:'14',flash:false}],
-  S2:[{amt:'100',rate:'5',flash:false},{amt:'1000',rate:'3',flash:false}] };
-function scratchSum(tier){ return scratch[tier].reduce((s,r)=>s+(Number(r.rate)||0),0); }
+let scratch={ N1:[{amt:'1',rate:'28',flash:false},{amt:'3',rate:'34',flash:false},{amt:'5',rate:'38',flash:false}],
+  N2:[{amt:'3',rate:'60',flash:false},{amt:'10',rate:'40',flash:false}],
+  S1:[{amt:'25',rate:'70',flash:false},{amt:'50',rate:'30',flash:false}],
+  S2:[{amt:'100',rate:'60',flash:false},{amt:'1000',rate:'40',flash:false}] };
+const SAMPLE_SCRATCH=JSON.parse(JSON.stringify(scratch));   // 编辑用示范值
+const BLANK_SCRATCH={ N1:[{amt:'',rate:'',flash:false}], N2:[{amt:'',rate:'',flash:false}],
+  S1:[{amt:'',rate:'',flash:false}], S2:[{amt:'',rate:'',flash:false}] };  // 新增用空白（各卡保留 1 项）
 function updateScratchHint(tier,body){
-  const rows=[...body.children]; const totalInvalid=scratchSum(tier)!==100;
-  rows.forEach((tr,idx)=>{
+  const rows=[...body.children];
+  rows.forEach(tr=>{
     const input=$('.js-rate',tr); const hint=$('.js-rate-hint',tr);
     const over=input.value!==''&&Number(input.value)>100;
     input.classList.toggle('is-error',over);
     if(over){ hint.textContent='比例配置不得超过100%'; hint.style.visibility='visible'; }
-    else if(idx===rows.length-1&&totalInvalid){ hint.textContent='获奖机率总计需为100%'; hint.style.visibility='visible'; }
     else { hint.style.visibility='hidden'; }
   });
 }
@@ -722,13 +882,13 @@ function renderScratch(){
       tr.innerHTML=`<td>${i+1}</td>
         <td><input class="input js-amt" value="${r.amt}"></td>
         <td><div class="suffix-wrap"><input class="input js-rate" value="${r.rate}"><span class="suffix">%</span></div>
-          <p class="hint hint--err js-rate-hint" style="visibility:hidden">获奖机率总计需为100%</p></td>
+          <p class="hint hint--err js-rate-hint" style="visibility:hidden">比例配置不得超过100%</p></td>
         <td><label class="chk"><input type="checkbox" class="js-flash-row" ${r.flash?'checked':''}>是</label></td>
         <td><button class="btn--link red js-del">删除</button></td>`;
       $('.js-amt',tr).addEventListener('input',e=>r.amt=e.target.value);
       $('.js-rate',tr).addEventListener('input',e=>{ r.rate=e.target.value; updateScratchHint(tier,body); });
       $('.js-flash-row',tr).addEventListener('change',e=>{ r.flash=e.target.checked; syncFlashAll(); });
-      $('.js-del',tr).addEventListener('click',()=>{ if(scratch[tier].length<=1){toast(tier+' 至少保留 1 项',true);return;}
+      $('.js-del',tr).addEventListener('click',()=>{
         scratch[tier].splice(i,1);renderScratch(); });
       body.appendChild(tr);
     });
@@ -786,6 +946,9 @@ $$('[data-close-modal]').forEach(b=>b.addEventListener('click',e=>e.target.close
 
 /* ---------- 自动拒绝：开关联动输入框 ---------- */
 $('#autoReject').addEventListener('change',e=>$('#rejectN').disabled=!e.target.checked);
+
+/* ---------- 流水倍数：可留空、不可填0；填入有效值即清除红框 ---------- */
+$('#fWager').addEventListener('input',e=>{ const v=e.target.value; if(v===''||Number(v)>0) e.target.classList.remove('is-error'); });
 
 /* ---------- 提交预览 ---------- */
 function buildPreview(){
