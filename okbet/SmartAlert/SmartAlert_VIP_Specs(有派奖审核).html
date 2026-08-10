@@ -751,6 +751,11 @@ tbody tr:last-child td{border-bottom:none}
 .ea-turnover{font-size:11px;color:var(--text-2);padding:2px 2px 0}
 
 .fe-rule-list{padding-left:18px;color:var(--text-2);font-size:13px;line-height:2}
+.rep-tabs{display:flex;gap:24px;border-bottom:1px solid var(--border-2);margin-bottom:16px}
+.rep-tab{padding:10px 2px;font-size:14px;color:var(--text-2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.rep-tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+.sum-row{display:flex;justify-content:flex-end;gap:20px;font-size:13px;color:var(--text-2);margin-bottom:10px}
+.sum-row b{font-weight:700}
 </style>
 </head>
 <body>
@@ -805,6 +810,8 @@ tbody tr:last-child td{border-bottom:none}
       <div class=&quot;subtab active&quot; data-tab=&quot;list&quot; onclick=&quot;switchSubtab('list')&quot;>推播列表</div>
       <div class=&quot;subtab&quot; data-tab=&quot;record&quot; onclick=&quot;switchSubtab('record')&quot;>推播记录</div>
       <div class=&quot;subtab&quot; data-tab=&quot;popup&quot; onclick=&quot;switchSubtab('popup')&quot;>推播弹窗</div>
+      <div class=&quot;subtab&quot; data-tab=&quot;review&quot; onclick=&quot;switchSubtab('review')&quot;>派奖审核</div>
+      <div class=&quot;subtab&quot; data-tab=&quot;report&quot; onclick=&quot;switchSubtab('report')&quot;>活动报表</div>
       <div class=&quot;subtab&quot; data-tab=&quot;freerecord&quot; onclick=&quot;switchSubtab('freerecord')&quot;>免费项目记录</div>
       <div class=&quot;subtab&quot; data-tab=&quot;couponrecord&quot; onclick=&quot;switchSubtab('couponrecord')&quot;>优惠券记录</div>
     </div>
@@ -1215,6 +1222,93 @@ tbody tr:last-child td{border-bottom:none}
     </div>
 
     <!-- ============ 页面 C：推播条件表单（新增 / 编辑） ============ -->
+    <!-- ============ 页面：派奖审核（活动类型含「智能推播」） ============ -->
+    <div id=&quot;view-review&quot; class=&quot;hidden&quot;>
+      <div class=&quot;toolbar&quot;>
+        <div class=&quot;field&quot;>活动ID：<input type=&quot;text&quot; class=&quot;input&quot; style=&quot;width:130px&quot; placeholder=&quot;请输入&quot;></div>
+        <div class=&quot;field&quot;>会员帐号：<input type=&quot;text&quot; class=&quot;input&quot; style=&quot;width:130px&quot; placeholder=&quot;请输入&quot;></div>
+        <div class=&quot;field&quot;>奖励类型：<select class=&quot;select&quot; style=&quot;width:110px&quot;><option>全选</option><option>礼金</option><option>积分</option><option>免费旋转券</option><option>免费投注券</option><option>优惠券</option><option>道具卡</option></select></div>
+        <div class=&quot;field&quot;>活动类型：<select class=&quot;select&quot; style=&quot;width:120px&quot;><option>全选</option><option>预约活动</option><option>周卡活动</option><option>智能推播</option></select></div>
+        <div class=&quot;field&quot;>状态：<select class=&quot;select&quot; style=&quot;width:110px&quot;><option>全部</option><option>审核通过</option><option>审核不通过</option></select></div>
+      </div>
+      <div class=&quot;toolbar&quot;>
+        <div class=&quot;field&quot;>申请时间：<input type=&quot;text&quot; class=&quot;input&quot; style=&quot;width:150px&quot; placeholder=&quot;开始时间&quot; readonly><span style=&quot;color:var(--text-3)&quot;>～</span><input type=&quot;text&quot; class=&quot;input&quot; style=&quot;width:150px&quot; placeholder=&quot;结束时间&quot; readonly></div>
+        <button class=&quot;btn btn-primary&quot;>搜索</button>
+        <button class=&quot;btn&quot; style=&quot;background:#e6a23c;border-color:#e6a23c;color:#fff&quot;>导出</button>
+        <div class=&quot;spacer&quot;></div>
+      </div>
+      <div class=&quot;card&quot; style=&quot;overflow-x:auto&quot;>
+        <table style=&quot;table-layout:fixed;min-width:1480px&quot;>
+          <thead><tr>
+            <th style=&quot;width:80px&quot;>活动ID</th><th style=&quot;width:120px&quot;>会员帐号</th><th style=&quot;width:100px&quot;>活动类型</th><th style=&quot;width:110px&quot;>活动名称</th><th style=&quot;width:100px&quot;>奖励类型</th><th style=&quot;width:130px&quot;>奖励金额/内容</th><th style=&quot;width:100px&quot;>状态</th><th style=&quot;width:150px&quot;>申请时间</th><th style=&quot;width:100px&quot;>审核人</th><th style=&quot;width:160px&quot;>审核时间</th><th style=&quot;width:120px&quot;>备注</th><th style=&quot;width:80px&quot;>操作</th>
+          </tr></thead>
+          <tbody>
+            <tr><td>184</td><td>ody002</td><td>智能推播</td><td>推播奖励</td><td>礼金</td><td>PHP 1,000</td><td style=&quot;color:var(--success);font-weight:600&quot;>审核通过</td><td>–</td><td>自动审核</td><td>2026-08-06 00:04:00</td><td>–</td><td>–</td></tr>
+            <tr><td>184</td><td>ody002</td><td>智能推播</td><td>推播奖励</td><td>免费旋转券</td><td>x1 张</td><td style=&quot;color:var(--success);font-weight:600&quot;>审核通过</td><td>–</td><td>自动审核</td><td>2026-08-06 00:04:00</td><td>–</td><td>–</td></tr>
+            <tr><td>184</td><td>member88899</td><td>智能推播</td><td>推播奖励</td><td>积分</td><td>22 pts</td><td style=&quot;color:var(--success);font-weight:600&quot;>审核通过</td><td>–</td><td>自动审核</td><td>2026-08-05 11:44:06</td><td>–</td><td>–</td></tr>
+            <tr><td>184</td><td>member88899</td><td>智能推播</td><td>推播奖励</td><td>道具卡</td><td>x1 张</td><td style=&quot;color:var(--success);font-weight:600&quot;>审核通过</td><td>–</td><td>自动审核</td><td>2026-08-05 10:19:12</td><td>–</td><td>–</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ 页面：活动报表（活动奖励统计 / 活动数据统计） ============ -->
+    <div id=&quot;view-report&quot; class=&quot;hidden&quot;>
+      <div class=&quot;rep-tabs&quot;>
+        <div class=&quot;rep-tab active&quot; id=&quot;reptab-reward&quot; onclick=&quot;switchReportTab('reward')&quot;>活动奖励统计</div>
+        <div class=&quot;rep-tab&quot; id=&quot;reptab-data&quot; onclick=&quot;switchReportTab('data')&quot;>活动数据统计</div>
+      </div>
+
+      <div id=&quot;rep-reward&quot;>
+        <div class=&quot;toolbar&quot;>
+          <div class=&quot;field&quot;>活动 ID：<input type=&quot;text&quot; class=&quot;input&quot; style=&quot;width:150px&quot; placeholder=&quot;请输入&quot;></div>
+          <div class=&quot;field&quot;>活动类型：<select class=&quot;select&quot; style=&quot;width:120px&quot;><option>全选</option><option>预约活动</option><option>周卡活动</option><option>智能推播</option></select></div>
+          <div class=&quot;field&quot;>奖励类型：<select class=&quot;select&quot; style=&quot;width:110px&quot;><option>全选</option></select></div>
+        </div>
+        <div class=&quot;toolbar&quot;>
+          <div class=&quot;field&quot;>起始日期～结束日期：<input type=&quot;text&quot; class=&quot;input&quot; style=&quot;width:150px&quot; placeholder=&quot;开始时间&quot; readonly><span style=&quot;color:var(--text-3)&quot;>～</span><input type=&quot;text&quot; class=&quot;input&quot; style=&quot;width:150px&quot; placeholder=&quot;结束时间&quot; readonly></div>
+          <button class=&quot;btn btn-primary&quot;>搜寻</button>
+          <button class=&quot;btn&quot; style=&quot;background:#e6a23c;border-color:#e6a23c;color:#fff&quot;>导出</button>
+        </div>
+        <div class=&quot;sum-row&quot;>总金额：<b style=&quot;color:var(--danger)&quot;>1000.00</b>总积分：<b style=&quot;color:var(--primary)&quot;>22.00</b>总免费券：<b style=&quot;color:var(--success)&quot;>1</b></div>
+        <div class=&quot;card&quot; style=&quot;overflow-x:auto&quot;>
+          <table style=&quot;table-layout:fixed;min-width:1320px&quot;>
+            <thead><tr><th style=&quot;width:110px&quot;>日期</th><th style=&quot;width:100px&quot;>活动类型</th><th style=&quot;width:80px&quot;>活动ID</th><th style=&quot;width:120px&quot;>活动名称</th><th style=&quot;width:100px&quot;>奖励类型</th><th style=&quot;width:100px&quot;>奖励内容</th><th style=&quot;width:90px&quot;>参与人数</th><th style=&quot;width:90px&quot;>领取次数</th><th style=&quot;width:140px&quot;>派发金额(系统币)</th><th style=&quot;width:90px&quot;>积分小计</th><th style=&quot;width:80px&quot;>券张数</th></tr></thead>
+            <tbody>
+              <tr><td>2026-08-06</td><td>智能推播</td><td>184</td><td>推播奖励</td><td>礼金</td><td>PHP 1,000</td><td>1</td><td>1</td><td>1000.00</td><td>0.00</td><td>0</td></tr>
+              <tr><td>2026-08-06</td><td>智能推播</td><td>184</td><td>推播奖励</td><td>免费旋转券</td><td>x1 张</td><td>1</td><td>1</td><td>0.00</td><td>0.00</td><td>1</td></tr>
+              <tr><td>2026-08-05</td><td>智能推播</td><td>184</td><td>推播奖励</td><td>积分</td><td>22 pts</td><td>1</td><td>1</td><td>0.00</td><td>22.00</td><td>0</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id=&quot;rep-data&quot; class=&quot;hidden&quot;>
+        <div class=&quot;toolbar&quot;>
+          <div class=&quot;field&quot;>活动 ID：<input type=&quot;text&quot; class=&quot;input&quot; style=&quot;width:130px&quot; placeholder=&quot;请输入&quot;></div>
+          <div class=&quot;field&quot;>会员账号：<input type=&quot;text&quot; class=&quot;input&quot; style=&quot;width:130px&quot; placeholder=&quot;请输入&quot;></div>
+          <div class=&quot;field&quot;>活动类型：<select class=&quot;select&quot; style=&quot;width:120px&quot;><option>全选</option><option>预约活动</option><option>周卡活动</option><option>智能推播</option></select></div>
+          <div class=&quot;field&quot;>奖励类型：<select class=&quot;select&quot; style=&quot;width:110px&quot;><option>全选</option></select></div>
+          <div class=&quot;field&quot;>状态：<select class=&quot;select&quot; style=&quot;width:110px&quot;><option>全部</option></select></div>
+        </div>
+        <div class=&quot;toolbar&quot;>
+          <button class=&quot;btn btn-primary&quot;>搜寻</button>
+          <button class=&quot;btn&quot; style=&quot;background:#e6a23c;border-color:#e6a23c;color:#fff&quot;>导出</button>
+          <div class=&quot;spacer&quot;></div>
+        </div>
+        <div class=&quot;card&quot; style=&quot;overflow-x:auto&quot;>
+          <table style=&quot;table-layout:fixed;min-width:1320px&quot;>
+            <thead><tr><th style=&quot;width:80px&quot;>活动ID</th><th style=&quot;width:120px&quot;>会员账号</th><th style=&quot;width:100px&quot;>活动类型</th><th style=&quot;width:110px&quot;>活动名称</th><th style=&quot;width:100px&quot;>奖励类型</th><th style=&quot;width:100px&quot;>奖励内容</th><th style=&quot;width:70px&quot;>天数</th><th style=&quot;width:160px&quot;>申请领取时间</th><th style=&quot;width:160px&quot;>审核时间</th><th style=&quot;width:90px&quot;>状态</th></tr></thead>
+            <tbody>
+              <tr><td>184</td><td>ody002</td><td>智能推播</td><td>推播奖励</td><td>礼金</td><td>PHP 1,000</td><td style=&quot;text-align:center&quot;>-</td><td>2026-08-06 00:04:00</td><td>2026-08-06 00:04:00</td><td style=&quot;color:var(--success);font-weight:600&quot;>已通过</td></tr>
+              <tr><td>184</td><td>ody002</td><td>智能推播</td><td>推播奖励</td><td>免费旋转券</td><td>x1 张</td><td style=&quot;text-align:center&quot;>-</td><td>2026-08-06 00:04:00</td><td>2026-08-06 00:04:00</td><td style=&quot;color:var(--success);font-weight:600&quot;>已通过</td></tr>
+              <tr><td>184</td><td>member88899</td><td>智能推播</td><td>推播奖励</td><td>积分</td><td>22 pts</td><td style=&quot;text-align:center&quot;>-</td><td>2026-08-05 11:44:06</td><td>2026-08-05 11:44:06</td><td style=&quot;color:var(--success);font-weight:600&quot;>已通过</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <!-- ============ 页面 F：新增/编辑表单 ============ -->
     <div id=&quot;view-form&quot; class=&quot;hidden&quot;>
       <div class=&quot;form-head&quot;>
@@ -1462,6 +1556,12 @@ function toggleSub(el){
   el.classList.toggle('open');
   el.nextElementSibling.classList.toggle('show');
 }
+function switchReportTab(which){
+  document.getElementById('reptab-reward').classList.toggle('active', which==='reward');
+  document.getElementById('reptab-data').classList.toggle('active', which==='data');
+  document.getElementById('rep-reward').classList.toggle('hidden', which!=='reward');
+  document.getElementById('rep-data').classList.toggle('hidden', which!=='data');
+}
 function switchSubtab(tab){
   document.querySelectorAll('.subtab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
   // 切页签时若在表单页，先退回列表
@@ -1471,6 +1571,9 @@ function switchSubtab(tab){
   document.getElementById('view-popup').classList.toggle('hidden', tab!=='popup');
   document.getElementById('view-freerecord').classList.toggle('hidden', tab!=='freerecord');
   document.getElementById('view-couponrecord').classList.toggle('hidden', tab!=='couponrecord');
+  document.getElementById('view-review').classList.toggle('hidden', tab!=='review');
+  document.getElementById('view-report').classList.toggle('hidden', tab!=='report');
+  if(tab==='report') switchReportTab('reward');
   if(tab==='record') renderRecordTable();
   if(tab!=='popup') closePushPopup();
 }
@@ -2680,7 +2783,143 @@ initPopup();
       </div>
     </div>
 
-    </section>
+    <!-- 3.6 派奖审核（异动） -->
+    <div class="func-block">
+      <div class="fb-head">
+        <span class="fb-code">3.6</span>
+        <span class="fb-name">派奖审核 — 活动类型新增「智能推播」（异动）</span>
+      </div>
+      <div class="fb-body" style="padding:20px 18px;flex-direction:column;gap:10px;align-items:flex-start">
+        <div class="mk-scr">
+          <div class="mk-scr-tb">
+            <span class="lbl">活动ID</span><span class="c-input c-w120 ph">请输入</span>
+            <span class="lbl">会员帐号</span><span class="c-input c-w120 ph">请输入</span>
+            <span class="lbl">奖励类型</span><span class="c-select c-w120">全选</span>
+            <span class="lbl">活动类型</span><span class="c-select c-w120">全选</span>
+            <span class="lbl">状态</span><span class="c-select c-w120">全部</span>
+            <span class="c-btn c-btn-primary c-btn-sm">搜索</span>
+            <span class="c-btn c-btn-primary c-btn-sm">导出</span>
+          </div>
+          <table style="width:100%">
+            <colgroup><col><col><col><col><col><col><col><col><col></colgroup>
+            <thead><tr><th>活动ID</th><th>会员帐号</th><th>活动类型</th><th>活动名称</th><th>奖励类型</th><th>奖励金额/内容</th><th>状态</th><th>审核人</th><th>审核时间</th></tr></thead>
+            <tbody>
+              <tr><td>184</td><td>ody002</td><td>智能推播</td><td>推播奖励</td><td>礼金</td><td>PHP 1,000</td><td><span class="tag-cell tc-yes">审核通过</span></td><td>自动审核</td><td>2026-08-06 00:04:00</td></tr>
+              <tr><td>184</td><td>member88899</td><td>智能推播</td><td>推播奖励</td><td>免费旋转券</td><td>x1 张</td><td><span class="tag-cell tc-yes">审核通过</span></td><td>自动审核</td><td>2026-08-06 00:04:00</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
+          <span class="fig-cap">图 3.6　派奖审核：活动类型下拉新增「智能推播」；智能推播记录状态＝审核通过、审核人＝自动审核</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center"><span class="fig-cap">活动类型下拉（展开）：</span><div style="width:150px;border:1px solid var(--c-line);border-radius:8px;background:#fff;box-shadow:0 6px 16px rgba(0,0,0,.12);overflow:hidden;flex-shrink:0"><div style="padding:7px 12px;font-size:12px;color:var(--c-primary);background:var(--c-primary-soft);font-weight:700">全选</div><div style="padding:7px 12px;font-size:12px;color:var(--c-text-2)">预约活动</div><div style="padding:7px 12px;font-size:12px;color:var(--c-text-2)">周卡活动</div><div style="padding:7px 12px;font-size:12px;color:var(--c-green);background:var(--c-green-soft);font-weight:700;display:flex;justify-content:space-between;align-items:center">智能推播 <span class="c-newflag">NEW</span></div></div></div>
+      </div>
+      <div class="fb-body" style="padding:0 18px 20px;flex-direction:column;gap:14px">
+        <div class="text-col" style="width:100%;flex:none">
+          <div class="rule-group">
+            <span class="rg-title src">异动内容（下拉来源）</span>
+            <ul class="rule-list">
+              <li>「活动类型」下拉<span class="k-green">新增选项「智能推播」</span>；清单：全选、预约活动、周卡活动、<span class="k-green">智能推播（新增）</span>…（依既有其余类型）。</li>
+              <li>选「智能推播」→ 仅显示活动类型＝<span class="k">智能推播</span>的派奖记录。</li>
+            </ul>
+          </div>
+          <div class="rule-group">
+            <span class="rg-title">智能推播记录显示规则</span>
+            <ul class="rule-list">
+              <li><span class="k">状态（奖励状态）</span>：一律显示 <span class="k-green">「审核通过」</span>（推播奖励为自动发放，见 4.4）。</li>
+              <li><span class="k">审核人</span>：一律显示 <span class="k">「自动审核」</span>。</li>
+              <li>其余栏位（活动ID／会员帐号／活动名称／奖励类型／奖励金额内容／申请时间／审核时间／备注／操作）依<span class="k">既有</span>显示，本次不异动。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3.7 活动报表（异动） -->
+    <div class="func-block">
+      <div class="fb-head">
+        <span class="fb-code">3.7</span>
+        <span class="fb-name">活动报表 — 活动类型新增「智能推播」（异动）</span>
+      </div>
+      <div class="fb-body" style="padding:16px 18px 0;flex-direction:column;gap:12px">
+        <div class="notice notice-blue" style="width:100%">
+          <span class="ni">ℹ</span>
+          <div class="nt">
+            <span>活动报表页面含两个页签：<b>「活动奖励统计」</b>与<b>「活动数据统计」</b>；两者的「活动类型」下拉皆新增「智能推播」。</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3.7.1 活动奖励统计 -->
+      <div class="fb-body" style="padding:6px 18px 0;flex-direction:column;gap:10px;align-items:flex-start">
+        <div class="rule-group" style="width:100%"><span class="rg-title src">3.7.1 活动奖励统计 · 活动类型新增「智能推播」</span></div>
+        <div class="mk-scr">
+          <div class="mk-scr-tb">
+            <span class="lbl">活动 ID</span><span class="c-input c-w120 ph">请输入</span>
+            <span class="lbl">活动类型</span><span class="c-select c-w120">全选</span>
+            <span class="lbl">奖励类型</span><span class="c-select c-w120">全选</span>
+            <span class="c-btn c-btn-primary c-btn-sm">搜寻</span>
+            <span class="c-btn c-btn-primary c-btn-sm">导出</span>
+          </div>
+          <table style="width:100%">
+            <colgroup><col><col><col><col><col><col><col><col><col><col><col></colgroup>
+            <thead><tr><th>日期</th><th>活动类型</th><th>活动ID</th><th>活动名称</th><th>奖励类型</th><th>奖励内容</th><th>参与人数</th><th>领取次数</th><th>派发金额(系统币)</th><th>积分小计</th><th>券张数</th></tr></thead>
+            <tbody>
+              <tr><td>2026-08-06</td><td>智能推播</td><td>184</td><td>推播奖励</td><td>礼金</td><td>PHP 1,000</td><td>1</td><td>1</td><td>1000.00</td><td>0.00</td><td>0</td></tr>
+              <tr><td>2026-08-06</td><td>智能推播</td><td>184</td><td>推播奖励</td><td>免费旋转券</td><td>x1 张</td><td>1</td><td>1</td><td>0.00</td><td>0.00</td><td>1</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <span class="fig-cap">图 3.7.1　活动奖励统计：活动类型下拉新增「智能推播」；智能推播派奖纳入统计（栏位依既有）</span>
+        <div class="text-col" style="width:100%;flex:none">
+          <div class="rule-group">
+            <span class="rg-title src">异动内容</span>
+            <ul class="rule-list">
+              <li>「活动类型」下拉<span class="k-green">新增「智能推播」</span>；选取后仅统计智能推播的派奖数据。</li>
+              <li>栏位依既有：日期、活动类型、活动ID、活动名称、奖励类型、奖励内容、参与人数、领取次数、派发金额(系统币)、积分小计、券张数；上方总金额／总积分／总免费券汇总一并纳入智能推播。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3.7.2 活动数据统计 -->
+      <div class="fb-body" style="padding:6px 18px 20px;flex-direction:column;gap:10px;align-items:flex-start">
+        <div class="rule-group" style="width:100%"><span class="rg-title src">3.7.2 活动数据统计 · 活动类型新增「智能推播」（含固定显示规则）</span></div>
+        <div class="mk-scr">
+          <div class="mk-scr-tb">
+            <span class="lbl">活动 ID</span><span class="c-input c-w120 ph">请输入</span>
+            <span class="lbl">会员账号</span><span class="c-input c-w120 ph">请输入</span>
+            <span class="lbl">活动类型</span><span class="c-select c-w120">全选</span>
+            <span class="lbl">奖励类型</span><span class="c-select c-w120">全选</span>
+            <span class="lbl">状态</span><span class="c-select c-w120">全部</span>
+            <span class="c-btn c-btn-primary c-btn-sm">搜寻</span>
+            <span class="c-btn c-btn-primary c-btn-sm">导出</span>
+          </div>
+          <table style="width:100%">
+            <colgroup><col><col><col><col><col><col><col><col><col><col></colgroup>
+            <thead><tr><th>活动ID</th><th>会员账号</th><th>活动类型</th><th>活动名称</th><th>奖励类型</th><th>奖励内容</th><th>天数</th><th>申请领取时间</th><th>审核时间</th><th>状态</th></tr></thead>
+            <tbody>
+              <tr><td>184</td><td>ody002</td><td>智能推播</td><td>推播奖励</td><td>礼金</td><td>PHP 1,000</td><td class="cell-c">-</td><td>2026-08-06 00:04:00</td><td>2026-08-06 00:04:00</td><td><span class="tag-cell tc-yes">已通过</span></td></tr>
+              <tr><td>184</td><td>ody002</td><td>智能推播</td><td>推播奖励</td><td>免费旋转券</td><td>x1 张</td><td class="cell-c">-</td><td>2026-08-06 00:04:00</td><td>2026-08-06 00:04:00</td><td><span class="tag-cell tc-yes">已通过</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <span class="fig-cap">图 3.7.2　活动数据统计：天数固定「-」、申请领取时间＝审核时间、状态皆「已通过」</span>
+        <div class="text-col" style="width:100%;flex:none">
+          <div class="rule-group">
+            <span class="rg-title src">异动内容与固定显示规则</span>
+            <ul class="rule-list">
+              <li>「活动类型」下拉<span class="k-green">新增「智能推播」</span>。</li>
+              <li><span class="k">天数</span>：智能推播记录一律<span class="k-red">固定显示「-」</span>。</li>
+              <li><span class="k">申请领取时间</span> 与 <span class="k">审核时间</span>：两者<span class="k-red">时间一致（相同）</span>。</li>
+              <li><span class="k">状态</span>：一律显示 <span class="k-green">「已通过」</span>。</li>
+              <li>其余栏位（活动ID／会员账号／活动名称／奖励类型／奖励内容）依既有显示。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   </div><!-- /sp-back -->
 
@@ -3007,6 +3246,8 @@ initPopup();
               <tr><td class="cell-c"><span class="tag-cell tc-new">新增</span></td><td>风控名单排除逻辑</td><td>命中「风控黑名单」或「NDRP 名单」即不显示弹窗（规则 I；对应 2.1、4.1、4.3）</td></tr>
               <tr><td class="cell-c"><span class="tag-cell tc-chg">异动</span></td><td>免费项目记录 · 来源筛选</td><td>「全部来源」新增「推播奖励」（对应 3.5）</td></tr>
               <tr><td class="cell-c"><span class="tag-cell tc-chg">异动</span></td><td>优惠券记录 · 来源筛选</td><td>「全部来源」新增「推播奖励」（对应 3.5）</td></tr>
+              <tr><td class="cell-c"><span class="tag-cell tc-chg">异动</span></td><td>派奖审核 · 活动类型</td><td>新增「智能推播」；记录状态＝审核通过、审核人＝自动审核（对应 3.6）</td></tr>
+              <tr><td class="cell-c"><span class="tag-cell tc-chg">异动</span></td><td>活动报表 · 活动奖励统计 / 活动数据统计</td><td>活动类型新增「智能推播」；数据统计天数固定「-」、申请领取＝审核时间、状态皆已通过（对应 3.7）</td></tr>
               <tr><td class="cell-c"><span class="tag-cell tc-keep">不异动</span></td><td>免费项目记录 / 优惠券记录 其余栏位</td><td>统计列、分页、导出、既有来源与栏位维持原样</td></tr>
               <tr><td class="cell-c"><span class="tag-cell tc-keep">不异动</span></td><td>盈利活动 / 消费活动 / 每日特别返水 / 每日特别加码 / 游戏挑战赛</td><td>各活动本身规则不变，仅由推播弹窗导流至其详情页</td></tr>
               <tr><td class="cell-c"><span class="tag-cell tc-keep">不异动</span></td><td>积分商城 / 我的优惠券 页面</td><td>仅作为福利加码领取后的导向目标，页面本身不变</td></tr>

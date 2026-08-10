@@ -313,6 +313,11 @@ tbody tr:last-child td{border-bottom:none}
 .fe-bonus-icon{width:22px;height:22px;flex:0 0 auto;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ffb057,#ff6a3d);color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center}
 .fe-bonus-turnover{margin-top:6px;font-size:11px;color:var(--text-2)}
 .fe-rule-list{padding-left:18px;color:var(--text-2);font-size:13px;line-height:2}
+.rep-tabs{display:flex;gap:24px;border-bottom:1px solid var(--border-2);margin-bottom:16px}
+.rep-tab{padding:10px 2px;font-size:14px;color:var(--text-2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.rep-tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+.sum-row{display:flex;justify-content:flex-end;gap:20px;font-size:13px;color:var(--text-2);margin-bottom:10px}
+.sum-row b{font-weight:700}
 /* ===== EVENT BULLETIN 推播弹窗（依图例重做，素材内嵌） ===== */
 .ea-pop{width:246px;max-height:540px;background:#fff;border-radius:18px;box-shadow:0 12px 34px rgba(0,0,0,.35);position:relative;display:flex;flex-direction:column;overflow:hidden}
 .ea-close{position:absolute;top:8px;right:8px;z-index:4;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;font-size:12px;color:#5b6b82;cursor:pointer}
@@ -389,6 +394,8 @@ tbody tr:last-child td{border-bottom:none}
       <div class="subtab active" data-tab="list" onclick="switchSubtab('list')">推播列表</div>
       <div class="subtab" data-tab="record" onclick="switchSubtab('record')">推播记录</div>
       <div class="subtab" data-tab="popup" onclick="switchSubtab('popup')">推播弹窗</div>
+      <div class="subtab" data-tab="review" onclick="switchSubtab('review')">派奖审核</div>
+      <div class="subtab" data-tab="report" onclick="switchSubtab('report')">活动报表</div>
       <div class="subtab" data-tab="freerecord" onclick="switchSubtab('freerecord')">免费项目记录</div>
       <div class="subtab" data-tab="couponrecord" onclick="switchSubtab('couponrecord')">优惠券记录</div>
     </div>
@@ -799,6 +806,93 @@ tbody tr:last-child td{border-bottom:none}
     </div>
 
     <!-- ============ 页面 C：推播条件表单（新增 / 编辑） ============ -->
+    <!-- ============ 页面：派奖审核（活动类型含「智能推播」） ============ -->
+    <div id="view-review" class="hidden">
+      <div class="toolbar">
+        <div class="field">活动ID：<input type="text" class="input" style="width:130px" placeholder="请输入"></div>
+        <div class="field">会员帐号：<input type="text" class="input" style="width:130px" placeholder="请输入"></div>
+        <div class="field">奖励类型：<select class="select" style="width:110px"><option>全选</option><option>礼金</option><option>积分</option><option>免费旋转券</option><option>免费投注券</option><option>优惠券</option><option>道具卡</option></select></div>
+        <div class="field">活动类型：<select class="select" style="width:120px"><option>全选</option><option>预约活动</option><option>周卡活动</option><option>智能推播</option></select></div>
+        <div class="field">状态：<select class="select" style="width:110px"><option>全部</option><option>审核通过</option><option>审核不通过</option></select></div>
+      </div>
+      <div class="toolbar">
+        <div class="field">申请时间：<input type="text" class="input" style="width:150px" placeholder="开始时间" readonly><span style="color:var(--text-3)">～</span><input type="text" class="input" style="width:150px" placeholder="结束时间" readonly></div>
+        <button class="btn btn-primary">搜索</button>
+        <button class="btn" style="background:#e6a23c;border-color:#e6a23c;color:#fff">导出</button>
+        <div class="spacer"></div>
+      </div>
+      <div class="card" style="overflow-x:auto">
+        <table style="table-layout:fixed;min-width:1480px">
+          <thead><tr>
+            <th style="width:80px">活动ID</th><th style="width:120px">会员帐号</th><th style="width:100px">活动类型</th><th style="width:110px">活动名称</th><th style="width:100px">奖励类型</th><th style="width:130px">奖励金额/内容</th><th style="width:100px">状态</th><th style="width:150px">申请时间</th><th style="width:100px">审核人</th><th style="width:160px">审核时间</th><th style="width:120px">备注</th><th style="width:80px">操作</th>
+          </tr></thead>
+          <tbody>
+            <tr><td>184</td><td>ody002</td><td>智能推播</td><td>推播奖励</td><td>礼金</td><td>PHP 1,000</td><td style="color:var(--success);font-weight:600">审核通过</td><td>–</td><td>自动审核</td><td>2026-08-06 00:04:00</td><td>–</td><td>–</td></tr>
+            <tr><td>184</td><td>ody002</td><td>智能推播</td><td>推播奖励</td><td>免费旋转券</td><td>x1 张</td><td style="color:var(--success);font-weight:600">审核通过</td><td>–</td><td>自动审核</td><td>2026-08-06 00:04:00</td><td>–</td><td>–</td></tr>
+            <tr><td>184</td><td>member88899</td><td>智能推播</td><td>推播奖励</td><td>积分</td><td>22 pts</td><td style="color:var(--success);font-weight:600">审核通过</td><td>–</td><td>自动审核</td><td>2026-08-05 11:44:06</td><td>–</td><td>–</td></tr>
+            <tr><td>184</td><td>member88899</td><td>智能推播</td><td>推播奖励</td><td>道具卡</td><td>x1 张</td><td style="color:var(--success);font-weight:600">审核通过</td><td>–</td><td>自动审核</td><td>2026-08-05 10:19:12</td><td>–</td><td>–</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ 页面：活动报表（活动奖励统计 / 活动数据统计） ============ -->
+    <div id="view-report" class="hidden">
+      <div class="rep-tabs">
+        <div class="rep-tab active" id="reptab-reward" onclick="switchReportTab('reward')">活动奖励统计</div>
+        <div class="rep-tab" id="reptab-data" onclick="switchReportTab('data')">活动数据统计</div>
+      </div>
+
+      <div id="rep-reward">
+        <div class="toolbar">
+          <div class="field">活动 ID：<input type="text" class="input" style="width:150px" placeholder="请输入"></div>
+          <div class="field">活动类型：<select class="select" style="width:120px"><option>全选</option><option>预约活动</option><option>周卡活动</option><option>智能推播</option></select></div>
+          <div class="field">奖励类型：<select class="select" style="width:110px"><option>全选</option></select></div>
+        </div>
+        <div class="toolbar">
+          <div class="field">起始日期～结束日期：<input type="text" class="input" style="width:150px" placeholder="开始时间" readonly><span style="color:var(--text-3)">～</span><input type="text" class="input" style="width:150px" placeholder="结束时间" readonly></div>
+          <button class="btn btn-primary">搜寻</button>
+          <button class="btn" style="background:#e6a23c;border-color:#e6a23c;color:#fff">导出</button>
+        </div>
+        <div class="sum-row">总金额：<b style="color:var(--danger)">1000.00</b>总积分：<b style="color:var(--primary)">22.00</b>总免费券：<b style="color:var(--success)">1</b></div>
+        <div class="card" style="overflow-x:auto">
+          <table style="table-layout:fixed;min-width:1320px">
+            <thead><tr><th style="width:110px">日期</th><th style="width:100px">活动类型</th><th style="width:80px">活动ID</th><th style="width:120px">活动名称</th><th style="width:100px">奖励类型</th><th style="width:100px">奖励内容</th><th style="width:90px">参与人数</th><th style="width:90px">领取次数</th><th style="width:140px">派发金额(系统币)</th><th style="width:90px">积分小计</th><th style="width:80px">券张数</th></tr></thead>
+            <tbody>
+              <tr><td>2026-08-06</td><td>智能推播</td><td>184</td><td>推播奖励</td><td>礼金</td><td>PHP 1,000</td><td>1</td><td>1</td><td>1000.00</td><td>0.00</td><td>0</td></tr>
+              <tr><td>2026-08-06</td><td>智能推播</td><td>184</td><td>推播奖励</td><td>免费旋转券</td><td>x1 张</td><td>1</td><td>1</td><td>0.00</td><td>0.00</td><td>1</td></tr>
+              <tr><td>2026-08-05</td><td>智能推播</td><td>184</td><td>推播奖励</td><td>积分</td><td>22 pts</td><td>1</td><td>1</td><td>0.00</td><td>22.00</td><td>0</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="rep-data" class="hidden">
+        <div class="toolbar">
+          <div class="field">活动 ID：<input type="text" class="input" style="width:130px" placeholder="请输入"></div>
+          <div class="field">会员账号：<input type="text" class="input" style="width:130px" placeholder="请输入"></div>
+          <div class="field">活动类型：<select class="select" style="width:120px"><option>全选</option><option>预约活动</option><option>周卡活动</option><option>智能推播</option></select></div>
+          <div class="field">奖励类型：<select class="select" style="width:110px"><option>全选</option></select></div>
+          <div class="field">状态：<select class="select" style="width:110px"><option>全部</option></select></div>
+        </div>
+        <div class="toolbar">
+          <button class="btn btn-primary">搜寻</button>
+          <button class="btn" style="background:#e6a23c;border-color:#e6a23c;color:#fff">导出</button>
+          <div class="spacer"></div>
+        </div>
+        <div class="card" style="overflow-x:auto">
+          <table style="table-layout:fixed;min-width:1320px">
+            <thead><tr><th style="width:80px">活动ID</th><th style="width:120px">会员账号</th><th style="width:100px">活动类型</th><th style="width:110px">活动名称</th><th style="width:100px">奖励类型</th><th style="width:100px">奖励内容</th><th style="width:70px">天数</th><th style="width:160px">申请领取时间</th><th style="width:160px">审核时间</th><th style="width:90px">状态</th></tr></thead>
+            <tbody>
+              <tr><td>184</td><td>ody002</td><td>智能推播</td><td>推播奖励</td><td>礼金</td><td>PHP 1,000</td><td style="text-align:center">-</td><td>2026-08-06 00:04:00</td><td>2026-08-06 00:04:00</td><td style="color:var(--success);font-weight:600">已通过</td></tr>
+              <tr><td>184</td><td>ody002</td><td>智能推播</td><td>推播奖励</td><td>免费旋转券</td><td>x1 张</td><td style="text-align:center">-</td><td>2026-08-06 00:04:00</td><td>2026-08-06 00:04:00</td><td style="color:var(--success);font-weight:600">已通过</td></tr>
+              <tr><td>184</td><td>member88899</td><td>智能推播</td><td>推播奖励</td><td>积分</td><td>22 pts</td><td style="text-align:center">-</td><td>2026-08-05 11:44:06</td><td>2026-08-05 11:44:06</td><td style="color:var(--success);font-weight:600">已通过</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <div id="view-form" class="hidden">
       <div class="form-head">
         <div class="title" id="formTitle">新增推播条件</div>
@@ -1045,6 +1139,12 @@ function toggleSub(el){
   el.classList.toggle('open');
   el.nextElementSibling.classList.toggle('show');
 }
+function switchReportTab(which){
+  document.getElementById('reptab-reward').classList.toggle('active', which==='reward');
+  document.getElementById('reptab-data').classList.toggle('active', which==='data');
+  document.getElementById('rep-reward').classList.toggle('hidden', which!=='reward');
+  document.getElementById('rep-data').classList.toggle('hidden', which!=='data');
+}
 function switchSubtab(tab){
   document.querySelectorAll('.subtab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
   // 切页签时若在表单页，先退回列表
@@ -1054,6 +1154,9 @@ function switchSubtab(tab){
   document.getElementById('view-popup').classList.toggle('hidden', tab!=='popup');
   document.getElementById('view-freerecord').classList.toggle('hidden', tab!=='freerecord');
   document.getElementById('view-couponrecord').classList.toggle('hidden', tab!=='couponrecord');
+  document.getElementById('view-review').classList.toggle('hidden', tab!=='review');
+  document.getElementById('view-report').classList.toggle('hidden', tab!=='report');
+  if(tab==='report') switchReportTab('reward');
   if(tab==='record') renderRecordTable();
   if(tab!=='popup') closePushPopup();
 }

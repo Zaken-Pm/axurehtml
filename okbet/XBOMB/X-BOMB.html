@@ -151,6 +151,9 @@ body {
 .claim-btn--topup { background:radial-gradient(circle at 50% 35%,#ff6a8a,#c81e3f); }
 .claim-btn--done { background:#2a2650; color:var(--text-dim); cursor:default; }
 .group-label { color:var(--neon-pink); font-weight:800; font-size:.86rem; margin:var(--space-4) 0 var(--space-2); }
+/* 充值卡若同时为挑战：金框（挑战）优先于粉框 */
+.level-card--topup.level-card--challenge { border-color:var(--gold); box-shadow:0 0 14px rgba(255,210,63,.35); }
+.level-card--topup.level-card--challenge::before { content:"Top-up Challenge"; color:var(--gold); }
 
 /* 空状态 */
 .empty { text-align:center; padding:var(--space-6) var(--space-4); color:var(--text-dim);
@@ -338,11 +341,8 @@ body {
     </div>
     <span class="spec-tag" style="margin-left:0">对应规格：领取展示区（仅真实数据）</span>
 
+    <p class="group-label" style="color:#cbb8ff">投注 &amp; 充值任务　·　依后台等级配置顺序显示；挑战（金框）依后台机率触发，可落在投注或充值</p>
     <div id="rebateList"></div>
-
-    <!-- 充值任务：固定配置（3.1） -->
-    <p class="group-label">Top-up Challenge　·　固定配置（每日 2 档，可扩充为 3 档）</p>
-    <div id="topupList"></div>
 
     <div class="empty" id="emptyRebate" hidden>
       <div class="empty__emoji">🎧</div>
@@ -447,20 +447,27 @@ buildTicker($('#tickerRebate'),claims);
 buildTicker($('#tickerRaffle'),claims);
 
 /* ---------- 返水等级卡 ---------- */
-const levels = [
-  { lv:1, cur:500, max:500, amt:'₱7',  status:'claim',  challenge:true },
-  { lv:2, cur:887, max:1000, amt:'₱10', status:'locked', ticket:'N1' },
-  { lv:3, cur:910, max:2000, amt:'₱15', status:'locked', ticket:'N1' },
-  { lv:4, cur:2125, max:5000, amt:'₱25', status:'locked', challenge:true, ticket:'N2' },
-  { lv:5, cur:3010, max:10000, amt:'₱10', status:'locked' },
-  { lv:6, cur:4600, max:20000, amt:'₱50', status:'locked', challenge:true },
-  { lv:7, cur:6280, max:50000, amt:'₱150', status:'locked', ticket:'S1' },
+/* 统一任务串：投注(bet)/充值(topup) 依后台等级顺序(lv)显示；
+   挑战(challenge)依后台机率触发，可落在投注或充值卡（金框）。 */
+const tasks = [
+  { type:'bet',   lv:1, cur:500,  max:500,   amt:'₱7',   status:'claim',  challenge:true },
+  { type:'topup', lv:2, cur:0,    max:1000,  amt:'₱10',  status:'topup',  ticket:'N1' },
+  { type:'bet',   lv:3, cur:910,  max:2000,  amt:'₱15',  status:'locked', ticket:'N1' },
+  { type:'bet',   lv:4, cur:2125, max:5000,  amt:'₱25',  status:'locked', challenge:true, ticket:'N2' },
+  { type:'bet',   lv:5, cur:3010, max:10000, amt:'₱10',  status:'locked' },
+  { type:'topup', lv:6, cur:0,    max:500,   amt:'₱250', status:'locked', challenge:true, ticket:'S1' },
+  { type:'bet',   lv:7, cur:4600, max:20000, amt:'₱50',  status:'locked', challenge:true },
+  { type:'bet',   lv:8, cur:6280, max:50000, amt:'₱150', status:'locked', ticket:'S1' },
 ];
-function levelCard(d){
+function taskCard(d){
   const pct=Math.min(100,Math.round(d.cur/d.max*100));
-  const cls=['level-card']; if(d.challenge)cls.push('level-card--challenge'); if(d.status==='done')cls.push('level-card--claimed');
+  const cls=['level-card'];
+  if(d.type==='topup')cls.push('level-card--topup');
+  if(d.challenge)cls.push('level-card--challenge');
+  if(d.status==='done')cls.push('level-card--claimed');
   let btn;
-  if(d.status==='claim') btn=`<button class="claim-btn claim-btn--claim" data-lv="${d.lv}">CLAIM</button>`;
+  if(d.type==='topup' && d.status==='topup') btn=`<button class="claim-btn claim-btn--topup" data-topup="1">TOP-UP</button>`;
+  else if(d.status==='claim') btn=`<button class="claim-btn claim-btn--claim" data-lv="${d.lv}">CLAIM</button>`;
   else if(d.status==='done') btn=`<button class="claim-btn claim-btn--done" disabled>Claimed</button>`;
   else btn=`<button class="claim-btn claim-btn--locked" disabled>LOCKED</button>`;
   const ticket=d.ticket?`<span class="level-card__ticket">+ ${d.ticket} 卡</span>`:'';
@@ -472,27 +479,7 @@ function levelCard(d){
     <div class="level-card__reward"><span class="level-card__coins">🪙</span>
       <span class="level-card__amt">${d.amt}</span>${ticket}</div>${btn}</article>`;
 }
-$('#rebateList').innerHTML = levels.map(levelCard).join('');
-
-/* 充值任务（固定配置；一定双奖励；TOP-UP） */
-const topups = [
-  { need:'Top-up ₱200', cur:0, max:1000, amt:'₱10', ticket:'N1', status:'topup' },
-  { need:'Top-up ₱1,000', cur:0, max:500, amt:'₱250', ticket:'S1', status:'locked' },
-];
-function topupCard(d){
-  const pct=Math.min(100,Math.round(d.cur/d.max*100));
-  const btn=d.status==='topup'
-    ?`<button class="claim-btn claim-btn--topup" data-topup="1">TOP-UP</button>`
-    :`<button class="claim-btn claim-btn--locked" disabled>LOCKED</button>`;
-  return `<article class="level-card level-card--topup">
-    <div class="level-card__main">
-      <div class="level-card__progress-label">${d.cur.toLocaleString()} / ${d.max.toLocaleString()}</div>
-      <div class="level-card__bar"><div class="level-card__bar-fill" style="width:${pct}%"></div></div>
-    </div>
-    <div class="level-card__reward"><span class="level-card__coins">🪙</span>
-      <span class="level-card__amt">${d.amt}</span><span class="level-card__ticket">+ ${d.ticket} 卡</span></div>${btn}</article>`;
-}
-$('#topupList').innerHTML = topups.map(topupCard).join('');
+$('#rebateList').innerHTML = tasks.slice().sort((a,b)=>a.lv-b.lv).map(taskCard).join('');
 
 /* 返水点击 */
 $('#viewRebate').addEventListener('click',(e)=>{
@@ -500,7 +487,7 @@ $('#viewRebate').addEventListener('click',(e)=>{
   const topupBtn=e.target.closest('.claim-btn--topup');
   if(topupBtn){ toast('跳转充值页；完成后回到本页领取奖励'); return; }
   if(!claimBtn) return;
-  const lv=+claimBtn.dataset.lv; const data=levels.find(l=>l.lv===lv);
+  const lv=+claimBtn.dataset.lv; const data=tasks.find(l=>l.lv===lv);
   if(data.challenge){ openFlip(data); } else { doClaim(claimBtn,data); }
 });
 function doClaim(btn,data){
@@ -666,7 +653,7 @@ $$('.toolbar__btn').forEach(btn=>btn.addEventListener('click',()=>{
   btn.setAttribute('aria-pressed','true');
   const nav=btn.dataset.nav;
   $('#emptyRebate').hidden=true; $('#emptyRaffle').hidden=true;
-  $('#rebateList').style.display=''; $('#topupList').style.display='';
+  $('#rebateList').style.display='';
   $$('#viewRebate .group-label').forEach(el=>el.style.display='');
   $('#raffleList').style.display=''; $('#flipOverlay').classList.remove('is-open');
   $('#makeupBanner').classList.remove('is-show');
@@ -674,9 +661,9 @@ $$('.toolbar__btn').forEach(btn=>btn.addEventListener('click',()=>{
   if(nav==='rebate'){ showView('rebate'); }
   if(nav==='makeup'){ showView('rebate'); $('#makeupBanner').classList.add('is-show'); }
   if(nav==='raffle'){ showView('raffle'); }
-  if(nav==='flip'){ showView('rebate'); openFlip(levels[0]); }
+  if(nav==='flip'){ showView('rebate'); openFlip(tasks.find(t=>t.challenge)||tasks[0]); }
   if(nav==='empty-rebate'){ showView('rebate');
-    $('#rebateList').style.display='none'; $('#topupList').style.display='none';
+    $('#rebateList').style.display='none';
     $$('#viewRebate .group-label').forEach(el=>el.style.display='none'); $('#emptyRebate').hidden=false; }
   if(nav==='empty-raffle'){ showView('raffle'); $('#raffleList').style.display='none'; $('#emptyRaffle').hidden=false; }
   $('#phone').scrollIntoView({behavior:'smooth',block:'start'});
