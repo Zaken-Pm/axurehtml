@@ -1327,11 +1327,12 @@ const THRESHOLDS = [
 /* 推送奖励——「活动推送」仅限定有角标的活动（有勾选才推送，未勾选则不推送） */
 const BADGE_ACTIVITIES = ['盈利活动','消费活动','每日特别返水','每日特别加码','游戏挑战赛'];
 /* 推送奖励——奖品类型；礼金/积分为输入数量，其余三种为下拉选择奖品内容 */
-const GIFT_TYPES = ['礼金','积分','免费旋转','免费投注','优惠券'];
+const GIFT_TYPES = ['礼金','积分','免费旋转','免费投注','优惠券','道具卡'];
 const GIFT_OPTIONS = {
   '免费旋转': ['免费旋转JILI','免费旋转FKG','免费旋转FC'],
   '免费投注': ['免费投注ONlive','免费投注Mini'],
   '优惠券':   ['20% Loss Cashback','10% Loss Cashback','10% Deposit Voucher (Max ₱500)'],
+  '道具卡':   ['VP道具卡','道具卡VP全部游戏','特色道具卡'],
 };
 
 /* ============================================================
@@ -1822,7 +1823,7 @@ function renderGiftValueCell(i){
     }
     return html;
   }
-  // 免费旋转 / 免费投注 / 优惠券——下拉选择奖品内容
+  // 免费旋转 / 免费投注 / 优惠券 / 道具卡——下拉选择奖品内容
   const opts = GIFT_OPTIONS[rw.giftType] || [];
   return `
     <select class=&quot;select&quot; style=&quot;width:100%&quot; onchange=&quot;onGiftValueSelect(${i},this.value)&quot;>
@@ -2209,7 +2210,7 @@ initPopup();
             <ul class="rule-list ok">
               <li><span class="k">礼金</span> → <span class="k-blue">仅关闭弹窗、不做页面导向</span>。</li>
               <li><span class="k">积分</span> → 导向<span class="k-blue">「积分商城」</span>。</li>
-              <li><span class="k">免费旋转 / 免费投注 / 优惠券</span> → 导向<span class="k-blue">「我的优惠券」</span>。</li>
+              <li><span class="k">免费旋转 / 免费投注 / 优惠券 / 道具卡</span> → 导向<span class="k-blue">「我的优惠券」</span>。</li>
             </ul>
           </div>
           <div class="rule-group">
@@ -2369,9 +2370,9 @@ initPopup();
             <ul class="rule-list">
               <li>阶级数<span class="k">与触发条件共用</span>（在触发条件区新增／删除阶级）。</li>
               <li><span class="k">活动推送</span>：勾选「推送角标相关活动」才推送；限角标活动：<span class="k">盈利活动 / 消费活动 / 每日特别返水 / 每日特别加码 / 游戏挑战赛</span>。</li>
-              <li><span class="k">奖品类型</span>（选填，下拉）：<span class="k">礼金 / 积分 / 免费旋转 / 免费投注 / 优惠券</span>。</li>
+              <li><span class="k">奖品类型</span>（选填，下拉）：<span class="k">礼金 / 积分 / 免费旋转 / 免费投注 / 优惠券 / 道具卡</span>。</li>
               <li>礼金、积分 → <span class="k">输入数量</span>；礼金另需输入<span class="k">「所需流水倍数」</span>。</li>
-              <li>免费旋转 / 免费投注 / 优惠券 → <span class="k">下拉选奖品内容</span>（来源：JILI／FKG／FC；ONlive／Mini；20%／10% Loss Cashback、10% Deposit Voucher 等）。</li>
+              <li>免费旋转 / 免费投注 / 优惠券 / 道具卡 → <span class="k">下拉选奖品内容</span>（来源：JILI／FKG／FC；ONlive／Mini；20%／10% Loss Cashback、10% Deposit Voucher 等；道具卡：VP道具卡／道具卡VP全部游戏／特色道具卡）。</li>
               <li><span class="k-red">每个阶级的「活动推送」与「奖品类型」至少需择一配置，不可两者皆空</span>（此为红字提示，显示于推送奖励区）。</li>
             </ul>
           </div>
@@ -2595,7 +2596,7 @@ initPopup();
               <li>该次有勾选<span class="k">「推送角标活动」</span>时，最前方加注<span class="k-blue">「推送活动、」</span>。</li>
               <li><span class="k">礼金</span>：显示「礼金 N」。</li>
               <li><span class="k">积分</span>：显示「积分 N」。</li>
-              <li><span class="k">免费旋转 / 免费投注 / 优惠券</span>：显示「类型 + 奖品内容」（如：免费旋转 JILI、优惠券 20% Loss Cashback）。</li>
+              <li><span class="k">免费旋转 / 免费投注 / 优惠券 / 道具卡</span>：显示「类型 + 奖品内容」（如：免费旋转 JILI、优惠券 20% Loss Cashback）。</li>
               <li>仅推送活动、无奖品：仅显示<span class="k-blue">「推送活动」</span>；两者皆无：显示「—」。</li>
             </ul>
           </div>
