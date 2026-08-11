@@ -390,7 +390,7 @@ label.chk input{accent-color:var(--primary);}
                   </tr></thead>
                   <tbody id="rebateBody"></tbody>
                 </table>
-                <p class="hint">任务目标／固定金额：不可为空、0 或小数点，任务目标需逐级递增（不可小于或等于较低等级）；比例：不可为空或 0；上限金额非必填，可留空。等级最低 LV1，最多 LV20。</p>
+                <p class="hint">任务目标／固定金额：不可为空、0 或小数点，任务目标需依同「任务条件」逐级递增（不可小于或等于同任务条件）；比例：不可为空或 0；上限金额非必填，可留空。等级最低 LV1，最多 LV20。</p>
               </div>
             </div>
 
@@ -877,7 +877,7 @@ function validateStep(n){
     showTime.classList.remove('is-error');
   }
   if(n===4){
-    // 校验返水表任务目标与固定金额不可为空/0，且任务目标需逐级递增
+    // 校验返水表任务目标与固定金额不可为空/0，且任务目标需依同「任务条件」逐级递增
     let bad=false;
     const {orderBad:goalOrderBad,anyBad:goalBad}=validateGoalOrder(true);
     if(goalBad) bad=true;
@@ -888,7 +888,7 @@ function validateStep(n){
         const cap=$('.js-cap',tr); if(cap&&cap.value&&Number(cap.value)<=0){cap.classList.add('is-error');bad=true;} else if(cap) cap.classList.remove('is-error'); }
     });
     const w=$('#fWager'); if(w.value!=='' && Number(w.value)===0){w.classList.add('is-error');bad=true;} else w.classList.remove('is-error');
-    if(goalOrderBad){toast('任务目标不可小于或等于较低等级，请检查红框',true);return false;}
+    if(goalOrderBad){toast('任务目标不可小于或等于同任务条件，请检查红框',true);return false;}
     if(bad){toast('活动条件有必填/格式错误，请检查红框',true);return false;}
     if(challengeAppearSum()>100){toast('触发机率总计不得超过100%',true);return false;}
   }
@@ -958,21 +958,24 @@ let rebateRows=[
 const SAMPLE_REBATE=JSON.parse(JSON.stringify(rebateRows));   // 编辑用示范值
 const BLANK_REBATE=[{cond:'有效投注',goal:'',amtType:'固定金额',amt:'',cap:'',trigger:false,card:''}];  // 新增用空白（保留 LV1）
 function validateGoalOrder(strict){
-  let orderBad=false, anyBad=false, prevGoal=null;
+  let orderBad=false, anyBad=false;
+  const prevGoalByCond={};
   $$('#rebateBody tr').forEach(tr=>{
     const goal=$('.js-goal',tr); if(!goal) return;
+    const condSel=$('.js-cond',tr); const cond=condSel?condSel.value:'';
     const hint=$('.js-goal-hint',tr);
     const hasValue=goal.value!=='';
     const val=Number(goal.value);
     let invalid=false, orderInvalid=false;
     if(hasValue){
       invalid = val<=0 || /\./.test(goal.value);
+      const prevGoal=Object.prototype.hasOwnProperty.call(prevGoalByCond,cond)?prevGoalByCond[cond]:null;
       if(!invalid && prevGoal!==null && val<=prevGoal){ invalid=true; orderInvalid=true; orderBad=true; }
     } else if(strict){ invalid=true; }
     if(invalid) anyBad=true;
     goal.classList.toggle('is-error',invalid);
     if(hint) hint.style.visibility=orderInvalid?'visible':'hidden';
-    if(hasValue && !/\./.test(goal.value) && !isNaN(val)) prevGoal=val;
+    if(hasValue && !/\./.test(goal.value) && !isNaN(val)) prevGoalByCond[cond]=val;
   });
   return {orderBad,anyBad};
 }
@@ -985,7 +988,7 @@ function renderRebate(){
       <td>LV${i+1}</td>
       <td><select class="select js-cond"><option ${r.cond==='有效投注'?'selected':''}>有效投注</option><option ${r.cond==='充值'?'selected':''}>充值</option></select></td>
       <td><div class="prefix-wrap"><span class="prefix">≥</span><input class="input js-goal" value="${r.goal}"></div>
-        <p class="hint hint--err js-goal-hint" style="visibility:hidden">任务目标不可小于或等于较低等级</p></td>
+        <p class="hint hint--err js-goal-hint" style="visibility:hidden">任务目标不可小于或等于同任务条件</p></td>
       <td>彩金</td>
       <td><div style="display:flex;gap:4px;align-items:center">
         <select class="select js-amt-type" style="width:88px;flex:none"><option ${!isRatio?'selected':''}>固定金额</option><option ${isRatio?'selected':''}>比例</option></select>
@@ -996,7 +999,7 @@ function renderRebate(){
       <td><label class="chk"><input type="checkbox" class="js-trigger" ${r.trigger?'checked':''}>触发</label></td>
       <td><select class="select js-card">${SCRATCH_TIERS.map(t=>`<option ${r.card===t?'selected':''} value="${t}">${t||'无'}</option>`).join('')}</select></td>
       <td><button class="btn--link red js-del">删除</button></td>`;
-    $('.js-cond',tr).addEventListener('change',e=>r.cond=e.target.value);
+    $('.js-cond',tr).addEventListener('change',e=>{ r.cond=e.target.value; validateGoalOrder(); });
     $('.js-goal',tr).addEventListener('input',e=>{ r.goal=e.target.value; validateGoalOrder(); });
     $('.js-amt-type',tr).addEventListener('change',e=>{r.amtType=e.target.value;renderRebate();});
     $('.js-amt',tr).addEventListener('input',e=>{ r.amt=e.target.value;
