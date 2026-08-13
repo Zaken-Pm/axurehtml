@@ -146,11 +146,15 @@ body {
 .level-card { position:relative; background:linear-gradient(180deg,var(--bg-card),#1a1440);
   border:1px solid rgba(124,58,237,.4); border-radius:var(--radius-pill); padding:var(--space-3);
   display:grid; grid-template-columns:1fr auto auto; align-items:center; gap:var(--space-3); margin-bottom:var(--space-3); }
-.level-card--challenge { margin-top:var(--space-4); } /* 为卡片外浮的徽标留出净空 */
-.level-card--challenge { border-color:var(--gold); box-shadow:0 0 14px rgba(255,210,63,.35); }
-.level-card--challenge::before { content:"Challenge"; position:absolute; top:-.75rem; left:var(--space-4);
-  font-size:.72rem; font-weight:800; color:var(--gold); text-shadow:0 0 6px rgba(255,210,63,.8); }
-.level-card--topup { background:linear-gradient(180deg,#3a1140,#2a0f38); }
+.level-card--challenge { margin-top:1.3rem; } /* 为放大后的 CHALLENGE 徽标留出净空 */
+.level-card--topup { background:linear-gradient(180deg,#3a1140,#2a0f38); border-color:var(--gold);
+  box-shadow:0 0 14px rgba(255,210,63,.35); margin-top:var(--space-4); } /* 充值任务统一黄框，无论是否触发挑战 */
+.level-card__badge-wrap { position:absolute; top:-.8rem; left:var(--space-4); display:flex; align-items:center; gap:.35rem; z-index:3; }
+.level-card__badge-wrap--ch { top:-1.05rem; }
+.level-card__badge { position:static; height:1.05rem; display:block; }
+.level-card__badge--challenge { height:1.7rem; }
+.level-card__boost { font-weight:900; font-style:italic; color:var(--gold); font-size:.9rem; line-height:1;
+  text-shadow:0 0 6px rgba(255,210,63,.75),0 1px 1px #000; white-space:nowrap; }
 .level-card--claimed { opacity:.55; filter:grayscale(.4); }
 .level-card__main { min-width:0; }
 .level-card__progress-label { font-size:.82rem; color:#cfc6f5; margin-bottom:var(--space-1); }
@@ -161,8 +165,10 @@ body {
 .level-card__reward { display:flex; flex-direction:column; align-items:center; gap:2px; }
 .level-card__coins { font-size:1.5rem; line-height:1; }
 .level-card__amt { font-weight:800; color:var(--gold); font-size:.95rem; }
-.level-card__ticket { margin-top:2px; font-size:.56rem; color:#fff; padding:1px var(--space-2); border-radius:4px;
+.level-card__ticket { margin-top:2px; font-size:.62rem; font-weight:800; color:var(--gold); display:inline-flex;
+  align-items:center; gap:3px; padding:1px var(--space-2) 1px 3px; border-radius:4px;
   background:linear-gradient(90deg,#2563eb,#7c3aed); border:1px solid rgba(255,255,255,.4); }
+.level-card__ticket img { width:16px; height:auto; display:block; }
 .claim-btn { border:none; border-radius:var(--radius-pill); font-weight:800; cursor:pointer;
   width:3.6rem; height:3.6rem; font-size:.7rem; color:#fff; padding:0; display:grid; place-items:center; text-align:center; }
 .claim-btn--claim { background:radial-gradient(circle at 50% 35%,#ff6a8a,#c81e3f); box-shadow:0 0 14px rgba(240,71,91,.6); }
@@ -171,9 +177,6 @@ body {
 .claim-btn--topup { background:radial-gradient(circle at 50% 35%,#ff6a8a,#c81e3f); }
 .claim-btn--done { background:#2a2650; color:var(--text-dim); cursor:default; }
 .group-label { color:var(--neon-pink); font-weight:800; font-size:.86rem; margin:var(--space-4) 0 var(--space-2); }
-/* 充值卡若同时为挑战：红框红字（区别于投注挑战的金框），优先于粉框 */
-.level-card--topup.level-card--challenge { border-color:var(--bad); box-shadow:0 0 14px rgba(240,71,91,.35); }
-.level-card--topup.level-card--challenge::before { content:"Top-up Challenge"; color:var(--bad); text-shadow:0 0 6px rgba(240,71,91,.8); }
 
 /* 空状态 */
 .empty { text-align:center; padding:var(--space-6) var(--space-4); color:var(--text-dim);
@@ -182,11 +185,6 @@ body {
 .empty__title { color:#fff; font-weight:700; margin:var(--space-2) 0 var(--space-1); }
 
 
-/* 子页签 */
-.subtabs { display:flex; gap:var(--space-4); border-bottom:1px solid rgba(255,255,255,.12); margin:var(--space-3) 0; }
-.subtab { background:none; border:none; color:var(--text-dim); font-size:.9rem; padding:var(--space-2) 0; text-transform:uppercase;
-  cursor:pointer; border-bottom:2px solid transparent; }
-.subtab[aria-selected="true"] { color:#fff; border-bottom-color:var(--gold); }
 
 /* 刮刮卡票 */
 .ticket-row { display:grid; grid-template-columns:1fr auto; gap:var(--space-3); align-items:center; margin-bottom:var(--space-4); }
@@ -332,7 +330,7 @@ body {
     <!-- 补领横幅：仅当有 T-1 未领奖励时出现（2.2 / 6.1） -->
     <div class="makeup" id="makeupBanner">
       <div class="makeup__txt">Yesterday's unclaimed rewards：<b>₱42</b>（示意）</div>
-      <button class="makeup__btn" id="makeupBtn">Claim All</button>
+      <button class="makeup__btn" id="makeupBtn">CLAIM</button>
     </div>
 
     <span class="spec-tag">对应规格：活动信息展示区（含补领状态）</span>
@@ -360,7 +358,7 @@ body {
     </div>
     <span class="spec-tag" style="margin-left:0">对应规格：领取展示区（仅真实数据）</span>
 
-    <p class="group-label" style="color:#cbb8ff">投注 &amp; 充值任务　·　依后台等级顺序合并显示；挑战（金框）依后台机率触发，可落在投注或充值；奖励高亮＝可领取</p>
+    <p class="group-label" style="color:#cbb8ff">投注 &amp; 充值任务　·　依后台等级顺序合并显示；挑战徽标依后台机率触发，可落在投注或充值；充值任务统一金框；奖励高亮＝可领取</p>
     <div id="rebateList"></div>
 
     <div class="empty" id="emptyRebate" hidden>
@@ -377,12 +375,6 @@ body {
 
     <h2 class="section-title">My Scratch Ticket</h2>
     <span class="spec-tag" style="margin-left:0">对应规格：刮刮卡玩法｜开奖＝获得次日 12:00 正午；过期＝开奖日 +72 小时；刮开即领取</span>
-
-    <div class="subtabs" role="tablist" aria-label="刮刮卡筛选">
-      <button class="subtab" role="tab" aria-selected="true"  data-sub="all">All</button>
-      <button class="subtab" role="tab" aria-selected="false" data-sub="claimed">Claimed</button>
-      <button class="subtab" role="tab" aria-selected="false" data-sub="expired">Expired</button>
-    </div>
 
     <div id="raffleList"></div>
 
@@ -437,12 +429,12 @@ const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
 function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('is-show');
   clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('is-show'),1900); }
 
-/* ---------- 领取滚动条（真实用户，格式：User ID Claimed XXP） ---------- */
+/* ---------- 领取滚动条（真实用户，格式：User ID Claimed XXP；隐码＝前2码+***+后2码） ---------- */
 const claims = [
-  ['Okbet156…1dx','Claimed','15P'],
-  ['Juan…88','Claimed','35P'],
-  ['Maria…07','Claimed','7P'],
-  ['Okbet156…1dx','Scratched','1,000P'],
+  ['Ok***dx','Claimed','15P'],
+  ['Ju***88','Claimed','35P'],
+  ['Ma***07','Claimed','7P'],
+  ['Ok***dx','Scratched','1,000P'],
 ];
 function buildTicker(el,rows){
   const make=(r)=>`<div class="ticker__item"><span class="ticker__ava"></span>
@@ -456,18 +448,21 @@ buildTicker($('#tickerRaffle'),claims);
 
 /* ---------- 返水等级卡 ---------- */
 /* 统一任务串：投注(bet)/充值(topup) 依后台等级顺序(lv)显示；
-   挑战(challenge)依后台机率触发，可落在投注或充值卡（金框）。 */
+   挑战(challenge)依后台机率触发，可落在投注或充值卡（显示 CHALLENGE 徽标）。 */
 /* 等级（保留 8 级）：LV1 投注500 / LV2 投注1000 / LV3 充值100 / LV4 投注2000 /
    LV5 投注3000 / LV6 投注4000(挑战) / LV7 充值100(挑战) / LV8 投注5000。
-   挑战(challenge)=金框，可落投注或充值。工具列可切换三个情境。 */
+   挑战(challenge)=显示 CHALLENGE 徽标（不再金框）；充值(topup)恒为金框＋TOP-UP CHALLENGE 徽标。工具列可切换三个情境。 */
+const CHALLENGE_BADGE = 'data:image/webp;base64,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';
+const TOPUP_BADGE = 'data:image/webp;base64,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';
+const TICKET_ICON = 'data:image/webp;base64,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';
 const tasks = [
   { type:'bet',   lv:1, need:500,  amt:'₱7'  },
   { type:'bet',   lv:2, need:1000, amt:'₱15', ticket:'N1' },
   { type:'topup', lv:3, need:100,  amt:'₱10', ticket:'N1' },
-  { type:'bet',   lv:4, need:2000, amt:'₱25', ticket:'N2', challenge:true },
+  { type:'bet',   lv:4, need:2000, amt:'₱25', ticket:'N2', challenge:true, boost:20 },
   { type:'bet',   lv:5, need:3000, amt:'₱50' },
-  { type:'bet',   lv:6, need:4000, amt:'₱80', ticket:'S1', challenge:true },
-  { type:'topup', lv:7, need:100,  amt:'₱250', ticket:'S1', challenge:true },
+  { type:'bet',   lv:6, need:4000, amt:'₱80', ticket:'S1', challenge:true, boost:30 },
+  { type:'topup', lv:7, need:100,  amt:'₱250', ticket:'S1', challenge:true, boost:50 },
   { type:'bet',   lv:8, need:5000, amt:'₱150', ticket:'S1' },
 ];
 /* 情境：bet=累积有效投注、topup=累积充值 */
@@ -490,8 +485,12 @@ function taskCard(d){
   else if(status==='claim') btn=`<button class="claim-btn claim-btn--claim" data-lv="${d.lv}">CLAIM</button>`;
   else btn=`<button class="claim-btn claim-btn--locked" disabled>LOCKED</button>`;
   const cond = d.type==='bet'?`有效投注 ${cur.toLocaleString()}/${d.need.toLocaleString()}`:`充值 ${cur.toLocaleString()}/${d.need.toLocaleString()}`;
-  const ticket=d.ticket?`<span class="level-card__ticket">+ ${d.ticket} 卡</span>`:'';
-  return `<article class="${cls.join(' ')}">
+  const ticket=d.ticket?`<span class="level-card__ticket"><img src="${TICKET_ICON}" alt="">TICKET</span>`:'';
+  const boostTag = (d.challenge && d.boost) ? `<span class="level-card__boost">+${d.boost}%</span>` : '';
+  const badge = d.type==='topup'
+    ? `<span class="level-card__badge-wrap"><img class="level-card__badge" src="${TOPUP_BADGE}" alt="Top-up Challenge">${boostTag}</span>`
+    : d.challenge ? `<span class="level-card__badge-wrap level-card__badge-wrap--ch"><img class="level-card__badge level-card__badge--challenge" src="${CHALLENGE_BADGE}" alt="Challenge">${boostTag}</span>` : '';
+  return `<article class="${cls.join(' ')}">${badge}
     <div class="level-card__main">
       <div class="level-card__progress-label">LV${d.lv} · ${cond}</div>
       <div class="level-card__bar"><div class="level-card__bar-fill" style="width:${pct}%"></div></div>
@@ -637,11 +636,6 @@ function renderTickets(){
   $('#raffleList').innerHTML = html;
 }
 renderTickets();
-
-$$('.subtab').forEach(b=>b.addEventListener('click',()=>{
-  $$('.subtab').forEach(x=>x.setAttribute('aria-selected','false'));
-  b.setAttribute('aria-selected','true'); currentSub=b.dataset.sub; renderTickets();
-}));
 
 /* 刮刮卡互动：Bless（可选）/ Scratch（刮开即领取） */
 $('#raffleList').addEventListener('click',(e)=>{

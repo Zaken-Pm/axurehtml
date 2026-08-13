@@ -390,7 +390,7 @@ label.chk input{accent-color:var(--primary);}
                   </tr></thead>
                   <tbody id="rebateBody"></tbody>
                 </table>
-                <p class="hint">任务目标／固定金额：不可为空、0 或小数点，任务目标需依同「任务条件」逐级递增（不可小于或等于同任务条件）；比例：不可为空或 0；上限金额非必填，可留空。等级最低 LV1，最多 LV20。</p>
+                <p class="hint">任务目标／固定金额：不可为空、0 或小数点，任务目标需依同「任务条件」逐级递增（不可小于或等于同任务条件）。奖励金额一律为固定金额。等级最低 LV1，最多 LV20。</p>
               </div>
             </div>
 
@@ -882,10 +882,8 @@ function validateStep(n){
     const {orderBad:goalOrderBad,anyBad:goalBad}=validateGoalOrder(true);
     if(goalBad) bad=true;
     $$('#rebateBody tr').forEach(tr=>{
-      const amtType=$('.js-amt-type',tr).value; const amt=$('.js-amt',tr);
-      if(amtType==='固定金额'){ if(!amt.value||Number(amt.value)<=0||/\./.test(amt.value)){amt.classList.add('is-error');bad=true;} else amt.classList.remove('is-error'); }
-      else { if(!amt.value||Number(amt.value)<=0){amt.classList.add('is-error');bad=true;} else amt.classList.remove('is-error');
-        const cap=$('.js-cap',tr); if(cap&&cap.value&&Number(cap.value)<=0){cap.classList.add('is-error');bad=true;} else if(cap) cap.classList.remove('is-error'); }
+      const amt=$('.js-amt',tr);
+      if(!amt.value||Number(amt.value)<=0||/\./.test(amt.value)){amt.classList.add('is-error');bad=true;} else amt.classList.remove('is-error');
     });
     const w=$('#fWager'); if(w.value!=='' && Number(w.value)===0){w.classList.add('is-error');bad=true;} else w.classList.remove('is-error');
     if(goalOrderBad){toast('任务目标不可小于或等于同任务条件，请检查红框',true);return false;}
@@ -982,7 +980,7 @@ function validateGoalOrder(strict){
 function renderRebate(){
   const tb=$('#rebateBody'); tb.innerHTML='';
   rebateRows.forEach((r,i)=>{
-    const isRatio=r.amtType==='比例';
+    const isRatio=false;   // 奖励金额一律固定金额（已移除比例）
     const tr=document.createElement('tr');
     tr.innerHTML=`
       <td>LV${i+1}</td>
@@ -990,18 +988,16 @@ function renderRebate(){
       <td><div class="prefix-wrap"><span class="prefix">≥</span><input class="input js-goal" value="${r.goal}"></div>
         <p class="hint hint--err js-goal-hint" style="visibility:hidden">任务目标不可小于或等于同任务条件</p></td>
       <td>彩金</td>
-      <td><div style="display:flex;gap:4px;align-items:center">
-        <select class="select js-amt-type" style="width:88px;flex:none"><option ${!isRatio?'selected':''}>固定金额</option><option ${isRatio?'selected':''}>比例</option></select>
-        ${isRatio
-          ? `<div class="suffix-wrap" style="flex:1;min-width:0"><input class="input js-amt" value="${r.amt}"><span class="suffix">%</span></div>`
-          : `<input class="input js-amt" value="${r.amt}" style="flex:1;min-width:0">`}
-        </div>${isRatio?`<input class="input js-cap" style="margin-top:4px" placeholder="上限金额（选填）" value="${r.cap}">`:''}${isRatio?pctHintHtml('js-amt-hint'):''}</td>
+      <td><div style="display:flex;gap:6px;align-items:center">
+        <span class="js-amt-type" style="flex:none;font-size:12px;color:#9fb3cc">固定金额</span>
+        <input class="input js-amt" value="${r.amt}" style="flex:1;min-width:0">
+        </div></td>
       <td><label class="chk"><input type="checkbox" class="js-trigger" ${r.trigger?'checked':''}>触发</label></td>
       <td><select class="select js-card">${SCRATCH_TIERS.map(t=>`<option ${r.card===t?'selected':''} value="${t}">${t||'无'}</option>`).join('')}</select></td>
       <td><button class="btn--link red js-del">删除</button></td>`;
     $('.js-cond',tr).addEventListener('change',e=>{ r.cond=e.target.value; validateGoalOrder(); });
     $('.js-goal',tr).addEventListener('input',e=>{ r.goal=e.target.value; validateGoalOrder(); });
-    $('.js-amt-type',tr).addEventListener('change',e=>{r.amtType=e.target.value;renderRebate();});
+    r.amtType='固定金额';
     $('.js-amt',tr).addEventListener('input',e=>{ r.amt=e.target.value;
       if(e.target.value&&Number(e.target.value)>0) e.target.classList.remove('is-error'); });
     if(isRatio) attachPctGuard($('.js-amt',tr),$('.js-amt-hint',tr));
