@@ -442,9 +442,9 @@ code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:
     <!-- 活动埋点 -->
     <div class="spanel" data-s="track">
       <div class="panel-title">活动埋点 <span class="badge badge-new">新增</span></div>
-      <div class="panel-sub">来源《埋点需求文档 · X-Bomb Lucky Blast》· 本页仅收录本次活动「新增」埋点；既有(灰底)埋点项目依原始文档说明不重复纳入</div>
+      <div class="panel-sub">本页仅收录本次活动埋点</div>
 
-      <div class="callout info"><span>📄</span><div>提交日：<code>2026-08-05</code>　·　验收日：<code>—</code>　·　字段命名（<code>event_type / event_name / page_name / button_name / page_url</code>）与取值一律<strong>沿用原始文档</strong>，实作前请与数据端核对。</div></div>
+      <div class="callout info"><span>📄</span><div>字段命名（<code>event_type / event_name / page_name / button_name / page_url</code>）与取值一律<strong>沿用原始文档</strong>，实作前请与数据端核对。</div></div>
 
       <div class="sub-title">本期埋点范围目标</div>
       <div class="card" style="padding:0;overflow:hidden;">
@@ -462,11 +462,6 @@ code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:
         <table class="data-table"><thead><tr>
           <th style="width:130px">模组</th><th style="width:150px">触发点（纳入范围）</th><th>event_type</th><th>event_name</th><th>page_name</th><th>button_name</th><th>备注</th>
         </tr></thead><tbody>
-          <tr><td>首页</td><td>弹窗（登入后弹窗；登入前弹窗显示 guest）</td><td><code>new_homepage_adpage_click</code></td><td>首页广告轮播图点击</td><td><code>ad_page</code></td><td><code>[AD_NAME]</code></td><td><code>page_url : [AD_URL]</code>；素材待补</td></tr>
-          <tr><td>首页</td><td>BANNER 广告</td><td><code>new_homepage_banner_click</code></td><td>轮播图点击</td><td><code>[AD_NAME]</code></td><td><code>homepage</code></td><td><code>page_url : [AD_URL]</code>；button_name 无法收取则 URL 必须抓到</td></tr>
-          <tr><td>首页</td><td>浮窗广告</td><td><code>new_homepage_floating_window_click</code></td><td>活动浮窗点击</td><td><code>homepage</code></td><td><code>[AD_NAME]</code></td><td>—</td></tr>
-          <tr><td>奖励中心</td><td>Banner</td><td><code>reward_click</code></td><td>奖励中心</td><td><code>reward_page</code></td><td><code>[AD_NAME]</code></td><td>—</td></tr>
-          <tr><td>活动入口与页面</td><td>落地页曝光</td><td><code>promotion_view</code></td><td>活动说明</td><td><code>promotion_page</code></td><td>—</td><td>需带 <code>page_url</code></td></tr>
           <tr><td>活动入口与页面</td><td>Rules（查看规则）</td><td><code>promotion_rule_click</code></td><td>活动规则</td><td><code>reward-centerpage</code></td><td><code>[AD_NAME]_RULE</code></td><td>查看 RULE</td></tr>
           <tr><td>活动页面<br>Today's Reward Board</td><td>Tab 切换按钮（bomb mission／bomb ticket）</td><td><code>promotion_[AD]_tab_click</code></td><td>活动分类 tab 点击</td><td><code>promotion_page</code></td><td><code>bomb mission</code> / <code>bomb ticket</code></td><td>切换 tab reward</td></tr>
           <tr><td>活动页面<br>Today's Reward Board</td><td>Bonus（点击进入页面）</td><td><code>promotion_view</code></td><td>活动说明</td><td><code>promotion_page</code></td><td>—</td><td>—</td></tr>
@@ -474,18 +469,6 @@ code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:
           <tr><td>活动中呈现</td><td>confirm（翻牌挑战）</td><td><code>BOMB_MISSION_click</code></td><td>活动关卡</td><td><code>reward_page</code></td><td><code>Challange_GO</code> / <code>Choose_confirm</code> / <code>Confirm_win</code> / <code>Confirm_lose</code></td><td>—</td></tr>
         </tbody></table>
       </div>
-      <div class="callout tip"><span>🧩</span><div><strong>入口点击（合并）：</strong>原始文档「入口点击」标注为「已补（上面 4 个）」，即由上方<strong>首页弹窗／BANNER／浮窗＋奖励中心 Banner</strong> 四个入口埋点合并覆盖，不另设独立事件。</div></div>
-
-      <div class="sub-title">暂不纳入 / 待确认</div>
-      <div class="callout warn"><span>🚫</span><div style="width:100%">
-        原始文档以<strong>删除线（action = X）</strong>标记、本次<strong>不埋点</strong>：
-        <ul style="margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:4px">
-          <li><strong>返回：</strong>应可不需要（返回至首页的埋点）。</li>
-          <li><strong>停留：</strong>如需要，须先询问 SID。</li>
-          <li><strong>滚动深度：</strong>如需要，须先询问 SID。</li>
-        </ul>
-      </div></div>
-      <div class="callout info"><span>ℹ️</span><div><strong>关于既有(灰底)埋点：</strong>依需求说明，原始文档中<strong>灰底＝既有埋点项目</strong>，已在既有埋点体系中实现，故不重复写入本 specs；本页仅列本次活动新增项。</div></div>
     </div>
 
   </div>
