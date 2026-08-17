@@ -337,7 +337,7 @@ label.chk input{accent-color:var(--primary);}
 
           <!-- 步骤2 活动图片 -->
           <div class="wizard__panel" data-panel="2">
-            <p class="panel-desc">设置首页浮窗图片及活动备注（与周卡活动相同，仅可上传首页浮窗）。</p>
+            <p class="panel-desc">设置首页浮窗图片、活动列表图片及活动备注。活动列表图片用于前台 Rewards → Promotion 分类显示（Event time／标题依步骤1配置，排序照旧依有无角标）。</p>
             <div class="sec-title">首页浮窗设置</div>
             <div style="margin-bottom:14px">
               <label class="radio"><input type="radio" name="float" checked>关闭</label>
@@ -350,6 +350,19 @@ label.chk input{accent-color:var(--primary);}
             </div>
             <p class="hint">图片格式：png、bmp、jpg、gif、webp；大小限制 5MB 内。</p>
             <div class="form-row" style="margin-top:12px"><label>排序：</label><input class="input" id="fSort" value="0" style="max-width:120px"></div>
+            <hr style="border:none;border-top:1px solid var(--border-l);margin:18px 0">
+            <div class="sec-title">活动列表设置</div>
+            <div style="margin-bottom:14px">
+              <label class="radio"><input type="radio" name="listShow" checked>开启</label>
+              <label class="radio"><input type="radio" name="listShow">关闭</label></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:820px">
+              <div class="block"><div class="block__head"><h4>PC 图片</h4></div>
+                <div class="block__body" style="text-align:center;color:var(--text-3);padding:32px">⬆<br>点击上传图片</div></div>
+              <div class="block"><div class="block__head"><h4>H5 图片</h4></div>
+                <div class="block__body" style="text-align:center;color:var(--text-3);padding:32px">⬆<br>点击上传图片</div></div>
+            </div>
+            <p class="hint">用于前台 Rewards → Promotion 列表；图片格式：png、bmp、jpg、gif、webp；大小限制 5MB 内。</p>
+            <div class="form-row" style="margin-top:12px"><label>排序：</label><input class="input" id="fListSort" value="0" style="max-width:120px"></div>
             <div class="sec-title" style="margin-top:12px">备注</div>
             <textarea class="input" id="fRemark" style="height:80px;padding:8px 10px;max-width:820px" placeholder="请输入备注内容…（仅供内部参考，不显示给用户）"></textarea>
           </div>
@@ -824,7 +837,6 @@ function gotoStep(n){
   $('#btnNext').style.display = n===LAST?'none':'';
   $('#btnSubmit').style.display = n===LAST?'':'none';
   if(n===6) buildPreview();
-  $('.wizard').scrollIntoView({behavior:'smooth',block:'start'});
 }
 $$('#stepRail .step').forEach(s=>s.addEventListener('click',()=>gotoStep(+s.dataset.step)));
 $('#btnPrev').addEventListener('click',()=>gotoStep(Math.max(1,curStep-1)));
@@ -1131,7 +1143,7 @@ function buildPreview(){
   const rows=[
     ['① 活动模板设置',[['活动ID','—'],['模板类型',$('#fType').value],['状态',status],['活动币种',$('#fCur').value],
       ['活动名称',$('#fName').value],['活动时间',$('#fActTime').value],['显示时间',$('#fShowTime').value]]],
-    ['② 活动图片',[['首页浮窗','关闭'],['排序','0'],['备注','—']]],
+    ['② 活动图片',[['首页浮窗',$$('input[name=float]')[1].checked?'开启':'关闭'],['浮窗排序',$('#fSort').value],['活动列表图','PC／H5'],['列表显示',$$('input[name=listShow]')[0].checked?'开启':'关闭'],['列表排序',$('#fListSort').value],['备注',$('#fRemark').value||'—']]],
     ['③ 参与对象与名单',[['充值层级','全选'],['指定代理','不指定'],['新会员限制','否'],['会员等级','全选'],['黑名单','—']]],
     ['④ 活动条件',[['返水等级数',rebateRows.length+' 级'],['挑战等级数',challengeRows.length+' 级'],
       ['刮刮卡配置',cardSummary],['流水倍数',$('#fWager').value||'—'],['适用游戏',syncGameCount()+' 个']]],

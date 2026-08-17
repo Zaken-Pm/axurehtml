@@ -185,11 +185,6 @@ body {
 .empty__title { color:#fff; font-weight:700; margin:var(--space-2) 0 var(--space-1); }
 
 
-/* 子页签 */
-.subtabs { display:flex; gap:var(--space-4); border-bottom:1px solid rgba(255,255,255,.12); margin:var(--space-3) 0; }
-.subtab { background:none; border:none; color:var(--text-dim); font-size:.9rem; padding:var(--space-2) 0; text-transform:uppercase;
-  cursor:pointer; border-bottom:2px solid transparent; }
-.subtab[aria-selected="true"] { color:#fff; border-bottom-color:var(--gold); }
 
 /* 刮刮卡票 */
 .ticket-row { display:grid; grid-template-columns:1fr auto; gap:var(--space-3); align-items:center; margin-bottom:var(--space-4); }
@@ -427,11 +422,6 @@ body {
     <h2 class="section-title">My Scratch Ticket</h2>
     <span class="spec-tag" style="margin-left:0">对应规格：刮刮卡玩法｜开奖＝获得次日 12:00 正午；过期＝开奖日 +72 小时；刮开即领取</span>
 
-    <div class="subtabs" role="tablist" aria-label="刮刮卡筛选">
-      <button class="subtab" role="tab" aria-selected="true"  data-sub="all">All</button>
-      <button class="subtab" role="tab" aria-selected="false" data-sub="claimed">Claimed</button>
-      <button class="subtab" role="tab" aria-selected="false" data-sub="expired">Expired</button>
-    </div>
 
     <div id="raffleList"></div>
 
@@ -443,6 +433,7 @@ body {
   </section>
   </main>
   <!-- ================== 活动规则 Overlay ================== -->
+
   <div class="rules-overlay" id="rulesOverlay" role="dialog" aria-modal="true" aria-label="活动规则">
     <div class="rules-modal">
       <div class="rules-modal__head">GENERAL MACHINE</div>
@@ -720,11 +711,6 @@ function renderTickets(){
   $('#raffleList').innerHTML = html;
 }
 renderTickets();
-
-$$('.subtab').forEach(b=>b.addEventListener('click',()=>{
-  $$('.subtab').forEach(x=>x.setAttribute('aria-selected','false'));
-  b.setAttribute('aria-selected','true'); currentSub=b.dataset.sub; renderTickets();
-}));
 
 /* 刮刮卡互动：Bless（可选）/ Scratch（刮开即领取） */
 $('#raffleList').addEventListener('click',(e)=>{
