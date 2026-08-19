@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>任务中心迭代 — 后台原型</title>
+<style>
+/* =========================================================
+   Design Tokens
+   ========================================================= */
+:root{
+  --c-primary:#2f80ed;
+  --c-primary-d:#1f6fe0;
+  --c-primary-l:#e8f1ff;
+  --c-danger:#f56c6c;
+  --c-danger-l:#fef0f0;
+  --c-warn:#e6a23c;
+  --c-warn-l:#fdf6ec;
+  --c-success:#2eb872;
+  --c-success-l:#e7f7ef;
+  --c-text:#1f2733;
+  --c-text-2:#5b6675;
+  --c-text-3:#909aa8;
+  --c-border:#e4e8ee;
+  --c-border-2:#eef1f5;
+  --c-bg:#f2f4f7;
+  --c-bg-head:#f6f8fb;
+  --c-white:#fff;
+  --nav-bg:#ffffff;
+  --nav-sel:#e8f1ff;
+  --radius:8px;
+  --radius-s:5px;
+  --shadow:0 6px 24px rgba(20,40,80,.14);
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:24px; --sp-6:32px;
+  --font:"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,"Noto Sans CJK SC",sans-serif;
+}
+*{box-sizing:border-box;}
+html{font-size:15px;}
+body{
+  margin:0;font-family:var(--font);color:var(--c-text);
+  background:var(--c-bg);font-size:.9rem;line-height:1.5;
+}
+h1,h2,h3,h4{margin:0;font-weight:600;}
+a{color:var(--c-primary);text-decoration:none;cursor:pointer;}
+button{font-family:inherit;cursor:pointer;}
+
+/* =========================================================
+   Layout
+   ========================================================= */
+.app{display:flex;min-height:100vh;}
+.sidebar{
+  width:210px;flex:0 0 210px;background:var(--nav-bg);
+  border-right:1px solid var(--c-border);overflow-y:auto;
+  max-height:100vh;position:sticky;top:0;
+}
+.sidebar__brand{
+  padding:var(--sp-4);font-weight:700;color:var(--c-text);
+  border-bottom:1px solid var(--c-border-2);font-size:1rem;
+}
+.nav__item{
+  display:flex;align-items:center;gap:var(--sp-2);
+  padding:10px var(--sp-4);color:var(--c-text-2);font-size:.9rem;
+  border-left:3px solid transparent;
+}
+.nav__item .badge{margin-left:auto;}
+.nav__item--head{font-weight:600;color:var(--c-text);}
+.nav__item--sel{background:var(--nav-sel);color:var(--c-primary);border-left-color:var(--c-primary);font-weight:600;}
+.nav__sub{padding-left:var(--sp-5);font-size:.85rem;color:var(--c-text-3);}
+
+.main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.crumb{padding:var(--sp-3) var(--sp-5);color:var(--c-text-3);font-size:.85rem;background:var(--c-white);border-bottom:1px solid var(--c-border-2);}
+.crumb b{color:var(--c-text-2);font-weight:500;}
+
+.tabs-open{
+  display:flex;gap:var(--sp-2);padding:var(--sp-2) var(--sp-4);
+  background:var(--c-bg-head);border-bottom:1px solid var(--c-border);
+  overflow-x:auto;
+}
+.tabs-open .chip{
+  flex:0 0 auto;padding:6px 12px;background:var(--c-white);border:1px solid var(--c-border);
+  border-radius:var(--radius-s);font-size:.82rem;color:var(--c-text-2);white-space:nowrap;
+}
+.tabs-open .chip--active{background:var(--c-primary);border-color:var(--c-primary);color:#fff;}
+
+.content{padding:var(--sp-5);flex:1;}
+.panel{background:var(--c-white);border-radius:var(--radius);box-shadow:0 1px 3px rgba(30,50,90,.06);}
+
+/* sub tabs */
+.subtabs{display:flex;gap:var(--sp-5);padding:0 var(--sp-5);border-bottom:1px solid var(--c-border);}
+.subtab{
+  padding:14px 2px;font-size:.95rem;color:var(--c-text-2);border-bottom:2px solid transparent;
+  background:none;border-top:none;border-left:none;border-right:none;display:flex;align-items:center;gap:6px;
+}
+.subtab--active{color:var(--c-primary);border-bottom-color:var(--c-primary);font-weight:600;}
+
+/* =========================================================
+   Reusable atoms
+   ========================================================= */
+.badge{display:inline-block;min-width:18px;padding:1px 6px;border-radius:10px;background:var(--c-danger);color:#fff;font-size:.7rem;text-align:center;line-height:1.5;}
+.tag{display:inline-block;padding:1px 8px;border-radius:4px;font-size:.72rem;line-height:1.6;white-space:nowrap;}
+.tag--new{background:var(--c-success-l);color:var(--c-success);border:1px solid #b7e6cd;}
+.tag--edit{background:var(--c-warn-l);color:var(--c-warn);border:1px solid #f2d9a8;}
+.tag--info{background:var(--c-primary-l);color:var(--c-primary);border:1px solid #bcd8ff;}
+.tag--gray{background:#f0f2f5;color:var(--c-text-3);border:1px solid var(--c-border);}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:8px 16px;border-radius:var(--radius-s);border:1px solid var(--c-border);
+  background:var(--c-white);color:var(--c-text-2);font-size:.85rem;line-height:1;
+}
+.btn--primary{background:var(--c-primary);border-color:var(--c-primary);color:#fff;}
+.btn--primary:hover{background:var(--c-primary-d);}
+.btn:focus-visible{outline:2px solid var(--c-primary);outline-offset:2px;}
+.btn--sm{padding:5px 10px;font-size:.8rem;}
+
+.field-row{display:flex;flex-wrap:wrap;gap:var(--sp-3);align-items:center;padding:var(--sp-4) var(--sp-5);}
+.input,.select{
+  height:34px;padding:0 10px;border:1px solid var(--c-border);border-radius:var(--radius-s);
+  background:var(--c-white);font-size:.85rem;color:var(--c-text);min-width:150px;
+}
+.input:focus,.select:focus{outline:none;border-color:var(--c-primary);box-shadow:0 0 0 2px var(--c-primary-l);}
+.select{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%23909aa8' stroke-width='1.4'/></svg>");background-repeat:no-repeat;background-position:right 10px center;padding-right:26px;}
+
+/* table */
+.table-wrap{padding:0 var(--sp-5) var(--sp-5);overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:.83rem;min-width:900px;}
+thead th{
+  background:var(--c-bg-head);color:var(--c-text-2);font-weight:600;text-align:center;
+  padding:12px 10px;border-bottom:1px solid var(--c-border);white-space:nowrap;
+}
+tbody td{padding:12px 10px;border-bottom:1px solid var(--c-border-2);text-align:center;color:var(--c-text-2);vertical-align:middle;}
+tbody tr:hover{background:#fafcff;}
+.cell-name{text-align:left;max-width:230px;}
+.op a{margin:0 4px;}
+.op a.del{color:var(--c-danger);}
+.status-dot{display:inline-flex;align-items:center;gap:5px;}
+.status-dot::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--c-success);}
+.status-dot--off::before{background:var(--c-text-3);}
+
+.stack-chip{display:inline-flex;flex-wrap:wrap;gap:4px;justify-content:center;}
+
+.pager{display:flex;justify-content:flex-end;align-items:center;gap:8px;padding:var(--sp-4) var(--sp-5);color:var(--c-text-3);font-size:.82rem;}
+.pager .pg{min-width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--c-border);border-radius:var(--radius-s);background:#fff;color:var(--c-text-2);}
+.pager .pg--on{background:var(--c-primary);border-color:var(--c-primary);color:#fff;}
+
+.hint{color:var(--c-danger);font-size:.78rem;line-height:1.6;}
+.note{color:var(--c-text-3);font-size:.78rem;}
+
+/* =========================================================
+   Modal (form)
+   ========================================================= */
+.modal-mask{
+  position:fixed;inset:0;background:rgba(15,25,45,.45);display:none;
+  align-items:flex-start;justify-content:center;padding:40px 16px;z-index:50;overflow-y:auto;
+}
+.modal-mask.open{display:flex;}
+.modal{
+  background:#fff;border-radius:10px;box-shadow:var(--shadow);width:min(880px,100%);
+  max-height:none;
+}
+.modal__head{display:flex;align-items:center;justify-content:space-between;padding:var(--sp-4) var(--sp-5);border-bottom:1px solid var(--c-border-2);}
+.modal__title{font-size:1.05rem;}
+.modal__close{border:none;background:none;font-size:1.3rem;color:var(--c-text-3);line-height:1;}
+.modal__body{padding:var(--sp-5);}
+.modal__foot{display:flex;justify-content:flex-end;gap:var(--sp-3);padding:var(--sp-4) var(--sp-5);border-top:1px solid var(--c-border-2);}
+
+/* form grid */
+.form__row{display:grid;grid-template-columns:150px 1fr;gap:var(--sp-3);align-items:start;margin-bottom:var(--sp-4);}
+.form__label{text-align:right;color:var(--c-text-2);font-size:.86rem;padding-top:8px;}
+.form__label .req{color:var(--c-danger);margin-right:2px;}
+.form__control{min-width:0;}
+.form__control .input,.form__control .select{width:100%;}
+.check-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:.86rem;color:var(--c-text-2);}
+.check-row input[type=checkbox],.check-row input[type=radio]{width:16px;height:16px;accent-color:var(--c-primary);}
+.radio-grp{display:flex;flex-wrap:wrap;gap:18px;align-items:center;}
+.radio-grp label{display:inline-flex;align-items:center;gap:6px;font-size:.86rem;color:var(--c-text-2);}
+.radio-grp input{accent-color:var(--c-primary);width:16px;height:16px;}
+
+.fieldset-new{
+  border:1px dashed #b7e6cd;background:#f4fbf7;border-radius:var(--radius);
+  padding:var(--sp-4);margin:var(--sp-4) 0;
+}
+.fieldset-new>legend, .fieldset-new .fs__title{
+  font-size:.88rem;font-weight:600;color:var(--c-success);padding:0 6px;display:flex;align-items:center;gap:8px;
+}
+.fieldset-edit{border-color:#f2d9a8;background:#fffaf1;}
+.fieldset-edit .fs__title{color:var(--c-warn);}
+
+.range-inline{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.range-inline .input{min-width:110px;}
+.pill{display:inline-block;padding:2px 9px;border-radius:20px;background:var(--c-primary-l);color:var(--c-primary);font-size:.75rem;}
+
+.tag-legend{display:flex;gap:14px;align-items:center;padding:10px var(--sp-5);border-top:1px solid var(--c-border-2);font-size:.78rem;color:var(--c-text-3);flex-wrap:wrap;}
+
+/* report */
+.report-note{margin:0 var(--sp-5) var(--sp-4);padding:10px 14px;background:var(--c-primary-l);border-radius:var(--radius-s);color:var(--c-primary);font-size:.82rem;}
+.mono{font-family:"SFMono-Regular",Consolas,monospace;font-size:.78rem;color:var(--c-text-2);}
+
+/* multiselect fake */
+.ms{display:flex;flex-wrap:wrap;gap:8px;}
+.ms label{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border:1px solid var(--c-border);border-radius:20px;font-size:.82rem;color:var(--c-text-2);background:#fff;}
+.ms input{accent-color:var(--c-primary);}
+.ms label:has(input:checked){border-color:var(--c-primary);color:var(--c-primary);background:var(--c-primary-l);}
+
+@media (max-width:960px){
+  .sidebar{display:none;}
+  .form__row{grid-template-columns:1fr;}
+  .form__label{text-align:left;padding-top:0;}
+}
+.hidden{display:none !important;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ================= Sidebar ================= -->
+  <aside class="sidebar" aria-label="主导航">
+    <div class="sidebar__brand">🎛️ 运营后台</div>
+    <nav>
+      <div class="nav__item nav__item--head">日志管理</div>
+      <div class="nav__item nav__item--head nav__item--sel">活动配置 <span class="badge">99+</span></div>
+      <div class="nav__item nav__sub">活动列表</div>
+      <div class="nav__item nav__sub">活动类别管理</div>
+      <div class="nav__item nav__sub">奖品配置</div>
+      <div class="nav__item nav__sub">派奖审核</div>
+      <div class="nav__item nav__sub">奖励中心活动管理</div>
+      <div class="nav__item nav__item--sel" style="padding-left:24px;">任务中心管理 <span class="badge">3487</span></div>
+      <div class="nav__item nav__item--head">代理结算</div>
+      <div class="nav__item nav__item--head">平台费用</div>
+      <div class="nav__item nav__item--head">红包雨管理</div>
+      <div class="nav__item nav__item--head">系统管理</div>
+    </nav>
+  </aside>
+
+  <!-- ================= Main ================= -->
+  <div class="main">
+    <div class="crumb">位置 &nbsp;&gt;&nbsp; <b>任务中心管理</b></div>
+
+    <div class="tabs-open">
+      <span class="chip">新游戏入口设置</span>
+      <span class="chip">vip返水加码活动</span>
+      <span class="chip">充值活动</span>
+      <span class="chip">新消费活动</span>
+      <span class="chip">Payday活动</span>
+      <span class="chip">活动图素材管理</span>
+      <span class="chip chip--active">任务中心管理 ✕</span>
+    </div>
+
+    <div class="content">
+      <div class="panel">
+
+        <!-- sub tabs -->
+        <div class="subtabs" role="tablist">
+          <button class="subtab subtab--active" data-tab="setting" role="tab">任务设置</button>
+          <button class="subtab" data-tab="audit" role="tab">资料审核 <span class="badge">89</span></button>
+          <button class="subtab" data-tab="record" role="tab">任务完成记录 <span class="badge">3398</span></button>
+          <button class="subtab" data-tab="report" role="tab">任务报表统计</button>
+          <button class="subtab" data-tab="blacklist" role="tab">黑名单设置 <span class="tag tag--new" style="margin-left:6px">对应排除包</span></button>
+        </div>
+
+        <!-- ============ TAB: 任务设置 ============ -->
+        <section data-panel="setting">
+          <div class="field-row">
+            <select class="select" aria-label="币种"><option>菲律宾比索</option><option>越南盾</option></select>
+            <select class="select" aria-label="任务状态"><option>全部状态</option><option>开启</option><option>关闭</option></select>
+            <button class="btn btn--primary">查询</button>
+            <button class="btn btn--primary" onclick="openModal('add')">＋ 新增任务</button>
+            <span style="margin-left:auto"></span>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>任务ID</th><th>任务类别</th><th class="cell-name">任务名称</th>
+                  <th>适用等级/层级 <span class="tag tag--new">新增</span></th>
+                  <th>参与资格 <span class="tag tag--new">新增</span></th>
+                  <th>名额上限 <span class="tag tag--new">新增</span></th>
+                  <th>适用端口</th><th>任务时间</th><th>审核方式</th><th>排序</th><th>任务状态</th><th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>944</td><td>基础任务</td><td class="cell-name">填写真实姓名-不要删除</td>
+                  <td><span class="stack-chip"><span class="tag tag--gray">全部VIP</span></span></td>
+                  <td><span class="tag tag--info">完成KYC</span></td>
+                  <td class="note">不限</td>
+                  <td>PC,H5,APP</td><td>永久</td><td>自动审核</td><td>101</td>
+                  <td><span class="status-dot">开启</span></td>
+                  <td class="op"><a>关闭</a><a class="del">删除</a><a onclick="openModal('edit')">编辑</a></td>
+                </tr>
+                <tr>
+                  <td>1024</td><td>充值任务</td><td class="cell-name">小额用户 · 每日充值任务</td>
+                  <td><span class="stack-chip"><span class="tag tag--info">VIP0</span><span class="tag tag--info">VIP1</span><span class="tag tag--gray">充值₱0–2,999</span></span></td>
+                  <td><span class="stack-chip"><span class="tag tag--info">充值≥₱50</span><span class="pill">AND</span><span class="tag tag--info">投注≥₱200</span></span></td>
+                  <td><span class="tag tag--edit">总1,000人</span></td>
+                  <td>H5,APP</td><td>每日</td><td>自动审核</td><td>10</td>
+                  <td><span class="status-dot">开启</span></td>
+                  <td class="op"><a>关闭</a><a class="del">删除</a><a onclick="openModal('edit')">编辑</a></td>
+                </tr>
+                <tr>
+                  <td>1025</td><td>投注任务</td><td class="cell-name">高价值用户 · 周限时投注</td>
+                  <td><span class="stack-chip"><span class="tag tag--info">VIP3</span><span class="tag tag--info">VIP4</span><span class="tag tag--gray">充值₱10,000+</span></span></td>
+                  <td><span class="stack-chip"><span class="tag tag--info">有效投注≥₱5,000</span></span></td>
+                  <td><span class="tag tag--edit">总200人</span></td>
+                  <td>PC,H5,APP</td><td>周限时</td><td>自动审核</td><td>8</td>
+                  <td><span class="status-dot">开启</span></td>
+                  <td class="op"><a>关闭</a><a class="del">删除</a><a onclick="openModal('edit')">编辑</a></td>
+                </tr>
+                <tr>
+                  <td>1030</td><td><span class="tag tag--new">任务组</span></td><td class="cell-name">Small Stake Club · 阶梯任务<br><span class="note">含 3 子任务 · 完成2个发奖 · 全部再额外奖 · 延迟3天派</span></td>
+                  <td><span class="stack-chip"><span class="tag tag--info">VIP1</span><span class="tag tag--gray">TH</span></span></td>
+                  <td><span class="note">阶梯逐阶完成</span></td>
+                  <td><span class="tag tag--edit">总500人</span></td>
+                  <td>H5,APP</td><td>每周</td><td>自动审核</td><td>6</td>
+                  <td><span class="status-dot">开启</span></td>
+                  <td class="op"><a>关闭</a><a class="del">删除</a><a onclick="openModal('edit')">编辑</a></td>
+                </tr>
+                <tr>
+                  <td>949</td><td>基础任务</td><td class="cell-name">KYC认证-不要删除</td>
+                  <td><span class="stack-chip"><span class="tag tag--gray">全部VIP</span></span></td>
+                  <td><span class="tag tag--info">完成KYC部分认证</span></td>
+                  <td class="note">不限</td>
+                  <td>PC,H5,APP</td><td>永久</td><td>自动审核</td><td>105</td>
+                  <td><span class="status-dot status-dot--off">关闭</span></td>
+                  <td class="op"><a>开启</a><a class="del">删除</a><a onclick="openModal('edit')">编辑</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="tag-legend">
+            图例：
+            <span class="tag tag--new">新增</span> 本次新增字段/功能 ·
+            <span class="tag tag--edit">异动</span> 现有字段本次调整 ·
+            <span class="tag tag--info">条件</span> 参与资格/条件 ·
+            <span class="pill">AND</span> 多条件组合关系
+          </div>
+        </section>
+
+        <!-- ============ TAB: 资料审核 ============ -->
+        <section data-panel="audit" class="hidden">
+          <div class="field-row">
+            <input class="input" placeholder="帐户" />
+            <select class="select"><option>全部状态</option><option>待审核</option><option>审核未通过</option></select>
+            <button class="btn btn--primary">搜索</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>任务名称</th><th>会员名</th><th>上传资料</th><th>提交时间</th><th>状态</th><th>操作</th></tr></thead>
+              <tbody>
+                <tr><td class="cell-name">关注Facebook</td><td>okbet0469afbr7</td><td><a>查看截图</a></td><td>2026-08-19 10:24:00</td><td><span class="tag tag--warn tag--edit">待审核</span></td><td class="op"><a>通过</a><a class="del">驳回</a></td></tr>
+                <tr><td class="cell-name">上传Okbet脸书</td><td>okbet99910n0s3</td><td><a>查看截图</a></td><td>2026-08-19 10:22:00</td><td><span class="tag tag--info">待审核</span></td><td class="op"><a>通过</a><a class="del">驳回</a></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ============ TAB: 任务完成记录 ============ -->
+        <section data-panel="record" class="hidden">
+          <div class="field-row">
+            <input class="input" value="2026-07-20 00:00:00 ~ 2026-08-19 23:59:59" style="min-width:280px" aria-label="时间范围"/>
+            <input class="input" placeholder="帐户" />
+            <select class="select"><option>选择币别</option><option>PHP</option></select>
+            <select class="select"><option>全部状态</option><option>待审核</option><option>待领取</option><option>自动发放</option><option>已领取</option><option>审核未通过</option><option>已过期</option></select>
+            <button class="btn btn--primary">搜索</button>
+            <button class="btn btn--primary">导出</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th class="cell-name">任务名称</th><th>会员名</th><th>币种</th><th>奖励类型</th><th>奖励值</th><th>创建时间</th><th>发放状态</th><th>审核人</th><th>审核时间</th><th>操作</th></tr></thead>
+              <tbody>
+                <tr><td class="cell-name">frank-okf-2069-test</td><td>okbet99910n0s3</td><td>PHP</td><td>积分</td><td>10</td><td>2026-08-19 10:28</td><td>自动发放</td><td>SYSTEM</td><td>2026-08-19 10:28</td><td class="op note">—</td></tr>
+                <tr><td class="cell-name">充值大于100</td><td>okbet99910n0s3</td><td>PHP</td><td>彩金</td><td>222</td><td>2026-08-19 10:28</td><td><span class="tag tag--info">待领取</span></td><td>SYSTEM</td><td>2026-08-19 10:28</td><td class="op note">—</td></tr>
+                <tr><td class="cell-name">aatest窗口</td><td>okbet0469afbr7</td><td>PHP</td><td>彩金</td><td>10</td><td>2026-08-19 10:27</td><td><span class="tag tag--edit">待审核</span></td><td>—</td><td>—</td><td class="op"><a>审核通过</a><a class="del">驳回</a></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pager">Total 4082 <span class="pg pg--on">1</span><span class="pg">2</span><span class="pg">3</span><span class="pg">…</span><span class="pg">409</span></div>
+        </section>
+
+        <!-- ============ TAB: 任务报表统计 ============ -->
+        <section data-panel="report" class="hidden">
+          <div class="field-row">
+            <select class="select"><option>选择币别</option><option>PHP</option></select>
+            <input class="input" value="2026-07-20 00:00:00 ~ 2026-08-19 23:59:59" style="min-width:280px" aria-label="时间范围"/>
+            <select class="select"><option>报表类型：实时领取报表</option><option>T+1 复盘报表</option><option>D3 复盘报表</option><option>D7 复盘报表</option><option>原·完成次数统计</option></select>
+            <input class="input" placeholder="输入任务名关键字" />
+            <button class="btn btn--primary">搜索</button>
+            <button class="btn btn--primary">导出</button>
+          </div>
+          <div class="report-note">
+            🆕 「任务统计报表」至少输出下列栏位，追踪「完成任务 → 领奖 → 领奖后价值表现」。时区统一 <b>UTC+8</b>，结算 <b>23:59:59</b>；
+            <span class="mono">ltv_*_before_event</span> 为注册至任务开始前一秒的历史快照（不含活动当天）。退款/撤单不回溯。
+          </div>
+          <div class="table-wrap">
+            <table style="min-width:1720px">
+              <thead>
+                <tr>
+                  <th>user_id</th><th>date</th><th>vip_level</th>
+                  <th>ltv_deposit_<br>before_event</th><th>ltv_valid_bet_<br>before_event</th>
+                  <th>task_id</th><th class="cell-name">task_name</th>
+                  <th>task_condition_<br>type</th><th>task_required_<br>amount</th><th>completed_<br>amount</th>
+                  <th>reward_type</th><th>reward_<br>amount</th><th>claim_time</th>
+                  <th>deposit_<br>after_task</th><th>valid_bet_<br>after_task</th>
+                  <th>ggr_<br>after_task</th><th>withdraw_<br>after_task</th>
+                  <th>second_<br>deposit_flag</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>okbet99910n0s3</td><td>2026-08-19</td><td>VIP1</td><td>₱12,300</td><td>₱48,900</td><td>1024</td><td class="cell-name">小额·每日充值任务</td><td>充值</td><td>₱50</td><td>₱50</td><td>积分</td><td>100</td><td>08-19 10:28</td><td>₱300</td><td>₱1,250</td><td>₱180</td><td>₱0</td><td>1</td></tr>
+                <tr><td>okbet0469afbr7</td><td>2026-08-19</td><td>VIP3</td><td>₱156,000</td><td>₱980,400</td><td>1025</td><td class="cell-name">高价值·周限时投注</td><td>投注</td><td>₱5,000</td><td>₱6,600</td><td>彩金</td><td>222</td><td>08-19 09:12</td><td>₱0</td><td>₱6,600</td><td>₱1,020</td><td>₱2,000</td><td>0</td></tr>
+                <tr><td>okbet55501x2a</td><td>2026-08-19</td><td>VIP0</td><td>₱0</td><td>₱0</td><td>1031</td><td class="cell-name">首充·新客任务</td><td>首次充值</td><td>₱100</td><td>₱120</td><td>彩金</td><td>50</td><td>08-19 23:57</td><td class="note">₱120 <span class="tag tag--gray">窗口偏小</span></td><td>₱0</td><td>₱30</td><td>₱0</td><td>0</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="note" style="padding:0 24px 20px">口径说明：实时领取报表＝当下已发生数据，after 字段可以是 rolling / pending；T+1 复盘报表＝当日最终 after 数据；D3 / D7 复盘报表＝长期行为效果。</div>
+        </section>
+
+        <!-- ============ TAB: 黑名单设置 ============ -->
+        <section data-panel="blacklist" class="hidden">
+          <div class="field-row">
+            <input class="input" placeholder="输入会员帐户 / 用户标签" style="min-width:240px"/>
+            <button class="btn btn--primary">加入排除包</button>
+            <span class="note">排除包优先：命中排除即不可参加（前台不显示该活动）。</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>排除项</th><th>类型</th><th>命中范围</th><th>加入时间</th><th>操作</th></tr></thead>
+              <tbody>
+                <tr><td>风险用户包</td><td><span class="tag tag--gray">用户标签</span></td><td>全部任务</td><td>2026-08-10</td><td class="op"><a class="del">移除</a></td></tr>
+                <tr><td>okbet_test001</td><td><span class="tag tag--gray">会员帐户</span></td><td>指定任务</td><td>2026-08-12</td><td class="op"><a class="del">移除</a></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= Modal：新增/编辑任务 ================= -->
+<div class="modal-mask" id="taskModal" role="dialog" aria-modal="true" aria-labelledby="taskModalTitle">
+  <div class="modal">
+    <div class="modal__head">
+      <h2 class="modal__title" id="taskModalTitle">新增任务</h2>
+      <button class="modal__close" onclick="closeModal()" aria-label="关闭">✕</button>
+    </div>
+    <div class="modal__body">
+
+      <div class="form__row">
+        <label class="form__label"><span class="req">*</span>币种：</label>
+        <div class="form__control"><select class="select"><option>菲律宾比索</option></select></div>
+      </div>
+
+      <!-- ===== 新增：用户分群 ===== -->
+      <fieldset class="fieldset-new">
+        <div class="fs__title">参与资格 · 用户分群 <span class="tag tag--new">本次新增</span></div>
+        <div class="form__row" style="margin-top:12px">
+          <label class="form__label">VIP 等级：<br><span class="note" style="font-weight:400">前台可见</span></label>
+          <div class="form__control">
+            <div class="ms">
+              <label><input type="checkbox" checked/> VIP0</label>
+              <label><input type="checkbox" checked/> VIP1</label>
+              <label><input type="checkbox"/> VIP2</label>
+              <label><input type="checkbox"/> VIP3</label>
+              <label><input type="checkbox"/> VIP4</label>
+            </div>
+          </div>
+        </div>
+        <div class="form__row">
+          <label class="form__label">用户标签：<br><span class="note" style="font-weight:400">前台不可见 · 可复选</span></label>
+          <div class="form__control">
+            <div class="note" style="margin-bottom:4px">一级标签</div>
+            <div class="ms" style="margin-bottom:10px">
+              <label><input type="checkbox" checked/> TH</label>
+              <label><input type="checkbox"/> TL</label>
+              <label><input type="checkbox"/> GH</label>
+              <label><input type="checkbox"/> GL</label>
+              <label><input type="checkbox"/> DH</label>
+              <label><input type="checkbox"/> DL</label>
+              <label><input type="checkbox"/> FD8</label>
+              <label><input type="checkbox"/> 7DFD0</label>
+              <label><input type="checkbox"/> 90Dlost</label>
+            </div>
+            <div class="note" style="margin-bottom:4px">二级标签</div>
+            <div class="ms">
+              <label><input type="checkbox"/> RL</label>
+              <label><input type="checkbox"/> RH</label>
+              <label><input type="checkbox"/> MH</label>
+              <label><input type="checkbox"/> ML</label>
+              <label><input type="checkbox"/> FH</label>
+              <label><input type="checkbox"/> FL</label>
+              <label><input type="checkbox"/> 90MH</label>
+              <label><input type="checkbox"/> 90ML</label>
+            </div>
+            <p class="note" style="margin:8px 0 0"><b>VIP 与所勾选标签需「完全符合」</b>，用户才能看到此任务。排除包（黑名单设置）优先——命中排除即不可参加。</p>
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="form__row">
+        <label class="form__label"><span class="req">*</span>任务类别：</label>
+        <div class="form__control">
+          <select class="select" id="taskCat" onchange="onTaskCat()"><option value="basic">基础任务</option><option value="group">任务组</option></select>
+          <span class="tag tag--new" style="margin-left:8px">新增「任务组」</span>
+        </div>
+      </div>
+      <div class="form__row">
+        <label class="form__label"><span class="req">*</span>任务名称：</label>
+        <div class="form__control"><input class="input" placeholder="请输入任务名称"/></div>
+      </div>
+      <div class="form__row">
+        <label class="form__label">任务标签：</label>
+        <div class="form__control"><select class="select"><option>无</option><option>体育</option><option>电子</option><option>真人</option><option>小游戏</option><option>其他</option></select></div>
+      </div>
+      <div class="form__row" id="rowCond">
+        <label class="form__label"><span class="req">*</span>任务条件：</label>
+        <div class="form__control">
+          <select class="select" id="condCat" onchange="onCond()"><option value="info">信息完善</option><option value="fund">资金</option><option value="other">其他</option></select>
+          <div style="height:8px"></div>
+          <select class="select" id="condSub" onchange="onCondSub()"></select>
+          <div id="condAmt" class="hidden" style="margin-top:8px"><input class="input" placeholder="请输入金额门槛，0为不限制金额"/></div>
+          <div id="condBet" class="hidden" style="margin-top:8px;display:flex;flex-direction:column;gap:8px">
+            <button class="btn btn--sm" style="align-self:flex-start" onclick="openGameModal(event)">限制游戏配置</button>
+            <input class="input" placeholder="请输入打码量要求"/>
+          </div>
+        </div>
+      </div>
+      <div class="form__row" id="rowReward">
+        <label class="form__label"><span class="req">*</span>任务奖励：</label>
+        <div class="form__control" style="display:flex;gap:10px;flex-wrap:wrap">
+          <select class="select" id="rewardType" onchange="onReward()" style="max-width:200px"><option value="p">积分</option><option value="c">彩金</option></select>
+          <input class="input" value="0" style="flex:1"/>
+        </div>
+      </div>
+
+      <!-- ===== 新增：任务组 / 阶梯任务配置 ===== -->
+      <fieldset class="fieldset-new hidden" id="groupCfg">
+        <div class="fs__title">组任务配置 <span class="tag tag--new">本次新增</span></div>
+        <p class="note" style="margin:8px 0 0">最多可配置 5 个子任务；每个子任务可各自设定奖励。</p>
+        <div id="subTasks" style="margin-top:10px;display:flex;flex-direction:column;gap:8px"></div>
+        <button class="btn btn--sm" id="addSubBtn" style="margin-top:8px" onclick="addSub(event)">＋ 添加子任务</button>
+        <p class="note" style="margin:8px 0 0">原始规则：「信息完善」「首充」类型仅支持「永久」；「充值」「投注」类型仅支持「每日」「限时」「周限时」。同一组任务的各子任务，其任务完成时间类别须一致。</p>
+        <p class="hint" id="groupTimeWarn" style="display:none;margin:6px 0 0">⚠ 需选择任务完成时间一致的条件（所选子任务的任务时间类别不一致，无法组成同一组任务）。</p>
+
+        <div class="form__row" style="margin-top:16px">
+          <label class="form__label">完成条件：</label>
+          <div class="form__control">
+            <div class="range-inline">完成任意 <input class="input" value="2" style="max-width:80px"/> 个子任务后即可领取奖励</div>
+            <p class="note" style="margin:6px 0 0">组任务＝完成任意 n 个子任务即可领奖，子任务之间无先后顺序（非阶梯任务）。n 为后台配置。</p>
+          </div>
+        </div>
+        <div class="form__row">
+          <label class="form__label">完成全部额外奖励：</label>
+          <div class="form__control">
+            <div class="range-inline">
+              <label class="check-row" style="margin:0"><input type="checkbox" checked/> 启用</label>
+              <select class="select extraReward" style="max-width:120px" onchange="onSubReward(this)"><option value="p">积分</option><option value="c">彩金</option></select>
+              <input class="input" placeholder="奖励值" value="1000" style="max-width:130px"/>
+              <span class="subChip note" style="display:none;align-items:center;gap:6px">彩金打码倍数 <input class="input" value="0" style="max-width:90px"/></span>
+            </div>
+            <p class="note" style="margin:6px 0 0">完成任务组「全部」任务后可额外获得。奖励为彩金时须配置彩金打码倍数。</p>
+          </div>
+        </div>
+        <div class="form__row">
+          <label class="form__label">延迟派奖：</label>
+          <div class="form__control">
+            <div class="range-inline">
+              <label class="check-row" style="margin:0"><input type="checkbox"/> 启用</label>
+              奖励于完成后 <input class="input" value="3" style="max-width:80px"/> 天派发
+            </div>
+            <p class="note" style="margin:6px 0 0">对任务组奖励与额外奖励皆生效（n 为后台配置）。若开启，前台需显示「奖励将于 n 天后发放」的额外提示。</p>
+          </div>
+        </div>
+      </fieldset>
+      <div class="form__row" id="rowChip"  style="display:none">
+        <label class="form__label">彩金打码倍数：</label>
+        <div class="form__control"><input class="input" value="0" style="max-width:160px"/></div>
+      </div>
+
+      <!-- ===== 现有：任务参与要求（KYC 前置门槛保留） ===== -->
+      <div class="form__row">
+        <label class="form__label">任务参与要求：</label>
+        <div class="form__control">
+          <label class="check-row"><input type="checkbox"/> 完成KYC <span class="tag tag--gray">既有 · 前置门槛</span></label>
+          <label class="check-row"><input type="checkbox"/> 完成KYC部分认证 <span class="tag tag--gray">既有 · 前置门槛</span></label>
+          <p class="note" style="margin:2px 0 0">勾选后：用户必须先符合该 KYC 资格，才能触发/领取此任务。</p>
+        </div>
+      </div>
+
+      <!-- ===== 新增/异动：用户分层 LTV 区间 ===== -->
+      <fieldset class="fieldset-edit">
+        <div class="fs__title">参与资格 · 用户分层（LTV 区间） <span class="tag tag--edit">异动：原「大于等于」→ 区间</span></div>
+        <div style="margin-top:14px;display:flex;flex-direction:column;gap:12px">
+          <div class="range-inline">
+            <label class="check-row" style="margin:0;min-width:150px"><input type="checkbox" id="chkDep" onchange="onQualDep()"/> 累计充值区间</label>
+            <input class="input" placeholder="最低" style="max-width:130px"/>
+            <span>~</span>
+            <input class="input" placeholder="最高" style="max-width:130px"/>
+          </div>
+          <div class="range-inline">
+            <label class="check-row" style="margin:0;min-width:150px"><input type="checkbox" id="chkBet" onchange="onQualDep()"/> 累计有效投注区间</label>
+            <input class="input" placeholder="最低" style="max-width:130px"/>
+            <span>~</span>
+            <input class="input" placeholder="最高" style="max-width:130px"/>
+          </div>
+          <div class="range-inline" id="qualBox" style="opacity:.5">
+            <span style="min-width:150px">充值及有效投注资格</span>
+            <label class="radio-grp" style="margin:0"><label><input type="radio" name="qual" class="qualRadio" disabled/> 符合任一条件</label></label>
+            <label class="radio-grp" style="margin:0"><label><input type="radio" name="qual" class="qualRadio" disabled/> 完全符合</label></label>
+          </div>
+          <p class="note" style="margin:0">「符合任一条件／完全符合」为单选，需同时勾选「累计充值区间」与「累计有效投注区间」后才可选。上限不得低于下限。累计口径＝任务开始前历史快照（注册至任务开始前一秒，不含活动当天）。</p>
+        </div>
+      </fieldset>
+
+      <!-- ===== 新增：资格判定快照 ===== -->
+      <fieldset class="fieldset-new">
+        <div class="fs__title">参与资格 · 资格判定时间 <span class="tag tag--new">本次新增</span></div>
+        <div class="form__row" style="margin-top:12px">
+          <label class="form__label">快照时间：</label>
+          <div class="form__control">
+            <div class="radio-grp">
+              <label><input type="radio" name="snap" checked/> 任务开始前快照（默认）</label>
+              <label><input type="radio" name="snap"/> 昨日 23:59:59</label>
+              <label><input type="radio" name="snap"/> 实时</label>
+            </div>
+            <p class="note" style="margin:6px 0 0">一次性任务：任务开放后满足条件即可直接领取（采实时资格）。先判资格通过、再扣名额。</p>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- ===== 新增：名额上限 ===== -->
+      <fieldset class="fieldset-new">
+        <div class="fs__title">名额限制（先到先得 FCFS） <span class="tag tag--new">本次新增</span></div>
+        <div class="form__row" style="margin-top:12px">
+          <label class="form__label">总人数上限：</label>
+          <div class="form__control"><div class="range-inline"><input class="input" value="1000" style="max-width:160px"/><span class="note">0 或留空＝不限制</span></div></div>
+        </div>
+        <p class="note" style="margin:8px 0 4px">每位用户完成任务后仅可领取 <b>1 次</b> 奖励，故名额只计「领取人数」、不计领取次数——名额＝去重领取人数（以领取时间 claim_time 为准）。满额后前台显示「奖励名额已满」；名额挂任务级。金额预算上限本轮不做。</p>
+      </fieldset>
+
+      <div class="form__row">
+        <label class="form__label"><span class="req">*</span>适用端口：</label>
+        <div class="form__control"><div class="radio-grp"><label><input type="checkbox"/> PC</label><label><input type="checkbox" checked/> H5</label><label><input type="checkbox" checked/> APP</label></div></div>
+      </div>
+      <div class="form__row">
+        <label class="form__label"><span class="req">*</span>任务时间：</label>
+        <div class="form__control">
+          <div class="radio-grp">
+            <label><input type="radio" name="ttime" checked/> 永久</label>
+            <label><input type="radio" name="ttime"/> 每日</label>
+            <label><input type="radio" name="ttime"/> 每周</label>
+            <label><input type="radio" name="ttime"/> 限时</label>
+            <label><input type="radio" name="ttime"/> 周限时</label>
+          </div>
+          <p class="hint" style="margin-top:8px">"信息完善"和"首充"类型仅支持「永久」；"充值"和"投注"类型仅支持「每日」「限时」「周限时」。</p>
+        </div>
+      </div>
+      <div class="form__row">
+        <label class="form__label"><span class="req">*</span>审核方式：</label>
+        <div class="form__control"><div class="radio-grp"><label><input type="radio" name="audit" checked/> 自动审核</label><label><input type="radio" name="audit"/> 人工审核</label></div></div>
+      </div>
+      <div class="form__row">
+        <label class="form__label"><span class="req">*</span>奖励发放方式：</label>
+        <div class="form__control"><div class="radio-grp"><label><input type="radio" name="grant" checked/> 自动发放</label><label><input type="radio" name="grant"/> 用户手动领取</label></div></div>
+      </div>
+      <div class="form__row">
+        <label class="form__label">排序：</label>
+        <div class="form__control"><input class="input" value="0" style="max-width:120px"/></div>
+      </div>
+      <div class="form__row">
+        <label class="form__label"><span class="req">*</span>任务状态：</label>
+        <div class="form__control"><div class="radio-grp"><label><input type="radio" name="st"/> 关闭</label><label><input type="radio" name="st" checked/> 开启</label></div></div>
+      </div>
+
+    </div>
+    <div class="modal__foot">
+      <button class="btn" onclick="closeModal()">返回</button>
+      <button class="btn btn--primary" onclick="closeModal()">确定</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== sub-tab switch ===== */
+document.querySelectorAll('.subtab').forEach(function(t){
+  t.addEventListener('click',function(){
+    document.querySelectorAll('.subtab').forEach(function(x){x.classList.remove('subtab--active');});
+    t.classList.add('subtab--active');
+    var name=t.getAttribute('data-tab');
+    document.querySelectorAll('[data-panel]').forEach(function(p){
+      p.classList.toggle('hidden', p.getAttribute('data-panel')!==name);
+    });
+  });
+});
+
+/* ===== modal ===== */
+function openModal(mode){
+  document.getElementById('taskModalTitle').textContent = (mode==='edit'?'编辑任务':'新增任务');
+  document.getElementById('taskModal').classList.add('open');
+}
+function closeModal(){ document.getElementById('taskModal').classList.remove('open'); }
+document.getElementById('taskModal').addEventListener('click',function(e){ if(e.target===this) closeModal(); });
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeModal(); });
+
+/* ===== conditional fields ===== */
+var COND_SUB = {
+  info:['填写真实姓名','填写生日','填写手机号码','填写邮箱','KYC认证','Maya绑定','Glife绑定'],
+  fund:['充值','投注','首次充值','Maya充值','Maya提款','Glife充值','Glife提款'],
+  other:['2025新版访问','关注Facebook','体验平台PWA','圣诞倒计时专属任务','Brand Daily Passcode']
+};
+function onCond(){
+  var cat=document.getElementById('condCat').value;
+  var sub=document.getElementById('condSub');
+  sub.innerHTML = COND_SUB[cat].map(function(o){return '<option>'+o+'</option>';}).join('');
+  onCondSub();
+}
+function onCondSub(){
+  var cat=document.getElementById('condCat').value;
+  var sub=document.getElementById('condSub').value;
+  var isDeposit = (cat==='fund' && sub.indexOf('充值')>-1);
+  var isBet = (cat==='fund' && sub==='投注');
+  document.getElementById('condAmt').classList.toggle('hidden', !isDeposit);
+  document.getElementById('condBet').classList.toggle('hidden', !isBet);
+}
+function openGameModal(e){ if(e) e.preventDefault(); alert('打码量限定游戏设置\n\n未设置：打码量 = 所有体育游戏 + 所有三方游戏\n有设置：打码量 = 设置的体育游戏与三方游戏总和\n\n（原型示意；正式版为弹窗，含 OK体育选择 + 第三方游戏分类/平台）'); }
+function onReward(){
+  var v=document.getElementById('rewardType').value;
+  document.getElementById('rowChip').style.display = (v==='c'?'grid':'none');
+}
+
+/* ===== 组任务配置 ===== */
+function subRowHTML(i){
+  return '<div class="range-inline" style="border:1px solid var(--c-border);border-radius:8px;padding:8px;background:#fff;flex-wrap:wrap">'
+    +'<span class="pill">子任务'+i+'</span>'
+    +'<select class="select subCat" style="max-width:120px" onchange="onSubCat(this)"><option value="info">信息完善</option><option value="fund" selected>资金</option><option value="other">其他</option></select>'
+    +'<select class="select subCond" style="max-width:170px" onchange="checkGroupTime()"></select>'
+    +'<span class="note">奖励</span>'
+    +'<select class="select subReward" style="max-width:100px" onchange="onSubReward(this)"><option value="p">积分</option><option value="c">彩金</option></select>'
+    +'<input class="input" placeholder="奖励值" style="max-width:110px"/>'
+    +'<span class="subChip note" style="display:none;align-items:center;gap:6px">彩金打码倍数 <input class="input" value="0" style="max-width:90px"/></span>'
+    +'<button class="btn btn--sm" style="color:var(--c-danger)" onclick="delSub(event,this)">删除</button>'
+    +'</div>';
+}
+/* 子任务：先选类别（信息完善/资金/其他）→ 再选对应任务条件 */
+function onSubCat(catSel){
+  var cat=catSel.value;
+  var condSel=catSel.parentNode.querySelector('.subCond');
+  condSel.innerHTML = COND_SUB[cat].map(function(o){return '<option>'+o+'</option>';}).join('');
+  checkGroupTime();
+}
+
+/* ===== 任务完成时间类别（对应「任务时间」原始规则） =====
+   永久：信息完善各项 + 首次充值(首充)
+   周期：充值/投注类（每日/限时/周限时）
+   其他：其他类活动条件                                    */
+var TIME_BUCKET={
+  '填写真实姓名':'永久','填写生日':'永久','填写手机号码':'永久','填写邮箱':'永久','KYC认证':'永久','Maya绑定':'永久','Glife绑定':'永久',
+  '首次充值':'永久',
+  '充值':'周期','投注':'周期','Maya充值':'周期','Maya提款':'周期','Glife充值':'周期','Glife提款':'周期'
+};
+function bucketOf(cond){ return TIME_BUCKET[cond] || '其他'; }
+/* 同一组任务的子任务须为相同任务时间类别，否则红字提示 */
+function checkGroupTime(){
+  var box=document.getElementById('subTasks');
+  var buckets={};
+  [].forEach.call(box.children,function(row){
+    var c=row.querySelector('.subCond');
+    if(c && c.value) buckets[bucketOf(c.value)]=true;
+  });
+  var warn=document.getElementById('groupTimeWarn');
+  if(warn) warn.style.display = (Object.keys(buckets).length>1?'block':'none');
+}
+/* 子任务奖励为「彩金」时，显示彩金打码倍数 */
+function onSubReward(sel){
+  var chip=sel.parentNode.querySelector('.subChip');
+  chip.style.display = (sel.value==='c'?'inline-flex':'none');
+}
+function renumberSubs(){
+  var box=document.getElementById('subTasks');
+  [].forEach.call(box.children,function(row,idx){ row.querySelector('.pill').textContent='子任务'+(idx+1); });
+  document.getElementById('addSubBtn').style.display = (box.children.length>=5?'none':'inline-flex');
+}
+function addSub(e){ if(e)e.preventDefault();
+  var box=document.getElementById('subTasks');
+  if(box.children.length>=5) return;
+  var d=document.createElement('div'); d.innerHTML=subRowHTML(box.children.length+1);
+  var row=d.firstChild; box.appendChild(row);
+  onSubCat(row.querySelector('.subCat')); onSubReward(row.querySelector('.subReward')); renumberSubs();
+}
+function delSub(e,btn){ if(e)e.preventDefault(); btn.closest('.range-inline').remove(); renumberSubs(); checkGroupTime(); }
+function onTaskCat(){
+  var isGroup=document.getElementById('taskCat').value==='group';
+  document.getElementById('groupCfg').classList.toggle('hidden',!isGroup);
+  document.getElementById('rowCond').classList.toggle('hidden',isGroup);
+  document.getElementById('rowReward').classList.toggle('hidden',isGroup);
+  if(isGroup) document.getElementById('rowChip').style.display='none'; else onReward();
+  var box=document.getElementById('subTasks');
+  if(isGroup && box.children.length===0){ addSub(); addSub(); }
+}
+
+/* ===== 充值/投注区间资格联动 ===== */
+function onQualDep(){
+  var both=document.getElementById('chkDep').checked && document.getElementById('chkBet').checked;
+  document.getElementById('qualBox').style.opacity = both?'1':'.5';
+  document.querySelectorAll('.qualRadio').forEach(function(r){ r.disabled=!both; if(!both) r.checked=false; });
+}
+
+onCond(); onReward(); onTaskCat(); onQualDep();
+</script>
+</body>
+</html>

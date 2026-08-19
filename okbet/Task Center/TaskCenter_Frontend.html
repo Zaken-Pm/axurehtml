@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>任务中心迭代 — 前台原型 (H5)</title>
+<style>
+/* =========================================================
+   Design Tokens — 深色 H5 奖励中心
+   ========================================================= */
+:root{
+  --c-bg:#0a1a30;
+  --c-bg-grad-1:#0d2140;
+  --c-bg-grad-2:#0a1626;
+  --c-card:#122a48;
+  --c-card-2:#16325a;
+  --c-line:#1e3a5f;
+  --c-text:#eaf1fb;
+  --c-text-2:#a9bdd8;
+  --c-text-3:#6f88a8;
+  --c-primary:#2f6bff;
+  --c-primary-d:#2258e0;
+  --c-green:#35d07f;
+  --c-green-d:#26b86c;
+  --c-orange:#ff8f29;
+  --c-red:#ff5a5f;
+  --c-gold:#ffce3d;
+  --radius:14px;
+  --radius-s:10px;
+  --sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-5:20px;
+  --font:"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,"Noto Sans CJK SC",sans-serif;
+}
+*{box-sizing:border-box;}
+html{font-size:15px;}
+body{
+  margin:0;font-family:var(--font);
+  background:#2a3a52;color:var(--c-text);
+  display:flex;justify-content:center;padding:20px;min-height:100vh;
+}
+button{font-family:inherit;cursor:pointer;border:none;}
+img{max-width:100%;display:block;}
+
+/* phone frame */
+.phone{
+  width:100%;max-width:400px;background:linear-gradient(180deg,var(--c-bg-grad-1),var(--c-bg-grad-2));
+  border-radius:26px;overflow:hidden;position:relative;
+  box-shadow:0 20px 60px rgba(0,0,0,.4);min-height:820px;
+  display:flex;flex-direction:column;
+}
+.scroll{flex:1;overflow-y:auto;padding-bottom:76px;}
+.scroll::-webkit-scrollbar{width:0;}
+
+/* =========================================================
+   Header
+   ========================================================= */
+.topbar{
+  display:flex;align-items:center;gap:var(--sp-2);
+  padding:14px var(--sp-4) 10px;position:sticky;top:0;z-index:5;
+  background:linear-gradient(180deg,#0e2banull,#0d2140 70%,rgba(13,33,64,.4));
+  background:linear-gradient(180deg,#0d2140,rgba(13,33,64,.6));
+  backdrop-filter:blur(6px);
+}
+.avatar{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ffb066,#c9701f);border:2px solid #ffd089;flex:0 0 auto;}
+.coin-pill{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.08);border-radius:20px;padding:4px 10px;font-size:.8rem;}
+.coin-pill::before{content:"";width:15px;height:15px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ffd76b,#f0912a);}
+.topbar__spacer{flex:1;}
+.btn-invite{background:linear-gradient(90deg,#ff5b5b,#ff7a3d);color:#fff;font-weight:700;padding:6px 12px;border-radius:18px;font-size:.78rem;display:flex;align-items:center;gap:4px;}
+.btn-topup{background:var(--c-primary);color:#fff;font-weight:700;padding:6px 14px;border-radius:18px;font-size:.8rem;}
+.icon-btn{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.08);display:grid;place-items:center;color:var(--c-text-2);}
+
+/* stat cards */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-3);padding:6px var(--sp-4) var(--sp-3);}
+.stat{
+  background:linear-gradient(135deg,#f4f7ff,#dfe9ff);color:#12233f;border-radius:var(--radius);
+  padding:12px 14px;position:relative;overflow:hidden;min-height:70px;
+}
+.stat__num{font-size:1.5rem;font-weight:800;line-height:1;}
+.stat__label{font-size:.74rem;color:#4a5c78;margin-top:6px;display:flex;align-items:center;gap:4px;}
+.stat__ico{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:12px;display:grid;place-items:center;font-size:1.5rem;}
+.stat--point .stat__ico{background:radial-gradient(circle at 40% 35%,#ff8b8b,#e0342f);box-shadow:0 4px 12px rgba(224,52,47,.5);}
+.stat--coupon .stat__ico{background:radial-gradient(circle at 40% 35%,#7fb0ff,#2f6bff);box-shadow:0 4px 12px rgba(47,107,255,.5);}
+
+/* section title */
+.sec-title{display:flex;align-items:center;gap:6px;padding:14px var(--sp-4) 8px;font-size:1.05rem;font-weight:800;}
+.sec-title .dot{width:6px;height:18px;border-radius:3px;background:var(--c-orange);}
+.sec-title__more{margin-left:auto;color:var(--c-text-3);font-size:.8rem;font-weight:400;}
+
+/* filter pills */
+.pills{display:flex;gap:8px;padding:4px var(--sp-4) 10px;overflow-x:auto;}
+.pill{flex:0 0 auto;padding:6px 14px;border-radius:18px;font-size:.82rem;background:rgba(255,255,255,.06);color:var(--c-text-2);border:1px solid transparent;white-space:nowrap;}
+.pill--on{background:var(--c-primary);color:#fff;font-weight:600;}
+
+/* promo banner */
+.promo{margin:0 var(--sp-4) 8px;border-radius:var(--radius);overflow:hidden;position:relative;min-height:120px;
+  background:linear-gradient(120deg,#1a3f7a,#2b6bd6);display:flex;flex-direction:column;justify-content:flex-end;padding:12px 14px;}
+.promo--2{background:linear-gradient(120deg,#3a2f7a,#7a5bd6);}
+.promo__time{font-size:.72rem;color:#cfe0ff;}
+.promo__name{font-size:1.05rem;font-weight:800;margin-top:2px;}
+.promo__more{position:absolute;right:14px;bottom:14px;background:var(--c-primary);color:#fff;font-size:.75rem;padding:6px 12px;border-radius:16px;}
+.promo__mascot{position:absolute;right:10px;top:8px;font-size:2.4rem;}
+.expand-btn{display:block;margin:4px auto 10px;background:rgba(47,107,255,.25);color:#bcd4ff;border-radius:16px;padding:6px 18px;font-size:.8rem;}
+
+/* =========================================================
+   Task card
+   ========================================================= */
+.task-list{padding:0 var(--sp-4);display:flex;flex-direction:column;gap:10px;}
+.recall{display:flex;align-items:center;gap:6px;color:#ffce3d;font-size:.85rem;padding:2px 2px 6px;}
+.recall .badge{background:var(--c-red);color:#fff;border-radius:10px;font-size:.68rem;padding:0 6px;min-width:16px;text-align:center;}
+
+.card{
+  background:var(--c-card);border:1px solid var(--c-line);border-radius:var(--radius);
+  padding:12px 14px;display:flex;align-items:center;gap:12px;position:relative;
+}
+.card__badge{position:absolute;left:0;top:0;background:#7a5bd6;color:#fff;font-size:.66rem;padding:2px 8px;border-bottom-right-radius:8px;}
+.card__main{flex:1;min-width:0;padding-top:6px;}
+.card__title{font-size:.95rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.card__title .info-i{color:var(--c-text-3);font-size:.8rem;margin-left:4px;}
+.card__progress{font-size:.76rem;color:var(--c-text-3);margin-top:3px;}
+.card__progress .pct{color:#4f9bff;}
+.card__reward{display:flex;align-items:center;gap:5px;margin-top:6px;font-weight:800;}
+.card__reward .rico{width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#ff8b8b,#e0342f);flex:0 0 auto;}
+.card__reward .rico--gold{background:radial-gradient(circle at 40% 35%,#ffe07a,#f0912a);}
+.card__reward.red{color:#ff6b6f;}
+.card__reward.gold{color:#ffce3d;}
+.card__right{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;gap:6px;text-align:right;}
+.countdown{display:flex;align-items:center;gap:4px;color:#ff6b6f;font-size:.82rem;font-weight:700;}
+.countdown::before{content:"⏱";font-size:.8rem;}
+
+.act{padding:8px 16px;border-radius:18px;font-size:.82rem;font-weight:700;color:#fff;}
+.act--claim{background:linear-gradient(90deg,#ff9d3d,#ff7a1a);}
+.act--bet{background:linear-gradient(90deg,#3ee08a,#25c06c);color:#06331d;}
+.act--go{background:linear-gradient(90deg,#3ee08a,#25c06c);color:#06331d;}
+.act--upload{background:var(--c-primary);}
+.act--proc{background:rgba(255,255,255,.12);color:var(--c-text-3);}
+.act--done{background:rgba(255,255,255,.10);color:var(--c-text-3);}
+.act--full{background:rgba(255,255,255,.08);color:var(--c-text-3);border:1px solid var(--c-line);}
+.act:disabled{cursor:default;}
+
+/* quota progress (新增) */
+.card--quota{flex-direction:column;align-items:stretch;gap:8px;}
+.card--quota .row1{display:flex;align-items:center;gap:12px;}
+.quota{margin-top:2px;}
+.quota__bar{height:8px;border-radius:6px;background:rgba(255,255,255,.10);overflow:hidden;}
+.quota__fill{height:100%;background:linear-gradient(90deg,#ff9d3d,#ff5a5f);}
+.quota__txt{display:flex;justify-content:space-between;font-size:.72rem;color:var(--c-text-2);margin-top:5px;}
+.quota__txt b{color:#ffce3d;}
+.tag-new{display:inline-block;background:rgba(53,208,127,.16);color:#54e59a;border:1px solid rgba(53,208,127,.4);border-radius:6px;font-size:.66rem;padding:1px 6px;margin-left:6px;vertical-align:middle;}
+.full-banner{background:rgba(255,90,95,.12);border:1px solid rgba(255,90,95,.35);color:#ff8f92;border-radius:8px;text-align:center;font-size:.8rem;padding:6px;font-weight:700;}
+
+/* delayed grant hint (新增) */
+.delay-hint{display:flex;align-items:center;gap:5px;color:#ffce3d;font-size:.74rem;margin-top:6px;background:rgba(255,206,61,.10);border:1px solid rgba(255,206,61,.32);border-radius:8px;padding:5px 8px;}
+.delay-hint::before{content:"⏳";}
+
+/* task group card (新增) */
+.subtasks{display:flex;flex-direction:column;gap:8px;margin-top:4px;border-top:1px dashed var(--c-line);padding-top:10px;}
+.subtasks.hidden{display:none;}
+.subtask{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.03);border-radius:10px;padding:8px 10px;}
+.subtask__step{flex:0 0 auto;width:44px;height:22px;border-radius:11px;background:rgba(47,107,255,.18);color:#7fb0ff;font-size:.68rem;display:grid;place-items:center;font-weight:700;}
+.subtask__body{flex:1;min-width:0;}
+.subtask__name{font-size:.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.subtask__prog{font-size:.7rem;color:var(--c-text-3);margin-top:2px;}
+.subtask__prog .pct{color:#4f9bff;}
+.chip-st{flex:0 0 auto;font-size:.7rem;font-weight:700;padding:4px 10px;border-radius:12px;}
+.chip-st--done{background:rgba(53,208,127,.16);color:#54e59a;}
+.chip-st--go{background:linear-gradient(90deg,#3ee08a,#25c06c);color:#06331d;}
+.chip-st--lock{background:rgba(255,255,255,.06);color:var(--c-text-3);}
+.group-reward{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:.78rem;color:#ffce3d;}
+.group-reward .box{background:rgba(255,206,61,.10);border:1px dashed rgba(255,206,61,.4);border-radius:8px;padding:5px 8px;}
+
+/* =========================================================
+   Bottom nav
+   ========================================================= */
+.tabbar{
+  position:absolute;left:0;right:0;bottom:0;height:64px;background:#0c1f3b;border-top:1px solid var(--c-line);
+  display:flex;justify-content:space-around;align-items:center;padding-bottom:4px;
+}
+.tabbar__item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.68rem;color:var(--c-text-3);flex:1;}
+.tabbar__item .ic{font-size:1.15rem;}
+.tabbar__item--on{color:#4f9bff;}
+
+/* =========================================================
+   Popups
+   ========================================================= */
+.pop-mask{position:absolute;inset:0;background:rgba(3,10,22,.72);display:none;align-items:center;justify-content:center;padding:24px;z-index:20;}
+.pop-mask.open{display:flex;}
+.pop{
+  background:#fff;color:#1b2a44;border-radius:18px;width:100%;max-width:300px;padding:26px 20px 20px;
+  text-align:center;position:relative;
+}
+.pop__coin{width:70px;height:70px;margin:-52px auto 6px;border-radius:50%;
+  background:radial-gradient(circle at 40% 35%,#bca7ff,#7a5bd6);display:grid;place-items:center;font-size:2rem;
+  box-shadow:0 8px 20px rgba(122,91,214,.5);border:4px solid #fff;}
+.pop__coin--gold{background:radial-gradient(circle at 40% 35%,#ffe07a,#f0912a);box-shadow:0 8px 20px rgba(240,145,42,.5);}
+.pop__coin--fail{background:radial-gradient(circle at 40% 35%,#ffa3a3,#e0342f);box-shadow:0 8px 20px rgba(224,52,47,.5);}
+.pop__title{font-size:1.05rem;font-weight:800;}
+.pop__amt{font-size:1.5rem;font-weight:800;color:#2f6bff;margin:8px 0 2px;}
+.pop__amt--gold{color:#f0912a;}
+.pop__desc{font-size:.84rem;color:#5b6a85;line-height:1.6;margin:6px 0 0;}
+.pop__btn{margin-top:16px;width:100%;background:var(--c-primary);color:#fff;font-weight:700;border-radius:12px;padding:12px;font-size:.95rem;}
+.pop__x{position:absolute;right:12px;top:10px;font-size:1.2rem;color:#9aa6b8;background:none;}
+.pop__rules{text-align:left;font-size:.8rem;color:#43506a;line-height:1.7;max-height:230px;overflow-y:auto;}
+.pop__rules h4{margin:0 0 6px;}
+
+/* demo controls */
+.demo-bar{max-width:400px;margin:0 auto 12px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;}
+.demo-bar button{background:#1c3252;color:#cfe0ff;border:1px solid #2a4670;border-radius:8px;padding:6px 10px;font-size:.74rem;}
+.demo-hint{color:#9fb4d4;font-size:.72rem;text-align:center;margin:0 auto 6px;max-width:400px;}
+</style>
+</head>
+<body>
+<div style="width:100%;max-width:400px;">
+  <p class="demo-hint">点下方按钮预览各弹窗；任务卡上的按钮也可点击。</p>
+  <div class="demo-bar">
+    <button onclick="showPop('cash')">领取成功·现金</button>
+    <button onclick="showPop('point')">领取成功·积分</button>
+    <button onclick="showPop('mix')">现金+积分</button>
+    <button onclick="showPop('fail')">领取失败</button>
+    <button onclick="showPop('rule')">任务规则</button>
+    <button onclick="showPop('intro')">任务介绍</button>
+    <button onclick="showPop('full')">名额已满</button>
+  </div>
+
+  <!-- ============ Phone ============ -->
+  <div class="phone">
+    <div class="scroll">
+
+      <!-- Header -->
+      <header class="topbar">
+        <div class="avatar" aria-label="头像"></div>
+        <span class="coin-pill">93,010</span>
+        <div class="topbar__spacer"></div>
+        <button class="btn-invite">🎁 Invite</button>
+        <button class="btn-topup">充值</button>
+        <button class="icon-btn" aria-label="搜索">🔍</button>
+      </header>
+
+      <!-- Stat cards -->
+      <div class="stats">
+        <div class="stat stat--point">
+          <div class="stat__num">21,745</div>
+          <div class="stat__label">我的积分 ›</div>
+          <div class="stat__ico">🎖️</div>
+        </div>
+        <div class="stat stat--coupon">
+          <div class="stat__num">29</div>
+          <div class="stat__label">我的优惠券 ›</div>
+          <div class="stat__ico">🎫</div>
+        </div>
+      </div>
+
+      <!-- 优惠 -->
+      <div class="sec-title"><span class="dot"></span>优惠</div>
+      <div class="pills">
+        <span class="pill pill--on">全部(6)</span>
+        <span class="pill">正盈利活动–ZH</span>
+        <span class="pill">负盈利活动–ZH</span>
+      </div>
+      <div class="promo">
+        <span class="promo__mascot">🏆</span>
+        <div class="promo__time">活动时间：2026/07/01 – 2028/08/30</div>
+        <div class="promo__name">Game Challenge</div>
+        <button class="promo__more" onclick="showPop('intro')">阅读更多 ›</button>
+      </div>
+      <div class="promo promo--2">
+        <span class="promo__mascot">🌈</span>
+        <div class="promo__time">活动时间：2026/08/01 – 2028/08/31</div>
+        <div class="promo__name">负盈利活动–角标</div>
+        <button class="promo__more" onclick="showPop('intro')">阅读更多 ›</button>
+      </div>
+      <button class="expand-btn">Expand ⌄</button>
+
+      <!-- 任务列表 -->
+      <div class="sec-title"><span class="dot"></span>任务列表 <button class="sec-title__more" onclick="showPop('rule')">规则 ›</button></div>
+      <div style="padding:0 16px;"><div class="recall">奖励找回 <span class="badge">1</span> ›</div></div>
+      <div class="pills">
+        <span class="pill pill--on">全部(56)</span>
+        <span class="pill">每日任务</span>
+        <span class="pill">每周</span>
+        <span class="pill">基础任务</span>
+      </div>
+
+      <div class="task-list">
+
+        <!-- 可领取 -->
+        <article class="card">
+          <div class="card__main" style="padding-top:0">
+            <div class="card__title">填写手机号码–不要删除</div>
+            <div class="card__progress">进度 1 / 1</div>
+            <div class="card__reward red"><span class="rico"></span>102</div>
+          </div>
+          <div class="card__right">
+            <button class="act act--claim" onclick="showPop('point')">领 取</button>
+          </div>
+        </article>
+
+        <!-- 名额进度（新增）-->
+        <article class="card card--quota">
+          <span class="card__badge">每日</span>
+          <div class="row1">
+            <div class="card__main">
+              <div class="card__title">小额用户·每日充值任务 <span class="tag-new">名额</span></div>
+              <div class="card__progress">进度 ₱0 / ₱50 <span class="pct">(0%)</span> · 充值≥₱50 <b style="color:#7fb0ff">AND</b> 投注≥₱200</div>
+              <div class="card__reward gold"><span class="rico rico--gold"></span>111</div>
+            </div>
+            <div class="card__right">
+              <div class="countdown">13:05:11</div>
+              <button class="act act--bet">去投注</button>
+            </div>
+          </div>
+          <div class="quota">
+            <div class="quota__bar"><div class="quota__fill" style="width:82%"></div></div>
+            <div class="quota__txt"><span>先到先得 · 剩余名额紧张</span><span>已领取 <b>820/1,000</b></span></div>
+          </div>
+        </article>
+
+        <!-- 名额已满（新增）-->
+        <article class="card card--quota">
+          <span class="card__badge">每日</span>
+          <div class="row1">
+            <div class="card__main">
+              <div class="card__title">限量彩金任务 <span class="tag-new">名额</span></div>
+              <div class="card__progress">进度 1 / 1</div>
+              <div class="card__reward gold"><span class="rico rico--gold"></span>500</div>
+            </div>
+            <div class="card__right">
+              <button class="act act--full" onclick="showPop('full')" >名额已满</button>
+            </div>
+          </div>
+          <div class="full-banner">奖励名额已满</div>
+        </article>
+
+        <!-- 任务组 · 可展开（新增）-->
+        <article class="card card--quota">
+          <span class="card__badge" style="background:#2f6bff">任务组</span>
+          <div class="row1">
+            <div class="card__main">
+              <div class="card__title">Small Stake Club · 组任务</div>
+              <div class="card__progress">已完成 1 / 3 · 完成任意 <b style="color:#7fb0ff">2</b> 个即可领奖</div>
+              <div class="group-reward"><span class="box">🎁 完成全部额外奖 +1,000</span></div>
+            </div>
+            <div class="card__right">
+              <button class="act act--bet" onclick="toggleGroup(this)">展开 ⌄</button>
+            </div>
+          </div>
+          <div class="subtasks hidden">
+            <div class="subtask">
+              <span class="subtask__step">子任务1</span>
+              <div class="subtask__body"><div class="subtask__name">每日充值任务</div><div class="subtask__prog">进度 ₱50 / ₱50 <span class="pct">(100%)</span></div></div>
+              <span class="chip-st chip-st--done">已完成 ✓</span>
+            </div>
+            <div class="subtask">
+              <span class="subtask__step">子任务2</span>
+              <div class="subtask__body"><div class="subtask__name">每日投注任务</div><div class="subtask__prog">进度 ₱120 / ₱200 <span class="pct">(60%)</span></div></div>
+              <span class="chip-st chip-st--go">去投注</span>
+            </div>
+            <div class="subtask">
+              <span class="subtask__step">子任务3</span>
+              <div class="subtask__body"><div class="subtask__name">周末累计任务</div><div class="subtask__prog">进度 ₱0 / ₱1,000 <span class="pct">(0%)</span></div></div>
+              <span class="chip-st chip-st--go">去充值</span>
+            </div>
+          </div>
+          <div class="delay-hint">奖励将于 3 天后发放</div>
+        </article>
+
+        <!-- 延迟派奖示例（新增）-->
+        <article class="card">
+          <div class="card__main" style="padding-top:0">
+            <div class="card__title">周末充值任务</div>
+            <div class="card__progress">进度 ₱1,000 / ₱1,000 <span class="pct">(100%)</span></div>
+            <div class="card__reward gold"><span class="rico rico--gold"></span>888</div>
+            <div class="delay-hint">奖励将于 3 天后发放</div>
+          </div>
+          <div class="card__right">
+            <button class="act act--proc" disabled>待发放</button>
+          </div>
+        </article>
+
+        <!-- 去投注 + 倒计时 -->
+        <article class="card">
+          <span class="card__badge">每日</span>
+          <div class="card__main">
+            <div class="card__title">配置单个厂商CQ9电子 <span class="info-i" onclick="showPop('intro')">ⓘ</span></div>
+            <div class="card__progress">进度 ₱0 / ₱100 <span class="pct">(0%)</span></div>
+            <div class="card__reward gold"><span class="rico rico--gold"></span>111</div>
+          </div>
+          <div class="card__right">
+            <div class="countdown">13:05:11</div>
+            <button class="act act--bet">去投注</button>
+          </div>
+        </article>
+
+        <!-- 上传证明 -->
+        <article class="card">
+          <div class="card__main" style="padding-top:0">
+            <div class="card__title">关注Facebook</div>
+            <div class="card__progress">进度 0 / 1</div>
+            <div class="card__reward red"><span class="rico"></span>114</div>
+          </div>
+          <div class="card__right">
+            <button class="act act--upload" onclick="showPop('intro')">上传证明</button>
+          </div>
+        </article>
+
+        <!-- 处理中 -->
+        <article class="card">
+          <div class="card__main" style="padding-top:0">
+            <div class="card__title">首次充值 <span class="info-i">ⓘ</span></div>
+            <div class="card__progress">进度 ₱1 / ₱1 <span class="pct">(100%)</span></div>
+            <div class="card__reward gold"><span class="rico rico--gold"></span>11</div>
+          </div>
+          <div class="card__right">
+            <button class="act act--proc" disabled>处理中</button>
+          </div>
+        </article>
+
+        <!-- 去完成 -->
+        <article class="card">
+          <div class="card__main" style="padding-top:0">
+            <div class="card__title">KYC认证–不要删除 <span class="info-i">ⓘ</span></div>
+            <div class="card__progress">进度 0 / 1 · 前置门槛</div>
+            <div class="card__reward gold"><span class="rico rico--gold"></span>105</div>
+          </div>
+          <div class="card__right">
+            <button class="act act--go">去完成</button>
+          </div>
+        </article>
+
+        <!-- 已完成 -->
+        <article class="card">
+          <div class="card__main" style="padding-top:0">
+            <div class="card__title">填写真实姓名–不要删除</div>
+            <div class="card__progress">进度 1 / 1</div>
+            <div class="card__reward red"><span class="rico"></span>100</div>
+          </div>
+          <div class="card__right">
+            <button class="act act--done" disabled>已完成</button>
+          </div>
+        </article>
+
+        <div style="height:8px"></div>
+      </div>
+    </div>
+
+    <!-- Bottom nav -->
+    <nav class="tabbar">
+      <div class="tabbar__item"><span class="ic">🏠</span>首页</div>
+      <div class="tabbar__item tabbar__item--on"><span class="ic">🎁</span>奖励中心</div>
+      <div class="tabbar__item"><span class="ic">🛍️</span>积分商城</div>
+      <div class="tabbar__item"><span class="ic">🏆</span>排行榜</div>
+      <div class="tabbar__item"><span class="ic">👤</span>我的</div>
+    </nav>
+
+    <!-- ===== Popups ===== -->
+    <div class="pop-mask" id="pop">
+      <!-- cash -->
+      <div class="pop" data-pop="cash" hidden>
+        <div class="pop__coin pop__coin--gold">🪙</div>
+        <div class="pop__title">实施领取成功</div>
+        <div class="pop__amt pop__amt--gold">₱6,000</div>
+        <button class="pop__btn" onclick="hidePop()">确定</button>
+      </div>
+      <!-- point -->
+      <div class="pop" data-pop="point" hidden>
+        <div class="pop__coin">⭐</div>
+        <div class="pop__title">奖励领取成功</div>
+        <div class="pop__amt">+102</div>
+        <button class="pop__btn" onclick="hidePop()">确定</button>
+      </div>
+      <!-- mix -->
+      <div class="pop" data-pop="mix" hidden>
+        <div class="pop__coin pop__coin--gold">🎁</div>
+        <div class="pop__title">奖励领取成功</div>
+        <div class="pop__amt">+1,000 <span style="color:#aaa;font-size:1rem">/</span> <span class="pop__amt--gold">₱120,000</span></div>
+        <button class="pop__btn" onclick="hidePop()">确定</button>
+      </div>
+      <!-- fail -->
+      <div class="pop" data-pop="fail" hidden>
+        <div class="pop__coin pop__coin--fail">✖</div>
+        <div class="pop__title">采取领取失败</div>
+        <div class="pop__desc">请稍后再试</div>
+        <button class="pop__btn" onclick="hidePop()">确定</button>
+      </div>
+      <!-- full -->
+      <div class="pop" data-pop="full" hidden>
+        <div class="pop__coin pop__coin--fail">🚫</div>
+        <div class="pop__title">奖励名额已满</div>
+        <div class="pop__desc">本任务采先到先得，名额已发放完毕，下次请早。</div>
+        <button class="pop__btn" onclick="hidePop()">确定</button>
+      </div>
+      <!-- rule -->
+      <div class="pop" data-pop="rule" hidden style="max-width:320px">
+        <button class="pop__x" onclick="hidePop()">✕</button>
+        <div class="pop__rules">
+          <h4>任务规则</h4>
+          1. 任务奖励采先到先得，名额有限，领完为止。<br>
+          2. 参与资格于任务开始前以历史数据快照判定。<br>
+          3. 同一用户每个任务的领取次数受上限限制。<br>
+          4. 奖励发放后的价值统计以平台结算时区（UTC+8）当日 23:59:59 为准。<br>
+          5. 最终解释权归平台所有。
+        </div>
+        <button class="pop__btn" onclick="hidePop()">确定</button>
+      </div>
+      <!-- intro -->
+      <div class="pop" data-pop="intro" hidden>
+        <button class="pop__x" onclick="hidePop()">✕</button>
+        <div class="pop__title" style="margin-top:6px">任务介绍</div>
+        <div class="pop__desc">完成指定充值与投注即可领取奖励，名额有限先到先得。</div>
+        <button class="pop__btn" onclick="hidePop()">确定</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleGroup(btn){
+  var sub=btn.closest('.card').querySelector('.subtasks');
+  var open=sub.classList.toggle('hidden')===false;
+  btn.textContent = open ? '收起 ⌃' : '展开 ⌄';
+}
+function showPop(name){
+  var mask=document.getElementById('pop');
+  mask.querySelectorAll('[data-pop]').forEach(function(p){ p.hidden = (p.getAttribute('data-pop')!==name); });
+  mask.classList.add('open');
+}
+function hidePop(){ document.getElementById('pop').classList.remove('open'); }
+document.getElementById('pop').addEventListener('click',function(e){ if(e.target===this) hidePop(); });
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') hidePop(); });
+</script>
+</body>
+</html>
