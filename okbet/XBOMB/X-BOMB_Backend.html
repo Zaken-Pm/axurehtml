@@ -331,11 +331,9 @@ label.chk input{accent-color:var(--primary);}
             <div class="sec-title" style="margin-top:24px">时间设定</div>
             <div class="form-row"><label><span class="req">*</span>活动时间：</label>
               <div class="dp-wrap"><input class="input dp-trigger" id="fActTime" type="text" readonly placeholder="开始时间 ~ 结束时间"><span class="dp-icon">📅</span></div></div>
-            <div class="form-row"><label><span class="req">*</span>显示时间：</label>
-              <div class="dp-wrap"><input class="input dp-trigger" id="fShowTime" type="text" readonly placeholder="开始时间 ~ 结束时间"><span class="dp-icon">📅</span></div></div>
-            <p class="hint hint--warn">· 显示时间不可小于活动时间。<br>
-              · 活动时间到期：停止计算返水/刮刮卡等奖励，但用户仍可领取到期前奖励。<br>
-              · 状态「关闭」：奖励清除并关闭入口。</p>
+            <p class="hint hint--warn">· 活动时间到期：停止计算奖励并<b>自动关闭前台入口</b>（关闭后不可再领，含补领）。<br>
+              · 前台入口显示区间＝活动时间；「状态」开关为手动强制下架（关闭：隐藏入口、停算、清奖，需二次确认）。<br>
+              · 注意：入口于活动时间迄自动关闭，「活动时间」建议涵盖最后一张刮刮卡的过期日。</p>
           </div>
 
           <!-- 步骤2 活动图片 -->
@@ -493,7 +491,7 @@ label.chk input{accent-color:var(--primary);}
       <table class="list-tbl" style="min-width:1180px">
         <thead><tr>
           <th>活动ID</th><th>会员帐号</th><th>活动类型</th><th>活动名称</th><th>奖励类型</th><th>奖励金额/内容</th>
-          <th>状态</th><th>申请时间</th><th>审核人</th><th>审核时间</th><th>备注</th><th>操作</th>
+          <th>状态</th><th>申请时间</th><th>审核人</th><th>审核时间</th><th style="min-width:220px">备注</th><th>操作</th>
         </tr></thead>
         <tbody id="auditBody"></tbody>
       </table>
@@ -672,9 +670,9 @@ $$('.side__subitem').forEach(s=>{ const t=s.textContent.trim();
 /* ---------- 派奖审核：资料与渲染 ---------- */
 /* 规则：联名挑战活动 → 状态一律「审核通过」、审核人一律「自动审核」 */
 const auditRows=[
-  ['190','member01','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 7.00','审核通过','2026-08-21 12:03:11','自动审核','2026-08-21 12:03:11','—'],
-  ['190','member02','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 25.00','审核通过','2026-08-21 12:10:44','自动审核','2026-08-21 12:10:44','—'],
-  ['190','member03','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 100.00','审核通过','2026-08-22 12:00:02','自动审核','2026-08-22 12:00:02','—'],
+  ['190','member01','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 200.00','审核通过','2026-08-21 12:03:11','自动审核','2026-08-21 12:03:11','LV2 基础奖励 200'],
+  ['190','member02','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 115.00','审核通过','2026-08-21 12:10:44','自动审核','2026-08-21 12:10:44','LV3 基础奖励 100、挑战3 +15%'],
+  ['190','member03','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 200.00','审核通过','2026-08-22 12:00:02','自动审核','2026-08-22 12:00:02','刮刮卡N2-1 奖励200'],
   ['184','xnjobe10','周卡活动','最新周卡','礼金','PHP 12.00','审核通过','2026-08-06 13:49:53','自动审核','2026-08-06 13:44:00','—'],
   ['184','ody002','周卡活动','最新周卡','礼金','PHP 23.00','审核不通过','—','自动审核','2026-08-06 00:04:00','未完成额外任务'],
 ];
@@ -729,8 +727,8 @@ function resetWizardFields(blank){
   /* ---- 步骤1 活动模板 ---- */
   $('#fType').value='联名挑战活动'; $('#fName').value=''; $('#fCur').value='PHP';
   $('input[name=status][value="关闭"]').checked=true;
-  $('#fActTime').value=''; $('#fShowTime').value='';
-  ['#fName','#fActTime','#fShowTime'].forEach(s=>$(s).classList.remove('is-error'));
+  $('#fActTime').value='';
+  ['#fName','#fActTime'].forEach(s=>$(s).classList.remove('is-error'));
 
   /* ---- 步骤2 活动图片 ---- */
   const floatR=$$('input[name=float]'); if(floatR[0]) floatR[0].checked=true;
@@ -756,7 +754,7 @@ function resetWizardFields(blank){
 }
 /* 既有活动的实际配置（示意：新增/编辑后的活动都会写入此表，供再次编辑读取） */
 const ACTIVITY_DATA={190:{type:'联名挑战活动',name:'X-Bomb Lucky Blast',cur:'PHP',status:'开启',
-  actTime:'2026-08-21 00:00 ~ 2026-10-31 23:59',showTime:'2026-08-21 00:00 ~ 2026-11-03 23:59'}};
+  actTime:'2026-08-21 00:00 ~ 2026-10-31 23:59'}};
 let editingActId=null;  // null=新增；否则为正在编辑的活动 ID
 let pendingDelRow=null; // 待删除的活动列表行
 
@@ -810,7 +808,7 @@ function openEditRow(tr){
   if(d){
     $('#fType').value=d.type; $('#fName').value=d.name; $('#fCur').value=d.cur;
     const sr=$(`input[name=status][value="${d.status}"]`); if(sr) sr.checked=true;
-    $('#fActTime').value=d.actTime; $('#fShowTime').value=d.showTime;
+    $('#fActTime').value=d.actTime;
   }
   showWizard(true,'编辑活动');
 }
@@ -859,20 +857,20 @@ $('#btnSubmit').addEventListener('click',()=>{
   const a={
     type:$('#fType').value, name:$('#fName').value.trim(), cur:$('#fCur').value,
     status:$('input[name=status]:checked').value,
-    actTime:$('#fActTime').value, showTime:$('#fShowTime').value,
+    actTime:$('#fActTime').value,
     wager:($('#fWager').value.trim()||'—')
   };
 
   if(editingActId){
     /* 编辑：更新对应行 + 同步资料表 */
-    ACTIVITY_DATA[editingActId]={type:a.type,name:a.name,cur:a.cur,status:a.status,actTime:a.actTime,showTime:a.showTime};
+    ACTIVITY_DATA[editingActId]={type:a.type,name:a.name,cur:a.cur,status:a.status,actTime:a.actTime};
     const tr=$$('#pageList tbody tr').find(r=>r.children[0].textContent.trim()===String(editingActId));
     if(tr) fillRow(tr,{id:editingActId,...a});
     toast('活动配置已保存（示意）');
   }else{
     /* 新增：产生新 ID，插到列表最上方，并写入资料表让它之后可编辑 */
     const id=nextActId();
-    ACTIVITY_DATA[id]={type:a.type,name:a.name,cur:a.cur,status:a.status,actTime:a.actTime,showTime:a.showTime};
+    ACTIVITY_DATA[id]={type:a.type,name:a.name,cur:a.cur,status:a.status,actTime:a.actTime};
     const tr=document.createElement('tr');
     fillRow(tr,{id,...a});
     const body=$('#pageList tbody'); body.insertBefore(tr,body.firstChild);
@@ -890,13 +888,9 @@ function validateStep(n){
   if(n===1){
     const name=$('#fName'); if(!name.value.trim()){name.classList.add('is-error');toast('活动名称必填',true);return false;}
     name.classList.remove('is-error');
-    const actTime=$('#fActTime'), showTime=$('#fShowTime');
+    const actTime=$('#fActTime');
     if(!actTime.value.trim()){actTime.classList.add('is-error');toast('活动时间必填',true);return false;}
     actTime.classList.remove('is-error');
-    if(!showTime.value.trim()){showTime.classList.add('is-error');toast('显示时间必填',true);return false;}
-    const actEnd=dpTimeEnd(actTime.value), showEnd=dpTimeEnd(showTime.value);
-    if(actEnd&&showEnd&&showEnd<actEnd){showTime.classList.add('is-error');toast('显示时间的结束时间不可小于活动时间',true);return false;}
-    showTime.classList.remove('is-error');
   }
   if(n===4){
     // 校验返水表任务目标与固定金额不可为空/0，且任务目标需依同「任务条件」逐级递增
@@ -1155,7 +1149,7 @@ function buildPreview(){
   const cardSummary=Object.keys(scratch).map(t=>`${t}:${scratch[t].length}项`).join('　');
   const rows=[
     ['① 活动模板设置',[['活动ID','—'],['模板类型',$('#fType').value],['状态',status],['活动币种',$('#fCur').value],
-      ['活动名称',$('#fName').value],['活动时间',$('#fActTime').value],['显示时间',$('#fShowTime').value]]],
+      ['活动名称',$('#fName').value],['活动时间',$('#fActTime').value]]],
     ['② 活动图片',[['首页浮窗',$$('input[name=float]')[1].checked?'开启':'关闭'],['浮窗排序',$('#fSort').value],['活动列表图','PC／H5'],['列表显示',$$('input[name=listShow]')[0].checked?'开启':'关闭'],['列表排序',$('#fListSort').value],['备注',$('#fRemark').value||'—']]],
     ['③ 参与对象与名单',[['充值层级','全选'],['指定代理','不指定'],['新会员限制','否'],['会员等级','全选'],['黑名单','—']]],
     ['④ 活动条件',[['返水等级数',rebateRows.length+' 级'],['挑战等级数',challengeRows.length+' 级'],
