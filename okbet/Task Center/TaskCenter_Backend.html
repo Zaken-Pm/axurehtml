@@ -649,11 +649,28 @@ tbody tr:hover{background:#fafcff;}
         <label class="form__label"><span class="req">*</span>任务时间：</label>
         <div class="form__control">
           <div class="radio-grp">
-            <label><input type="radio" name="ttime" checked/> 永久</label>
-            <label><input type="radio" name="ttime"/> 每日</label>
-            <label><input type="radio" name="ttime"/> 每周</label>
-            <label><input type="radio" name="ttime"/> 限时</label>
-            <label><input type="radio" name="ttime"/> 周限时</label>
+            <label><input type="radio" name="ttime" value="永久" checked onchange="onTaskTime()"/> 永久</label>
+            <label><input type="radio" name="ttime" value="每日" onchange="onTaskTime()"/> 每日</label>
+            <label><input type="radio" name="ttime" value="每周" onchange="onTaskTime()"/> 每周</label>
+            <label><input type="radio" name="ttime" value="限时" onchange="onTaskTime()"/> 限时</label>
+            <label><input type="radio" name="ttime" value="周限时" onchange="onTaskTime()"/> 周限时</label>
+          </div>
+          <!-- 限时：指定日期时间区间（开始时间 ~ 结束时间） -->
+          <div id="timeRangeLimited" class="hidden" style="margin-top:10px">
+            <div style="display:flex;align-items:center;gap:10px;border:1px solid var(--c-border);border-radius:var(--radius-s);background:#fafbfc;padding:0 12px;height:36px;max-width:460px">
+              <span style="color:var(--c-text-3);font-size:.9rem">🕐</span>
+              <input type="text" placeholder="开始时间" onfocus="this.type='datetime-local'" onblur="if(!this.value)this.type='text'" style="border:none;background:transparent;flex:1;min-width:0;outline:none;color:var(--c-text);font-size:.85rem"/>
+              <span style="color:var(--c-text-3)">~</span>
+              <input type="text" placeholder="结束时间" onfocus="this.type='datetime-local'" onblur="if(!this.value)this.type='text'" style="border:none;background:transparent;flex:1;min-width:0;outline:none;color:var(--c-text);font-size:.85rem"/>
+            </div>
+          </div>
+          <!-- 周限时：星期区间（星期一 至 星期日） -->
+          <div id="timeRangeWeekly" class="hidden" style="margin-top:10px">
+            <div class="range-inline" style="max-width:460px">
+              <select class="select" style="flex:1"><option>星期一</option><option>星期二</option><option>星期三</option><option>星期四</option><option>星期五</option><option>星期六</option><option>星期日</option></select>
+              <span>至</span>
+              <select class="select" style="flex:1"><option>星期一</option><option>星期二</option><option>星期三</option><option>星期四</option><option>星期五</option><option>星期六</option><option>星期日</option></select>
+            </div>
           </div>
           <p class="hint" style="margin-top:8px">"信息完善"和"首充"类型仅支持「永久」；"充值"和"投注"类型仅支持「每日」「限时」「周限时」。</p>
         </div>
@@ -708,7 +725,7 @@ document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeModal
 /* ===== conditional fields ===== */
 var COND_SUB = {
   info:['填写真实姓名','填写生日','填写手机号码','填写邮箱','KYC认证','Maya绑定','Glife绑定'],
-  fund:['充值','投注','首次充值','Maya充值','Maya提款','Glife充值','Glife提款'],
+  fund:['充值','投注','首次充值','Maya充值','Maya提款','Glife充值','Glife提款','首次充值(阶级)'],
   other:['2025新版访问','关注Facebook','体验平台PWA','圣诞倒计时专属任务','Brand Daily Passcode']
 };
 function onCond(){
@@ -758,7 +775,7 @@ function onSubCat(catSel){
    其他：其他类活动条件                                    */
 var TIME_BUCKET={
   '填写真实姓名':'永久','填写生日':'永久','填写手机号码':'永久','填写邮箱':'永久','KYC认证':'永久','Maya绑定':'永久','Glife绑定':'永久',
-  '首次充值':'永久',
+  '首次充值':'永久','首次充值(阶级)':'永久',
   '充值':'周期','投注':'周期','Maya充值':'周期','Maya提款':'周期','Glife充值':'周期','Glife提款':'周期'
 };
 function bucketOf(cond){ return TIME_BUCKET[cond] || '其他'; }
@@ -808,7 +825,16 @@ function onQualDep(){
   document.querySelectorAll('.qualRadio').forEach(function(r){ r.disabled=!both; if(!both) r.checked=false; });
 }
 
-onCond(); onReward(); onTaskCat(); onQualDep();
+/* 任务时间：限时＝日期时间区间；周限时＝星期区间；其余隐藏 */
+function onTaskTime(){
+  var v=(document.querySelector('input[name="ttime"]:checked')||{}).value;
+  var lim=document.getElementById('timeRangeLimited');
+  var wk=document.getElementById('timeRangeWeekly');
+  if(lim) lim.classList.toggle('hidden', v!=='限时');
+  if(wk)  wk.classList.toggle('hidden', v!=='周限时');
+}
+
+onCond(); onReward(); onTaskCat(); onQualDep(); onTaskTime();
 </script>
 </body>
 </html>
