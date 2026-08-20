@@ -267,20 +267,24 @@ label.chk input{accent-color:var(--primary);}
         <button class="btn btn--primary">🔍 搜索</button>
         <button class="btn btn--primary" id="btnNew" style="margin-left:auto">＋ 新增活动</button>
       </div>
-      <table class="list-tbl">
+      <table class="list-tbl" style="min-width:1360px">
         <thead><tr>
-          <th>ID</th><th>起止时间</th><th>币种</th><th>活动模板</th><th>活动名称</th>
-          <th>状态</th><th>参与/中奖</th><th>流水倍数</th><th>操作</th>
+          <th>ID</th><th>排序</th><th>状态</th><th>起止时间</th><th>币种</th><th>语系</th>
+          <th>活动模板</th><th>活动名称</th><th>预览图片</th><th>黑名单</th><th>指定代理</th>
+          <th>参与/中奖人数</th><th>彩金所需流水倍数</th><th>操作</th>
         </tr></thead>
         <tbody>
-          <tr><td>190</td><td>26/08/21<br>26/10/31</td><td>PHP</td><td><b>联名挑战活动</b></td><td>X-Bomb Lucky Blast</td>
-            <td class="tag-on">开启</td><td>0 / 0</td><td>1</td>
+          <tr><td>190</td><td>0</td><td class="tag-on">开启</td><td>26/08/21<br>26/10/31</td><td>PHP</td><td>预设</td>
+            <td><b>联名挑战活动</b></td><td>X-Bomb Lucky Blast</td><td><button class="btn btn--primary btn--sm">上传</button></td><td>—</td><td>—</td>
+            <td>0 / 0</td><td>1</td>
             <td><button class="btn--link" data-edit>编辑</button><span class="op-sep">|</span><button class="btn--link red" data-del>删除</button><br><button class="btn--link red" data-close>关闭</button></td></tr>
-          <tr><td>184</td><td>26/07/30<br>26/08/08</td><td>PHP</td><td>周卡活动</td><td>最新周卡</td>
-            <td class="tag-off">关闭</td><td>4 / 4</td><td>—</td>
+          <tr><td>184</td><td>0</td><td class="tag-off">关闭</td><td>26/07/30<br>26/08/08</td><td>PHP</td><td>—</td>
+            <td>周卡活动</td><td>最新周卡</td><td><button class="btn btn--primary btn--sm">上传</button></td><td>—</td><td>—</td>
+            <td>4 / 4</td><td>—</td>
             <td><button class="btn--link">编辑</button><span class="op-sep">|</span><button class="btn--link red" data-del>删除</button><br><button class="btn--link">开启</button></td></tr>
-          <tr><td>183</td><td>26/07/01<br>26/07/14</td><td>PHP</td><td>周卡活动</td><td>周卡时间到期测试</td>
-            <td class="tag-on">开启</td><td>3 / 3</td><td>—</td>
+          <tr><td>183</td><td>0</td><td class="tag-on">开启</td><td>26/07/01<br>26/07/14</td><td>PHP</td><td>—</td>
+            <td>周卡活动</td><td>周卡时间到期测试</td><td><button class="btn btn--primary btn--sm">上传</button></td><td>—</td><td>—</td>
+            <td>3 / 3</td><td>—</td>
             <td><button class="btn--link">编辑</button><span class="op-sep">|</span><button class="btn--link red" data-del>删除</button><br><button class="btn--link red">关闭</button></td></tr>
         </tbody>
       </table>
@@ -331,7 +335,6 @@ label.chk input{accent-color:var(--primary);}
               <div class="dp-wrap"><input class="input dp-trigger" id="fShowTime" type="text" readonly placeholder="开始时间 ~ 结束时间"><span class="dp-icon">📅</span></div></div>
             <p class="hint hint--warn">· 显示时间不可小于活动时间。<br>
               · 活动时间到期：停止计算返水/刮刮卡等奖励，但用户仍可领取到期前奖励。<br>
-              · 显示时间到期：前台活动入口关闭，奖励直接清除。<br>
               · 状态「关闭」：奖励清除并关闭入口。</p>
           </div>
 
@@ -416,7 +419,7 @@ label.chk input{accent-color:var(--primary);}
                   <thead><tr><th style="width:70px">挑战</th><th>奖励提升</th><th>触发机率</th><th>获奖机率</th><th style="width:56px">操作</th></tr></thead>
                   <tbody id="challengeBody"></tbody>
                 </table>
-                <p class="hint">非必填；可全部删除不设置挑战。如有设置：奖励提升／触发机率／获奖机率不可为空或 0（单位 %）；触发机率为 LV1～LV5 加总不得超过100%；获奖机率为各等级各自不得超过100%，奖励提升无上限。最多 LV5。</p>
+                <p class="hint">非必填；可全部删除不设置挑战。如有设置：奖励提升／触发机率／获奖机率不可为空或 0（单位 %）；触发机率为 挑战1～挑战5 加总不得超过100%；获奖机率为各挑战各自不得超过100%，奖励提升无上限。最多 挑战5。</p>
               </div>
             </div>
 
@@ -638,15 +641,16 @@ function attachPctGuard(input,hintEl){
 /* ---------- 页面切换：列表 / 向导 / 派奖审核 / 活动报表 ---------- */
 function hideAuxPages(){ ['#pageAudit','#pageReport'].forEach(id=>{const e=$(id); if(e)e.style.display='none';}); }
 function setActiveSub(title){ $$('.side__subitem').forEach(s=>s.classList.toggle('is-active', s.textContent.trim()===title)); }
+let isEditMode=false;
 function showWizard(on,label){
   hideAuxPages();
   $('#pageList').style.display=on?'none':'';
   $('#pageWizard').style.display=on?'':'none';
-  const tag=label||'新增活动';
+  const tag=label||'新增活动'; isEditMode=(tag==='编辑活动');
   $('#crumbTail').textContent=on?tag:'活动列表';
   $('#tabMain').firstChild.textContent=on?tag+' ':'活动列表 ';
   if(!on) setActiveSub('活动列表');
-  if(on){ gotoStep(1); }
+  if(on){ gotoStep(1); renderScratch(); }
 }
 /* 派奖审核 / 活动报表 页面切换 */
 function showAux(name){
@@ -768,13 +772,19 @@ function nextActId(){ let mx=0; $$('#pageList tbody tr').forEach(tr=>{const n=pa
 
 /* 填充/更新一行活动（会保留原有「参与/中奖」数值），并重新绑定该行的操作按钮 */
 function fillRow(tr,a){
-  const prevJoin  = tr.children[6] ? tr.children[6].textContent.trim() : '0 / 0';
-  const wager     = (a.wager!==undefined) ? a.wager : (tr.children[7]?tr.children[7].textContent.trim():'—');
+  const sort     = (a.sort!==undefined) ? a.sort : (tr.children[1]?tr.children[1].textContent.trim():'0');
+  const lang     = tr.children[5] ? tr.children[5].textContent.trim() : '预设';
+  const preview  = tr.children[8] ? tr.children[8].innerHTML : '<button class="btn btn--primary btn--sm">上传</button>';
+  const black    = tr.children[9] ? tr.children[9].textContent.trim() : '—';
+  const agent    = tr.children[10]? tr.children[10].textContent.trim(): '—';
+  const prevJoin = tr.children[11]? tr.children[11].textContent.trim(): '0 / 0';
+  const wager    = (a.wager!==undefined) ? a.wager : (tr.children[12]?tr.children[12].textContent.trim():'—');
   const actionBtn = a.status==='开启'
       ? '<button class="btn--link red" data-close>关闭</button>'
       : '<button class="btn--link" data-open>开启</button>';
-  tr.innerHTML=`<td>${a.id}</td><td>${actTimeToCell(a.actTime)}</td><td>${a.cur}</td><td><b>${a.type}</b></td><td>${a.name}</td>
-    <td class="${a.status==='开启'?'tag-on':'tag-off'}">${a.status}</td><td>${prevJoin}</td><td>${wager}</td>
+  tr.innerHTML=`<td>${a.id}</td><td>${sort}</td><td class="${a.status==='开启'?'tag-on':'tag-off'}">${a.status}</td><td>${actTimeToCell(a.actTime)}</td><td>${a.cur}</td><td>${lang}</td>
+    <td><b>${a.type}</b></td><td>${a.name}</td><td>${preview}</td><td>${black}</td><td>${agent}</td>
+    <td>${prevJoin}</td><td>${wager}</td>
     <td><button class="btn--link" data-edit>编辑</button><span class="op-sep">|</span><button class="btn--link red" data-del>删除</button><br>${actionBtn}</td>`;
   bindRowActions(tr);
 }
@@ -936,18 +946,20 @@ function updateChallengeAppearHint(){
     else { hint.style.visibility='hidden'; }
   });
 }
+function sanInt(v){ return v.replace(/[^\d.]/g,'').split('.')[0]; }
+function sanDec2(v){ v=v.replace(/[^\d.]/g,''); const p=v.split('.'); return p.length>1? p[0]+'.'+p.slice(1).join('').slice(0,2) : v; }
 function renderChallenge(){
   const tb=$('#challengeBody'); tb.innerHTML='';
   challengeRows.forEach((r,i)=>{
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td>挑战LV${i+1}</td>
+    tr.innerHTML=`<td>挑战${i+1}</td>
       <td><div class="suffix-wrap"><input class="input js-up" value="${r.up}"><span class="suffix">%</span></div></td>
       <td><div class="suffix-wrap"><input class="input js-appear" value="${r.appear}"><span class="suffix">%</span></div>${pctHintHtml('js-appear-hint')}</td>
       <td><div class="suffix-wrap"><input class="input js-win" value="${r.win}"><span class="suffix">%</span></div>${pctHintHtml('js-win-hint')}</td>
       <td><button class="btn--link red js-del">删除</button></td>`;
-    $('.js-up',tr).addEventListener('input',e=>r.up=e.target.value);
-    $('.js-appear',tr).addEventListener('input',e=>{ r.appear=e.target.value; updateChallengeAppearHint(); });
-    $('.js-win',tr).addEventListener('input',e=>r.win=e.target.value);
+    $('.js-up',tr).addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r.up=e.target.value; });
+    $('.js-appear',tr).addEventListener('input',e=>{ e.target.value=sanDec2(e.target.value); r.appear=e.target.value; updateChallengeAppearHint(); });
+    $('.js-win',tr).addEventListener('input',e=>{ e.target.value=sanDec2(e.target.value); r.win=e.target.value; });
     attachPctGuard($('.js-win',tr),$('.js-win-hint',tr));
     $('.js-del',tr).addEventListener('click',()=>{
       challengeRows.splice(i,1); renderChallenge(); renderRebate(); });
@@ -1008,9 +1020,9 @@ function renderRebate(){
       <td><select class="select js-card">${SCRATCH_TIERS.map(t=>`<option ${r.card===t?'selected':''} value="${t}">${t||'无'}</option>`).join('')}</select></td>
       <td><button class="btn--link red js-del">删除</button></td>`;
     $('.js-cond',tr).addEventListener('change',e=>{ r.cond=e.target.value; validateGoalOrder(); });
-    $('.js-goal',tr).addEventListener('input',e=>{ r.goal=e.target.value; validateGoalOrder(); });
+    $('.js-goal',tr).addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r.goal=e.target.value; validateGoalOrder(); });
     r.amtType='固定金额';
-    $('.js-amt',tr).addEventListener('input',e=>{ r.amt=e.target.value;
+    $('.js-amt',tr).addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r.amt=e.target.value;
       if(e.target.value&&Number(e.target.value)>0) e.target.classList.remove('is-error'); });
     if(isRatio) attachPctGuard($('.js-amt',tr),$('.js-amt-hint',tr));
     const cap=$('.js-cap',tr); if(cap)cap.addEventListener('input',e=>{ r.cap=e.target.value;
@@ -1071,10 +1083,11 @@ function renderScratch(){
           <p class="hint hint--err js-rate-hint" style="visibility:hidden">比例配置不得超过100%</p></td>
         <td><label class="chk"><input type="checkbox" class="js-flash-row" ${r.flash?'checked':''}>是</label></td>
         <td><button class="btn--link red js-del">删除</button></td>`;
-      $('.js-amt',tr).addEventListener('input',e=>r.amt=e.target.value);
-      $('.js-rate',tr).addEventListener('input',e=>{ r.rate=e.target.value; updateScratchHint(tier,body); });
+      $('.js-amt',tr).addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r.amt=e.target.value; });
+      $('.js-rate',tr).addEventListener('input',e=>{ e.target.value=sanDec2(e.target.value); r.rate=e.target.value; updateScratchHint(tier,body); });
       $('.js-flash-row',tr).addEventListener('change',e=>{ r.flash=e.target.checked; syncFlashAll(); });
       $('.js-del',tr).addEventListener('click',()=>{
+        if(isEditMode){ toast('不可删除',true); return; }
         scratch[tier].splice(i,1);renderScratch(); });
       body.appendChild(tr);
     });
