@@ -121,6 +121,35 @@ button{font-family:inherit;cursor:pointer;}
 .input:focus,.select:focus{outline:none;border-color:var(--c-primary);box-shadow:0 0 0 2px var(--c-primary-l);}
 .select{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%23909aa8' stroke-width='1.4'/></svg>");background-repeat:no-repeat;background-position:right 10px center;padding-right:26px;}
 
+/* 自定义下拉（弹窗固定高度、超出可滚动）——弹窗内所有下拉统一使用 */
+.dropdown{position:relative;display:inline-block;vertical-align:middle;min-width:150px;}
+.form__control>.dropdown{display:block;width:100%;}
+.dropdown__native{display:none;}
+.dropdown>.select{
+  width:100%;min-width:0;display:flex;align-items:center;text-align:left;cursor:pointer;
+  font-family:inherit;line-height:1;
+}
+.dropdown__text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.dropdown__text.is-ph{color:var(--c-text-3);}
+.dropdown__panel{
+  position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:60;display:none;
+  background:var(--c-white);border:1px solid var(--c-border);border-radius:var(--radius-s);
+  box-shadow:0 6px 18px rgba(15,25,45,.14);
+  max-height:240px;overflow-y:auto;overscroll-behavior:contain;padding:4px 0;
+}
+.dropdown.is-open>.dropdown__panel{display:block;}
+.dropdown.is-open>.select{border-color:var(--c-primary);box-shadow:0 0 0 2px var(--c-primary-l);}
+.dropdown__opt{
+  padding:8px 12px;font-size:.85rem;color:var(--c-text);cursor:pointer;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.dropdown__opt:hover{background:var(--c-bg-head);}
+.dropdown__opt.is-disabled{color:var(--c-text-3);cursor:not-allowed;background:none;}
+.dropdown__opt.is-sel{background:var(--c-primary-l);color:var(--c-primary);font-weight:600;}
+.dropdown__panel::-webkit-scrollbar{width:6px;}
+.dropdown__panel::-webkit-scrollbar-thumb{background:#cfd6e0;border-radius:3px;}
+.dropdown__panel::-webkit-scrollbar-track{background:transparent;}
+
 /* table */
 .table-wrap{padding:0 var(--sp-5) var(--sp-5);overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:.83rem;min-width:900px;}
@@ -528,6 +557,34 @@ tbody tr:hover{background:#fafcff;}
           </div>
         </div>
       </div>
+      <div class="form__row" id="rowJump">
+        <label class="form__label"><span class="req">*</span>跳转地址：</label>
+        <div class="form__control">
+          <select class="select" id="jumpUrl" style="width:100%">
+            <option value="" selected disabled hidden>请选择任务跳转地址</option>
+            <option>无</option>
+            <option>首页</option>
+            <option>Home – Sport</option>
+            <option>充值页</option>
+            <option>注册页</option>
+            <option>个人中心–个人资讯页</option>
+            <option>KYC认证页</option>
+            <option>Maya</option>
+            <option>Glife</option>
+            <option>账号与安全</option>
+            <option>2025新版</option>
+            <option>下载PWA</option>
+            <option>Home – Slot</option>
+            <option>Home – Perya</option>
+            <option>Home – Casino</option>
+            <option>Home – Arcade</option>
+            <option>Home – E-Bingo</option>
+            <option>Home – Numeric</option>
+            <option>Home – OKWin</option>
+            <option>Home – Popular</option>
+          </select>
+        </div>
+      </div>
       <div class="form__row" id="rowReward">
         <label class="form__label"><span class="req">*</span>任务奖励：</label>
         <div class="form__control" style="display:flex;gap:10px;flex-wrap:wrap">
@@ -720,7 +777,7 @@ function openModal(mode){
 }
 function closeModal(){ document.getElementById('taskModal').classList.remove('open'); }
 document.getElementById('taskModal').addEventListener('click',function(e){ if(e.target===this) closeModal(); });
-document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeModal(); });
+document.addEventListener('keydown',function(e){ if(e.key!=='Escape') return; if(ddCloseAll()) return; closeModal(); });
 
 /* ===== conditional fields ===== */
 var COND_SUB = {
@@ -764,7 +821,7 @@ function subRowHTML(i){
 /* 子任务：先选类别（信息完善/资金/其他）→ 再选对应任务条件 */
 function onSubCat(catSel){
   var cat=catSel.value;
-  var condSel=catSel.parentNode.querySelector('.subCond');
+  var condSel=catSel.closest('.range-inline').querySelector('.subCond');
   condSel.innerHTML = COND_SUB[cat].map(function(o){return '<option>'+o+'</option>';}).join('');
   checkGroupTime();
 }
@@ -792,7 +849,7 @@ function checkGroupTime(){
 }
 /* 子任务奖励为「彩金」时，显示彩金打码倍数 */
 function onSubReward(sel){
-  var chip=sel.parentNode.querySelector('.subChip');
+  var chip=sel.closest('.range-inline').querySelector('.subChip');
   chip.style.display = (sel.value==='c'?'inline-flex':'none');
 }
 function renumberSubs(){
@@ -804,7 +861,7 @@ function addSub(e){ if(e)e.preventDefault();
   var box=document.getElementById('subTasks');
   if(box.children.length>=5) return;
   var d=document.createElement('div'); d.innerHTML=subRowHTML(box.children.length+1);
-  var row=d.firstChild; box.appendChild(row);
+  var row=d.firstChild; box.appendChild(row); ddInitAll(row);
   onSubCat(row.querySelector('.subCat')); onSubReward(row.querySelector('.subReward')); renumberSubs();
 }
 function delSub(e,btn){ if(e)e.preventDefault(); btn.closest('.range-inline').remove(); renumberSubs(); checkGroupTime(); }
@@ -834,7 +891,92 @@ function onTaskTime(){
   if(wk)  wk.classList.toggle('hidden', v!=='周限时');
 }
 
+/* ===== 自定义下拉：弹窗高度固定、超出可上下滚动 =====
+   保留原生 <select>（隐藏）承载 value 与 change 事件，
+   仅替换外观，故既有联动逻辑（onCond / onTaskCat / onSubCat…）无需改写。 */
+function ddInitAll(scope){
+  (scope||document).querySelectorAll('select.select').forEach(ddInit);
+}
+function ddInit(sel){
+  if(sel.dataset.ddReady) return;
+  sel.dataset.ddReady='1';
+  var wrap=document.createElement('div');
+  wrap.className='dropdown';
+  if(sel.getAttribute('style')) wrap.setAttribute('style', sel.getAttribute('style'));
+  sel.parentNode.insertBefore(wrap, sel);
+  wrap.appendChild(sel);
+  sel.classList.add('dropdown__native');
+
+  var btn=document.createElement('button');
+  btn.type='button'; btn.className='select';
+  btn.setAttribute('aria-haspopup','listbox');
+  btn.setAttribute('aria-expanded','false');
+  if(sel.getAttribute('aria-label')) btn.setAttribute('aria-label', sel.getAttribute('aria-label'));
+  btn.innerHTML='<span class="dropdown__text"></span>';
+  btn.addEventListener('click',function(e){ ddToggle(e,btn); });
+
+  var panel=document.createElement('div');
+  panel.className='dropdown__panel'; panel.setAttribute('role','listbox');
+
+  wrap.appendChild(btn); wrap.appendChild(panel);
+  /* 选项被 JS 动态重建时（如任务条件二级下拉）自动同步 */
+  new MutationObserver(function(){ ddSync(wrap); }).observe(sel,{childList:true});
+  sel.addEventListener('change',function(){ ddSync(wrap); });
+  ddSync(wrap);
+}
+function ddSync(wrap){
+  var sel=wrap.querySelector('.dropdown__native');
+  var panel=wrap.querySelector('.dropdown__panel');
+  var cur=sel.selectedIndex;
+  panel.innerHTML='';
+  Array.prototype.forEach.call(sel.options,function(op,i){
+    if(op.hidden) return;                      /* 占位项不进清单 */
+    var d=document.createElement('div');
+    d.className='dropdown__opt'+(i===cur?' is-sel':'')+(op.disabled?' is-disabled':'');
+    d.setAttribute('role','option');
+    d.setAttribute('aria-selected', i===cur?'true':'false');
+    d.textContent=op.textContent;
+    if(!op.disabled) d.addEventListener('click',function(){ ddChoose(wrap,i); });
+    panel.appendChild(d);
+  });
+  var txt=wrap.querySelector('.dropdown__text'), op=sel.options[cur];
+  txt.textContent = op ? op.textContent : '';
+  txt.classList.toggle('is-ph', !op || op.disabled || op.value==='');
+}
+function ddChoose(wrap,i){
+  var sel=wrap.querySelector('.dropdown__native');
+  ddCloseAll();
+  if(sel.selectedIndex!==i){
+    sel.selectedIndex=i;
+    sel.dispatchEvent(new Event('change',{bubbles:true}));   /* 触发既有联动 */
+  }
+  ddSync(wrap);
+}
+function ddToggle(e,btn){
+  e.preventDefault(); e.stopPropagation();
+  var dd=btn.closest('.dropdown'), willOpen=!dd.classList.contains('is-open');
+  ddCloseAll(dd);
+  dd.classList.toggle('is-open', willOpen);
+  btn.setAttribute('aria-expanded', willOpen?'true':'false');
+  if(willOpen){
+    var cur=dd.querySelector('.dropdown__opt.is-sel');
+    if(cur && cur.scrollIntoView) cur.scrollIntoView({block:'nearest'});
+  }
+}
+function ddCloseAll(except){
+  var closed=false;
+  document.querySelectorAll('.dropdown.is-open').forEach(function(d){
+    if(d===except) return;
+    d.classList.remove('is-open');
+    var b=d.querySelector('button.select'); if(b) b.setAttribute('aria-expanded','false');
+    closed=true;
+  });
+  return closed;
+}
+document.addEventListener('click',function(e){ if(!e.target.closest('.dropdown')) ddCloseAll(); });
+
 onCond(); onReward(); onTaskCat(); onQualDep(); onTaskTime();
+ddInitAll(document.getElementById('taskModal'));
 </script>
 </body>
 </html>
