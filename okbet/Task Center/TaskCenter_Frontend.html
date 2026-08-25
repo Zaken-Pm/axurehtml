@@ -130,12 +130,14 @@ img{max-width:100%;display:block;}
 .countdown::before{content:"⏱";font-size:.8rem;}
 
 .act{padding:8px 16px;border-radius:18px;font-size:.82rem;font-weight:700;color:#fff;}
-.act--claim{background:linear-gradient(90deg,#ff9d3d,#ff7a1a);}
-.act--bet{background:linear-gradient(90deg,#3ee08a,#25c06c);color:#06331d;}
-.act--go{background:linear-gradient(90deg,#3ee08a,#25c06c);color:#06331d;}
-.act--upload{background:var(--c-primary);}
-.act--proc{background:rgba(255,255,255,.12);color:var(--c-text-3);}
-.act--done{background:rgba(255,255,255,.10);color:var(--c-text-3);}
+.act--claim{background:linear-gradient(90deg,#ff9d3d,#ff7a1a);}                 /* 领取 橙 */
+.act--bet{background:linear-gradient(90deg,#3ee08a,#25c06c);color:#06331d;}     /* 去投注 绿 */
+.act--go,.act--follow,.act--accept{background:var(--c-primary);color:#fff;}     /* 去完成 / 关注 / 领取任务 蓝 */
+.act--upload,.act--verify{background:linear-gradient(90deg,#2ed9c3,#12b3a3);color:#05332e;} /* 上传证明 / 去认证 青 */
+.act--deposit{background:linear-gradient(90deg,#d872cf,#b94fb0);color:#fff;}    /* 去充值 洋红 */
+.act--reject{background:var(--c-red);color:#fff;}                               /* 未通过 红 */
+.act--proc{background:#5b7191;color:#e6eefc;}                                   /* 处理中 / 待发放 蓝灰 */
+.act--done{background:rgba(255,255,255,.10);color:var(--c-text-3);}             /* 已完成 灰 */
 .act--full{background:rgba(255,255,255,.08);color:var(--c-text-3);border:1px solid var(--c-line);}
 .act:disabled{cursor:default;}
 
@@ -166,9 +168,19 @@ img{max-width:100%;display:block;}
 .chip-st{flex:0 0 auto;font-size:.7rem;font-weight:700;padding:4px 10px;border-radius:12px;}
 .chip-st--done{background:rgba(53,208,127,.16);color:#54e59a;}
 .chip-st--go{background:linear-gradient(90deg,#3ee08a,#25c06c);color:#06331d;cursor:pointer;}
+.chip-st--claim{background:linear-gradient(90deg,#ff9d3d,#ff7a1a);color:#fff;cursor:pointer;}
+.chip-st--deposit{background:linear-gradient(90deg,#d872cf,#b94fb0);color:#fff;cursor:pointer;}
 .chip-st--lock{background:rgba(255,255,255,.06);color:var(--c-text-3);}
 .group-reward{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:.78rem;color:#ffce3d;}
 .group-reward .box{background:rgba(255,206,61,.10);border:1px dashed rgba(255,206,61,.4);border-radius:8px;padding:5px 8px;}
+/* 额外奖励手动领取（新增情境）*/
+.extra-claim{display:flex;align-items:center;gap:10px;margin-top:8px;background:rgba(255,206,61,.10);border:1px dashed rgba(255,206,61,.45);border-radius:10px;padding:8px 10px;}
+.extra-claim__info{display:flex;align-items:center;gap:8px;flex:1;min-width:0;}
+.extra-claim__ico{font-size:1.25rem;flex:0 0 auto;}
+.extra-claim__t{font-size:.8rem;font-weight:700;color:#ffce3d;}
+.extra-claim__d{font-size:.72rem;color:var(--c-text-2);margin-top:1px;}
+.extra-claim .act{flex:0 0 auto;}
+.extra-claim .act--done{background:rgba(255,255,255,.10);color:var(--c-text-3);}
 
 /* =========================================================
    Bottom nav
@@ -220,7 +232,6 @@ img{max-width:100%;display:block;}
     <button onclick="showPop('fail')">领取失败</button>
     <button onclick="showPop('rule')">任务规则</button>
     <button onclick="showPop('intro')">任务介绍</button>
-    <button onclick="showPop('full')">名额已满</button>
   </div>
 
   <!-- ============ Phone ============ -->
@@ -326,7 +337,7 @@ img{max-width:100%;display:block;}
               <div class="card__reward gold"><span class="rico rico--gold"></span>500</div>
             </div>
             <div class="card__right">
-              <button class="act act--full" onclick="showPop('full')" >名额已满</button>
+              <button class="act act--full" disabled>名额已满</button>
             </div>
           </div>
           <div class="full-banner">奖励名额已满</div>
@@ -359,10 +370,83 @@ img{max-width:100%;display:block;}
             <div class="subtask">
               <span class="subtask__step">子任务3</span>
               <div class="subtask__body"><div class="subtask__name">周末累计任务</div><div class="subtask__prog">进度 ₱0 / ₱1,000 <span class="pct">(0%)</span></div></div>
-              <span class="chip-st chip-st--go" onclick="showRedirect('充值页')">去充值</span>
+              <span class="chip-st chip-st--deposit" onclick="showRedirect('充值页')">去充值</span>
             </div>
           </div>
           <div class="delay-hint">奖励将于 3 天后发放</div>
+        </article>
+
+        <!-- 任务组 · 额外奖励手动领取（新增情境）-->
+        <article class="card card--quota">
+          <span class="card__badge" style="background:#2f6bff">任务组</span>
+          <div class="row1">
+            <div class="card__main">
+              <div class="card__title">连续任务挑战 · 组任务</div>
+              <div class="card__progress">已完成 <b style="color:#54e59a">3 / 3</b> · 全部子任务已完成</div>
+            </div>
+            <div class="card__right">
+              <button class="act act--bet" onclick="toggleGroup(this)">展开 ⌄</button>
+            </div>
+          </div>
+          <div class="subtasks hidden">
+            <div class="subtask">
+              <span class="subtask__step">子任务1</span>
+              <div class="subtask__body"><div class="subtask__name">每日充值任务</div><div class="subtask__prog">进度 ₱50 / ₱50 <span class="pct">(100%)</span></div></div>
+              <span class="chip-st chip-st--done">已完成 ✓</span>
+            </div>
+            <div class="subtask">
+              <span class="subtask__step">子任务2</span>
+              <div class="subtask__body"><div class="subtask__name">每日投注任务</div><div class="subtask__prog">进度 ₱200 / ₱200 <span class="pct">(100%)</span></div></div>
+              <span class="chip-st chip-st--done">已完成 ✓</span>
+            </div>
+            <div class="subtask">
+              <span class="subtask__step">子任务3</span>
+              <div class="subtask__body"><div class="subtask__name">周末累计任务</div><div class="subtask__prog">进度 ₱1,000 / ₱1,000 <span class="pct">(100%)</span></div></div>
+              <span class="chip-st chip-st--done">已完成 ✓</span>
+            </div>
+          </div>
+          <!-- 额外奖励：全部完成后手动领取 -->
+          <div class="extra-claim">
+            <div class="extra-claim__info">
+              <span class="extra-claim__ico">🎁</span>
+              <div>
+                <div class="extra-claim__t">完成全部额外奖励</div>
+                <div class="extra-claim__d">积分 +1,000 · 需手动领取</div>
+              </div>
+            </div>
+            <button class="act act--claim" onclick="claimExtra(this)">领取</button>
+          </div>
+        </article>
+
+        <!-- 任务组 · 子任务奖励各自领取（新增情境）-->
+        <article class="card card--quota">
+          <span class="card__badge" style="background:#2f6bff">任务组</span>
+          <div class="row1">
+            <div class="card__main">
+              <div class="card__title">每日三连任务 · 组任务</div>
+              <div class="card__progress">已完成 <b style="color:#54e59a">2 / 3</b> · 子任务奖励各自领取</div>
+            </div>
+            <div class="card__right">
+              <button class="act act--bet" onclick="toggleGroup(this)">展开 ⌄</button>
+            </div>
+          </div>
+          <div class="subtasks hidden">
+            <div class="subtask">
+              <span class="subtask__step">子任务1</span>
+              <div class="subtask__body"><div class="subtask__name">每日充值任务 · 积分 +100</div><div class="subtask__prog">进度 ₱50 / ₱50 <span class="pct">(100%)</span></div></div>
+              <span class="chip-st chip-st--claim" data-amt="100" onclick="claimSub(this)">领取</span>
+            </div>
+            <div class="subtask">
+              <span class="subtask__step">子任务2</span>
+              <div class="subtask__body"><div class="subtask__name">每日投注任务 · 积分 +150</div><div class="subtask__prog">进度 ₱200 / ₱200 <span class="pct">(100%)</span></div></div>
+              <span class="chip-st chip-st--done">已领取 ✓</span>
+            </div>
+            <div class="subtask">
+              <span class="subtask__step">子任务3</span>
+              <div class="subtask__body"><div class="subtask__name">每日打码任务 · 积分 +200</div><div class="subtask__prog">进度 ₱120 / ₱300 <span class="pct">(40%)</span></div></div>
+              <span class="chip-st chip-st--go" onclick="showRedirect('首页')">去投注</span>
+            </div>
+          </div>
         </article>
 
         <!-- 延迟派奖示例（新增）-->
@@ -424,8 +508,58 @@ img{max-width:100%;display:block;}
             <div class="card__reward gold"><span class="rico rico--gold"></span>105</div>
           </div>
           <div class="card__right">
-            <button class="act act--go" onclick="showRedirect('首页')">去完成</button>
+            <button class="act act--verify" onclick="showRedirect('KYC认证页')">去认证</button>
           </div>
+        </article>
+
+        <!-- 领取任务（新增状态）-->
+        <article class="card">
+          <div class="card__main" style="padding-top:0">
+            <div class="card__title">新人首充礼</div>
+            <div class="card__progress">进度 0 / 1 · 领取后开始</div>
+            <div class="card__reward gold"><span class="rico rico--gold"></span>200</div>
+          </div>
+          <div class="card__right"><button class="act act--accept" onclick="showPop('accept')">领取任务</button></div>
+        </article>
+
+        <!-- 去完成（新增状态）-->
+        <article class="card">
+          <div class="card__main" style="padding-top:0">
+            <div class="card__title">完成新手引导</div>
+            <div class="card__progress">进度 0 / 1</div>
+            <div class="card__reward red"><span class="rico"></span>50</div>
+          </div>
+          <div class="card__right"><button class="act act--go" onclick="showRedirect('首页')">去完成</button></div>
+        </article>
+
+        <!-- 关注（新增状态）-->
+        <article class="card">
+          <div class="card__main" style="padding-top:0">
+            <div class="card__title">关注官方 Facebook</div>
+            <div class="card__progress">进度 0 / 1</div>
+            <div class="card__reward red"><span class="rico"></span>60</div>
+          </div>
+          <div class="card__right"><button class="act act--follow" onclick="showPop('follow')">关注</button></div>
+        </article>
+
+        <!-- 去充值（新增状态）-->
+        <article class="card">
+          <div class="card__main" style="padding-top:0">
+            <div class="card__title">储值加码任务</div>
+            <div class="card__progress">进度 ₱0 / ₱500 <span class="pct">(0%)</span></div>
+            <div class="card__reward gold"><span class="rico rico--gold"></span>288</div>
+          </div>
+          <div class="card__right"><button class="act act--deposit" onclick="showRedirect('充值页')">去充值</button></div>
+        </article>
+
+        <!-- 未通过（新增状态）-->
+        <article class="card">
+          <div class="card__main" style="padding-top:0">
+            <div class="card__title">关注 IG 获取奖励</div>
+            <div class="card__progress">进度 1 / 1 · 审核未通过</div>
+            <div class="card__reward red"><span class="rico"></span>80</div>
+          </div>
+          <div class="card__right"><button class="act act--reject" onclick="showPop('reject')">未通过</button></div>
         </article>
 
         <!-- 已完成 -->
@@ -503,6 +637,43 @@ img{max-width:100%;display:block;}
         </div>
         <button class="pop__btn" onclick="hidePop()">确定</button>
       </div>
+      <!-- accept 领取任务 -->
+      <div class="pop" data-pop="accept" hidden>
+        <div class="pop__coin">📥</div>
+        <div class="pop__title">任务已领取</div>
+        <div class="pop__desc">已加入你的任务列表，完成后即可领取奖励。</div>
+        <button class="pop__btn" onclick="hidePop()">确定</button>
+      </div>
+      <!-- follow 关注 -->
+      <div class="pop" data-pop="follow" hidden>
+        <div class="pop__coin">👍</div>
+        <div class="pop__title">前往关注</div>
+        <div class="pop__desc">即将打开官方 Facebook，关注后回来上传截图以供审核。</div>
+        <button class="pop__btn" onclick="hidePop()">前往</button>
+      </div>
+      <!-- reject 未通过 -->
+      <div class="pop" data-pop="reject" hidden>
+        <div class="pop__coin pop__coin--fail">✖</div>
+        <div class="pop__title">审核未通过</div>
+        <div class="pop__desc">你提交的证明未通过审核，请确认后重新提交。</div>
+        <button class="pop__btn" onclick="hidePop()">重新提交</button>
+      </div>
+      <!-- subreward 子任务奖励领取成功 -->
+      <div class="pop" data-pop="subreward" hidden>
+        <div class="pop__coin">⭐</div>
+        <div class="pop__title">子任务奖励领取成功</div>
+        <div class="pop__amt" id="subRewardAmt">+100</div>
+        <div class="pop__desc">积分已发放，继续完成其他子任务领取更多奖励。</div>
+        <button class="pop__btn" onclick="hidePop()">确定</button>
+      </div>
+      <!-- extra 额外奖励领取成功 -->
+      <div class="pop" data-pop="extra" hidden>
+        <div class="pop__coin pop__coin--gold">🎁</div>
+        <div class="pop__title">额外奖励领取成功</div>
+        <div class="pop__amt">+1,000 <span style="color:#aaa;font-size:1rem">积分</span></div>
+        <div class="pop__desc">完成任务组全部子任务的额外奖励已发放。</div>
+        <button class="pop__btn" onclick="hidePop()">确定</button>
+      </div>
       <!-- upload 上传截图提示 -->
       <div class="pop" data-pop="upload" hidden>
         <div class="pop__coin">📷</div>
@@ -534,6 +705,21 @@ function toggleGroup(btn){
   var sub=btn.closest('.card').querySelector('.subtasks');
   var open=sub.classList.toggle('hidden')===false;
   btn.textContent = open ? '收起 ⌃' : '展开 ⌄';
+}
+function claimSub(el){
+  document.getElementById('subRewardAmt').textContent = '+' + (el.dataset.amt||'100');
+  showPop('subreward');
+  el.textContent='已领取 ✓';
+  el.classList.remove('chip-st--claim');
+  el.classList.add('chip-st--done');
+  el.onclick=null;
+}
+function claimExtra(btn){
+  showPop('extra');
+  btn.textContent='已领取';
+  btn.classList.remove('act--claim');
+  btn.classList.add('act--done');
+  btn.disabled=true;
 }
 function showRedirect(target){
   document.getElementById('redirectTarget').textContent = target;
