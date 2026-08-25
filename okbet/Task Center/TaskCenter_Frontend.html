@@ -41,14 +41,17 @@ button{font-family:inherit;cursor:pointer;border:none;}
 img{max-width:100%;display:block;}
 
 /* phone frame */
+/* 手机框：一般手机尺寸（360 × 720），内容超出于框内滚动 */
 .phone{
-  width:100%;max-width:400px;background:linear-gradient(180deg,var(--c-bg-grad-1),var(--c-bg-grad-2));
+  width:100%;max-width:360px;background:linear-gradient(180deg,var(--c-bg-grad-1),var(--c-bg-grad-2));
   border-radius:26px;overflow:hidden;position:relative;
-  box-shadow:0 20px 60px rgba(0,0,0,.4);min-height:820px;
+  box-shadow:0 20px 60px rgba(0,0,0,.4);height:720px;
   display:flex;flex-direction:column;
 }
-.scroll{flex:1;overflow-y:auto;padding-bottom:76px;}
-.scroll::-webkit-scrollbar{width:0;}
+.scroll{flex:1;overflow-y:auto;padding-bottom:76px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.28) transparent;}
+.scroll::-webkit-scrollbar{width:6px;}
+.scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.24);border-radius:3px;}
+.scroll::-webkit-scrollbar-track{background:transparent;}
 
 /* =========================================================
    Header
@@ -162,7 +165,7 @@ img{max-width:100%;display:block;}
 .subtask__prog .pct{color:#4f9bff;}
 .chip-st{flex:0 0 auto;font-size:.7rem;font-weight:700;padding:4px 10px;border-radius:12px;}
 .chip-st--done{background:rgba(53,208,127,.16);color:#54e59a;}
-.chip-st--go{background:linear-gradient(90deg,#3ee08a,#25c06c);color:#06331d;}
+.chip-st--go{background:linear-gradient(90deg,#3ee08a,#25c06c);color:#06331d;cursor:pointer;}
 .chip-st--lock{background:rgba(255,255,255,.06);color:var(--c-text-3);}
 .group-reward{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:.78rem;color:#ffce3d;}
 .group-reward .box{background:rgba(255,206,61,.10);border:1px dashed rgba(255,206,61,.4);border-radius:8px;padding:5px 8px;}
@@ -202,13 +205,13 @@ img{max-width:100%;display:block;}
 .pop__rules h4{margin:0 0 6px;}
 
 /* demo controls */
-.demo-bar{max-width:400px;margin:0 auto 12px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;}
+.demo-bar{max-width:360px;margin:0 auto 12px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;}
 .demo-bar button{background:#1c3252;color:#cfe0ff;border:1px solid #2a4670;border-radius:8px;padding:6px 10px;font-size:.74rem;}
-.demo-hint{color:#9fb4d4;font-size:.72rem;text-align:center;margin:0 auto 6px;max-width:400px;}
+.demo-hint{color:#9fb4d4;font-size:.72rem;text-align:center;margin:0 auto 6px;max-width:360px;}
 </style>
 </head>
 <body>
-<div style="width:100%;max-width:400px;">
+<div style="width:100%;max-width:360px;">
   <p class="demo-hint">点下方按钮预览各弹窗；任务卡上的按钮也可点击。</p>
   <div class="demo-bar">
     <button onclick="showPop('cash')">领取成功·现金</button>
@@ -304,7 +307,7 @@ img{max-width:100%;display:block;}
             </div>
             <div class="card__right">
               <div class="countdown">13:05:11</div>
-              <button class="act act--bet">去投注</button>
+              <button class="act act--bet" onclick="showRedirect('首页')">去投注</button>
             </div>
           </div>
           <div class="quota">
@@ -351,12 +354,12 @@ img{max-width:100%;display:block;}
             <div class="subtask">
               <span class="subtask__step">子任务2</span>
               <div class="subtask__body"><div class="subtask__name">每日投注任务</div><div class="subtask__prog">进度 ₱120 / ₱200 <span class="pct">(60%)</span></div></div>
-              <span class="chip-st chip-st--go">去投注</span>
+              <span class="chip-st chip-st--go" onclick="showRedirect('首页')">去投注</span>
             </div>
             <div class="subtask">
               <span class="subtask__step">子任务3</span>
               <div class="subtask__body"><div class="subtask__name">周末累计任务</div><div class="subtask__prog">进度 ₱0 / ₱1,000 <span class="pct">(0%)</span></div></div>
-              <span class="chip-st chip-st--go">去充值</span>
+              <span class="chip-st chip-st--go" onclick="showRedirect('充值页')">去充值</span>
             </div>
           </div>
           <div class="delay-hint">奖励将于 3 天后发放</div>
@@ -385,7 +388,7 @@ img{max-width:100%;display:block;}
           </div>
           <div class="card__right">
             <div class="countdown">13:05:11</div>
-            <button class="act act--bet">去投注</button>
+            <button class="act act--bet" onclick="showRedirect('首页')">去投注</button>
           </div>
         </article>
 
@@ -397,7 +400,7 @@ img{max-width:100%;display:block;}
             <div class="card__reward red"><span class="rico"></span>114</div>
           </div>
           <div class="card__right">
-            <button class="act act--upload" onclick="showPop('intro')">上传证明</button>
+            <button class="act act--upload" onclick="showPop('upload')">上传证明</button>
           </div>
         </article>
 
@@ -421,7 +424,7 @@ img{max-width:100%;display:block;}
             <div class="card__reward gold"><span class="rico rico--gold"></span>105</div>
           </div>
           <div class="card__right">
-            <button class="act act--go">去完成</button>
+            <button class="act act--go" onclick="showRedirect('首页')">去完成</button>
           </div>
         </article>
 
@@ -494,11 +497,26 @@ img{max-width:100%;display:block;}
           <h4>任务规则</h4>
           1. 任务奖励采先到先得，名额有限，领完为止。<br>
           2. 参与资格于任务开始前以历史数据快照判定。<br>
-          3. 同一用户每个任务的领取次数受上限限制。<br>
+          3. 每位用户每个任务仅可领取 1 次奖励；名额以去重领取人数计，不计领取次数。<br>
           4. 奖励发放后的价值统计以平台结算时区（UTC+8）当日 23:59:59 为准。<br>
           5. 最终解释权归平台所有。
         </div>
         <button class="pop__btn" onclick="hidePop()">确定</button>
+      </div>
+      <!-- upload 上传截图提示 -->
+      <div class="pop" data-pop="upload" hidden>
+        <div class="pop__coin">📷</div>
+        <div class="pop__title">上传截图</div>
+        <div class="pop__desc">请上传完成任务的截图以供审核，审核通过后即可发放奖励。</div>
+        <button class="pop__btn" onclick="hidePop()">选择图片</button>
+      </div>
+      <!-- redirect 导向提示 -->
+      <div class="pop" data-pop="redirect" hidden>
+        <div class="pop__coin">➡️</div>
+        <div class="pop__title">即将前往</div>
+        <div class="pop__amt" id="redirectTarget" style="font-size:1.15rem">首页</div>
+        <div class="pop__desc">正在为你导向该页面完成任务…</div>
+        <button class="pop__btn" onclick="hidePop()">前往</button>
       </div>
       <!-- intro -->
       <div class="pop" data-pop="intro" hidden>
@@ -516,6 +534,10 @@ function toggleGroup(btn){
   var sub=btn.closest('.card').querySelector('.subtasks');
   var open=sub.classList.toggle('hidden')===false;
   btn.textContent = open ? '收起 ⌃' : '展开 ⌄';
+}
+function showRedirect(target){
+  document.getElementById('redirectTarget').textContent = target;
+  showPop('redirect');
 }
 function showPop(name){
   var mask=document.getElementById('pop');
