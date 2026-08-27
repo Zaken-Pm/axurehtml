@@ -390,7 +390,7 @@ label.chk input{accent-color:var(--primary);}
 
             <!-- 每日返水配置 -->
             <div class="block">
-              <div class="block__head"><h4><span class="req">*</span>每日返水配置</h4>
+              <div class="block__head"><h4><span class="req">*</span>每日返水配置 <span style="font-weight:400;font-size:11.5px;color:var(--text-2)">（VIP 分级配置，仅适用返水任务）</span></h4>
                 <button class="btn btn--primary btn--sm" id="btnAddLevel">＋ 新增等级</button></div>
               <div class="block__body">
                 <div class="vip-tabs" id="vipTabs"></div>
@@ -410,22 +410,22 @@ label.chk input{accent-color:var(--primary);}
 
             <!-- 挑战任务配置 -->
             <div class="block">
-              <div class="block__head"><h4>挑战任务配置</h4>
+              <div class="block__head"><h4>挑战任务配置 <span style="font-weight:400;font-size:11.5px;color:var(--text-2)">（与 VIP 等级无关·全等级共用）</span></h4>
                 <button class="btn btn--primary btn--sm" id="btnAddChallenge">＋ 新增挑战</button></div>
               <div class="block__body">
                 <table class="tbl" style="min-width:520px">
                   <thead><tr><th style="width:70px">挑战</th><th>奖励提升</th><th>触发机率</th><th>获奖机率</th><th style="width:56px">操作</th></tr></thead>
                   <tbody id="challengeBody"></tbody>
                 </table>
-                <p class="hint">非必填；可全部删除不设置挑战。如有设置：奖励提升／触发机率／获奖机率不可为空或 0（单位 %）；触发机率为 挑战1～挑战5 加总不得超过100%；获奖机率为各挑战各自不得超过100%，奖励提升无上限。最多 挑战5。</p>
+                <p class="hint">非必填；可全部删除不设置挑战。如有设置：奖励提升／触发机率／获奖机率<b>皆为整数</b>、不可为空或 0（单位 %）；<b>触发机率为 挑战1～挑战5 加总须等于 100%</b>（≠100% 红字提示并挡下一步）；获奖机率＝该挑战翻牌胜率、各自不得超过 100%；奖励提升无上限。最多 挑战5。</p>
               </div>
             </div>
 
             <!-- 刮刮卡配置 -->
             <div class="block">
-              <div class="block__head"><h4>刮刮卡配置</h4></div>
+              <div class="block__head"><h4>刮刮卡配置 <span style="font-weight:400;font-size:11.5px;color:var(--text-2)">（与 VIP 等级无关·全等级共用）</span></h4></div>
               <div class="block__body" id="scratchWrap"></div>
-              <p class="hint" style="padding:0 14px 12px">非必填；等级固定 N1／N2／S1／S2，各卡可不设置奖励。如有设置：每个奖励皆需填「获奖机率」（不得超过100%），每张卡最多 12 个奖励。</p>
+              <p class="hint" style="padding:0 14px 12px">等级固定 N1／N2／S1／S2。<b>刮刮卡必定中奖（无「铭谢惠顾」）</b>，故<b>每个等级的「获奖机率」加总须等于 100%</b>（大于或小于 100% 会红字提示「获奖机率需等于100%」并挡下一步）；每个奖励皆需填「获奖机率」，每张卡最多 12 个奖励。</p>
             </div>
 
             <!-- 流水倍数 + 游戏范围 -->
@@ -794,6 +794,7 @@ function bindRowActions(tr){
   const db=$('[data-del]',tr);   if(db) db.onclick=()=>{ pendingDelRow=tr; $('#delMask').classList.add('is-open'); };
   const ob=$('[data-open]',tr);  if(ob) ob.onclick=()=>{
     const id=tr.children[0].textContent.trim(); const d=ACTIVITY_DATA[id];
+    if(d && d.type==='联名挑战活动' && activeXbombExists(id)){ toast('检测到相同活动正在进行中',true); return; }
     if(d){ d.status='开启'; fillRow(tr,{id, ...d}); }
     toast('活动已开启（示意）');
   };
@@ -849,6 +850,15 @@ function gotoStep(n){
 $$('#stepRail .step').forEach(s=>s.addEventListener('click',()=>gotoStep(+s.dataset.step)));
 $('#btnPrev').addEventListener('click',()=>gotoStep(Math.max(1,curStep-1)));
 $('#btnNext').addEventListener('click',()=>{ if(validateStep(curStep)) gotoStep(Math.min(LAST,curStep+1)); });
+function activeXbombExists(excludeId){
+  return [...$$('#pageList tbody tr')].some(tr=>{
+    const id=tr.children[0]?tr.children[0].textContent.trim():'';
+    if(String(id)===String(excludeId)) return false;
+    const isX=[...tr.children].some(td=>/联名挑战活动/.test(td.textContent));
+    const st=tr.querySelector('.tag-on,.tag-off');
+    return isX && st && st.textContent.trim()==='开启';
+  });
+}
 $('#btnSubmit').addEventListener('click',()=>{
   /* 提交前再把关键步骤校验一次，避免用户用左侧步骤条跳过必填 */
   if(!validateStep(1)){ gotoStep(1); return; }
@@ -860,6 +870,11 @@ $('#btnSubmit').addEventListener('click',()=>{
     actTime:$('#fActTime').value,
     wager:($('#fWager').value.trim()||'—')
   };
+
+  /* 规则：同一时间只能有一个「x-bomb 联名挑战活动」处于开启 */
+  if(a.type==='联名挑战活动' && a.status==='开启' && activeXbombExists(editingActId)){
+    toast('检测到相同活动正在进行中',true); return;
+  }
 
   if(editingActId){
     /* 编辑：更新对应行 + 同步资料表 */
@@ -904,7 +919,9 @@ function validateStep(n){
     const w=$('#fWager'); if(w.value!=='' && Number(w.value)===0){w.classList.add('is-error');bad=true;} else w.classList.remove('is-error');
     if(goalOrderBad){toast('任务目标不可小于或等于同任务条件，请检查红框',true);return false;}
     if(bad){toast('活动条件有必填/格式错误，请检查红框',true);return false;}
-    if(challengeAppearSum()>100){toast('触发机率总计不得超过100%',true);return false;}
+    if(challengeRows.length>0 && challengeAppearFilled() && challengeAppearSum()!==100){renderChallenge();toast('挑战任务「触发机率」总计须等于100%（目前 '+challengeAppearSum()+'%）',true);return false;}
+    const badScratchTier=Object.keys(scratch).find(t=>scratchTierConfigured(t)&&scratchTierSum(t)!==100);
+    if(badScratchTier){ renderScratch(); toast('刮刮卡「'+badScratchTier+'」获奖机率需等于100%',true); return false; }
   }
   return true;
 }
@@ -929,14 +946,14 @@ let challengeRows=[{up:'20',appear:'60',win:'60'},{up:'50',appear:'40',win:'50'}
 const SAMPLE_CHALLENGE=JSON.parse(JSON.stringify(challengeRows));   // 编辑既有活动用的示范值
 const BLANK_CHALLENGE=[{up:'',appear:'',win:''}];                   // 新增活动用的空白值（保留最低 1 列）
 function challengeAppearSum(){ return challengeRows.reduce((s,r)=>s+(Number(r.appear)||0),0); }
+function challengeAppearFilled(){ return challengeRows.some(r=>String(r.appear).trim()!==''); }
 function updateChallengeAppearHint(){
-  const rows=[...$('#challengeBody').children]; const totalInvalid=challengeAppearSum()>100;
+  const rows=[...$('#challengeBody').children];
+  const sum=challengeAppearSum(); const bad=challengeAppearFilled()&&sum!==100;
   rows.forEach((tr,idx)=>{
     const input=$('.js-appear',tr); const hint=$('.js-appear-hint',tr);
-    const over=input.value!==''&&Number(input.value)>100;
-    input.classList.toggle('is-error',over);
-    if(over){ hint.textContent='比例配置不得超过100%'; hint.style.visibility='visible'; }
-    else if(idx===rows.length-1&&totalInvalid){ hint.textContent='触发机率总计不得超过100%'; hint.style.visibility='visible'; }
+    input.classList.toggle('is-error',bad);
+    if(idx===rows.length-1&&bad){ hint.textContent='触发机率总计须等于100%（目前 '+sum+'%）'; hint.style.visibility='visible'; }
     else { hint.style.visibility='hidden'; }
   });
 }
@@ -952,8 +969,8 @@ function renderChallenge(){
       <td><div class="suffix-wrap"><input class="input js-win" value="${r.win}"><span class="suffix">%</span></div>${pctHintHtml('js-win-hint')}</td>
       <td><button class="btn--link red js-del">删除</button></td>`;
     $('.js-up',tr).addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r.up=e.target.value; });
-    $('.js-appear',tr).addEventListener('input',e=>{ e.target.value=sanDec2(e.target.value); r.appear=e.target.value; updateChallengeAppearHint(); });
-    $('.js-win',tr).addEventListener('input',e=>{ e.target.value=sanDec2(e.target.value); r.win=e.target.value; });
+    $('.js-appear',tr).addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r.appear=e.target.value; updateChallengeAppearHint(); });
+    $('.js-win',tr).addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r.win=e.target.value; });
     attachPctGuard($('.js-win',tr),$('.js-win-hint',tr));
     $('.js-del',tr).addEventListener('click',()=>{
       challengeRows.splice(i,1); renderChallenge(); renderRebate(); });
@@ -1043,15 +1060,15 @@ let scratch={ N1:[{amt:'1',rate:'28',flash:false},{amt:'3',rate:'34',flash:false
 const SAMPLE_SCRATCH=JSON.parse(JSON.stringify(scratch));   // 编辑用示范值
 const BLANK_SCRATCH={ N1:[{amt:'',rate:'',flash:false}], N2:[{amt:'',rate:'',flash:false}],
   S1:[{amt:'',rate:'',flash:false}], S2:[{amt:'',rate:'',flash:false}] };  // 新增用空白（各卡保留 1 项）
-function updateScratchHint(tier,body){
-  const rows=[...body.children];
-  rows.forEach(tr=>{
-    const input=$('.js-rate',tr); const hint=$('.js-rate-hint',tr);
-    const over=input.value!==''&&Number(input.value)>100;
-    input.classList.toggle('is-error',over);
-    if(over){ hint.textContent='比例配置不得超过100%'; hint.style.visibility='visible'; }
-    else { hint.style.visibility='hidden'; }
-  });
+function scratchTierSum(tier){ return Math.round(scratch[tier].reduce((a,r)=>a+(Number(r.rate)||0),0)*100)/100; }
+function scratchTierConfigured(tier){ return scratch[tier].some(r=>String(r.rate).trim()!==''); }
+function updateScratchHint(tier,box){
+  const sum=scratchTierSum(tier), configured=scratchTierConfigured(tier);
+  const bad=configured && sum!==100;
+  const sumEl=$('.js-sum',box), warnEl=$('.js-warn',box);
+  if(sumEl){ sumEl.textContent=sum; sumEl.style.color=bad?'#e5544b':(configured?'#2fae5a':'var(--text-2)'); }
+  if(warnEl) warnEl.style.display=bad?'inline':'none';
+  $$('.js-rate',box).forEach(inp=>inp.classList.toggle('is-error',bad&&inp.value!==''));
 }
 function renderScratch(){
   const wrap=$('#scratchWrap'); wrap.innerHTML='';
@@ -1063,7 +1080,8 @@ function renderScratch(){
         <tr><th style="width:60px">#</th><th style="width:26%">奖励金额</th><th style="width:26%">获奖机率</th>
           <th style="width:26%"><label class="chk"><input type="checkbox" class="js-flash-all">闪卡</label></th>
           <th style="width:56px">操作</th></tr></thead>
-        <tbody class="js-body"></tbody></table></div>`;
+        <tbody class="js-body"></tbody></table>
+        <p class="js-sum-line" style="padding:2px 14px 10px;font-size:12px;color:var(--text-2)">合计 <b class="js-sum">0</b>%　<span class="js-warn" style="color:#e5544b;font-weight:600;display:none">获奖机率需等于100%</span></p></div>`;
     const body=$('.js-body',box);
     function syncFlashAll(){
       const boxes=$$('.js-flash-row',body);
@@ -1073,12 +1091,11 @@ function renderScratch(){
       const tr=document.createElement('tr');
       tr.innerHTML=`<td>${i+1}</td>
         <td><input class="input js-amt" value="${r.amt}"></td>
-        <td><div class="suffix-wrap"><input class="input js-rate" value="${r.rate}"><span class="suffix">%</span></div>
-          <p class="hint hint--err js-rate-hint" style="visibility:hidden">比例配置不得超过100%</p></td>
+        <td><div class="suffix-wrap"><input class="input js-rate" value="${r.rate}"><span class="suffix">%</span></div></td>
         <td><label class="chk"><input type="checkbox" class="js-flash-row" ${r.flash?'checked':''}>是</label></td>
         <td><button class="btn--link red js-del">删除</button></td>`;
       $('.js-amt',tr).addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r.amt=e.target.value; });
-      $('.js-rate',tr).addEventListener('input',e=>{ e.target.value=sanDec2(e.target.value); r.rate=e.target.value; updateScratchHint(tier,body); });
+      $('.js-rate',tr).addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r.rate=e.target.value; updateScratchHint(tier,box); });
       $('.js-flash-row',tr).addEventListener('change',e=>{ r.flash=e.target.checked; syncFlashAll(); });
       $('.js-del',tr).addEventListener('click',()=>{
         if(isEditMode){ toast('不可删除',true); return; }
@@ -1095,7 +1112,7 @@ function renderScratch(){
       scratch[tier].push({amt:'',rate:'',flash:false}); renderScratch();
     });
     wrap.appendChild(box);
-    updateScratchHint(tier,body);
+    updateScratchHint(tier,box);
   });
 }
 

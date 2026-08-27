@@ -420,7 +420,7 @@ body {
     </div>
 
     <h2 class="section-title">My Scratch Ticket</h2>
-    <span class="spec-tag" style="margin-left:0">对应规格：刮刮卡玩法｜开奖＝获得次日 12:00 正午；过期＝开奖日 +72 小时；刮开即领取</span>
+    <span class="spec-tag" style="margin-left:0">对应规格：刮刮卡玩法｜开奖＝获得次日 12:00 正午；过期＝开奖时间(中午12:00)＋72 小时；刮开即领取</span>
 
 
     <div id="raffleList"></div>
@@ -653,12 +653,12 @@ function closeFlip(){
 /* state: wait=等待(可选Bless) / scratch=待刮奖 / scratched=已刮已领 / expired=过期未刮
    刮开即领取（单步）；无「过期刮开」状态 (5.5) */
 const tickets = [
-  { id:'t2', tier:'good',  amount:'', dates:'Expiry Date: Jun 20', state:'scratch', foil:true, group:'all' },
-  { id:'t3', tier:'good',  amount:'', raffle:'Raffle Date: Jun 18', dates:'Expiry Date: Jun 21', state:'wait', blessed:false, count:'11:13:13 to open', group:'all' },
-  { id:'t4', tier:'super', amount:'', dates:'Expiry Date: Jun 22', state:'wait', blessed:true, count:'23:41:02 to open', foil:true, group:'all' },
-  { id:'t5', tier:'good',  amount:'50p', dates:'Scratched Jun 19', state:'scratched', group:'claimed' },
-  { id:'t6', tier:'super', amount:'1,000p', dates:'Scratched Jun 18', state:'scratched', bigwin:true, group:'claimed' },
-  { id:'t7', tier:'good',  amount:'', dates:'Expired Jun 17', state:'expired', group:'expired' },
+  { id:'t2', got:618, tier:'good',  amount:'', dates:'Expiry Date: Jun 20', state:'scratch', foil:true, group:'all' },
+  { id:'t3', got:617, tier:'good',  amount:'', raffle:'Raffle Date: Jun 18', dates:'Expiry Date: Jun 21', state:'wait', blessed:false, count:'11:13:13 to open', group:'all' },
+  { id:'t4', got:618, tier:'super', amount:'', dates:'Expiry Date: Jun 22', state:'wait', blessed:true, count:'23:41:02 to open', foil:true, group:'all' },
+  { id:'t5', got:617, tier:'good',  amount:'50p', dates:'Scratched Jun 19', state:'scratched', group:'claimed' },
+  { id:'t6', got:616, tier:'super', amount:'1,000p', dates:'Scratched Jun 18', state:'scratched', bigwin:true, group:'claimed' },
+  { id:'t7', got:614, tier:'good',  amount:'', dates:'Expired Jun 17', state:'expired', group:'expired' },
 ];
 function faceName(t){ return t.tier==='super' ? 'Lucky Bomb Ticket' : 'Bomb Ticket'; }
 function ticketRow(t){
@@ -678,10 +678,10 @@ function ticketRow(t){
 
   let side='';
   if(t.state==='wait') side=`<span class="ticket-side__count">${t.count}</span>
-    <button class="ticket-side__btn ticket-side__btn--bless" data-bless="${t.id}" ${t.blessed?'disabled':''}>Bless</button>`;
-  else if(t.state==='scratch') side=`<button class="ticket-side__btn ticket-side__btn--scratch" data-scratchbtn="${t.id}">Scratch</button>`;
-  else if(t.state==='scratched') side=`<button class="ticket-side__btn ticket-side__btn--done" disabled>Scratched</button>`;
-  else side=`<button class="ticket-side__btn ticket-side__btn--expired" disabled>Expired</button>`;
+    <button class="ticket-side__btn ticket-side__btn--bless" data-bless="${t.id}" ${t.blessed?'disabled':''}>BLESS</button>`;
+  else if(t.state==='scratch') side=`<button class="ticket-side__btn ticket-side__btn--scratch" data-scratchbtn="${t.id}">SCRATCH</button>`;
+  else if(t.state==='scratched') side=`<button class="ticket-side__btn ticket-side__btn--done" disabled>CLAIMED</button>`;
+  else side=`<button class="ticket-side__btn ticket-side__btn--expired" disabled>EXPIRED</button>`;
 
   return `<div class="ticket-row" data-id="${t.id}">
     <div class="ticket ${tierCls} ${grey} ${big} ${foil}">
@@ -693,9 +693,11 @@ let currentSub='all';
 /* 排序优先级（Sid 5.5）：可领取(待刮) > 待开奖(等待) > 已领取 > 过期 */
 const SORT_PRIORITY={ scratch:0, wait:1, scratched:2, expired:3 };
 const GROUP_TITLES={ scratch:'To Be Claimed', wait:'To Be Scratched', scratched:'Claimed', expired:'Expired' };
+function syncRaffleBadge(){ const n=tickets.filter(t=>t.state==='scratch').length; const b=$('#badgeRaffle'); if(b){ b.textContent=n; b.style.display=n?'':'none'; } }
 function renderTickets(){
+  syncRaffleBadge();
   const list=tickets.filter(t=> currentSub==='all'?true:t.group===currentSub )
-    .slice().sort((a,b)=>(SORT_PRIORITY[a.state]??9)-(SORT_PRIORITY[b.state]??9));
+    .slice().sort((a,b)=>((SORT_PRIORITY[a.state]??9)-(SORT_PRIORITY[b.state]??9)) || ((b.got||0)-(a.got||0)));
   if(!list.length){
     $('#raffleList').innerHTML = `<div class="empty"><div class="empty__emoji">🎫</div><p class="empty__title">Nothing here</p></div>`;
     return;
@@ -726,7 +728,7 @@ $('#raffleList').addEventListener('click',(e)=>{
     t.amount = t.tier==='super'?'100p':'10p';   // 示意金额
     t.state='scratched'; t.group='claimed'; renderTickets();
     toast('✨ Scratched '+t.amount+' 🪙 → 已领取（刮开即领取）');
-    bumpBadge('#badgeRaffle',-1);
+   
   }
 });
 
