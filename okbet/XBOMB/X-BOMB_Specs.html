@@ -176,7 +176,7 @@ code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:
         <tr><td>流水倍数</td><td>提现前所需流水；后台「彩金所需流水倍数」，可配 0。</td></tr>
       </table></div>
       <div class="sub-title">活动开启限制 <span class="badge badge-new">新增</span></div>
-      <div class="callout danger"><span>🚫</span><div><b>同期仅能开启一个「x-bomb 联名挑战活动」</b>：在后台<b>新增活动</b>或将<b>既有活动状态变更为「开启」</b>时，若侦测到已有相同活动正在进行（状态＝开启），一律<b>挡下并显示错误提示「检测到相同活动正在进行中」</b>，不予开启。</div></div>
+      <div class="callout danger"><span>🚫</span><div><b>同期仅能开启一个「x-bomb 联名挑战活动」</b>：在后台<b>新增活动</b>或将<b>既有活动状态变更为「开启」</b>时，若侦测到已有相同活动正在进行（状态＝开启），一律<b>挡下并显示错误提示「检测到相同活动正在进行中」</b>，不予开启。<br>须先将<b>既有活动「关闭」或「删除」</b>（关闭需二次确认），同期名额释出后才可开启／新增下一个联名挑战活动。</div></div>
       <div class="sub-title">活动时间机制</div>
       <div class="callout warn"><span>⏱️</span><div><b>活动时间</b>＝计算奖励有效期（迄后停产、停算）；<b>前台入口显示期＝活动时间起 ～ 活动时间迄＋3.5 自然日</b>。「迄 → 迄＋3.5 自然日」为<b>延长领取期</b>：不产生新奖励，但仍可刮刮卡、领已获奖励、补领；<b>迄＋3.5 自然日后隐藏入口</b>，之后不可再进入／领取／补领。「状态」开关另作手动强制下架。</div></div>
       <div class="timeline">
@@ -420,7 +420,7 @@ code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:
           <div class="io-spec">
             <table class="spec-table">
               <tr><td>活动时间</td><td>活动实际生效区间（计算／产生奖励）。<strong>到期（迄）</strong>：停产新奖励、停止计算。<strong>前台入口显示至「迄＋3.5 自然日」</strong>，延长期内仍可刮刮卡、领奖、补领，之后隐藏入口。</td></tr>
-              <tr><td>状态「开启」</td><td><strong>同期仅能有一个「联名挑战活动」开启</strong>；新增／变更为「开启」时若已有相同活动进行中，报错「检测到相同活动正在进行中」并挡下。</td></tr>
+              <tr><td>状态「开启」</td><td><strong>同期仅能有一个「联名挑战活动」开启</strong>；新增／变更为「开启」时若已有相同活动进行中，报错「检测到相同活动正在进行中」并挡下。检核对象＝活动列表中<strong>活动模板＝「联名挑战活动」且状态＝「开启」</strong>者（编辑时不含自己）；须先关闭或删除既有活动才可开启。</td></tr>
               <tr><td>状态「关闭」</td><td><strong>前台入口隐藏、活动奖励不再计算</strong>；<strong>关闭时该活动所有数据清除</strong>，下次开启新活动时数据<strong>重新计算</strong>（等同强制下架，需二次确认）。</td></tr>
             </table>
             <div class="callout warn"><span>⏰</span><div><strong>已移除「显示时间」栏位</strong>：前台入口显示期＝<strong>活动时间起 ～ 活动时间迄＋3.5 自然日</strong>（系统自动，无需配置）；「状态」开关为手动强制下架。前台 Rewards → Promotion 列表的 <code>Event time</code> 取自本步骤「活动时间」。</div></div>

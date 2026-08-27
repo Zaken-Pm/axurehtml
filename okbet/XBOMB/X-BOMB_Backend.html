@@ -327,7 +327,8 @@ label.chk input{accent-color:var(--primary);}
               <select class="select" id="fCur"><option>PHP</option><option>USD</option></select></div>
             <div class="form-row"><label>状态：</label>
               <div><label class="radio"><input type="radio" name="status" value="关闭" checked>关闭</label>
-                   <label class="radio"><input type="radio" name="status" value="开启">开启</label></div></div>
+                   <label class="radio"><input type="radio" name="status" value="开启">开启</label>
+                   <p class="hint hint--warn">· 同期仅能开启一个「联名挑战活动」：已有相同活动进行中时，保存／开启将被挡下并提示「检测到相同活动正在进行中」，须先<b>关闭</b>或<b>删除</b>既有活动。</p></div></div>
             <div class="sec-title" style="margin-top:24px">时间设定</div>
             <div class="form-row"><label><span class="req">*</span>活动时间：</label>
               <div class="dp-wrap"><input class="input dp-trigger" id="fActTime" type="text" readonly placeholder="开始时间 ~ 结束时间"><span class="dp-icon">📅</span></div></div>
@@ -583,7 +584,7 @@ label.chk input{accent-color:var(--primary);}
     <div class="modal__body">⚠️ 关闭活动将强制终止整个活动，所有持有有效奖励的会员将无法继续领取剩余奖励周期。确定关闭？</div>
     <div class="modal__foot">
       <button class="btn" data-close-modal>Cancel</button>
-      <button class="btn btn--primary" data-close-modal>OK</button>
+      <button class="btn btn--primary" id="closeConfirm">OK</button>
     </div>
   </div>
 </div>
@@ -757,6 +758,13 @@ const ACTIVITY_DATA={190:{type:'联名挑战活动',name:'X-Bomb Lucky Blast',cu
   actTime:'2026-08-21 00:00 ~ 2026-10-31 23:59'}};
 let editingActId=null;  // null=新增；否则为正在编辑的活动 ID
 let pendingDelRow=null; // 待删除的活动列表行
+let pendingCloseRow=null; // 待关闭的活动列表行
+
+/* 从列表行反推活动资料（供静态示意行、或资料表尚无纪录的行使用；活动时间沿用原本储存格） */
+function rowToAct(tr){
+  const t=i=>tr.children[i]?tr.children[i].textContent.trim():'';
+  return {sort:t(1),status:t(2),cur:t(4),type:t(6),name:t(7),wager:t(12)};
+}
 
 /* 把「活动时间」字串（2026-08-21 00:00 ~ 2026-10-31 23:59）转成列表的两行 yy/mm/dd 显示 */
 function actTimeToCell(v){
@@ -777,10 +785,12 @@ function fillRow(tr,a){
   const agent    = tr.children[10]? tr.children[10].textContent.trim(): '—';
   const prevJoin = tr.children[11]? tr.children[11].textContent.trim(): '0 / 0';
   const wager    = (a.wager!==undefined) ? a.wager : (tr.children[12]?tr.children[12].textContent.trim():'—');
+  const timeCell = (a.actTime!==undefined) ? actTimeToCell(a.actTime)
+                 : (tr.children[3] ? tr.children[3].innerHTML : '—');
   const actionBtn = a.status==='开启'
       ? '<button class="btn--link red" data-close>关闭</button>'
       : '<button class="btn--link" data-open>开启</button>';
-  tr.innerHTML=`<td>${a.id}</td><td>${sort}</td><td class="${a.status==='开启'?'tag-on':'tag-off'}">${a.status}</td><td>${actTimeToCell(a.actTime)}</td><td>${a.cur}</td><td>${lang}</td>
+  tr.innerHTML=`<td>${a.id}</td><td>${sort}</td><td class="${a.status==='开启'?'tag-on':'tag-off'}">${a.status}</td><td>${timeCell}</td><td>${a.cur}</td><td>${lang}</td>
     <td><b>${a.type}</b></td><td>${a.name}</td><td>${preview}</td><td>${black}</td><td>${agent}</td>
     <td>${prevJoin}</td><td>${wager}</td>
     <td><button class="btn--link" data-edit>编辑</button><span class="op-sep">|</span><button class="btn--link red" data-del>删除</button><br>${actionBtn}</td>`;
@@ -790,12 +800,13 @@ function fillRow(tr,a){
 /* 为一行绑定「编辑 / 开启 / 关闭」行为（静态示意行若无 data-edit 则维持原样、不绑定） */
 function bindRowActions(tr){
   const eb=$('[data-edit]',tr);  if(eb) eb.onclick=()=>openEditRow(tr);
-  const cb=$('[data-close]',tr); if(cb) cb.onclick=()=>$('#closeMask').classList.add('is-open');
+  const cb=$('[data-close]',tr); if(cb) cb.onclick=()=>{ pendingCloseRow=tr; $('#closeMask').classList.add('is-open'); };
   const db=$('[data-del]',tr);   if(db) db.onclick=()=>{ pendingDelRow=tr; $('#delMask').classList.add('is-open'); };
   const ob=$('[data-open]',tr);  if(ob) ob.onclick=()=>{
-    const id=tr.children[0].textContent.trim(); const d=ACTIVITY_DATA[id];
-    if(d && d.type==='联名挑战活动' && activeXbombExists(id)){ toast('检测到相同活动正在进行中',true); return; }
-    if(d){ d.status='开启'; fillRow(tr,{id, ...d}); }
+    const id=tr.children[0].textContent.trim();
+    const d=ACTIVITY_DATA[id] || rowToAct(tr);
+    if(d.type==='联名挑战活动' && activeXbombExists(id)){ toast('检测到相同活动正在进行中',true); return; }
+    d.status='开启'; ACTIVITY_DATA[id]=d; fillRow(tr,{id,...d});
     toast('活动已开启（示意）');
   };
 }
@@ -809,7 +820,7 @@ function openEditRow(tr){
   if(d){
     $('#fType').value=d.type; $('#fName').value=d.name; $('#fCur').value=d.cur;
     const sr=$(`input[name=status][value="${d.status}"]`); if(sr) sr.checked=true;
-    $('#fActTime').value=d.actTime;
+    $('#fActTime').value=d.actTime||'';
   }
   showWizard(true,'编辑活动');
 }
@@ -829,6 +840,18 @@ $('#delConfirm').addEventListener('click',()=>{
     toast('活动已删除（示意）');
   }
   $('#delMask').classList.remove('is-open');
+});
+
+/* 关闭确认：确定后状态改「关闭」并即时更新列表（关闭后同期名额释出，可再开启新的联名挑战活动） */
+$('#closeConfirm').addEventListener('click',()=>{
+  if(pendingCloseRow){
+    const tr=pendingCloseRow, id=tr.children[0].textContent.trim();
+    const d=ACTIVITY_DATA[id] || rowToAct(tr);
+    d.status='关闭'; ACTIVITY_DATA[id]=d; fillRow(tr,{id,...d});
+    toast('活动已关闭（示意）');
+  }
+  pendingCloseRow=null;
+  $('#closeMask').classList.remove('is-open');
 });
 $('#btnExit').addEventListener('click',()=>showWizard(false));
 
@@ -854,7 +877,7 @@ function activeXbombExists(excludeId){
   return [...$$('#pageList tbody tr')].some(tr=>{
     const id=tr.children[0]?tr.children[0].textContent.trim():'';
     if(String(id)===String(excludeId)) return false;
-    const isX=[...tr.children].some(td=>/联名挑战活动/.test(td.textContent));
+    const isX=tr.children[6] && tr.children[6].textContent.trim()==='联名挑战活动';
     const st=tr.querySelector('.tag-on,.tag-off');
     return isX && st && st.textContent.trim()==='开启';
   });
@@ -1152,7 +1175,10 @@ $('#gameAll').addEventListener('change',()=>{ const on=$('#gameAll').checked;
   $$('#gameList .js-game, #gameList .js-prov').forEach(c=>c.checked=on); syncGameCount(); });
 $('#btnGames').addEventListener('click',()=>$('#gameMask').classList.add('is-open'));
 $('#gameConfirm').addEventListener('click',()=>{ $('#gameMask').classList.remove('is-open'); toast('已更新适用游戏范围'); });
-$$('[data-close-modal]').forEach(b=>b.addEventListener('click',e=>e.target.closest('.mask').classList.remove('is-open')));
+$$('[data-close-modal]').forEach(b=>b.addEventListener('click',e=>{
+  pendingCloseRow=null; pendingDelRow=null;           /* 取消/× → 清掉待处理的活动列表行 */
+  e.target.closest('.mask').classList.remove('is-open');
+}));
 
 /* ---------- 自动拒绝：开关联动输入框 ---------- */
 $('#autoReject').addEventListener('change',e=>$('#rejectN').disabled=!e.target.checked);
