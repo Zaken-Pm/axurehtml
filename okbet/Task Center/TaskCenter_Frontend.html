@@ -136,7 +136,7 @@ img{max-width:100%;display:block;}
 .act--upload,.act--verify{background:linear-gradient(90deg,#2ed9c3,#12b3a3);color:#05332e;} /* 上传证明 / 去认证 青 */
 .act--deposit{background:linear-gradient(90deg,#d872cf,#b94fb0);color:#fff;}    /* 去充值 洋红 */
 .act--reject{background:var(--c-red);color:#fff;}                               /* 未通过 红 */
-.act--proc{background:#5b7191;color:#e6eefc;}                                   /* 处理中 / 待发放 蓝灰 */
+.act--proc{background:#5b7191;color:#e6eefc;}                                   /* 处理中 蓝灰 */
 .act--done{background:rgba(255,255,255,.10);color:var(--c-text-3);}             /* 已完成 灰 */
 .act--full{background:rgba(255,255,255,.08);color:var(--c-text-3);border:1px solid var(--c-line);}
 .act:disabled{cursor:default;}
@@ -151,10 +151,6 @@ img{max-width:100%;display:block;}
 .quota__txt b{color:#ffce3d;}
 .tag-new{display:inline-block;background:rgba(53,208,127,.16);color:#54e59a;border:1px solid rgba(53,208,127,.4);border-radius:6px;font-size:.66rem;padding:1px 6px;margin-left:6px;vertical-align:middle;}
 .full-banner{background:rgba(255,90,95,.12);border:1px solid rgba(255,90,95,.35);color:#ff8f92;border-radius:8px;text-align:center;font-size:.8rem;padding:6px;font-weight:700;}
-
-/* delayed grant hint (新增) */
-.delay-hint{display:flex;align-items:center;gap:5px;color:#ffce3d;font-size:.74rem;margin-top:6px;background:rgba(255,206,61,.10);border:1px solid rgba(255,206,61,.32);border-radius:8px;padding:5px 8px;}
-.delay-hint::before{content:"⏳";}
 
 /* task group card (新增) */
 .subtasks{display:flex;flex-direction:column;gap:8px;margin-top:4px;border-top:1px dashed var(--c-line);padding-top:10px;}
@@ -323,7 +319,7 @@ img{max-width:100%;display:block;}
           </div>
           <div class="quota">
             <div class="quota__bar"><div class="quota__fill" style="width:82%"></div></div>
-            <div class="quota__txt"><span>先到先得 · 剩余名额紧张</span><span>已领取 <b>820/1,000</b></span></div>
+            <div class="quota__txt"><span>先到先得 · 剩余名额 <b>180</b> 份</span><span>已完成 <b>820 / 1,000</b></span></div>
           </div>
         </article>
 
@@ -340,6 +336,7 @@ img{max-width:100%;display:block;}
               <button class="act act--full" disabled>名额已满</button>
             </div>
           </div>
+          <div class="quota__txt" style="margin-top:2px"><span>先到先得 · 剩余名额 <b>0</b> 份</span><span>已完成 <b>1,000 / 1,000</b></span></div>
           <div class="full-banner">奖励名额已满</div>
         </article>
 
@@ -373,7 +370,6 @@ img{max-width:100%;display:block;}
               <span class="chip-st chip-st--deposit" onclick="showRedirect('充值页')">去充值</span>
             </div>
           </div>
-          <div class="delay-hint">奖励将于 3 天后发放</div>
         </article>
 
         <!-- 任务组 · 额外奖励手动领取（新增情境）-->
@@ -446,19 +442,6 @@ img{max-width:100%;display:block;}
               <div class="subtask__body"><div class="subtask__name">每日打码任务 · 积分 +200</div><div class="subtask__prog">进度 ₱120 / ₱300 <span class="pct">(40%)</span></div></div>
               <span class="chip-st chip-st--go" onclick="showRedirect('首页')">去投注</span>
             </div>
-          </div>
-        </article>
-
-        <!-- 延迟派奖示例（新增）-->
-        <article class="card">
-          <div class="card__main" style="padding-top:0">
-            <div class="card__title">周末充值任务</div>
-            <div class="card__progress">进度 ₱1,000 / ₱1,000 <span class="pct">(100%)</span></div>
-            <div class="card__reward gold"><span class="rico rico--gold"></span>888</div>
-            <div class="delay-hint">奖励将于 3 天后发放</div>
-          </div>
-          <div class="card__right">
-            <button class="act act--proc" disabled>待发放</button>
           </div>
         </article>
 

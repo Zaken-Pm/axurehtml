@@ -395,7 +395,7 @@ tbody tr:hover{background:#fafcff;}
                   <td class="op"><a>关闭</a><a class="del">删除</a><a onclick="openModal('edit')">编辑</a></td>
                 </tr>
                 <tr>
-                  <td><div class="tid">1030<span class="tid__subs"><span class="tid__sub">1030-1</span><span class="tid__sub">1030-2</span><span class="tid__sub">1030-3</span></span></div></td><td><span class="tag tag--new">任务组</span></td><td class="cell-name">Small Stake Club · 组任务<br><span class="note">含 3 子任务 · 完成2个发奖 · 全部再额外奖 · 延迟3天派</span></td>
+                  <td><div class="tid">1030<span class="tid__subs"><span class="tid__sub">1030-1</span><span class="tid__sub">1030-2</span><span class="tid__sub">1030-3</span></span></div></td><td><span class="tag tag--new">任务组</span></td><td class="cell-name">Small Stake Club · 组任务<br><span class="note">含 3 子任务 · 阶梯奖励：完成2个→100彩金 / 5个→500彩金 / 10个→10000积分</span></td>
                   <td><span class="stack-chip"><span class="tag tag--info">VIP1</span><span class="tag tag--gray">TH</span></span></td>
                   <td><span class="stack-chip"><span class="tag tag--info">充值≥₱100</span><span class="tag tag--info">有效投注≥₱1,000</span><span class="tag tag--info">投注≥₱200</span><span class="pill">完成任意2项</span></span></td>
                   <td><span class="tag tag--edit">总500人</span></td>
@@ -585,7 +585,72 @@ tbody tr:hover{background:#fafcff;}
               <label><input type="checkbox"/> 90MH</label>
               <label><input type="checkbox"/> 90ML</label>
             </div>
-            <p class="note" style="margin:8px 0 0"><b>VIP 与所勾选标签需「完全符合」</b>，用户才能看到此任务。排除包（黑名单设置）优先——命中排除即不可参加。</p>
+            <ul class="note" style="margin:8px 0 0;padding-left:18px;line-height:1.7">
+              <li><b>VIP 与所勾选标签需「完全符合」</b>，用户才能看到此任务。</li>
+              <li>排除包（黑名单设置）优先——命中排除即不可参加。</li>
+            </ul>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- ===== 任务参与要求（KYC 选填条件 ＋ 用户分层 LTV 区间）· 位于目标用户下方 ===== -->
+      <div class="form__row">
+        <label class="form__label">任务参与要求：</label>
+        <div class="form__control">
+          <label class="check-row"><input type="checkbox"/> 完成KYC</label>
+          <label class="check-row"><input type="checkbox"/> 完成KYC部分认证</label>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:6px">
+            <div class="range-inline">
+              <label class="check-row" style="margin:0;min-width:170px"><input type="checkbox" id="chkDep" onchange="onQualDep()"/> 累计充值区间 <span class="tag tag--edit">异动</span></label>
+              <input class="input" placeholder="最低" style="max-width:130px"/>
+              <span>~</span>
+              <input class="input" placeholder="最高" style="max-width:130px"/>
+            </div>
+            <div class="range-inline">
+              <label class="check-row" style="margin:0;min-width:170px"><input type="checkbox" id="chkBet" onchange="onQualDep()"/> 累计有效投注区间 <span class="tag tag--edit">异动</span></label>
+              <input class="input" placeholder="最低" style="max-width:130px"/>
+              <span>~</span>
+              <input class="input" placeholder="最高" style="max-width:130px"/>
+            </div>
+            <div class="range-inline" id="qualBox" style="opacity:.5">
+              <span style="min-width:170px">充值及有效投注资格</span>
+              <label class="radio-grp" style="margin:0"><label><input type="radio" name="qual" class="qualRadio" disabled/> 符合任一条件</label></label>
+              <label class="radio-grp" style="margin:0"><label><input type="radio" name="qual" class="qualRadio" disabled/> 完全符合</label></label>
+            </div>
+          </div>
+          <ul class="note" style="margin:8px 0 0;padding-left:18px;line-height:1.7">
+            <li>「完成KYC／完成KYC部分认证」为选填条件：<b>勾选后才生效</b>——用户须符合所勾选项目才能触发／领取此任务；未勾选则不限制。</li>
+            <li>「符合任一条件／完全符合」为单选，需同时勾选「累计充值区间」与「累计有效投注区间」后才可选。</li>
+            <li>区间上限不得低于下限。</li>
+            <li>累计口径＝任务开始前历史快照（注册至任务开始前一秒，不含活动当天）。</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ===== 新增：资格判定快照 · 移至目标用户下方 ===== -->
+      <fieldset class="fieldset-new">
+        <div class="fs__title">参与资格 · 资格判定时间 <span class="tag tag--new">本次新增</span></div>
+        <div class="form__row" style="margin-top:12px">
+          <label class="form__label">快照时间：</label>
+          <div class="form__control">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div>
+                <label class="check-row" style="margin:0"><input type="checkbox" class="snapChk" onchange="onSnap(this)"/> 任务开始前快照（默认）</label>
+                <div class="range-inline" style="margin:8px 0 0 24px">
+                  <input class="input" type="date" style="max-width:170px" aria-label="快照起日"/>
+                  <span>~</span>
+                  <input class="input" type="date" style="max-width:170px" aria-label="快照迄日"/>
+                </div>
+              </div>
+              <label class="check-row" style="margin:0"><input type="checkbox" class="snapChk" onchange="onSnap(this)"/> 昨日 23:59:59</label>
+              <label class="check-row" style="margin:0"><input type="checkbox" class="snapChk" onchange="onSnap(this)"/> 实时</label>
+            </div>
+            <ul class="note" style="margin:8px 0 0;padding-left:18px;line-height:1.7">
+              <li>单选：至多勾选一项，预设不勾选。</li>
+              <li>「任务开始前快照」可指定日期区间。</li>
+              <li>一次性任务：任务开放后满足条件即可直接领取（采实时资格）。</li>
+              <li>判定顺序：先判资格通过、再扣名额。</li>
+            </ul>
           </div>
         </div>
       </fieldset>
@@ -657,39 +722,31 @@ tbody tr:hover{background:#fafcff;}
       <!-- ===== 新增：任务组 / 阶梯任务配置 ===== -->
       <fieldset class="fieldset-new hidden" id="groupCfg">
         <div class="fs__title">组任务配置 <span class="tag tag--new">本次新增</span></div>
-        <p class="note" style="margin:8px 0 0">最多可配置 5 个子任务；每个子任务须各自设定目标值，并可各自设定奖励。</p>
+        <ul class="note" style="margin:8px 0 0;padding-left:18px;line-height:1.7">
+          <li>最多可配置 10 个子任务。</li>
+          <li>每个子任务须各自设定目标值，并可各自设定奖励。</li>
+        </ul>
         <div id="subTasks" style="margin-top:10px;display:flex;flex-direction:column;gap:8px"></div>
         <button class="btn btn--sm" id="addSubBtn" style="margin-top:8px" onclick="addSub(event)">＋ 添加子任务</button>
-        <p class="note" style="margin:8px 0 0">原始规则：「信息完善」「首充」类型仅支持「永久」；「充值」「投注」类型仅支持「每日」「限时」「周限时」。同一组任务的各子任务，其任务完成时间类别须一致。</p>
+        <p class="note" style="margin:8px 0 0">原始规则：</p>
+        <ul class="note" style="margin:2px 0 0;padding-left:18px;line-height:1.7">
+          <li>「信息完善」「首充」类型仅支持「永久」。</li>
+          <li>「充值」「投注」类型仅支持「每日」「限时」「周限时」。</li>
+          <li>同一组任务的各子任务，其任务完成时间类别须一致。</li>
+        </ul>
         <p class="hint" id="groupTimeWarn" style="display:none;margin:6px 0 0">⚠ 需选择任务完成时间一致的条件（所选子任务的任务时间类别不一致，无法组成同一组任务）。</p>
 
         <div class="form__row" style="margin-top:16px">
-          <label class="form__label">完成条件：</label>
+          <label class="form__label">阶梯奖励配置：</label>
           <div class="form__control">
-            <div class="range-inline">完成任意 <input class="input" value="2" style="max-width:80px"/> 个子任务后即可领取奖励</div>
-            <p class="note" style="margin:6px 0 0">组任务＝完成任意 n 个子任务即可领奖，子任务之间无先后顺序（非阶梯任务）。n 为后台配置。</p>
-          </div>
-        </div>
-        <div class="form__row">
-          <label class="form__label">完成全部额外奖励：</label>
-          <div class="form__control">
-            <div class="range-inline">
-              <label class="check-row" style="margin:0"><input type="checkbox" checked/> 启用</label>
-              <select class="select extraReward" style="max-width:120px" onchange="onSubReward(this)"><option value="p">积分</option><option value="c">彩金</option></select>
-              <input class="input" placeholder="奖励值" value="1000" style="max-width:130px"/>
-              <span class="subChip note" style="display:none;align-items:center;gap:6px">彩金打码倍数 <input class="input" value="0" style="max-width:90px"/></span>
-            </div>
-            <p class="note" style="margin:6px 0 0">完成任务组「全部」任务后可额外获得。奖励为彩金时须配置彩金打码倍数。</p>
-          </div>
-        </div>
-        <div class="form__row">
-          <label class="form__label">延迟派奖：</label>
-          <div class="form__control">
-            <div class="range-inline">
-              <label class="check-row" style="margin:0"><input type="checkbox"/> 启用</label>
-              奖励于完成后 <input class="input" value="3" style="max-width:80px"/> 天派发
-            </div>
-            <p class="note" style="margin:6px 0 0">对任务组奖励与额外奖励皆生效（n 为后台配置）。若开启，前台需显示「奖励将于 n 天后发放」的额外提示。</p>
+            <div id="tierRewards" style="display:flex;flex-direction:column;gap:8px"></div>
+            <button class="btn btn--sm" id="addTierBtn" style="margin-top:8px" onclick="addTier(event)">＋ 添加阶梯</button>
+            <ul class="note" style="margin:8px 0 0;padding-left:18px;line-height:1.7">
+              <li>「完成 n 个子任务」各自对应一档奖励，可配置多档。</li>
+              <li>n 不可超过子任务总数。</li>
+              <li>奖励为彩金时须额外配置彩金打码倍数。</li>
+              <li>例：完成 2 个 → 100 彩金；完成 5 个 → 500 彩金；完成 10 个 → 10,000 积分。</li>
+            </ul>
           </div>
         </div>
       </fieldset>
@@ -698,56 +755,6 @@ tbody tr:hover{background:#fafcff;}
         <div class="form__control"><input class="input" value="0" style="max-width:160px"/></div>
       </div>
 
-      <!-- ===== 现有：任务参与要求（KYC 前置门槛保留） ===== -->
-      <div class="form__row">
-        <label class="form__label">任务参与要求：</label>
-        <div class="form__control">
-          <label class="check-row"><input type="checkbox"/> 完成KYC</label>
-          <label class="check-row"><input type="checkbox"/> 完成KYC部分认证</label>
-          <p class="note" style="margin:2px 0 0">勾选后：用户必须先符合该 KYC 资格，才能触发/领取此任务。</p>
-        </div>
-      </div>
-
-      <!-- ===== 新增/异动：用户分层 LTV 区间 ===== -->
-      <fieldset class="fieldset-edit">
-        <div class="fs__title">目标用户<span class="tag tag--edit">异动：原「大于等于」→ 区间</span></div>
-        <div style="margin-top:14px;display:flex;flex-direction:column;gap:12px">
-          <div class="range-inline">
-            <label class="check-row" style="margin:0;min-width:150px"><input type="checkbox" id="chkDep" onchange="onQualDep()"/> 累计充值区间</label>
-            <input class="input" placeholder="最低" style="max-width:130px"/>
-            <span>~</span>
-            <input class="input" placeholder="最高" style="max-width:130px"/>
-          </div>
-          <div class="range-inline">
-            <label class="check-row" style="margin:0;min-width:150px"><input type="checkbox" id="chkBet" onchange="onQualDep()"/> 累计有效投注区间</label>
-            <input class="input" placeholder="最低" style="max-width:130px"/>
-            <span>~</span>
-            <input class="input" placeholder="最高" style="max-width:130px"/>
-          </div>
-          <div class="range-inline" id="qualBox" style="opacity:.5">
-            <span style="min-width:150px">充值及有效投注资格</span>
-            <label class="radio-grp" style="margin:0"><label><input type="radio" name="qual" class="qualRadio" disabled/> 符合任一条件</label></label>
-            <label class="radio-grp" style="margin:0"><label><input type="radio" name="qual" class="qualRadio" disabled/> 完全符合</label></label>
-          </div>
-          <p class="note" style="margin:0">「符合任一条件／完全符合」为单选，需同时勾选「累计充值区间」与「累计有效投注区间」后才可选。上限不得低于下限。累计口径＝任务开始前历史快照（注册至任务开始前一秒，不含活动当天）。</p>
-        </div>
-      </fieldset>
-
-      <!-- ===== 新增：资格判定快照 ===== -->
-      <fieldset class="fieldset-new">
-        <div class="fs__title">参与资格 · 资格判定时间 <span class="tag tag--new">本次新增</span></div>
-        <div class="form__row" style="margin-top:12px">
-          <label class="form__label">快照时间：</label>
-          <div class="form__control">
-            <div class="radio-grp">
-              <label><input type="radio" name="snap" checked/> 任务开始前快照（默认）</label>
-              <label><input type="radio" name="snap"/> 昨日 23:59:59</label>
-              <label><input type="radio" name="snap"/> 实时</label>
-            </div>
-            <p class="note" style="margin:6px 0 0">一次性任务：任务开放后满足条件即可直接领取（采实时资格）。先判资格通过、再扣名额。</p>
-          </div>
-        </div>
-      </fieldset>
 
       <!-- ===== 新增：名额上限 ===== -->
       <fieldset class="fieldset-new">
@@ -756,7 +763,13 @@ tbody tr:hover{background:#fafcff;}
           <label class="form__label">总人数上限：</label>
           <div class="form__control"><div class="range-inline"><input class="input" value="1000" style="max-width:160px"/><span class="note">0 或留空＝不限制</span></div></div>
         </div>
-        <p class="note" style="margin:8px 0 4px">每位用户完成任务后仅可领取 <b>1 次</b> 奖励，故名额只计「领取人数」、不计领取次数——名额＝去重领取人数（以领取时间 claim_time 为准）。满额后前台显示「奖励名额已满」；名额挂任务级。金额预算上限本轮不做。</p>
+        <ul class="note" style="margin:8px 0 4px;padding-left:18px;line-height:1.7">
+          <li>每位用户完成任务后仅可领取 <b>1 次</b> 奖励，故名额只计「领取人数」、不计领取次数。</li>
+          <li>名额＝去重领取人数（以领取时间 claim_time 为准）。</li>
+          <li>满额后前台显示「奖励名额已满」。</li>
+          <li>名额挂任务级。</li>
+          <li>金额预算上限本轮不做。</li>
+        </ul>
       </fieldset>
 
       <div class="form__row">
@@ -772,6 +785,16 @@ tbody tr:hover{background:#fafcff;}
             <label><input type="radio" name="ttime" value="每周" onchange="onTaskTime()"/> 每周</label>
             <label><input type="radio" name="ttime" value="限时" onchange="onTaskTime()"/> 限时</label>
             <label><input type="radio" name="ttime" value="周限时" onchange="onTaskTime()"/> 周限时</label>
+          </div>
+          <!-- 每日：24 小时内开始/结束时间 -->
+          <div id="timeRangeDaily" class="hidden" style="margin-top:10px">
+            <div class="range-inline" style="max-width:460px">
+              <span class="note">每日</span>
+              <input class="input" type="time" value="00:00" style="max-width:130px" aria-label="每日开始时间"/>
+              <span>~</span>
+              <input class="input" type="time" value="23:59" style="max-width:130px" aria-label="每日结束时间"/>
+              <span class="note">（24 小时内）</span>
+            </div>
           </div>
           <!-- 限时：指定日期时间区间（开始时间 ~ 结束时间） -->
           <div id="timeRangeLimited" class="hidden" style="margin-top:10px">
@@ -790,7 +813,10 @@ tbody tr:hover{background:#fafcff;}
               <select class="select" style="flex:1"><option>星期一</option><option>星期二</option><option>星期三</option><option>星期四</option><option>星期五</option><option>星期六</option><option>星期日</option></select>
             </div>
           </div>
-          <p class="hint" style="margin-top:8px">"信息完善"和"首充"类型仅支持「永久」；"充值"和"投注"类型仅支持「每日」「限时」「周限时」。</p>
+          <ul class="hint" style="margin-top:8px;padding-left:18px;line-height:1.7">
+            <li>"信息完善"和"首充"类型仅支持「永久」。</li>
+            <li>"充值"和"投注"类型仅支持「每日」「限时」「周限时」。</li>
+          </ul>
         </div>
       </div>
       <div class="form__row">
@@ -852,7 +878,10 @@ tbody tr:hover{background:#fafcff;}
           </div>
         </div>
       </div>
-      <p class="note" style="flex:0 0 auto;margin:8px 2px 0">未设置：打码量＝所有体育游戏 ＋ 所有三方游戏；有设置：打码量＝所勾选的体育游戏与第三方游戏总和。</p>
+      <ul class="note" style="flex:0 0 auto;margin:8px 2px 0;padding-left:18px;line-height:1.7">
+        <li>未设置：打码量＝所有体育游戏 ＋ 所有三方游戏。</li>
+        <li>有设置：打码量＝所勾选的体育游戏与第三方游戏总和。</li>
+      </ul>
     </div>
     <div class="modal__foot">
       <button class="btn" onclick="closeGameModal()">返回</button>
@@ -1002,16 +1031,39 @@ function renumberSubs(){
     row.querySelector('.pill').textContent='子任务'+(idx+1);
     var sid=row.querySelector('.subId'); if(sid) sid.textContent=GROUP_TASK_ID+'-'+(idx+1);
   });
-  document.getElementById('addSubBtn').style.display = (box.children.length>=5?'none':'inline-flex');
+  document.getElementById('addSubBtn').style.display = (box.children.length>=10?'none':'inline-flex');
 }
 function addSub(e){ if(e)e.preventDefault();
   var box=document.getElementById('subTasks');
-  if(box.children.length>=5) return;
+  if(box.children.length>=10) return;
   var d=document.createElement('div'); d.innerHTML=subRowHTML(box.children.length+1);
   var row=d.firstChild; box.appendChild(row); ddInitAll(row);
   onSubCat(row.querySelector('.subCat')); onSubReward(row.querySelector('.subReward')); renumberSubs();
 }
 function delSub(e,btn){ if(e)e.preventDefault(); btn.closest('.range-inline').remove(); renumberSubs(); checkGroupTime(); }
+
+/* ===== 阶梯奖励：完成 n 个子任务 → 对应奖励（可多档；彩金需配打码倍数）===== */
+function tierRowHTML(n,type,val){
+  return '<div class="range-inline" style="border:1px solid var(--c-border);border-radius:8px;padding:8px;background:#fff;flex-wrap:wrap">'
+    +'完成 <input class="input" value="'+n+'" style="max-width:70px"/> 个 获得'
+    +'<select class="select tierReward" style="max-width:100px" onchange="onSubReward(this)"><option value="p"'+(type==='p'?' selected':'')+'>积分</option><option value="c"'+(type==='c'?' selected':'')+'>彩金</option></select>'
+    +'<input class="input" placeholder="奖励值" value="'+val+'" style="max-width:120px"/>'
+    +'<span class="subChip note" style="display:none;align-items:center;gap:6px">彩金打码倍数 <input class="input" value="0" style="max-width:90px"/></span>'
+    +'<button class="btn btn--sm" style="color:var(--c-danger)" onclick="delTier(event,this)">删除</button>'
+    +'</div>';
+}
+function addTierRow(n,type,val){
+  var box=document.getElementById('tierRewards');
+  var d=document.createElement('div'); d.innerHTML=tierRowHTML(n,type,val);
+  var row=d.firstChild; box.appendChild(row); ddInitAll(row);
+  onSubReward(row.querySelector('.tierReward'));
+}
+function addTier(e){ if(e)e.preventDefault(); addTierRow('', 'p', ''); }
+function delTier(e,btn){ if(e)e.preventDefault(); btn.closest('.range-inline').remove(); }
+function seedTiers(){
+  var box=document.getElementById('tierRewards'); if(!box||box.children.length) return;
+  addTierRow('2','c','100'); addTierRow('5','c','500'); addTierRow('10','p','10000');
+}
 function onTaskCat(){
   var isGroup=document.getElementById('taskCat').value==='group';
   document.getElementById('groupCfg').classList.toggle('hidden',!isGroup);
@@ -1020,6 +1072,12 @@ function onTaskCat(){
   if(isGroup) document.getElementById('rowChip').style.display='none'; else onReward();
   var box=document.getElementById('subTasks');
   if(isGroup && box.children.length===0){ addSub(); addSub(); }
+  if(isGroup) seedTiers();
+}
+
+/* ===== 快照时间：复选框单选（至多一项，可全不选）===== */
+function onSnap(cb){
+  if(cb.checked){ document.querySelectorAll('.snapChk').forEach(function(x){ if(x!==cb) x.checked=false; }); }
 }
 
 /* ===== 充值/投注区间资格联动 ===== */
@@ -1034,8 +1092,10 @@ function onTaskTime(){
   var v=(document.querySelector('input[name="ttime"]:checked')||{}).value;
   var lim=document.getElementById('timeRangeLimited');
   var wk=document.getElementById('timeRangeWeekly');
+  var day=document.getElementById('timeRangeDaily');
   if(lim) lim.classList.toggle('hidden', v!=='限时');
   if(wk)  wk.classList.toggle('hidden', v!=='周限时');
+  if(day) day.classList.toggle('hidden', v!=='每日');
 }
 
 /* ===== 自定义下拉：弹窗高度固定、超出可上下滚动 =====
