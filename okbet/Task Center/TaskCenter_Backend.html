@@ -342,6 +342,7 @@ tbody tr:hover{background:#fafcff;}
           <button class="subtab" data-tab="audit" role="tab">资料审核 <span class="badge">89</span></button>
           <button class="subtab" data-tab="record" role="tab">任务完成记录 <span class="badge">3398</span></button>
           <button class="subtab" data-tab="report" role="tab">任务报表统计</button>
+          <button class="subtab" data-tab="tasklog" role="tab">任务记录 <span class="tag tag--new" style="margin-left:6px">本次新增</span></button>
           <button class="subtab" data-tab="blacklist" role="tab">黑名单设置 <span class="tag tag--new" style="margin-left:6px">对应排除包</span></button>
         </div>
 
@@ -507,6 +508,97 @@ tbody tr:hover{background:#fafcff;}
           </div>
         </section>
 
+        <!-- ============ TAB: 任务记录（新增·每日成效统计）============ -->
+        <section data-panel="tasklog" class="hidden">
+          <div class="field-row">
+            <select class="select"><option>选择币别</option><option>PHP</option></select>
+            <div class="range-inline">
+              <span class="note">日期</span>
+              <input class="input" type="date" value="2026-08-13" style="max-width:160px" aria-label="统计起日"/>
+              <span>~</span>
+              <input class="input" type="date" value="2026-08-19" style="max-width:160px" aria-label="统计迄日"/>
+            </div>
+            <input class="input" placeholder="输入任务名 / 任务ID 关键字" />
+            <button class="btn btn--primary">搜索</button>
+            <button class="btn btn--primary">导出</button>
+          </div>
+          <div class="report-note">
+            🆕 「任务记录」：呈现任务<b>完成后的成效</b>，按 <b>每日</b> 统计（时区 UTC+8 · 结算 23:59:59）。<br>
+            「完成人数」＝当日完成此任务的<b>去重人数</b>，点击数字可查看完成用户清单；「任务完成值 / 有效投注 / 充值金额 / 任务完成后第一笔充值」皆为<b>当日完成此任务全部用户的总计</b>。<b>「奖励金额」仅计入已实际发放的部分（发放状态＝自动发放 或 已领取）</b>，不含待领取 / 待审核 / 未通过。<br>组任务<b>依各「子任务」分别记录</b>（任务id 显示为母ID-序号，如 1030-1）；组任务的<b>「额外奖励」（阶梯奖励）依各档（完成 n 个）分别列出</b>，每档单独一行（任务id 为母ID）。
+          </div>
+          <div class="table-wrap">
+            <table style="min-width:1280px">
+              <thead>
+                <tr>
+                  <th>日期</th><th>任务id</th><th class="cell-name">任务名称</th>
+                  <th>完成人数<br><span class="note">去重·可点击</span></th>
+                  <th>任务目标值</th><th>任务完成值<br><span class="note">当日总计</span></th>
+                  <th>奖励类型</th><th>奖励金额<br><span class="note">当日总计·仅计已发放</span></th>
+                  <th>有效投注<br><span class="note">当日总计</span></th><th>充值金额<br><span class="note">当日总计</span></th>
+                  <th>任务完成后<br>第一笔充值<br><span class="note">当日总计</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>2026-08-19</td><td>1024</td><td class="cell-name">小额·每日充值任务</td>
+                  <td><a onclick="openUserList('1024','小额·每日充值任务',820)">820</a></td>
+                  <td>₱50</td><td>₱41,000</td><td>积分</td><td>82,000</td>
+                  <td>₱1,025,000</td><td>₱246,000</td><td>₱132,800</td>
+                </tr>
+                <tr>
+                  <td>2026-08-19</td><td>1025</td><td class="cell-name">高价值·周限时投注</td>
+                  <td><a onclick="openUserList('1025','高价值·周限时投注',146)">146</a></td>
+                  <td>₱5,000</td><td>₱963,600</td><td>彩金</td><td>32,412</td>
+                  <td>₱2,480,300</td><td>₱0</td><td>₱0</td>
+                </tr>
+                <tr>
+                  <td>2026-08-19</td><td>1031</td><td class="cell-name">首充·新客任务</td>
+                  <td><a onclick="openUserList('1031','首充·新客任务',53)">53</a></td>
+                  <td>₱100</td><td>₱6,360</td><td>彩金</td><td>2,650</td>
+                  <td>₱18,900</td><td>₱6,360</td><td>₱9,540</td>
+                </tr>
+                <tr>
+                  <td>2026-08-19</td><td>1030-1</td><td class="cell-name">Small Stake Club · 子任务1（每日充值） <span class="tag tag--info">子任务</span></td>
+                  <td><a onclick="openUserList('1030-1','Small Stake Club · 子任务1',67)">67</a></td>
+                  <td>₱50</td><td>₱3,350</td><td>积分</td><td>6,700</td>
+                  <td>₱210,000</td><td>₱42,000</td><td>₱15,000</td>
+                </tr>
+                <tr>
+                  <td>2026-08-19</td><td>1030-2</td><td class="cell-name">Small Stake Club · 子任务2（每日投注） <span class="tag tag--info">子任务</span></td>
+                  <td><a onclick="openUserList('1030-2','Small Stake Club · 子任务2',58)">58</a></td>
+                  <td>₱200</td><td>₱11,600</td><td>积分</td><td>8,700</td>
+                  <td>₱185,000</td><td>₱30,000</td><td>₱9,000</td>
+                </tr>
+                <tr>
+                  <td>2026-08-19</td><td>1030-3</td><td class="cell-name">Small Stake Club · 子任务3（周末累计） <span class="tag tag--info">子任务</span></td>
+                  <td><a onclick="openUserList('1030-3','Small Stake Club · 子任务3',41)">41</a></td>
+                  <td>₱1,000</td><td>₱41,000</td><td>积分</td><td>8,200</td>
+                  <td>₱140,000</td><td>₱28,000</td><td>₱6,200</td>
+                </tr>
+                <tr>
+                  <td>2026-08-19</td><td>1030</td><td class="cell-name">Small Stake Club · 额外奖励（完成2个） <span class="tag tag--edit">阶梯</span></td>
+                  <td><a onclick="openUserList('1030','额外奖励·完成2个',30)">30</a></td>
+                  <td class="note">完成 2 个</td><td class="note">—</td><td>彩金</td><td>3,000</td>
+                  <td>₱95,000</td><td>₱18,000</td><td>₱4,500</td>
+                </tr>
+                <tr>
+                  <td>2026-08-19</td><td>1030</td><td class="cell-name">Small Stake Club · 额外奖励（完成5个） <span class="tag tag--edit">阶梯</span></td>
+                  <td><a onclick="openUserList('1030','额外奖励·完成5个',12)">12</a></td>
+                  <td class="note">完成 5 个</td><td class="note">—</td><td>彩金</td><td>6,000</td>
+                  <td>₱52,000</td><td>₱9,600</td><td>₱2,400</td>
+                </tr>
+                <tr>
+                  <td>2026-08-19</td><td>1030</td><td class="cell-name">Small Stake Club · 额外奖励（完成10个） <span class="tag tag--edit">阶梯</span></td>
+                  <td><a onclick="openUserList('1030','额外奖励·完成10个',4)">4</a></td>
+                  <td class="note">完成 10 个</td><td class="note">—</td><td>积分</td><td>40,000</td>
+                  <td>₱21,000</td><td>₱3,800</td><td>₱900</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pager">Total 128 <span class="pg pg--on">1</span><span class="pg">2</span><span class="pg">3</span><span class="pg">…</span><span class="pg">13</span></div>
+        </section>
+
         <!-- ============ TAB: 黑名单设置 ============ -->
         <section data-panel="blacklist" class="hidden">
           <div class="field-row">
@@ -585,10 +677,7 @@ tbody tr:hover{background:#fafcff;}
               <label><input type="checkbox"/> 90MH</label>
               <label><input type="checkbox"/> 90ML</label>
             </div>
-            <ul class="note" style="margin:8px 0 0;padding-left:18px;line-height:1.7">
-              <li><b>VIP 与所勾选标签需「完全符合」</b>，用户才能看到此任务。</li>
-              <li>排除包（黑名单设置）优先——命中排除即不可参加。</li>
-            </ul>
+            <p class="note" style="margin:8px 0 0"><b>VIP 与所勾选标签需「完全符合」</b>，用户才能看到此任务。排除包（黑名单设置）优先——命中排除即不可参加。</p>
           </div>
         </div>
       </fieldset>
@@ -618,12 +707,7 @@ tbody tr:hover{background:#fafcff;}
               <label class="radio-grp" style="margin:0"><label><input type="radio" name="qual" class="qualRadio" disabled/> 完全符合</label></label>
             </div>
           </div>
-          <ul class="note" style="margin:8px 0 0;padding-left:18px;line-height:1.7">
-            <li>「完成KYC／完成KYC部分认证」为选填条件：<b>勾选后才生效</b>——用户须符合所勾选项目才能触发／领取此任务；未勾选则不限制。</li>
-            <li>「符合任一条件／完全符合」为单选，需同时勾选「累计充值区间」与「累计有效投注区间」后才可选。</li>
-            <li>区间上限不得低于下限。</li>
-            <li>累计口径＝任务开始前历史快照（注册至任务开始前一秒，不含活动当天）。</li>
-          </ul>
+          <p class="note" style="margin:8px 0 0">「完成KYC／完成KYC部分认证」为选填条件：<b>勾选后才生效</b>——用户须符合所勾选项目才能触发/领取此任务；未勾选则不限制。「符合任一条件／完全符合」为单选，需同时勾选「累计充值区间」与「累计有效投注区间」后才可选；上限不得低于下限。累计口径＝任务开始前历史快照（注册至任务开始前一秒，不含活动当天）。</p>
         </div>
       </div>
 
@@ -645,12 +729,7 @@ tbody tr:hover{background:#fafcff;}
               <label class="check-row" style="margin:0"><input type="checkbox" class="snapChk" onchange="onSnap(this)"/> 昨日 23:59:59</label>
               <label class="check-row" style="margin:0"><input type="checkbox" class="snapChk" onchange="onSnap(this)"/> 实时</label>
             </div>
-            <ul class="note" style="margin:8px 0 0;padding-left:18px;line-height:1.7">
-              <li>单选：至多勾选一项，预设不勾选。</li>
-              <li>「任务开始前快照」可指定日期区间。</li>
-              <li>一次性任务：任务开放后满足条件即可直接领取（采实时资格）。</li>
-              <li>判定顺序：先判资格通过、再扣名额。</li>
-            </ul>
+            <p class="note" style="margin:8px 0 0">单选：至多勾选一项，预设不勾选。「任务开始前快照」可指定日期区间。一次性任务：任务开放后满足条件即可直接领取（采实时资格）。先判资格通过、再扣名额。</p>
           </div>
         </div>
       </fieldset>
@@ -722,18 +801,10 @@ tbody tr:hover{background:#fafcff;}
       <!-- ===== 新增：任务组 / 阶梯任务配置 ===== -->
       <fieldset class="fieldset-new hidden" id="groupCfg">
         <div class="fs__title">组任务配置 <span class="tag tag--new">本次新增</span></div>
-        <ul class="note" style="margin:8px 0 0;padding-left:18px;line-height:1.7">
-          <li>最多可配置 10 个子任务。</li>
-          <li>每个子任务须各自设定目标值，并可各自设定奖励。</li>
-        </ul>
+        <p class="note" style="margin:8px 0 0">最多可配置 10 个子任务；每个子任务须各自设定目标值，并可各自设定奖励。</p>
         <div id="subTasks" style="margin-top:10px;display:flex;flex-direction:column;gap:8px"></div>
         <button class="btn btn--sm" id="addSubBtn" style="margin-top:8px" onclick="addSub(event)">＋ 添加子任务</button>
-        <p class="note" style="margin:8px 0 0">原始规则：</p>
-        <ul class="note" style="margin:2px 0 0;padding-left:18px;line-height:1.7">
-          <li>「信息完善」「首充」类型仅支持「永久」。</li>
-          <li>「充值」「投注」类型仅支持「每日」「限时」「周限时」。</li>
-          <li>同一组任务的各子任务，其任务完成时间类别须一致。</li>
-        </ul>
+        <p class="note" style="margin:8px 0 0">原始规则：「信息完善」「首充」类型仅支持「永久」；「充值」「投注」类型仅支持「每日」「限时」「周限时」。同一组任务的各子任务，其任务完成时间类别须一致。</p>
         <p class="hint" id="groupTimeWarn" style="display:none;margin:6px 0 0">⚠ 需选择任务完成时间一致的条件（所选子任务的任务时间类别不一致，无法组成同一组任务）。</p>
 
         <div class="form__row" style="margin-top:16px">
@@ -741,12 +812,7 @@ tbody tr:hover{background:#fafcff;}
           <div class="form__control">
             <div id="tierRewards" style="display:flex;flex-direction:column;gap:8px"></div>
             <button class="btn btn--sm" id="addTierBtn" style="margin-top:8px" onclick="addTier(event)">＋ 添加阶梯</button>
-            <ul class="note" style="margin:8px 0 0;padding-left:18px;line-height:1.7">
-              <li>「完成 n 个子任务」各自对应一档奖励，可配置多档。</li>
-              <li>n 不可超过子任务总数。</li>
-              <li>奖励为彩金时须额外配置彩金打码倍数。</li>
-              <li>例：完成 2 个 → 100 彩金；完成 5 个 → 500 彩金；完成 10 个 → 10,000 积分。</li>
-            </ul>
+            <p class="note" style="margin:8px 0 0">「完成 n 个子任务」各自对应一档奖励，可配置多档；n 不可超过子任务总数。奖励为彩金时须额外配置彩金打码倍数。<br>例：完成 2 个 → 100 彩金；完成 5 个 → 500 彩金；完成 10 个 → 10,000 积分。</p>
           </div>
         </div>
       </fieldset>
@@ -763,13 +829,7 @@ tbody tr:hover{background:#fafcff;}
           <label class="form__label">总人数上限：</label>
           <div class="form__control"><div class="range-inline"><input class="input" value="1000" style="max-width:160px"/><span class="note">0 或留空＝不限制</span></div></div>
         </div>
-        <ul class="note" style="margin:8px 0 4px;padding-left:18px;line-height:1.7">
-          <li>每位用户完成任务后仅可领取 <b>1 次</b> 奖励，故名额只计「领取人数」、不计领取次数。</li>
-          <li>名额＝去重领取人数（以领取时间 claim_time 为准）。</li>
-          <li>满额后前台显示「奖励名额已满」。</li>
-          <li>名额挂任务级。</li>
-          <li>金额预算上限本轮不做。</li>
-        </ul>
+        <p class="note" style="margin:8px 0 4px">每位用户完成任务后仅可领取 <b>1 次</b> 奖励，故名额只计「领取人数」、不计领取次数——名额＝去重领取人数（以领取时间 claim_time 为准）。满额后前台显示「奖励名额已满」；名额挂任务级。金额预算上限本轮不做。</p>
       </fieldset>
 
       <div class="form__row">
@@ -813,10 +873,7 @@ tbody tr:hover{background:#fafcff;}
               <select class="select" style="flex:1"><option>星期一</option><option>星期二</option><option>星期三</option><option>星期四</option><option>星期五</option><option>星期六</option><option>星期日</option></select>
             </div>
           </div>
-          <ul class="hint" style="margin-top:8px;padding-left:18px;line-height:1.7">
-            <li>"信息完善"和"首充"类型仅支持「永久」。</li>
-            <li>"充值"和"投注"类型仅支持「每日」「限时」「周限时」。</li>
-          </ul>
+          <p class="hint" style="margin-top:8px">"信息完善"和"首充"类型仅支持「永久」；"充值"和"投注"类型仅支持「每日」「限时」「周限时」。</p>
         </div>
       </div>
       <div class="form__row">
@@ -878,14 +935,34 @@ tbody tr:hover{background:#fafcff;}
           </div>
         </div>
       </div>
-      <ul class="note" style="flex:0 0 auto;margin:8px 2px 0;padding-left:18px;line-height:1.7">
-        <li>未设置：打码量＝所有体育游戏 ＋ 所有三方游戏。</li>
-        <li>有设置：打码量＝所勾选的体育游戏与第三方游戏总和。</li>
-      </ul>
+      <p class="note" style="flex:0 0 auto;margin:8px 2px 0">未设置：打码量＝所有体育游戏 ＋ 所有三方游戏；有设置：打码量＝所勾选的体育游戏与第三方游戏总和。</p>
     </div>
     <div class="modal__foot">
       <button class="btn" onclick="closeGameModal()">返回</button>
       <button class="btn btn--primary" onclick="closeGameModal()">确 定</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= Modal：完成用户清单（任务记录·完成人数）================= -->
+<div class="modal-mask" id="userListModal" role="dialog" aria-modal="true" aria-labelledby="ulTitle">
+  <div class="modal" style="width:min(600px,100%);max-height:calc(100vh - 80px);display:flex;flex-direction:column">
+    <div class="modal__head">
+      <h2 class="modal__title" id="ulTitle">完成用户清单</h2>
+      <button class="modal__close" onclick="closeUserList()" aria-label="关闭">✕</button>
+    </div>
+    <div class="modal__body" style="flex:1 1 auto;min-height:0;overflow:auto">
+      <p class="note" style="margin:0 0 10px">任务 <b id="ulTask"></b>（ID <span id="ulId"></span>）· 2026-08-19 当日完成的<b>去重用户</b>，共 <b id="ulCount">0</b> 人。</p>
+      <div class="table-wrap" style="padding:0">
+        <table style="min-width:0">
+          <thead><tr><th>会员名</th><th>VIP</th><th>奖励</th><th>有效投注</th><th>充值金额</th><th>任务完成后<br>第一笔充值</th></tr></thead>
+          <tbody id="ulBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal__foot">
+      <button class="btn" onclick="closeUserList()">关闭</button>
+      <button class="btn btn--primary" onclick="closeUserList()">导出清单</button>
     </div>
   </div>
 </div>
@@ -904,15 +981,40 @@ document.querySelectorAll('.subtab').forEach(function(t){
 });
 
 /* ===== modal ===== */
+/* ===== 任务记录：完成人数 → 完成用户清单弹窗 ===== */
+function openUserList(id,name,count){
+  document.getElementById('ulTask').textContent=name;
+  document.getElementById('ulId').textContent=id;
+  document.getElementById('ulCount').textContent=count.toLocaleString();
+  var vips=['VIP0','VIP1','VIP2','VIP3'];
+  var peso=function(n){ return '₱'+n.toLocaleString(); };
+  var seed=parseInt(String(id).replace(/[^0-9]/g,''))||1;   /* 支援子任务ID（如 1030-1）*/
+  var rows='';
+  for(var i=0;i<count;i++){                     /* 全部完成用户皆列出（弹窗内可上下滚动）*/
+    var acc='okbet'+(10000+((seed*37+i*613)%89999));
+    var bet=1200+((seed*53+i*811)%9000);        /* 有效投注 */
+    var dep=300+((seed*29+i*307)%2400);          /* 充值金额 */
+    var fd =(i%3===0)?0:(120+((seed*17+i*211)%1600)); /* 任务完成后第一笔充值 */
+    rows+='<tr><td>'+acc+'</td><td>'+vips[i%vips.length]+'</td><td>'+(i%3?'积分':'彩金')+' '+(50+i*10)+'</td>'
+      +'<td>'+peso(bet)+'</td><td>'+peso(dep)+'</td><td>'+(fd?peso(fd):'<span class="note">₱0</span>')+'</td></tr>';
+  }
+  document.getElementById('ulBody').innerHTML=rows;
+  document.getElementById('userListModal').classList.add('open');
+}
+function closeUserList(){ document.getElementById('userListModal').classList.remove('open'); }
+
 function openModal(mode){
   document.getElementById('taskModalTitle').textContent = (mode==='edit'?'编辑任务':'新增任务');
   document.getElementById('taskModal').classList.add('open');
 }
 function closeModal(){ document.getElementById('taskModal').classList.remove('open'); }
 document.getElementById('taskModal').addEventListener('click',function(e){ if(e.target===this) closeModal(); });
+document.getElementById('userListModal').addEventListener('click',function(e){ if(e.target===this) closeUserList(); });
 document.addEventListener('keydown',function(e){
   if(e.key!=='Escape') return;
   if(ddCloseAll()) return;
+  var ul=document.getElementById('userListModal');
+  if(ul && ul.classList.contains('open')){ closeUserList(); return; }
   var gm=document.getElementById('gameModal');
   if(gm && gm.classList.contains('open')){ closeGameModal(); return; }
   closeModal();
