@@ -216,7 +216,7 @@ code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:
                 </ul></div></li>
               <li class="rule-item"><div class="rule-num">1b</div><div class="rule-text"><strong>金额显示：</strong>前台所有奖励数字显示至<strong>小数点后 2 位</strong>，<strong>第 3 位无条件舍去</strong>（floor，非四舍五入；例 12.345 → 12.34、12.349 → 12.34）。</div></li>
               <li class="rule-item"><div class="rule-num">2</div><div class="rule-text">TAB <code>BOMB MISSION</code>／<code>BOMB TICKET REVEAL</code>；选中态呼吸光晕。<br><strong>气泡角标</strong>：<code>BOMB MISSION</code> ＝ <strong>返水及充值奖励未领取</strong>数量总数；<br><code>BOMB TICKET REVEAL</code> ＝ 刮刮卡<strong>「TO BE CLAIMED（待刮开/待领取）」张数</strong>（待开奖／已领／过期不计；<code>0</code> 不显示）。</div></li>
-              <li class="rule-item"><div class="rule-num">3</div><div class="rule-text">领取展示区<strong>仅真实数据</strong>（不灌水）；0.8 秒上滚；格式 <code>用户ID(隐码账号，账号前2码+***+后2码) · 动作 · 金额</code>。<br><strong>取数与缓存：</strong>依<strong>当前领取时间</strong>排序<strong>取前 100 笔</strong>展示，<strong>缓存 1 小时</strong>；缓存到期后<strong>重新依当前领取时间取前 100 笔</strong>。</div></li>
+              <li class="rule-item"><div class="rule-num">3</div><div class="rule-text">领取展示区<strong>仅真实数据</strong>（不灌水）；0.8 秒上滚；格式 <code>用户ID(隐码账号，账号前2码+***+后2码) · 动作 · 金额</code>。<br><strong>取数与缓存：</strong>依<strong>当前领取时间</strong>排序<strong>取前 50 笔</strong>展示，<strong>缓存 1 小时</strong>；缓存到期后<strong>重新依当前领取时间取前 50 笔</strong>。</div></li>
             </ul>
             <div class="sub-title">奖励状态</div>
             <table class="data-table"><thead><tr><th>状态</th><th>按钮</th><th>说明</th></tr></thead><tbody>
@@ -685,7 +685,7 @@ code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:
       <li><b>x-bomb 联名活动同期只能开启一个</b>：新增或既有活动状态变更为「开启」时，若已有相同活动进行中，显示错误提示「<b>检测到相同活动正在进行中</b>」。</li>
       <li>刮刮卡状态<b>每日中午 12:00 跑 JOB 更新</b>（开奖／过期等状态转移）。</li>
       <li>刮刮卡页每个区块<b>依「获得时间」排序，愈近愈上方</b>（由近到远）。</li>
-      <li>领取展示区依<b>当前领取时间</b>取<b>前 100 笔</b>展示、<b>缓存 1 小时</b>；到期后重新依当前领取时间取前 100 笔。</li>
+      <li>领取展示区依<b>当前领取时间</b>取<b>前 50 笔</b>展示、<b>缓存 1 小时</b>；到期后重新依当前领取时间取前 50 笔。</li>
     </ol>
   </div>
   </div>
