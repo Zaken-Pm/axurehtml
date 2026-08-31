@@ -431,7 +431,7 @@ label.chk input{accent-color:var(--primary);}
 
             <!-- 流水倍数 + 游戏范围 -->
             <div class="form-row"><label>彩金所需流水倍数：</label>
-              <input class="input" id="fWager" placeholder="请输入（可为空，不可填 0）" style="max-width:220px"></div>
+              <input class="input" id="fWager" placeholder="0.01～999999.99（可空；不可为 0）" style="max-width:220px"></div>
             <div class="form-row"><label><span class="req">*</span>适用游戏范围：</label>
               <div style="display:flex;align-items:center;gap:12px">
                 <button class="btn" id="btnGames">请选择游戏</button>
@@ -939,7 +939,10 @@ function validateStep(n){
       const amt=$('.js-amt',tr);
       if(!amt.value||Number(amt.value)<=0||/\./.test(amt.value)){amt.classList.add('is-error');bad=true;} else amt.classList.remove('is-error');
     });
-    const w=$('#fWager'); if(w.value!=='' && Number(w.value)===0){w.classList.add('is-error');bad=true;} else w.classList.remove('is-error');
+    const w=$('#fWager'); const wv=w.value.trim(); const wn=Number(wv);
+    const wagerBad = wv!=='' && !(Number.isFinite(wn) && wn>=0.01 && wn<=999999.99 && /^\d{1,8}(\.\d{1,2})?$/.test(wv));
+    if(wagerBad){ w.classList.add('is-error'); toast('彩金所需流水倍数须为 0.01～999999.99（最多 8 位整数＋2 位小数、不可为 0）',true); return false; }
+    w.classList.remove('is-error');
     if(goalOrderBad){toast('任务目标不可小于或等于同任务条件，请检查红框',true);return false;}
     if(bad){toast('活动条件有必填/格式错误，请检查红框',true);return false;}
     if(challengeRows.length>0 && challengeAppearFilled() && challengeAppearSum()!==100){renderChallenge();toast('挑战任务「触发机率」总计须等于100%（目前 '+challengeAppearSum()+'%）',true);return false;}
@@ -982,6 +985,7 @@ function updateChallengeAppearHint(){
 }
 function sanInt(v){ return v.replace(/[^\d.]/g,'').split('.')[0]; }
 function sanDec2(v){ v=v.replace(/[^\d.]/g,''); const p=v.split('.'); return p.length>1? p[0]+'.'+p.slice(1).join('').slice(0,2) : v; }
+function sanWager(v){ v=v.replace(/[^\d.]/g,''); const i=v.indexOf('.'); if(i===-1) return v.slice(0,8); return v.slice(0,i).slice(0,8)+'.'+v.slice(i+1).replace(/\./g,'').slice(0,2); }
 function renderChallenge(){
   const tb=$('#challengeBody'); tb.innerHTML='';
   challengeRows.forEach((r,i)=>{
@@ -1184,7 +1188,7 @@ $$('[data-close-modal]').forEach(b=>b.addEventListener('click',e=>{
 $('#autoReject').addEventListener('change',e=>$('#rejectN').disabled=!e.target.checked);
 
 /* ---------- 流水倍数：可留空、不可填0；填入有效值即清除红框 ---------- */
-$('#fWager').addEventListener('input',e=>{ const v=e.target.value; if(v===''||Number(v)>0) e.target.classList.remove('is-error'); });
+$('#fWager').addEventListener('input',e=>{ e.target.value=sanWager(e.target.value); const v=e.target.value, n=Number(v); if(v===''||(n>=0.01&&n<=999999.99)) e.target.classList.remove('is-error'); });
 
 /* ---------- 提交预览 ---------- */
 function buildPreview(){
