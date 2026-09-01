@@ -527,8 +527,9 @@ tbody tr:hover{background:#fafcff;}
             <button class="btn btn--primary">导出</button>
           </div>
           <div class="report-note">
-            <div class="report-note__title">🆕 「任务报表统计」：呈现任务<b>完成后的成效</b>，按 <b>每日</b> 统计（时区 UTC+8 · 结算 23:59:59）。</div>
+            <div class="report-note__title">🆕 「任务报表统计(日)」：呈现任务<b>完成后的成效</b>，按 <b>每日</b> 统计（时区 UTC+8 · 结算 23:59:59）。</div>
             <ul class="report-note__list">
+              <li><b>报表范围</b>：<b>仅统计任务时间设定为「每日」的任务</b>；其他任务时间（每周／永久／限时／周限时）不纳入本报表。</li>
               <li><b>完成人数</b>＝当日完成此任务的<b>去重人数</b>，点击数字可查看完成用户清单。</li>
               <li>下列数值皆为<b>当日完成此任务全部用户的总计</b>。</li>
               <li><b>有效投注 / 充值金额</b>：统计口径为该用户「任务触发 → 任务完成当下」期间的累计（<b>非完成后数据</b>）。</li>
@@ -559,52 +560,46 @@ tbody tr:hover{background:#fafcff;}
                   <td>₱1,025,000</td><td>₱246,000</td><td>₱132,800</td>
                 </tr>
                 <tr>
-                  <td>2026-08-19</td><td>1025</td><td class="cell-name">高价值·周限时投注</td>
-                  <td><a onclick="openUserList('1025','高价值·周限时投注',146)">146</a></td>
-                  <td>投注</td><td>₱5,000</td><td>₱963,600</td><td>彩金</td><td>32,412</td>
-                  <td>₱2,480,300</td><td>₱0</td><td>₱0</td>
+                  <td>2026-08-19</td><td>1040</td><td class="cell-name">中额·每日投注任务</td>
+                  <td><a onclick="openUserList('1040','中额·每日投注任务',512)">512</a></td>
+                  <td>投注</td><td>₱200</td><td>₱112,000</td><td>积分</td><td>51,200</td>
+                  <td>₱1,860,000</td><td>₱96,000</td><td>₱44,800</td>
                 </tr>
                 <tr>
-                  <td>2026-08-19</td><td>1031</td><td class="cell-name">首充·新客任务</td>
-                  <td><a onclick="openUserList('1031','首充·新客任务',53)">53</a></td>
-                  <td>首次充值</td><td>₱100</td><td>₱6,360</td><td>彩金</td><td>2,650</td>
-                  <td>₱18,900</td><td>₱6,360</td><td>₱9,540</td>
+                  <td>2026-08-19</td><td>1042</td><td class="cell-name">每日游戏任务·CQ9电子</td>
+                  <td><a onclick="openUserList('1042','每日游戏任务·CQ9电子',240)">240</a></td>
+                  <td>投注</td><td>₱100</td><td>₱26,400</td><td>积分</td><td>24,000</td>
+                  <td>₱520,000</td><td>₱62,000</td><td>₱18,000</td>
                 </tr>
                 <tr>
-                  <td>2026-08-19</td><td>1030-1</td><td class="cell-name">Small Stake Club · 子任务1（每日充值） <span class="tag tag--info">子任务</span></td>
-                  <td><a onclick="openUserList('1030-1','Small Stake Club · 子任务1',67)">67</a></td>
-                  <td>充值</td><td>₱50</td><td>₱3,350</td><td>积分</td><td>6,700</td>
-                  <td>₱210,000</td><td>₱42,000</td><td>₱15,000</td>
+                  <td>2026-08-19</td><td>1050-1</td><td class="cell-name">每日三连·组任务 · 子任务1（每日充值） <span class="tag tag--info">子任务</span></td>
+                  <td><a onclick="openUserList('1050-1','每日三连·子任务1',78)">78</a></td>
+                  <td>充值</td><td>₱50</td><td>₱3,900</td><td>积分</td><td>7,800</td>
+                  <td>₱240,000</td><td>₱46,000</td><td>₱16,000</td>
                 </tr>
                 <tr>
-                  <td>2026-08-19</td><td>1030-2</td><td class="cell-name">Small Stake Club · 子任务2（每日投注） <span class="tag tag--info">子任务</span></td>
-                  <td><a onclick="openUserList('1030-2','Small Stake Club · 子任务2',58)">58</a></td>
-                  <td>投注</td><td>₱200</td><td>₱11,600</td><td>积分</td><td>8,700</td>
-                  <td>₱185,000</td><td>₱30,000</td><td>₱9,000</td>
+                  <td>2026-08-19</td><td>1050-2</td><td class="cell-name">每日三连·组任务 · 子任务2（每日投注） <span class="tag tag--info">子任务</span></td>
+                  <td><a onclick="openUserList('1050-2','每日三连·子任务2',65)">65</a></td>
+                  <td>投注</td><td>₱200</td><td>₱13,000</td><td>积分</td><td>9,750</td>
+                  <td>₱205,000</td><td>₱33,000</td><td>₱10,200</td>
                 </tr>
                 <tr>
-                  <td>2026-08-19</td><td>1030-3</td><td class="cell-name">Small Stake Club · 子任务3（周末累计） <span class="tag tag--info">子任务</span></td>
-                  <td><a onclick="openUserList('1030-3','Small Stake Club · 子任务3',41)">41</a></td>
-                  <td>投注</td><td>₱1,000</td><td>₱41,000</td><td>积分</td><td>8,200</td>
-                  <td>₱140,000</td><td>₱28,000</td><td>₱6,200</td>
+                  <td>2026-08-19</td><td>1050-3</td><td class="cell-name">每日三连·组任务 · 子任务3（每日打码） <span class="tag tag--info">子任务</span></td>
+                  <td><a onclick="openUserList('1050-3','每日三连·子任务3',52)">52</a></td>
+                  <td>投注</td><td>₱300</td><td>₱15,600</td><td>积分</td><td>10,400</td>
+                  <td>₱168,000</td><td>₱25,000</td><td>₱7,300</td>
                 </tr>
                 <tr>
-                  <td>2026-08-19</td><td>1030</td><td class="cell-name">Small Stake Club · 额外奖励（任意完成2个）</td>
-                  <td><a onclick="openUserList('1030','额外奖励·任意完成2个',30)">30</a></td>
-                  <td class="note">组任务·额外奖励</td><td class="note">完成 2 个</td><td class="note">—</td><td>彩金</td><td>3,000</td>
-                  <td>₱95,000</td><td>₱18,000</td><td>₱4,500</td>
+                  <td>2026-08-19</td><td>1050</td><td class="cell-name">每日三连·组任务 · 额外奖励（任意完成2个）</td>
+                  <td><a onclick="openUserList('1050','额外奖励·任意完成2个',40)">40</a></td>
+                  <td class="note">组任务·额外奖励</td><td class="note">完成 2 个</td><td class="note">—</td><td>彩金</td><td>4,000</td>
+                  <td>₱110,000</td><td>₱20,000</td><td>₱5,200</td>
                 </tr>
                 <tr>
-                  <td>2026-08-19</td><td>1030</td><td class="cell-name">Small Stake Club · 额外奖励（任意完成5个）</td>
-                  <td><a onclick="openUserList('1030','额外奖励·任意完成5个',12)">12</a></td>
-                  <td class="note">组任务·额外奖励</td><td class="note">完成 5 个</td><td class="note">—</td><td>彩金</td><td>6,000</td>
-                  <td>₱52,000</td><td>₱9,600</td><td>₱2,400</td>
-                </tr>
-                <tr>
-                  <td>2026-08-19</td><td>1030</td><td class="cell-name">Small Stake Club · 额外奖励（任意完成10个）</td>
-                  <td><a onclick="openUserList('1030','额外奖励·任意完成10个',4)">4</a></td>
-                  <td class="note">组任务·额外奖励</td><td class="note">完成 10 个</td><td class="note">—</td><td>积分</td><td>40,000</td>
-                  <td>₱21,000</td><td>₱3,800</td><td>₱900</td>
+                  <td>2026-08-19</td><td>1050</td><td class="cell-name">每日三连·组任务 · 额外奖励（任意完成3个）</td>
+                  <td><a onclick="openUserList('1050','额外奖励·任意完成3个',18)">18</a></td>
+                  <td class="note">组任务·额外奖励</td><td class="note">完成 3 个</td><td class="note">—</td><td>积分</td><td>18,000</td>
+                  <td>₱62,000</td><td>₱11,000</td><td>₱2,900</td>
                 </tr>
               </tbody>
             </table>
@@ -817,8 +812,8 @@ tbody tr:hover{background:#fafcff;}
         <p class="note" style="margin:8px 0 0">最多可配置 10 个子任务；每个子任务须各自设定目标值，并可各自设定奖励。</p>
         <div id="subTasks" style="margin-top:10px;display:flex;flex-direction:column;gap:8px"></div>
         <button class="btn btn--sm" id="addSubBtn" style="margin-top:8px" onclick="addSub(event)">＋ 添加子任务</button>
-        <p class="note" style="margin:8px 0 0">原始规则：「信息完善」「首充」类型仅支持「永久」；「充值」「投注」类型仅支持「每日」「限时」「周限时」。同一组任务的各子任务，其任务完成时间类别须一致。</p>
-        <p class="hint" id="groupTimeWarn" style="display:none;margin:6px 0 0">⚠ 需选择任务完成时间一致的条件（所选子任务的任务时间类别不一致，无法组成同一组任务）。</p>
+        <p class="note" style="margin:8px 0 0">组任务的「任务时间」<b>统一由下方「任务时间」设定、套用至所有子任务</b>，子任务不单独配置任务时间。原始规则：「信息完善」「首充」类型仅支持「永久」；「充值」「投注」类型仅支持「每日」「限时」「周限时」——各子任务条件类型须与所选任务时间相容。</p>
+        <p class="hint" id="groupTimeWarn" style="display:none;margin:6px 0 0">⚠ 所选子任务条件的任务时间类别不一致，无法统一为同一「任务时间」，请调整子任务条件。</p>
 
         <div class="form__row" style="margin-top:16px">
           <label class="form__label">额外奖励配置：</label>
@@ -837,7 +832,7 @@ tbody tr:hover{background:#fafcff;}
 
       <!-- ===== 新增：名额上限 ===== -->
       <fieldset class="fieldset-new">
-        <div class="fs__title">名额限制（先到先得 FCFS） <span class="tag tag--new">本次新增</span></div>
+        <div class="fs__title">名额限制 <span class="tag tag--new">本次新增</span></div>
         <div class="form__row" style="margin-top:12px">
           <label class="form__label">总人数上限：</label>
           <div class="form__control"><div class="range-inline"><input class="input" value="1000" style="max-width:160px"/><span class="note">0 或留空＝不限制</span></div></div>
