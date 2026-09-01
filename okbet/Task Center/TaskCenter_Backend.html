@@ -346,7 +346,7 @@ tbody tr:hover{background:#fafcff;}
           <button class="subtab" data-tab="audit" role="tab">资料审核 <span class="badge">89</span></button>
           <button class="subtab" data-tab="record" role="tab">任务完成记录 <span class="badge">3398</span></button>
           <button class="subtab" data-tab="report" role="tab">任务报表统计(用户)</button>
-          <button class="subtab" data-tab="tasklog" role="tab">任务报表统计 <span class="tag tag--new" style="margin-left:6px">本次新增</span></button>
+          <button class="subtab" data-tab="tasklog" role="tab">任务报表统计(日) <span class="tag tag--new" style="margin-left:6px">本次新增</span></button>
           <button class="subtab" data-tab="blacklist" role="tab">黑名单设置 <span class="tag tag--new" style="margin-left:6px">对应排除包</span></button>
         </div>
 
@@ -485,20 +485,20 @@ tbody tr:hover{background:#fafcff;}
             <button class="btn btn--primary">导出</button>
           </div>
           <div class="report-note">
-            🆕 「任务报表统计(用户)」至少输出下列栏位，追踪「完成任务 → 领奖 → 领奖后价值表现」。时区统一 <b>UTC+8</b>，结算 <b>23:59:59</b>；
-            <span class="mono">ltv_*_before_event</span> 为注册至任务开始前一秒的历史快照（不含活动当天）。退款/撤单不回溯。
+            🆕 「任务报表统计(用户)」至少输出下列栏位，追踪「完成任务 → 领奖 → 价值表现」。时区统一 <b>UTC+8</b>，结算 <b>23:59:59</b>。<br>
+            <b>「充值金额／有效投注 (任务触发前)」</b>计算区间＝<b>任务触发前</b>（注册至任务触发前一秒的历史记录，不含活动当天）；<b>「充值金额／有效投注／GGR (完成任务)」</b>计算区间＝<b>任务触发到完成</b>期间。退款/撤单不回溯。
           </div>
           <div class="table-wrap">
             <table style="min-width:1720px">
               <thead>
                 <tr>
                   <th>会员名</th><th>任务完成时间</th><th>VIP</th>
-                  <th>任务完成前<br>充值金额</th><th>任务完成前<br>有效投注</th>
+                  <th>充值金额<br><span class="note">(任务触发前)</span></th><th>有效投注<br><span class="note">(任务触发前)</span></th>
                   <th>任务id</th><th class="cell-name">任务名称</th>
                   <th>任务条件</th><th>任务目标值</th><th>任务完成值</th>
                   <th>奖励类型</th><th>奖励金额</th><th>奖励领取时间</th>
-                  <th>任务完成后<br>充值金额</th><th>任务完成后<br>有效投注</th>
-                  <th>任务完成后<br>GGR</th><th>任务完成后<br>提现金额</th>
+                  <th>充值金额<br><span class="note">(完成任务)</span></th><th>有效投注<br><span class="note">(完成任务)</span></th>
+                  <th>GGR<br><span class="note">(完成任务)</span></th><th>任务完成后<br>提现金额</th>
                   <th>任务完成后<br>是否再充值</th>
                 </tr>
               </thead>
@@ -720,29 +720,29 @@ tbody tr:hover{background:#fafcff;}
               <label class="radio-grp" style="margin:0"><label><input type="radio" name="qual" class="qualRadio" disabled/> 完全符合</label></label>
             </div>
           </div>
-          <p class="note" style="margin:8px 0 0">「完成KYC／完成KYC部分认证」为选填条件：<b>勾选后才生效</b>——用户须符合所勾选项目才能触发/领取此任务；未勾选则不限制。「符合任一条件／完全符合」为单选，需同时勾选「累计充值区间」与「累计有效投注区间」后才可选；上限不得低于下限。累计口径＝任务开始前历史快照（注册至任务开始前一秒，不含活动当天）。</p>
+          <p class="note" style="margin:8px 0 0">「完成KYC／完成KYC部分认证」为选填条件：<b>勾选后才生效</b>——用户须符合所勾选项目才能触发/领取此任务；未勾选则不限制。「符合任一条件／完全符合」为单选，需同时勾选「累计充值区间」与「累计有效投注区间」后才可选；上限不得低于下限。累计口径＝任务开始前历史记录（注册至任务开始前一秒，不含活动当天）。</p>
         </div>
       </div>
 
       <!-- ===== 新增：资格判定快照 · 移至目标用户下方 ===== -->
       <fieldset class="fieldset-new">
-        <div class="fs__title">参与资格 · 资格判定时间 <span class="tag tag--new">本次新增</span></div>
+        <div class="fs__title">参与资格判定时间 <span class="tag tag--new">本次新增</span></div>
         <div class="form__row" style="margin-top:12px">
-          <label class="form__label">快照时间：</label>
+          <label class="form__label">资格时间：</label>
           <div class="form__control">
             <div style="display:flex;flex-direction:column;gap:10px">
               <div>
-                <label class="check-row" style="margin:0"><input type="checkbox" class="snapChk" onchange="onSnap(this)"/> 任务开始前快照（默认）</label>
+                <label class="check-row" style="margin:0"><input type="checkbox" class="snapChk" onchange="onSnap(this)"/> 任务开始前时间（默认）</label>
                 <div class="range-inline" style="margin:8px 0 0 24px">
-                  <input class="input" type="date" style="max-width:170px" aria-label="快照起日"/>
+                  <input class="input" type="date" style="max-width:170px" aria-label="起始日"/>
                   <span>~</span>
-                  <input class="input" type="date" style="max-width:170px" aria-label="快照迄日"/>
+                  <input class="input" type="date" style="max-width:170px" aria-label="结束日"/>
                 </div>
               </div>
               <label class="check-row" style="margin:0"><input type="checkbox" class="snapChk" onchange="onSnap(this)"/> 昨日 23:59:59</label>
               <label class="check-row" style="margin:0"><input type="checkbox" class="snapChk" onchange="onSnap(this)"/> 实时</label>
             </div>
-            <p class="note" style="margin:8px 0 0">单选：至多勾选一项，预设不勾选。「任务开始前快照」可指定日期区间。一次性任务：任务开放后满足条件即可直接领取（采实时资格）。先判资格通过、再扣名额。</p>
+            <p class="note" style="margin:8px 0 0">单选：至多勾选一项，预设不勾选。「任务开始前时间」可指定日期区间。一次性任务：任务开放后满足条件即可直接领取（采实时资格）。先判资格通过、再扣名额。</p>
           </div>
         </div>
       </fieldset>
