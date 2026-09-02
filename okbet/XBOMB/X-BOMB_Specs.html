@@ -131,7 +131,7 @@ code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:
   <div class="mtabs">
     <button class="mtab active" data-m="spec">规则说明</button>
     <button class="mtab" data-m="proto">原型预览</button>
-    <button class="mtab mtab-chg" data-m="chg">🔧 本次调整 <span class="mtab-badge">21</span></button>
+    <button class="mtab mtab-chg" data-m="chg">🔧 本次调整 <span class="mtab-badge">23</span></button>
   </div>
 </div>
 
@@ -141,7 +141,7 @@ code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:
     <h1 class="doc-title">X-BOMB · <em>联名挑战活动</em></h1>
     <p class="doc-desc">活动正式名称「X-Bomb Lucky Blast」。投注返水保障基础利益，翻牌挑战与次日刮刮卡制造大奖噱头与回访诱因，形成「存 → 投 → 返 → 再存」闭环。</p>
     <div class="doc-meta">
-      <div class="meta-chip"><span>版本</span> <strong>v3</strong></div>
+      <div class="meta-chip"><span>版本</span> <strong>v4</strong></div>
       <div class="meta-chip"><span>后台模板</span> <strong>活动配置(新) › 联名挑战活动</strong></div>
       <div class="meta-chip"><span>关联原型</span> <strong>前台 · 后台</strong></div>
     </div>
@@ -318,6 +318,8 @@ code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:
                 <li><strong>角标计数：</strong>刮刮卡角标<strong>仅计算「TO BE CLAIMED（待刮开/待领取）」的张数</strong>；待开奖（TO BE SCRATCHED）、已领（CLAIMED）、过期（EXPIRED）<strong>皆不计入</strong>。</li>
                 <li><strong>状态更新 JOB：</strong>刮刮卡状态<strong>每日中午 12:00 由 JOB 更新</strong>（含开奖：待开奖→待刮开；过期：逾期→已过期 等状态转移）。</li>
                 <li><strong>区块内排序：</strong>各区块（TO BE CLAIMED／TO BE SCRATCHED／CLAIMED／EXPIRED）内部一律<strong>依「获得时间」由近到远排序</strong>（获得时间愈近、排愈上方）。</li>
+                <li><strong>过期后点击（前端状态过时）：</strong>用户在刮刮卡<strong>未过期前</strong>进入活动详情页、且<strong>未刷新页面</strong>；当刮刮卡<strong>已过期后</strong>再点击 <code>SCRATCH</code>，前端<strong>跳 toast「Scratch Card Expired」</strong>，并<strong>重打 API 重新获取刮刮卡状态</strong>（据以刷新该卡至正确状态）。</li>
+                <li><strong>开奖状态「Drawing Soon」：</strong>开奖<strong>倒数结束后、后端尚未返回</strong>刮刮卡状态的空窗期，<strong>由前端将文案变更显示「Drawing Soon」</strong>（待后端返回后再切至实际状态）。</li>
                 <li><strong>空状态：</strong><code>No Scratch Tickets Yet</code>。</li>
               </ul>
             </div></div>
@@ -664,7 +666,12 @@ code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:
 
   <div class="mview" data-m="chg">
     <div class="doc-header">
-    <div class="doc-eyebrow" style="color:var(--green);background:var(--green-bg);border-color:var(--green-border)">🔧 本次调整 · v3（21 项）</div>
+    <div class="doc-eyebrow" style="color:var(--green);background:var(--green-bg);border-color:var(--green-border)">🔧 本次调整 · v4（2 项）</div>
+    <ol style="margin:6px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:5px;font-size:12.5px;line-height:1.6;color:var(--text)">
+      <li>刮刮卡未过期前进详情页且未刷新，过期后点 SCRATCH → toast「<b>Scratch Card Expired</b>」并<b>重打 API</b> 刷新状态。</li>
+      <li>开奖倒数结束、后端尚未返回状态时，前端文案改显示「<b>Drawing Soon</b>」。</li>
+    </ol>
+    <div class="doc-eyebrow" style="color:var(--green);background:var(--green-bg);border-color:var(--green-border);margin-top:16px">🔧 本次调整 · v3（21 项）</div>
     <ol style="margin:6px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:5px;font-size:12.5px;line-height:1.6;color:var(--text)">
       <li><b>前台奖励数字</b>显示至<b>小数点后 2 位</b>，第 3 位<b>无条件舍去</b>（floor，非四舍五入）。</li>
       <li><b>已领取奖励</b>：升级 VIP 后<b>相同任务</b>的奖励<b>不可再领</b>（维持「已领取」）。</li>
