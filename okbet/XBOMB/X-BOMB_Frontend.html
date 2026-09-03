@@ -354,7 +354,7 @@ body {
     <button class="toolbar__btn" data-scn="2" aria-pressed="false">情境2 · 投注≥5000 &amp; 充值&lt;100</button>
     <button class="toolbar__btn" data-scn="3" aria-pressed="false">情境3 · 投注≥500 &amp; 充值≥100</button>
   </div>
-  <p class="toolbar__hint">切换情境观察投注/充值奖励的高亮(可领)与锁定；情境3 点 LV3 充值 CLAIM 会提示「需先完成前个等级投注任务」。挑战卡 CLAIM 触发翻牌。</p>
+  <p class="toolbar__hint">切换情境观察投注/充值奖励的高亮(可领)与锁定；情境3 点 LV3 充值 CLAIM 会提示「需先完成前个等级任务后才能领取」（后端文案·多语系）。挑战卡 CLAIM 触发翻牌。</p>
 </aside>
 
 <!-- ============================== 手机界面 ======================= -->
@@ -589,7 +589,7 @@ $('#viewRebate').addEventListener('click',(e)=>{
   const lv=+claimBtn.dataset.lv; const d=tasks.find(t=>t.lv===lv);
   if(d.type==='topup'){
     const prev=prevBetLevel(lv);
-    if(prev && scenarios[curScn].bet < prev.need){ toast('需先完成前个等级投注任务后才能领取'); return; }
+    if(prev && scenarios[curScn].bet < prev.need){ toast(({zh:'需先完成前个等级任务后才能领取',en:"Complete the previous level's mission before claiming this reward",vi:'Vui lòng hoàn thành nhiệm vụ của cấp trước rồi mới nhận thưởng'})[(window.LANG||'zh')] || "Complete the previous level's mission before claiming this reward"); return; }
   }
   if(d.challenge){ openFlip(d); return; }
   claimed[lv]=true; toast(`Claimed ${d.amt} 🪙 → Bonus Claimed`); renderTasks();

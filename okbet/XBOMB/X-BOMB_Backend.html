@@ -529,7 +529,7 @@ label.chk input{accent-color:var(--primary);}
           <tbody id="awardBody"></tbody>
         </table>
         </div>
-        <p class="mini-note">「联名挑战活动」奖励类型一律「礼金」；活动类型一律显示「联名挑战活动」（<b>不加括号</b>，刮刮卡奖励亦归入此类型）。</p>
+        <p class="mini-note">「联名挑战活动」奖励类型一律「礼金」；若奖励来自刮刮卡，活动类型附加括号显示为「联名挑战活动(刮刮卡)」。</p>
       </div>
 
       <!-- 子页：活动数据统计 -->
@@ -555,7 +555,7 @@ label.chk input{accent-color:var(--primary);}
           <tbody id="dataBody"></tbody>
         </table>
         </div>
-        <p class="mini-note">「联名挑战活动」：活动类型一律显示「联名挑战活动」（<b>不会出现「联名挑战活动(刮刮卡)」</b>，刮刮卡奖励亦归入此类型）；天数固定「-」；申请领取时间与审核时间一致；状态一律「已通过」。</p>
+        <p class="mini-note">「联名挑战活动」：天数固定「-」；申请领取时间与审核时间一致；状态一律「已通过」；刮刮卡奖励活动类型加括号「联名挑战活动(刮刮卡)」。</p>
       </div>
     </section>
 
@@ -671,9 +671,9 @@ $$('.side__subitem').forEach(s=>{ const t=s.textContent.trim();
 /* ---------- 派奖审核：资料与渲染 ---------- */
 /* 规则：联名挑战活动 → 状态一律「审核通过」、审核人一律「自动审核」 */
 const auditRows=[
-  ['190','member01','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 200.00','审核通过','2026-08-21 12:03:11','自动审核','2026-08-21 12:03:11','LV2 基础奖励 200'],
-  ['190','member02','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 115.00','审核通过','2026-08-21 12:10:44','自动审核','2026-08-21 12:10:44','LV3 基础奖励 100、挑战3 +15%'],
-  ['190','member03','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 200.00','审核通过','2026-08-22 12:00:02','自动审核','2026-08-22 12:00:02','刮刮卡N2-1 奖励200'],
+  ['190','member01','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 100.00','审核通过','2026-08-21 12:03:11','自动审核','2026-08-21 12:03:11','User VIP Level 1, LV3 Base Reward 100'],
+  ['190','member02','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 115.00','审核通过','2026-08-21 12:10:44','自动审核','2026-08-21 12:10:44','User VIP Level 1, LV3 Base Reward 100, Challenge 3 +15%'],
+  ['190','member03','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 200.00','审核通过','2026-08-22 12:00:02','自动审核','2026-08-22 12:00:02','User VIP Level 1, Scratch Card N2-1 Reward 200'],
   ['184','xnjobe10','周卡活动','最新周卡','礼金','PHP 12.00','审核通过','2026-08-06 13:49:53','自动审核','2026-08-06 13:44:00','—'],
   ['184','ody002','周卡活动','最新周卡','礼金','PHP 23.00','审核不通过','—','自动审核','2026-08-06 00:04:00','未完成额外任务'],
 ];
@@ -695,18 +695,18 @@ $$('.rtab').forEach(b=>b.addEventListener('click',()=>{
   $('#reportData').style.display=isAward?'none':'';
 }));
 
-/* 活动奖励统计：联名挑战活动奖励类型一律「礼金」；活动类型一律「联名挑战活动」（不加(刮刮卡)） */
+/* 活动奖励统计：联名挑战活动奖励类型一律「礼金」；刮刮卡奖励→活动类型加(刮刮卡) */
 const awardRows=[
   ['2026-08-21','联名挑战活动','190','X-Bomb Lucky Blast','礼金','PHP 7','120','118','826.00','0.00','0'],
-  ['2026-08-21','联名挑战活动','190','X-Bomb Lucky Blast','礼金','PHP 100','33','33','3,300.00','0.00','0'],
+  ['2026-08-21','联名挑战活动(刮刮卡)','190','X-Bomb Lucky Blast','礼金','PHP 100','33','33','3,300.00','0.00','0'],
   ['2026-08-22','联名挑战活动','190','X-Bomb Lucky Blast','礼金','PHP 25','96','90','2,250.00','0.00','0'],
   ['2026-08-06','周卡活动','184','最新周卡','礼金','PHP 12','1','1','12.00','0.00','0'],
   ['2026-08-05','周卡活动','184','最新周卡','积分','22 pts','1','1','0.00','22.00','0'],
 ];
-/* 活动数据统计：联名挑战活动 → 活动类型一律「联名挑战活动」（不加(刮刮卡)）、天数「-」、申请领取时间=审核时间、状态「已通过」 */
+/* 活动数据统计：联名挑战活动 → 天数「-」、申请领取时间=审核时间、状态「已通过」；刮刮卡加(刮刮卡) */
 const dataRows=[
   ['190','member01','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 7','-','2026-08-21 12:03:11','2026-08-21 12:03:11','已通过'],
-  ['190','member03','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 100','-','2026-08-22 12:00:02','2026-08-22 12:00:02','已通过'],
+  ['190','member03','联名挑战活动(刮刮卡)','X-Bomb Lucky Blast','礼金','PHP 100','-','2026-08-22 12:00:02','2026-08-22 12:00:02','已通过'],
   ['190','member02','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 25','-','2026-08-21 12:10:44','2026-08-21 12:10:44','已通过'],
   ['183','xnjobe11','周卡活动','周卡时间到期活动测试','礼金','PHP 17','Day 7','—','—','待审核'],
 ];
@@ -1193,17 +1193,48 @@ $('#fWager').addEventListener('input',e=>{ e.target.value=sanWager(e.target.valu
 /* ---------- 提交预览 ---------- */
 function buildPreview(){
   const status=$('input[name=status]:checked').value;
-  const cardSummary=Object.keys(scratch).map(t=>`${t}:${scratch[t].length}项`).join('　');
+  const sw=$$('#pageWizard [data-panel="5"] .switch input');
+  const yn=x=>x&&x.checked?'是':'否';
+  const order=['N1','N2','S1','S2'];
+  const scTotal=order.reduce((a,t)=>a+(scratch[t]?scratch[t].length:0),0);
+  const scBreak=order.map(t=>`${t} ${scratch[t]?scratch[t].length:0}`).join(' / ');
+  const applyAll=$('#applyAll').checked;
+  let periods='—', showEnd='—';
+  const at=dpParse($('#fActTime').value);
+  if(at){
+    const days=Math.round((at.end-at.start)/86400000)+1; periods=days+' 期';
+    const se=new Date(at.end.getTime()+3.5*86400000); const p=n=>String(n).padStart(2,'0');
+    showEnd=`${se.getFullYear()}-${p(se.getMonth()+1)}-${p(se.getDate())} 12:00:00`;
+  }
+  const floatOn=$$('input[name=float]')[1]?$$('input[name=float]')[1].checked:false;
+  const listOn=$$('input[name=listShow]')[0]?$$('input[name=listShow]')[0].checked:false;
   const rows=[
-    ['① 活动模板设置',[['活动ID','—'],['模板类型',$('#fType').value],['状态',status],['活动币种',$('#fCur').value],
-      ['活动名称',$('#fName').value],['活动时间',$('#fActTime').value]]],
-    ['② 活动图片',[['首页浮窗',$$('input[name=float]')[1].checked?'开启':'关闭'],['浮窗排序',$('#fSort').value],['活动列表图','PC／H5'],['列表显示',$$('input[name=listShow]')[0].checked?'开启':'关闭'],['列表排序',$('#fListSort').value],['备注',$('#fRemark').value||'—']]],
-    ['③ 参与对象与名单',[['充值层级','全选'],['指定代理','不指定'],['新会员限制','否'],['会员等级','全选'],['黑名单','—']]],
-    ['④ 活动条件',[['返水等级数',rebateRows.length+' 级'],['挑战等级数',challengeRows.length+' 级'],
-      ['刮刮卡配置',cardSummary],['流水倍数',$('#fWager').value||'—'],['适用游戏',syncGameCount()+' 个']]],
-    ['⑤ 风控条件',[['同IP检测',$$('#pageWizard [data-panel="5"] .switch input')[0].checked?'是':'否'],
-      ['同手机号检测',$$('#pageWizard [data-panel="5"] .switch input')[1].checked?'是':'否'],
-      ['自动拒绝',$('#autoReject').checked?('是（'+$('#rejectN').value+' 笔）'):'否']]],
+    ['① 活动模板设置',[
+      ['活动ID',(typeof editingActId!=='undefined'&&editingActId)?editingActId:'—'],['模板类型',$('#fType').value],
+      ['状态',status],['活动币种',$('#fCur').value],
+      ['活动名称',$('#fName').value||'—'],['活动时间',$('#fActTime').value||'—']]],
+    ['② 活动图片',[
+      ['首页浮窗',floatOn?'开启':'关闭'],['PC 图片','已上传'],
+      ['H5 图片','已上传'],['首页浮窗排序',$('#fSort').value||'0'],
+      ['活动列表',listOn?'开启':'关闭'],['活动列表 PC 图片','已上传'],
+      ['活动列表 H5 图片','已上传'],['活动列表排序',$('#fListSort').value||'0'],
+      ['备注',$('#fRemark').value||'—']]],
+    ['③ 参与对象与名单',[
+      ['充值层级','全选'],['指定代理','不指定'],
+      ['新会员限制','否'],['会员等级','全选'],
+      ['用户标签','—'],['用户标签(排除)','—'],
+      ['黑名单用户名','—']]],
+    ['④ 活动条件',[
+      ['套用至其他等级（勾选后其余 VIP 等级套用 VIP0 配置、不可再编辑）',applyAll?'是':'否'],['VIP 配置数',applyAll?'1 个':'11 个'],
+      ['每日返水配置',rebateRows.length+' 个'],['挑战任务配置',challengeRows.length+' 个'],
+      ['刮刮卡配置',scTotal+' 个（'+scBreak+'）'],['每日开奖期次（只读）',periods],
+      ['前台展示截止时间',showEnd],['彩金所需流水倍数',$('#fWager').value||'—'],
+      ['适用游戏范围','全部'],['审核方式','自动审核'],
+      ['领取方式','手动领取']]],
+    ['⑤ 风控条件',[
+      ['同 IP 检测',yn(sw[0])],['同姓名检测',yn(sw[2])],
+      ['同手机号检测',yn(sw[1])],['同 email 检测',yn(sw[3])],
+      ['自动拒绝',$('#autoReject').checked?('是（'+$('#rejectN').value+' 笔）'):'—']]],
   ];
   $('#previewBody').innerHTML=rows.map(([step,kvs])=>`<tr>
     <td class="pv-step">${step}</td>
