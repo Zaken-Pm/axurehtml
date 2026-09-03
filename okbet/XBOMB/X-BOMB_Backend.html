@@ -1203,7 +1203,7 @@ function buildPreview(){
   const at=dpParse($('#fActTime').value);
   if(at){
     const days=Math.round((at.end-at.start)/86400000)+1; periods=days+' 期';
-    const se=new Date(at.end.getTime()+3.5*86400000); const p=n=>String(n).padStart(2,'0');
+    const se=new Date(at.end.getTime()); se.setDate(se.getDate()+1); se.setHours(12,0,0,0); se.setTime(se.getTime()+72*3600000); const p=n=>String(n).padStart(2,'0');
     showEnd=`${se.getFullYear()}-${p(se.getMonth()+1)}-${p(se.getDate())} 12:00:00`;
   }
   const floatOn=$$('input[name=float]')[1]?$$('input[name=float]')[1].checked:false;
