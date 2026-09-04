@@ -658,12 +658,14 @@ const tickets = [
   { id:'t4', got:618, tier:'super', amount:'', dates:'Expiry Date: Jun 22', state:'wait', blessed:true, count:'23:41:02 to open', foil:true, group:'all' },
   { id:'t5', got:617, tier:'good',  amount:'50p', dates:'Scratched Jun 19', state:'scratched', group:'claimed' },
   { id:'t6', got:616, tier:'super', amount:'1,000p', dates:'Scratched Jun 18', state:'scratched', bigwin:true, group:'claimed' },
+  { id:'t8', got:620, tier:'super', amount:'200p', dates:'Scratched Jun 20', state:'scratched', foil:true, group:'claimed' },
+  { id:'t9', got:615, tier:'good', amount:'80p', dates:'Scratched Jun 15', state:'scratched', foil:true, group:'claimed' },
   { id:'t7', got:614, tier:'good',  amount:'', dates:'Expired Jun 17', state:'expired', group:'expired' },
 ];
 function faceName(t){ return t.tier==='super' ? 'Lucky Bomb Ticket' : 'Bomb Ticket'; }
 function ticketRow(t){
   const tierCls=t.tier==='super'?'ticket--super':'';
-  const grey=['scratched','expired'].includes(t.state)?'ticket--grey':'';
+  const grey=(t.state==='expired' || (t.state==='scratched' && !t.foil))?'ticket--grey':'';
   const big=t.bigwin?'ticket--bigwin':'';
   const foil=t.foil?'ticket--foil':'';
   const foilBadge=t.foil?'<span class="ticket__foil-badge">✦ FOIL</span>':'';
@@ -697,7 +699,12 @@ function syncRaffleBadge(){ const n=tickets.filter(t=>t.state==='scratch').lengt
 function renderTickets(){
   syncRaffleBadge();
   const list=tickets.filter(t=> currentSub==='all'?true:t.group===currentSub )
-    .slice().sort((a,b)=>((SORT_PRIORITY[a.state]??9)-(SORT_PRIORITY[b.state]??9)) || ((b.got||0)-(a.got||0)));
+    .slice().sort((a,b)=>{
+      const sp=(SORT_PRIORITY[a.state]??9)-(SORT_PRIORITY[b.state]??9);
+      if(sp!==0) return sp;
+      if(a.state==='scratched'){ const fa=a.foil?0:1, fb=b.foil?0:1; if(fa!==fb) return fa-fb; }
+      return (b.got||0)-(a.got||0);
+    });
   if(!list.length){
     $('#raffleList').innerHTML = `<div class="empty"><div class="empty__emoji">🎫</div><p class="empty__title">Nothing here</p></div>`;
     return;
