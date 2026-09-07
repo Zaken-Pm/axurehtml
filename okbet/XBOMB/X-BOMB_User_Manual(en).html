@@ -280,6 +280,7 @@
     <li>The scratch page has four blocks; top-to-bottom order: <b>TO BE CLAIMED (SCRATCH) ＞ TO BE SCRATCHED (BLESS) ＞ CLAIMED · Foil ＞ CLAIMED ＞ EXPIRED</b>. The CLAIMED block is greyed out, but <b>foil cards are pinned to the top and not greyed</b> (keep their color).</li>
   </ul>
   <div class="note warn"><span class="ic">⚠️</span><b>Claim condition (frequently asked):</b> to claim a level’s reward, the <b>previous level’s task must be met</b> (reach the threshold); <b>it only checks whether it’s met, not whether the previous reward was claimed</b>. If not met, tapping CLAIM shows a toast (multi-language): please complete the previous level’s mission before claiming.</div>
+  <div class="note info"><span class="ic">🧭</span><b>Trigger rule (important):</b> each day a member must <b>enter the “activity detail page”</b> to <b>trigger that day’s activity and generate that day’s rebate</b> (and lock in that day’s reward boost / trigger rate / win rate). <b>If they don’t open the detail page that day → no rewards are produced that day, and there is no reclaim the next day.</b></div>
 
   <h3 class="sec">Card-flip Challenge (Pili Card Challenge) flow</h3>
   <p>Triggered when a member claims a rebate task “bound” to a challenge: entry → choose a card → reveal the result (win / lose).</p>
@@ -317,6 +318,8 @@
   <div class="a">A: <b>Already-claimed</b> ones are unaffected (stay claimed). <b>Unclaimed</b> ones are recalculated against the new VIP level’s thresholds (may return to incomplete).</div>
   <div class="q">Q5. The activity has ended — can members still claim?</div>
   <div class="a">A: After the event end time <b>no new rewards are produced</b>, but already-obtained rewards and scratch cards can still be claimed before the frontend entry is hidden (up to the “last scratch card expiry”).</div>
+  <div class="q">Q6. A member bet yesterday but got no rebate / can’t reclaim today?</div>
+  <div class="a">A: Because the member <b>did not open the “activity detail page” yesterday</b>. The rebate is only calculated and generated on a day when they open the detail page; if they didn’t, nothing is produced, so there is nothing to reclaim the next day. Ask them to open the activity page once each day.</div>
 </div>
 
 <!-- CH8 -->
