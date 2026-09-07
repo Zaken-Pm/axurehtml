@@ -702,8 +702,8 @@ function renderTickets(){
     .slice().sort((a,b)=>{
       const sp=(SORT_PRIORITY[a.state]??9)-(SORT_PRIORITY[b.state]??9);
       if(sp!==0) return sp;
-      if(a.state==='scratched'){ const fa=a.foil?0:1, fb=b.foil?0:1; if(fa!==fb) return fa-fb; }
-      return (b.got||0)-(a.got||0);
+      if(a.state==='scratched'){ const fa=a.foil?0:1, fb=b.foil?0:1; if(fa!==fb) return fa-fb; } /* 已刮卡：闪卡置顶 */
+      return 0; /* 不再依获得时间排序，群组内维持原顺序 */
     });
   if(!list.length){
     $('#raffleList').innerHTML = `<div class="empty"><div class="empty__emoji">🎫</div><p class="empty__title">Nothing here</p></div>`;
