@@ -56,6 +56,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .balltab{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:5px;
   width:74px;padding:2px 4px 6px;color:#aab4c8;font-size:12.5px;font-weight:600;position:relative}
 .balltab__ico{font-size:26px;filter:grayscale(1);opacity:.45;line-height:1}
+.balltab__lb{display:block;width:100%;text-align:center;line-height:1.15;overflow-wrap:break-word;word-break:normal}
 .balltab.is-on{color:var(--blue);font-weight:800}
 .balltab.is-on .balltab__ico{filter:none;opacity:1}
 /* Featured tab: selected = coloured thumb + gold star; unselected = greyed thumb + grey star */
@@ -484,7 +485,12 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .mcard--out{padding:16px;text-align:center;font-weight:800;color:#22304f;font-size:14px}
 .ocell__val{position:relative}
 .fbcol .ocell__val{width:100%}
-.ocell__val .a{position:absolute;right:2px;top:50%;margin-top:-6px;line-height:0} .ocell__val .a svg{width:10px;height:12px} .ocell__val.up{color:var(--green)} .ocell__val.dn{color:var(--down)}
+.ocell__val .a{position:absolute;right:2px;top:50%;margin-top:-6px;line-height:0} .ocell__val .a svg{width:10px;height:12px}
+/* 赔率变更:数字闪一下颜色后回复原色,箭头维持绿/红当方向指示 */
+.ocell__val.up{animation:valUp 1.4s ease forwards} .ocell__val.dn{animation:valDn 1.4s ease forwards}
+.ocell__val.up .a{color:var(--green)} .ocell__val.dn .a{color:var(--down)}
+@keyframes valUp{0%{color:var(--green)}100%{color:#15264a}}
+@keyframes valDn{0%{color:var(--down)}100%{color:#15264a}}
 
 /* ===== detail more-events sticky bar + sheet ===== */
 .morebar{position:absolute;left:0;right:0;top:0;z-index:9;display:flex;align-items:center;justify-content:space-between;
@@ -1270,9 +1276,6 @@ var SPORTS=[
  {k:'baseball',ico:'⚾',lab:'Baseball'},
  {k:'rugby',ico:'🏉',lab:'Rugby'},
  {k:'amfootball',ico:'🏈',lab:'American Football'},
- {k:'motor',ico:'🏎️',lab:'Motor Racing'},
- {k:'golf',ico:'⛳',lab:'Golf'},
- {k:'financial',ico:'📈',lab:'Financial Bets'},
  {k:'esports',ico:'🎮',lab:'eSports'}
 ];
 var curSport='featured';
@@ -1286,7 +1289,7 @@ function renderBallTabs(){
       ? '<span class="balltab__ico">👍<span class="feat-star">'+(on?'★':'☆')+'</span></span>'
       : '<span class="balltab__ico">'+s.ico+'</span>';
     return '<button class="balltab'+(on?' is-on':'')+(s.feat?' balltab--feat':'')+'" data-sport="'+s.k+'">'+
-      ico+s.lab+'</button>';
+      ico+'<span class="balltab__lb">'+s.lab.replace(/\//g,'/<wbr>')+'</span></button>';
   }).join('');
 }
 renderBallTabs();
