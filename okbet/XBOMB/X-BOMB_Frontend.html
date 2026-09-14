@@ -553,7 +553,7 @@ function taskCard(d){
   const status=taskStatus(d);
   const acc = d.type==='bet'? scenarios[curScn].bet : scenarios[curScn].topup;
   const cur=Math.min(acc,d.need), pct=Math.round(cur/d.need*100);
-  const cls=['level-card']; if(d.type==='topup')cls.push('level-card--topup'); if(d.challenge)cls.push('level-card--challenge'); if(status==='done')cls.push('level-card--claimed');
+  const cls=['level-card']; if(d.type==='topup')cls.push('level-card--topup'); if(d.challenge && d.type!=='topup')cls.push('level-card--challenge'); if(status==='done')cls.push('level-card--claimed');
   let btn;
   if(status==='done') btn=`<button class="claim-btn claim-btn--done" disabled>Claimed</button>`;
   else if(status==='topup') btn=`<button class="claim-btn claim-btn--topup" data-topup="${d.lv}">TOP-UP</button>`;
@@ -562,9 +562,8 @@ function taskCard(d){
   const cond = d.type==='bet'?`有效投注 ${cur.toLocaleString()}/${d.need.toLocaleString()}`:`充值 ${cur.toLocaleString()}/${d.need.toLocaleString()}`;
   const ticket=d.ticket?`<span class="level-card__ticket"><img src="${TICKET_ICON}" alt="">TICKET</span>`:'';
   const boostTag = (d.challenge && d.boost) ? `<span class="level-card__boost">+${d.boost}%</span>` : '';
-  const badge = d.type==='topup'
-    ? `<span class="level-card__badge-wrap"><img class="level-card__badge" src="${TOPUP_BADGE}" alt="Top-up Challenge">${boostTag}</span>`
-    : d.challenge ? `<span class="level-card__badge-wrap level-card__badge-wrap--ch"><img class="level-card__badge level-card__badge--challenge" src="${CHALLENGE_BADGE}" alt="Challenge">${boostTag}</span>` : '';
+  const badge = (d.type!=='topup' && d.challenge)
+    ? `<span class="level-card__badge-wrap level-card__badge-wrap--ch"><img class="level-card__badge level-card__badge--challenge" src="${CHALLENGE_BADGE}" alt="Challenge">${boostTag}</span>` : ''; /* 充值任务不显示挑战示意 */
   return `<article class="${cls.join(' ')}">${badge}
     <div class="level-card__main">
       <div class="level-card__progress-label">LV${d.lv} · ${cond}</div>

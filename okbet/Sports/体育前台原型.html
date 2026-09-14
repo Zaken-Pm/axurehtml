@@ -1,0 +1,1752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>OKBET Sports Prototype</title>
+<style>
+:root{
+  --blue:#1f5fe0; --blue-d:#123fae; --blue-l:#e8f0ff;
+  --red:#e11338; --red-d:#b10f2c;
+  --navy:#0b2f7a; --navy2:#0a2560;
+  --gold:#f5c23e; --gold-d:#e0a512;
+  --green:#12a150; --down:#e0402f;
+  --ink:#12213f; --muted:#6b7893; --line:#dbe3ef;
+  --page:#eef1f6; --card:#ffffff; --cell:#eef3fb;
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px;
+  --radius:12px; --radius-s:8px;
+  --shadow:0 1px 2px rgba(18,33,63,.08), 0 6px 18px rgba(18,33,63,.06);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+[data-goto],[data-fav],[data-collapse],[data-sport],[data-mpin],[data-rule],[data-ruleclose],[data-sheet],[data-playersheet],[data-pall],[data-pchk],[data-svfav],[data-svmedia],[data-ectoggle],[data-ecgrpcollapse],[data-crktoggle],[data-outcollapse],[data-bstab],[data-sel],[data-mcollapse],[data-when],.oddstab,.mtab,.micon,.lmatch__more,.leaguehead__more,.tabbar__item,.sbchip,.egchip,.egdate,.egview,.pfil button,.bs-tab,.sheet__tab,.mcard,.collcard,.oline[data-sel]{cursor:pointer}
+html{font-size:16px;-webkit-text-size-adjust:100%}
+body{margin:0;background:#c9d2e0;color:var(--ink);
+  font-family:"PingFang SC","Segoe UI",system-ui,-apple-system,"Microsoft YaHei",sans-serif;
+  line-height:1.4;display:flex;justify-content:center}
+img{max-width:100%}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+
+/* ===== phone frame ===== */
+.app{width:100%;max-width:430px;height:100vh;height:100dvh;background:var(--page);
+  position:relative;display:flex;flex-direction:column;box-shadow:0 0 40px rgba(0,0,0,.15);overflow:hidden}
+.screen{display:none;flex-direction:column;flex:1;min-height:0}
+.screen.is-active{display:flex}
+.scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:80px}
+
+/* ===== app bar ===== */
+.appbar{display:flex;align-items:center;gap:var(--s2);padding:10px var(--s3);
+  background:#fff;position:sticky;top:0;z-index:20;border-bottom:1px solid #eef1f6}
+.appbar__menu{font-size:20px;color:var(--blue);width:28px}
+.appbar__avatar{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#8fd3ff,#2b6cff);
+  display:flex;align-items:center;justify-content:center;font-size:18px;flex:0 0 auto}
+.appbar__coins{display:flex;align-items:center;gap:3px;font-size:12px;font-weight:700;color:#3a4767}
+.appbar__coins .dot{width:16px;height:16px;border-radius:50%;background:linear-gradient(#ffcf5a,#f0a91e);
+  display:flex;align-items:center;justify-content:center;font-size:10px;color:#7a4a00}
+.appbar__refresh{color:#2b8cff;font-size:15px}
+.appbar__spacer{flex:1}
+.pill{border-radius:999px;padding:9px 18px;font-weight:800;font-size:14px;color:#fff;white-space:nowrap;letter-spacing:.3px}
+.pill--deposit{background:linear-gradient(180deg,#2f7bff,#1552d6);box-shadow:0 3px 8px rgba(31,95,224,.35)}
+.pill--mybet{background:linear-gradient(180deg,#f0324f,#c8102e);box-shadow:0 3px 8px rgba(225,19,56,.35)}
+.appbar__search{font-size:20px;color:#33405f;width:26px;text-align:center}
+
+/* ===== ball tabs ===== */
+.balltabs{display:flex;gap:2px;overflow-x:auto;background:#fff;padding:10px 6px 6px;scrollbar-width:none}
+.balltabs::-webkit-scrollbar{display:none}
+.balltab{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:5px;
+  width:74px;padding:2px 4px 6px;color:#aab4c8;font-size:12.5px;font-weight:600;position:relative}
+.balltab__ico{font-size:26px;filter:grayscale(1);opacity:.45;line-height:1}
+.balltab.is-on{color:var(--blue);font-weight:800}
+.balltab.is-on .balltab__ico{filter:none;opacity:1}
+/* Featured tab: selected = coloured thumb + gold star; unselected = greyed thumb + grey star */
+.balltab--feat .balltab__ico{position:relative;display:inline-block}
+.balltab--feat .feat-star{position:absolute;top:-3px;right:-9px;font-size:13px;line-height:1}
+.balltab--feat.is-on .feat-star{color:#f4b400;filter:none;opacity:1}
+.balltab--feat:not(.is-on) .feat-star{color:#c3ccdb}
+.balltab.is-on .balltab__star{position:absolute;top:-2px;right:16px;font-size:12px;filter:none;opacity:1}
+
+/* ===== section banner ===== */
+.banner{margin:12px var(--s3) 6px;background:linear-gradient(180deg,#123c95,#0a2560);
+  border-radius:10px;padding:11px;text-align:center;color:var(--gold);font-weight:900;
+  letter-spacing:2px;font-size:15px;box-shadow:var(--shadow);border:1px solid #16358a}
+
+/* ===== league head ===== */
+.leaguehead{display:flex;align-items:center;gap:var(--s2);padding:12px var(--s3) 6px}
+.leaguehead__logo{width:26px;height:26px;border-radius:6px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:17px;line-height:1;background:#eef2f9;overflow:hidden}
+.leaguehead__name{font-weight:800;font-size:15px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.leaguehead__more{display:flex;align-items:center;gap:5px;color:#33405f;font-weight:800;font-size:13px}
+.leaguehead__more .star{color:#f4b400}
+.leaguehead>.star{cursor:pointer;font-size:19px;color:#c3ccdb;flex:0 0 auto;line-height:1}
+.leaguehead>.star.is-fav{color:#f4b400}
+.lrow__star{cursor:pointer}
+.lrow__star.is-fav{color:#f4b400}
+.micon.fav-toggle{cursor:pointer}
+.micon.fav-toggle.is-fav{color:#f4b400}
+.micon.fav-toggle.is-fav svg{fill:currentColor}
+
+/* ===== home match card (horizontal scroller) ===== */
+.cardrow{display:flex;gap:10px;overflow-x:auto;padding:4px var(--s3) 4px;scrollbar-width:none}
+.cardrow::-webkit-scrollbar{display:none}
+.mcard{flex:0 0 92%;background:#fff;border-radius:14px;box-shadow:var(--shadow);overflow:hidden;position:relative}
+.mcard__head{display:flex;align-items:center;gap:8px;padding:9px 12px;color:#fff;font-weight:700;font-size:13px;
+  background:linear-gradient(90deg,#2a3f7a,#7c3048)}
+.mcard__head .lg{width:18px;height:18px;border-radius:4px;background:#fff2}
+.voucher{position:absolute;top:8px;right:0;background:linear-gradient(#fff0c4,#f6cf6a);
+  color:#7a5200;font-size:10px;font-weight:800;padding:3px 12px;border-radius:6px 0 0 6px;box-shadow:0 2px 5px rgba(0,0,0,.15)}
+.ribbon{position:absolute;top:12px;right:-26px;transform:rotate(38deg);background:#f0a81e;color:#fff;
+  font-size:9px;font-weight:800;padding:3px 30px}
+.mcard__body{padding:12px 10px 6px;background:linear-gradient(180deg,#f6f9ff,#eaf1fd)}
+.mcard--tennis .mcard__body{background:linear-gradient(180deg,#eaf6ff,#d7ecff)}
+.teams{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.team{display:flex;flex-direction:column;align-items:center;gap:6px;width:82px}
+.team__logo{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-weight:800;color:#fff;font-size:15px;border:2px solid #e7c96b;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.team__name{font-size:12px;font-weight:700;text-align:center;color:#22304f;line-height:1.2}
+.score{display:flex;flex-direction:column;align-items:center;gap:2px;flex:1}
+.score__nums{font-size:26px;font-weight:900;letter-spacing:2px;color:#12213f}
+.score__nums .dash{color:#9aa6bf;margin:0 6px}
+.score__period{background:#ffd24d;color:#5a3d00;font-size:10px;font-weight:800;border-radius:4px;padding:1px 8px}
+.score__time{font-size:12px;color:#4a5675;font-weight:700}
+.oddsbar{display:flex;align-items:center;gap:6px;padding:10px 4px 4px}
+.opill{flex:1;background:#fff;border:1px solid #d7e0f0;border-radius:8px;padding:7px;text-align:center;font-weight:900;font-size:15px;color:#12213f;box-shadow:inset 0 -2px 0 #e9eef7}
+.opill--mid{flex:1.1;background:linear-gradient(180deg,#123c95,#0a2560);color:#fff;display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px}
+.oddsbar .oarr{flex:0 0 14px}
+.oddsbar .oarr svg{width:14px;height:16px}
+.opill .up{color:var(--green)} .opill .dn{color:var(--down)}
+/* 赔率升降箭头动画:上升往上滑、下降往下滑 */
+@keyframes arrUp{0%{transform:translateY(3px);opacity:0}25%{opacity:1}100%{transform:translateY(-3px);opacity:0}}
+@keyframes arrDn{0%{transform:translateY(-3px);opacity:0}25%{opacity:1}100%{transform:translateY(3px);opacity:0}}
+.oarr.up svg{animation:arrUp 1.1s ease-in-out infinite}
+.oarr.dn svg{animation:arrDn 1.1s ease-in-out infinite}
+.ocell__val.up .a{display:inline-block;animation:arrUp 1.1s ease-in-out infinite}
+.ocell__val.dn .a{display:inline-block;animation:arrDn 1.1s ease-in-out infinite}
+.tips{display:flex;align-items:center;gap:8px;margin:8px 8px 12px;background:#eef2f9;border-radius:8px;padding:7px 9px}
+.tips__tag{background:#8794b4;color:#fff;font-size:10px;font-weight:800;padding:2px 6px;border-radius:4px;flex:0 0 auto}
+.tips__txt{font-size:11px;color:#5c6885;line-height:1.3}
+
+/* promo */
+.promo{margin:12px var(--s3);border-radius:12px;overflow:hidden;background:linear-gradient(90deg,#1b3f8f,#2f6ad0);
+  display:flex;align-items:center;gap:10px;padding:12px;color:#fff;box-shadow:var(--shadow)}
+.promo__txt{flex:1;font-size:13px;font-weight:700;line-height:1.3}
+.promo__txt b{color:var(--gold);font-size:16px}
+.promo__btn{background:linear-gradient(180deg,#2f7bff,#1552d6);color:#fff;font-weight:800;font-size:12px;padding:8px 12px;border-radius:8px;white-space:nowrap}
+
+/* ===== bottom tabbar ===== */
+.tabbar{position:absolute;left:0;right:0;bottom:0;max-width:430px;margin:0 auto;display:flex;
+  background:#fff;border-top:1px solid #eef1f6;padding:8px 0 10px;box-shadow:0 -2px 10px rgba(0,0,0,.05);z-index:30}
+.tabbar__item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:#9aa6bf;font-size:11px;font-weight:600;position:relative}
+.tabbar__item .ico{font-size:20px}
+.tabbar__item.is-on{color:var(--blue)}
+.tabbar__item .dotred{position:absolute;top:-2px;right:26px;width:7px;height:7px;background:#e11338;border-radius:50%}
+
+/* ===== list page: odds tabbar ===== */
+.oddstabs{display:flex;align-items:center;gap:2px;margin:10px var(--s3);background:linear-gradient(180deg,#12347f,#0a2158);
+  border-radius:10px;padding:6px;box-shadow:var(--shadow)}
+.oddstab{flex:0 0 auto;padding:7px 10px;color:#9fb4e6;font-weight:800;font-size:13px;white-space:nowrap;position:relative}
+.oddstab.is-on{color:#ffd24d}
+.oddstab.is-on::after{content:"";position:absolute;left:10px;right:10px;bottom:-1px;height:3px;background:#ffd24d;border-radius:2px}
+.oddstabs__scroll{display:flex;gap:2px;overflow-x:auto;flex:1;scrollbar-width:none}
+.oddstabs__scroll::-webkit-scrollbar{display:none}
+.single{flex:0 0 auto;display:flex;align-items:center;gap:0;border:1px solid #4f74c8;border-radius:8px;overflow:hidden;margin-left:4px;cursor:pointer}
+.single span{font-size:12px;padding:6px 10px;transition:background .15s}
+.single .is-act{background:linear-gradient(180deg,#ffcf5a,#f0a81e);color:#6b3d00;font-weight:900}
+.single .is-dim{background:#0a2158;color:#cfe0ff;font-weight:800;padding:6px 9px}
+
+/* list league row */
+.lrow{display:flex;align-items:center;gap:10px;margin:10px var(--s3) 0;background:linear-gradient(90deg,#e8eefc,#f4f7fd);
+  border-radius:10px;padding:11px 12px;box-shadow:var(--shadow)}
+.lrow__flag{width:24px;height:24px;border-radius:5px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1;background:#eef2f9;border:1px solid #d8e0f0;overflow:hidden}
+.lrow__name{flex:1;font-weight:800;color:var(--blue);font-size:15px}
+.lrow__star{color:#9aa6bf;font-size:16px}
+.lrow__chev{color:#9aa6bf;font-size:14px;transition:transform .2s}
+.lrow.collapsed .lrow__chev{transform:rotate(180deg)}
+
+.lmatches{margin:0 var(--s3)}
+.lmatch{background:#fff;border-radius:0 0 10px 10px;padding:10px 12px;box-shadow:var(--shadow);margin-bottom:2px}
+.lmatch__top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.lmatch__time{background:#e4ebf7;color:#3a4767;font-size:11px;font-weight:800;border-radius:6px;padding:3px 8px}
+.lmatch__more{background:linear-gradient(180deg,#ffcf5a,#f0a81e);color:#6b3d00;font-size:11px;font-weight:800;border-radius:6px;padding:3px 8px;display:flex;align-items:center;gap:4px}
+.lgrid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:6px;align-items:center}
+.lgrid__h{font-size:12px;font-weight:800;color:var(--blue);text-align:center;padding-bottom:2px}
+.lgrid__h.tm{text-align:left}
+.lteam{display:flex;align-items:center;gap:7px;padding:6px 0;font-size:13px;font-weight:700;color:#22304f}
+.lteam__logo{width:22px;height:22px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;font-weight:800}
+.ocell{background:linear-gradient(180deg,#f5f8fd,#e7eef9);border:1px solid #dbe4f2;border-radius:8px;
+  padding:6px 2px;text-align:center;box-shadow:inset 0 -2px 0 #dde6f3}
+.ocell__lab{font-size:10.5px;color:#8b97b3;font-weight:700}
+.ocell__val{font-size:15px;font-weight:900;color:#15264a}
+
+/* ===== detail ===== */
+.dback{position:absolute;top:64px;left:12px;z-index:5;color:#fff;font-size:22px;background:rgba(0,0,0,.3);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.scoreboard{position:relative;background:#0c1116;color:#fff}
+.scoreboard__video{height:200px;background:linear-gradient(160deg,#20303f,#101820);position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center}
+.scoreboard__video .court{position:absolute;inset:0;background:
+   radial-gradient(circle at 50% 120%,#3a5a2f,#243b1f);opacity:.9}
+.scoreboard__video .players{position:relative;font-size:60px;opacity:.85}
+.scorebar{display:flex;align-items:center;gap:10px;background:#0b0f14;padding:10px 12px;font-size:13px}
+.scorebar__ctrl{display:flex;align-items:center;gap:8px;color:#c7d0dd}
+.live{display:flex;align-items:center;gap:4px;background:#e11338;color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:5px}
+.live .d{width:6px;height:6px;background:#fff;border-radius:50%}
+.scorebar__mid{flex:1;display:flex;align-items:center;justify-content:center;gap:10px}
+.sb-team{display:flex;align-items:center;gap:6px;font-weight:800}
+.sb-logo{width:22px;height:22px;border-radius:50%;background:#24304a;display:flex;align-items:center;justify-content:center;font-size:9px}
+.sb-score{font-size:22px;font-weight:900}
+.sb-period{text-align:center;font-size:11px;color:#aeb9cc;line-height:1.15}
+.sb-period b{display:block;color:#fff;font-size:13px}
+.scorebar__end{display:flex;gap:12px;color:#aeb9cc;font-size:16px}
+/* no-video calc-board (滚球 已开赛) */
+.cbrd{position:relative;min-height:150px;padding:10px 12px 12px;color:#fff;display:flex;flex-direction:column}
+.cbrd__top{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#d7e2f5}
+.cbrd__lg{font-weight:700;font-size:13px}
+.cbrd__mid{flex:1;display:flex;align-items:center;justify-content:space-around;gap:8px;padding:14px 0 10px}
+.cbrd__team{display:flex;flex-direction:column;align-items:center;gap:6px;width:92px;text-align:center;font-size:12px}
+.cbrd__team .sb-logo{width:42px;height:42px;font-size:12px;border:2px solid rgba(255,255,255,.5)}
+.cbrd__sc{text-align:center;min-width:96px}
+.cbrd__nums{font-size:30px;font-weight:900;letter-spacing:1px}
+.cbrd__prog{font-size:12px;color:#ffd24d;margin-top:3px}
+.cbrd__bottom{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px;font-size:12px;color:#e3ebf7;border-top:1px solid rgba(255,255,255,.16);padding-top:9px}
+.cbrd__bottom .neutral{width:16px;height:16px;font-size:9px}
+.hometag,.awaytag{font-size:8.5px;font-weight:800;background:rgba(255,255,255,.22);border-radius:3px;padding:1px 5px;letter-spacing:.5px}
+.tntbl{width:100%;border-collapse:collapse;font-size:12px;color:#e3ebf7;margin-top:8px}
+.tntbl th{color:#a9bcdb;font-weight:700;padding:5px 2px;text-align:center;font-size:11px}
+.tntbl td{padding:6px 2px;text-align:center;font-weight:800}
+.tntbl td:first-child,.tntbl th:first-child{text-align:left;color:#cfe0ff;font-weight:700;padding-left:4px}
+.tntbl tr+tr td{border-top:1px solid rgba(255,255,255,.14)}
+.mkdot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#e0902a;margin-right:6px;vertical-align:1px}
+.crk-sc{font-size:12px;font-weight:800;color:#fff;margin-top:3px}
+.crk-tag{background:#e11338;color:#fff;font-size:10px;font-weight:800;border-radius:4px;padding:2px 8px;display:inline-block;margin-top:5px}
+.crk-foot{display:flex;gap:10px;margin-top:8px}
+.crk-foot>div{flex:1;background:rgba(0,0,0,.22);border-radius:8px;padding:8px;text-align:center}
+.crk-foot__h{font-size:11px;color:#a9bcdb}
+.crk-foot__v{font-weight:800;margin-top:4px;color:#fff}
+.crk-toggle{text-align:center;color:#cfe0ff;font-size:15px;cursor:pointer;padding:6px;margin-top:2px}
+/* pre-match board (未开赛) */
+.pbrd{min-height:150px;background:linear-gradient(160deg,#1f5fe0,#0a2560);color:#fff;padding:10px 12px 12px;display:flex;flex-direction:column}
+.pbrd__mid{flex:1;display:flex;align-items:center;justify-content:space-around;gap:8px;padding:12px 0}
+.pbrd__time{text-align:center}
+.pbrd__t{font-size:28px;font-weight:900}
+.pbrd__state{font-size:13px;color:#cfe0ff;margin-top:3px}
+.pbrd__note{font-size:10.5px;color:#bcd0f5;text-align:center;border-top:1px solid rgba(255,255,255,.18);padding-top:8px}
+/* 计分板下方 收藏/视频/动画 bar */
+.svbar{display:flex;align-items:center;justify-content:space-between;background:#0b0f14;padding:11px 14px;border-top:1px solid #1a2230}
+.svbar__fav{background:none;border:0;color:#cfe0ff;font-weight:800;font-size:13px;cursor:pointer}
+.svbar__fav.is-on{color:#f4b400}
+.svbar__r{display:flex;gap:18px}
+.svbar__btn{background:none;border:0;color:#5a6b86;font-weight:800;font-size:13px;cursor:pointer}
+.svbar__btn.is-on{color:#7fb0ff}
+.anim-lbl{position:absolute;bottom:8px;left:0;right:0;text-align:center;color:#9fe6b0;font-size:12px;font-weight:800}
+/* scoreboard demo switcher */
+.sbswitch{background:#0b0f14;padding:8px 10px;display:flex;flex-direction:column;gap:8px}
+.sbrow{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.sbrow::-webkit-scrollbar{display:none}
+.sbrow__lab{color:#8a97ad;font-size:10px;align-self:center;white-space:nowrap;margin-right:2px;flex:0 0 auto}
+.sbchip{flex:0 0 auto;border:1px solid #2a3550;background:#131a28;color:#cfe0ff;font-size:12px;font-weight:700;padding:6px 10px;border-radius:16px;cursor:pointer;white-space:nowrap}
+.sbchip.is-on{background:#1f5fe0;border-color:#1f5fe0}
+
+.mtabs{display:flex;background:#fff;border-bottom:1px solid #eef1f6;position:sticky;top:38px;z-index:6}
+.mtab{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:12px 4px;color:#9aa6bf;font-weight:800;font-size:14px;position:relative}
+.mtab.is-on{color:var(--blue)}
+.mtab.is-on::after{content:"";position:absolute;left:24%;right:24%;bottom:0;height:3px;background:var(--blue);border-radius:2px}
+
+.mgroup{margin:12px var(--s3) 0}
+.mgroup__head{display:flex;align-items:center;gap:8px;background:linear-gradient(90deg,#123c95,#1f5fe0);
+  color:#fff;border-radius:10px;padding:11px 12px;font-weight:800;font-size:15px;box-shadow:var(--shadow)}
+.mgroup__head .star{color:#ffffff;cursor:pointer}
+.mgroup__head .star.is-pin{color:#ffd24d}
+.mgroup__head .q{width:18px;height:18px;border-radius:50%;background:#ffb020;color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:900}
+.mgroup__head .chev{margin-left:auto;transition:transform .2s}
+.mgroup.collapsed .mgroup__head .chev{transform:rotate(180deg)}
+.mgroup.collapsed .mgroup__body{display:none}
+.mgroup__body{padding:6px 0 2px}
+
+.ha{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px 0}
+.hacard{background:linear-gradient(180deg,#eef3fb,#e4ecf8);border-radius:12px;padding:10px;position:relative}
+.hacard__lab{font-size:11px;font-weight:800;color:#8b97b3;text-align:right;letter-spacing:1px}
+.hacard__team{display:flex;align-items:center;gap:8px;margin:6px 0 10px;min-height:44px}
+.hacard__team .lg{width:40px;height:40px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:11px;border:2px solid #e7c96b}
+.hacard__team .nm{font-size:13px;font-weight:800;color:#22304f;line-height:1.2}
+.oline{display:flex;align-items:center;justify-content:space-between;gap:6px;background:#fff;border:1px solid #dbe4f2;
+  border-radius:8px;padding:8px 10px;margin-top:6px;box-shadow:inset 0 -2px 0 #eef2f8}
+.oline__hcp{font-size:13px;font-weight:800;color:#4a5675}
+.oline__odd{font-size:16px;font-weight:900;color:#15264a}
+.oline__odd.up{color:var(--green)} .oline__odd.dn{color:var(--down)}
+.oline.is-sel,.oline.is-selx{background:linear-gradient(180deg,#123c95,#0a2560);border-color:#0a2560}
+.oline.is-sel .oline__hcp,.oline.is-selx .oline__hcp{color:#cfe0ff} .oline.is-sel .oline__odd,.oline.is-selx .oline__odd{color:#ffd24d}
+.oline.is-sel .oline__odd.up,.oline.is-selx .oline__odd.up{color:#37e07a} .oline.is-sel .oline__odd.dn,.oline.is-selx .oline__odd.dn{color:#ff6a5a}
+.oline-row{display:flex;align-items:center;gap:5px}
+.oline-row .oline{flex:1;min-width:0}
+.oarr{flex:0 0 13px;display:flex;justify-content:center;align-items:center;line-height:0}
+.oarr svg{width:12px;height:14px;display:block}
+.oarr.up{color:var(--green)} .oarr.dn{color:var(--down)}
+
+.dtips{display:flex;align-items:center;gap:8px;margin:8px 0 2px;background:#eef2f9;border-radius:8px;padding:8px 10px}
+.dtips__tag{background:#8794b4;color:#fff;font-size:10px;font-weight:800;padding:2px 6px;border-radius:4px;flex:0 0 auto}
+.dtips__txt{font-size:11px;color:#5c6885;line-height:1.3;flex:1}
+.dtips__more{color:var(--blue);font-weight:800;font-size:12px;white-space:nowrap}
+
+.expert{margin:12px var(--s3) 0;background:linear-gradient(160deg,#ffe7a0,#ffcf4d);border-radius:14px;padding:14px;box-shadow:var(--shadow)}
+.expert__head{display:flex;align-items:center;gap:8px;font-weight:900;color:#d98a1c;font-size:13px;letter-spacing:.5px}
+.expert__badge{width:24px;height:24px;border-radius:7px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.expert__row{display:flex;align-items:flex-start;gap:12px;margin-top:12px}
+.expert__ava{width:52px;height:52px;border-radius:50%;background:#eaf0f8;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:26px;overflow:hidden;border:2px solid #fff}
+.expert__info{flex:0 0 auto;padding-top:4px}
+.expert__who{font-size:14px;font-weight:800;color:#3a2b00}
+.expert__rate{margin-top:2px;display:flex;align-items:baseline;gap:4px}
+.expert__rate b{font-size:18px;font-weight:900;color:#2a2000}
+.expert__rate small{font-size:11px;color:#9a7a20;font-weight:700}
+.expert__right{flex:1;min-width:0;display:flex;flex-direction:column;gap:14px}
+.expert__desc{font-size:12px;color:#c8912a;font-weight:700;line-height:1.4;padding-top:2px}
+.expert__pick{display:flex;align-items:stretch;justify-content:flex-end;gap:10px}
+.expert__odd{flex:0 0 auto;min-width:130px;background:#fffdf5;border:1px solid #f0dca0;border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;font-weight:900;color:#2a2000;font-size:15px;white-space:nowrap}
+.expert__btn{flex:0 0 auto;background:linear-gradient(180deg,#153e86,#0a2560);color:#ffd24d;font-weight:900;font-size:13px;padding:0 16px;border-radius:10px;border:0;cursor:pointer;white-space:nowrap}
+
+.mgroup--mini .mgroup__head{background:linear-gradient(90deg,#16367f,#1a4fd0);font-size:14px}
+/* ===== Player tab ===== */
+.psub{display:flex;gap:18px;overflow-x:auto;padding:12px 14px 10px;background:#fff;border-bottom:1px solid #eef1f6;scrollbar-width:none}
+.psub::-webkit-scrollbar{display:none}
+.psub button{flex:0 0 auto;background:none;border:0;font-size:14px;font-weight:800;color:#9aa6bf;position:relative;padding:2px 0;cursor:pointer;white-space:nowrap}
+.psub button.is-on{color:var(--blue)}
+.psub button.is-on::after{content:"";position:absolute;left:0;right:0;bottom:-10px;height:3px;background:var(--blue);border-radius:2px}
+.psub .newtag{position:absolute;top:-12px;right:-18px;background:#ffb020;color:#fff;font-size:8px;font-weight:900;border-radius:4px;padding:1px 4px}
+.psel{display:flex;align-items:center;justify-content:space-between;margin:12px var(--s3) 8px;padding:11px 14px;border:1px solid #e2e9f4;border-radius:10px;font-weight:700;color:#22304f;cursor:pointer;background:#fff}
+.psel__chev{color:#9aa6bf}
+.pfil{display:flex;gap:8px;margin:0 var(--s3) 4px}
+.pfil button{border:1px solid #d7e0f0;background:#fff;border-radius:16px;padding:6px 18px;font-weight:800;font-size:13px;color:#7a879f;cursor:pointer}
+.pfil button.is-on{background:#12a150;border-color:#12a150;color:#fff}
+.prow+.prow{border-top:1px solid #eef1f6}
+.prow__name{background:#f2f5fa;padding:8px 14px;font-weight:800;font-size:13px;color:#22304f}
+.prow__grid{display:grid;grid-template-columns:56px 1fr 1fr;gap:8px;align-items:center;padding:8px 14px 12px}
+.prow__lab{font-size:12px;color:#8a97b3;font-weight:700;text-align:center}
+.prow__line{font-size:12px;font-weight:800;color:#8a97b3;text-align:center}
+.pcell{background:#f5f8fd;border:1px solid #e7eef9;border-radius:8px;text-align:center;padding:9px 4px}
+.pcell__val{font-size:16px;font-weight:900;color:#15264a}
+.sheet__panel.rule-panel{background:#0d1b3d}
+.rule-panel .sheet__head{color:#fff;border-bottom-color:#1c2b52}
+.rule-panel .sheet__head .x{color:#8ba0c8}
+.rule-sec{margin:6px 0 14px}
+.rule-sec__h{color:#5b8ff0;font-weight:800;font-size:15px;margin-bottom:8px}
+.rule-sec ol{margin:0;padding-left:22px;color:#cbd6ec;font-size:13px;line-height:1.6}
+.rule-sec li{margin-bottom:8px}
+.picks-empty{margin:24px var(--s3);padding:26px 16px;text-align:center;color:#8a97b3;font-size:14px;font-weight:700;background:#f3f6fc;border:1px dashed #d4deec;border-radius:12px;line-height:1.7}
+.picks-empty span{font-size:12px;font-weight:600;color:#a7b2c6}
+/* player select checkbox rows */
+.pchk{display:flex;align-items:center;gap:12px;padding:13px 6px;border-bottom:1px solid #f0f3f8;font-size:14px;font-weight:700;color:#22304f}
+.pchk__box{width:20px;height:20px;border-radius:5px;border:2px solid #c3ccdb;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:900}
+.pchk.is-on .pchk__box{background:#12a150;border-color:#12a150}
+.pchk__flag{font-size:16px}
+.spacer{height:16px}
+
+/* ===== match icons (list) ===== */
+.micons{display:flex;align-items:center;gap:20px;padding:8px 2px 2px;margin-top:8px;border-top:1px solid #eef1f6;color:#8a97b3}
+.micon{display:inline-flex;align-items:center;color:#8894ab}
+.micon svg{width:19px;height:19px;display:block}
+.micon.on{color:var(--blue)}
+.card-y{display:inline-block;width:10px;height:13px;background:#f5c518;border-radius:2px;vertical-align:-2px}
+.card-r{display:inline-block;width:10px;height:13px;background:#e11338;border-radius:2px;vertical-align:-2px}
+.cardnum{font-size:12px;font-weight:800;color:#4a5675;display:inline-flex;align-items:center;gap:3px;margin-right:8px}
+.smallscore{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin:2px 0 4px}
+.ss .card-y,.ss .card-r{vertical-align:-1px;margin-right:1px}
+.ss{background:#eef2f9;border:1px solid #e0e7f2;border-radius:5px;font-size:10.5px;font-weight:700;color:#5c6885;padding:1px 6px}
+.ss b{color:#15264a}
+/* ===== Champions / Outrights (冠军) ===== */
+.outhead{display:flex;align-items:center;justify-content:space-between;margin:12px var(--s3)}
+.outhead__chip{display:flex;align-items:center;gap:8px;background:#eef2f9;border:1px solid #e2e9f4;border-radius:22px;padding:6px 14px}
+.outhead__chip .t{font-size:16px}
+.outhead__chip .tx b{font-size:13px;color:#22304f;display:block;line-height:1.1}
+.outhead__chip .tx small{font-size:10px;color:#8a97b3;font-weight:700}
+.outhead__chip .cnt{background:#d9e2f2;color:#33405f;font-size:10px;font-weight:800;border-radius:9px;padding:1px 6px;margin-left:2px}
+.outhead__chip .dd{color:#8a97b3;font-size:12px}
+.outhead__collapse{color:var(--blue);font-size:18px;font-weight:800;cursor:pointer}
+.outgrp{background:#fff;margin:0 var(--s3) 10px;border-radius:12px;overflow:hidden;border:1px solid #eef1f6}
+.outgrp__country{display:flex;align-items:center;gap:10px;padding:12px 14px;font-weight:800;color:#15264a;font-size:14px;background:#f7f9fd}
+.outgrp__flag{width:22px;height:22px;border-radius:4px;display:flex;align-items:center;justify-content:center;background:#eef2f9;font-size:14px;line-height:1;overflow:hidden}
+.outrow{display:flex;align-items:center;gap:12px;padding:13px 14px;border-top:1px solid #f0f3f8}
+.outrow__star{cursor:pointer;color:#c3ccdb;font-size:18px;flex:0 0 auto;line-height:1}
+.outrow__star.is-fav{color:#f4b400}
+.outrow__nm{flex:1;font-size:14px;color:#22304f;font-weight:600;line-height:1.35}
+.outrow__chev{color:#c3ccdb;font-size:18px;flex:0 0 auto}
+/* ===== Ending Card ===== */
+.ecbar{display:flex;align-items:center;justify-content:space-between;padding:12px var(--s3) 8px}
+.ecbar__t{font-weight:800;color:#22304f;font-size:15px}
+.ecbar__t span{color:#8a97b3;font-weight:700;margin-left:4px}
+.ecbar__tools{display:flex;gap:16px;color:var(--blue);font-size:16px}
+.ecgrp{background:#fff;margin:0 var(--s3) 10px;border-radius:12px;border:1px solid #eef1f6;overflow:hidden}
+.ecgrp__head{display:flex;align-items:center;gap:8px;padding:11px 14px;background:#f7f9fd;font-weight:800;color:#15264a;font-size:14px;cursor:pointer}
+.ecgrp__head .chev{margin-left:auto;color:#9aa6bf;transition:transform .2s}
+.ecgrp__cnt{margin-left:auto;color:#8a97b3;font-weight:800;font-size:13px;display:none}
+.ecgrp--collapsed .ecgrp__cnt{display:inline}
+.ecgrp--collapsed .ecgrp__head .chev{margin-left:8px;transform:rotate(180deg)}
+.ecgrp--collapsed > *:not(.ecgrp__head){display:none!important}
+.ecmatch__time{display:flex;align-items:center;gap:8px;color:#8a97b3;font-size:12px;font-weight:700;padding:12px 14px 6px}
+.ecmatch__time .star{cursor:pointer;color:#c3ccdb;font-size:16px}
+.ecmatch__time .star.is-fav{color:#f4b400}
+.ecvs{display:flex;align-items:center;justify-content:center;gap:26px;padding:6px 0 14px}
+.ecvs__team{display:flex;flex-direction:column;align-items:center;gap:6px;width:120px;text-align:center}
+.ecvs__logo{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;background:#eef2f9;border:1px solid #e2e9f4;overflow:hidden;line-height:1}
+.ecvs__nm{font-size:13px;font-weight:700;color:#22304f;line-height:1.2}
+.ecvs__mid{color:#9aa6bf;font-weight:900;font-size:18px}
+.ecbtn{display:block;width:calc(100% - 28px);margin:0 14px 12px;padding:11px;text-align:center;border-radius:10px;font-weight:800;font-size:14px;cursor:pointer}
+.ecbtn--outline{border:1px solid var(--blue);color:var(--blue);background:#fff}
+.ecbtn--primary{border:0;color:#fff;background:var(--blue)}
+.ecsecwrap{padding:0 14px}
+.ecsec{font-weight:800;color:var(--blue);font-size:14px;border-bottom:2px solid var(--blue);display:inline-block;padding-bottom:5px;margin-bottom:10px}
+.ecgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0 14px 12px}
+.eccell{background:#f7f9fd;border:1px solid #eef1f6;border-radius:8px;text-align:center;padding:8px 2px}
+.eccell__s{font-weight:800;color:#22304f;font-size:14px}
+.eccell__o{font-size:11px;color:#8a97b3;margin-top:2px}
+.eccollapsed .ecvs{padding-bottom:8px}
+/* ===== Ending Game ===== */
+.egchips{display:flex;gap:12px;overflow-x:auto;padding:12px var(--s3) 6px;scrollbar-width:none}
+.egchips::-webkit-scrollbar{display:none}
+.egchip{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:11px;color:#8a97b3;font-weight:700;width:56px;text-align:center;cursor:pointer}
+.egchip__ic{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;background:#eef2f9;border:1px solid #e2e9f4;line-height:1}
+.egchip.is-on{color:var(--blue)}
+.egchip.is-on .egchip__ic{border:2px solid var(--blue)}
+.egchip .lb{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:56px}
+.egmarquee{display:flex;align-items:center;gap:8px;margin:6px var(--s3) 10px;padding:8px 12px;background:#fff6df;border:1px solid #f0dca0;border-radius:8px;font-size:12px;color:#6b4a00;font-weight:600}
+.egdates{display:flex;gap:10px;padding:0 var(--s3) 12px}
+.egdate{flex:0 0 auto;background:#eef1f7;border-radius:10px;padding:7px 16px;text-align:center;font-size:12px;font-weight:800;color:#7a879f;cursor:pointer;line-height:1.3}
+.egdate.is-on{background:#e7efff;color:var(--blue)}
+.egmatch{display:flex;align-items:stretch;gap:12px;padding:14px;border-top:1px solid #f0f3f8}
+.egmatch__main{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:10px}
+.egvs{display:flex;align-items:center;gap:14px}
+.egvs__team{display:flex;flex-direction:column;align-items:center;gap:5px;width:80px;text-align:center}
+.egvs__logo{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;background:#eef2f9;border:1px solid #e2e9f4;line-height:1;overflow:hidden}
+.egvs__nm{font-size:11.5px;font-weight:700;color:#22304f;line-height:1.2}
+.egvs__mid{color:#e08b1e;font-weight:900;font-size:14px}
+.egfire{display:inline-flex;align-items:center;gap:5px;background:#f5f7fb;border-radius:12px;padding:3px 10px;font-size:11px;color:#7a879f;font-weight:700;align-self:flex-start}
+.egfire b{color:#e0531e}
+.egmatch__side{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;gap:8px}
+.egtime{font-size:11px;color:#8a97b3;font-weight:600}
+.egview{background:#eef2f9;border:1px solid #e2e9f4;color:#22304f;border-radius:8px;padding:8px 16px;font-weight:800;font-size:13px;cursor:pointer}
+.egslots{font-size:11px;color:#8a97b3;font-weight:600}
+.egslots b{color:#12a150}
+.list-empty{margin:24px var(--s3);padding:26px 16px;text-align:center;color:#8a97b3;font-size:14px;font-weight:700;background:#f3f6fc;border:1px dashed #d4deec;border-radius:12px;line-height:1.7}
+.list-empty span{font-size:12px;font-weight:600;color:#a7b2c6}
+.drawrow{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:6px;align-items:center;margin:6px 0 2px}
+.neutral{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;background:#2f8f6b;color:#fff;font-size:10px;font-weight:900;border-radius:4px;flex:0 0 auto}
+.bases{color:#e0902a;letter-spacing:1px}
+.diamond{position:relative;width:24px;height:19px;display:inline-block;vertical-align:-5px}
+.diamond i{position:absolute;width:8px;height:8px;transform:rotate(45deg);border:1px solid #d99a2e;background:#fff;border-radius:1px}
+.diamond i.on{background:#e0902a;border-color:#e0902a}
+.diamond .b2{top:0;left:8px}
+.diamond .b3{top:8px;left:2px}
+.diamond .b1{top:8px;left:14px}
+/* football list markets — horizontal scroll of 6 markets */
+.fbmkt{display:flex;gap:8px;margin:4px 0 2px}
+.fbmkt__teams{flex:0 0 118px;display:flex;flex-direction:column;gap:8px}
+.fbhh{height:34px}
+.fbteam{height:52px;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#22304f;line-height:1.2}
+.fbteam__nm{min-width:0}
+.fbteam b{color:#e11338;font-weight:900;margin-left:auto}
+.fbmkt__scroll{flex:1;min-width:0;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.fbmkt__scroll::-webkit-scrollbar{display:none}
+.fbcol{flex:0 0 84px;display:flex;flex-direction:column;gap:8px}
+.fbcol__h{height:34px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11.5px;font-weight:800;color:var(--blue);line-height:1.15}
+.fbcol .ocell{height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0}
+.mfav{cursor:pointer;color:#c3ccdb;font-size:16px;margin-right:6px;line-height:1}
+.mfav.is-fav{color:#f4b400}
+/* my collection (favorites) — same style as TOP MATCHES */
+.coll-empty{margin:4px var(--s3);padding:20px 14px;text-align:center;color:#8a97b3;font-size:13px;background:#f3f6fc;border:1px dashed #d4deec;border-radius:12px}
+.collbadge{font-size:10px;font-weight:800;color:#33405f;background:#eef2f9;border-radius:10px;padding:2px 8px;flex:0 0 auto}
+.leaguehead>.collbadge{margin-left:2px}
+.mcard--out{padding:16px;text-align:center;font-weight:800;color:#22304f;font-size:14px}
+.ocell__val{position:relative}
+.ocell__val .a{position:absolute;right:2px;top:50%;margin-top:-6px;line-height:0} .ocell__val .a svg{width:10px;height:12px} .ocell__val.up{color:var(--green)} .ocell__val.dn{color:var(--down)}
+
+/* ===== detail more-events sticky bar + sheet ===== */
+.morebar{position:absolute;left:0;right:0;top:0;z-index:9;display:flex;align-items:center;justify-content:space-between;
+  background:#123c95;color:#fff;padding:9px 14px;font-size:13px;font-weight:700;
+  transform:translateY(-110%);transition:transform .24s ease;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.morebar.is-show{transform:translateY(0)}
+.morebar__r{display:flex;align-items:center;gap:6px;color:#ffd24d;font-weight:800}
+.sheet{position:absolute;inset:0;z-index:60;display:none}
+.sheet.is-open{display:block}
+.sheet__mask{position:absolute;inset:0;background:rgba(6,12,22,.5)}
+.sheet__panel{position:absolute;left:0;right:0;bottom:0;max-height:78%;background:#fff;border-radius:16px 16px 0 0;
+  display:flex;flex-direction:column;box-shadow:0 -8px 30px rgba(0,0,0,.25)}
+.sheet__head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #eef1f6;font-weight:800}
+.sheet__head .x{font-size:20px;color:#8a97b3}
+.sheet__tabs{display:flex;gap:16px;padding:8px 16px 0;border-bottom:1px solid #eef1f6}
+.sheet__tab{padding:8px 2px;font-weight:800;font-size:14px;color:#9aa6bf;border-bottom:3px solid transparent}
+.sheet__tab.is-on{color:var(--blue);border-color:var(--blue)}
+.sheet__body{overflow-y:auto;padding:6px 12px 16px}
+.selrow{display:flex;align-items:center;gap:10px;padding:12px 6px;border-bottom:1px solid #f0f3f8}
+.selrow.is-cur{background:#eaf1ff;border-radius:8px}
+.selrow__lg{width:26px;height:26px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;font-weight:800}
+.selrow__mid{flex:1;min-width:0}
+.selrow__t{font-size:13px;font-weight:700;color:#22304f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.selrow__s{font-size:11px;color:#8a97b3}
+.selrow__sc{font-weight:900;color:#12213f;font-size:15px}
+.selrow__live{font-size:10px;font-weight:800;color:#e11338}
+
+/* ===== bet slip (My Bet) ===== */
+.bs-title{text-align:center;font-weight:900;font-size:18px;padding:14px}
+.bs-tabs{display:flex;margin:0 var(--s3);background:#eef1f7;border-radius:10px;padding:4px}
+.bs-tab{flex:1;text-align:center;padding:9px;font-weight:800;font-size:14px;color:#7a879f;border-radius:8px}
+.bs-tab.is-on{background:var(--blue);color:#fff}
+.bs-cashout{display:flex;align-items:center;gap:8px;margin:12px var(--s3) 0;font-size:14px;font-weight:700;color:#4a5675;cursor:pointer}
+.bs-cashout__radio{width:16px;height:16px;border-radius:50%;border:2px solid #9aa6bf;flex:0 0 auto;position:relative}
+.bs-cashout.is-checked .bs-cashout__radio{border-color:var(--blue)}
+.bs-cashout.is-checked .bs-cashout__radio:after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--blue)}
+.bs-datefilter{display:flex;justify-content:center;margin:12px var(--s3)}
+.bs-datefilter .box{display:flex;align-items:center;gap:14px;border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 16px;font-weight:800;color:#3a4767}
+.bs-dategrp{margin:14px var(--s3) 6px}
+.bs-dategrp span{background:var(--blue);color:#fff;font-weight:800;font-size:13px;padding:4px 12px;border-radius:6px}
+.bscard{margin:8px var(--s3);background:#fff;border-radius:12px;box-shadow:var(--shadow);overflow:hidden;border:1px solid #eef1f6}
+.bscard__top{display:flex;align-items:center;gap:8px;padding:11px 12px;border-bottom:1px solid #f0f3f8}
+.bscard__lg{width:22px;height:22px;border-radius:5px;flex:0 0 auto}
+.bscard__lgname{flex:1;font-weight:800;font-size:13px}
+.tag{border:1px solid #c7d2e6;border-radius:16px;padding:4px 12px;font-size:12px;font-weight:800;color:#3a4767}
+.tag--parlay{border-color:var(--blue);color:var(--blue)}
+.bscard__meta{display:flex;align-items:center;justify-content:space-between;padding:8px 12px 2px;font-size:12px;color:#8a97b3}
+.bscard__meta .more{color:var(--blue);font-weight:800}
+.bscard__meta .ongo{color:#f0a81e;font-weight:800;display:flex;align-items:center;gap:6px}
+.bscard__meta .stream{background:linear-gradient(180deg,#ff8a3d,#f0632a);color:#fff;font-size:10px;padding:2px 7px;border-radius:5px}
+.bsmatch{display:flex;align-items:center;gap:8px;padding:8px 12px}
+.bsmatch__lg{width:26px;height:26px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;font-weight:800}
+.bsmatch__nm{flex:1;font-size:13px;font-weight:700;color:#22304f}
+.bsmatch__sc{font-weight:900;font-size:15px;color:#12213f}
+.bssel{display:flex;align-items:center;gap:10px;margin:6px 12px;background:#f5f7fb;border-radius:10px;padding:10px}
+.bssel__lg{width:30px;height:30px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:800}
+.bssel__nm{flex:1;font-size:12px;font-weight:700;color:#4a5675}
+.bssel__box{text-align:center}
+.bssel__box .k{font-size:11px;color:#8a97b3;font-weight:700}
+.bssel__box .v{font-weight:900;font-size:16px;background:#fff;border:1px solid #dbe4f2;border-radius:6px;padding:3px 16px;display:inline-block;margin-top:3px}
+.bsparlay{margin:6px 12px;background:#f5f7fb;border-radius:10px;padding:10px}
+.bsparlay__t{font-weight:800;font-size:13px;margin-bottom:6px}
+.bsparlay__grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px 8px;font-size:11px;color:#5c6885}
+.bsparlay__odd{text-align:center;margin-top:8px;font-weight:900;font-size:16px;background:#fff;border:1px solid #dbe4f2;border-radius:6px;padding:5px}
+.bsfoot{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-top:1px solid #f0f3f8;font-size:13px;font-weight:800}
+.bsfoot .stake{color:#3a4767}
+.bsfoot .pay{color:var(--green)} .bsfoot .pay0{color:#c33} .bsfoot .pend{color:#f0a81e}
+.bscard__id{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;color:#9aa6bf;font-size:11px;background:#fafbfd}
+
+/* misc */
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ APP BAR (shared) ============ -->
+  <header class="appbar">
+    <button class="appbar__menu" title="Menu">☰</button>
+    <div class="appbar__avatar">🦊</div>
+    <div class="appbar__coins"><span class="dot">P</span>0</div>
+    <button class="appbar__refresh">↻</button>
+    <div class="appbar__spacer"></div>
+    <button class="pill pill--deposit">Deposit</button>
+    <button class="pill pill--mybet" data-goto="betslip">My Bet</button>
+    <button class="appbar__search">🔍</button>
+  </header>
+
+  <!-- ============ BALL TABS (shared) ============ -->
+  <nav class="balltabs" id="ballTabs"></nav>
+
+  <!-- ============ HOME (Featured) ============ -->
+  <section class="screen is-active" id="screen-home">
+    <div class="scroll" id="homeScroll">
+
+      <div class="banner">TOP MATCHES</div>
+
+      <!-- League: NBA -->
+      <div class="leaguehead">
+        <div class="leaguehead__logo">🇺🇸</div>
+        <div class="leaguehead__name">NBAPLAYOFFS-Semifinal</div>
+        <span class="star" data-fav="nba" data-favtype="league">☆</span>
+        <button class="leaguehead__more" data-goto="listInplay">MORE ›</button>
+      </div>
+      <div class="cardrow">
+        <!-- card 1 -->
+        <article class="mcard" data-goto="detail">
+          <div class="mcard__head"><span class="lg"></span> NBAPLAYOFFS-Semifinal <span class="voucher">Free Voucher</span></div>
+          <div class="mcard__body">
+            <div class="teams">
+              <div class="team"><div class="team__logo" style="background:#1d428a">DEN</div><div class="team__name">Denver<br>Nuggets</div></div>
+              <div class="score">
+                <div class="score__nums">83<span class="dash">-</span>126</div>
+                <div class="score__period">3rd</div>
+                <div class="score__time">11:14</div>
+              </div>
+              <div class="team"><div class="team__logo" style="background:#236192">MIN</div><div class="team__name">Minnesota<br>Timberwolves</div></div>
+            </div>
+            <div class="oddsbar">
+              <div class="opill"><span class="up">7.40</span></div>
+              <span class="oarr up"><svg viewBox="0 0 12 14"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg></span>
+              <div class="opill opill--mid">Winner</div>
+              <span class="oarr"></span>
+              <div class="opill">1.07</div>
+            </div>
+          </div>
+          <div class="tips"><span class="tips__tag">BET TIPS</span><span class="tips__txt">Clipper has won 9 matches in last 10 matches with lakers.</span></div>
+        </article>
+        <!-- card 2 (peek) -->
+        <article class="mcard" data-goto="detail">
+          <div class="mcard__head"><span class="lg"></span> NBAPLAYOFFS-Semifinal</div>
+          <div class="mcard__body">
+            <div class="teams">
+              <div class="team"><div class="team__logo" style="background:#1d428a">DEN</div><div class="team__name">Denver<br>Nuggets</div></div>
+              <div class="score"><div class="score__nums">83<span class="dash">-</span>126</div><div class="score__period">3rd</div><div class="score__time">11:14</div></div>
+              <div class="team"><div class="team__logo" style="background:#236192">MIN</div><div class="team__name">Minnesota</div></div>
+            </div>
+            <div class="oddsbar"><div class="opill">7.40</div><div class="opill opill--mid">Winner</div><div class="opill">1.07</div></div>
+          </div>
+          <div class="tips"><span class="tips__tag">BET TIPS</span><span class="tips__txt">Clipper has won 9 matches…</span></div>
+        </article>
+      </div>
+
+      <!-- promo -->
+      <div class="promo">
+        <div style="font-size:26px">🏀</div>
+        <div class="promo__txt">Watch NBA New season<br>Win up to <b>777.777</b> daily</div>
+        <button class="promo__btn">JOIN NOW</button>
+      </div>
+
+      <div class="banner">MY COLLECTION</div>
+      <div id="myCollection"><!-- filled by JS from favorites --></div>
+
+      <div class="spacer"></div>
+    </div>
+  </section>
+
+  <!-- ============ LIST (event list) ============ -->
+  <section class="screen" id="screen-list">
+    <div class="oddstabs">
+      <div class="oddstabs__scroll">
+        <button class="oddstab is-on" data-when="inplay">IN-PLAY</button>
+        <button class="oddstab" data-when="today">TODAY</button>
+        <button class="oddstab" data-when="apr31">APR-31</button>
+        <button class="oddstab" data-when="may1">MAY-1</button>
+        <button class="oddstab" data-when="may2">MAY-2</button>
+      </div>
+      <div class="single" id="modeToggle" title="切换 单式 / 串关"><span class="is-act" id="modeL">SINGLE</span><span class="is-dim" id="modeR">P</span></div>
+    </div>
+    <div class="scroll">
+
+      <!-- Basketball · WNBA (第X节 + clock, Total Points, 小节比分) -->
+      <div class="lrow" data-collapse><div class="lrow__flag">🇺🇸</div>
+        <div class="lrow__name">WNBA</div><span class="lrow__star" data-fav="wnba" data-favtype="league">☆</span><span class="lrow__chev">▲</span></div>
+      <div class="lmatches" data-body>
+        <div class="lmatch" data-parlay="yes" data-favmatch="m_wnba" data-when="inplay">
+          <div class="lmatch__top"><span class="lmatch__time">Q3 09:06</span><span class="lmatch__more" data-goto="detail" style="margin-left:auto">29+ ›</span></div>
+          <div class="lgrid">
+            <div class="lgrid__h tm"></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap</div><div class="lgrid__h">Total Points</div>
+            <div class="lteam"><span class="lteam__logo" style="background:#e08">CS</span>Connecticut Sun(W)</div>
+            <div class="ocell"><div class="ocell__lab">Home</div><div class="ocell__val up">6.26 <span class="a"><svg viewBox="0 0 12 14" width="10" height="12"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg></span></div></div>
+            <div class="ocell"><div class="ocell__lab">13</div><div class="ocell__val">1.95</div></div>
+            <div class="ocell"><div class="ocell__lab">Over 150.5</div><div class="ocell__val">1.72</div></div>
+            <div class="lteam"><span class="lteam__logo" style="background:#333">GV</span>Golden State Valkyries(W)</div>
+            <div class="ocell"><div class="ocell__lab">Away</div><div class="ocell__val dn">1.12 <span class="a"><svg viewBox="0 0 12 14" width="10" height="12"><path d="M6 13L11 8H1Z M6 7L11 2H1Z" fill="currentColor"/></svg></span></div></div>
+            <div class="ocell"><div class="ocell__lab">-13</div><div class="ocell__val">1.93</div></div>
+            <div class="ocell"><div class="ocell__lab">Under 150.5</div><div class="ocell__val">2.16</div></div>
+          </div>
+          <div class="smallscore"><span class="ss">Q1 <b>22</b></span><span class="ss">Q2 <b>19</b></span><span class="ss">Q3 <b>28</b></span><span class="ss">Q4 <b>-</b></span></div>
+          <div class="micons" data-icons></div>
+        </div>
+        <div class="lmatch" data-when="today" style="border-radius:0 0 10px 10px">
+          <div class="lmatch__top"><span class="lmatch__time">TODAY 10:40</span><span class="lmatch__more" data-goto="detail">21+ ›</span></div>
+          <div class="lgrid">
+            <div class="lgrid__h tm"></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap</div><div class="lgrid__h">Total Points</div>
+            <div class="lteam"><span class="lteam__logo" style="background:#0a5">SS</span>Seattle Storm(W)</div>
+            <div class="ocell"><div class="ocell__lab">Home</div><div class="ocell__val">1.43</div></div>
+            <div class="ocell"><div class="ocell__lab">-6</div><div class="ocell__val">1.91</div></div>
+            <div class="ocell"><div class="ocell__lab">Over 176.5</div><div class="ocell__val">2.02</div></div>
+            <div class="lteam"><span class="lteam__logo" style="background:#248">TT</span>Toronto Tempo(W)</div>
+            <div class="ocell"><div class="ocell__lab">Away</div><div class="ocell__val">2.85</div></div>
+            <div class="ocell"><div class="ocell__lab">6</div><div class="ocell__val">1.97</div></div>
+            <div class="ocell"><div class="ocell__lab">Under 176.5</div><div class="ocell__val">1.84</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Football · Premier League (上/下半场 + min, Total Goals, 红黄牌/角球, 1X2 含 Draw) -->
+      <div class="lrow" data-collapse><div class="lrow__flag">🏴󠁧󠁢󠁥󠁮󠁧󠁿</div>
+        <div class="lrow__name">Premier League</div><span class="lrow__star" data-fav="epl" data-favtype="league">☆</span><span class="lrow__chev">▲</span></div>
+      <div class="lmatches" data-body>
+        <div class="lmatch" data-parlay="yes" data-favmatch="m_epl" data-when="inplay">
+          <div class="lmatch__top"><span class="lmatch__time">2nd Half 77:11</span><span class="lmatch__more" data-goto="detail" style="margin-left:auto">45+ ›</span></div>
+          <div class="fbmkt" data-fbmkt="eplLive"></div>
+          <div class="smallscore">
+            <span class="neutral" title="中立场">N</span>
+            <span class="ss"><span class="card-y"></span> <b>2 - 1</b></span>
+            <span class="ss"><span class="card-r"></span> <b>0 - 1</b></span>
+            <span class="ss">⛳ <b>5 - 3</b></span>
+          </div>
+          <div class="micons" data-icons></div>
+        </div>
+        <!-- upcoming (未开赛) → TODAY -->
+        <div class="lmatch" data-when="today" style="border-radius:0 0 10px 10px">
+          <div class="lmatch__top"><span class="lmatch__time">TODAY 22:00</span><span class="lmatch__more" data-goto="detail">52+ ›</span></div>
+          <div class="fbmkt" data-fbmkt="eplUp"></div>
+        </div>
+      </div>
+
+      <!-- Tennis · Australian Open (第X盘 + 盘制, Games O/U, 盘/局比分) -->
+      <div class="lrow" data-collapse><div class="lrow__flag">🇦🇺</div>
+        <div class="lrow__name">Australian Open</div><span class="lrow__star" data-fav="ao" data-favtype="league">☆</span><span class="lrow__chev">▲</span></div>
+      <div class="lmatches" data-body>
+        <div class="lmatch" data-parlay="yes" data-favmatch="m_ao" data-when="inplay">
+          <div class="lmatch__top"><span class="lmatch__time">Set 3 · Best of 5</span><span class="lmatch__more" data-goto="detail" style="margin-left:auto">18+ ›</span></div>
+          <div class="lgrid">
+            <div class="lgrid__h tm"></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap (Games)</div><div class="lgrid__h">Games O/U</div>
+            <div class="lteam"><span class="lteam__logo" style="background:#111">JS</span>Jannik Sinner <b style="color:#e11338;font-weight:900">1</b></div>
+            <div class="ocell"><div class="ocell__lab">Home</div><div class="ocell__val up">1.55 <span class="a"><svg viewBox="0 0 12 14" width="10" height="12"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg></span></div></div>
+            <div class="ocell"><div class="ocell__lab">-4.5</div><div class="ocell__val">1.90</div></div>
+            <div class="ocell"><div class="ocell__lab">Over 22.5</div><div class="ocell__val">1.87</div></div>
+            <div class="lteam"><span class="lteam__logo" style="background:#e11338">CA</span>Carlos Alcaraz <b style="color:#e11338;font-weight:900">1</b></div>
+            <div class="ocell"><div class="ocell__lab">Away</div><div class="ocell__val dn">2.45 <span class="a"><svg viewBox="0 0 12 14" width="10" height="12"><path d="M6 13L11 8H1Z M6 7L11 2H1Z" fill="currentColor"/></svg></span></div></div>
+            <div class="ocell"><div class="ocell__lab">+4.5</div><div class="ocell__val">1.90</div></div>
+            <div class="ocell"><div class="ocell__lab">Under 22.5</div><div class="ocell__val">1.93</div></div>
+          </div>
+          <div class="smallscore">
+            <span class="ss">Set1 <b>6 - 3</b></span>
+            <span class="ss">Set2 <b>4 - 6</b></span>
+            <span class="ss">Set3 <b>40 - 30</b></span>
+          </div>
+          <div class="micons" data-icons></div>
+        </div>
+        <!-- upcoming (未开赛) → TODAY -->
+        <div class="lmatch" data-when="today" style="border-radius:0 0 10px 10px">
+          <div class="lmatch__top"><span class="lmatch__time">TODAY 18:30</span><span class="lmatch__more" data-goto="detail">15+ ›</span></div>
+          <div class="lgrid">
+            <div class="lgrid__h tm"></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap (Games)</div><div class="lgrid__h">Games O/U</div>
+            <div class="lteam"><span class="lteam__logo" style="background:#0a3">ND</span>Novak Djokovic</div>
+            <div class="ocell"><div class="ocell__lab">Home</div><div class="ocell__val">1.70</div></div>
+            <div class="ocell"><div class="ocell__lab">-3.5</div><div class="ocell__val">1.90</div></div>
+            <div class="ocell"><div class="ocell__lab">Over 21.5</div><div class="ocell__val">1.90</div></div>
+            <div class="lteam"><span class="lteam__logo" style="background:#c50">DM</span>Daniil Medvedev</div>
+            <div class="ocell"><div class="ocell__lab">Away</div><div class="ocell__val">2.10</div></div>
+            <div class="ocell"><div class="ocell__lab">+3.5</div><div class="ocell__val">1.90</div></div>
+            <div class="ocell"><div class="ocell__lab">Under 21.5</div><div class="ocell__val">1.90</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Baseball · MLB (局数 + 垒包 + 出局数, Total Runs) -->
+      <div class="lrow" data-collapse><div class="lrow__flag">🇺🇸</div>
+        <div class="lrow__name">MLB</div><span class="lrow__star" data-fav="mlb" data-favtype="league">☆</span><span class="lrow__chev">▲</span></div>
+      <div class="lmatches" data-body>
+        <div class="lmatch" data-favmatch="m_mlb" data-when="inplay" style="border-radius:0 0 10px 10px">
+          <div class="lmatch__top"><span class="lmatch__time">7 <span style="color:#e11338">▲</span></span><span class="lmatch__more" data-goto="detail" style="margin-left:auto">12+ ›</span></div>
+          <div class="lgrid">
+            <div class="lgrid__h tm"></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap (Run)</div><div class="lgrid__h">Total Runs</div>
+            <div class="lteam"><span class="lteam__logo" style="background:#c8102e">USA</span>USA Baseball <b style="color:#e11338;font-weight:900">3</b></div>
+            <div class="ocell"><div class="ocell__lab">Home</div><div class="ocell__val">1.42</div></div>
+            <div class="ocell"><div class="ocell__lab">-1.5</div><div class="ocell__val">1.90</div></div>
+            <div class="ocell"><div class="ocell__lab">Over 8.5</div><div class="ocell__val up">1.88 <span class="a"><svg viewBox="0 0 12 14" width="10" height="12"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg></span></div></div>
+            <div class="lteam"><span class="lteam__logo" style="background:#bc002d">JPN</span>Japan Baseball <b style="color:#e11338;font-weight:900">1</b></div>
+            <div class="ocell"><div class="ocell__lab">Away</div><div class="ocell__val">2.90</div></div>
+            <div class="ocell"><div class="ocell__lab">+1.5</div><div class="ocell__val">1.90</div></div>
+            <div class="ocell"><div class="ocell__lab">Under 8.5</div><div class="ocell__val">1.92</div></div>
+          </div>
+          <div class="smallscore">
+            <span class="ss"><span class="diamond"><i class="b2 on"></i><i class="b3"></i><i class="b1 on"></i></span></span>
+            <span class="ss">Outs: <b>1</b></span>
+          </div>
+          <div class="micons" data-icons></div>
+        </div>
+      </div>
+
+      <div id="listEmpty" class="list-empty" hidden>该日期目前没有赛事示意<br><span>(原型资料以 IN-PLAY 滚球与 TODAY 未开赛为主)</span></div>
+      <div class="spacer"></div>
+    </div>
+  </section>
+
+  <!-- ============ CHAMPIONS / OUTRIGHTS (冠军) ============ -->
+  <section class="screen" id="screen-champions">
+    <div class="scroll">
+      <div class="outwrap" data-outbody>
+        <div class="outgrp">
+          <div class="outgrp__country"><span class="outgrp__flag">🇦🇺</span>Australia</div>
+          <div class="outrow"><span class="outrow__star" data-fav="o_aus" data-favtype="league">☆</span><span class="outrow__nm">Australia NBL 2026/2027 - Winner</span><span class="outrow__chev">›</span></div>
+        </div>
+
+        <div class="outgrp">
+          <div class="outgrp__country"><span class="outgrp__flag">🇧🇷</span>Brazil</div>
+          <div class="outrow"><span class="outrow__star" data-fav="o_bra" data-favtype="league">☆</span><span class="outrow__nm">Brazil NBB 2026/2027 - Winner</span><span class="outrow__chev">›</span></div>
+        </div>
+
+        <div class="outgrp">
+          <div class="outgrp__country"><span class="outgrp__flag">🇪🇸</span>Spain</div>
+          <div class="outrow"><span class="outrow__star" data-fav="o_esp" data-favtype="league">☆</span><span class="outrow__nm">Spain ACB 2026/2027 - Winner</span><span class="outrow__chev">›</span></div>
+        </div>
+
+        <div class="outgrp">
+          <div class="outgrp__country"><span class="outgrp__flag">🇪🇺</span>EUROPA</div>
+          <div class="outrow"><span class="outrow__star" data-fav="o_el_ff" data-favtype="league">☆</span><span class="outrow__nm">EuroLeague 2026/2027 - Teams to Make Final Four</span><span class="outrow__chev">›</span></div>
+          <div class="outrow"><span class="outrow__star" data-fav="o_ec" data-favtype="league">☆</span><span class="outrow__nm">EuroCup 2026/2027 - Winner</span><span class="outrow__chev">›</span></div>
+          <div class="outrow"><span class="outrow__star" data-fav="o_vtb" data-favtype="league">☆</span><span class="outrow__nm">VTB United League 2026/2027 - Winner</span><span class="outrow__chev">›</span></div>
+          <div class="outrow"><span class="outrow__star" data-fav="o_bcl" data-favtype="league">☆</span><span class="outrow__nm">Basketball Champions League 2026/2027 - Winner</span><span class="outrow__chev">›</span></div>
+          <div class="outrow"><span class="outrow__star" data-fav="o_el" data-favtype="league">☆</span><span class="outrow__nm">EuroLeague 2026/2027 - Winner</span><span class="outrow__chev">›</span></div>
+        </div>
+
+        <div class="outgrp">
+          <div class="outgrp__country"><span class="outgrp__flag">🇫🇷</span>France</div>
+          <div class="outrow"><span class="outrow__star" data-fav="o_fra" data-favtype="league">☆</span><span class="outrow__nm">France LNB Elite 2026/2027 - Winner</span><span class="outrow__chev">›</span></div>
+        </div>
+
+        <div class="outgrp">
+          <div class="outgrp__country"><span class="outgrp__flag">🇺🇸</span>USA</div>
+          <div class="outrow"><span class="outrow__star" data-fav="o_nba" data-favtype="league">☆</span><span class="outrow__nm">NBA 2026/2027 - Winner</span><span class="outrow__chev">›</span></div>
+          <div class="outrow"><span class="outrow__star" data-fav="o_nba_mvp" data-favtype="league">☆</span><span class="outrow__nm">NBA 2026/2027 - Regular Season MVP</span><span class="outrow__chev">›</span></div>
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+    </div>
+  </section>
+
+  <!-- ============ ENDING CARD ============ -->
+  <section class="screen" id="screen-endcard">
+    <div class="scroll">
+      <!-- match 1 (expanded) -->
+      <div class="ecgrp" data-ecgrp>
+        <div class="ecgrp__head" data-ecgrpcollapse><span>🌏</span>Asian Games<span class="ecgrp__cnt">1</span><span class="chev">▲</span></div>
+        <div class="ecmatch__time"><span class="star" data-fav="ec_kor_sau" data-favtype="match">☆</span>29 Minute · </div>
+        <div class="ecvs">
+          <div class="ecvs__team"><span class="ecvs__logo">🇰🇷</span><span class="ecvs__nm">Korea Republic</span></div>
+          <div class="ecvs__mid">VS</div>
+          <div class="ecvs__team"><span class="ecvs__logo">🇸🇦</span><span class="ecvs__nm">Saudi Arabia</span></div>
+        </div>
+        <div class="ecbtn ecbtn--outline" data-ectoggle>Collapse ↑</div>
+        <div class="ecsecwrap" data-ecbody><span class="ecsec">Basketball Ending</span></div>
+        <div class="ecgrid" id="ecGrid1"></div>
+        <div class="ecbtn ecbtn--outline" data-ecbody>View All</div>
+      </div>
+
+      <!-- match 2 (collapsed) -->
+      <div class="ecgrp eccollapsed" data-ecgrp>
+        <div class="ecmatch__time"><span class="star" data-fav="ec_bel_ger" data-favtype="match">☆</span>Today 23:45</div>
+        <div class="ecvs">
+          <div class="ecvs__team"><span class="ecvs__logo">🇧🇪</span><span class="ecvs__nm">Belgium (W)</span></div>
+          <div class="ecvs__mid">VS</div>
+          <div class="ecvs__team"><span class="ecvs__logo">🇩🇪</span><span class="ecvs__nm">Germany (W)</span></div>
+        </div>
+        <div class="ecbtn ecbtn--primary" data-ectoggle>Expand ↓</div>
+        <div class="ecsecwrap" data-ecbody hidden><span class="ecsec">Basketball Ending</span></div>
+        <div class="ecgrid" id="ecGrid2" hidden></div>
+      </div>
+
+      <div class="spacer"></div>
+    </div>
+  </section>
+
+  <!-- ============ ENDING GAME ============ -->
+  <section class="screen" id="screen-endgame">
+    <div class="scroll">
+      <div class="egchips" id="egChips"></div>
+      <div class="egdates">
+        <div class="egdate is-on">Today<small>09/10</small></div>
+        <div class="egdate">Fri<small>09/11</small></div>
+        <div class="egdate">Sat<small>09/12</small></div>
+      </div>
+
+      <div class="ecgrp">
+        <div class="ecgrp__head" data-ecgrpcollapse><span>🌏</span>Asian Games<span class="ecgrp__cnt">2</span><span class="chev">▲</span></div>
+        <div class="egmatch">
+          <div class="egmatch__main">
+            <div class="egvs"><div class="egvs__team"><span class="egvs__logo">🇰🇷</span><span class="egvs__nm">Korea Republic</span></div><span class="egvs__mid">VS</span><div class="egvs__team"><span class="egvs__logo">🇸🇦</span><span class="egvs__nm">Saudi Arabia</span></div></div>
+            <span class="egfire">🔥 <b>6</b> People are viewing</span>
+          </div>
+          <div class="egmatch__side"><div class="egtime">09/10/2026 15:00:00</div><button class="egview">View Card</button><div class="egslots">🎟️ <b>164</b> Slots sold</div></div>
+        </div>
+        <div class="egmatch">
+          <div class="egmatch__main">
+            <div class="egvs"><div class="egvs__team"><span class="egvs__logo">🇯🇵</span><span class="egvs__nm">Japan</span></div><span class="egvs__mid">VS</span><div class="egvs__team"><span class="egvs__logo">🇮🇩</span><span class="egvs__nm">Indonesia</span></div></div>
+            <span class="egfire">🔥 <b>7</b> People are viewing</span>
+          </div>
+          <div class="egmatch__side"><div class="egtime">09/10/2026 18:00:00</div><button class="egview">View Card</button><div class="egslots">🎟️ <b>130</b> Slots sold</div></div>
+        </div>
+      </div>
+
+      <div class="ecgrp">
+        <div class="ecgrp__head" data-ecgrpcollapse><span>🌏</span>FIBA World Cup Women<span class="ecgrp__cnt">1</span><span class="chev">▲</span></div>
+        <div class="egmatch">
+          <div class="egmatch__main">
+            <div class="egvs"><div class="egvs__team"><span class="egvs__logo">🇨🇳</span><span class="egvs__nm">China (W)</span></div><span class="egvs__mid">VS</span><div class="egvs__team"><span class="egvs__logo">🇫🇷</span><span class="egvs__nm">France (W)</span></div></div>
+            <span class="egfire">🔥 <b>9</b> People are viewing</span>
+          </div>
+          <div class="egmatch__side"><div class="egtime">09/10/2026 20:30:00</div><button class="egview">View Card</button><div class="egslots">🎟️ <b>114</b> Slots sold</div></div>
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+    </div>
+  </section>
+
+  <!-- ============ DETAIL ============ -->
+  <section class="screen" id="screen-detail" style="position:relative">
+    <button class="dback" data-goto="back">‹</button>
+
+    <!-- 更多赛事 sheet -->
+    <div class="sheet" id="moreSheet">
+      <div class="sheet__mask" data-sheet="close"></div>
+      <div class="sheet__panel">
+        <div class="sheet__head"><span>NBA Playoffs</span><span class="x" data-sheet="close">✕</span></div>
+        <div class="sheet__tabs">
+          <button class="sheet__tab is-on">In-Play (滚球)</button>
+          <button class="sheet__tab">Upcoming (早盘)</button>
+        </div>
+        <div class="sheet__body">
+          <div class="selrow is-cur">
+            <span class="selrow__lg" style="background:#1d428a">DEN</span>
+            <div class="selrow__mid"><div class="selrow__t">Denver Nuggets vs Minnesota Timberwolves</div><div class="selrow__s selrow__live">● LIVE · 4Q 9:13</div></div>
+            <div class="selrow__sc">93 - 115</div>
+          </div>
+          <div class="selrow" data-goto="detail">
+            <span class="selrow__lg" style="background:#552583">LAL</span>
+            <div class="selrow__mid"><div class="selrow__t">LA Lakers vs LA Clippers</div><div class="selrow__s selrow__live">● LIVE · 3Q 5:20</div></div>
+            <div class="selrow__sc">78 - 74</div>
+          </div>
+          <div class="selrow" data-goto="detail">
+            <span class="selrow__lg" style="background:#007ac1">OKC</span>
+            <div class="selrow__mid"><div class="selrow__t">OKC Thunder vs Dallas Mavericks</div><div class="selrow__s selrow__live">● LIVE · 2Q 1:45</div></div>
+            <div class="selrow__sc">55 - 60</div>
+          </div>
+          <div class="selrow" data-goto="detail">
+            <span class="selrow__lg" style="background:#ce1141">MIA</span>
+            <div class="selrow__mid"><div class="selrow__t">Miami Heat vs Boston Celtics</div><div class="selrow__s">Today 22:30</div></div>
+            <div class="selrow__sc">VS</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- more events entry (slides in when scrolling up the page) -->
+    <div class="morebar" id="detailMoreBar" data-sheet="open"><span>NBA Playoffs · Denver Nuggets vs Minnesota</span><span class="morebar__r">更多赛事 ›</span></div>
+
+    <div class="scroll" id="detailScroll">
+      <!-- scoreboard (swapped by sport) -->
+      <div class="scoreboard" id="scoreboard"><!--filled by JS--></div>
+
+      <!-- 计分板下方:收藏 / 视频 / 动画 -->
+      <div class="svbar">
+        <button class="svbar__fav" data-svfav>☆ Favorite</button>
+        <div class="svbar__r"><button class="svbar__btn is-on" data-svmedia="video">▶ Video</button><button class="svbar__btn" data-svmedia="anim">◎ Animation</button></div>
+      </div>
+
+      <!-- demo: 依球种切换计分板 (prototype review aid) -->
+      <div id="sportSwitch" class="sbswitch"></div>
+
+      <!-- market tabs -->
+      <div class="mtabs">
+        <button class="mtab is-on" data-mpaneltab="all">▦ All Markets</button>
+        <button class="mtab" data-mpaneltab="player">👤 Player</button>
+        <button class="mtab" data-mpaneltab="picks">🚩 Picks</button>
+      </div>
+
+      <!-- ===== ALL MARKETS panel ===== -->
+      <div data-mpanel="all">
+      <!-- Winner -->
+      <div class="mgroup" data-ord="0">
+        <div class="mgroup__head" data-mcollapse><span class="star is-pin" data-mpin>★</span> Winner <span class="chev" style="margin-left:auto">▲</span></div>
+        <div class="mgroup__body">
+          <div class="ha">
+            <div class="hacard">
+              <div class="hacard__lab">HOME</div>
+              <div class="hacard__team"><span class="lg" style="background:#1d428a">DEN</span><span class="nm">Denver Nuggets</span></div>
+              <div class="oline-row"><div class="oline is-selx"><span class="oline__hcp"></span><span class="oline__odd up">7.40</span></div><span class="oarr up"><svg viewBox="0 0 12 14"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg></span></div>
+            </div>
+            <div class="hacard">
+              <div class="hacard__lab">AWAY</div>
+              <div class="hacard__team"><span class="lg" style="background:#236192">MIN</span><span class="nm">Minnesota Timberwolves</span></div>
+              <div class="oline-row"><span class="oarr"></span><div class="oline"><span class="oline__hcp"></span><span class="oline__odd">1.07</span></div></div>
+            </div>
+          </div>
+          <div class="dtips"><span class="dtips__tag">BET TIPS</span><span class="dtips__txt">The Denver Nuggets have led by more than 10 points and have not been overturned in their last 10 games.</span><span class="dtips__more">More Tips ›</span></div>
+        </div>
+      </div>
+
+      <!-- Handicap -->
+      <div class="mgroup" data-ord="1">
+        <div class="mgroup__head" data-mcollapse><span class="star" data-mpin>☆</span> Handicap <span class="q" data-rule="handicap">?</span><span class="chev" style="margin-left:auto">▲</span></div>
+        <div class="mgroup__body">
+          <div class="ha">
+            <div class="hacard">
+              <div class="hacard__lab">HOME</div>
+              <div class="hacard__team"><span class="lg" style="background:#1d428a">DEN</span><span class="nm">Denver Nuggets</span></div>
+              <div class="oline-row"><div class="oline" data-sel><span class="oline__hcp">-14.5</span><span class="oline__odd up">1.86</span></div><span class="oarr up"><svg viewBox="0 0 12 14"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg></span></div>
+              <div class="oline-row"><div class="oline is-sel" data-sel><span class="oline__hcp">-15.5</span><span class="oline__odd">1.97</span></div><span class="oarr"></span></div>
+              <div class="oline-row"><div class="oline" data-sel><span class="oline__hcp">-13.5</span><span class="oline__odd dn">1.75</span></div><span class="oarr dn"><svg viewBox="0 0 12 14"><path d="M6 13L11 8H1Z M6 7L11 2H1Z" fill="currentColor"/></svg></span></div>
+            </div>
+            <div class="hacard">
+              <div class="hacard__lab">AWAY</div>
+              <div class="hacard__team"><span class="lg" style="background:#236192">MIN</span><span class="nm">Minnesota Timberwolves</span></div>
+              <div class="oline-row"><span class="oarr"></span><div class="oline" data-sel><span class="oline__hcp">+14.5</span><span class="oline__odd">1.90</span></div></div>
+              <div class="oline-row"><span class="oarr up"><svg viewBox="0 0 12 14"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg></span><div class="oline" data-sel><span class="oline__hcp">+15.5</span><span class="oline__odd up">1.79</span></div></div>
+              <div class="oline-row"><span class="oarr"></span><div class="oline" data-sel><span class="oline__hcp">+13.5</span><span class="oline__odd">2.02</span></div></div>
+            </div>
+          </div>
+          <!-- EXPERT PICKS -->
+          <div class="expert">
+            <div class="expert__head"><span class="expert__badge">🎖️</span> EXPERT PICKS</div>
+            <div class="expert__row">
+              <div class="expert__ava">🧑</div>
+              <div class="expert__info">
+                <div class="expert__who">Jimmy Oster</div>
+                <div class="expert__rate"><b>87%</b><small>Win Rate</small></div>
+              </div>
+              <div class="expert__right">
+                <div class="expert__desc">Denver Nuggets vs Minnesota Timberwolves Handicap.</div>
+                <div class="expert__pick">
+                  <div class="expert__odd"><span>-14.5</span><span>1.86</span></div>
+                  <button class="expert__btn">Follow BET</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- collapsed extra markets -->
+      <div class="mgroup mgroup--mini collapsed" data-ord="2">
+        <div class="mgroup__head" data-mcollapse><span class="star" data-mpin>☆</span> Assists O/U (incl.OT) <span class="chev" style="margin-left:auto">▲</span></div>
+        <div class="mgroup__body"><div class="ha"><div class="hacard"><div class="oline-row"><div class="oline"><span class="oline__hcp">Over 44.5</span><span class="oline__odd">1.90</span></div><span class="oarr"></span></div></div><div class="hacard"><div class="oline-row"><span class="oarr"></span><div class="oline"><span class="oline__hcp">Under 44.5</span><span class="oline__odd">1.90</span></div></div></div></div></div>
+      </div>
+      <div class="mgroup mgroup--mini collapsed" data-ord="3">
+        <div class="mgroup__head" data-mcollapse><span class="star" data-mpin>☆</span> Sum OF Two Team Last Digit Score (incl.OT) <span class="chev" style="margin-left:auto">▲</span></div>
+        <div class="mgroup__body"><div class="ha"><div class="hacard"><div class="oline-row"><div class="oline"><span class="oline__hcp">Odd</span><span class="oline__odd">1.95</span></div><span class="oarr"></span></div></div><div class="hacard"><div class="oline-row"><span class="oarr"></span><div class="oline"><span class="oline__hcp">Even</span><span class="oline__odd">1.85</span></div></div></div></div></div>
+      </div>
+      <div class="mgroup mgroup--mini collapsed" data-ord="4">
+        <div class="mgroup__head" data-mcollapse><span class="star" data-mpin>☆</span> DAL Wings (W) Last Digit Score (incl.OT) <span class="chev" style="margin-left:auto">▲</span></div>
+        <div class="mgroup__body"><div class="ha"><div class="hacard"><div class="oline-row"><div class="oline"><span class="oline__hcp">0</span><span class="oline__odd">9.50</span></div><span class="oarr"></span></div></div><div class="hacard"><div class="oline-row"><span class="oarr"></span><div class="oline"><span class="oline__hcp">1</span><span class="oline__odd">9.50</span></div></div></div></div></div>
+      </div>
+      </div><!-- /all panel -->
+
+      <!-- ===== PLAYER panel ===== -->
+      <div data-mpanel="player" hidden>
+        <div class="psel" data-playersheet="open"><span id="pselLabel">选择球员 (7/7)</span><span class="psel__chev">⌄</span></div>
+        <div class="pfil">
+          <button class="is-on">全部</button>
+          <button>分</button>
+        </div>
+        <div class="mgroup" id="pgroup">
+          <div class="mgroup__head" data-mcollapse><span class="star" data-mpin>☆</span> 球员得分数大小盘 <span class="chev" style="margin-left:auto">▲</span></div>
+          <div class="mgroup__body" id="playerRows"></div>
+        </div>
+        <div class="spacer"></div>
+      </div>
+
+      <!-- ===== PICKS panel ===== -->
+      <div data-mpanel="picks" hidden>
+        <div class="picks-empty">🚩 专家精选 Picks<br><span>此区块示意，实际由后端提供专家推荐盘。</span></div>
+        <div class="spacer"></div>
+      </div>
+
+      <!-- market rule sheet (?) -->
+      <div class="sheet" id="ruleSheet">
+        <div class="sheet__mask" data-ruleclose></div>
+        <div class="sheet__panel rule-panel">
+          <div class="sheet__head"><span id="ruleTitle">Handicap</span><span class="x" data-ruleclose>✕</span></div>
+          <div class="sheet__body" id="ruleBody"></div>
+        </div>
+      </div>
+
+      <!-- player select sheet -->
+      <div class="sheet" id="playerSheet">
+        <div class="sheet__mask" data-playersheet="close"></div>
+        <div class="sheet__panel">
+          <div class="sheet__head"><span>选择球员 (7/7)</span><span class="x" data-playersheet="close">✕</span></div>
+          <div class="sheet__body" id="playerPick"></div>
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+    </div>
+  </section>
+
+  <!-- ============ BET SLIP (My Bet) ============ -->
+  <section class="screen" id="screen-betslip">
+    <div class="scroll">
+      <div class="bs-title">Sports Bet Slip</div>
+      <div class="bs-tabs"><button class="bs-tab is-on" data-bstab>ON-GOING</button><button class="bs-tab" data-bstab>FINISHED</button><button class="bs-tab" data-bstab>Scheduled</button><button class="bs-tab" data-bstab>Expired</button></div>
+      <label class="bs-cashout" id="bsCashout"><span class="bs-cashout__radio"></span>Cash Out Only</label>
+      <div class="bs-datefilter"><div class="box"><span>APR-31</span><span>MAY-15</span><span>📅</span></div></div>
+
+      <div class="bs-dategrp"><span>TODAY</span></div>
+      <!-- won -->
+      <div class="bscard">
+        <div class="bscard__top"><span class="bscard__lg" style="background:#c8102e"></span><span class="bscard__lgname">NBAPLAYOFFS-Semifinal</span><span class="tag">Single</span></div>
+        <div class="bscard__meta"><span>2026/4/27 &nbsp;09:15</span><span class="more">More Result</span></div>
+        <div class="bsmatch"><span class="bsmatch__lg" style="background:#552583">LAL</span><span class="bsmatch__nm">Los Angels Lakers</span><span class="bsmatch__sc">113 - 102</span><span class="bsmatch__lg" style="background:#c8102e">LAC</span></div>
+        <div class="bssel"><span class="bssel__lg" style="background:#552583">LAL</span><span class="bssel__nm">Los Angels Lakers</span><div class="bssel__box"><div class="k">WINNER</div><div class="v">7.40</div></div></div>
+        <div class="bsfoot"><span class="stake">STAKE ₱ 100</span><span class="pay">PAYOUT ₱ 750</span></div>
+        <div class="bscard__id"><span>04/27/2026 · 15:37:19</span><span>ID:5181527530426859669 ⧉</span></div>
+      </div>
+
+      <div class="bs-dategrp"><span>APR-26</span></div>
+      <!-- lost -->
+      <div class="bscard">
+        <div class="bscard__top"><span class="bscard__lg" style="background:#0a67b3"></span><span class="bscard__lgname">Australian Open</span><span class="tag">Single</span></div>
+        <div class="bscard__meta"><span>2026/4/27 &nbsp;09:15</span><span class="more">More Result</span></div>
+        <div class="bsmatch"><span class="bsmatch__lg" style="background:#111">JS</span><span class="bsmatch__nm">Jannik Sinner</span><span class="bsmatch__sc">4 - 1</span><span class="bsmatch__lg" style="background:#e11338">CA</span></div>
+        <div class="bssel"><span class="bssel__lg" style="background:#e11338">CA</span><span class="bssel__nm">Carlos Alcaraz</span><div class="bssel__box"><div class="k">WINNER</div><div class="v">7.40</div></div></div>
+        <div class="bsfoot"><span class="stake">STAKE ₱ 100</span><span class="pay0">PAYOUT ₱ 0</span></div>
+        <div class="bscard__id"><span>04/27/2026 · 15:37:19</span><span>ID:5181527530426859669 ⧉</span></div>
+      </div>
+      <!-- on-going / pending -->
+      <div class="bscard">
+        <div class="bscard__top"><span class="bscard__lg" style="background:#c8102e"></span><span class="bscard__lgname">NBAPLAYOFFS-Semifinal</span><span class="tag">Single</span></div>
+        <div class="bscard__meta"><span>2026/4/27 &nbsp;09:15</span><span class="ongo">On-Going <span class="stream">▶ Streaming</span></span></div>
+        <div class="bsmatch"><span class="bsmatch__lg" style="background:#1d428a">DEN</span><span class="bsmatch__nm">Denver Nuggets</span><span class="bsmatch__sc">36 - 45</span><span class="bsmatch__lg" style="background:#236192">MIN</span></div>
+        <div class="bssel"><span class="bssel__lg" style="background:#1d428a">AE</span><span class="bssel__nm">Anthony Edwards</span><div class="bssel__box"><div class="k">THREE POINT SCORE&nbsp; 35</div><div class="v">2.5</div></div></div>
+        <div class="bsfoot"><span class="stake">STAKE ₱ 100</span><span class="pend">PENDING</span></div>
+        <div class="bscard__id"><span>04/27/2026 · 15:37:19</span><span>ID:5181527530426859669 ⧉</span></div>
+      </div>
+
+      <div class="bs-dategrp"><span>APR-25</span></div>
+      <!-- parlay -->
+      <div class="bscard">
+        <div class="bscard__top"><span class="bscard__lg" style="background:#c8102e"></span><span class="bscard__lgname">NBAPLAYOFFS-Semifinal</span><span class="tag tag--parlay">Parlay</span></div>
+        <div class="bscard__meta"><span>2026/4/26 &nbsp;09:15</span></div>
+        <div class="bsmatch"><span class="bsmatch__lg" style="background:#1d428a">DEN</span><span class="bsmatch__nm">Denver Nuggets</span><span class="bsmatch__sc">36 - 45</span><span class="bsmatch__lg" style="background:#236192">MIN</span></div>
+        <div class="bsmatch" style="border-top:1px solid #f4f6fa"><span class="bsmatch__lg" style="background:#552583">LAL</span><span class="bsmatch__nm">Los Angels Lakers</span><span class="bsmatch__sc">36 - 45</span><span class="bsmatch__lg" style="background:#c8102e">LAC</span></div>
+        <div class="bsmatch" style="border-top:1px solid #f4f6fa"><span class="bsmatch__lg" style="background:#1d428a">DEN</span><span class="bsmatch__nm">Denver Nuggets</span><span class="bsmatch__sc">36 - 45</span><span class="bsmatch__lg" style="background:#b23">NOP</span></div>
+        <div class="bsparlay">
+          <div class="bsparlay__t">Parlay</div>
+          <div class="bsparlay__grid">
+            <span>Denver Nuggets</span><span>Minnesota Timberwolves</span><span>Handicap -15</span>
+            <span>Los Angels Lakers</span><span>Los Angels Clipper</span><span>Total Points over 225</span>
+            <span>Los Angels Lakers</span><span>Los Angels Clipper</span><span>Winner</span>
+          </div>
+          <div class="bsparlay__odd">35.2</div>
+        </div>
+        <div class="bsfoot"><span class="stake">STAKE ₱ 100</span><span class="pay0">PAYOUT ₱ 0</span></div>
+        <div class="bscard__id"><span>04/27/2026 · 15:37:19</span><span>ID:5181527530426859669 ⧉</span></div>
+      </div>
+
+      <div class="spacer"></div>
+    </div>
+  </section>
+
+  <!-- ============ BOTTOM TAB BAR (shared) ============ -->
+  <nav class="tabbar">
+    <button class="tabbar__item is-on" data-goto="home"><span class="ico">🏠</span>Home</button>
+    <button class="tabbar__item"><span class="ico">🎁</span>Rewards</button>
+    <button class="tabbar__item"><span class="ico">🏪</span>Points Mall</button>
+    <button class="tabbar__item"><span class="ico">🏆</span>Tourney<span class="dotred"></span></button>
+    <button class="tabbar__item"><span class="ico">👤</span>My</button>
+  </nav>
+
+</div>
+
+<script>
+/* ===== data ===== */
+var SPORTS=[
+ {k:'featured',ico:'👍',lab:'Featured',feat:true},
+ {k:'football',ico:'⚽',lab:'Football'},
+ {k:'basketball',ico:'🏀',lab:'Basketball'},
+ {k:'tennis',ico:'🎾',lab:'Tennis'},
+ {k:'volleyball',ico:'🏐',lab:'Volleyball'},
+ {k:'badminton',ico:'🏸',lab:'Badminton'},
+ {k:'tabletennis',ico:'🏓',lab:'Table Tennis'},
+ {k:'icehockey',ico:'🏒',lab:'Ice Hockey'},
+ {k:'boxing',ico:'🥊',lab:'Boxing/Fighting'},
+ {k:'billiards',ico:'🎱',lab:'Billiards'},
+ {k:'cricket',ico:'🏏',lab:'Cricket'},
+ {k:'baseball',ico:'⚾',lab:'Baseball'},
+ {k:'rugby',ico:'🏉',lab:'Rugby'},
+ {k:'amfootball',ico:'🏈',lab:'American Football'},
+ {k:'motor',ico:'🏎️',lab:'Motor Racing'},
+ {k:'golf',ico:'⛳',lab:'Golf'},
+ {k:'financial',ico:'📈',lab:'Financial Bets'},
+ {k:'esports',ico:'🎮',lab:'eSports'},
+ {k:'champions',ico:'🏆',lab:'Outrights'},
+ {k:'endcard',ico:'🏀',lab:'Ending Card'},
+ {k:'endgame',ico:'🏀',lab:'Ending Game'}
+];
+var curSport='featured';
+
+/* ===== ball tabs render ===== */
+var ballTabs=document.getElementById('ballTabs');
+function renderBallTabs(){
+  ballTabs.innerHTML=SPORTS.map(function(s){
+    var on=(s.k===curSport);
+    var ico = s.feat
+      ? '<span class="balltab__ico">👍<span class="feat-star">'+(on?'★':'☆')+'</span></span>'
+      : '<span class="balltab__ico">'+s.ico+'</span>';
+    return '<button class="balltab'+(on?' is-on':'')+(s.feat?' balltab--feat':'')+'" data-sport="'+s.k+'">'+
+      ico+s.lab+'</button>';
+  }).join('');
+}
+renderBallTabs();
+
+/* ===== screens / nav ===== */
+var screens={home:document.getElementById('screen-home'),list:document.getElementById('screen-list'),champions:document.getElementById('screen-champions'),endcard:document.getElementById('screen-endcard'),endgame:document.getElementById('screen-endgame'),detail:document.getElementById('screen-detail'),betslip:document.getElementById('screen-betslip')};
+var prevScreen='home';
+function show(name){
+  Object.keys(screens).forEach(function(k){screens[k].classList.toggle('is-active',k===name);});
+  ballTabs.style.display = (name==='detail'||name==='betslip') ? 'none' : 'flex';
+  document.querySelectorAll('.tabbar__item').forEach(function(t){t.classList.toggle('is-on',t.getAttribute('data-goto')==='home'&&name==='home');});
+  var sc=screens[name]&&screens[name].querySelector('.scroll'); if(sc)sc.scrollTop=0;
+  var ms=document.getElementById('moreSheet'); if(ms)ms.classList.remove('is-open');
+  var mb=document.getElementById('detailMoreBar'); if(mb)mb.classList.remove('is-show');
+  window.scrollTo(0,0);
+}
+function goto(name){
+  if(name==='back'){ show(prevScreen); return; }
+  if(name==='listInplay'){ prevScreen='home'; openInplayList(); return; }
+  if(name==='detail'||name==='betslip'){ prevScreen=currentScreen(); }
+  show(name);
+}
+function openInplayList(){
+  curSport='basketball';
+  renderBallTabs();
+  var tabs=document.querySelectorAll('#screen-list .oddstab');
+  tabs.forEach(function(o){o.classList.remove('is-on');});
+  if(tabs[0])tabs[0].classList.add('is-on'); // IN-PLAY
+  currentWhen='inplay'; applyFilters();
+  show('list');
+}
+function currentScreen(){ for(var k in screens){ if(screens[k].classList.contains('is-active'))return k;} return 'home'; }
+
+/* delegate clicks */
+document.body.addEventListener('click',function(e){
+  var fv=e.target.closest('[data-fav]');
+  if(fv){ toggleFav(fv.getAttribute('data-fav')); syncFavStars(); e.stopPropagation(); return; }
+  var g=e.target.closest('[data-goto]');
+  if(g){ goto(g.getAttribute('data-goto')); return; }
+  var bt=e.target.closest('[data-sport]');
+  if(bt){ selectSport(bt.getAttribute('data-sport')); return; }
+  var lc=e.target.closest('[data-collapse]');
+  if(lc){ lc.classList.toggle('collapsed'); var body=lc.nextElementSibling; if(body&&body.hasAttribute('data-body'))body.classList.toggle('hidden'); return; }
+  var mpin=e.target.closest('[data-mpin]');
+  if(mpin){ e.stopPropagation(); var grp=mpin.closest('.mgroup'); var on4=grp.classList.toggle('is-pinned');
+    mpin.classList.toggle('is-pin',on4); mpin.textContent=on4?'★':'☆'; if(on4)grp.dataset.pin=(++mpinSeq); reorderMarkets(); return; }
+  var rq=e.target.closest('[data-rule]');
+  if(rq){ e.stopPropagation(); openRule(rq.getAttribute('data-rule')); return; }
+  var rc=e.target.closest('[data-ruleclose]');
+  if(rc){ document.getElementById('ruleSheet').classList.remove('is-open'); return; }
+  var mc=e.target.closest('[data-mcollapse]');
+  if(mc){ mc.parentElement.classList.toggle('collapsed'); return; }
+  var ol=e.target.closest('.oline[data-sel]');
+  if(ol){ var box=ol.closest('.ha'); box.querySelectorAll('.oline').forEach(function(o){o.classList.remove('is-sel');}); ol.classList.add('is-sel'); return; }
+  var od=e.target.closest('.oddstab');
+  if(od){ od.parentElement.querySelectorAll('.oddstab').forEach(function(o){o.classList.remove('is-on');}); od.classList.add('is-on');
+    currentWhen=od.getAttribute('data-when')||'inplay'; applyFilters(); return; }
+  var mt=e.target.closest('.mtab');
+  if(mt){ mt.parentElement.querySelectorAll('.mtab').forEach(function(o){o.classList.remove('is-on');}); mt.classList.add('is-on'); if(mt.getAttribute('data-mpaneltab'))switchMPanel(mt.getAttribute('data-mpaneltab')); return; }
+  var psb=e.target.closest('.psub button');
+  if(psb){ psb.parentElement.querySelectorAll('button').forEach(function(o){o.classList.remove('is-on');}); psb.classList.add('is-on'); return; }
+  var pfl=e.target.closest('.pfil button');
+  if(pfl){ pfl.parentElement.querySelectorAll('button').forEach(function(o){o.classList.remove('is-on');}); pfl.classList.add('is-on'); return; }
+  var pss=e.target.closest('[data-playersheet]');
+  if(pss){ document.getElementById('playerSheet').classList.toggle('is-open', pss.getAttribute('data-playersheet')==='open'); return; }
+  var pall=e.target.closest('[data-pall]');
+  if(pall){ var on=!pall.classList.contains('is-on'); document.querySelectorAll('#playerPick .pchk').forEach(function(c){c.classList.toggle('is-on',on); c.querySelector('.pchk__box').textContent=on?'✓':'';}); return; }
+  var pck=e.target.closest('[data-pchk]');
+  if(pck){ var o2=pck.classList.toggle('is-on'); pck.querySelector('.pchk__box').textContent=o2?'✓':''; return; }
+  var svf=e.target.closest('[data-svfav]');
+  if(svf){ var on3=svf.classList.toggle('is-on'); svf.textContent=(on3?'★':'☆')+' Favorite'; return; }
+  var svm=e.target.closest('[data-svmedia]');
+  if(svm){ var t2=svm.getAttribute('data-svmedia');
+    if(t2==='video'){ svVideo=!svVideo; if(svVideo)svAnim=false; }
+    else { svAnim=!svAnim; if(svAnim)svVideo=false; }
+    renderMedia(); return; }
+  var sh=e.target.closest('[data-sheet]');
+  if(sh){ document.getElementById('moreSheet').classList.toggle('is-open', sh.getAttribute('data-sheet')==='open'); return; }
+  var bstab=e.target.closest('[data-bstab]');
+  if(bstab){ bstab.parentElement.querySelectorAll('.bs-tab').forEach(function(o){o.classList.remove('is-on');}); bstab.classList.add('is-on');
+    var co=document.getElementById('bsCashout'); if(co)co.style.display=(bstab.textContent.trim()==='ON-GOING')?'flex':'none'; return; }
+  var cash=e.target.closest('#bsCashout');
+  if(cash){ cash.classList.toggle('is-checked'); return; }
+  var stab=e.target.closest('.sheet__tab');
+  if(stab){ stab.parentElement.querySelectorAll('.sheet__tab').forEach(function(o){o.classList.remove('is-on');}); stab.classList.add('is-on'); return; }
+  var mtog=e.target.closest('#modeToggle');
+  if(mtog){ toggleMode(); return; }
+  var oc=e.target.closest('[data-outcollapse]');
+  if(oc){ var wrap=document.querySelector('[data-outbody]'); if(wrap){ var hid=wrap.hasAttribute('hidden'); if(hid)wrap.removeAttribute('hidden'); else wrap.setAttribute('hidden',''); oc.textContent=hid?'⏫':'⏬'; } return; }
+  var et=e.target.closest('[data-ectoggle]');
+  if(et){ var grp=et.closest('.ecgrp'); var coll=grp.classList.toggle('eccollapsed');
+    grp.querySelectorAll('[data-ecbody], .ecgrid').forEach(function(x){ x.hidden=coll; });
+    et.textContent=coll?'Expand ↓':'Collapse ↑';
+    et.classList.toggle('ecbtn--primary',coll); et.classList.toggle('ecbtn--outline',!coll); return; }
+  var eca=e.target.closest('[data-eccollapseall]');
+  if(eca){ document.querySelectorAll('#screen-endcard .ecgrp').forEach(function(grp){ grp.classList.add('eccollapsed');
+    grp.querySelectorAll('[data-ecbody], .ecgrid').forEach(function(x){x.hidden=true;});
+    var t=grp.querySelector('[data-ectoggle]'); if(t){t.textContent='Expand ↓';t.classList.add('ecbtn--primary');t.classList.remove('ecbtn--outline');} }); return; }
+  var egc2=e.target.closest('[data-ecgrpcollapse]');
+  if(egc2){ egc2.closest('.ecgrp').classList.toggle('ecgrp--collapsed'); return; }
+  var crk=e.target.closest('[data-crktoggle]');
+  if(crk){ var body=crk.parentElement.querySelector('[data-crkbody]'); if(body){ var h=body.hasAttribute('hidden'); if(h)body.removeAttribute('hidden'); else body.setAttribute('hidden',''); crk.textContent=h?'︿':'﹀'; } return; }
+  var egchip=e.target.closest('.egchip');
+  if(egchip){ egchip.parentElement.querySelectorAll('.egchip').forEach(function(o){o.classList.remove('is-on');}); egchip.classList.add('is-on'); return; }
+  var egd=e.target.closest('.egdate');
+  if(egd){ egd.parentElement.querySelectorAll('.egdate').forEach(function(o){o.classList.remove('is-on');}); egd.classList.add('is-on'); return; }
+});
+
+/* ===== favorites (收藏) → MY COLLECTION ===== */
+var FAVDATA={
+  nba:{type:'league',name:'NBAPLAYOFFS-Semifinal',color:'#c8102e',sub:'🏀 Basketball · Denver vs Minnesota'},
+  wnba:{type:'league',name:'WNBA',color:'#b22222',sub:'🏀 Basketball · Connecticut vs Golden State'},
+  epl:{type:'league',name:'Premier League',color:'#3b0d5b',sub:'⚽ Football · Man Utd vs Chelsea'},
+  ao:{type:'league',name:'Australian Open',color:'#0a67b3',sub:'🎾 Tennis · Sinner vs Alcaraz'},
+  mlb:{type:'league',name:'MLB',color:'#041e42',sub:'⚾ Baseball · USA vs Japan'},
+  m_wnba:{type:'match',name:'Connecticut Sun vs Golden State',color:'#e0208a',sub:'WNBA · Q3 09:06 · 76-66'},
+  m_epl:{type:'match',name:'Man Utd vs Chelsea',color:'#da291c',sub:'Premier League · 2nd Half 77:11 · 2-1'},
+  m_ao:{type:'match',name:'Sinner vs Alcaraz',color:'#0a67b3',sub:'Australian Open · Set 3 · 1-1'},
+  m_mlb:{type:'match',name:'USA vs Japan',color:'#041e42',sub:'MLB · Top 7th · 7-4'},
+  o_aus:{type:'league',name:'Australia NBL 2026/2027 - Winner',color:'#00843d',sub:'🏆 Outright · 🇦🇺 Australia'},
+  o_bra:{type:'league',name:'Brazil NBB 2026/2027 - Winner',color:'#009c3b',sub:'🏆 Outright · 🇧🇷 Brazil'},
+  o_esp:{type:'league',name:'Spain ACB 2026/2027 - Winner',color:'#aa151b',sub:'🏆 Outright · 🇪🇸 Spain'},
+  o_el_ff:{type:'league',name:'EuroLeague 2026/2027 - Teams to Make Final Four',color:'#1a3fa0',sub:'🏆 Outright · 🇪🇺 EUROPA'},
+  o_ec:{type:'league',name:'EuroCup 2026/2027 - Winner',color:'#1a3fa0',sub:'🏆 Outright · 🇪🇺 EUROPA'},
+  o_vtb:{type:'league',name:'VTB United League 2026/2027 - Winner',color:'#1a3fa0',sub:'🏆 Outright · 🇪🇺 EUROPA'},
+  o_bcl:{type:'league',name:'Basketball Champions League 2026/2027 - Winner',color:'#1a3fa0',sub:'🏆 Outright · 🇪🇺 EUROPA'},
+  o_el:{type:'league',name:'EuroLeague 2026/2027 - Winner',color:'#1a3fa0',sub:'🏆 Outright · 🇪🇺 EUROPA'},
+  o_fra:{type:'league',name:'France LNB Elite 2026/2027 - Winner',color:'#0055a4',sub:'🏆 Outright · 🇫🇷 France'},
+  o_nba:{type:'league',name:'NBA 2026/2027 - Winner',color:'#c8102e',sub:'🏆 Outright · 🇺🇸 USA'},
+  o_nba_mvp:{type:'league',name:'NBA 2026/2027 - Regular Season MVP',color:'#1d428a',sub:'🏆 Outright · 🇺🇸 USA'}
+};
+var FAV=[];  /* order preserved */
+function isFav(k){return FAV.indexOf(k)>=0;}
+function toggleFav(k){var i=FAV.indexOf(k); if(i>=0)FAV.splice(i,1); else FAV.push(k);}
+function syncFavStars(){
+  document.querySelectorAll('[data-fav]').forEach(function(s){
+    var on=isFav(s.getAttribute('data-fav'));
+    s.classList.toggle('is-fav',on);
+    if(s.classList.contains('star')||s.classList.contains('lrow__star')||s.classList.contains('mfav')||s.classList.contains('outrow__star')){ s.textContent=on?'★':'☆'; }
+  });
+  renderCollection();
+}
+/* keys already shown in TOP MATCHES — excluded from MY COLLECTION */
+var TOPKEYS={nba:1};
+/* full match-card data, shared by a league fav and its match fav */
+var CARDS={
+  wnba:{league:'WNBA',flag:'🇺🇸',mv:['up',''],h:{ab:'CS',bg:'#e0208a',nm:'Connecticut<br>Sun(W)'},a:{ab:'GV',bg:'#333',nm:'Golden State<br>Valkyries(W)'},sc:'76 - 66',pd:'Q3',tm:'09:06',od:['6.26','1.12'],tip:'Connecticut leads the series 2-1 this season.'},
+  epl:{league:'Premier League',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',mv:['up',''],h:{ab:'MUN',bg:'#da291c',nm:'Manchester<br>Utd'},a:{ab:'CHE',bg:'#034694',nm:'Chelsea'},sc:'2 - 1',pd:'2nd Half',tm:'77:11',od:['1.80','4.20'],tip:'Man Utd unbeaten in their last 5 home games.'},
+  ao:{league:'Australian Open',flag:'🇦🇺',ns:true,mv:['','dn'],h:{ab:'JS',bg:'#111',nm:'Jannik<br>Sinner'},a:{ab:'CA',bg:'#e11338',nm:'Carlos<br>Alcaraz'},sc:'1 - 1',pd:'Set 3',tm:'40-30',od:['1.55','2.45'],tip:'Sinner has won the last 3 meetings.'},
+  mlb:{league:'MLB',flag:'🇺🇸',mv:['up',''],h:{ab:'USA',bg:'#c8102e',nm:'USA<br>Baseball'},a:{ab:'JPN',bg:'#bc002d',nm:'Japan<br>Baseball'},sc:'7 - 4',pd:'Top 7th',tm:'Out 1',od:['1.42','2.90'],tip:'USA leading going into the 7th inning.'},
+  korsau:{league:'Asian Games',flag:'🌏',h:{ab:'KOR',bg:'#0a3161',nm:'Korea<br>Republic'},a:{ab:'KSA',bg:'#165c33',nm:'Saudi<br>Arabia'},sc:'—',pd:'29 Min',tm:'LIVE',od:['1.65','2.20'],tip:'Ending Card market · 29 Minute.'},
+  belger:{league:'Asian Games',flag:'🌏',h:{ab:'BEL',bg:'#111',nm:'Belgium<br>(W)'},a:{ab:'GER',bg:'#c8102e',nm:'Germany<br>(W)'},sc:'VS',pd:'Today',tm:'23:45',od:['1.90','1.90'],tip:'Ending Card market · Today 23:45.'}
+};
+var CARDOF={wnba:'wnba',epl:'epl',ao:'ao',mlb:'mlb',m_wnba:'wnba',m_epl:'epl',m_ao:'ao',m_mlb:'mlb',ec_kor_sau:'korsau',ec_bel_ger:'belger'};
+var CHEV_UP='<svg viewBox="0 0 12 14"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg>';
+var CHEV_DN='<svg viewBox="0 0 12 14"><path d="M6 13L11 8H1Z M6 7L11 2H1Z" fill="currentColor"/></svg>';
+function oArrow(m){ return m==='up'?'<span class="oarr up">'+CHEV_UP+'</span>':m==='dn'?'<span class="oarr dn">'+CHEV_DN+'</span>':'<span class="oarr"></span>'; }
+function oNum(v,m){ return m==='up'?'<span class="up">'+v+'</span>':m==='dn'?'<span class="dn">'+v+'</span>':v; }
+function oddsbarHTML(od,mv){ mv=mv||['',''];
+  return '<div class="oddsbar"><div class="opill">'+oNum(od[0],mv[0])+'</div>'+oArrow(mv[0])+
+    '<div class="opill opill--mid">Winner</div>'+oArrow(mv[1])+
+    '<div class="opill">'+oNum(od[1],mv[1])+'</div></div>';
+}
+function mcardHTML(c){
+  var sc=c.sc.split(' - '); var left=sc[0], right=sc.length>1?sc[1]:'';
+  return '<article class="mcard" data-goto="detail">'+
+    (c.ns?'<span class="ribbon">New Season</span>':'')+
+    '<div class="mcard__head"><span class="lg"></span> '+c.league+'</div>'+
+    '<div class="mcard__body"><div class="teams">'+
+      '<div class="team"><div class="team__logo" style="background:'+c.h.bg+'">'+c.h.ab+'</div><div class="team__name">'+c.h.nm+'</div></div>'+
+      '<div class="score"><div class="score__nums">'+left+(right?'<span class="dash">-</span>'+right:'')+'</div><div class="score__period">'+c.pd+'</div><div class="score__time">'+c.tm+'</div></div>'+
+      '<div class="team"><div class="team__logo" style="background:'+c.a.bg+'">'+c.a.ab+'</div><div class="team__name">'+c.a.nm+'</div></div>'+
+    '</div>'+
+    oddsbarHTML(c.od,c.mv)+'</div>'+
+    '<div class="tips"><span class="tips__tag">BET TIPS</span><span class="tips__txt">'+c.tip+'</span></div>'+
+  '</article>';
+}
+function renderCollection(){
+  var box=document.getElementById('myCollection'); if(!box)return;
+  var items=FAV.filter(function(k){return !TOPKEYS[k];});
+  if(!items.length){ box.innerHTML='<div class="coll-empty">尚无收藏。点击联赛或赛事旁的 ☆ 加入收藏，收藏的联赛 / 赛事会以与 TOP MATCHES 相同的样式显示在这里。<br>(已在 TOP MATCHES 出现的赛事不会重复显示)</div>'; return; }
+  box.innerHTML=items.map(function(k){
+    var d=FAVDATA[k]||{}; var badge=(d.type==='match')?'赛事':'联赛';
+    var cid=CARDOF[k];
+    if(cid&&CARDS[cid]){ var c=CARDS[cid];
+      return '<div class="leaguehead"><div class="leaguehead__logo">'+c.flag+'</div><div class="leaguehead__name">'+c.league+'</div>'+
+        '<span class="star is-fav" data-fav="'+k+'">★</span>'+
+        '<button class="leaguehead__more" data-goto="listInplay">MORE ›</button></div>'+
+        '<div class="cardrow">'+mcardHTML(c)+'</div>';
+    }
+    /* outright / other markets */
+    return '<div class="leaguehead"><div class="leaguehead__logo">🏆</div><div class="leaguehead__name">'+(d.name||k)+'</div>'+
+      '<span class="star is-fav" data-fav="'+k+'">★</span>'+
+      '<button class="leaguehead__more" data-goto="champions">MORE ›</button></div>'+
+      '<div class="cardrow"><article class="mcard" data-goto="champions"><div class="mcard__head"><span class="lg"></span> Outright</div><div class="mcard__body mcard--out">'+(d.name||k)+'</div></article></div>';
+  }).join('');
+}
+
+/* ===== list filter: date-tab (IN-PLAY 已开赛 / TODAY 未开赛 / 其他日期) + SINGLE/PARLAY ===== */
+var currentWhen='inplay';
+function applyFilters(){
+  var total=0;
+  document.querySelectorAll('#screen-list .lmatches').forEach(function(body){
+    var shown=0;
+    body.querySelectorAll('.lmatch').forEach(function(m){
+      var w=m.getAttribute('data-when')||'today';
+      var okWhen=(w===currentWhen);
+      var okParlay=!(mode==='parlay' && m.getAttribute('data-parlay')!=='yes');
+      var vis=okWhen&&okParlay;
+      m.style.display=vis?'':'none';
+      if(vis)shown++;
+    });
+    var head=body.previousElementSibling;
+    if(head&&head.classList.contains('lrow')) head.style.display=shown?'':'none';
+    body.style.display=shown?'':'none';
+    total+=shown;
+  });
+  var em=document.getElementById('listEmpty'); if(em)em.hidden=(total>0);
+}
+
+/* SINGLE / PARLAY toggle */
+var mode='single';
+function toggleMode(){
+  mode = (mode==='single') ? 'parlay' : 'single';
+  var L=document.getElementById('modeL'), R=document.getElementById('modeR');
+  if(mode==='single'){ L.textContent='SINGLE'; L.className='is-act'; R.textContent='P'; R.className='is-dim'; }
+  else { L.textContent='S'; L.className='is-dim'; R.textContent='PARLAY'; R.className='is-act'; }
+  applyFilters();
+}
+
+/* match icons injector */
+var IC={
+ fav:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.2l1-5.8L3.5 9.2l5.9-.9z"/></svg>',
+ video:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2zm14 3l4-2v10l-4-2z"/></svg>',
+ anim:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 3h16a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm2 2v2h2V5H6zm10 0v2h2V5h-2zM6 17v2h2v-2H6zm10 0v2h2v-2h-2z"/></svg>',
+ stats:'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="10" width="3" height="9"/><rect x="10" y="5" width="3" height="14"/><rect x="16" y="13" width="3" height="6"/></svg>',
+ cash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.6c0-1 1-1.6 2.5-1.6s2.5.6 2.5 1.6-1 1.4-2.5 1.4-2.5.5-2.5 1.5 1 1.5 2.5 1.5 2.5-.5 2.5-1.5"/></svg>',
+ resv:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.5 1.8M8.5 3.2 5.5 5.6M15.5 3.2l3 2.4"/></svg>'
+};
+var ICONSET=
+ '<span class="micon fav-toggle" title="收藏本场赛事">'+IC.fav+'</span>'+
+ '<span class="micon" title="视频">'+IC.video+'</span>'+
+ '<span class="micon" title="动画">'+IC.anim+'</span>'+
+ '<span class="micon" title="统计">'+IC.stats+'</span>'+
+ '<span class="micon" title="兑现 Cashout">'+IC.cash+'</span>'+
+ '<span class="micon" title="预约投注">'+IC.resv+'</span>';
+document.querySelectorAll('[data-icons]').forEach(function(el){
+  el.innerHTML=ICONSET;
+  var m=el.closest('[data-favmatch]');
+  var f=el.querySelector('.micon.fav-toggle');
+  if(m&&f){ f.setAttribute('data-fav', m.getAttribute('data-favmatch')); }
+});
+
+/* ball tab select */
+function selectSport(k){
+  curSport=k;
+  renderBallTabs();
+  var s=SPORTS.filter(function(x){return x.k===k;})[0];
+  if(!s)return;
+  if(s.feat){ show('home'); }
+  else if(k==='champions'){ show('champions'); }
+  else if(k==='endcard'){ show('endcard'); }
+  else if(k==='endgame'){ show('endgame'); }
+  else { show('list'); }
+}
+
+/* ===== per-sport scoreboards (detail) ===== */
+function card(color,txt){return '<span class="sb-logo" style="background:'+color+'">'+txt+'</span>';}
+var yc='<span style="display:inline-block;width:9px;height:12px;background:#f5c518;border-radius:2px;vertical-align:-1px"></span>';
+var rc='<span style="display:inline-block;width:9px;height:12px;background:#e11338;border-radius:2px;vertical-align:-1px"></span>';
+function sbShell(bg,emoji,inner){
+  return '<div class="scoreboard__video" style="height:150px"><div class="court" style="background:'+bg+'"></div><div class="players">'+emoji+'</div></div>'+inner;
+}
+var SB={};
+SB.basketball=
+ '<div class="scoreboard__video"><div class="court"></div><div class="players">🏀</div></div>'+
+ '<div class="scorebar"><div class="scorebar__ctrl"><span>⏸</span><span class="live"><span class="d"></span>LIVE</span></div>'+
+ '<div class="scorebar__mid"><div class="sb-team">'+card('#1d428a','DEN')+'<span class="sb-score">93</span></div>'+
+ '<div class="sb-period"><b>4Q</b>9:13<br>POSS</div>'+
+ '<div class="sb-team"><span class="sb-score">115</span>'+card('#236192','MIN')+'</div></div>'+
+ '<div class="scorebar__end"><span>⚙</span><span>⛶</span></div></div>';
+SB.football=sbShell('radial-gradient(circle at 50% 120%,#2f7a35,#173f18)','⚽',
+ '<div class="scorebar" style="flex-direction:column;align-items:stretch;gap:8px">'+
+ '<div style="display:flex;align-items:center;gap:10px"><div class="scorebar__ctrl"><span>⏸</span><span class="live"><span class="d"></span>LIVE</span></div>'+
+ '<div class="scorebar__mid"><div class="sb-team">'+card('#da291c','MUN')+'<span class="sb-score">2</span></div>'+
+ '<div class="sb-period"><b>2nd Half</b>77:11</div>'+
+ '<div class="sb-team"><span class="sb-score">1</span>'+card('#034694','CHE')+'</div></div>'+
+ '<div class="scorebar__end"><span>⚙</span><span>⛶</span></div></div>'+
+ '<div style="display:flex;justify-content:space-between;font-size:12px;color:#c7d0dd;padding:0 4px">'+
+ '<span>'+yc+' 2 &nbsp;'+rc+' 0 &nbsp;|&nbsp; ⛳ Corner 5</span>'+
+ '<span>Corner 3 &nbsp;|&nbsp; '+yc+' 1 &nbsp;'+rc+' 1</span></div></div>');
+SB.tennis=sbShell('linear-gradient(160deg,#155a9c,#0a2a52)','🎾',
+ '<div class="scorebar" style="flex-direction:column;align-items:stretch;gap:6px">'+
+ '<div style="display:flex;align-items:center;gap:10px"><div class="scorebar__ctrl"><span>⏸</span><span class="live"><span class="d"></span>LIVE</span></div>'+
+ '<div class="scorebar__mid"><div class="sb-team">'+card('#111','JS')+'Sinner ●<span class="sb-score">30</span></div>'+
+ '<div class="sb-period"><b>Set 2</b>Game</div>'+
+ '<div class="sb-team"><span class="sb-score">15</span>Alcaraz'+card('#e11338','CA')+'</div></div>'+
+ '<div class="scorebar__end"><span>⚙</span><span>⛶</span></div></div>'+
+ '<div style="text-align:center;font-size:12px;color:#c7d0dd">Sets&nbsp; Sinner <b>1</b> · <b>1</b> Alcaraz &nbsp;|&nbsp; 6-4 &nbsp; 3-6 &nbsp; 2-1</div></div>');
+SB.baseball=sbShell('radial-gradient(circle at 50% 120%,#2f6a35,#173f18)','⚾',
+ '<div class="scorebar" style="flex-direction:column;align-items:stretch;gap:6px">'+
+ '<div style="display:flex;align-items:center;gap:10px"><div class="scorebar__ctrl"><span>⏸</span><span class="live"><span class="d"></span>LIVE</span></div>'+
+ '<div class="scorebar__mid"><div class="sb-team">'+card('#c8102e','USA')+'<span class="sb-score">7</span></div>'+
+ '<div class="sb-period"><b>7th ▲</b>Top</div>'+
+ '<div class="sb-team"><span class="sb-score">4</span>'+card('#0a2560','JPN')+'</div></div>'+
+ '<div class="scorebar__end"><span>⚙</span><span>⛶</span></div></div>'+
+ '<div style="text-align:center;font-size:12px;color:#c7d0dd">◆ Bases: 1st &amp; 3rd &nbsp;|&nbsp; Out: 2</div></div>');
+SB.cricket=sbShell('radial-gradient(circle at 50% 120%,#2f7a55,#134a34)','🏏',
+ '<div class="scorebar" style="flex-direction:column;align-items:stretch;gap:6px">'+
+ '<div style="display:flex;align-items:center;gap:10px"><div class="scorebar__ctrl"><span>⏸</span><span class="live"><span class="d"></span>LIVE</span></div>'+
+ '<div class="scorebar__mid"><div class="sb-team">'+card('#0a7','AUS')+'<span class="sb-score">2/2</span></div>'+
+ '<div class="sb-period"><b>Over</b>12.2</div>'+
+ '<div class="sb-team"><span class="sb-score">1/3</span>'+card('#0a5','BAN')+'</div></div>'+
+ '<div class="scorebar__end"><span>⚙</span><span>⛶</span></div></div></div>');
+SB.billiards=sbShell('radial-gradient(circle at 50% 120%,#0e5a3a,#06301f)','🎱',
+ '<div class="scorebar" style="flex-direction:column;align-items:stretch;gap:6px">'+
+ '<div style="display:flex;align-items:center;gap:10px"><div class="scorebar__ctrl"><span>⏸</span><span class="live"><span class="d"></span>LIVE</span></div>'+
+ '<div class="scorebar__mid"><div class="sb-team">'+card('#333','OSU')+'<span class="sb-score">10</span></div>'+
+ '<div class="sb-period"><b>Frame 17</b>n盘n胜</div>'+
+ '<div class="sb-team"><span class="sb-score">6</span>'+card('#c8102e','ROB')+'</div></div>'+
+ '<div class="scorebar__end"><span>⚙</span><span>⛶</span></div></div></div>');
+SB.esports=sbShell('linear-gradient(160deg,#3a1a6b,#140a2e)','🎮',
+ '<div class="scorebar" style="flex-direction:column;align-items:stretch;gap:6px">'+
+ '<div style="display:flex;align-items:center;gap:10px"><div class="scorebar__ctrl"><span>⏸</span><span class="live"><span class="d"></span>LIVE</span></div>'+
+ '<div class="scorebar__mid"><div class="sb-team">'+card('#1a8','BDS')+'<span class="sb-score">2</span></div>'+
+ '<div class="sb-period"><b>Map 3</b>Dota2</div>'+
+ '<div class="sb-team"><span class="sb-score">1</span>'+card('#a12','MAD')+'</div></div>'+
+ '<div class="scorebar__end"><span>⚙</span><span>⛶</span></div></div></div>');
+SB.champions='<div style="height:150px;background:linear-gradient(160deg,#123c95,#0a2560);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#ffd24d;gap:6px">'+
+ '<div style="font-size:44px">🏆</div><div style="font-weight:900;letter-spacing:2px">OUTRIGHT · CHAMPION</div>'+
+ '<div style="color:#cfe0ff;font-size:12px">冠军/优胜为赛前盘,无实时比分</div></div>';
+/* no-video variant (not every match has video/animation) */
+SB.novideo=
+ '<div style="height:120px;background:linear-gradient(160deg,#1b2636,#0c1219);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#8a97ad;gap:8px">'+
+ '<div style="font-size:32px;opacity:.6">📺🚫</div><div style="font-size:12px">This match has no live video / animation</div></div>'+
+ '<div class="scorebar"><div class="scorebar__ctrl"><span class="live"><span class="d"></span>LIVE</span></div>'+
+ '<div class="scorebar__mid"><div class="sb-team">'+card('#1d428a','DEN')+'<span class="sb-score">93</span></div>'+
+ '<div class="sb-period"><b>4Q</b>9:13</div>'+
+ '<div class="sb-team"><span class="sb-score">115</span>'+card('#236192','MIN')+'</div></div>'+
+ '<div class="scorebar__end"><span>📊</span></div></div>';
+/* aliases */
+SB.volleyball=SB.tennis; SB.tabletennis=SB.tennis; SB.badminton=SB.tennis;
+SB.rugby=SB.football; SB.amfootball=SB.football; SB.icehockey=SB.football; SB.boxing=SB.billiards;
+
+/* ===== ONE live video/animation example (只示意一场) ===== */
+var VIDEO_SB = SB.basketball;
+/* basketball scorebar reused for video/animation/no-media */
+var SBAR_BK='<div class="scorebar"><div class="scorebar__ctrl"><span class="live"><span class="d"></span>LIVE</span></div>'+
+ '<div class="scorebar__mid"><div class="sb-team">'+card('#1d428a','DEN')+'<span class="sb-score">93</span></div>'+
+ '<div class="sb-period"><b>4Q</b>9:13</div>'+
+ '<div class="sb-team"><span class="sb-score">115</span>'+card('#236192','MIN')+'</div></div>'+
+ '<div class="scorebar__end"><span>📊</span></div></div>';
+var ANIM_SB='<div class="scoreboard__video" style="background:linear-gradient(160deg,#0e3a24,#08210f)"><div class="court" style="opacity:.45"></div><div class="players">🎬</div><div class="anim-lbl">2D Animation · 动画</div></div>'+SBAR_BK;
+var NOMEDIA_SB='<div style="height:120px;background:linear-gradient(160deg,#1b2636,#0c1219);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#8a97ad;gap:8px"><div style="font-size:30px;opacity:.6">📺🚫</div><div style="font-size:12px">No live video / animation</div></div>'+SBAR_BK;
+var svVideo=true, svAnim=false;
+function renderMedia(){
+  var el=document.getElementById('scoreboard'); if(!el)return;
+  document.querySelectorAll('[data-svmedia]').forEach(function(btn){var t=btn.getAttribute('data-svmedia');btn.classList.toggle('is-on',(t==='video'&&svVideo)||(t==='anim'&&svAnim));});
+  el.innerHTML = svVideo?VIDEO_SB : svAnim?ANIM_SB : NOMEDIA_SB;
+}
+
+/* ===== no-video in-play (滚球·已开赛) themed calc-board per sport ===== */
+function calcBoard(bg,lg,hbg,ht,hn,abg,at,an,score,prog,bottom){
+  return '<div class="cbrd" style="background:'+bg+'">'+
+    '<div class="cbrd__top"><span>‹</span><span class="cbrd__lg">'+lg+' ▾</span><span>📊&nbsp;↻</span></div>'+
+    '<div class="cbrd__mid">'+
+      '<div class="cbrd__team">'+card(hbg,ht)+'<span>'+hn+'</span></div>'+
+      '<div class="cbrd__sc"><div class="cbrd__nums">'+score+'</div><div class="cbrd__prog">'+prog+'</div></div>'+
+      '<div class="cbrd__team">'+card(abg,at)+'<span>'+an+'</span></div>'+
+    '</div>'+ (bottom?'<div class="cbrd__bottom">'+bottom+'</div>':'') +'</div>';
+}
+var nbadge='<span class="neutral">N</span>';
+/* table-style calc-board (篮球小节 / 网球盘局) */
+function tblBoard(bg,prog,hbg,ht,hn,abg,at,an,score,headers,rmain,raway,serve){
+  var dot='<span class="mkdot" title="球权"></span>';
+  var head='<tr><th></th>'+headers.map(function(h){return '<th>'+h+'</th>';}).join('')+'</tr>';
+  var r1='<tr><td>'+(serve==='main'?dot:'')+'主</td>'+rmain.map(function(v){return '<td>'+v+'</td>';}).join('')+'</tr>';
+  var r2='<tr><td>'+(serve==='away'?dot:'')+'客</td>'+raway.map(function(v){return '<td>'+v+'</td>';}).join('')+'</tr>';
+  return '<div class="cbrd" style="background:'+bg+'">'+
+    '<div style="text-align:center;font-weight:800;font-size:13px;color:#fff;padding-top:2px">'+prog+'</div>'+
+    '<div class="cbrd__mid" style="padding:8px 0 6px">'+
+      '<div class="cbrd__team">'+card(hbg,ht)+'<span>'+hn+'</span></div>'+
+      '<div class="cbrd__sc"><div class="cbrd__nums">'+score+'</div></div>'+
+      '<div class="cbrd__team">'+card(abg,at)+'<span>'+an+'</span></div>'+
+    '</div>'+
+    '<table class="tntbl">'+head+r1+r2+'</table></div>';
+}
+var INPLAY={
+  basketball:tblBoard('radial-gradient(circle at 50% 130%,#3a2530,#160d14)','第四节 03:23','#1b2b4a','🇰🇷','南韩','#165c33','🇸🇦','沙地阿拉伯','77 - 60',
+    ['1节','2节','半场','3节','4节','加时','全场'],['24','17','41','33','3','-','77'],['17','11','28','19','13','-','60']),
+  football:calcBoard('radial-gradient(circle at 50% 130%,#2f7a35,#123012)','Premier League','#da291c','MUN','Man Utd','#034694','CHE','Chelsea','2 - 1','下半场 · 77:11', nbadge+' HT 1-0 · '+yc+' 2-1 · '+rc+' 0-1 · ⛳ 5-3'),
+  tennis:tblBoard('linear-gradient(160deg,#155a9c,#08203f)','滚球','#1b2b4a','🇦🇺','伯纳德-托米奇(澳洲)','#c0202e','🇺🇸','伊利亚-伊华舒卡','1 - 1',
+    ['总盘数','1盘','2盘','3盘','得分','总局数'],['1','4','6','1','15','11'],['1','6','4','2','15','12'],'main'),
+  cricket:'<div class="cbrd" style="background:radial-gradient(circle at 50% 130%,#2f7a55,#0e3626)">'+
+    '<div class="cbrd__mid" style="padding:8px 0 4px;align-items:flex-start">'+
+      '<div class="cbrd__team">'+card('#1b2b4a','🏴')+'<span>英格兰</span><span class="crk-sc">156/4 (Ov39.0\')</span></div>'+
+      '<div class="cbrd__sc"><div style="font-weight:800;color:#fff">滚球</div><span class="crk-tag">比赛待续</span></div>'+
+      '<div class="cbrd__team">'+card('#116a3a','🇵🇰')+'<span>巴基斯坦</span><span class="crk-sc">133/10</span></div>'+
+    '</div>'+
+    '<table class="tntbl"><tr><th></th><th colspan="2">首局得分</th><th colspan="2">次局得分</th></tr>'+
+      '<tr><th>球队</th><th>跑位</th><th>出局数</th><th>赛轮</th><th>赛轮</th></tr>'+
+      '<tr><td>主</td><td>156</td><td>4</td><td>39.0*</td><td>-</td></tr>'+
+      '<tr><td>客</td><td>133</td><td>10</td><td>-</td><td>-</td></tr></table>'+
+    '<div data-crkbody hidden>'+
+      '<table class="tntbl"><tr><th>赛局统计</th><th>四分打</th><th>六分打</th><th>附加分</th><th>四分打</th><th>六分打</th></tr>'+
+        '<tr><td>主</td><td>15</td><td>0</td><td>-</td><td>-</td><td>-</td></tr>'+
+        '<tr><td>客</td><td>18</td><td>0</td><td>-</td><td>-</td><td>-</td></tr></table>'+
+      '<table class="tntbl"><tr><th>击球手</th><th>跑位</th><th>球数</th><th>击球率</th><th>四分打</th><th>六分打</th></tr>'+
+        '<tr><td>丹-劳伦斯</td><td>5</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>'+
+        '<tr><td>哈里-布鲁克</td><td>52</td><td>-</td><td>-</td><td>-</td><td>-</td></tr></table>'+
+      '<div class="crk-foot"><div><div class="crk-foot__h">前6球</div><div class="crk-foot__v">· · · <b>2</b> · ·</div></div>'+
+        '<div><div class="crk-foot__h">前一出局得分</div><div class="crk-foot__v">143</div></div></div>'+
+    '</div>'+
+    '<div class="crk-toggle" data-crktoggle>▼</div>'+
+  '</div>',
+  billiards:calcBoard('radial-gradient(circle at 50% 130%,#0e5a3a,#052016)','World Snooker','#333','OSU',"O'Sullivan",'#c8102e','ROB','Robertson','10 - 6','滚球','n盘n胜 · 25盘13胜'),
+  baseball:calcBoard('radial-gradient(circle at 50% 130%,#2f6a35,#123012)','World Baseball','#c8102e','USA','USA','#0a2560','JPN','Japan','7 - 4','滚球','<span style="font-weight:800">7th <span style="color:#ffd24d">▲</span></span> &nbsp;·&nbsp; <span class="diamond"><i class="b2 on"></i><i class="b3"></i><i class="b1 on"></i></span> &nbsp;·&nbsp; Outs: 1')
+};
+INPLAY.badminton=tblBoard('linear-gradient(160deg,#1d5aa0,#0a2a52)','滚球','#1b2b4a','🇻🇳','阮海当(越南)','#c0202e','🇮🇳','塔伦-曼内帕利(印度)','1 - 0',
+  ['总局数','1局','2局','3局','总得分'],['1','21','14','-','35'],['0','14','9','-','23'],'away');
+INPLAY.tabletennis=tblBoard('linear-gradient(160deg,#1d5aa0,#0a2a52)','滚球','#1b2b4a','🇨🇿','卢博米尔-扬卡里克(捷克)','#c0202e','🇫🇷','朱尔-罗兰(法国)','2 - 2',
+  ['总局数','1局','2局','3局','4局','5局','总得分'],['2','11','7','11','6','0','35'],['2','7','11','7','11','2','38'],'main');
+INPLAY.volleyball=tblBoard('linear-gradient(160deg,#1d5aa0,#0a2a52)','滚球','#1b2b4a','🏐','维迪亚兹职业','#c0202e','🏐','普拉米亚职业','0 - 2',
+  ['总局数','1局','2局','3局','4局','5局','总得分'],['0','24','18','11','-','-','53'],['2','26','25','7','-','-','58']);
+INPLAY.rugby=INPLAY.football; INPLAY.amfootball=INPLAY.football; INPLAY.icehockey=INPLAY.football; INPLAY.boxing=INPLAY.billiards;
+
+/* ===== no-video pre-match (未开赛) per sport ===== */
+function preBoard(lg,hbg,ht,hn,abg,at,an){
+  return '<div class="pbrd"><div class="cbrd__top"><span>‹</span><span class="cbrd__lg">'+lg+' ▾</span><span>📊&nbsp;↻</span></div>'+
+    '<div class="pbrd__mid"><div class="cbrd__team">'+card(hbg,ht)+'<span>'+hn+'</span></div>'+
+    '<div class="pbrd__time"><div class="pbrd__t">22:30</div><div class="pbrd__state">即将 · 倒数 11 分钟</div></div>'+
+    '<div class="cbrd__team">'+card(abg,at)+'<span>'+an+'</span></div></div>'+
+    '<div class="pbrd__note">未开赛状态:即将(无倒数) / 今日 / 早盘(日期) / 即将(倒数)</div></div>';
+}
+var PRE={
+  basketball:preBoard('NBA Playoffs','#1d428a','DEN','Denver Nuggets','#236192','MIN','Minnesota'),
+  football:preBoard('Premier League','#da291c','MUN','Man Utd','#034694','CHE','Chelsea'),
+  tennis:preBoard('Australian Open','#111','JS','Sinner','#e11338','CA','Alcaraz'),
+  cricket:preBoard('World Cricket','#0a7','AUS','Australia','#0a5','BAN','Bangladesh'),
+  billiards:preBoard('World Snooker','#333','OSU',"O'Sullivan",'#c8102e','ROB','Robertson'),
+  baseball:preBoard('World Baseball','#c8102e','USA','USA','#0a2560','JPN','Japan')
+};
+PRE.volleyball=PRE.tennis; PRE.tabletennis=PRE.tennis; PRE.badminton=PRE.tennis;
+PRE.rugby=PRE.football; PRE.amfootball=PRE.football; PRE.icehockey=PRE.football; PRE.boxing=PRE.billiards;
+
+/* ===== switcher: mode row + sport row ===== */
+var SB_MODES=[['video','🎥 有直播/动画 (示意1场)'],['inplay','🟢 无直播·滚球(已开赛)'],['pre','⏳ 无直播·未开赛']];
+var SB_SPORTS=[['basketball','🏀 篮球'],['football','⚽ 足球'],['tennis','🎾 网球/排球/乒乓'],['cricket','🏏 板球'],['billiards','🎱 撞球'],['baseball','⚾ 棒球']];
+var sbMode='video', sbSport='basketball';
+var swBox=document.getElementById('sportSwitch');
+function renderSwitch(){
+  var modeRow='<div class="sbrow"><span class="sbrow__lab">状态 ▸</span>'+SB_MODES.map(function(m){return '<button class="sbchip'+(m[0]===sbMode?' is-on':'')+'" data-sbmode="'+m[0]+'">'+m[1]+'</button>';}).join('')+'</div>';
+  var sportRow = (sbMode==='video') ? '' :
+    '<div class="sbrow"><span class="sbrow__lab">球种 ▸</span>'+SB_SPORTS.map(function(s){return '<button class="sbchip'+(s[0]===sbSport?' is-on':'')+'" data-sbsport="'+s[0]+'">'+s[1]+'</button>';}).join('')+'</div>';
+  swBox.innerHTML=modeRow+sportRow;
+}
+function applyScoreboard(){
+  var el=document.getElementById('scoreboard'); if(!el)return;
+  if(sbMode==='video') el.innerHTML=VIDEO_SB;
+  else if(sbMode==='inplay') el.innerHTML=INPLAY[sbSport]||INPLAY.basketball;
+  else el.innerHTML=PRE[sbSport]||PRE.basketball;
+}
+function setScoreboard(k){ /* legacy: pick sport in in-play mode */ sbMode='inplay'; sbSport=k; renderSwitch(); applyScoreboard(); }
+swBox.addEventListener('click',function(e){
+  var m=e.target.closest('[data-sbmode]'); if(m){ sbMode=m.getAttribute('data-sbmode'); renderSwitch(); applyScoreboard(); return; }
+  var s=e.target.closest('[data-sbsport]'); if(s){ sbSport=s.getAttribute('data-sbsport'); renderSwitch(); applyScoreboard(); return; }
+});
+renderSwitch(); applyScoreboard();
+
+/* detail: 更多赛事 bar slides in only after scrolling the page up */
+(function(){
+  var sc=document.getElementById('detailScroll'), bar=document.getElementById('detailMoreBar');
+  if(sc&&bar){ sc.addEventListener('scroll',function(){ bar.classList.toggle('is-show', sc.scrollTop>90); }); }
+})();
+
+/* ===== Ending Card score grid + Ending Game chips ===== */
+function fillEcGrid(id){var g=document.getElementById(id);if(!g)return;var h='';for(var a=0;a<=9;a++){for(var b=0;b<=9;b++){h+='<div class="eccell"><div class="eccell__s">'+a+'-'+b+'</div><div class="eccell__o">85.00</div></div>';}}g.innerHTML=h;}
+fillEcGrid('ecGrid1'); fillEcGrid('ecGrid2');
+(function(){var EGL=[['🏀','All'],['🌏','Asian Games'],['🌍','FIBA WC'],['🏀','BBL C'],['⚾','LMB'],['🏀','ISR C'],['🏀','LNBP']];
+  var egc=document.getElementById('egChips'); if(egc){ egc.innerHTML=EGL.map(function(x,i){return '<div class="egchip'+(i===0?' is-on':'')+'"><span class="egchip__ic">'+x[0]+'</span><span class="lb">'+x[1]+'</span></div>';}).join(''); }
+})();
+
+/* ===== football list markets (6 markets, horizontal scroll) ===== */
+var FBMKT={
+  eplLive:{teams:[{ab:'MUN',bg:'#da291c',nm:'Manchester Utd',sc:'2'},{ab:'CHE',bg:'#034694',nm:'Chelsea',sc:'1'}],
+    cols:[
+      {h:'Handicap',cells:[['-0.5','1.80','up'],['+0.5','4.20','']]},
+      {h:'Goals O/U',cells:[['O 2.5','2.05','dn'],['U 2.5','1.75','up']]},
+      {h:'1 X 2',cells:[['Home','2.43',''],['Away','3.05',''],['Draw','3.20','']]},
+      {h:'Handicap<br>1st Half',cells:[['0','1.91',''],['0','1.90','']]},
+      {h:'Goals O/U<br>1st Half',cells:[['O 1','2.00',''],['U 1','1.82','']]},
+      {h:'1 X 2<br>1st Half',cells:[['Home','3.45',''],['Away','3.40',''],['Draw','2.15','']]}
+    ]},
+  eplUp:{teams:[{ab:'MCI',bg:'#6cabdd',nm:'Manchester City',sc:''},{ab:'ARS',bg:'#c8102e',nm:'Arsenal',sc:''}],
+    cols:[
+      {h:'Handicap',cells:[['-1.0','1.55',''],['+1.0','5.20','']]},
+      {h:'Goals O/U',cells:[['O 3.0','1.88',''],['U 3.0','1.92','']]},
+      {h:'1 X 2',cells:[['Home','1.55',''],['Away','5.20',''],['Draw','4.00','']]},
+      {h:'Handicap<br>1st Half',cells:[['0','1.95',''],['0','1.85','']]},
+      {h:'Goals O/U<br>1st Half',cells:[['O 1','2.10',''],['U 1','1.72','']]},
+      {h:'1 X 2<br>1st Half',cells:[['Home','2.30',''],['Away','3.60',''],['Draw','2.20','']]}
+    ]}
+};
+function renderFbmkt(el){
+  var d=FBMKT[el.getAttribute('data-fbmkt')]; if(!d)return;
+  var teams='<div class="fbmkt__teams"><div class="fbhh"></div>'+d.teams.map(function(t){
+    return '<div class="fbteam"><span class="lteam__logo" style="background:'+t.bg+'">'+t.ab+'</span><span class="fbteam__nm">'+t.nm+'</span>'+(t.sc?'<b>'+t.sc+'</b>':'')+'</div>';
+  }).join('')+'</div>';
+  var scroll='<div class="fbmkt__scroll">'+d.cols.map(function(c){
+    return '<div class="fbcol"><div class="fbcol__h">'+c.h+'</div>'+c.cells.map(function(cell){
+      var arr=cell[2]==='up'?' <span class="a"><svg viewBox="0 0 12 14" width="10" height="12"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg></span>':cell[2]==='dn'?' <span class="a"><svg viewBox="0 0 12 14" width="10" height="12"><path d="M6 13L11 8H1Z M6 7L11 2H1Z" fill="currentColor"/></svg></span>':'';
+      var cls=cell[2]==='up'?' up':cell[2]==='dn'?' dn':'';
+      return '<div class="ocell"><div class="ocell__lab">'+cell[0]+'</div><div class="ocell__val'+cls+'">'+cell[1]+arr+'</div></div>';
+    }).join('')+'</div>';
+  }).join('')+'</div>';
+  el.innerHTML=teams+scroll;
+}
+document.querySelectorAll('[data-fbmkt]').forEach(renderFbmkt);
+
+/* ===== Player tab (详情页) ===== */
+var PLAYERS=[
+  {n:'布里安娜-斯图尔特(美国)',f:'🇺🇸',line:'15.5',o:['1.84','1.88']},
+  {n:'凯特琳-克拉克(美国)',f:'🇺🇸',line:'13.5',o:['1.81','1.91']},
+  {n:'杰姬-扬(美国)',f:'🇺🇸',line:'11.5',o:['1.91','1.81']},
+  {n:'娜菲莎-科利尔(美国)',f:'🇺🇸',line:'10.5',o:['1.95','1.77']},
+  {n:'多尔卡·尤哈斯(匈牙利)',f:'🇭🇺',line:'15.5',o:['1.79','1.71']},
+  {n:'张子宇(中国)',f:'🇨🇳',line:'8.5',o:['1.86','1.86']},
+  {n:'多米尼克-马隆加(法国)',f:'🇫🇷',line:'14.5',o:['1.81','1.91']}
+];
+(function(){
+  var rows=document.getElementById('playerRows'); if(rows){
+    rows.innerHTML=PLAYERS.map(function(p){
+      return '<div class="prow"><div class="prow__name">'+p.n+'</div>'+
+        '<div class="ha">'+
+          '<div class="hacard"><div class="hacard__lab">大 OVER</div><div class="oline" data-sel><span class="oline__hcp">'+p.line+'</span><span class="oline__odd">'+p.o[0]+'</span></div></div>'+
+          '<div class="hacard"><div class="hacard__lab">小 UNDER</div><div class="oline" data-sel><span class="oline__hcp">'+p.line+'</span><span class="oline__odd">'+p.o[1]+'</span></div></div>'+
+        '</div></div>';
+    }).join('');
+  }
+  var pick=document.getElementById('playerPick'); if(pick){
+    pick.innerHTML='<div class="pchk is-on" data-pall><span class="pchk__box">✓</span><b>全选</b></div>'+
+      PLAYERS.map(function(p){return '<div class="pchk is-on" data-pchk><span class="pchk__box">✓</span><span class="pchk__flag">'+p.f+'</span>'+p.n+'</div>';}).join('');
+  }
+})();
+function switchMPanel(name){
+  document.querySelectorAll('[data-mpanel]').forEach(function(p){p.hidden=(p.getAttribute('data-mpanel')!==name);});
+}
+/* market pin-to-top */
+var mpinSeq=0;
+function reorderMarkets(){
+  var cont=document.querySelector('[data-mpanel="all"]'); if(!cont)return;
+  var groups=[].slice.call(cont.querySelectorAll('.mgroup'));
+  groups.sort(function(a,b){
+    var pa=a.classList.contains('is-pinned'), pb=b.classList.contains('is-pinned');
+    if(pa!==pb) return pa?-1:1;
+    if(pa&&pb) return (+a.dataset.pin)-(+b.dataset.pin);
+    return (+a.dataset.ord)-(+b.dataset.ord);
+  });
+  groups.forEach(function(g){cont.appendChild(g);});
+}
+document.querySelector('[data-mpanel="all"] .mgroup[data-ord="0"]') && (function(){var w=document.querySelector('[data-mpanel="all"] .mgroup[data-ord="0"]'); w.classList.add('is-pinned'); w.dataset.pin=(++mpinSeq);})();
+reorderMarkets();
+/* market rules (?) */
+var RULES={ handicap:{title:'Handicap',secs:[
+  {h:'Handicap',items:['Predict who will win the game / period with the indicated handicap applied.','If the game is suspended or cancelled during the 2nd half, all 1st half bets will still be valid.','If the game is suspended or cancelled during the 2nd half, all 2nd half bets will be considered void.','Markets offered may include Full Game, Match Halves or Quarter Betting.']},
+  {h:'In–Play Handicap',items:['Predict who will win the game / period with the indicated handicap applied.','Markets offered may include Full Game, Match Halves or Quarter Betting.']}
+]}};
+function openRule(k){var r=RULES[k];if(!r)return;
+  document.getElementById('ruleTitle').textContent=r.title;
+  document.getElementById('ruleBody').innerHTML=r.secs.map(function(s){return '<div class="rule-sec"><div class="rule-sec__h">'+s.h+'</div><ol>'+s.items.map(function(i){return '<li>'+i+'</li>';}).join('')+'</ol></div>';}).join('');
+  document.getElementById('ruleSheet').classList.add('is-open');
+}
+
+/* init */
+syncFavStars();
+applyFilters();
+show('home');
+
+</script>
+</body>
+</html>
