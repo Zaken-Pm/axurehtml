@@ -142,7 +142,8 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 /* ===== list page: odds tabbar ===== */
 .oddstabs{display:flex;align-items:center;gap:2px;margin:10px var(--s3);background:linear-gradient(180deg,#12347f,#0a2158);
   border-radius:10px;padding:6px;box-shadow:var(--shadow)}
-.oddstab{flex:0 0 auto;padding:7px 10px;color:#9fb4e6;font-weight:800;font-size:13px;white-space:nowrap;position:relative}
+.oddstab{flex:0 0 auto;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:6px 10px;color:#9fb4e6;font-weight:800;font-size:13px;white-space:nowrap;position:relative;line-height:1.15}
+.oddstab__m{font-size:10px;font-weight:700;opacity:.85}
 .oddstab.is-on{color:#ffd24d}
 .oddstab.is-on::after{content:"";position:absolute;left:10px;right:10px;bottom:-1px;height:3px;background:#ffd24d;border-radius:2px}
 .oddstabs__scroll{display:flex;gap:2px;overflow-x:auto;flex:1;scrollbar-width:none}
@@ -198,6 +199,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 /* no-video calc-board (滚球 已开赛) */
 .cbrd{position:relative;min-height:150px;padding:10px 12px 12px;color:#fff;display:flex;flex-direction:column}
 .cbrd__top{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#d7e2f5}
+.cbrd__refresh{position:absolute;top:10px;right:12px;color:#d7e2f5;font-size:15px;cursor:pointer;z-index:3}
 .cbrd__lg{font-weight:700;font-size:13px}
 .cbrd__mid{flex:1;display:flex;align-items:center;justify-content:space-around;gap:8px;padding:14px 0 10px}
 .cbrd__team{display:flex;flex-direction:column;align-items:center;gap:6px;width:92px;text-align:center;font-size:12px}
@@ -614,12 +616,8 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
   <!-- ============ LIST (event list) ============ -->
   <section class="screen" id="screen-list">
     <div class="oddstabs">
-      <div class="oddstabs__scroll">
+      <div class="oddstabs__scroll" id="oddsTabs">
         <button class="oddstab is-on" data-when="inplay">IN-PLAY</button>
-        <button class="oddstab" data-when="today">TODAY</button>
-        <button class="oddstab" data-when="apr31">APR-31</button>
-        <button class="oddstab" data-when="may1">MAY-1</button>
-        <button class="oddstab" data-when="may2">MAY-2</button>
       </div>
       <div class="single" id="modeToggle" title="切换 单式 / 串关"><span class="is-act" id="modeL">SINGLE</span><span class="is-dim" id="modeR">P</span></div>
     </div>
@@ -1533,7 +1531,7 @@ function renderMedia(){
 /* ===== no-video in-play (滚球·已开赛) themed calc-board per sport ===== */
 function calcBoard(bg,lg,hbg,ht,hn,abg,at,an,score,prog,bottom){
   return '<div class="cbrd" style="background:'+bg+'">'+
-    '<div class="cbrd__top"><span>‹</span><span class="cbrd__lg">'+lg+' ▾</span><span>📊&nbsp;↻</span></div>'+
+    '<div class="cbrd__top"><span>‹</span><span class="cbrd__lg">'+lg+' ▾</span><span>↻</span></div>'+
     '<div class="cbrd__mid">'+
       '<div class="cbrd__team">'+card(hbg,ht)+'<span>'+hn+'</span></div>'+
       '<div class="cbrd__sc"><div class="cbrd__nums">'+score+'</div><div class="cbrd__prog">'+prog+'</div></div>'+
@@ -1547,7 +1545,7 @@ function tblBoard(bg,prog,hbg,ht,hn,abg,at,an,score,headers,rmain,raway,serve){
   var head='<tr><th></th>'+headers.map(function(h){return '<th>'+h+'</th>';}).join('')+'</tr>';
   var r1='<tr><td>'+(serve==='main'?dot:'')+'主</td>'+rmain.map(function(v){return '<td>'+v+'</td>';}).join('')+'</tr>';
   var r2='<tr><td>'+(serve==='away'?dot:'')+'客</td>'+raway.map(function(v){return '<td>'+v+'</td>';}).join('')+'</tr>';
-  return '<div class="cbrd" style="background:'+bg+'">'+
+  return '<div class="cbrd" style="background:'+bg+'"><span class="cbrd__refresh">↻</span>'+
     '<div style="text-align:center;font-weight:800;font-size:13px;color:#fff;padding-top:2px">'+prog+'</div>'+
     '<div class="cbrd__mid" style="padding:8px 0 6px">'+
       '<div class="cbrd__team">'+card(hbg,ht)+'<span>'+hn+'</span></div>'+
@@ -1562,7 +1560,7 @@ var INPLAY={
   football:calcBoard('radial-gradient(circle at 50% 130%,#2f7a35,#123012)','Premier League','#da291c','MUN','Man Utd','#034694','CHE','Chelsea','2 - 1','下半场 · 77:11', nbadge+' HT 1-0 · '+yc+' 2-1 · '+rc+' 0-1 · ⛳ 5-3'),
   tennis:tblBoard('linear-gradient(160deg,#155a9c,#08203f)','滚球','#1b2b4a','🇦🇺','伯纳德-托米奇(澳洲)','#c0202e','🇺🇸','伊利亚-伊华舒卡','1 - 1',
     ['总盘数','1盘','2盘','3盘','得分','总局数'],['1','4','6','1','15','11'],['1','6','4','2','15','12'],'main'),
-  cricket:'<div class="cbrd" style="background:radial-gradient(circle at 50% 130%,#2f7a55,#0e3626)">'+
+  cricket:'<div class="cbrd" style="background:radial-gradient(circle at 50% 130%,#2f7a55,#0e3626)"><span class="cbrd__refresh">↻</span>'+
     '<div class="cbrd__mid" style="padding:8px 0 4px;align-items:flex-start">'+
       '<div class="cbrd__team">'+card('#1b2b4a','🏴')+'<span>英格兰</span><span class="crk-sc">156/4 (Ov39.0\')</span></div>'+
       '<div class="cbrd__sc"><div style="font-weight:800;color:#fff">滚球</div><span class="crk-tag">比赛待续</span></div>'+
@@ -1597,7 +1595,7 @@ INPLAY.rugby=INPLAY.football; INPLAY.amfootball=INPLAY.football; INPLAY.icehocke
 
 /* ===== no-video pre-match (未开赛) per sport ===== */
 function preBoard(lg,hbg,ht,hn,abg,at,an){
-  return '<div class="pbrd"><div class="cbrd__top"><span>‹</span><span class="cbrd__lg">'+lg+' ▾</span><span>📊&nbsp;↻</span></div>'+
+  return '<div class="pbrd"><div class="cbrd__top"><span>‹</span><span class="cbrd__lg">'+lg+' ▾</span><span>↻</span></div>'+
     '<div class="pbrd__mid"><div class="cbrd__team">'+card(hbg,ht)+'<span>'+hn+'</span></div>'+
     '<div class="pbrd__time"><div class="pbrd__t">22:30</div><div class="pbrd__state">即将 · 倒数 11 分钟</div></div>'+
     '<div class="cbrd__team">'+card(abg,at)+'<span>'+an+'</span></div></div>'+
@@ -1741,6 +1739,20 @@ function openRule(k){var r=RULES[k];if(!r)return;
   document.getElementById('ruleBody').innerHTML=r.secs.map(function(s){return '<div class="rule-sec"><div class="rule-sec__h">'+s.h+'</div><ol>'+s.items.map(function(i){return '<li>'+i+'</li>';}).join('')+'</ol></div>';}).join('');
   document.getElementById('ruleSheet').classList.add('is-open');
 }
+
+/* 日期分页:近7日(含 today) */
+(function(){
+  var box=document.getElementById('oddsTabs'); if(!box)return;
+  var wk=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  var now=new Date(); var h='';
+  for(var i=0;i<7;i++){
+    var d=new Date(now.getTime()+i*86400000);
+    var mm=('0'+(d.getMonth()+1)).slice(-2), dd=('0'+d.getDate()).slice(-2);
+    var top=i===0?'TODAY':wk[d.getDay()];
+    h+='<button class="oddstab" data-when="'+(i===0?'today':'d'+i)+'"><span class="oddstab__d">'+top+'</span><span class="oddstab__m">'+mm+'/'+dd+'</span></button>';
+  }
+  box.insertAdjacentHTML('beforeend',h);
+})();
 
 /* init */
 syncFavStars();
