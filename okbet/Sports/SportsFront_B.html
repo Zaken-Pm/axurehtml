@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>赛事列表 · B版</title>
+<style>
+:root{
+  --bg:#eceff4; --card:#fff; --orange:#f6631e; --orange2:#ff9146;
+  --green:#12b866; --greenbg:#d9f7e6; --red:#ef3b46; --redbg:#fde3e5;
+  --ink:#232a3d; --mut:#8b93a6; --line:#eef1f6; --chip:#f2f5fa; --blue:#1ca9e0;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:#c9ced8;font-family:-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink)}
+.frame{max-width:430px;margin:0 auto;min-height:100vh;background:var(--bg);position:relative;overflow:hidden}
+
+/* ===== header ===== */
+.hdr{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+.logo{font-weight:900;font-size:20px;letter-spacing:-.5px;display:flex;align-items:baseline;gap:1px;line-height:1}
+.logo b{font-weight:900}
+.logo .c1{color:#23a7e0}.logo .c2{color:#f7941d}.logo .c3{color:#5cc244}.logo .c4{color:#e94f8a}.logo .c5{color:#f6631e}
+.logo small{font-size:11px;color:var(--blue);font-weight:900;margin-left:3px;transform:translateY(-1px)}
+.hdr__sp{flex:1}
+.bal{display:inline-flex;align-items:center;gap:6px;background:var(--chip);border-radius:20px;padding:6px 10px;font-weight:800;font-size:13px}
+.bal .coin{width:17px;height:17px;border-radius:50%;background:linear-gradient(180deg,#ffd76a,#f4a91d);color:#7a4f00;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900}
+.login{background:linear-gradient(180deg,var(--orange2),var(--orange));color:#fff;border:none;border-radius:20px;padding:8px 14px;font-weight:800;font-size:13px;box-shadow:0 3px 8px rgba(246,99,30,.3)}
+
+/* ===== sport tabs ===== */
+.sports{display:flex;gap:4px;overflow-x:auto;background:#fff;padding:2px 8px 0;border-bottom:1px solid var(--line);scrollbar-width:none}
+.sports::-webkit-scrollbar{display:none}
+.sptab{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 12px 9px;font-size:12px;font-weight:800;color:var(--mut);border-bottom:3px solid transparent;white-space:nowrap;cursor:pointer}
+.sptab .em{font-size:19px;line-height:1;filter:grayscale(.35);opacity:.75}
+.sptab.on{color:var(--green);border-color:var(--green)}
+.sptab.on .em{filter:none;opacity:1}
+
+/* ===== filter row ===== */
+.filt{display:flex;align-items:center;gap:7px;padding:10px 12px;overflow-x:auto;scrollbar-width:none}
+.filt::-webkit-scrollbar{display:none}
+.fchip{flex:0 0 auto;background:#fff;border:1px solid #e3e8f0;border-radius:16px;padding:7px 13px;font-size:12.5px;font-weight:800;color:#59617a;cursor:pointer}
+.fchip.on{background:linear-gradient(180deg,var(--orange2),var(--orange));color:#fff;border-color:transparent;box-shadow:0 2px 7px rgba(246,99,30,.28)}
+.fchip.live.on{background:linear-gradient(180deg,#ff5d5d,#e5202f);box-shadow:0 2px 7px rgba(229,32,47,.3)}
+.fchip .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#fff;margin-right:5px;vertical-align:middle;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.35}}
+.seg{margin-left:auto;flex:0 0 auto;display:flex;background:#fff;border:1px solid #e3e8f0;border-radius:16px;overflow:hidden}
+.seg button{border:none;background:transparent;padding:7px 12px;font-size:12px;font-weight:800;color:#8b93a6;cursor:pointer}
+.seg button.on{background:linear-gradient(180deg,#43c1ff,var(--blue));color:#fff}
+
+/* ===== league card ===== */
+.wrap{padding:0 10px 24px}
+.lg{background:#fff;border-radius:14px;margin-bottom:12px;box-shadow:0 2px 10px rgba(40,55,90,.05);overflow:hidden}
+.lg__h{display:flex;align-items:center;gap:9px;padding:11px 13px;cursor:pointer}
+.lg__flag{width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;background:var(--chip);flex:0 0 auto}
+.lg__nm{font-weight:900;font-size:14px}
+.lg__sub{font-size:11px;color:var(--mut);font-weight:700}
+.lg__star{margin-left:auto;color:#d7deea;font-size:17px;cursor:pointer}
+.lg__star.on{color:#ffb32b}
+.lg__chev{color:#b7c0d2;font-size:12px;transition:transform .2s}
+.lg.collapsed .lg__chev{transform:rotate(180deg)}
+.lg.collapsed .lg__body{display:none}
+.lg__body{border-top:1px solid var(--line)}
+
+/* ===== match ===== */
+.mt{padding:11px 13px;border-bottom:1px solid var(--line)}
+.mt:last-child{border-bottom:none}
+.mt__top{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.liveic{flex:0 0 auto;display:inline-flex;width:20px;height:20px}
+.liveic svg{width:20px;height:20px}
+.liveic .arc{fill:none;stroke:#e5202f;stroke-width:2;stroke-linecap:round}
+.liveic .dot{fill:#e5202f}
+.liveic .a1{animation:sig 1.5s infinite ease-in-out}
+.liveic .a2{animation:sig 1.5s infinite ease-in-out .35s}
+.liveic .dot{animation:sigdot 1.5s infinite ease-in-out}
+@keyframes sig{0%,100%{opacity:.15}50%{opacity:1}}
+@keyframes sigdot{0%,100%{opacity:.6}50%{opacity:1}}
+.tpill{background:#ffece1;color:var(--orange);font-size:10.5px;font-weight:900;border-radius:6px;padding:3px 7px;white-space:nowrap}
+.tpill.live{background:#ffe1e3;color:#e5202f}
+.tpill.live .d{display:inline-block;width:5px;height:5px;border-radius:50%;background:#e5202f;margin-right:4px;vertical-align:middle;animation:blink 1s infinite}
+.mt__more{margin-left:auto;font-size:11px;font-weight:800;color:var(--blue);cursor:pointer;white-space:nowrap}
+.mt__hdr{display:grid;grid-template-columns:1fr repeat(3,72px);gap:6px;align-items:end;margin-bottom:5px}
+.mt__hcell{text-align:center;font-size:10.5px;font-weight:800;color:var(--mut);line-height:1.2}
+.row{display:grid;grid-template-columns:1fr repeat(3,72px);gap:6px;align-items:center;margin-bottom:6px}
+.row:last-child{margin-bottom:0}
+.team{display:flex;align-items:center;gap:8px;min-width:0}
+.team__lg{width:24px;height:24px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;font-weight:900}
+.team__nm{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.team__sc{margin-left:auto;font-size:15px;font-weight:900;color:var(--orange);flex:0 0 auto;padding-left:6px}
+
+/* ===== odds button + up/down animation ===== */
+.odd{position:relative;background:var(--chip);border:1px solid #e8edf5;border-radius:10px;padding:7px 4px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;overflow:hidden;transition:transform .08s}
+.odd:active{transform:scale(.95)}
+.odd__lab{font-size:10.5px;font-weight:700;color:var(--mut);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.odd__val{font-size:15px;font-weight:900;color:var(--ink);display:flex;align-items:center;line-height:1}
+/* competitor-style corner wedge on the right edge: up=green(bottom), down=red(top) */
+.odd::after{content:"";position:absolute;right:0;width:9px;opacity:0;pointer-events:none}
+.odd.up::after{bottom:0;height:78%;background:linear-gradient(to top,var(--green),rgba(18,184,102,0));clip-path:polygon(100% 0,100% 100%,0 100%);opacity:1;animation:wedgeUp .5s ease}
+.odd.dn::after{top:0;height:78%;background:linear-gradient(to bottom,var(--red),rgba(239,59,70,0));clip-path:polygon(100% 0,100% 100%,0 0);opacity:1;animation:wedgeDn .5s ease}
+.odd.up{animation:tintUp 1s ease}
+.odd.dn{animation:tintDn 1s ease}
+@keyframes tintUp{0%{background:var(--greenbg)}70%{background:var(--greenbg)}100%{background:var(--chip)}}
+@keyframes tintDn{0%{background:var(--redbg)}70%{background:var(--redbg)}100%{background:var(--chip)}}
+@keyframes wedgeUp{0%{opacity:0;transform:translateY(6px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes wedgeDn{0%{opacity:0;transform:translateY(-6px)}100%{opacity:1;transform:translateY(0)}}
+
+.note{font-size:11px;color:var(--mut);text-align:center;padding:6px 0 2px}
+.legend{display:flex;justify-content:center;gap:16px;padding:4px 0 12px;font-size:11px;font-weight:800;color:var(--mut)}
+.legend i{display:inline-block;width:0;height:0;margin-right:4px;vertical-align:middle}
+.legend .u{border-left:4px solid transparent;border-right:4px solid transparent;border-bottom:6px solid var(--green)}
+.legend .d{border-left:4px solid transparent;border-right:4px solid transparent;border-top:6px solid var(--red)}
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <!-- header -->
+  <div class="hdr">
+    <div class="logo"><b class="c1">B</b><b class="c2">I</b><b class="c3">N</b><b class="c4">G</b><b class="c5">O</b><small>PLUS</small></div>
+    <div class="hdr__sp"></div>
+    <div class="bal"><span class="coin">₱</span>168.55</div>
+    <button class="login">Login</button>
+  </div>
+
+  <!-- sport tabs -->
+  <div class="sports" id="sports"></div>
+
+  <!-- filter -->
+  <div class="filt" id="filt">
+    <button class="fchip live on"><span class="dot"></span>LIVE</button>
+    <button class="fchip">TODAY</button>
+    <button class="fchip">SEP-15</button>
+    <button class="fchip">SEP-16</button>
+    <button class="fchip">SEP-17</button>
+    <div class="seg"><button class="on">SINGLE</button><button>PARLAY</button></div>
+  </div>
+
+  <div class="wrap" id="wrap"></div>
+
+  <div class="legend"><span><i class="u"></i>赔率上升</span><span><i class="d"></i>赔率下降</span></div>
+  <div class="note">赔率每隔数秒自动浮动，演示上升 / 下降动画</div>
+
+</div>
+
+<script>
+/* ===== sport tabs ===== */
+var SPORTS=[['🏀','Basketball',1],['⚽','Football',0],['🎾','Tennis',0],['🏐','Volleyball',0],['🥊','Boxing',0],['🏓','Table Tennis',0],['⚾','Baseball',0],['🏈','Am. Football',0]];
+document.getElementById('sports').innerHTML=SPORTS.map(function(s){
+  return '<div class="sptab'+(s[2]?' on':'')+'"><span class="em">'+s[0]+'</span>'+s[1]+'</div>';
+}).join('');
+
+/* ===== match data ===== */
+var DATA=[
+ {flag:'🇺🇸',nm:'WNBA',sub:'Basketball · USA',star:false,markets:['Winner','Handicap','Total Pts'],matches:[
+   {live:true,time:'Q3 09:06',more:'29+ 玩法',
+    teams:[['CS','#e0208a','Connecticut Sun','76'],['GV','#333','Golden State','66']],
+    odds:[[['Home','6.26'],['13','1.95'],['O 150.5','1.72']],[['Away','1.12'],['-13','1.93'],['U 150.5','2.16']]]},
+   {live:false,time:'TODAY 10:40',more:'21+ 玩法',
+    teams:[['SS','#0a5','Seattle Storm','-'],['TT','#248','Toronto Tempo','-']],
+    odds:[[['Home','1.43'],['-6','1.91'],['O 176.5','2.02']],[['Away','2.85'],['6','1.97'],['U 176.5','1.84']]]}
+ ]},
+ {flag:'🏴',nm:'Premier League',sub:'Football · England',star:false,markets:['Handicap','Goals O/U','1 X 2'],matches:[
+   {live:true,time:'2nd Half 77:11',more:'45+ 玩法',
+    teams:[['MUN','#da291c','Manchester Utd','2'],['CHE','#034694','Chelsea','1']],
+    odds:[[['-0.5','1.80'],['O 2.5','2.05'],['Home','2.43']],[['+0.5','4.20'],['U 2.5','1.75'],['Away','3.05']]]},
+   {live:false,time:'TODAY 22:00',more:'52+ 玩法',
+    teams:[['MCI','#6cabdd','Manchester City','-'],['ARS','#c8102e','Arsenal','-']],
+    odds:[[['-1.0','1.55'],['O 3.0','1.88'],['Home','1.55']],[['+1.0','5.20'],['U 3.0','1.92'],['Away','5.20']]]}
+ ]},
+ {flag:'🇦🇺',nm:'Australian Open',sub:'Tennis · Best of 5',star:false,markets:['Winner','Handicap','Games O/U'],matches:[
+   {live:true,time:'Set 3',more:'18+ 玩法',
+    teams:[['JS','#111','Jannik Sinner','1'],['CA','#e11338','Carlos Alcaraz','1']],
+    odds:[[['Home','1.55'],['-4.5','1.90'],['O 22.5','1.87']],[['Away','2.45'],['+4.5','1.90'],['U 22.5','1.93']]]}
+ ]}
+];
+
+/* ===== render ===== */
+function oddHTML(o){
+  return '<button class="odd" data-odd data-base="'+o[1]+'">'+
+    '<span class="odd__lab">'+o[0]+'</span>'+
+    '<span class="odd__val"><span class="v">'+o[1]+'</span></span></button>';
+}
+var LIVEIC='<span class="liveic" title="滚球直播"><svg viewBox="0 0 24 24">'+
+  '<path class="arc a2" d="M4.6 6.2a11 11 0 0 0 0 11.6"/><path class="arc a2" d="M19.4 6.2a11 11 0 0 1 0 11.6"/>'+
+  '<path class="arc a1" d="M7.8 9a6.5 6.5 0 0 0 0 6"/><path class="arc a1" d="M16.2 9a6.5 6.5 0 0 1 0 6"/>'+
+  '<circle class="dot" cx="12" cy="12" r="2.3"/></svg></span>';
+function matchHTML(m,markets){
+  var hdr='<div class="mt__hdr"><div></div>'+markets.map(function(x){return '<div class="mt__hcell">'+x+'</div>';}).join('')+'</div>';
+  var rows=m.teams.map(function(t,i){
+    var cells=m.odds[i].map(oddHTML).join('');
+    return '<div class="row"><div class="team"><span class="team__lg" style="background:'+t[1]+'">'+t[0]+'</span>'+
+      '<span class="team__nm">'+t[2]+'</span><span class="team__sc">'+t[3]+'</span></div>'+cells+'</div>';
+  }).join('');
+  var pill=m.live?'<span class="tpill live"><span class="d"></span>'+m.time+'</span>':'<span class="tpill">'+m.time+'</span>';
+  var lic=m.live?LIVEIC:'';
+  return '<div class="mt"><div class="mt__top">'+lic+pill+'<span class="mt__more">'+m.more+' ›</span></div>'+hdr+rows+'</div>';
+}
+document.getElementById('wrap').innerHTML=DATA.map(function(l){
+  var body=l.matches.map(function(m){return matchHTML(m,l.markets);}).join('');
+  return '<div class="lg"><div class="lg__h" data-coll>'+
+    '<span class="lg__flag">'+l.flag+'</span>'+
+    '<div><div class="lg__nm">'+l.nm+'</div><div class="lg__sub">'+l.sub+'</div></div>'+
+    '<span class="lg__star'+(l.star?' on':'')+'" data-star>'+(l.star?'★':'☆')+'</span>'+
+    '<span class="lg__chev">▲</span></div>'+
+    '<div class="lg__body">'+body+'</div></div>';
+}).join('');
+
+/* ===== interactions ===== */
+document.body.addEventListener('click',function(e){
+  var st=e.target.closest('[data-star]');
+  if(st){ e.stopPropagation(); var on=st.classList.toggle('on'); st.textContent=on?'★':'☆'; return; }
+  var h=e.target.closest('[data-coll]');
+  if(h){ h.closest('.lg').classList.toggle('collapsed'); return; }
+  var sp=e.target.closest('.sptab');
+  if(sp){ document.querySelectorAll('.sptab').forEach(function(x){x.classList.remove('on');}); sp.classList.add('on'); return; }
+  var fc=e.target.closest('.fchip');
+  if(fc){ document.querySelectorAll('.fchip').forEach(function(x){x.classList.remove('on');}); fc.classList.add('on'); return; }
+  var sg=e.target.closest('.seg button');
+  if(sg){ sg.parentElement.querySelectorAll('button').forEach(function(x){x.classList.remove('on');}); sg.classList.add('on'); return; }
+  var od=e.target.closest('[data-odd]');
+  if(od){ od.style.borderColor='var(--orange)'; setTimeout(function(){od.style.borderColor='';},250); return; }
+});
+
+/* ===== odds up/down animation loop ===== */
+function tick(){
+  var cells=[].slice.call(document.querySelectorAll('.odd'));
+  // pick 3-5 random visible cells
+  var pick=Math.floor(Math.random()*3)+3;
+  for(var i=0;i<pick;i++){
+    var c=cells[Math.floor(Math.random()*cells.length)];
+    if(!c)continue;
+    var vEl=c.querySelector('.v'); var cur=parseFloat(vEl.textContent);
+    if(isNaN(cur))continue;
+    var up=Math.random()>0.5;
+    var delta=(Math.random()*0.06+0.01);
+    var nv=up?cur+delta:Math.max(1.01,cur-delta);
+    vEl.textContent=nv.toFixed(2);
+    c.classList.remove('up','dn'); void c.offsetWidth; // restart animation
+    c.classList.add(up?'up':'dn'); // wedge persists until next change (shows last movement)
+  }
+}
+setInterval(tick,2200);
+setTimeout(tick,600);
+</script>
+</body>
+</html>
