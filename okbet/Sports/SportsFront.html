@@ -253,7 +253,8 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .ocell__val{font-size:14px;font-weight:900;color:#15264a;transition:color .35s ease;display:inline-flex;align-items:center;justify-content:center;gap:2px}
 
 /* ===== detail ===== */
-.dback{position:absolute;top:64px;left:12px;z-index:5;color:#fff;font-size:22px;background:rgba(0,0,0,.3);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+#detailScroll{position:relative}
+.dback{position:absolute;top:12px;left:12px;z-index:5;color:#fff;font-size:22px;background:rgba(0,0,0,.3);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .scoreboard{position:relative;background:#0c1116;color:#fff}
 .scoreboard__video{height:200px;background:linear-gradient(160deg,#20303f,#101820);position:relative;overflow:hidden;
   display:flex;align-items:center;justify-content:center}
@@ -322,7 +323,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .sbchip{flex:0 0 auto;border:1px solid #2a3550;background:#131a28;color:#cfe0ff;font-size:12px;font-weight:700;padding:6px 10px;border-radius:16px;cursor:pointer;white-space:nowrap}
 .sbchip.is-on{background:#1f5fe0;border-color:#1f5fe0}
 
-.mtabs{display:flex;background:#fff;border-bottom:1px solid #eef1f6;position:sticky;top:38px;z-index:6}
+.mtabs{display:flex;background:#fff;border-bottom:1px solid #eef1f6}
 .mtab{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:12px 4px;color:#9aa6bf;font-weight:800;font-size:14px;position:relative}
 .mtab.is-on{color:var(--blue)}
 .mtab.is-on::after{content:"";position:absolute;left:24%;right:24%;bottom:0;height:3px;background:var(--blue);border-radius:2px}
@@ -1031,7 +1032,6 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 
   <!-- ============ DETAIL ============ -->
   <section class="screen" id="screen-detail" style="position:relative">
-    <button class="dback" data-goto="back">‹</button>
 
     <!-- 更多赛事 sheet -->
     <div class="sheet" id="moreSheet">
@@ -1081,6 +1081,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
     </div>
 
     <div class="scroll" id="detailScroll">
+      <button class="dback" data-goto="back">‹</button>
       <!-- scoreboard (swapped by sport) -->
       <div class="scoreboard" id="scoreboard"><!--filled by JS--></div>
 
