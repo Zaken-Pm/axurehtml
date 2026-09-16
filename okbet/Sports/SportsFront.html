@@ -103,16 +103,21 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .team__logo{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;
   font-weight:800;color:#fff;font-size:15px;border:2px solid #e7c96b;box-shadow:0 2px 6px rgba(0,0,0,.12)}
 .team__name{font-size:12px;font-weight:700;text-align:center;color:#22304f;line-height:1.2}
-.score{display:flex;flex-direction:column;align-items:center;gap:2px;flex:1}
+.score{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1}
 .score__nums{font-size:26px;font-weight:900;letter-spacing:2px;color:#12213f}
 .score__nums .dash{color:#9aa6bf;margin:0 6px}
 .score__period{background:#ffd24d;color:#5a3d00;font-size:10px;font-weight:800;border-radius:4px;padding:1px 8px}
 .score__time{font-size:12px;color:#4a5675;font-weight:700}
 .oddsbar{display:flex;align-items:center;gap:6px;padding:10px 4px 4px}
-.opill{flex:1;background:#fff;border:1px solid #d7e0f0;border-radius:8px;padding:7px;text-align:center;font-weight:900;font-size:15px;color:#12213f;box-shadow:inset 0 -2px 0 #e9eef7}
-.opill--mid{flex:1.1;background:linear-gradient(180deg,#123c95,#0a2560);color:#fff;display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px}
+.opill{flex:1;box-sizing:border-box;height:34px;background:#fff;border:1px solid #d7e0f0;border-radius:8px;padding:0 7px;text-align:center;font-weight:900;font-size:15px;line-height:1.05;color:#12213f;box-shadow:inset 0 -2px 0 #e9eef7;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.opill__lb{font-size:9px;font-weight:800;color:#8a97b3;letter-spacing:.3px;line-height:1.1}
+.opill--mid{flex:1.1;flex-direction:row;background:linear-gradient(180deg,#123c95,#0a2560);color:#fff;gap:6px;font-size:14px}
 .oddsbar .oarr{flex:0 0 14px}
 .oddsbar .oarr svg{width:14px;height:16px}
+/* 赔率升降箭头显示在按钮内:数字保持置中,箭头绝对定位在数字右侧 */
+.opill__val{position:relative;display:inline-flex;align-items:center;justify-content:center;line-height:1}
+.opill__val .oarr{position:absolute;left:100%;top:50%;transform:translateY(-50%);margin-left:3px;flex:0 0 auto}
+.opill__val .oarr svg{width:11px;height:13px;display:block}
 .opill .up{color:var(--green)} .opill .dn{color:var(--down)}
 /* 赔率升降箭头动画:上升往上滑、下降往下滑 */
 @keyframes arrUp{0%{transform:translateY(3px);opacity:0}25%{opacity:1}100%{transform:translateY(-3px);opacity:0}}
@@ -163,7 +168,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .lgsel{position:relative;display:flex;align-items:center;gap:8px;margin:2px var(--s3) 6px}
 .listpad{height:0}
 /* 返回顶部浮动钮 */
-.backtop{position:absolute;right:14px;bottom:84px;width:44px;height:44px;border-radius:50%;z-index:80;
+.backtop{position:absolute;right:14px;bottom:84px;width:44px;height:44px;border-radius:50%;z-index:50;
   border:none;background:linear-gradient(180deg,#2a4fb0,#12347f);color:#fff;box-shadow:0 6px 16px rgba(10,33,88,.4);
   display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:none;-webkit-user-select:none;user-select:none;
   opacity:.65}
@@ -216,12 +221,17 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 @keyframes sig{0%,100%{opacity:.15}50%{opacity:1}}
 @keyframes sigdot{0%,100%{opacity:.6}50%{opacity:1}}
 .lmatch__more{background:linear-gradient(180deg,#ffcf5a,#f0a81e);color:#6b3d00;font-size:9.5px;font-weight:800;border-radius:6px;padding:2px 5px;display:inline-flex;align-items:center;gap:2px;white-space:nowrap;flex:0 0 auto}
-.lgrid{display:grid;grid-template-columns:1.9fr 1fr 1fr 1fr;gap:5px;align-items:center}
+.lgrid{display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr;gap:5px;align-items:center}
 .lgrid__h{font-size:12px;font-weight:800;color:var(--blue);text-align:center;padding-bottom:0}
 .lgrid__h.tm{text-align:left;display:flex;align-items:center;gap:4px;flex-wrap:nowrap;overflow:hidden}
 .fbhh{display:flex!important;flex-direction:row;align-items:center;gap:4px;flex-wrap:nowrap;overflow:hidden}
-.lteam{display:flex;align-items:center;gap:7px;padding:6px 0;font-size:13px;font-weight:700;color:#22304f}
+.lteam{position:relative;display:flex;align-items:center;gap:5px;padding:6px 0 6px 6px;font-size:12.5px;font-weight:700;color:#22304f;min-width:0}
+.lteam__nm{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lteam b{margin-left:auto;padding-left:6px;flex:0 0 auto}
+/* 发球权提示(网球/羽球/乒乓球):竖条 */
+.serve{position:absolute;left:-2px;top:50%;transform:translateY(-50%);width:3px;height:15px;border-radius:2px;background:#12b866}
+/* 让分/让球盘较强队伍:名称红字 */
+.lteam.is-fav,.fbteam.is-fav .fbteam__nm{color:var(--down)}
 .lteam__logo{width:22px;height:22px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;font-weight:800}
 .ocell{background:linear-gradient(180deg,#f5f8fd,#e7eef9);border:1px solid #dbe4f2;border-radius:8px;
   padding:5px 2px;text-align:center;box-shadow:inset 0 -2px 0 #dde6f3}
@@ -701,11 +711,9 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
               <div class="team"><div class="team__logo" style="background:#236192">MIN</div><div class="team__name">Minnesota<br>Timberwolves</div></div>
             </div>
             <div class="oddsbar">
-              <div class="opill"><span class="up">7.40</span></div>
-              <span class="oarr up"><svg viewBox="0 0 12 14"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg></span>
+              <div class="opill"><span class="opill__lb">Home</span><span class="opill__val"><span class="up">7.40</span><span class="oarr up"><svg viewBox="0 0 12 14"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg></span></span></div>
               <div class="opill opill--mid">Winner</div>
-              <span class="oarr"></span>
-              <div class="opill">1.07</div>
+              <div class="opill"><span class="opill__lb">Away</span><span class="opill__val">1.07</span></div>
             </div>
           </div>
           <div class="tips"><span class="tips__tag">BET TIPS</span><span class="tips__txt">Clipper has won 9 matches in last 10 matches with lakers.</span></div>
@@ -719,11 +727,14 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
               <div class="score"><div class="score__nums">83<span class="dash">-</span>126</div><div class="score__period">3rd</div><div class="score__time">11:14</div></div>
               <div class="team"><div class="team__logo" style="background:#236192">MIN</div><div class="team__name">Minnesota</div></div>
             </div>
-            <div class="oddsbar"><div class="opill">7.40</div><div class="opill opill--mid">Winner</div><div class="opill">1.07</div></div>
+            <div class="oddsbar"><div class="opill"><span class="opill__lb">Home</span>7.40</div><div class="opill opill--mid">Winner</div><div class="opill"><span class="opill__lb">Away</span>1.07</div></div>
           </div>
           <div class="tips"><span class="tips__tag">BET TIPS</span><span class="tips__txt">Clipper has won 9 matches…</span></div>
         </article>
       </div>
+
+      <!-- 额外推荐联赛(仅在无收藏赛事时显示) -->
+      <div id="topExtra"></div>
 
       <!-- promo -->
       <div class="promo">
@@ -732,7 +743,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
         <button class="promo__btn">JOIN NOW</button>
       </div>
 
-      <div class="banner">MY COLLECTION</div>
+      <div class="banner" id="collBanner">MY COLLECTION</div>
       <div id="myCollection"><!-- filled by JS from favorites --></div>
 
       <div class="spacer"></div>
@@ -811,7 +822,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
         <div class="lmatch" data-parlay="yes" data-favmatch="m_ao" data-when="inplay">
           <div class="lgrid">
             <div class="lgrid__h tm"><span class="lmatch__time">Best of 5</span><span class="lmatch__more" data-goto="detail">18+ ›</span></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap (Games)</div><div class="lgrid__h">Games O/U</div>
-            <div class="lteam"><span class="lteam__logo" style="background:#111">JS</span>Jannik Sinner <b style="color:#e11338;font-weight:900">1</b></div>
+            <div class="lteam"><span class="lteam__logo" style="background:#111">JS</span><span class="serve" title="发球权"></span>Jannik Sinner <b style="color:#e11338;font-weight:900">1</b></div>
             <div class="ocell"><div class="ocell__lab">Home</div><div class="ocell__val up">1.55 <span class="a"><svg viewBox="0 0 12 14" width="10" height="12"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg></span></div></div>
             <div class="ocell"><div class="ocell__lab">-4.5</div><div class="ocell__val">1.90</div></div>
             <div class="ocell"><div class="ocell__lab">Over 22.5</div><div class="ocell__val">1.87</div></div>
@@ -862,6 +873,55 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
           <div class="smallscore">
             <span class="ss"><span class="diamond"><i class="b2 on"></i><i class="b3"></i><i class="b1 on"></i></span></span>
             <span class="ss">Outs: <b>1</b></span>
+          </div>
+          <div class="micons" data-icons></div>
+        </div>
+      </div>
+
+      <!-- Badminton · BWF World Tour -->
+      <div class="lrow" data-collapse><div class="lrow__flag">🏸</div>
+        <div class="lrow__name">BWF World Tour</div><span class="lrow__star" data-fav="bwf" data-favtype="league">☆</span><span class="lrow__chev">▲</span></div>
+      <div class="lmatches" data-body>
+        <div class="lmatch" data-parlay="yes" data-favmatch="m_bwf" data-when="inplay" style="border-radius:0 0 10px 10px">
+          <div class="lgrid">
+            <div class="lgrid__h tm"><span class="lmatch__time lmatch__time--live">GAME 2</span><span class="lmatch__more" data-goto="detail">16+ ›</span></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap (Pts)</div><div class="lgrid__h">Points O/U</div>
+            <div class="lteam"><span class="lteam__logo" style="background:#c60c30">VA</span><span class="serve" title="发球权"></span>Viktor Axelsen <b style="color:#e11338;font-weight:900">1</b></div>
+            <div class="ocell"><div class="ocell__lab">Home</div><div class="ocell__val up">1.48 <span class="a"><svg viewBox="0 0 12 14" width="10" height="12"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg></span></div></div>
+            <div class="ocell"><div class="ocell__lab">-3.5</div><div class="ocell__val">1.90</div></div>
+            <div class="ocell"><div class="ocell__lab">Over 40.5</div><div class="ocell__val">1.85</div></div>
+            <div class="lteam"><span class="lteam__logo" style="background:#00247d">KV</span>Kunlavut Vitidsarn <b style="color:#e11338;font-weight:900">0</b></div>
+            <div class="ocell"><div class="ocell__lab">Away</div><div class="ocell__val">2.60</div></div>
+            <div class="ocell"><div class="ocell__lab">+3.5</div><div class="ocell__val">1.90</div></div>
+            <div class="ocell"><div class="ocell__lab">Under 40.5</div><div class="ocell__val">1.95</div></div>
+          </div>
+          <div class="smallscore">
+            <span class="ss">Game1 <b>21 - 18</b></span>
+            <span class="ss">Game2 <b>15 - 12</b></span>
+          </div>
+          <div class="micons" data-icons></div>
+        </div>
+      </div>
+
+      <!-- Table Tennis · WTT Champions -->
+      <div class="lrow" data-collapse><div class="lrow__flag">🏓</div>
+        <div class="lrow__name">WTT Champions</div><span class="lrow__star" data-fav="wtt" data-favtype="league">☆</span><span class="lrow__chev">▲</span></div>
+      <div class="lmatches" data-body>
+        <div class="lmatch" data-parlay="yes" data-favmatch="m_wtt" data-when="inplay" style="border-radius:0 0 10px 10px">
+          <div class="lgrid">
+            <div class="lgrid__h tm"><span class="lmatch__time lmatch__time--live">GAME 3</span><span class="lmatch__more" data-goto="detail">14+ ›</span></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap (Pts)</div><div class="lgrid__h">Points O/U</div>
+            <div class="lteam"><span class="lteam__logo" style="background:#de2910">ML</span>Ma Long <b style="color:#e11338;font-weight:900">2</b></div>
+            <div class="ocell"><div class="ocell__lab">Home</div><div class="ocell__val">1.60</div></div>
+            <div class="ocell"><div class="ocell__lab">-2.5</div><div class="ocell__val">1.90</div></div>
+            <div class="ocell"><div class="ocell__lab">Over 18.5</div><div class="ocell__val">1.88</div></div>
+            <div class="lteam"><span class="lteam__logo" style="background:#f5c518;color:#333">FZ</span><span class="serve" title="发球权"></span>Fan Zhendong <b style="color:#e11338;font-weight:900">1</b></div>
+            <div class="ocell"><div class="ocell__lab">Away</div><div class="ocell__val">2.20</div></div>
+            <div class="ocell"><div class="ocell__lab">+2.5</div><div class="ocell__val">1.90</div></div>
+            <div class="ocell"><div class="ocell__lab">Under 18.5</div><div class="ocell__val">1.92</div></div>
+          </div>
+          <div class="smallscore">
+            <span class="ss">G1 <b>11 - 8</b></span>
+            <span class="ss">G2 <b>9 - 11</b></span>
+            <span class="ss">G3 <b>7 - 5</b></span>
           </div>
           <div class="micons" data-icons></div>
         </div>
@@ -956,8 +1016,14 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
   <!-- ============ ENDING GAME ============ -->
   <section class="screen" id="screen-endgame">
     <div class="scroll">
-      <div class="egchips" id="egChips"></div>
-      <div class="egdates" id="egDates"></div>
+      <!-- 联赛选择列(与其他页面同款 pill + 展开箭头) -->
+      <div class="lgsel eglgsel">
+        <div class="lgsel__tabs"></div>
+        <button class="lgsel__more" data-eglgexpand title="展开联赛">▾</button>
+        <div class="lgsel__list" hidden></div>
+      </div>
+      <!-- 日期列(与其他页面同款底线样式) -->
+      <div class="daterow" id="egDateRow"></div>
 
       <div class="ecgrp">
         <div class="ecgrp__head" data-ecgrpcollapse><span>🌏</span>Asian Games<span class="ecgrp__cnt">2</span><span class="chev">▲</span></div>
@@ -1491,7 +1557,7 @@ function betFromOline(ol){
 document.body.addEventListener('click',function(e){
   /* --- TODAY 分页:切到日期视图(带回上次选的日期,预设 today)并展开星期列 --- */
   if(e.target.closest('[data-todaytab]')){ currentWhen=lastDate; applyFilters(); show('list'); return; }
-  var dopt=e.target.closest('.dateopt');
+  var dopt=e.target.closest('#dateRow .dateopt');
   if(dopt){ currentWhen=lastDate=dopt.getAttribute('data-when'); applyFilters(); show('list'); return; }
   /* --- bet slip: close / numpad / place --- */
   if(e.target.closest('[data-betclose]')){ closeBetSheet(); return; }
@@ -1600,12 +1666,15 @@ var FAVDATA={
   nba:{type:'league',name:'NBAPLAYOFFS-Semifinal',color:'#c8102e',sub:'🏀 Basketball · Denver vs Minnesota'},
   wnba:{type:'league',name:'WNBA',color:'#b22222',sub:'🏀 Basketball · Connecticut vs Golden State'},
   epl:{type:'league',name:'Premier League',color:'#3b0d5b',sub:'⚽ Football · Man Utd vs Chelsea'},
+  epl3:{type:'league',name:'Premier League',color:'#3b0d5b',sub:'⚽ Football · Man Utd vs Chelsea'},
   ao:{type:'league',name:'Australian Open',color:'#0a67b3',sub:'🎾 Tennis · Sinner vs Alcaraz'},
   mlb:{type:'league',name:'MLB',color:'#041e42',sub:'⚾ Baseball · USA vs Japan'},
   m_wnba:{type:'match',name:'Connecticut Sun vs Golden State',color:'#e0208a',sub:'WNBA · Q3 09:06 · 76-66'},
   m_epl:{type:'match',name:'Man Utd vs Chelsea',color:'#da291c',sub:'Premier League · 2nd Half 77:11 · 2-1'},
   m_ao:{type:'match',name:'Sinner vs Alcaraz',color:'#0a67b3',sub:'Australian Open · Set 3 · 1-1'},
   m_mlb:{type:'match',name:'USA vs Japan',color:'#041e42',sub:'MLB · Top 7th · 7-4'},
+  m_bwf:{type:'match',name:'Axelsen vs Vitidsarn',color:'#c60c30',sub:'BWF World Tour · Game 2 · 1-0'},
+  m_wtt:{type:'match',name:'Ma Long vs Fan Zhendong',color:'#de2910',sub:'WTT Champions · Game 3 · 2-1'},
   o_aus:{type:'league',name:'Australia NBL 2026/2027 - Winner',color:'#00843d',sub:'🏆 Outright · 🇦🇺 Australia'},
   o_bra:{type:'league',name:'Brazil NBB 2026/2027 - Winner',color:'#009c3b',sub:'🏆 Outright · 🇧🇷 Brazil'},
   o_esp:{type:'league',name:'Spain ACB 2026/2027 - Winner',color:'#aa151b',sub:'🏆 Outright · 🇪🇸 Spain'},
@@ -1635,20 +1704,28 @@ var TOPKEYS={nba:1};
 var CARDS={
   wnba:{league:'WNBA',flag:'🇺🇸',mv:['up',''],h:{ab:'CS',bg:'#e0208a',nm:'Connecticut<br>Sun(W)'},a:{ab:'GV',bg:'#333',nm:'Golden State<br>Valkyries(W)'},sc:'76 - 66',pd:'Q3',tm:'09:06',od:['6.26','1.12'],tip:'Connecticut leads the series 2-1 this season.'},
   epl:{league:'Premier League',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',mv:['up',''],h:{ab:'MUN',bg:'#da291c',nm:'Manchester<br>Utd'},a:{ab:'CHE',bg:'#034694',nm:'Chelsea'},sc:'2 - 1',pd:'2nd Half',tm:'77:11',od:['1.80','4.20'],tip:'Man Utd unbeaten in their last 5 home games.'},
+  epl3:{league:'Premier League',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',way3:true,mv:['up','',''],h:{ab:'MUN',bg:'#da291c',nm:'Manchester<br>Utd'},a:{ab:'CHE',bg:'#034694',nm:'Chelsea'},sc:'2 - 1',pd:'2nd Half',tm:'77:11',od:['1.80','3.40','4.20'],tip:'Man Utd unbeaten in their last 5 home games.'},
   ao:{league:'Australian Open',flag:'🇦🇺',ns:true,mv:['','dn'],h:{ab:'JS',bg:'#111',nm:'Jannik<br>Sinner'},a:{ab:'CA',bg:'#e11338',nm:'Carlos<br>Alcaraz'},sc:'1 - 1',pd:'Set 3',tm:'40-30',od:['1.55','2.45'],tip:'Sinner has won the last 3 meetings.'},
   mlb:{league:'MLB',flag:'🇺🇸',mv:['up',''],h:{ab:'USA',bg:'#c8102e',nm:'USA<br>Baseball'},a:{ab:'JPN',bg:'#bc002d',nm:'Japan<br>Baseball'},sc:'7 - 4',pd:'Top 7th',tm:'Out 1',od:['1.42','2.90'],tip:'USA leading going into the 7th inning.'},
   korsau:{league:'Asian Games',flag:'🌏',h:{ab:'KOR',bg:'#0a3161',nm:'Korea<br>Republic'},a:{ab:'KSA',bg:'#165c33',nm:'Saudi<br>Arabia'},sc:'—',pd:'29 Min',tm:'LIVE',od:['1.65','2.20'],tip:'Ending Card market · 29 Minute.'},
   belger:{league:'Asian Games',flag:'🌏',h:{ab:'BEL',bg:'#111',nm:'Belgium<br>(W)'},a:{ab:'GER',bg:'#c8102e',nm:'Germany<br>(W)'},sc:'VS',pd:'Today',tm:'23:45',od:['1.90','1.90'],tip:'Ending Card market · Today 23:45.'}
 };
-var CARDOF={wnba:'wnba',epl:'epl',ao:'ao',mlb:'mlb',m_wnba:'wnba',m_epl:'epl',m_ao:'ao',m_mlb:'mlb',ec_kor_sau:'korsau',ec_bel_ger:'belger'};
+var CARDOF={wnba:'wnba',epl:'epl',epl3:'epl3',ao:'ao',mlb:'mlb',m_wnba:'wnba',m_epl:'epl',m_ao:'ao',m_mlb:'mlb',ec_kor_sau:'korsau',ec_bel_ger:'belger'};
 var CHEV_UP='<svg viewBox="0 0 12 14"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg>';
 var CHEV_DN='<svg viewBox="0 0 12 14"><path d="M6 13L11 8H1Z M6 7L11 2H1Z" fill="currentColor"/></svg>';
 function oArrow(m){ return m==='up'?'<span class="oarr up">'+CHEV_UP+'</span>':m==='dn'?'<span class="oarr dn">'+CHEV_DN+'</span>':'<span class="oarr"></span>'; }
+/* 按钮内显示的箭头:无升降时不占位 */
+function oArrowIn(m){ return m==='up'?'<span class="oarr up">'+CHEV_UP+'</span>':m==='dn'?'<span class="oarr dn">'+CHEV_DN+'</span>':''; }
 function oNum(v,m){ return m==='up'?'<span class="up">'+v+'</span>':m==='dn'?'<span class="dn">'+v+'</span>':v; }
-function oddsbarHTML(od,mv){ mv=mv||['',''];
-  return '<div class="oddsbar"><div class="opill">'+oNum(od[0],mv[0])+'</div>'+oArrow(mv[0])+
-    '<div class="opill opill--mid">Winner</div>'+oArrow(mv[1])+
-    '<div class="opill">'+oNum(od[1],mv[1])+'</div></div>';
+function oddsbarHTML(od,mv,way3){ mv=mv||['','',''];
+  if(way3){ /* 足球 1X2:三个赔率按钮 Home / Draw / Away */
+    return '<div class="oddsbar"><div class="opill"><span class="opill__lb">Home</span><span class="opill__val">'+oNum(od[0],mv[0])+oArrowIn(mv[0])+'</span></div>'+
+      '<div class="opill"><span class="opill__lb">Draw</span><span class="opill__val">'+oNum(od[1],mv[1])+oArrowIn(mv[1])+'</span></div>'+
+      '<div class="opill"><span class="opill__lb">Away</span><span class="opill__val">'+oNum(od[2],mv[2])+oArrowIn(mv[2])+'</span></div></div>';
+  }
+  return '<div class="oddsbar"><div class="opill"><span class="opill__lb">Home</span><span class="opill__val">'+oNum(od[0],mv[0])+oArrowIn(mv[0])+'</span></div>'+
+    '<div class="opill opill--mid">Winner</div>'+
+    '<div class="opill"><span class="opill__lb">Away</span><span class="opill__val">'+oNum(od[1],mv[1])+oArrowIn(mv[1])+'</span></div></div>';
 }
 function mcardHTML(c){
   var sc=c.sc.split(' - '); var left=sc[0], right=sc.length>1?sc[1]:'';
@@ -1660,14 +1737,34 @@ function mcardHTML(c){
       '<div class="score"><div class="score__nums">'+left+(right?'<span class="dash">-</span>'+right:'')+'</div><div class="score__period">'+c.pd+'</div><div class="score__time">'+c.tm+'</div></div>'+
       '<div class="team"><div class="team__logo" style="background:'+c.a.bg+'">'+c.a.ab+'</div><div class="team__name">'+c.a.nm+'</div></div>'+
     '</div>'+
-    oddsbarHTML(c.od,c.mv)+'</div>'+
+    oddsbarHTML(c.od,c.mv,c.way3)+'</div>'+
     '<div class="tips"><span class="tips__tag">BET TIPS</span><span class="tips__txt">'+c.tip+'</span></div>'+
   '</article>';
+}
+/* 额外推荐联赛(仅在「无收藏赛事」时于 TOP MATCHES 追加多个联赛) */
+var TOPEXTRA=['epl3'];
+function renderTopExtra(hasColl){
+  var extra=document.getElementById('topExtra'); if(!extra)return;
+  if(hasColl){ extra.innerHTML=''; return; }
+  extra.innerHTML=TOPEXTRA.map(function(k){
+    var c=CARDS[k]; if(!c)return '';
+    var on=isFav(k);
+    return '<div class="leaguehead"><div class="leaguehead__logo">'+c.flag+'</div><div class="leaguehead__name">'+c.league+'</div>'+
+      '<span class="star'+(on?' is-fav':'')+'" data-fav="'+k+'" data-favtype="league">'+(on?'★':'☆')+'</span>'+
+      '<button class="leaguehead__more" data-goto="listInplay">MORE ›</button></div>'+
+      '<div class="cardrow">'+mcardHTML(c)+'</div>';
+  }).join('');
 }
 function renderCollection(){
   var box=document.getElementById('myCollection'); if(!box)return;
   var items=FAV.filter(function(k){return !TOPKEYS[k];});
-  if(!items.length){ box.innerHTML='<div class="coll-empty">尚无收藏。点击联赛或赛事旁的 ☆ 加入收藏，收藏的联赛 / 赛事会以与 TOP MATCHES 相同的样式显示在这里。<br>(已在 TOP MATCHES 出现的赛事不会重复显示)</div>'; return; }
+  var hasColl=items.length>0;
+  /* 无收藏赛事:隐藏 MY COLLECTION,TOP MATCHES 追加多个联赛;有收藏:恢复单一推荐联赛 */
+  var banner=document.getElementById('collBanner');
+  if(banner)banner.hidden=!hasColl;
+  box.hidden=!hasColl;
+  renderTopExtra(hasColl);
+  if(!hasColl){ box.innerHTML=''; return; }
   box.innerHTML=items.map(function(k){
     var d=FAVDATA[k]||{}; var badge=(d.type==='match')?'赛事':'联赛';
     var cid=CARDOF[k];
@@ -1986,17 +2083,46 @@ renderSwitch(); applyScoreboard();
 /* ===== Ending Card score grid + Ending Game chips ===== */
 function fillEcGrid(id){var g=document.getElementById(id);if(!g)return;var h='';for(var a=0;a<=9;a++){for(var b=0;b<=9;b++){h+='<div class="eccell"><div class="eccell__s">'+a+'-'+b+'</div><div class="eccell__o">85.00</div></div>';}}g.innerHTML=h;}
 fillEcGrid('ecGrid1'); fillEcGrid('ecGrid2');
-(function(){var EGL=[['🏀','All'],['🇺🇸','WNBA'],['🏀','NBL'],['✨','FBC'],['🏀','BCL'],['🏀','C LNB'],['🏀','LNBP'],['🏀','TDM'],['🏀','ISR C']];
-  var egc=document.getElementById('egChips'); if(egc){ egc.innerHTML=EGL.map(function(x,i){return '<div class="egchip'+(i===0?' is-on':'')+'"><span class="egchip__ic">'+x[0]+'</span><span class="lb">'+x[1]+'</span></div>';}).join(''); }
-  /* Ending Game 日期卡:Today + 之后星期缩写 + MM/DD,依今日推算 */
-  var egd=document.getElementById('egDates');
-  if(egd){ var wd=['Sun','Mon','Tue','Wed','Thu','Fri','Sat']; var now=new Date(); var h='';
+/* ===== Ending Game 联赛(pill 样式,与其他页同款)+ 日期列(底线样式) ===== */
+(function(){
+  var w=document.querySelector('.eglgsel'); if(!w)return;
+  /* 联赛清单取自 Ending Game 实际分组(移除 All),确保点击可定锚 */
+  function egName(head){ var c=head.cloneNode(true); c.querySelectorAll('.ecgrp__cnt,.chev').forEach(function(x){x.remove();}); var s=c.querySelector('span'); if(s)s.remove(); return c.textContent.replace(/\s+/g,' ').trim(); }
+  var EGL=[].slice.call(document.querySelectorAll('#screen-endgame .ecgrp__head')).map(egName);
+  if(!EGL.length)EGL=['Asian Games'];
+  var cur=EGL[0];
+  function render(){
+    w.querySelector('.lgsel__tabs').innerHTML=EGL.map(function(n){return '<button class="lgtab'+(n===cur?' is-on':'')+'" data-eglg="'+n+'">'+n+'</button>';}).join('');
+    w.querySelector('.lgsel__list').innerHTML=EGL.map(function(n){return '<button class="lglist__i'+(n===cur?' is-on':'')+'" data-eglg="'+n+'">'+n+'<span class="c">›</span></button>';}).join('');
+  }
+  render();
+  function egAnchor(name){
+    var head=[].slice.call(document.querySelectorAll('#screen-endgame .ecgrp__head')).filter(function(h){return egName(h)===name;})[0];
+    if(!head)return; var g=head.closest('.ecgrp'); if(!g)return;
+    g.classList.remove('ecgrp--collapsed');
+    var scEl=document.querySelector('#screen-endgame .scroll');
+    if(scEl){ var top=scEl.scrollTop+g.getBoundingClientRect().top-scEl.getBoundingClientRect().top-8; scEl.scrollTo({top:Math.max(0,top),behavior:'smooth'}); }
+    else g.scrollIntoView({block:'start',behavior:'smooth'});
+  }
+  document.body.addEventListener('click',function(e){
+    var ex=e.target.closest('[data-eglgexpand]');
+    if(ex){ var open=!w.classList.contains('is-open'); w.classList.toggle('is-open',open); w.querySelector('.lgsel__list').hidden=!open; return; }
+    var t=e.target.closest('.eglgsel .lgtab, .eglgsel .lglist__i');
+    if(t){ var n=t.getAttribute('data-eglg'); cur=(cur===n)?null:n; render();
+      w.classList.remove('is-open'); w.querySelector('.lgsel__list').hidden=true;
+      if(cur){ var on=w.querySelector('.lgtab.is-on'); if(on)on.scrollIntoView({inline:'center',block:'nearest'}); egAnchor(cur); }
+      return; }
+    if(!e.target.closest('.eglgsel')){ w.classList.remove('is-open'); var l=w.querySelector('.lgsel__list'); if(l)l.hidden=true; }
+  });
+  /* 日期列:TODAY / TOMORROW / 之后大写月份缩写+日 */
+  var row=document.getElementById('egDateRow');
+  if(row){ var mo=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC']; var now=new Date(); var h='';
     for(var i=0;i<7;i++){ var d=new Date(now.getTime()+i*86400000);
-      var top=i===0?'Today':wd[d.getDay()];
-      var md=('0'+(d.getMonth()+1)).slice(-2)+'/'+('0'+d.getDate()).slice(-2);
-      h+='<div class="egdate'+(i===0?' is-on':'')+'">'+top+'<small>'+md+'</small></div>';
+      var lab=i===0?'TODAY':(mo[d.getMonth()]+'-'+d.getDate());
+      h+='<button class="dateopt'+(i===0?' is-on':'')+'" data-egwhen="'+(i===0?'today':'d'+i)+'">'+lab+'</button>';
     }
-    egd.innerHTML=h;
+    row.innerHTML=h;
+    document.body.addEventListener('click',function(e){ var o=e.target.closest('#egDateRow .dateopt'); if(o){ row.querySelectorAll('.dateopt').forEach(function(x){x.classList.remove('is-on');}); o.classList.add('is-on'); } });
   }
 })();
 
@@ -2026,8 +2152,11 @@ function renderFbmkt(el){
   var tv=el.getAttribute('data-time')||'', mv=el.getAttribute('data-more')||'';
   var tcls='lmatch__time'+(el.getAttribute('data-live')?' lmatch__time--live':'');
   var hh=(tv?'<span class="'+tcls+'">'+tv+'</span>':'')+(mv?'<span class="lmatch__more" data-goto="detail">'+mv+'</span>':'');
-  var teams='<div class="fbmkt__teams"><div class="fbhh">'+hh+'</div>'+d.teams.map(function(t){
-    return '<div class="fbteam"><span class="lteam__logo" style="background:'+t.bg+'">'+t.ab+'</span><span class="fbteam__nm">'+t.nm+'</span>'+(t.sc?'<b>'+t.sc+'</b>':'')+'</div>';
+  /* 让球盘较强队(负分)标红 */
+  var favIdx=-1; var hcol=d.cols.filter(function(c){return /Handicap/i.test((c.h||'').replace(/<[^>]+>/g,''));})[0];
+  if(hcol){ hcol.cells.forEach(function(cell,i){ if(/^-/.test((cell[0]||'').trim()))favIdx=i; }); }
+  var teams='<div class="fbmkt__teams"><div class="fbhh">'+hh+'</div>'+d.teams.map(function(t,ti){
+    return '<div class="fbteam'+(ti===favIdx?' is-fav':'')+'"><span class="lteam__logo" style="background:'+t.bg+'">'+t.ab+'</span><span class="fbteam__nm">'+t.nm+'</span>'+(t.sc?'<b>'+t.sc+'</b>':'')+'</div>';
   }).join('')+'</div>';
   var scroll='<div class="fbmkt__scroll">'+d.cols.map(function(c){
     return '<div class="fbcol"><div class="fbcol__h">'+c.h+'</div>'+c.cells.map(function(cell){
@@ -2097,11 +2226,11 @@ function openRule(k){var r=RULES[k];if(!r)return;
 /* 二级星期列:保留 TODAY,其余为大写星期缩写(可左右滑动),预设 Today */
 (function(){
   var row=document.getElementById('dateRow'); if(!row)return;
-  var wd=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  var mo=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
   var now=new Date(); var h='';
-  for(var i=0;i<8;i++){
+  for(var i=0;i<7;i++){
     var d=new Date(now.getTime()+i*86400000);
-    var lab = i===0?'TODAY' : wd[d.getDay()];
+    var lab = i===0?'TODAY' : (mo[d.getMonth()]+'-'+d.getDate());
     var when = i===0?'today':'d'+i;
     h+='<button class="dateopt'+(i===0?' is-on':'')+'" data-when="'+when+'">'+lab+'</button>';
   }
@@ -2165,8 +2294,8 @@ var LIVEIC='<span class="liveic" title="滚球直播"><svg viewBox="0 0 24 24">'
     w.querySelector('.lgsel__tabs').innerHTML=LGS.map(function(n){return '<button class="lgtab'+(n===cur?' is-on':'')+'" data-lg="'+n+'">'+n+'</button>';}).join('');
     w.querySelector('.lgsel__list').innerHTML=LGS.map(function(n){return '<button class="lglist__i'+(n===cur?' is-on':'')+'" data-lg="'+n+'">'+n+'<span class="c">›</span></button>';}).join('');
   }
-  function renderAll(){ document.querySelectorAll('.lgsel').forEach(renderOne); }
-  function closeAll(){ document.querySelectorAll('.lgsel').forEach(function(w){ var l=w.querySelector('.lgsel__list'); if(l)l.hidden=true; w.classList.remove('is-open'); }); }
+  function renderAll(){ document.querySelectorAll('#screen-list .lgsel').forEach(renderOne); }
+  function closeAll(){ document.querySelectorAll('#screen-list .lgsel').forEach(function(w){ var l=w.querySelector('.lgsel__list'); if(l)l.hidden=true; w.classList.remove('is-open'); }); }
   function anchorTo(name){
     var g=[].slice.call(document.querySelectorAll('#screen-list .lrow')).filter(function(r){var n=r.querySelector('.lrow__name');return n&&n.textContent.trim()===name;})[0];
     if(!g)return;
@@ -2178,16 +2307,16 @@ var LIVEIC='<span class="liveic" title="滚球直播"><svg viewBox="0 0 24 24">'
   }
   renderAll();
   document.body.addEventListener('click',function(e){
-    var ex=e.target.closest('[data-lgexpand]');
+    var ex=e.target.closest('#screen-list [data-lgexpand]');
     if(ex){ var w=ex.closest('.lgsel'); var open=!w.classList.contains('is-open'); closeAll(); if(open){ w.classList.add('is-open'); w.querySelector('.lgsel__list').hidden=false; } return; }
-    var t=e.target.closest('.lgtab, .lglist__i');
+    var t=e.target.closest('#screen-list .lgtab, #screen-list .lglist__i');
     if(t){ var n=t.getAttribute('data-lg');
       cur=(cur===n)?null:n; /* 再点一次已选联赛即取消选中 */
       renderAll(); closeAll();
-      if(cur){ document.querySelectorAll('.lgsel').forEach(function(w){ var on=w.querySelector('.lgtab.is-on'); if(on)on.scrollIntoView({inline:'center',block:'nearest'}); });
+      if(cur){ document.querySelectorAll('#screen-list .lgsel').forEach(function(w){ var on=w.querySelector('.lgtab.is-on'); if(on)on.scrollIntoView({inline:'center',block:'nearest'}); });
         anchorTo(cur); }
       return; }
-    if(!e.target.closest('.lgsel')){ closeAll(); }
+    if(!e.target.closest('#screen-list .lgsel')){ closeAll(); }
   });
 })();
 
@@ -2227,6 +2356,35 @@ var LIVEIC='<span class="liveic" title="滚球直播"><svg viewBox="0 0 24 24">'
   function endDrag(e){ if(!dragging)return; dragging=false; btn.classList.remove('is-drag'); try{btn.releasePointerCapture(e.pointerId);}catch(_){}}
   btn.addEventListener('pointerup', endDrag);
   btn.addEventListener('pointercancel', endDrag);
+})();
+
+/* ===== 队名包成可省略元件:一行显示、过长以…省略,比分不被裁 ===== */
+(function(){
+  document.querySelectorAll('#screen-list .lteam').forEach(function(t){
+    if(t.querySelector('.lteam__nm'))return;
+    var nodes=[].slice.call(t.childNodes).filter(function(n){return n.nodeType===3 && n.nodeValue.trim();});
+    if(!nodes.length)return;
+    var span=document.createElement('span'); span.className='lteam__nm';
+    span.textContent=nodes.map(function(n){return n.nodeValue;}).join(' ').replace(/\s+/g,' ').trim();
+    t.insertBefore(span, nodes[0]);
+    nodes.forEach(function(n){ n.parentNode.removeChild(n); });
+  });
+})();
+
+/* ===== 让分/让球盘较强队(负分)名称标红:lgrid 各运动 ===== */
+(function(){
+  document.querySelectorAll('#screen-list .lgrid').forEach(function(grid){
+    var heads=[].slice.call(grid.querySelectorAll('.lgrid__h:not(.tm)'));
+    var hIdx=-1; heads.forEach(function(h,i){ if(/Handicap/i.test(h.textContent))hIdx=i; });
+    if(hIdx<0)return;
+    grid.querySelectorAll('.lteam').forEach(function(tm){
+      var cells=[]; var p=tm.nextElementSibling;
+      while(p&&p.classList&&p.classList.contains('ocell')){ cells.push(p); p=p.nextElementSibling; }
+      var c=cells[hIdx]; if(!c)return;
+      var labEl=c.querySelector('.ocell__lab'); var lab=labEl?labEl.textContent.trim():'';
+      if(/^-/.test(lab)) tm.classList.add('is-fav');
+    });
+  });
 })();
 
 </script>
