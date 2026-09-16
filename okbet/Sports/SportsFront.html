@@ -1802,6 +1802,8 @@ function applyFilters(){
     total+=shown;
   });
   var em=document.getElementById('listEmpty'); if(em)em.hidden=(total>0);
+  /* 没有赛事时,联赛筛选栏也一并隐藏 */
+  document.querySelectorAll('#screen-list .lgsel').forEach(function(w){ w.style.display=(total>0)?'':'none'; });
 }
 
 /* SINGLE / PARLAY toggle */
