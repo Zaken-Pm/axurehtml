@@ -156,14 +156,27 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .tabbar__item .dotred{position:absolute;top:-2px;right:26px;width:7px;height:7px;background:#e11338;border-radius:50%}
 
 /* ===== list page: odds tabbar ===== */
-.oddstabs{display:flex;align-items:center;gap:2px;margin:8px var(--s3) 6px;background:linear-gradient(180deg,#12347f,#0a2158);
+.oddstabs{position:relative;display:flex;align-items:center;gap:2px;margin:8px var(--s3) 6px;background:linear-gradient(180deg,#12347f,#0a2158);
   border-radius:10px;padding:6px;box-shadow:var(--shadow)}
-.oddstab{flex:0 0 auto;padding:7px 10px;color:#9fb4e6;font-weight:800;font-size:13px;white-space:nowrap;position:relative}
+.oddstab{flex:0 0 auto;padding:7px 6px;color:#9fb4e6;font-weight:800;font-size:12.5px;white-space:nowrap;position:relative;background:none;border:none;cursor:pointer}
 .oddstab.is-on{color:#ffd24d}
 .oddstab.is-on::after{content:"";position:absolute;left:10px;right:10px;bottom:-1px;height:3px;background:#ffd24d;border-radius:2px}
 .oddstabs__scroll{display:flex;align-items:center;gap:2px;overflow-x:auto;flex:1;scrollbar-width:none}
 .oddstabs__scroll::-webkit-scrollbar{display:none}
+#dateTabs{display:contents}
 .oddstab--today .dcaret{font-size:9px;margin-left:3px}
+/* 日期图标(展开更多日期) */
+.oddstab--cal{display:inline-flex;align-items:center;gap:2px;padding:6px 6px}
+.oddstab--cal svg{display:block}
+.oddstab--cal .dcaret{font-size:9px;transition:transform .2s}
+.oddstab--cal.is-open .dcaret{transform:rotate(180deg)}
+.oddstab--cal.is-on::after{display:none}
+/* 更多日期下拉面板 */
+.calpanel{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:40;background:linear-gradient(180deg,#12347f,#0a2158);
+  border-radius:10px;padding:12px;box-shadow:0 12px 30px rgba(6,12,22,.35);display:flex;flex-wrap:wrap;gap:10px}
+.caldate{flex:0 0 calc(33.333% - 7px);box-sizing:border-box;padding:10px 6px;border:none;border-radius:16px;
+  background:#0e295e;color:#cdd9f2;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap}
+.caldate.is-on{background:#ffd24d;color:#0a2158}
 /* FEATURE 联赛选择列 */
 .lgsel{position:relative;display:flex;align-items:center;gap:8px;margin:2px var(--s3) 6px}
 .listpad{height:0}
@@ -262,7 +275,8 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .cbrd{position:relative;min-height:150px;padding:10px 12px 12px;color:#fff;display:flex;flex-direction:column}
 .cbrd__top{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#d7e2f5}
 .cbrd__refresh{position:absolute;top:10px;right:12px;color:#d7e2f5;font-size:15px;cursor:pointer;z-index:3}
-.cbrd__lg{font-weight:700;font-size:13px}
+.cbrd__lg{font-weight:700;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;transition:background .15s}
+.cbrd__lg:active{background:rgba(255,255,255,.14)}
 .cbrd__mid{flex:1;display:flex;align-items:center;justify-content:space-around;gap:8px;padding:14px 0 10px}
 .cbrd__team{display:flex;flex-direction:column;align-items:center;gap:6px;width:92px;text-align:center;font-size:12px}
 .cbrd__team .sb-logo{width:42px;height:42px;font-size:12px;border:2px solid rgba(255,255,255,.5)}
@@ -535,11 +549,10 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 @keyframes chgDn{0%,80%{color:var(--down)}100%{color:#15264a}}
 
 /* ===== detail more-events sticky bar + sheet ===== */
-.morebar{position:absolute;left:0;right:0;top:0;z-index:9;display:flex;align-items:center;justify-content:space-between;
-  background:#123c95;color:#fff;padding:9px 14px;font-size:13px;font-weight:700;
-  transform:translateY(-110%);transition:transform .24s ease;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.morebar{position:absolute;left:0;right:0;top:0;z-index:9;background:#0b0f14;color:#fff;
+  transform:translateY(-110%);transition:transform .24s ease;box-shadow:0 4px 12px rgba(0,0,0,.35)}
 .morebar.is-show{transform:translateY(0)}
-.morebar__r{display:flex;align-items:center;gap:6px;color:#ffd24d;font-weight:800}
+.morebar .scorebar{padding:8px 12px}
 .sheet{position:absolute;inset:0;z-index:60;display:none}
 .sheet.is-open{display:block}
 .sheet__mask{position:absolute;inset:0;background:rgba(6,12,22,.5)}
@@ -672,16 +685,17 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
   <!-- ============ ODDS/DATE TABS (shared: list + outright/ending pages) ============ -->
   <div class="oddstabs" id="oddstabsBar">
     <div class="oddstabs__scroll" id="oddsTabs">
-      <button class="oddstab is-on" data-when="inplay">IN-PLAY</button>
-      <button class="oddstab oddstab--today" data-todaytab>TODAY</button>
-      <button class="oddstab" data-when="featured">FEATURE</button>
+      <!-- 日期tab(TODAY + 3天日期 + 日期icon) 由 JS 生成 -->
+      <span id="dateTabs"></span>
       <button class="oddstab oddstab--page" data-page="champions">OUTRIGHT</button>
       <button class="oddstab oddstab--page" data-page="endcard">ENDING CARD</button>
       <button class="oddstab oddstab--page" data-page="endgame">ENDING GAME</button>
     </div>
     <div class="single" id="modeToggle" title="切换 单式 / 串关"><span class="is-act" id="modeL">SINGLE</span><span class="is-dim" id="modeR">P</span></div>
+    <!-- 点日期icon展开:后5日日期 -->
+    <div class="calpanel" id="calPanel" hidden></div>
   </div>
-  <!-- 二级星期列(点 TODAY 显示,可左右滑动) -->
+  <!-- (旧的二级星期列已并入上方日期tab) -->
   <div class="daterow" id="dateRow" hidden></div>
 
   <!-- ============ HOME (Featured) ============ -->
@@ -1053,8 +1067,18 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
       </div>
     </div>
 
-    <!-- more events entry (slides in when scrolling up the page) -->
-    <div class="morebar" id="detailMoreBar" data-sheet="open"><span>NBA Playoffs · Denver Nuggets vs Minnesota</span><span class="morebar__r">更多赛事 ›</span></div>
+    <!-- 滑动后置顶的精简计分板(仅显示,不可点击) -->
+    <div class="morebar" id="detailMoreBar">
+      <div class="scorebar">
+        <div class="scorebar__ctrl"><span>⏸</span><span class="live"><span class="d"></span>LIVE</span></div>
+        <div class="scorebar__mid">
+          <div class="sb-team"><span class="sb-logo" style="background:#1d428a">DEN</span><span class="sb-score">93</span></div>
+          <div class="sb-period"><b>4Q</b>9:13<br>POSS</div>
+          <div class="sb-team"><span class="sb-score">115</span><span class="sb-logo" style="background:#236192">MIN</span></div>
+        </div>
+        <div class="scorebar__end"><span>⚙</span><span>⛶</span></div>
+      </div>
+    </div>
 
     <div class="scroll" id="detailScroll">
       <!-- scoreboard (swapped by sport) -->
@@ -1368,28 +1392,27 @@ function show(name){
   if(otb){
     var vis=(name==='list'||name==='champions'||name==='endcard'||name==='endgame');
     otb.style.display = vis?'flex':'none';
-    if(!vis){ var drH=document.getElementById('dateRow'); if(drH)drH.hidden=true; }
     if(vis){
-      var onDate=(name==='list' && currentWhen!=='inplay' && currentWhen!=='featured');
-      /* 主分页高亮:IN-PLAY / TODAY / FEATURE / OUTRIGHT / ENDING CARD / ENDING GAME */
+      /* 高亮:日期tab(TODAY/日期) / OUTRIGHT / ENDING CARD / ENDING GAME */
       document.querySelectorAll('#oddsTabs .oddstab').forEach(function(o){
         var on=false;
         if(o.hasAttribute('data-page')){ on = (o.getAttribute('data-page')===name); }
-        else if(o.hasAttribute('data-todaytab')){ on = onDate; }
         else if(o.hasAttribute('data-when')){ on = (name==='list' && o.getAttribute('data-when')===currentWhen); }
         o.classList.toggle('is-on', on);
       });
-      /* 二级星期列:仅在 TODAY(日期)时显示 */
-      var dr=document.getElementById('dateRow');
-      if(dr){ dr.hidden=!onDate;
-        dr.querySelectorAll('.dateopt').forEach(function(o){ o.classList.toggle('is-on', o.getAttribute('data-when')===currentWhen); });
-      }
+      /* 选到面板内的后5日:高亮日期icon,并同步面板内高亮 */
+      var farActive=(name==='list' && /^d[4-8]$/.test(currentWhen));
+      var calBtn=document.querySelector('#oddsTabs [data-calexpand]');
+      if(calBtn) calBtn.classList.toggle('is-on', farActive);
+      document.querySelectorAll('#calPanel .caldate').forEach(function(o){ o.classList.toggle('is-on', name==='list'&&o.getAttribute('data-when')===currentWhen); });
     }
   }
   document.querySelectorAll('.tabbar__item').forEach(function(t){t.classList.toggle('is-on',t.getAttribute('data-goto')==='home'&&name==='home');});
   var sc=screens[name]&&screens[name].querySelector('.scroll'); if(sc)sc.scrollTop=0;
   var ms=document.getElementById('moreSheet'); if(ms)ms.classList.remove('is-open');
   var mb=document.getElementById('detailMoreBar'); if(mb)mb.classList.remove('is-show');
+  var cpn=document.getElementById('calPanel'); if(cpn)cpn.hidden=true;
+  var cbn=document.querySelector('#oddsTabs [data-calexpand]'); if(cbn)cbn.classList.remove('is-open');
   window.scrollTo(0,0);
 }
 function goto(name){
@@ -1402,7 +1425,7 @@ function openInplayList(){
   curSport='basketball';
   renderBallTabs();
   if(typeof updateSpecialTabs==='function')updateSpecialTabs();
-  currentWhen='inplay'; applyFilters();
+  currentWhen='today'; applyFilters();
   show('list');
 }
 function currentScreen(){ for(var k in screens){ if(screens[k].classList.contains('is-active'))return k;} return 'home'; }
@@ -1512,10 +1535,16 @@ function betFromOline(ol){
 
 /* delegate clicks */
 document.body.addEventListener('click',function(e){
-  /* --- TODAY 分页:切到日期视图(带回上次选的日期,预设 today)并展开星期列 --- */
-  if(e.target.closest('[data-todaytab]')){ currentWhen=lastDate; applyFilters(); show('list'); return; }
-  var dopt=e.target.closest('#dateRow .dateopt');
-  if(dopt){ currentWhen=lastDate=dopt.getAttribute('data-when'); applyFilters(); show('list'); return; }
+  /* --- 日期icon:展开/收起后5日面板 --- */
+  var calx=e.target.closest('[data-calexpand]');
+  if(calx){ var pnl=document.getElementById('calPanel'); var open=pnl.hidden;
+    pnl.hidden=!open; calx.classList.toggle('is-open',open); return; }
+  /* --- 面板内后5日日期:筛选并收起面板 --- */
+  var cald=e.target.closest('.caldate');
+  if(cald){ currentWhen=lastDate=cald.getAttribute('data-when'); applyFilters();
+    var cp=document.getElementById('calPanel'); if(cp)cp.hidden=true;
+    var cb=document.querySelector('#oddsTabs [data-calexpand]'); if(cb)cb.classList.remove('is-open');
+    show('list'); return; }
   /* --- bet slip: close / numpad / place --- */
   if(e.target.closest('[data-betclose]')){ closeBetSheet(); return; }
   var bk=e.target.closest('[data-bk]');
@@ -1565,7 +1594,10 @@ document.body.addEventListener('click',function(e){
   var od=e.target.closest('.oddstab');
   if(od){ var pg=od.getAttribute('data-page');
     if(pg){ show(pg); }
-    else { currentWhen=od.getAttribute('data-when')||'inplay'; applyFilters(); show('list'); }
+    else if(od.hasAttribute('data-when')){ currentWhen=lastDate=od.getAttribute('data-when'); applyFilters();
+      var cp3=document.getElementById('calPanel'); if(cp3)cp3.hidden=true;
+      var cb3=document.querySelector('#oddsTabs [data-calexpand]'); if(cb3)cb3.classList.remove('is-open');
+      show('list'); }
     return; }
   var mt=e.target.closest('.mtab');
   if(mt){ mt.parentElement.querySelectorAll('.mtab').forEach(function(o){o.classList.remove('is-on');}); mt.classList.add('is-on'); if(mt.getAttribute('data-mpaneltab'))switchMPanel(mt.getAttribute('data-mpaneltab')); return; }
@@ -1746,16 +1778,18 @@ function renderCollection(){
 }
 
 /* ===== list filter: date-tab (IN-PLAY 已开赛 / TODAY 未开赛 / 其他日期) + SINGLE/PARLAY ===== */
-var currentWhen='inplay';
-var lastDate='today'; /* TODAY 分页记住上次选的日期 */
+var currentWhen='today';
+var lastDate='today'; /* 记住上次选的日期 */
 function applyFilters(){
   var total=0;
   document.querySelectorAll('#screen-list .lmatches').forEach(function(body){
     var shown=0;
     body.querySelectorAll('.lmatch').forEach(function(m){
       var w=m.getAttribute('data-when')||'today';
-      /* FEATURE:精选,显示全部赛事(inplay + 未开赛),呈现方式与 IN-PLAY/TODAY 相同 */
-      var okWhen=(currentWhen==='featured') ? true : (w===currentWhen);
+      /* TODAY:含滚球(已开赛)+今日未开赛;其他日期:各自比对 */
+      var okWhen=(currentWhen==='featured') ? true
+        : (currentWhen==='today') ? (w==='today'||w==='inplay')
+        : (w===currentWhen);
       var okParlay=!(mode==='parlay' && m.getAttribute('data-parlay')!=='yes');
       var vis=okWhen&&okParlay;
       m.style.display=vis?'':'none';
@@ -1932,7 +1966,7 @@ function renderMedia(){
 /* ===== no-video in-play (滚球·已开赛) themed calc-board per sport ===== */
 function calcBoard(bg,lg,hbg,ht,hn,abg,at,an,score,prog,bottom){
   return '<div class="cbrd" style="background:'+bg+'">'+
-    '<div class="cbrd__top"><span>‹</span><span class="cbrd__lg">'+lg+' ▾</span><span>↻</span></div>'+
+    '<div class="cbrd__top"><span>‹</span><span class="cbrd__lg" data-sheet="open">'+lg+' ▾</span><span>↻</span></div>'+
     '<div class="cbrd__mid">'+
       '<div class="cbrd__team">'+card(hbg,ht)+'<span>'+hn+'</span></div>'+
       '<div class="cbrd__sc"><div class="cbrd__nums">'+score+'</div><div class="cbrd__prog">'+prog+'</div></div>'+
@@ -1941,12 +1975,13 @@ function calcBoard(bg,lg,hbg,ht,hn,abg,at,an,score,prog,bottom){
 }
 var nbadge='<span class="neutral">N</span>';
 /* table-style calc-board (篮球小节 / 网球盘局) */
-function tblBoard(bg,prog,hbg,ht,hn,abg,at,an,score,headers,rmain,raway,serve){
+function tblBoard(bg,lg,prog,hbg,ht,hn,abg,at,an,score,headers,rmain,raway,serve){
   var dot='<span class="mkdot" title="球权"></span>';
   var head='<tr><th></th>'+headers.map(function(h){return '<th>'+h+'</th>';}).join('')+'</tr>';
   var r1='<tr><td>'+(serve==='main'?dot:'')+'主</td>'+rmain.map(function(v){return '<td>'+v+'</td>';}).join('')+'</tr>';
   var r2='<tr><td>'+(serve==='away'?dot:'')+'客</td>'+raway.map(function(v){return '<td>'+v+'</td>';}).join('')+'</tr>';
-  return '<div class="cbrd" style="background:'+bg+'"><span class="cbrd__refresh">↻</span>'+
+  return '<div class="cbrd" style="background:'+bg+'">'+
+    '<div class="cbrd__top"><span>‹</span><span class="cbrd__lg" data-sheet="open">'+lg+' ▾</span><span>↻</span></div>'+
     '<div style="text-align:center;font-weight:800;font-size:13px;color:#fff;padding-top:2px">'+prog+'</div>'+
     '<div class="cbrd__mid" style="padding:8px 0 6px">'+
       '<div class="cbrd__team">'+card(hbg,ht)+'<span>'+hn+'</span></div>'+
@@ -1956,10 +1991,10 @@ function tblBoard(bg,prog,hbg,ht,hn,abg,at,an,score,headers,rmain,raway,serve){
     '<table class="tntbl">'+head+r1+r2+'</table></div>';
 }
 var INPLAY={
-  basketball:tblBoard('radial-gradient(circle at 50% 130%,#3a2530,#160d14)','第四节 03:23','#1b2b4a','🇰🇷','南韩','#165c33','🇸🇦','沙地阿拉伯','77 - 60',
+  basketball:tblBoard('radial-gradient(circle at 50% 130%,#3a2530,#160d14)','Asian Games','第四节 03:23','#1b2b4a','🇰🇷','南韩','#165c33','🇸🇦','沙地阿拉伯','77 - 60',
     ['1节','2节','半场','3节','4节','加时','全场'],['24','17','41','33','3','-','77'],['17','11','28','19','13','-','60']),
   football:calcBoard('radial-gradient(circle at 50% 130%,#2f7a35,#123012)','Premier League','#da291c','MUN','Man Utd','#034694','CHE','Chelsea','2 - 1','下半场 · 77:11', nbadge+' HT 1-0 · '+yc+' 2-1 · '+rc+' 0-1 · ⛳ 5-3'),
-  tennis:tblBoard('linear-gradient(160deg,#155a9c,#08203f)','滚球','#1b2b4a','🇦🇺','伯纳德-托米奇(澳洲)','#c0202e','🇺🇸','伊利亚-伊华舒卡','1 - 1',
+  tennis:tblBoard('linear-gradient(160deg,#155a9c,#08203f)','ATP Tour','滚球','#1b2b4a','🇦🇺','伯纳德-托米奇(澳洲)','#c0202e','🇺🇸','伊利亚-伊华舒卡','1 - 1',
     ['总盘数','1盘','2盘','3盘','得分','总局数'],['1','4','6','1','15','11'],['1','6','4','2','15','12'],'main'),
   cricket:'<div class="cbrd" style="background:radial-gradient(circle at 50% 130%,#2f7a55,#0e3626)"><span class="cbrd__refresh">↻</span>'+
     '<div class="cbrd__mid" style="padding:8px 0 4px;align-items:flex-start">'+
@@ -1986,17 +2021,17 @@ var INPLAY={
   billiards:calcBoard('radial-gradient(circle at 50% 130%,#0e5a3a,#052016)','World Snooker','#333','OSU',"O'Sullivan",'#c8102e','ROB','Robertson','10 - 6','滚球','n盘n胜 · 25盘13胜'),
   baseball:calcBoard('radial-gradient(circle at 50% 130%,#2f6a35,#123012)','World Baseball','#c8102e','USA','USA','#0a2560','JPN','Japan','7 - 4','滚球','<span style="font-weight:800">7th <span style="color:#ffd24d">▲</span></span> &nbsp;·&nbsp; <span class="diamond"><i class="b2 on"></i><i class="b3"></i><i class="b1 on"></i></span> &nbsp;·&nbsp; Outs: 1')
 };
-INPLAY.badminton=tblBoard('linear-gradient(160deg,#1d5aa0,#0a2a52)','滚球','#1b2b4a','🇻🇳','阮海当(越南)','#c0202e','🇮🇳','塔伦-曼内帕利(印度)','1 - 0',
+INPLAY.badminton=tblBoard('linear-gradient(160deg,#1d5aa0,#0a2a52)','BWF World Tour','滚球','#1b2b4a','🇻🇳','阮海当(越南)','#c0202e','🇮🇳','塔伦-曼内帕利(印度)','1 - 0',
   ['总局数','1局','2局','3局','总得分'],['1','21','14','-','35'],['0','14','9','-','23'],'away');
-INPLAY.tabletennis=tblBoard('linear-gradient(160deg,#1d5aa0,#0a2a52)','滚球','#1b2b4a','🇨🇿','卢博米尔-扬卡里克(捷克)','#c0202e','🇫🇷','朱尔-罗兰(法国)','2 - 2',
+INPLAY.tabletennis=tblBoard('linear-gradient(160deg,#1d5aa0,#0a2a52)','WTT Champions','滚球','#1b2b4a','🇨🇿','卢博米尔-扬卡里克(捷克)','#c0202e','🇫🇷','朱尔-罗兰(法国)','2 - 2',
   ['总局数','1局','2局','3局','4局','5局','总得分'],['2','11','7','11','6','0','35'],['2','7','11','7','11','2','38'],'main');
-INPLAY.volleyball=tblBoard('linear-gradient(160deg,#1d5aa0,#0a2a52)','滚球','#1b2b4a','🏐','维迪亚兹职业','#c0202e','🏐','普拉米亚职业','0 - 2',
+INPLAY.volleyball=tblBoard('linear-gradient(160deg,#1d5aa0,#0a2a52)','Volleyball League','滚球','#1b2b4a','🏐','维迪亚兹职业','#c0202e','🏐','普拉米亚职业','0 - 2',
   ['总局数','1局','2局','3局','4局','5局','总得分'],['0','24','18','11','-','-','53'],['2','26','25','7','-','-','58']);
 INPLAY.rugby=INPLAY.football; INPLAY.amfootball=INPLAY.football; INPLAY.icehockey=INPLAY.football; INPLAY.boxing=INPLAY.billiards;
 
 /* ===== no-video pre-match (未开赛) per sport ===== */
 function preBoard(lg,hbg,ht,hn,abg,at,an){
-  return '<div class="pbrd"><div class="cbrd__top"><span>‹</span><span class="cbrd__lg">'+lg+' ▾</span><span>↻</span></div>'+
+  return '<div class="pbrd"><div class="cbrd__top"><span>‹</span><span class="cbrd__lg" data-sheet="open">'+lg+' ▾</span><span>↻</span></div>'+
     '<div class="pbrd__mid"><div class="cbrd__team">'+card(hbg,ht)+'<span>'+hn+'</span></div>'+
     '<div class="pbrd__time"><div class="pbrd__t">22:30</div><div class="pbrd__state">即将 · 倒数 11 分钟</div></div>'+
     '<div class="cbrd__team">'+card(abg,at)+'<span>'+an+'</span></div></div>'+
@@ -2040,7 +2075,7 @@ renderSwitch(); applyScoreboard();
 /* detail: 更多赛事 bar slides in only after scrolling the page up */
 (function(){
   var sc=document.getElementById('detailScroll'), bar=document.getElementById('detailMoreBar');
-  if(sc&&bar){ sc.addEventListener('scroll',function(){ bar.classList.toggle('is-show', sc.scrollTop>90); }); }
+  if(sc&&bar){ sc.addEventListener('scroll',function(){ bar.classList.toggle('is-show', sc.scrollTop>40); }); }
 })();
 
 /* ===== Ending Card score grid + Ending Game chips ===== */
@@ -2186,19 +2221,34 @@ function openRule(k){var r=RULES[k];if(!r)return;
   document.getElementById('ruleSheet').classList.add('is-open');
 }
 
-/* 二级星期列:保留 TODAY,其余为大写星期缩写(可左右滑动),预设 Today */
+/* 赛事筛选栏日期tab:TODAY + 3天日期 + 日期icon;icon展开后5日 */
+var DMO=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+var CAL_ICON='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/></svg>';
+function dLabel(i){ if(i===0)return 'TODAY'; var d=new Date(Date.now()+i*86400000); return DMO[d.getMonth()]+'-'+d.getDate(); }
 (function(){
-  var row=document.getElementById('dateRow'); if(!row)return;
-  var mo=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-  var now=new Date(); var h='';
-  for(var i=0;i<7;i++){
-    var d=new Date(now.getTime()+i*86400000);
-    var lab = i===0?'TODAY' : (mo[d.getMonth()]+'-'+d.getDate());
-    var when = i===0?'today':'d'+i;
-    h+='<button class="dateopt'+(i===0?' is-on':'')+'" data-when="'+when+'">'+lab+'</button>';
+  var box=document.getElementById('dateTabs');
+  if(box){ var h='';
+    for(var i=0;i<4;i++){ /* TODAY + 之后3天 */
+      h+='<button class="oddstab" data-when="'+(i===0?'today':'d'+i)+'">'+dLabel(i)+'</button>';
+    }
+    h+='<button class="oddstab oddstab--cal" data-calexpand title="更多日期">'+CAL_ICON+'<span class="dcaret">▾</span></button>';
+    box.innerHTML=h;
   }
-  row.innerHTML=h;
+  var panel=document.getElementById('calPanel');
+  if(panel){ var ph='';
+    for(var j=4;j<9;j++){ /* 后5日 */
+      ph+='<button class="caldate" data-when="d'+j+'">'+dLabel(j)+'</button>';
+    }
+    panel.innerHTML=ph;
+  }
 })();
+/* 点面板以外区域收起后5日面板 */
+document.addEventListener('click',function(e){
+  var pnl=document.getElementById('calPanel');
+  if(pnl&&!pnl.hidden&&!e.target.closest('#oddstabsBar')){
+    pnl.hidden=true; var cb=document.querySelector('#oddsTabs [data-calexpand]'); if(cb)cb.classList.remove('is-open');
+  }
+});
 
 /* init */
 syncFavStars();
