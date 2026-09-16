@@ -179,6 +179,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .lgtab{flex:0 0 auto;background:#eef2f9;border:1px solid #e3e9f3;border-radius:8px;padding:8px 13px;font-size:13px;font-weight:800;color:#5c6885;white-space:nowrap;cursor:pointer}
 .lgtab.is-on{background:#e7efff;border-color:#bcd2ff;color:var(--blue)}
 .lgsel__more{flex:0 0 auto;width:30px;height:30px;border-radius:50%;border:1px solid #d7deea;background:#fff;color:#8a97b3;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .2s}
+.lgsel__more svg{display:block}
 .lgsel.is-open .lgsel__more{transform:rotate(180deg);color:var(--blue);border-color:var(--blue)}
 .lgsel__list{position:absolute;left:0;right:0;top:calc(100% + 6px);background:#fff;border-radius:10px;box-shadow:0 12px 30px rgba(6,12,22,.2);overflow:hidden;z-index:40}
 .lglist__i{display:flex;align-items:center;justify-content:space-between;width:100%;padding:14px 16px;font-size:15px;font-weight:800;color:#3a4767;background:#fff;border:none;border-bottom:1px solid #eef1f6;cursor:pointer}
@@ -689,52 +690,8 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 
       <div class="banner">TOP MATCHES</div>
 
-      <!-- League: NBA -->
-      <div class="leaguehead">
-        <div class="leaguehead__logo">🇺🇸</div>
-        <div class="leaguehead__name">NBAPLAYOFFS-Semifinal</div>
-        <span class="star" data-fav="nba" data-favtype="league">☆</span>
-        <button class="leaguehead__more" data-goto="listInplay">MORE ›</button>
-      </div>
-      <div class="cardrow">
-        <!-- card 1 -->
-        <article class="mcard" data-goto="detail">
-          <div class="mcard__head"><span class="lg"></span> NBAPLAYOFFS-Semifinal <span class="voucher">Free Voucher</span></div>
-          <div class="mcard__body">
-            <div class="teams">
-              <div class="team"><div class="team__logo" style="background:#1d428a">DEN</div><div class="team__name">Denver<br>Nuggets</div></div>
-              <div class="score">
-                <div class="score__nums">83<span class="dash">-</span>126</div>
-                <div class="score__period">3rd</div>
-                <div class="score__time">11:14</div>
-              </div>
-              <div class="team"><div class="team__logo" style="background:#236192">MIN</div><div class="team__name">Minnesota<br>Timberwolves</div></div>
-            </div>
-            <div class="oddsbar">
-              <div class="opill"><span class="opill__lb">Home</span><span class="opill__val"><span class="up">7.40</span><span class="oarr up"><svg viewBox="0 0 12 14"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg></span></span></div>
-              <div class="opill opill--mid">Winner</div>
-              <div class="opill"><span class="opill__lb">Away</span><span class="opill__val">1.07</span></div>
-            </div>
-          </div>
-          <div class="tips"><span class="tips__tag">BET TIPS</span><span class="tips__txt">Clipper has won 9 matches in last 10 matches with lakers.</span></div>
-        </article>
-        <!-- card 2 (peek) -->
-        <article class="mcard" data-goto="detail">
-          <div class="mcard__head"><span class="lg"></span> NBAPLAYOFFS-Semifinal</div>
-          <div class="mcard__body">
-            <div class="teams">
-              <div class="team"><div class="team__logo" style="background:#1d428a">DEN</div><div class="team__name">Denver<br>Nuggets</div></div>
-              <div class="score"><div class="score__nums">83<span class="dash">-</span>126</div><div class="score__period">3rd</div><div class="score__time">11:14</div></div>
-              <div class="team"><div class="team__logo" style="background:#236192">MIN</div><div class="team__name">Minnesota</div></div>
-            </div>
-            <div class="oddsbar"><div class="opill"><span class="opill__lb">Home</span>7.40</div><div class="opill opill--mid">Winner</div><div class="opill"><span class="opill__lb">Away</span>1.07</div></div>
-          </div>
-          <div class="tips"><span class="tips__tag">BET TIPS</span><span class="tips__txt">Clipper has won 9 matches…</span></div>
-        </article>
-      </div>
-
-      <!-- 额外推荐联赛(仅在无收藏赛事时显示) -->
-      <div id="topExtra"></div>
+      <!-- 推荐联赛(由 JS 渲染,两个联赛收藏功能一致) -->
+      <div id="topMatches"></div>
 
       <!-- promo -->
       <div class="promo">
@@ -757,7 +714,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
       <!-- 联赛选择列(所有赛事列表页) -->
       <div class="lgsel">
         <div class="lgsel__tabs"></div>
-        <button class="lgsel__more" data-lgexpand title="展开联赛">▾</button>
+        <button class="lgsel__more" data-lgexpand title="展开联赛"><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <div class="lgsel__list" hidden></div>
       </div>
 
@@ -1019,7 +976,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
       <!-- 联赛选择列(与其他页面同款 pill + 展开箭头) -->
       <div class="lgsel eglgsel">
         <div class="lgsel__tabs"></div>
-        <button class="lgsel__more" data-eglgexpand title="展开联赛">▾</button>
+        <button class="lgsel__more" data-eglgexpand title="展开联赛"><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <div class="lgsel__list" hidden></div>
       </div>
       <!-- 日期列(与其他页面同款底线样式) -->
@@ -1698,19 +1655,20 @@ function syncFavStars(){
   });
   renderCollection();
 }
-/* keys already shown in TOP MATCHES — excluded from MY COLLECTION */
-var TOPKEYS={nba:1};
 /* full match-card data, shared by a league fav and its match fav */
 var CARDS={
+  nba:{league:'NBAPLAYOFFS-Semifinal',flag:'🇺🇸',voucher:true,mv:['up',''],h:{ab:'DEN',bg:'#1d428a',nm:'Denver<br>Nuggets'},a:{ab:'MIN',bg:'#236192',nm:'Minnesota<br>Timberwolves'},sc:'83 - 126',pd:'3rd',tm:'11:14',od:['7.40','1.07'],tip:'Clipper has won 9 matches in last 10 matches with lakers.',
+    more:[{league:'NBAPLAYOFFS-Semifinal',flag:'🇺🇸',mv:['','dn'],h:{ab:'GSW',bg:'#1d428a',nm:'Golden State<br>Warriors'},a:{ab:'LAL',bg:'#552583',nm:'LA<br>Lakers'},sc:'102 - 98',pd:'4th',tm:'02:30',od:['1.55','2.45'],tip:'Warriors lead the series 3-2.'}]},
   wnba:{league:'WNBA',flag:'🇺🇸',mv:['up',''],h:{ab:'CS',bg:'#e0208a',nm:'Connecticut<br>Sun(W)'},a:{ab:'GV',bg:'#333',nm:'Golden State<br>Valkyries(W)'},sc:'76 - 66',pd:'Q3',tm:'09:06',od:['6.26','1.12'],tip:'Connecticut leads the series 2-1 this season.'},
   epl:{league:'Premier League',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',mv:['up',''],h:{ab:'MUN',bg:'#da291c',nm:'Manchester<br>Utd'},a:{ab:'CHE',bg:'#034694',nm:'Chelsea'},sc:'2 - 1',pd:'2nd Half',tm:'77:11',od:['1.80','4.20'],tip:'Man Utd unbeaten in their last 5 home games.'},
-  epl3:{league:'Premier League',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',way3:true,mv:['up','',''],h:{ab:'MUN',bg:'#da291c',nm:'Manchester<br>Utd'},a:{ab:'CHE',bg:'#034694',nm:'Chelsea'},sc:'2 - 1',pd:'2nd Half',tm:'77:11',od:['1.80','3.40','4.20'],tip:'Man Utd unbeaten in their last 5 home games.'},
+  epl3:{league:'Premier League',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',way3:true,mv:['up','',''],h:{ab:'MUN',bg:'#da291c',nm:'Manchester<br>Utd'},a:{ab:'CHE',bg:'#034694',nm:'Chelsea'},sc:'2 - 1',pd:'2nd Half',tm:'77:11',od:['1.80','3.40','4.20'],tip:'Man Utd unbeaten in their last 5 home games.',
+    more:[{league:'Premier League',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',way3:true,mv:['','','up'],h:{ab:'ARS',bg:'#ef0107',nm:'Arsenal'},a:{ab:'LIV',bg:'#c8102e',nm:'Liverpool'},sc:'1 - 1',pd:'2nd Half',tm:'63:20',od:['2.40','3.30','2.80'],tip:'Liverpool unbeaten in their last 6 away games.'}]},
   ao:{league:'Australian Open',flag:'🇦🇺',ns:true,mv:['','dn'],h:{ab:'JS',bg:'#111',nm:'Jannik<br>Sinner'},a:{ab:'CA',bg:'#e11338',nm:'Carlos<br>Alcaraz'},sc:'1 - 1',pd:'Set 3',tm:'40-30',od:['1.55','2.45'],tip:'Sinner has won the last 3 meetings.'},
   mlb:{league:'MLB',flag:'🇺🇸',mv:['up',''],h:{ab:'USA',bg:'#c8102e',nm:'USA<br>Baseball'},a:{ab:'JPN',bg:'#bc002d',nm:'Japan<br>Baseball'},sc:'7 - 4',pd:'Top 7th',tm:'Out 1',od:['1.42','2.90'],tip:'USA leading going into the 7th inning.'},
   korsau:{league:'Asian Games',flag:'🌏',h:{ab:'KOR',bg:'#0a3161',nm:'Korea<br>Republic'},a:{ab:'KSA',bg:'#165c33',nm:'Saudi<br>Arabia'},sc:'—',pd:'29 Min',tm:'LIVE',od:['1.65','2.20'],tip:'Ending Card market · 29 Minute.'},
   belger:{league:'Asian Games',flag:'🌏',h:{ab:'BEL',bg:'#111',nm:'Belgium<br>(W)'},a:{ab:'GER',bg:'#c8102e',nm:'Germany<br>(W)'},sc:'VS',pd:'Today',tm:'23:45',od:['1.90','1.90'],tip:'Ending Card market · Today 23:45.'}
 };
-var CARDOF={wnba:'wnba',epl:'epl',epl3:'epl3',ao:'ao',mlb:'mlb',m_wnba:'wnba',m_epl:'epl',m_ao:'ao',m_mlb:'mlb',ec_kor_sau:'korsau',ec_bel_ger:'belger'};
+var CARDOF={nba:'nba',wnba:'wnba',epl:'epl',epl3:'epl3',ao:'ao',mlb:'mlb',m_wnba:'wnba',m_epl:'epl',m_ao:'ao',m_mlb:'mlb',ec_kor_sau:'korsau',ec_bel_ger:'belger'};
 var CHEV_UP='<svg viewBox="0 0 12 14"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg>';
 var CHEV_DN='<svg viewBox="0 0 12 14"><path d="M6 13L11 8H1Z M6 7L11 2H1Z" fill="currentColor"/></svg>';
 function oArrow(m){ return m==='up'?'<span class="oarr up">'+CHEV_UP+'</span>':m==='dn'?'<span class="oarr dn">'+CHEV_DN+'</span>':'<span class="oarr"></span>'; }
@@ -1731,7 +1689,7 @@ function mcardHTML(c){
   var sc=c.sc.split(' - '); var left=sc[0], right=sc.length>1?sc[1]:'';
   return '<article class="mcard" data-goto="detail">'+
     (c.ns?'<span class="ribbon">New Season</span>':'')+
-    '<div class="mcard__head"><span class="lg"></span> '+c.league+'</div>'+
+    '<div class="mcard__head"><span class="lg"></span> '+c.league+(c.voucher?' <span class="voucher">Free Voucher</span>':'')+'</div>'+
     '<div class="mcard__body"><div class="teams">'+
       '<div class="team"><div class="team__logo" style="background:'+c.h.bg+'">'+c.h.ab+'</div><div class="team__name">'+c.h.nm+'</div></div>'+
       '<div class="score"><div class="score__nums">'+left+(right?'<span class="dash">-</span>'+right:'')+'</div><div class="score__period">'+c.pd+'</div><div class="score__time">'+c.tm+'</div></div>'+
@@ -1741,29 +1699,34 @@ function mcardHTML(c){
     '<div class="tips"><span class="tips__tag">BET TIPS</span><span class="tips__txt">'+c.tip+'</span></div>'+
   '</article>';
 }
-/* 额外推荐联赛(仅在「无收藏赛事」时于 TOP MATCHES 追加多个联赛) */
-var TOPEXTRA=['epl3'];
-function renderTopExtra(hasColl){
-  var extra=document.getElementById('topExtra'); if(!extra)return;
-  if(hasColl){ extra.innerHTML=''; return; }
-  extra.innerHTML=TOPEXTRA.map(function(k){
-    var c=CARDS[k]; if(!c)return '';
-    var on=isFav(k);
-    return '<div class="leaguehead"><div class="leaguehead__logo">'+c.flag+'</div><div class="leaguehead__name">'+c.league+'</div>'+
-      '<span class="star'+(on?' is-fav':'')+'" data-fav="'+k+'" data-favtype="league">'+(on?'★':'☆')+'</span>'+
-      '<button class="leaguehead__more" data-goto="listInplay">MORE ›</button></div>'+
-      '<div class="cardrow">'+mcardHTML(c)+'</div>';
-  }).join('');
+/* 联赛区块(TOP MATCHES 与 MY COLLECTION 共用,收藏功能一致) */
+function leagueBlockHTML(k,c){
+  var on=isFav(k);
+  var cards=[c].concat(c.more||[]); /* 每个联赛的赛事补到 ≥2 张 */
+  return '<div class="leaguehead"><div class="leaguehead__logo">'+c.flag+'</div><div class="leaguehead__name">'+c.league+'</div>'+
+    '<span class="star'+(on?' is-fav':'')+'" data-fav="'+k+'" data-favtype="league">'+(on?'★':'☆')+'</span>'+
+    '<button class="leaguehead__more" data-goto="listInplay">MORE ›</button></div>'+
+    '<div class="cardrow">'+cards.map(mcardHTML).join('')+'</div>';
+}
+/* 推荐联赛(依序);其收藏星只切换状态,始终留在 TOP MATCHES,不进入 MY COLLECTION */
+var RECS=['nba','epl3'];
+/* MY COLLECTION 内容 = 收藏中「非推荐联赛」的项目(来自赛事列表等) */
+function collItems(){ return FAV.filter(function(k){return RECS.indexOf(k)<0;}); }
+function renderTopMatches(){
+  var box=document.getElementById('topMatches'); if(!box)return;
+  /* 有收藏赛事时收敛为单一推荐,无收藏时显示全部推荐(2个) */
+  var show=(collItems().length===0)?RECS:RECS.slice(0,1);
+  box.innerHTML=show.map(function(k){ var c=CARDS[k]; return c?leagueBlockHTML(k,c):''; }).join('');
 }
 function renderCollection(){
   var box=document.getElementById('myCollection'); if(!box)return;
-  var items=FAV.filter(function(k){return !TOPKEYS[k];});
+  var items=collItems();
   var hasColl=items.length>0;
-  /* 无收藏赛事:隐藏 MY COLLECTION,TOP MATCHES 追加多个联赛;有收藏:恢复单一推荐联赛 */
+  /* 无收藏赛事:隐藏 MY COLLECTION;有收藏:显示收藏,并让 TOP MATCHES 收敛为单一推荐 */
   var banner=document.getElementById('collBanner');
   if(banner)banner.hidden=!hasColl;
   box.hidden=!hasColl;
-  renderTopExtra(hasColl);
+  renderTopMatches();
   if(!hasColl){ box.innerHTML=''; return; }
   box.innerHTML=items.map(function(k){
     var d=FAVDATA[k]||{}; var badge=(d.type==='match')?'赛事':'联赛';
