@@ -477,7 +477,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .ecgrp__head .chev{margin-left:auto;color:#9aa6bf;transition:transform .2s}
 /* 赛事数量徽章:与滚球(列表)页同款样式 */
 .ecgrp__cnt{margin-left:auto;min-width:20px;height:20px;padding:0 5px;border-radius:6px;background:#7ea6ec;color:#fff;font-weight:800;font-size:12px;display:none;align-items:center;justify-content:center}
-.ecgrp--collapsed .ecgrp__cnt,.ecgrp.eccollapsed .ecgrp__cnt{display:inline-flex}
+.ecgrp--collapsed .ecgrp__cnt{display:inline-flex}
 .ecgrp--collapsed .ecgrp__head .chev{margin-left:8px;transform:rotate(180deg)}
 .ecgrp--collapsed > *:not(.ecgrp__head){display:none!important}
 .ecmatch__time{display:flex;align-items:center;gap:8px;color:#8a97b3;font-size:12px;font-weight:700;padding:12px 14px 6px}
@@ -1060,7 +1060,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 
       <!-- match 2 (collapsed) -->
       <div class="ecgrp eccollapsed" data-ecgrp>
-        <div class="ecgrp__head"><span>🌍</span>FIBA World Cup Women<span class="ecgrp__cnt">1</span></div>
+        <div class="ecgrp__head" data-ecgrpcollapse><span>🌍</span>FIBA World Cup Women<span class="ecgrp__cnt">1</span><span class="chev">▲</span></div>
         <div class="ecmatch__time"><span class="star" data-fav="ec_bel_ger" data-favtype="match">☆</span>Today 23:45</div>
         <div class="ecvs">
           <div class="ecvs__team"><span class="ecvs__logo">🇧🇪</span><span class="ecvs__nm">Belgium (W)</span></div>
