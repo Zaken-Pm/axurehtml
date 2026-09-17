@@ -341,14 +341,19 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 
 .ha{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:4px 0}
 .ha--3{grid-template-columns:1fr 1fr 1fr;gap:8px}
-.ha--3 .hacard__team{flex-direction:column;gap:4px;text-align:center;min-height:0;margin:0 0 8px}
-.ha--3 .hacard__team .nm{font-size:11.5px;line-height:1.2}
-.ha--3 .hacard__team .lg{width:30px;height:30px;font-size:9px}
+.ha--3 .hacard{padding:10px 8px;display:flex;flex-direction:column}
+.ha--3 .hacard__team .nm{font-size:11.5px}
+.ha--3 .oline-row{margin-top:auto}
+.ha--3 .oline{justify-content:center}
+.oline.oline--c{justify-content:center}
 .hacard{background:linear-gradient(180deg,#eef3fb,#e4ecf8);border-radius:12px;padding:10px;position:relative}
-.hacard__lab{font-size:11px;font-weight:800;color:#8b97b3;text-align:right;letter-spacing:1px}
+.hacard__lab{font-size:11px;font-weight:800;color:#8b97b3;text-align:right;letter-spacing:1px;margin-bottom:2px}
 .hacard__team{display:flex;align-items:center;gap:8px;margin:0 0 8px;min-height:44px}
-.hacard__team .lg{width:40px;height:40px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:11px;border:2px solid #e7c96b}
-.hacard__team .nm{font-size:13px;font-weight:800;color:#22304f;line-height:1.2}
+/* 客队镜像:队徽靠外侧(右),队名在内侧,AWAY 标签靠左 */
+.hacard--away .hacard__team{flex-direction:row-reverse}
+.hacard--away .hacard__lab{text-align:left}
+.hacard__team .lg{width:52px;height:52px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px;border:2px solid #e7c96b}
+.hacard__team .nm{flex:1 1 auto;text-align:center;font-size:13px;font-weight:800;color:#22304f;line-height:1.2}
 .oline{display:flex;align-items:center;justify-content:space-between;gap:6px;background:#fff;border:1px solid #dbe4f2;
   border-radius:8px;padding:8px 10px;margin-top:6px;box-shadow:inset 0 -2px 0 #eef2f8}
 .oline__hcp{font-size:13px;font-weight:800;color:#4a5675}
@@ -1155,36 +1160,17 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
         <div class="mgroup__body">
           <div class="ha">
             <div class="hacard">
+              <div class="hacard__lab">HOME</div>
               <div class="hacard__team"><span class="lg" style="background:#1d428a">DEN</span><span class="nm">Denver Nuggets</span></div>
-              <div class="oline-row"><div class="oline is-selx"><span class="oline__hcp"></span><span class="oline__odd up">7.40</span></div><span class="oarr up"><svg viewBox="0 0 12 14"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg></span></div>
+              <div class="oline-row"><div class="oline oline--c is-selx"><span class="oline__odd up">7.40</span></div><span class="oarr up"><svg viewBox="0 0 12 14"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg></span></div>
             </div>
-            <div class="hacard">
+            <div class="hacard hacard--away">
+              <div class="hacard__lab">AWAY</div>
               <div class="hacard__team"><span class="lg" style="background:#236192">MIN</span><span class="nm">Minnesota Timberwolves</span></div>
-              <div class="oline-row"><span class="oarr"></span><div class="oline"><span class="oline__hcp"></span><span class="oline__odd">1.07</span></div></div>
+              <div class="oline-row"><span class="oarr"></span><div class="oline oline--c"><span class="oline__odd">1.07</span></div></div>
             </div>
           </div>
           <div class="dtips"><span class="dtips__tag">BET TIPS</span><span class="dtips__txt">The Denver Nuggets have led by more than 10 points and have not been overturned in their last 10 games.</span><span class="dtips__more">More Tips ›</span></div>
-        </div>
-      </div>
-
-      <!-- 1X2 (足球示意,参照 Winner,三个结果:主胜/和局/客胜) -->
-      <div class="mgroup" data-ord="1">
-        <div class="mgroup__head" data-mcollapse><span class="star" data-mpin>☆</span> 1X2 <span class="chev" style="margin-left:auto">▲</span></div>
-        <div class="mgroup__body">
-          <div class="ha ha--3">
-            <div class="hacard">
-              <div class="hacard__team"><span class="lg" style="background:#0aa1a1">UZB</span><span class="nm">Uzbekistan (W)</span></div>
-              <div class="oline-row"><div class="oline" data-sel><span class="oline__odd">3.50</span></div></div>
-            </div>
-            <div class="hacard">
-              <div class="hacard__team"><span class="lg" style="background:#8a97b3">X</span><span class="nm">Draw</span></div>
-              <div class="oline-row"><div class="oline" data-sel><span class="oline__odd">4.20</span></div></div>
-            </div>
-            <div class="hacard">
-              <div class="hacard__team"><span class="lg" style="background:#c8102e">CHN</span><span class="nm">China (W)</span></div>
-              <div class="oline-row"><div class="oline" data-sel><span class="oline__odd">1.68</span></div></div>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -1194,12 +1180,14 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
         <div class="mgroup__body">
           <div class="ha">
             <div class="hacard">
+              <div class="hacard__lab">HOME</div>
               <div class="hacard__team"><span class="lg" style="background:#1d428a">DEN</span><span class="nm">Denver Nuggets</span></div>
               <div class="oline-row"><div class="oline" data-sel><span class="oline__hcp">-14.5</span><span class="oline__odd up">1.86</span></div><span class="oarr up"><svg viewBox="0 0 12 14"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg></span></div>
               <div class="oline-row"><div class="oline is-sel" data-sel><span class="oline__hcp">-15.5</span><span class="oline__odd">1.97</span></div><span class="oarr"></span></div>
               <div class="oline-row"><div class="oline" data-sel><span class="oline__hcp">-13.5</span><span class="oline__odd dn">1.75</span></div><span class="oarr dn"><svg viewBox="0 0 12 14"><path d="M6 13L11 8H1Z M6 7L11 2H1Z" fill="currentColor"/></svg></span></div>
             </div>
-            <div class="hacard">
+            <div class="hacard hacard--away">
+              <div class="hacard__lab">AWAY</div>
               <div class="hacard__team"><span class="lg" style="background:#236192">MIN</span><span class="nm">Minnesota Timberwolves</span></div>
               <div class="oline-row"><span class="oarr"></span><div class="oline" data-sel><span class="oline__hcp">+14.5</span><span class="oline__odd">1.90</span></div></div>
               <div class="oline-row"><span class="oarr up"><svg viewBox="0 0 12 14"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg></span><div class="oline" data-sel><span class="oline__hcp">+15.5</span><span class="oline__odd up">1.79</span></div></div>
