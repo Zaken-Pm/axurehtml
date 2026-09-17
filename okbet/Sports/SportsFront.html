@@ -216,6 +216,9 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .lrow__flag{width:24px;height:24px;border-radius:5px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1;background:#eef2f9;border:1px solid #d8e0f0;overflow:hidden}
 .lrow__name{flex:1;font-weight:800;color:var(--blue);font-size:15px}
 .lrow__star{color:#9aa6bf;font-size:16px}
+/* 联赛收合时显示赛事数量,位于收藏星形左侧 */
+.lrow__cnt{display:none;min-width:20px;height:20px;padding:0 5px;border-radius:6px;background:#7ea6ec;color:#fff;font-size:12px;font-weight:800;align-items:center;justify-content:center}
+.lrow.collapsed .lrow__cnt{display:inline-flex}
 .lrow__chev{color:#9aa6bf;font-size:14px;transition:transform .2s}
 .lrow.collapsed .lrow__chev{transform:rotate(180deg)}
 
@@ -472,8 +475,9 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .ecgrp{background:#fff;margin:0 var(--s3) 10px;border-radius:12px;border:1px solid #eef1f6;overflow:hidden}
 .ecgrp__head{display:flex;align-items:center;gap:8px;padding:11px 14px;background:#f7f9fd;font-weight:800;color:#15264a;font-size:14px;cursor:pointer}
 .ecgrp__head .chev{margin-left:auto;color:#9aa6bf;transition:transform .2s}
-.ecgrp__cnt{margin-left:auto;color:#8a97b3;font-weight:800;font-size:13px;display:none}
-.ecgrp--collapsed .ecgrp__cnt{display:inline}
+/* 赛事数量徽章:与滚球(列表)页同款样式 */
+.ecgrp__cnt{margin-left:auto;min-width:20px;height:20px;padding:0 5px;border-radius:6px;background:#7ea6ec;color:#fff;font-weight:800;font-size:12px;display:none;align-items:center;justify-content:center}
+.ecgrp--collapsed .ecgrp__cnt,.ecgrp.eccollapsed .ecgrp__cnt{display:inline-flex}
 .ecgrp--collapsed .ecgrp__head .chev{margin-left:8px;transform:rotate(180deg)}
 .ecgrp--collapsed > *:not(.ecgrp__head){display:none!important}
 .ecmatch__time{display:flex;align-items:center;gap:8px;color:#8a97b3;font-size:12px;font-weight:700;padding:12px 14px 6px}
@@ -773,7 +777,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
           <div class="smallscore"><span class="ss">Q1 <b>22</b></span><span class="ss">Q2 <b>19</b></span><span class="ss">Q3 <b>28</b></span><span class="ss">Q4 <b>-</b></span></div>
           <div class="micons" data-icons></div>
         </div>
-        <div class="lmatch" data-when="today" style="border-radius:0 0 10px 10px">
+        <div class="lmatch" data-when="today">
           <div class="lgrid">
             <div class="lgrid__h tm"><span class="lmatch__time">TODAY 10:40</span><span class="lmatch__more" data-goto="detail">21+ ›</span></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap</div><div class="lgrid__h">Total Points</div>
             <div class="lteam"><span class="lteam__logo" style="background:#0a5">SS</span>Seattle Storm(W)</div>
@@ -784,6 +788,33 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
             <div class="ocell"><div class="ocell__lab">Away</div><div class="ocell__val">2.85</div></div>
             <div class="ocell"><div class="ocell__lab">6</div><div class="ocell__val">1.97</div></div>
             <div class="ocell"><div class="ocell__lab">Under 176.5</div><div class="ocell__val">1.84</div></div>
+          </div>
+        </div>
+        <!-- SEP-18 (d1) 未开赛示意 -->
+        <div class="lmatch" data-when="d1">
+          <div class="lgrid">
+            <div class="lgrid__h tm"><span class="lmatch__time">SEP-18 09:00</span><span class="lmatch__more" data-goto="detail">20+ ›</span></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap</div><div class="lgrid__h">Total Points</div>
+            <div class="lteam"><span class="lteam__logo" style="background:#b22">LV</span>Las Vegas Aces(W)</div>
+            <div class="ocell"><div class="ocell__lab">Home</div><div class="ocell__val">1.30</div></div>
+            <div class="ocell"><div class="ocell__lab">-8.5</div><div class="ocell__val">1.90</div></div>
+            <div class="ocell"><div class="ocell__lab">Over 168.5</div><div class="ocell__val">1.95</div></div>
+            <div class="lteam"><span class="lteam__logo" style="background:#0a4">NY</span>New York Liberty(W)</div>
+            <div class="ocell"><div class="ocell__lab">Away</div><div class="ocell__val">3.40</div></div>
+            <div class="ocell"><div class="ocell__lab">8.5</div><div class="ocell__val">1.92</div></div>
+            <div class="ocell"><div class="ocell__lab">Under 168.5</div><div class="ocell__val">1.88</div></div>
+          </div>
+        </div>
+        <div class="lmatch" data-when="d1" style="border-radius:0 0 10px 10px">
+          <div class="lgrid">
+            <div class="lgrid__h tm"><span class="lmatch__time">SEP-18 11:30</span><span class="lmatch__more" data-goto="detail">18+ ›</span></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap</div><div class="lgrid__h">Total Points</div>
+            <div class="lteam"><span class="lteam__logo" style="background:#611">PX</span>Phoenix Mercury(W)</div>
+            <div class="ocell"><div class="ocell__lab">Home</div><div class="ocell__val">2.10</div></div>
+            <div class="ocell"><div class="ocell__lab">+2.5</div><div class="ocell__val">1.90</div></div>
+            <div class="ocell"><div class="ocell__lab">Over 159.5</div><div class="ocell__val">1.90</div></div>
+            <div class="lteam"><span class="lteam__logo" style="background:#08c">CH</span>Chicago Sky(W)</div>
+            <div class="ocell"><div class="ocell__lab">Away</div><div class="ocell__val">1.75</div></div>
+            <div class="ocell"><div class="ocell__lab">-2.5</div><div class="ocell__val">1.92</div></div>
+            <div class="ocell"><div class="ocell__lab">Under 159.5</div><div class="ocell__val">1.92</div></div>
           </div>
         </div>
       </div>
@@ -1006,6 +1037,12 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
   <!-- ============ ENDING CARD ============ -->
   <section class="screen" id="screen-endcard">
     <div class="scroll">
+      <!-- 联赛选择列(与其他页面同款 pill + 展开箭头) -->
+      <div class="lgsel eclgsel">
+        <div class="lgsel__tabs"></div>
+        <button class="lgsel__more" data-eclgexpand title="展开联赛"><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="lgsel__list" hidden></div>
+      </div>
       <!-- match 1 (expanded) -->
       <div class="ecgrp" data-ecgrp>
         <div class="ecgrp__head" data-ecgrpcollapse><span>🌏</span>Asian Games<span class="ecgrp__cnt">1</span><span class="chev">▲</span></div>
@@ -1023,6 +1060,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 
       <!-- match 2 (collapsed) -->
       <div class="ecgrp eccollapsed" data-ecgrp>
+        <div class="ecgrp__head"><span>🌍</span>FIBA World Cup Women<span class="ecgrp__cnt">1</span></div>
         <div class="ecmatch__time"><span class="star" data-fav="ec_bel_ger" data-favtype="match">☆</span>Today 23:45</div>
         <div class="ecvs">
           <div class="ecvs__team"><span class="ecvs__logo">🇧🇪</span><span class="ecvs__nm">Belgium (W)</span></div>
@@ -1866,7 +1904,12 @@ function applyFilters(){
       if(vis)shown++;
     });
     var head=body.previousElementSibling;
-    if(head&&head.classList.contains('lrow')) head.style.display=shown?'':'none';
+    if(head&&head.classList.contains('lrow')){ head.style.display=shown?'':'none';
+      /* 赛事数量徽章(收合时显示,位于收藏星形左侧) */
+      var cnt=head.querySelector('.lrow__cnt');
+      if(!cnt){ cnt=document.createElement('span'); cnt.className='lrow__cnt'; var star=head.querySelector('.lrow__star'); if(star)head.insertBefore(cnt,star); else head.appendChild(cnt); }
+      cnt.textContent=shown;
+    }
     body.style.display=shown?'':'none';
     total+=shown;
   });
@@ -2194,6 +2237,37 @@ fillEcGrid('ecGrid1'); fillEcGrid('ecGrid2');
     row.innerHTML=h;
     document.body.addEventListener('click',function(e){ var o=e.target.closest('#egDateRow .dateopt'); if(o){ row.querySelectorAll('.dateopt').forEach(function(x){x.classList.remove('is-on');}); o.classList.add('is-on'); } });
   }
+})();
+
+/* ===== Ending Card 联赛(pill 样式,与其他页同款) ===== */
+(function(){
+  var w=document.querySelector('.eclgsel'); if(!w)return;
+  function ecName(head){ var c=head.cloneNode(true); c.querySelectorAll('.ecgrp__cnt,.chev').forEach(function(x){x.remove();}); var s=c.querySelector('span'); if(s)s.remove(); return c.textContent.replace(/\s+/g,' ').trim(); }
+  var ECL=[].slice.call(document.querySelectorAll('#screen-endcard .ecgrp__head')).map(ecName);
+  if(!ECL.length)ECL=['Asian Games'];
+  var cur=ECL[0];
+  function render(){
+    w.querySelector('.lgsel__tabs').innerHTML=ECL.map(function(n){return '<button class="lgtab'+(n===cur?' is-on':'')+'" data-eclg="'+n+'">'+n+'</button>';}).join('');
+    w.querySelector('.lgsel__list').innerHTML=ECL.map(function(n){return '<button class="lglist__i'+(n===cur?' is-on':'')+'" data-eclg="'+n+'">'+n+'<span class="c">›</span></button>';}).join('');
+  }
+  render();
+  function ecAnchor(name){
+    var head=[].slice.call(document.querySelectorAll('#screen-endcard .ecgrp__head')).filter(function(h){return ecName(h)===name;})[0];
+    if(!head)return; var g=head.closest('.ecgrp'); if(!g)return;
+    var scEl=document.querySelector('#screen-endcard .scroll');
+    if(scEl){ var top=scEl.scrollTop+g.getBoundingClientRect().top-scEl.getBoundingClientRect().top-8; scEl.scrollTo({top:Math.max(0,top),behavior:'smooth'}); }
+    else g.scrollIntoView({block:'start',behavior:'smooth'});
+  }
+  document.body.addEventListener('click',function(e){
+    var ex=e.target.closest('[data-eclgexpand]');
+    if(ex){ var open=!w.classList.contains('is-open'); w.classList.toggle('is-open',open); w.querySelector('.lgsel__list').hidden=!open; return; }
+    var t=e.target.closest('.eclgsel .lgtab, .eclgsel .lglist__i');
+    if(t){ var n=t.getAttribute('data-eclg'); cur=(cur===n)?null:n; render();
+      w.classList.remove('is-open'); w.querySelector('.lgsel__list').hidden=true;
+      if(cur){ var on=w.querySelector('.lgtab.is-on'); if(on)on.scrollIntoView({inline:'center',block:'nearest'}); ecAnchor(cur); }
+      return; }
+    if(!e.target.closest('.eclgsel')){ w.classList.remove('is-open'); var l=w.querySelector('.lgsel__list'); if(l)l.hidden=true; }
+  });
 })();
 
 /* ===== football list markets (6 markets, horizontal scroll) ===== */
