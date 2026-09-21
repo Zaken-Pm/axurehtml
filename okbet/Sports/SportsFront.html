@@ -243,8 +243,16 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .lgrid__h.tm{text-align:left;display:flex;align-items:center;gap:4px;flex-wrap:nowrap;overflow:hidden}
 .fbhh{display:flex!important;flex-direction:row;align-items:center;gap:4px;flex-wrap:nowrap;overflow:hidden}
 .lteam{position:relative;display:flex;align-items:center;gap:5px;padding:6px 0 6px 6px;font-size:12.5px;font-weight:700;color:#22304f;min-width:0}
-.lteam__nm{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lteam__nm{flex:1 1 auto;min-width:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.2;word-break:break-word}
 .lteam b{margin-left:auto;padding-left:6px;flex:0 0 auto}
+/* 滚球即时比分栏(每队):篮球=当前得分;网球/羽球/桌球=盘/局/分 */
+.lsc{margin-left:auto;display:flex;gap:3px;flex:0 0 auto;padding-left:6px}
+.lsc i{min-width:16px;text-align:center;font-style:normal;font-weight:900;font-size:12.5px;color:#15264a}
+.lsc i.pt{color:#15264a}
+/* 双行赛事进程(网球:第X盘 + 盘制) */
+.ltime2{display:inline-flex;flex-direction:column;align-items:flex-start;line-height:1.15;padding:0}
+.ltime2 b{font-size:11px;font-weight:800;color:#12b866}
+.ltime2 i{font-style:normal;font-size:9px;font-weight:700;color:#8b97b3;letter-spacing:0}
 /* 发球权提示(网球/羽球/乒乓球):竖条 */
 .serve{position:absolute;left:-2px;top:50%;transform:translateY(-50%);width:3px;height:15px;border-radius:2px;background:#12b866}
 /* 让分/让球盘较强队伍:名称红字 */
@@ -765,17 +773,16 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
       <div class="lmatches" data-body>
         <div class="lmatch" data-parlay="yes" data-favmatch="m_wnba" data-when="inplay">
           <div class="lgrid">
-            <div class="lgrid__h tm"><span class="lmatch__time lmatch__time--live">3rd 9'</span><span class="lmatch__more" data-goto="detail">29+ ›</span></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap</div><div class="lgrid__h">Total Points</div>
-            <div class="lteam"><span class="lteam__logo" style="background:#e08">CS</span>Connecticut Sun(W)</div>
+            <div class="lgrid__h tm"><span class="lmatch__time lmatch__time--live">3rd 08:29</span><span class="lmatch__more" data-goto="detail">29+ ›</span></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap</div><div class="lgrid__h">Total Points</div>
+            <div class="lteam"><span class="lteam__logo" style="background:#e08">CS</span><span class="lteam__nm">Connecticut Sun(W)</span><span class="lsc"><i class="pt">58</i></span></div>
             <div class="ocell"><div class="ocell__lab">Home</div><div class="ocell__val up">6.26 <span class="a"><svg viewBox="0 0 12 14" width="10" height="12"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg></span></div></div>
             <div class="ocell"><div class="ocell__lab">13</div><div class="ocell__val">1.95</div></div>
             <div class="ocell"><div class="ocell__lab">Over 150.5</div><div class="ocell__val">1.72</div></div>
-            <div class="lteam"><span class="lteam__logo" style="background:#333">GV</span>Golden State Valkyries(W)</div>
+            <div class="lteam"><span class="lteam__logo" style="background:#333">GV</span><span class="lteam__nm">Golden State Valkyries(W)</span><span class="lsc"><i class="pt">71</i></span></div>
             <div class="ocell"><div class="ocell__lab">Away</div><div class="ocell__val dn">1.12 <span class="a"><svg viewBox="0 0 12 14" width="10" height="12"><path d="M6 13L11 8H1Z M6 7L11 2H1Z" fill="currentColor"/></svg></span></div></div>
             <div class="ocell"><div class="ocell__lab">-13</div><div class="ocell__val">1.93</div></div>
             <div class="ocell"><div class="ocell__lab">Under 150.5</div><div class="ocell__val">2.16</div></div>
           </div>
-          <div class="smallscore"><span class="ss">Q1 <b>22</b></span><span class="ss">Q2 <b>19</b></span><span class="ss">Q3 <b>28</b></span><span class="ss">Q4 <b>-</b></span></div>
           <div class="micons" data-icons></div>
         </div>
         <div class="lmatch" data-when="today">
@@ -846,20 +853,20 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
       <div class="lmatches" data-body>
         <div class="lmatch" data-parlay="yes" data-favmatch="m_ao" data-when="inplay">
           <div class="lgrid">
-            <div class="lgrid__h tm"><span class="lmatch__time">Best of 5</span><span class="lmatch__more" data-goto="detail">18+ ›</span></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap (Games)</div><div class="lgrid__h">Games O/U</div>
-            <div class="lteam"><span class="lteam__logo" style="background:#111">JS</span><span class="serve" title="发球权"></span>Jannik Sinner <b style="color:#e11338;font-weight:900">1</b></div>
+            <div class="lgrid__h tm"><span class="lmatch__time lmatch__time--live ltime2"><b>3rd Set</b><i>Best of 5</i></span><span class="lmatch__more" data-goto="detail">18+ ›</span></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap (Games)</div><div class="lgrid__h">Games O/U</div>
+            <div class="lteam"><span class="lteam__logo" style="background:#111">JS</span><span class="serve" title="发球权"></span><span class="lteam__nm">Jannik Sinner</span><span class="lsc"><i>1</i><i>3</i><i class="pt">40</i></span></div>
             <div class="ocell"><div class="ocell__lab">Home</div><div class="ocell__val up">1.55 <span class="a"><svg viewBox="0 0 12 14" width="10" height="12"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg></span></div></div>
             <div class="ocell"><div class="ocell__lab">-4.5</div><div class="ocell__val">1.90</div></div>
             <div class="ocell"><div class="ocell__lab">Over 22.5</div><div class="ocell__val">1.87</div></div>
-            <div class="lteam"><span class="lteam__logo" style="background:#e11338">CA</span>Carlos Alcaraz <b style="color:#e11338;font-weight:900">1</b></div>
+            <div class="lteam"><span class="lteam__logo" style="background:#e11338">CA</span><span class="lteam__nm">Carlos Alcaraz</span><span class="lsc"><i>1</i><i>2</i><i class="pt">30</i></span></div>
             <div class="ocell"><div class="ocell__lab">Away</div><div class="ocell__val dn">2.45 <span class="a"><svg viewBox="0 0 12 14" width="10" height="12"><path d="M6 13L11 8H1Z M6 7L11 2H1Z" fill="currentColor"/></svg></span></div></div>
             <div class="ocell"><div class="ocell__lab">+4.5</div><div class="ocell__val">1.90</div></div>
             <div class="ocell"><div class="ocell__lab">Under 22.5</div><div class="ocell__val">1.93</div></div>
           </div>
           <div class="smallscore">
-            <span class="ss">Set1 <b>6 - 3</b></span>
-            <span class="ss">Set2 <b>4 - 6</b></span>
-            <span class="ss">Set3 <b>40 - 30</b></span>
+            <span class="ss">6 - 3</span>
+            <span class="ss">4 - 6</span>
+            <span class="ss">3 - 2</span>
           </div>
           <div class="micons" data-icons></div>
         </div>
@@ -885,19 +892,15 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
       <div class="lmatches" data-body>
         <div class="lmatch" data-favmatch="m_mlb" data-when="inplay" style="border-radius:0 0 10px 10px">
           <div class="lgrid">
-            <div class="lgrid__h tm"><span class="lmatch__time">7 <span style="color:#e11338">▲</span></span><span class="lmatch__more" data-goto="detail">12+ ›</span></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap (Run)</div><div class="lgrid__h">Total Runs</div>
-            <div class="lteam"><span class="lteam__logo" style="background:#c8102e">USA</span>USA Baseball <b style="color:#e11338;font-weight:900">3</b></div>
+            <div class="lgrid__h tm"><span class="lmatch__time lmatch__time--live">7th <span style="color:#e11338">▲</span> · Out 1</span><span class="lmatch__more" data-goto="detail">12+ ›</span></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap (Run)</div><div class="lgrid__h">Total Runs</div>
+            <div class="lteam"><span class="lteam__logo" style="background:#c8102e">USA</span><span class="lteam__nm">USA Baseball</span><span class="lsc"><i class="pt">3</i></span></div>
             <div class="ocell"><div class="ocell__lab">Home</div><div class="ocell__val">1.42</div></div>
             <div class="ocell"><div class="ocell__lab">-1.5</div><div class="ocell__val">1.90</div></div>
             <div class="ocell"><div class="ocell__lab">Over 8.5</div><div class="ocell__val up">1.88 <span class="a"><svg viewBox="0 0 12 14" width="10" height="12"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg></span></div></div>
-            <div class="lteam"><span class="lteam__logo" style="background:#bc002d">JPN</span>Japan Baseball <b style="color:#e11338;font-weight:900">1</b></div>
+            <div class="lteam"><span class="lteam__logo" style="background:#bc002d">JPN</span><span class="lteam__nm">Japan Baseball</span><span class="lsc"><i class="pt">1</i></span></div>
             <div class="ocell"><div class="ocell__lab">Away</div><div class="ocell__val">2.90</div></div>
             <div class="ocell"><div class="ocell__lab">+1.5</div><div class="ocell__val">1.90</div></div>
             <div class="ocell"><div class="ocell__lab">Under 8.5</div><div class="ocell__val">1.92</div></div>
-          </div>
-          <div class="smallscore">
-            <span class="ss"><span class="diamond"><i class="b2 on"></i><i class="b3"></i><i class="b1 on"></i></span></span>
-            <span class="ss">Outs: <b>1</b></span>
           </div>
           <div class="micons" data-icons></div>
         </div>
@@ -909,19 +912,19 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
       <div class="lmatches" data-body>
         <div class="lmatch" data-parlay="yes" data-favmatch="m_bwf" data-when="inplay" style="border-radius:0 0 10px 10px">
           <div class="lgrid">
-            <div class="lgrid__h tm"><span class="lmatch__time lmatch__time--live">GAME 2</span><span class="lmatch__more" data-goto="detail">16+ ›</span></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap (Pts)</div><div class="lgrid__h">Points O/U</div>
-            <div class="lteam"><span class="lteam__logo" style="background:#c60c30">VA</span><span class="serve" title="发球权"></span>Viktor Axelsen <b style="color:#e11338;font-weight:900">1</b></div>
+            <div class="lgrid__h tm"><span class="lmatch__time lmatch__time--live ltime2"><b>Game 2</b><i>Best of 5</i></span><span class="lmatch__more" data-goto="detail">16+ ›</span></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap (Pts)</div><div class="lgrid__h">Points O/U</div>
+            <div class="lteam"><span class="lteam__logo" style="background:#c60c30">VA</span><span class="serve" title="发球权"></span><span class="lteam__nm">Viktor Axelsen</span><span class="lsc"><i class="pt">15</i></span></div>
             <div class="ocell"><div class="ocell__lab">Home</div><div class="ocell__val up">1.48 <span class="a"><svg viewBox="0 0 12 14" width="10" height="12"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg></span></div></div>
             <div class="ocell"><div class="ocell__lab">-3.5</div><div class="ocell__val">1.90</div></div>
             <div class="ocell"><div class="ocell__lab">Over 40.5</div><div class="ocell__val">1.85</div></div>
-            <div class="lteam"><span class="lteam__logo" style="background:#00247d">KV</span>Kunlavut Vitidsarn <b style="color:#e11338;font-weight:900">0</b></div>
+            <div class="lteam"><span class="lteam__logo" style="background:#00247d">KV</span><span class="lteam__nm">Kunlavut Vitidsarn</span><span class="lsc"><i class="pt">12</i></span></div>
             <div class="ocell"><div class="ocell__lab">Away</div><div class="ocell__val">2.60</div></div>
             <div class="ocell"><div class="ocell__lab">+3.5</div><div class="ocell__val">1.90</div></div>
             <div class="ocell"><div class="ocell__lab">Under 40.5</div><div class="ocell__val">1.95</div></div>
           </div>
           <div class="smallscore">
-            <span class="ss">Game1 <b>21 - 18</b></span>
-            <span class="ss">Game2 <b>15 - 12</b></span>
+            <span class="ss">21 - 18</span>
+            <span class="ss">15 - 12</span>
           </div>
           <div class="micons" data-icons></div>
         </div>
@@ -933,20 +936,20 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
       <div class="lmatches" data-body>
         <div class="lmatch" data-parlay="yes" data-favmatch="m_wtt" data-when="inplay" style="border-radius:0 0 10px 10px">
           <div class="lgrid">
-            <div class="lgrid__h tm"><span class="lmatch__time lmatch__time--live">GAME 3</span><span class="lmatch__more" data-goto="detail">14+ ›</span></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap (Pts)</div><div class="lgrid__h">Points O/U</div>
-            <div class="lteam"><span class="lteam__logo" style="background:#de2910">ML</span>Ma Long <b style="color:#e11338;font-weight:900">2</b></div>
+            <div class="lgrid__h tm"><span class="lmatch__time lmatch__time--live ltime2"><b>Game 3</b><i>Best of 5</i></span><span class="lmatch__more" data-goto="detail">14+ ›</span></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap (Pts)</div><div class="lgrid__h">Points O/U</div>
+            <div class="lteam"><span class="lteam__logo" style="background:#de2910">ML</span><span class="lteam__nm">Ma Long</span><span class="lsc"><i class="pt">7</i></span></div>
             <div class="ocell"><div class="ocell__lab">Home</div><div class="ocell__val">1.60</div></div>
             <div class="ocell"><div class="ocell__lab">-2.5</div><div class="ocell__val">1.90</div></div>
             <div class="ocell"><div class="ocell__lab">Over 18.5</div><div class="ocell__val">1.88</div></div>
-            <div class="lteam"><span class="lteam__logo" style="background:#f5c518;color:#333">FZ</span><span class="serve" title="发球权"></span>Fan Zhendong <b style="color:#e11338;font-weight:900">1</b></div>
+            <div class="lteam"><span class="lteam__logo" style="background:#f5c518;color:#333">FZ</span><span class="serve" title="发球权"></span><span class="lteam__nm">Fan Zhendong</span><span class="lsc"><i class="pt">5</i></span></div>
             <div class="ocell"><div class="ocell__lab">Away</div><div class="ocell__val">2.20</div></div>
             <div class="ocell"><div class="ocell__lab">+2.5</div><div class="ocell__val">1.90</div></div>
             <div class="ocell"><div class="ocell__lab">Under 18.5</div><div class="ocell__val">1.92</div></div>
           </div>
           <div class="smallscore">
-            <span class="ss">G1 <b>11 - 8</b></span>
-            <span class="ss">G2 <b>9 - 11</b></span>
-            <span class="ss">G3 <b>7 - 5</b></span>
+            <span class="ss">11 - 8</span>
+            <span class="ss">9 - 11</span>
+            <span class="ss">7 - 5</span>
           </div>
           <div class="micons" data-icons></div>
         </div>
@@ -1542,7 +1545,7 @@ function currentScreen(){ for(var k in screens){ if(screens[k].classList.contain
 var betStake='';
 function betCleanOdds(t){ return (t||'').replace(/[^0-9.]/g,'').trim(); }
 function betCleanTeam(t){ return (t||'').replace(/\s+/g,' ').trim(); }
-function betTeamName(el){ if(!el)return ''; var c=el.cloneNode(true); c.querySelectorAll('.lteam__logo,b').forEach(function(x){x.remove();}); c.querySelectorAll('br').forEach(function(x){x.replaceWith(' ');}); return c.textContent.replace(/\s+/g,' ').trim(); }
+function betTeamName(el){ if(!el)return ''; var c=el.cloneNode(true); c.querySelectorAll('.lteam__logo,b,.lsc,.serve').forEach(function(x){x.remove();}); c.querySelectorAll('br').forEach(function(x){x.replaceWith(' ');}); return c.textContent.replace(/\s+/g,' ').trim(); }
 function betBrName(el){ if(!el)return ''; var c=el.cloneNode(true); c.querySelectorAll('br').forEach(function(x){x.replaceWith(' ');}); return c.textContent.replace(/\s+/g,' ').trim(); }
 function betHeadLeague(el){ if(!el)return ''; var c=el.cloneNode(true); c.querySelectorAll('.voucher,.lg,.tag').forEach(function(x){x.remove();}); return c.textContent.replace(/\s+/g,' ').trim(); }
 function betLogoHTML(el){ return el?{txt:el.textContent.trim(),bg:(el.getAttribute('style')||'').replace(/.*background:\s*([^;]+).*/,'$1')}:{txt:'',bg:'#123c95'}; }
@@ -1942,24 +1945,28 @@ function toggleMode(){
 (function(){
   var em=document.getElementById('listEmpty'); if(!em)return;
   var host=em.parentNode;
+  /* 各球种滚球:进程(prog 可双行)、每队即时比分(sc)、底部各局比分(bottom) 参照穷举表 */
   var DEMO=[
     {sport:'volleyball', flag:'🏐', lg:'FIVB Nations League', fav:'volleyball', mkt:'Total Pts',
-     h:{ab:'POL',bg:'#dc143c',nm:'Poland'}, a:{ab:'ITA',bg:'#0066b3',nm:'Italy'}, time:'SET 3', more:'22+ ›', hcp:'-4.5', tot:'Over 190.5'},
+     h:{ab:'POL',bg:'#dc143c',nm:'Poland',sc:'18'}, a:{ab:'ITA',bg:'#0066b3',nm:'Italy',sc:'22'}, prog:{main:'Set 2',sub:'Best of 5'}, more:'22+ ›', hcp:'-4.5', tot:'Over 190.5', bottom:['25-20','18-22']},
     {sport:'icehockey', flag:'🏒', lg:'NHL', fav:'nhl', mkt:'Total Goals',
-     h:{ab:'TOR',bg:'#00205b',nm:'Maple Leafs'}, a:{ab:'BOS',bg:'#111',nm:'Bruins'}, time:'P2 12:40', more:'18+ ›', hcp:'-1.5', tot:'Over 5.5'},
+     h:{ab:'TOR',bg:'#00205b',nm:'Maple Leafs',sc:'2'}, a:{ab:'BOS',bg:'#111',nm:'Bruins',sc:'3'}, prog:'P2 12:40', more:'18+ ›', hcp:'-1.5', tot:'Over 5.5'},
     {sport:'boxing', flag:'🥊', lg:'WBC Title Fight', fav:'wbc', mkt:'Total Rds',
-     h:{ab:'CAN',bg:'#c8102e',nm:'Canelo'}, a:{ab:'GGG',bg:'#111',nm:'Golovkin'}, time:'Rd 6', more:'9+ ›', hcp:'-2.5', tot:'Over 9.5'},
+     h:{ab:'CAN',bg:'#c8102e',nm:'Canelo',sc:'8'}, a:{ab:'GGG',bg:'#111',nm:'Golovkin',sc:'6'}, prog:'Round 6', more:'9+ ›', hcp:'-2.5', tot:'Over 9.5'},
     {sport:'billiards', flag:'🎱', lg:'World Snooker', fav:'snooker', mkt:'Total Frames',
-     h:{ab:'OSU',bg:'#333',nm:"O'Sullivan"}, a:{ab:'ROB',bg:'#c8102e',nm:'Robertson'}, time:'Frame 17', more:'12+ ›', hcp:'-2.5', tot:'Over 25.5'},
-    {sport:'cricket', flag:'🏏', lg:'ICC World Cup', fav:'icc', mkt:'Total Runs',
-     h:{ab:'AUS',bg:'#0a7d46',nm:'Australia'}, a:{ab:'BAN',bg:'#0a5',nm:'Bangladesh'}, time:'Ov 39.0', more:'20+ ›', hcp:'-15.5', tot:'Over 310.5'},
+     h:{ab:'OSU',bg:'#333',nm:"O'Sullivan",sc:'10'}, a:{ab:'ROB',bg:'#c8102e',nm:'Robertson',sc:'6'}, prog:'Frame 17', more:'12+ ›', hcp:'-2.5', tot:'Over 25.5'},
+    {sport:'cricket', flag:'🏏', lg:'ICC World Cup', fav:'icc', mkt:'Method',
+     h:{ab:'AUS',bg:'#0a7d46',nm:'Australia',sc:'0/7'}, a:{ab:'BAN',bg:'#0a5',nm:'Bangladesh',sc:'0/8'}, prog:'Over 7.1', more:'20+ ›', hcp:'-15.5', tot:'Over 310.5'},
     {sport:'rugby', flag:'🏉', lg:'Six Nations', fav:'sixnations', mkt:'Total Pts',
-     h:{ab:'ENG',bg:'#0b0b45',nm:'England'}, a:{ab:'FRA',bg:'#0055a4',nm:'France'}, time:'2nd Half', more:'14+ ›', hcp:'-6.5', tot:'Over 44.5'},
+     h:{ab:'ENG',bg:'#0b0b45',nm:'England',sc:'24'}, a:{ab:'FRA',bg:'#0055a4',nm:'France',sc:'19'}, prog:'2nd Half 40:00', more:'14+ ›', hcp:'-6.5', tot:'Over 44.5'},
     {sport:'amfootball', flag:'🏈', lg:'NFL', fav:'nfl', mkt:'Total Pts',
-     h:{ab:'KC',bg:'#e31837',nm:'Chiefs'}, a:{ab:'SF',bg:'#aa0000',nm:'49ers'}, time:'Q3 08:20', more:'25+ ›', hcp:'-3.5', tot:'Over 47.5'},
-    {sport:'esports', flag:'🎮', lg:'Dota 2 · TI', fav:'dota2', mkt:'Total Maps',
-     h:{ab:'BDS',bg:'#1a8877',nm:'Team BDS'}, a:{ab:'MAD',bg:'#a12a3a',nm:'MAD Lions'}, time:'MAP 4', more:'16+ ›', hcp:'-1.5', tot:'Over 3.5'}
+     h:{ab:'KC',bg:'#e31837',nm:'Chiefs',sc:'26'}, a:{ab:'SF',bg:'#aa0000',nm:'49ers',sc:'14'}, prog:'Q3 09:06', more:'25+ ›', hcp:'-3.5', tot:'Over 47.5'},
+    {sport:'esports', flag:'🎮', lg:'Dota 2 · TI', fav:'dota2', mkt:'Maps',
+     h:{ab:'BDS',bg:'#1a8877',nm:'Team BDS',sc:'2'}, a:{ab:'MAD',bg:'#a12a3a',nm:'MAD Lions',sc:'3'}, prog:'Map 3', more:'16+ ›', hcp:'-1.5', tot:'Over 3.5'}
   ];
+  function progHTML(p){ return (typeof p==='object')
+    ? '<span class="lmatch__time lmatch__time--live ltime2"><b>'+p.main+'</b><i>'+p.sub+'</i></span>'
+    : '<span class="lmatch__time lmatch__time--live">'+p+'</span>'; }
   DEMO.forEach(function(d){
     var row=document.createElement('div');
     row.className='lrow'; row.setAttribute('data-collapse',''); row.setAttribute('data-lgsport',d.sport);
@@ -1967,20 +1974,22 @@ function toggleMode(){
       '<div class="lrow__name">'+d.lg+'</div><span class="lrow__star" data-fav="'+d.fav+'" data-favtype="league">☆</span><span class="lrow__chev">▲</span>';
     var body=document.createElement('div');
     body.className='lmatches'; body.setAttribute('data-body','');
+    var bottom = d.bottom ? '<div class="smallscore">'+d.bottom.map(function(s){return '<span class="ss">'+s+'</span>';}).join('')+'</div>' : '';
     body.innerHTML=
       '<div class="lmatch" data-favmatch="m_'+d.fav+'" data-when="inplay" style="border-radius:0 0 10px 10px">'+
         '<div class="lgrid">'+
-          '<div class="lgrid__h tm"><span class="lmatch__time lmatch__time--live">'+d.time+'</span><span class="lmatch__more" data-goto="detail">'+d.more+'</span></div>'+
+          '<div class="lgrid__h tm">'+progHTML(d.prog)+'<span class="lmatch__more" data-goto="detail">'+d.more+'</span></div>'+
           '<div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap</div><div class="lgrid__h">'+d.mkt+'</div>'+
-          '<div class="lteam"><span class="lteam__logo" style="background:'+d.h.bg+'">'+d.h.ab+'</span>'+d.h.nm+'</div>'+
+          '<div class="lteam"><span class="lteam__logo" style="background:'+d.h.bg+'">'+d.h.ab+'</span><span class="lteam__nm">'+d.h.nm+'</span><span class="lsc"><i class="pt">'+d.h.sc+'</i></span></div>'+
           '<div class="ocell"><div class="ocell__lab">Home</div><div class="ocell__val">1.80</div></div>'+
           '<div class="ocell"><div class="ocell__lab">'+d.hcp+'</div><div class="ocell__val">1.90</div></div>'+
           '<div class="ocell"><div class="ocell__lab">'+d.tot+'</div><div class="ocell__val">1.90</div></div>'+
-          '<div class="lteam"><span class="lteam__logo" style="background:'+d.a.bg+'">'+d.a.ab+'</span>'+d.a.nm+'</div>'+
+          '<div class="lteam"><span class="lteam__logo" style="background:'+d.a.bg+'">'+d.a.ab+'</span><span class="lteam__nm">'+d.a.nm+'</span><span class="lsc"><i class="pt">'+d.a.sc+'</i></span></div>'+
           '<div class="ocell"><div class="ocell__lab">Away</div><div class="ocell__val">2.00</div></div>'+
           '<div class="ocell"><div class="ocell__lab">'+d.hcp.replace('-','+')+'</div><div class="ocell__val">1.90</div></div>'+
           '<div class="ocell"><div class="ocell__lab">'+d.tot.replace('Over','Under')+'</div><div class="ocell__val">1.88</div></div>'+
         '</div>'+
+        bottom+
         '<div class="micons" data-icons></div>'+
       '</div>';
     host.insertBefore(row, em); host.insertBefore(body, em);
