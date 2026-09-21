@@ -296,6 +296,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .tntbl td:first-child,.tntbl th:first-child{text-align:left;color:#cfe0ff;font-weight:700;padding-left:4px}
 .tntbl tr+tr td{border-top:1px solid rgba(255,255,255,.14)}
 .mkdot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#e0902a;margin-right:6px;vertical-align:1px}
+.mkdot--off{visibility:hidden}
 .crk-sc{font-size:12px;font-weight:800;color:#fff;margin-top:3px}
 .crk-tag{background:#e11338;color:#fff;font-size:10px;font-weight:800;border-radius:4px;padding:2px 8px;display:inline-block;margin-top:5px}
 .crk-foot{display:flex;gap:10px;margin-top:8px}
@@ -759,7 +760,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
       </div>
 
       <!-- Basketball · WNBA (第X节 + clock, Total Points, 小节比分) -->
-      <div class="lrow" data-collapse><div class="lrow__flag">🇺🇸</div>
+      <div class="lrow" data-collapse data-lgsport="basketball"><div class="lrow__flag">🇺🇸</div>
         <div class="lrow__name">WNBA</div><span class="lrow__star" data-fav="wnba" data-favtype="league">☆</span><span class="lrow__chev">▲</span></div>
       <div class="lmatches" data-body>
         <div class="lmatch" data-parlay="yes" data-favmatch="m_wnba" data-when="inplay">
@@ -820,7 +821,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
       </div>
 
       <!-- Football · Premier League (上/下半场 + min, Total Goals, 红黄牌/角球, 1X2 含 Draw) -->
-      <div class="lrow" data-collapse><div class="lrow__flag">🏴󠁧󠁢󠁥󠁮󠁧󠁿</div>
+      <div class="lrow" data-collapse data-lgsport="football"><div class="lrow__flag">🏴󠁧󠁢󠁥󠁮󠁧󠁿</div>
         <div class="lrow__name">Premier League</div><span class="lrow__star" data-fav="epl" data-favtype="league">☆</span><span class="lrow__chev">▲</span></div>
       <div class="lmatches" data-body>
         <div class="lmatch" data-parlay="yes" data-favmatch="m_epl" data-when="inplay">
@@ -840,7 +841,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
       </div>
 
       <!-- Tennis · Australian Open (第X盘 + 盘制, Games O/U, 盘/局比分) -->
-      <div class="lrow" data-collapse><div class="lrow__flag">🇦🇺</div>
+      <div class="lrow" data-collapse data-lgsport="tennis"><div class="lrow__flag">🇦🇺</div>
         <div class="lrow__name">Australian Open</div><span class="lrow__star" data-fav="ao" data-favtype="league">☆</span><span class="lrow__chev">▲</span></div>
       <div class="lmatches" data-body>
         <div class="lmatch" data-parlay="yes" data-favmatch="m_ao" data-when="inplay">
@@ -879,7 +880,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
       </div>
 
       <!-- Baseball · MLB (局数 + 垒包 + 出局数, Total Runs) -->
-      <div class="lrow" data-collapse><div class="lrow__flag">🇺🇸</div>
+      <div class="lrow" data-collapse data-lgsport="baseball"><div class="lrow__flag">🇺🇸</div>
         <div class="lrow__name">MLB</div><span class="lrow__star" data-fav="mlb" data-favtype="league">☆</span><span class="lrow__chev">▲</span></div>
       <div class="lmatches" data-body>
         <div class="lmatch" data-favmatch="m_mlb" data-when="inplay" style="border-radius:0 0 10px 10px">
@@ -903,7 +904,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
       </div>
 
       <!-- Badminton · BWF World Tour -->
-      <div class="lrow" data-collapse><div class="lrow__flag">🏸</div>
+      <div class="lrow" data-collapse data-lgsport="badminton"><div class="lrow__flag">🏸</div>
         <div class="lrow__name">BWF World Tour</div><span class="lrow__star" data-fav="bwf" data-favtype="league">☆</span><span class="lrow__chev">▲</span></div>
       <div class="lmatches" data-body>
         <div class="lmatch" data-parlay="yes" data-favmatch="m_bwf" data-when="inplay" style="border-radius:0 0 10px 10px">
@@ -927,7 +928,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
       </div>
 
       <!-- Table Tennis · WTT Champions -->
-      <div class="lrow" data-collapse><div class="lrow__flag">🏓</div>
+      <div class="lrow" data-collapse data-lgsport="tabletennis"><div class="lrow__flag">🏓</div>
         <div class="lrow__name">WTT Champions</div><span class="lrow__star" data-fav="wtt" data-favtype="league">☆</span><span class="lrow__chev">▲</span></div>
       <div class="lmatches" data-body>
         <div class="lmatch" data-parlay="yes" data-favmatch="m_wtt" data-when="inplay" style="border-radius:0 0 10px 10px">
@@ -1182,9 +1183,6 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
         <button class="svbar__fav" data-svfav>☆ Favorite</button>
         <div class="svbar__r"><button class="svbar__btn is-on" data-svmedia="video">▶ Video</button><button class="svbar__btn" data-svmedia="anim">◎ Animation</button></div>
       </div>
-
-      <!-- demo: 依球种切换计分板 (prototype review aid) -->
-      <div id="sportSwitch" class="sbswitch"></div>
 
       <!-- market tabs -->
       <div class="mtabs">
@@ -1681,7 +1679,7 @@ document.body.addEventListener('click',function(e){
   var fv=e.target.closest('[data-fav]');
   if(fv){ toggleFav(fv.getAttribute('data-fav')); syncFavStars(); e.stopPropagation(); return; }
   var g=e.target.closest('[data-goto]');
-  if(g){ goto(g.getAttribute('data-goto')); return; }
+  if(g){ var gt=g.getAttribute('data-goto'); if(gt==='detail'){ setDetailContext(g); } goto(gt); return; }
   var bt=e.target.closest('[data-sport]');
   if(bt){ selectSport(bt.getAttribute('data-sport')); return; }
   var lc=e.target.closest('[data-collapse]');
@@ -1799,16 +1797,16 @@ function syncFavStars(){
 }
 /* full match-card data, shared by a league fav and its match fav */
 var CARDS={
-  nba:{league:'NBAPLAYOFFS-Semifinal',flag:'🇺🇸',voucher:true,mv:['up',''],h:{ab:'DEN',bg:'#1d428a',nm:'Denver<br>Nuggets'},a:{ab:'MIN',bg:'#236192',nm:'Minnesota<br>Timberwolves'},sc:'83 - 126',pd:'3rd',tm:'11:14',od:['7.40','1.07'],tip:'Clipper has won 9 matches in last 10 matches with lakers.',
-    more:[{league:'NBAPLAYOFFS-Semifinal',flag:'🇺🇸',mv:['','dn'],h:{ab:'GSW',bg:'#1d428a',nm:'Golden State<br>Warriors'},a:{ab:'LAL',bg:'#552583',nm:'LA<br>Lakers'},sc:'102 - 98',pd:'4th',tm:'02:30',od:['1.55','2.45'],tip:'Warriors lead the series 3-2.'}]},
-  wnba:{league:'WNBA',flag:'🇺🇸',mv:['up',''],h:{ab:'CS',bg:'#e0208a',nm:'Connecticut<br>Sun(W)'},a:{ab:'GV',bg:'#333',nm:'Golden State<br>Valkyries(W)'},sc:'76 - 66',pd:'Q3',tm:'09:06',od:['6.26','1.12'],tip:'Connecticut leads the series 2-1 this season.'},
-  epl:{league:'Premier League',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',mv:['up',''],h:{ab:'MUN',bg:'#da291c',nm:'Manchester<br>Utd'},a:{ab:'CHE',bg:'#034694',nm:'Chelsea'},sc:'2 - 1',pd:'2nd Half',tm:'77:11',od:['1.80','4.20'],tip:'Man Utd unbeaten in their last 5 home games.'},
-  epl3:{league:'Premier League',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',way3:true,mv:['up','',''],h:{ab:'MUN',bg:'#da291c',nm:'Manchester<br>Utd'},a:{ab:'CHE',bg:'#034694',nm:'Chelsea'},sc:'2 - 1',pd:'2nd Half',tm:'77:11',od:['1.80','3.40','4.20'],tip:'Man Utd unbeaten in their last 5 home games.',
-    more:[{league:'Premier League',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',way3:true,mv:['','','up'],h:{ab:'ARS',bg:'#ef0107',nm:'Arsenal'},a:{ab:'LIV',bg:'#c8102e',nm:'Liverpool'},sc:'1 - 1',pd:'2nd Half',tm:'63:20',od:['2.40','3.30','2.80'],tip:'Liverpool unbeaten in their last 6 away games.'}]},
-  ao:{league:'Australian Open',flag:'🇦🇺',ns:true,mv:['','dn'],h:{ab:'JS',bg:'#111',nm:'Jannik<br>Sinner'},a:{ab:'CA',bg:'#e11338',nm:'Carlos<br>Alcaraz'},sc:'1 - 1',pd:'Set 3',tm:'40-30',od:['1.55','2.45'],tip:'Sinner has won the last 3 meetings.'},
-  mlb:{league:'MLB',flag:'🇺🇸',mv:['up',''],h:{ab:'USA',bg:'#c8102e',nm:'USA<br>Baseball'},a:{ab:'JPN',bg:'#bc002d',nm:'Japan<br>Baseball'},sc:'7 - 4',pd:'Top 7th',tm:'Out 1',od:['1.42','2.90'],tip:'USA leading going into the 7th inning.'},
-  korsau:{league:'Asian Games',flag:'🌏',h:{ab:'KOR',bg:'#0a3161',nm:'Korea<br>Republic'},a:{ab:'KSA',bg:'#165c33',nm:'Saudi<br>Arabia'},sc:'—',pd:'29 Min',tm:'LIVE',od:['1.65','2.20'],tip:'Ending Card market · 29 Minute.'},
-  belger:{league:'Asian Games',flag:'🌏',h:{ab:'BEL',bg:'#111',nm:'Belgium<br>(W)'},a:{ab:'GER',bg:'#c8102e',nm:'Germany<br>(W)'},sc:'VS',pd:'Today',tm:'23:45',od:['1.90','1.90'],tip:'Ending Card market · Today 23:45.'}
+  nba:{league:'NBAPLAYOFFS-Semifinal',flag:'🇺🇸',voucher:true,sport:'basketball',state:'video',mv:['up',''],h:{ab:'DEN',bg:'#1d428a',nm:'Denver<br>Nuggets'},a:{ab:'MIN',bg:'#236192',nm:'Minnesota<br>Timberwolves'},sc:'83 - 126',pd:'3rd',tm:'11:14',od:['7.40','1.07'],tip:'Clipper has won 9 matches in last 10 matches with lakers.',
+    more:[{league:'NBAPLAYOFFS-Semifinal',flag:'🇺🇸',sport:'basketball',state:'inplay',mv:['','dn'],h:{ab:'GSW',bg:'#1d428a',nm:'Golden State<br>Warriors'},a:{ab:'LAL',bg:'#552583',nm:'LA<br>Lakers'},sc:'102 - 98',pd:'4th',tm:'02:30',od:['1.55','2.45'],tip:'Warriors lead the series 3-2.'}]},
+  wnba:{league:'WNBA',flag:'🇺🇸',sport:'basketball',state:'inplay',mv:['up',''],h:{ab:'CS',bg:'#e0208a',nm:'Connecticut<br>Sun(W)'},a:{ab:'GV',bg:'#333',nm:'Golden State<br>Valkyries(W)'},sc:'76 - 66',pd:'Q3',tm:'09:06',od:['6.26','1.12'],tip:'Connecticut leads the series 2-1 this season.'},
+  epl:{league:'Premier League',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',sport:'football',state:'inplay',mv:['up',''],h:{ab:'MUN',bg:'#da291c',nm:'Manchester<br>Utd'},a:{ab:'CHE',bg:'#034694',nm:'Chelsea'},sc:'2 - 1',pd:'2nd Half',tm:'77:11',od:['1.80','4.20'],tip:'Man Utd unbeaten in their last 5 home games.'},
+  epl3:{league:'Premier League',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',way3:true,sport:'football',state:'inplay',mv:['up','',''],h:{ab:'MUN',bg:'#da291c',nm:'Manchester<br>Utd'},a:{ab:'CHE',bg:'#034694',nm:'Chelsea'},sc:'2 - 1',pd:'2nd Half',tm:'77:11',od:['1.80','3.40','4.20'],tip:'Man Utd unbeaten in their last 5 home games.',
+    more:[{league:'Premier League',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',way3:true,sport:'football',state:'inplay',mv:['','','up'],h:{ab:'ARS',bg:'#ef0107',nm:'Arsenal'},a:{ab:'LIV',bg:'#c8102e',nm:'Liverpool'},sc:'1 - 1',pd:'2nd Half',tm:'63:20',od:['2.40','3.30','2.80'],tip:'Liverpool unbeaten in their last 6 away games.'}]},
+  ao:{league:'Australian Open',flag:'🇦🇺',ns:true,sport:'tennis',state:'inplay',mv:['','dn'],h:{ab:'JS',bg:'#111',nm:'Jannik<br>Sinner'},a:{ab:'CA',bg:'#e11338',nm:'Carlos<br>Alcaraz'},sc:'1 - 1',pd:'Set 3',tm:'40-30',od:['1.55','2.45'],tip:'Sinner has won the last 3 meetings.'},
+  mlb:{league:'MLB',flag:'🇺🇸',sport:'baseball',state:'inplay',mv:['up',''],h:{ab:'USA',bg:'#c8102e',nm:'USA<br>Baseball'},a:{ab:'JPN',bg:'#bc002d',nm:'Japan<br>Baseball'},sc:'7 - 4',pd:'Top 7th',tm:'Out 1',od:['1.42','2.90'],tip:'USA leading going into the 7th inning.'},
+  korsau:{league:'Asian Games',flag:'🌏',sport:'basketball',state:'inplay',h:{ab:'KOR',bg:'#0a3161',nm:'Korea<br>Republic'},a:{ab:'KSA',bg:'#165c33',nm:'Saudi<br>Arabia'},sc:'—',pd:'29 Min',tm:'LIVE',od:['1.65','2.20'],tip:'Ending Card market · 29 Minute.'},
+  belger:{league:'Asian Games',flag:'🌏',sport:'basketball',state:'pre',h:{ab:'BEL',bg:'#111',nm:'Belgium<br>(W)'},a:{ab:'GER',bg:'#c8102e',nm:'Germany<br>(W)'},sc:'VS',pd:'Today',tm:'23:45',od:['1.90','1.90'],tip:'Ending Card market · Today 23:45.'}
 };
 var CARDOF={nba:'nba',wnba:'wnba',epl:'epl',epl3:'epl3',ao:'ao',mlb:'mlb',m_wnba:'wnba',m_epl:'epl',m_ao:'ao',m_mlb:'mlb',ec_kor_sau:'korsau',ec_bel_ger:'belger'};
 var CHEV_UP='<svg viewBox="0 0 12 14"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg>';
@@ -1829,7 +1827,7 @@ function oddsbarHTML(od,mv,way3){ mv=mv||['','',''];
 }
 function mcardHTML(c){
   var sc=c.sc.split(' - '); var left=sc[0], right=sc.length>1?sc[1]:'';
-  return '<article class="mcard" data-goto="detail">'+
+  return '<article class="mcard" data-goto="detail"'+(c.sport?' data-sbsport="'+c.sport+'"':'')+(c.state?' data-sbmode="'+c.state+'"':'')+'>'+
     (c.ns?'<span class="ribbon">New Season</span>':'')+
     '<div class="mcard__head"><span class="lg"></span> '+c.league+(c.voucher?' <span class="voucher">Free Voucher</span>':'')+'</div>'+
     '<div class="mcard__body"><div class="teams">'+
@@ -1890,9 +1888,19 @@ function renderCollection(){
 /* ===== list filter: date-tab (IN-PLAY 已开赛 / TODAY 未开赛 / 其他日期) + SINGLE/PARLAY ===== */
 var currentWhen='inplay';
 var lastDate='today'; /* 记住上次选的日期 */
+var LIST_SPORTS=['football','basketball','tennis','volleyball','badminton','tabletennis','icehockey','boxing','billiards','cricket','baseball','rugby','amfootball','esports'];
 function applyFilters(){
   var total=0;
+  var sportOn=(LIST_SPORTS.indexOf(curSport)>=0);
   document.querySelectorAll('#screen-list .lmatches').forEach(function(body){
+    var head=body.previousElementSibling;
+    /* 依「球种」tab 过滤联赛:仅显示当前球种的联赛 */
+    var lgSport=(head&&head.getAttribute)?head.getAttribute('data-lgsport'):'';
+    if(sportOn && lgSport && lgSport!==curSport){
+      if(head&&head.classList.contains('lrow'))head.style.display='none';
+      body.style.display='none';
+      return;
+    }
     var shown=0;
     body.querySelectorAll('.lmatch').forEach(function(m){
       var w=m.getAttribute('data-when')||'today';
@@ -1903,7 +1911,6 @@ function applyFilters(){
       m.style.display=vis?'':'none';
       if(vis)shown++;
     });
-    var head=body.previousElementSibling;
     if(head&&head.classList.contains('lrow')){ head.style.display=shown?'':'none';
       /* 赛事数量徽章(收合时显示,位于收藏星形左侧) */
       var cnt=head.querySelector('.lrow__cnt');
@@ -1916,6 +1923,8 @@ function applyFilters(){
   var em=document.getElementById('listEmpty'); if(em)em.hidden=(total>0);
   /* 没有赛事时,联赛筛选栏也一并隐藏 */
   document.querySelectorAll('#screen-list .lgsel').forEach(function(w){ w.style.display=(total>0)?'':'none'; });
+  /* 联赛选择列同步为当前球种可见的联赛 */
+  if(window.__refreshLgsel)window.__refreshLgsel();
 }
 
 /* SINGLE / PARLAY toggle */
@@ -1927,6 +1936,56 @@ function toggleMode(){
   else { L.textContent='S'; L.className='is-dim'; R.textContent='PARLAY'; R.className='is-act'; }
   applyFilters();
 }
+
+/* ===== 补充示意赛事:为「没有实际赛事」的球种各补一个联赛+一场滚球赛事,
+   使每个球种 tab 都可点进详情、呈现对应计分板 ===== */
+(function(){
+  var em=document.getElementById('listEmpty'); if(!em)return;
+  var host=em.parentNode;
+  var DEMO=[
+    {sport:'volleyball', flag:'🏐', lg:'FIVB Nations League', fav:'volleyball', mkt:'Total Pts',
+     h:{ab:'POL',bg:'#dc143c',nm:'Poland'}, a:{ab:'ITA',bg:'#0066b3',nm:'Italy'}, time:'SET 3', more:'22+ ›', hcp:'-4.5', tot:'Over 190.5'},
+    {sport:'icehockey', flag:'🏒', lg:'NHL', fav:'nhl', mkt:'Total Goals',
+     h:{ab:'TOR',bg:'#00205b',nm:'Maple Leafs'}, a:{ab:'BOS',bg:'#111',nm:'Bruins'}, time:'P2 12:40', more:'18+ ›', hcp:'-1.5', tot:'Over 5.5'},
+    {sport:'boxing', flag:'🥊', lg:'WBC Title Fight', fav:'wbc', mkt:'Total Rds',
+     h:{ab:'CAN',bg:'#c8102e',nm:'Canelo'}, a:{ab:'GGG',bg:'#111',nm:'Golovkin'}, time:'Rd 6', more:'9+ ›', hcp:'-2.5', tot:'Over 9.5'},
+    {sport:'billiards', flag:'🎱', lg:'World Snooker', fav:'snooker', mkt:'Total Frames',
+     h:{ab:'OSU',bg:'#333',nm:"O'Sullivan"}, a:{ab:'ROB',bg:'#c8102e',nm:'Robertson'}, time:'Frame 17', more:'12+ ›', hcp:'-2.5', tot:'Over 25.5'},
+    {sport:'cricket', flag:'🏏', lg:'ICC World Cup', fav:'icc', mkt:'Total Runs',
+     h:{ab:'AUS',bg:'#0a7d46',nm:'Australia'}, a:{ab:'BAN',bg:'#0a5',nm:'Bangladesh'}, time:'Ov 39.0', more:'20+ ›', hcp:'-15.5', tot:'Over 310.5'},
+    {sport:'rugby', flag:'🏉', lg:'Six Nations', fav:'sixnations', mkt:'Total Pts',
+     h:{ab:'ENG',bg:'#0b0b45',nm:'England'}, a:{ab:'FRA',bg:'#0055a4',nm:'France'}, time:'2nd Half', more:'14+ ›', hcp:'-6.5', tot:'Over 44.5'},
+    {sport:'amfootball', flag:'🏈', lg:'NFL', fav:'nfl', mkt:'Total Pts',
+     h:{ab:'KC',bg:'#e31837',nm:'Chiefs'}, a:{ab:'SF',bg:'#aa0000',nm:'49ers'}, time:'Q3 08:20', more:'25+ ›', hcp:'-3.5', tot:'Over 47.5'},
+    {sport:'esports', flag:'🎮', lg:'Dota 2 · TI', fav:'dota2', mkt:'Total Maps',
+     h:{ab:'BDS',bg:'#1a8877',nm:'Team BDS'}, a:{ab:'MAD',bg:'#a12a3a',nm:'MAD Lions'}, time:'MAP 4', more:'16+ ›', hcp:'-1.5', tot:'Over 3.5'}
+  ];
+  DEMO.forEach(function(d){
+    var row=document.createElement('div');
+    row.className='lrow'; row.setAttribute('data-collapse',''); row.setAttribute('data-lgsport',d.sport);
+    row.innerHTML='<div class="lrow__flag">'+d.flag+'</div>'+
+      '<div class="lrow__name">'+d.lg+'</div><span class="lrow__star" data-fav="'+d.fav+'" data-favtype="league">☆</span><span class="lrow__chev">▲</span>';
+    var body=document.createElement('div');
+    body.className='lmatches'; body.setAttribute('data-body','');
+    body.innerHTML=
+      '<div class="lmatch" data-favmatch="m_'+d.fav+'" data-when="inplay" style="border-radius:0 0 10px 10px">'+
+        '<div class="lgrid">'+
+          '<div class="lgrid__h tm"><span class="lmatch__time lmatch__time--live">'+d.time+'</span><span class="lmatch__more" data-goto="detail">'+d.more+'</span></div>'+
+          '<div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap</div><div class="lgrid__h">'+d.mkt+'</div>'+
+          '<div class="lteam"><span class="lteam__logo" style="background:'+d.h.bg+'">'+d.h.ab+'</span>'+d.h.nm+'</div>'+
+          '<div class="ocell"><div class="ocell__lab">Home</div><div class="ocell__val">1.80</div></div>'+
+          '<div class="ocell"><div class="ocell__lab">'+d.hcp+'</div><div class="ocell__val">1.90</div></div>'+
+          '<div class="ocell"><div class="ocell__lab">'+d.tot+'</div><div class="ocell__val">1.90</div></div>'+
+          '<div class="lteam"><span class="lteam__logo" style="background:'+d.a.bg+'">'+d.a.ab+'</span>'+d.a.nm+'</div>'+
+          '<div class="ocell"><div class="ocell__lab">Away</div><div class="ocell__val">2.00</div></div>'+
+          '<div class="ocell"><div class="ocell__lab">'+d.hcp.replace('-','+')+'</div><div class="ocell__val">1.90</div></div>'+
+          '<div class="ocell"><div class="ocell__lab">'+d.tot.replace('Over','Under')+'</div><div class="ocell__val">1.88</div></div>'+
+        '</div>'+
+        '<div class="micons" data-icons></div>'+
+      '</div>';
+    host.insertBefore(row, em); host.insertBefore(body, em);
+  });
+})();
 
 /* match icons injector */
 var IC={
@@ -1980,7 +2039,7 @@ function selectSport(k){
   else if(k==='champions'){ show('champions'); }
   else if(k==='endcard'){ show('endcard'); }
   else if(k==='endgame'){ show('endgame'); }
-  else { show('list'); }
+  else { currentWhen='inplay'; applyFilters(); show('list'); }
 }
 
 /* ===== per-sport scoreboards (detail) ===== */
@@ -2091,10 +2150,11 @@ function calcBoard(bg,lg,hbg,ht,hn,abg,at,an,score,prog,bottom){
 var nbadge='<span class="neutral">N</span>';
 /* table-style calc-board (篮球小节 / 网球盘局) */
 function tblBoard(bg,lg,prog,hbg,ht,hn,abg,at,an,score,headers,rmain,raway,serve){
-  var dot='<span class="mkdot" title="球权"></span>';
+  /* 球权圆点固定占位:主/客文案不因球权图标而位移 */
+  function dotFor(on){ return '<span class="mkdot'+(on?'':' mkdot--off')+'" title="球权"></span>'; }
   var head='<tr><th></th>'+headers.map(function(h){return '<th>'+h+'</th>';}).join('')+'</tr>';
-  var r1='<tr><td>'+(serve==='main'?dot:'')+'主</td>'+rmain.map(function(v){return '<td>'+v+'</td>';}).join('')+'</tr>';
-  var r2='<tr><td>'+(serve==='away'?dot:'')+'客</td>'+raway.map(function(v){return '<td>'+v+'</td>';}).join('')+'</tr>';
+  var r1='<tr><td>'+dotFor(serve==='main')+'主</td>'+rmain.map(function(v){return '<td>'+v+'</td>';}).join('')+'</tr>';
+  var r2='<tr><td>'+dotFor(serve==='away')+'客</td>'+raway.map(function(v){return '<td>'+v+'</td>';}).join('')+'</tr>';
   return '<div class="cbrd" style="background:'+bg+'">'+
     '<div class="cbrd__top"><span></span><span class="cbrd__lg" data-sheet="open">'+lg+' ▾</span><span>↻</span></div>'+
     '<div style="text-align:center;font-weight:800;font-size:13px;color:#fff;padding-top:2px">'+prog+'</div>'+
@@ -2143,6 +2203,7 @@ INPLAY.tabletennis=tblBoard('linear-gradient(160deg,#1d5aa0,#0a2a52)','WTT Champ
 INPLAY.volleyball=tblBoard('linear-gradient(160deg,#1d5aa0,#0a2a52)','Volleyball League','滚球','#1b2b4a','🏐','维迪亚兹职业','#c0202e','🏐','普拉米亚职业','0 - 2',
   ['总局数','1局','2局','3局','4局','5局','总得分'],['0','24','18','11','-','-','53'],['2','26','25','7','-','-','58']);
 INPLAY.rugby=INPLAY.football; INPLAY.amfootball=INPLAY.football; INPLAY.icehockey=INPLAY.football; INPLAY.boxing=INPLAY.billiards;
+INPLAY.esports=calcBoard('linear-gradient(160deg,#3a1a6b,#160a34)','Dota 2 · TI','#1a8877','BDS','Team BDS','#a12a3a','MAD','MAD Lions','2 - 1','滚球 · Map 4','<span style="font-weight:800">Map 4 进行中</span> &nbsp;·&nbsp; Net Worth 领先 4.2k');
 
 /* ===== no-video pre-match (未开赛) per sport ===== */
 function preBoard(lg,hbg,ht,hn,abg,at,an){
@@ -2162,30 +2223,36 @@ var PRE={
 };
 PRE.volleyball=PRE.tennis; PRE.tabletennis=PRE.tennis; PRE.badminton=PRE.tennis;
 PRE.rugby=PRE.football; PRE.amfootball=PRE.football; PRE.icehockey=PRE.football; PRE.boxing=PRE.billiards;
+PRE.esports=preBoard('Dota 2 · TI','#1a8877','BDS','Team BDS','#a12a3a','MAD','MAD Lions');
 
-/* ===== switcher: mode row + sport row ===== */
-var SB_MODES=[['video','🎥 有直播/动画 (示意1场)'],['inplay','🟢 无直播·滚球(已开赛)'],['pre','⏳ 无直播·未开赛']];
-var SB_SPORTS=[['basketball','🏀 篮球'],['football','⚽ 足球'],['tennis','🎾 网球/排球/乒乓'],['cricket','🏏 板球'],['billiards','🎱 撞球'],['baseball','⚾ 棒球']];
+/* ===== detail scoreboard: driven by real context (球种 + 赛事状态) ===== */
 var sbMode='video', sbSport='basketball';
-var swBox=document.getElementById('sportSwitch');
-function renderSwitch(){
-  var modeRow='<div class="sbrow"><span class="sbrow__lab">状态 ▸</span>'+SB_MODES.map(function(m){return '<button class="sbchip'+(m[0]===sbMode?' is-on':'')+'" data-sbmode="'+m[0]+'">'+m[1]+'</button>';}).join('')+'</div>';
-  var sportRow = (sbMode==='video') ? '' :
-    '<div class="sbrow"><span class="sbrow__lab">球种 ▸</span>'+SB_SPORTS.map(function(s){return '<button class="sbchip'+(s[0]===sbSport?' is-on':'')+'" data-sbsport="'+s[0]+'">'+s[1]+'</button>';}).join('')+'</div>';
-  swBox.innerHTML=modeRow+sportRow;
-}
 function applyScoreboard(){
   var el=document.getElementById('scoreboard'); if(!el)return;
   if(sbMode==='video') el.innerHTML=VIDEO_SB;
   else if(sbMode==='inplay') el.innerHTML=INPLAY[sbSport]||INPLAY.basketball;
   else el.innerHTML=PRE[sbSport]||PRE.basketball;
 }
-function setScoreboard(k){ /* legacy: pick sport in in-play mode */ sbMode='inplay'; sbSport=k; renderSwitch(); applyScoreboard(); }
-swBox.addEventListener('click',function(e){
-  var m=e.target.closest('[data-sbmode]'); if(m){ sbMode=m.getAttribute('data-sbmode'); renderSwitch(); applyScoreboard(); return; }
-  var s=e.target.closest('[data-sbsport]'); if(s){ sbSport=s.getAttribute('data-sbsport'); renderSwitch(); applyScoreboard(); return; }
-});
-renderSwitch(); applyScoreboard();
+/* 进入详情前,依点击的赛事解析「球种」与「状态」,再决定计分板 */
+function setDetailContext(el){
+  var sport='', mode='';
+  if(el){
+    sport=el.getAttribute('data-sbsport')||'';
+    mode=el.getAttribute('data-sbmode')||'';
+    if(!sport){ var body=el.closest('.lmatches'); var row=body?body.previousElementSibling:null;
+      if(row&&row.getAttribute) sport=row.getAttribute('data-lgsport')||''; }
+    if(!mode){ var lm=el.closest('.lmatch'); var w=lm?lm.getAttribute('data-when'):''; mode=(w==='inplay')?'inplay':(w?'pre':''); }
+  }
+  if(!sport){ sport=(curSport&&curSport!=='featured'&&curSport!=='champions'&&curSport!=='endcard'&&curSport!=='endgame')?curSport:'basketball'; }
+  if(!mode) mode='video';
+  sbSport=sport; sbMode=mode;
+  /* 视频/动画切换仅对「有直播」赛事显示;无直播赛事直接呈现滚球/未开赛计分板 */
+  var svr=document.querySelector('#screen-detail .svbar__r');
+  if(svr) svr.style.display=(mode==='video')?'':'none';
+  if(mode==='video'){ svVideo=true; svAnim=false; renderMedia(); }
+  else { applyScoreboard(); }
+}
+applyScoreboard();
 
 /* detail: 更多赛事 bar slides in only after scrolling the page up */
 (function(){
@@ -2382,7 +2449,7 @@ function dLabel(i){ if(i===0)return 'TODAY'; var d=new Date(Date.now()+i*8640000
   }
   var panel=document.getElementById('calPanel');
   if(panel){ var ph='';
-    for(var j=4;j<9;j++){ /* 后5日 */
+    for(var j=4;j<7;j++){ /* 后3日:全部日期含今日共近7天 */
       ph+='<button class="caldate" data-when="d'+j+'">'+dLabel(j)+'</button>';
     }
     panel.innerHTML=ph;
@@ -2445,15 +2512,17 @@ var LIVEIC='<span class="liveic" title="滚球直播"><svg viewBox="0 0 24 24">'
 
 /* ===== 联赛选择列(赛事列表页;对应列表实际联赛区块,点击定锚到该联赛) ===== */
 (function(){
-  /* 联赛清单取自列表实际的联赛区块名称,确保点击可定锚 */
-  var LGS=[].slice.call(document.querySelectorAll('#screen-list .lrow__name')).map(function(t){return t.textContent.trim();});
-  if(!LGS.length)LGS=['NBA','WNBA'];
-  var cur=LGS[0];
+  /* 联赛清单取自列表「当前可见」的联赛区块名称,随球种切换同步 */
+  function curLGS(){ return [].slice.call(document.querySelectorAll('#screen-list .lrow')).filter(function(r){return r.style.display!=='none';}).map(function(r){var n=r.querySelector('.lrow__name');return n?n.textContent.trim():'';}).filter(Boolean); }
+  var cur=null;
   function renderOne(w){
+    var LGS=curLGS();
+    if(cur&&LGS.indexOf(cur)<0)cur=null;
     w.querySelector('.lgsel__tabs').innerHTML=LGS.map(function(n){return '<button class="lgtab'+(n===cur?' is-on':'')+'" data-lg="'+n+'">'+n+'</button>';}).join('');
     w.querySelector('.lgsel__list').innerHTML=LGS.map(function(n){return '<button class="lglist__i'+(n===cur?' is-on':'')+'" data-lg="'+n+'">'+n+'<span class="c">›</span></button>';}).join('');
   }
   function renderAll(){ document.querySelectorAll('#screen-list .lgsel').forEach(renderOne); }
+  window.__refreshLgsel=renderAll;
   function closeAll(){ document.querySelectorAll('#screen-list .lgsel').forEach(function(w){ var l=w.querySelector('.lgsel__list'); if(l)l.hidden=true; w.classList.remove('is-open'); }); }
   function anchorTo(name){
     var g=[].slice.call(document.querySelectorAll('#screen-list .lrow')).filter(function(r){var n=r.querySelector('.lrow__name');return n&&n.textContent.trim()===name;})[0];
