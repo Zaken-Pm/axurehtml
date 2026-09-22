@@ -262,6 +262,9 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
   padding:5px 2px;text-align:center;box-shadow:inset 0 -2px 0 #dde6f3}
 .ocell__lab{font-size:10px;color:#8b97b3;font-weight:700}
 .ocell__val{font-size:14px;font-weight:900;color:#15264a;transition:color .35s ease;display:inline-flex;align-items:center;justify-content:center;gap:2px}
+/* 未开赛:让球盘锁定(参照图例,独赢与大小开放) */
+.ocell--lock{display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#eef1f7,#e3e8f1);pointer-events:none}
+.ocell__lock{font-size:15px;opacity:.55}
 
 /* ===== detail ===== */
 #detailScroll{position:relative}
@@ -773,7 +776,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
       <div class="lmatches" data-body>
         <div class="lmatch" data-parlay="yes" data-favmatch="m_wnba" data-when="inplay">
           <div class="lgrid">
-            <div class="lgrid__h tm"><span class="lmatch__time lmatch__time--live">3rd 08:29</span><span class="lmatch__more" data-goto="detail">29+ ›</span></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap</div><div class="lgrid__h">Total Points</div>
+            <div class="lgrid__h tm"><span class="lmatch__time lmatch__time--live">Q3 08'29"</span><span class="lmatch__more" data-goto="detail">29+ ›</span></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap</div><div class="lgrid__h">Total Points</div>
             <div class="lteam"><span class="lteam__logo" style="background:#e08">CS</span><span class="lteam__nm">Connecticut Sun(W)</span><span class="lsc"><i class="pt">58</i></span></div>
             <div class="ocell"><div class="ocell__lab">Home</div><div class="ocell__val up">6.26 <span class="a"><svg viewBox="0 0 12 14" width="10" height="12"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg></span></div></div>
             <div class="ocell"><div class="ocell__lab">13</div><div class="ocell__val">1.95</div></div>
@@ -782,6 +785,11 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
             <div class="ocell"><div class="ocell__lab">Away</div><div class="ocell__val dn">1.12 <span class="a"><svg viewBox="0 0 12 14" width="10" height="12"><path d="M6 13L11 8H1Z M6 7L11 2H1Z" fill="currentColor"/></svg></span></div></div>
             <div class="ocell"><div class="ocell__lab">-13</div><div class="ocell__val">1.93</div></div>
             <div class="ocell"><div class="ocell__lab">Under 150.5</div><div class="ocell__val">2.16</div></div>
+          </div>
+          <div class="smallscore">
+            <span class="ss">18 - 25</span>
+            <span class="ss">20 - 24</span>
+            <span class="ss">20 - 22</span>
           </div>
           <div class="micons" data-icons></div>
         </div>
@@ -832,7 +840,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
         <div class="lrow__name">Premier League</div><span class="lrow__star" data-fav="epl" data-favtype="league">☆</span><span class="lrow__chev">▲</span></div>
       <div class="lmatches" data-body>
         <div class="lmatch" data-parlay="yes" data-favmatch="m_epl" data-when="inplay">
-          <div class="fbmkt" data-fbmkt="eplLive" data-time="2nd 77'" data-live="1" data-more="45+ ›"></div>
+          <div class="fbmkt" data-fbmkt="eplLive" data-time="2H 77'22&quot;" data-live="1" data-more="45+ ›"></div>
           <div class="smallscore">
             <span class="neutral" title="中立场">N</span>
             <span class="ss"><span class="card-y"></span> <b>2 - 1</b></span>
@@ -1950,17 +1958,17 @@ function toggleMode(){
     {sport:'volleyball', flag:'🏐', lg:'FIVB Nations League', fav:'volleyball', mkt:'Total Pts',
      h:{ab:'POL',bg:'#dc143c',nm:'Poland',sc:'18'}, a:{ab:'ITA',bg:'#0066b3',nm:'Italy',sc:'22'}, prog:{main:'Set 2',sub:'Best of 5'}, more:'22+ ›', hcp:'-4.5', tot:'Over 190.5', bottom:['25-20','18-22']},
     {sport:'icehockey', flag:'🏒', lg:'NHL', fav:'nhl', mkt:'Total Goals',
-     h:{ab:'TOR',bg:'#00205b',nm:'Maple Leafs',sc:'2'}, a:{ab:'BOS',bg:'#111',nm:'Bruins',sc:'3'}, prog:'P2 12:40', more:'18+ ›', hcp:'-1.5', tot:'Over 5.5'},
+     h:{ab:'TOR',bg:'#00205b',nm:'Maple Leafs',sc:'2'}, a:{ab:'BOS',bg:'#111',nm:'Bruins',sc:'3'}, prog:'P2 12\'40"', more:'18+ ›', hcp:'-1.5', tot:'Over 5.5'},
     {sport:'boxing', flag:'🥊', lg:'WBC Title Fight', fav:'wbc', mkt:'Total Rds',
      h:{ab:'CAN',bg:'#c8102e',nm:'Canelo',sc:'8'}, a:{ab:'GGG',bg:'#111',nm:'Golovkin',sc:'6'}, prog:'Round 6', more:'9+ ›', hcp:'-2.5', tot:'Over 9.5'},
     {sport:'billiards', flag:'🎱', lg:'World Snooker', fav:'snooker', mkt:'Total Frames',
      h:{ab:'OSU',bg:'#333',nm:"O'Sullivan",sc:'10'}, a:{ab:'ROB',bg:'#c8102e',nm:'Robertson',sc:'6'}, prog:'Frame 17', more:'12+ ›', hcp:'-2.5', tot:'Over 25.5'},
-    {sport:'cricket', flag:'🏏', lg:'ICC World Cup', fav:'icc', mkt:'Method',
-     h:{ab:'AUS',bg:'#0a7d46',nm:'Australia',sc:'0/7'}, a:{ab:'BAN',bg:'#0a5',nm:'Bangladesh',sc:'0/8'}, prog:'Over 7.1', more:'20+ ›', hcp:'-15.5', tot:'Over 310.5'},
+    {sport:'cricket', flag:'🏏', lg:'ICC World Cup', fav:'icc', mkt:'4 分打',
+     h:{ab:'AUS',bg:'#0a7d46',nm:'Australia',sc:'144'}, a:{ab:'BAN',bg:'#0a5',nm:'Bangladesh',sc:'46'}, prog:'Innings 1', more:'20+ ›', hcp:'-15.5', tot:'Over 310.5'},
     {sport:'rugby', flag:'🏉', lg:'Six Nations', fav:'sixnations', mkt:'Total Pts',
-     h:{ab:'ENG',bg:'#0b0b45',nm:'England',sc:'24'}, a:{ab:'FRA',bg:'#0055a4',nm:'France',sc:'19'}, prog:'2nd Half 40:00', more:'14+ ›', hcp:'-6.5', tot:'Over 44.5'},
+     h:{ab:'ENG',bg:'#0b0b45',nm:'England',sc:'24'}, a:{ab:'FRA',bg:'#0055a4',nm:'France',sc:'19'}, prog:'2H 40\'00"', more:'14+ ›', hcp:'-6.5', tot:'Over 44.5'},
     {sport:'amfootball', flag:'🏈', lg:'NFL', fav:'nfl', mkt:'Total Pts',
-     h:{ab:'KC',bg:'#e31837',nm:'Chiefs',sc:'26'}, a:{ab:'SF',bg:'#aa0000',nm:'49ers',sc:'14'}, prog:'Q3 09:06', more:'25+ ›', hcp:'-3.5', tot:'Over 47.5'},
+     h:{ab:'KC',bg:'#e31837',nm:'Chiefs',sc:'26'}, a:{ab:'SF',bg:'#aa0000',nm:'49ers',sc:'14'}, prog:'Q3 09\'06"', more:'25+ ›', hcp:'-3.5', tot:'Over 47.5'},
     {sport:'esports', flag:'🎮', lg:'Dota 2 · TI', fav:'dota2', mkt:'Maps',
      h:{ab:'BDS',bg:'#1a8877',nm:'Team BDS',sc:'2'}, a:{ab:'MAD',bg:'#a12a3a',nm:'MAD Lions',sc:'3'}, prog:'Map 3', more:'16+ ›', hcp:'-1.5', tot:'Over 3.5'}
   ];
@@ -2471,6 +2479,20 @@ document.addEventListener('click',function(e){
     pnl.hidden=true; var cb=document.querySelector('#oddsTabs [data-calexpand]'); if(cb)cb.classList.remove('is-open');
   }
 });
+
+/* 未开赛(非滚球)列表赛事:锁定让球盘(仅 .lgrid 版型;足球 fbmkt 另计) */
+(function(){
+  document.querySelectorAll('#screen-list .lgrid').forEach(function(grid){
+    var m=grid.closest('.lmatch'); if(!m)return;
+    var w=m.getAttribute('data-when'); if(!w||w==='inplay')return;
+    grid.querySelectorAll('.lteam').forEach(function(tm){
+      var cells=[], p=tm.nextElementSibling;
+      while(p&&p.classList&&p.classList.contains('ocell')){ cells.push(p); p=p.nextElementSibling; }
+      var hc=cells[1]; /* 第2栏=让球 */
+      if(hc){ hc.classList.add('ocell--lock'); hc.innerHTML='<span class="ocell__lock">🔒</span>'; }
+    });
+  });
+})();
 
 /* init */
 syncFavStars();
