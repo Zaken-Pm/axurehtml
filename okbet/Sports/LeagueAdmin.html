@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>后台原型 · 联赛管理（普通联赛-集群）</title>
+<style>
+  :root{
+    --side:#eef1f5; --side-top:#2bb3a3; --ink:#2b3648; --muted:#8a97ab; --line:#e4e8ef;
+    --blue:#2f7bd6; --blue2:#2668b8; --green:#2fae6a; --greenbg:#e7f7ee; --red:#e0512f;
+    --hd:#f5f7fa; --pill:#6aa3e0; --new:#f0932b; --newbg:#fff3e2;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"PingFang SC","Microsoft YaHei",-apple-system,"Segoe UI",Arial,sans-serif;background:#f0f2f5;color:var(--ink);font-size:13px}
+  .app{display:flex;min-height:100vh}
+  /* ===== sidebar ===== */
+  .side{width:200px;flex:0 0 200px;background:#fff;border-right:1px solid var(--line)}
+  .side__top{height:56px;background:var(--side-top);color:#fff;display:flex;align-items:center;gap:8px;padding:0 16px;font-weight:800;letter-spacing:1px}
+  .side__top .dot{width:22px;height:22px;border-radius:50%;background:#ffd24d;display:flex;align-items:center;justify-content:center;color:#8a5a00;font-size:12px}
+  .navg{border-bottom:1px solid var(--line)}
+  .nav__i{display:flex;align-items:center;gap:9px;padding:12px 16px;color:#4a5568;cursor:pointer;position:relative}
+  .nav__i:hover{background:#f6f8fb}
+  .nav__i .ico{width:16px;text-align:center;opacity:.7}
+  .nav__i .chev{margin-left:auto;color:#c2ccd9;font-size:10px}
+  .nav__i.open{color:var(--ink);font-weight:700}
+  .sub__i{padding:10px 16px 10px 40px;color:#5a6678;cursor:pointer;display:flex;align-items:center;gap:6px}
+  .sub__i:hover{background:#f6f8fb}
+  .sub__i.active{background:var(--blue);color:#fff;font-weight:700}
+  .sub__i.active::before{content:"▸";margin-right:2px}
+  /* ===== content ===== */
+  .main{flex:1;min-width:0;padding:14px 18px 40px}
+  .crumb{color:var(--muted);font-size:13px;margin:2px 0 12px}
+  .crumb b{color:var(--ink);font-weight:700}
+  .card{background:#fff;border:1px solid var(--line);border-radius:6px}
+  .tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);padding:0 6px;background:#fafbfd;border-radius:6px 6px 0 0;flex-wrap:wrap}
+  .tab{padding:12px 16px;color:#5a6678;cursor:pointer;font-size:13px;border-bottom:2px solid transparent;white-space:nowrap}
+  .tab:hover{color:var(--blue)}
+  .tab.active{color:var(--blue);font-weight:800;border-bottom-color:var(--blue)}
+  .body{padding:16px 18px}
+  .note{color:var(--red);font-size:12.5px;margin:0 0 14px}
+  /* selected leagues */
+  .selrow{display:flex;gap:10px;margin-bottom:16px}
+  .selrow__lb{flex:0 0 auto;color:#4a5568;font-weight:700;padding-top:6px;white-space:nowrap}
+  .sels{display:flex;flex-wrap:wrap;gap:8px;flex:1}
+  .selpill{background:var(--pill);color:#fff;border-radius:5px;padding:6px 12px;font-size:12.5px;white-space:nowrap}
+  /* filter */
+  .cluster{margin-bottom:10px}
+  .sel,.inp{height:34px;border:1px solid #d7deea;border-radius:5px;padding:0 10px;font-size:13px;color:var(--ink);background:#fff}
+  .sel{min-width:200px;color:#7b8persistent}
+  select.sel{min-width:180px;color:#5a6678}
+  .filter{display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap;background:#fafbfd;border:1px solid var(--line);border-radius:6px;padding:12px 14px;margin-bottom:16px}
+  .fitem{display:flex;align-items:center;gap:7px}
+  .fitem>label{color:#4a5568;font-weight:700;white-space:nowrap}
+  .inp{width:150px}
+  .chk{display:flex;align-items:center;gap:6px;cursor:pointer;color:#4a5568;white-space:nowrap}
+  .chk input{width:15px;height:15px}
+  .tag-new{display:inline-block;background:var(--newbg);color:var(--new);border:1px solid #f6c98a;border-radius:4px;font-size:10.5px;font-weight:800;padding:1px 5px;margin-left:4px;vertical-align:1px}
+  .btn{height:34px;border:none;border-radius:5px;padding:0 16px;font-size:13px;font-weight:700;cursor:pointer;color:#fff;background:var(--blue);display:inline-flex;align-items:center;gap:5px}
+  .btn:hover{background:var(--blue2)}
+  .btn--ghost{background:#eef2f8;color:var(--blue);border:1px solid #cddcf1}
+  .btn--ghost:hover{background:#e3ecfa}
+  /* table */
+  .tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+  .tbl th{background:var(--hd);color:#5a6678;font-weight:700;text-align:center;padding:12px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+  .tbl td{text-align:center;padding:14px 8px;border-bottom:1px solid #eef1f6;color:#3b465a;vertical-align:middle}
+  .tbl tr:hover td{background:#fafcff}
+  .th-new{color:var(--new)!important}
+  .logo-fail{width:52px;height:34px;border-radius:4px;background:#f0f2f6;color:#aeb6c4;font-size:10px;display:inline-flex;align-items:center;justify-content:center;border:1px dashed #d7deea}
+  .pill{display:inline-block;border-radius:4px;padding:2px 10px;font-size:12px;font-weight:700}
+  .pill--on{background:var(--greenbg);color:var(--green)}
+  .pill--off{background:#f2f4f7;color:#8a97ab}
+  .yn-y{color:var(--new);font-weight:800}
+  .yn-n{color:#9aa6b6}
+  .seasontag{display:inline-block;background:var(--newbg);color:var(--new);border:1px solid #f6c98a;border-radius:4px;padding:2px 8px;font-size:11.5px;font-weight:800}
+  .ops{display:flex;flex-direction:column;gap:7px;align-items:flex-end;min-width:100px}
+  .op{color:var(--blue);cursor:pointer;font-size:12.5px;white-space:nowrap}
+  .op:hover{text-decoration:underline}
+  .op--new{color:var(--new);font-weight:700}
+  .op--on{color:var(--green)}
+  .sort-h{display:inline-flex;align-items:center;gap:3px}
+  .empty{padding:36px;text-align:center;color:#9aa6b6}
+  .legend{margin:14px 2px 0;color:#8a97ab;font-size:12px}
+  .legend .tag-new{margin:0 3px}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- ===== sidebar ===== -->
+  <aside class="side">
+    <div class="side__top"><span class="dot">▾</span> 菜单</div>
+    <div class="navg">
+      <div class="nav__i"><span class="ico">▤</span>用户管理<span class="chev">▾</span></div>
+      <div class="nav__i"><span class="ico">▤</span>控盘管理<span class="chev">▾</span></div>
+      <div class="nav__i"><span class="ico">▤</span>风险管理<span class="chev">▾</span></div>
+      <div class="nav__i"><span class="ico">▤</span>结算<span class="chev">▾</span></div>
+      <div class="nav__i"><span class="ico">▤</span>公告管理<span class="chev">▾</span></div>
+      <div class="nav__i open"><span class="ico">▤</span>联赛管理<span class="chev">▴</span></div>
+      <div class="sub__i active">联赛管理</div>
+      <div class="sub__i">世界杯积分榜</div>
+      <div class="sub__i">篮球世界杯</div>
+      <div class="sub__i">欧洲杯积分榜</div>
+      <div class="sub__i">赛事配置</div>
+      <div class="nav__i"><span class="ico">▤</span>系统管理<span class="chev">▾</span></div>
+      <div class="nav__i"><span class="ico">▤</span>ON数据管理<span class="chev">▾</span></div>
+    </div>
+  </aside>
+
+  <!-- ===== main ===== -->
+  <main class="main">
+    <div class="crumb">› <b>联赛管理</b></div>
+    <div class="card">
+      <!-- tabs -->
+      <div class="tabs">
+        <div class="tab">普通联赛(全局)</div>
+        <div class="tab active">普通联赛(集群)</div>
+        <div class="tab">普通联赛(平台)</div>
+        <div class="tab">冠军联赛</div>
+        <div class="tab">联赛国家</div>
+        <div class="tab">专题管理</div>
+        <div class="tab">赛事管理</div>
+        <div class="tab">平台赛事管理</div>
+      </div>
+
+      <div class="body">
+        <div class="note">*被推荐的联赛显示于[搜索]页面。</div>
+
+        <!-- selected leagues -->
+        <div class="selrow">
+          <div class="selrow__lb">已选择联赛：</div>
+          <div class="sels" id="sels"></div>
+        </div>
+
+        <!-- cluster -->
+        <div class="cluster">
+          <select class="sel"><option>越南體育測試集群</option><option>菲律賓集群</option><option>泰國集群</option></select>
+        </div>
+
+        <!-- filter -->
+        <div class="filter">
+          <select class="sel"><option>请选择体育育类</option><option>足球</option><option>篮球</option><option>网球</option><option>棒球</option><option>羽球</option></select>
+          <div class="fitem"><label>联赛ID</label><input class="inp" id="fId" placeholder="联赛ID"></div>
+          <div class="fitem"><label>联赛名称</label><input class="inp" id="fName" placeholder="联赛名称"></div>
+          <div class="fitem"><label>赔率数据源</label>
+            <select class="sel" style="min-width:150px"><option>赔率数据源</option><option>小金 XJ188</option><option>模拟赛事 Simulating</option></select>
+          </div>
+          <label class="chk"><input type="checkbox" id="fRec"> 留下推荐联赛</label>
+          <label class="chk"><input type="checkbox" id="fNew"> 留下新赛季联赛 <span class="tag-new">新增</span></label>
+          <button class="btn" onclick="doSearch()">🔍 搜索</button>
+          <button class="btn btn--ghost" onclick="doExport()">导出</button>
+        </div>
+
+        <!-- table -->
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>联赛ID</th><th>来源</th><th>名称</th><th>简称</th><th>联赛Logo</th>
+              <th>国家代码</th><th>国家名称</th><th>游戏类型</th>
+              <th>是否热门</th>
+              <th class="th-new">是否新赛季 <span class="tag-new">新增</span></th>
+              <th>状态</th><th>手动赛果结算状态</th>
+              <th><span class="sort-h">排序 ⇅</span></th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+        <div class="empty" id="empty" hidden>无符合条件的联赛。</div>
+
+        <div class="legend">标记 <span class="tag-new">新增</span> 为本次新增之筛选／栏位／操作。</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+/* 已选择联赛 pills */
+var SELECTED=['Meghalaya State Liga',"AFC Women's Champions League",'Reserve League','Premier League','Premier League','Super League W','Brazilian Matches W','NCAA | Football | Women','Major League Soccer','Central League Cup Reserves','Division 3','Eliteserien','World Cup'];
+document.getElementById('sels').innerHTML=SELECTED.map(function(n){return '<span class="selpill">'+n+'</span>';}).join('');
+
+/* 联赛资料(demo) */
+var LEAGUES=[
+  {id:2123,src:'小金 XJ188',name:'模拟联赛BM',abbr:'YYYY',cc:'SIMULATION',cn:'SIMULATION',game:'羽球',hot:false,newS:true,  on:true,settle:'自动',sort:999995,rec:false},
+  {id:2112,src:'小金 XJ188',name:'模拟联赛BB',abbr:'1',   cc:'SIMULATION',cn:'SIMULATION',game:'棒球',hot:false,newS:false, on:true,settle:'自动',sort:999999,rec:false},
+  {id:2121,src:'模拟赛事 Simulating',name:'模拟联赛BK',abbr:'test',cc:'SIMULATION',cn:'SIMULATION',game:'篮球',hot:false,newS:false,on:true,settle:'自动',sort:999999,rec:false},
+  {id:823, src:'小金 XJ188',name:'Premier League',abbr:'EPL',cc:'ENG',cn:'England',game:'足球',hot:true, newS:true, on:true,settle:'手动',sort:480,rec:true},
+  {id:843, src:'小金 XJ188',name:'Australian Open',abbr:'AO',cc:'AUS',cn:'Australia',game:'网球',hot:true,newS:false,on:true,settle:'自动',sort:500,rec:true},
+  {id:762, src:'小金 XJ188',name:'WNBA',abbr:'WNBA',cc:'USA',cn:'USA',game:'篮球',hot:false,newS:false,on:false,settle:'自动',sort:600,rec:false}
+];
+
+function ynHot(v){return v?'<span class="yn-y">是</span>':'<span class="yn-n">否</span>';}
+function ynNew(v){return v?'<span class="seasontag">是</span>':'<span class="yn-n">否</span>';}
+
+function rowHTML(L){
+  return '<tr data-id="'+L.id+'">'+
+    '<td>'+L.id+'</td>'+
+    '<td>'+L.src+'</td>'+
+    '<td style="text-align:left;padding-left:14px">'+L.name+'</td>'+
+    '<td>'+L.abbr+'</td>'+
+    '<td><span class="logo-fail">加载失败</span></td>'+
+    '<td>'+L.cc+'</td>'+
+    '<td>'+L.cn+'</td>'+
+    '<td>'+L.game+'</td>'+
+    '<td>'+ynHot(L.hot)+'</td>'+
+    '<td class="cell-new">'+ynNew(L.newS)+'</td>'+
+    '<td>'+(L.on?'<span class="pill pill--on">开启</span>':'<span class="pill pill--off">关闭</span>')+'</td>'+
+    '<td>'+L.settle+'</td>'+
+    '<td>'+L.sort+'</td>'+
+    '<td><div class="ops">'+
+      '<span class="op" onclick="toggleOn('+L.id+')">'+(L.on?'关闭':'开启')+'</span>'+
+      '<span class="op" onclick="void 0">设定推荐联赛</span>'+
+      '<span class="op op--new" onclick="toggleNew('+L.id+')">'+(L.newS?'取消新赛季':'设定新赛季')+'</span>'+
+      '<span class="op" onclick="void 0">编辑</span>'+
+    '</div></td>'+
+  '</tr>';
+}
+
+function render(list){
+  var box=document.getElementById('rows');
+  box.innerHTML=list.map(rowHTML).join('');
+  document.getElementById('empty').hidden = list.length>0;
+}
+render(LEAGUES);
+
+/* 操作:设定/取消新赛季 → 切换文案 + 是否新赛季栏位 */
+function toggleNew(id){
+  var L=LEAGUES.filter(function(x){return x.id===id;})[0]; if(!L)return;
+  L.newS=!L.newS;
+  applyFilterOrRender();
+}
+/* 操作:开启/关闭 状态 */
+function toggleOn(id){
+  var L=LEAGUES.filter(function(x){return x.id===id;})[0]; if(!L)return;
+  L.on=!L.on;
+  applyFilterOrRender();
+}
+
+/* 筛选:留下推荐联赛 / 留下新赛季联赛 / 联赛ID / 联赛名称 */
+var lastFiltered=null;
+function doSearch(){
+  var id=document.getElementById('fId').value.trim();
+  var nm=document.getElementById('fName').value.trim().toLowerCase();
+  var onlyRec=document.getElementById('fRec').checked;
+  var onlyNew=document.getElementById('fNew').checked;
+  lastFiltered=LEAGUES.filter(function(L){
+    if(id && String(L.id).indexOf(id)<0) return false;
+    if(nm && L.name.toLowerCase().indexOf(nm)<0) return false;
+    if(onlyRec && !L.rec) return false;
+    if(onlyNew && !L.newS) return false;
+    return true;
+  });
+  render(lastFiltered);
+}
+function applyFilterOrRender(){ if(lastFiltered)doSearch(); else render(LEAGUES); }
+function doExport(){ /* demo:导出 */ }
+</script>
+</body>
+</html>
