@@ -383,6 +383,10 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .oarr{flex:0 0 13px;display:flex;justify-content:center;align-items:center;line-height:0}
 .oarr svg{width:12px;height:14px;display:block}
 .oarr.up{color:var(--green)} .oarr.dn{color:var(--down)}
+.oline{position:relative} .oline__odd{position:relative}
+.oline--arr{padding-right:22px}
+.oline__odd .oarr--in{position:absolute;left:100%;top:50%;transform:translateY(-50%);margin-left:2px}
+.oline__odd .oarr--in svg{width:11px;height:13px;display:block}
 
 .dtips{display:flex;align-items:center;gap:8px;margin:8px 0 2px;background:#eef2f9;border-radius:8px;padding:8px 10px}
 .dtips__tag{background:#8794b4;color:#fff;font-size:10px;font-weight:800;padding:2px 6px;border-radius:4px;flex:0 0 auto}
@@ -2437,6 +2441,8 @@ function renderFbmkt(el){
   el.innerHTML=teams+scroll;
 }
 document.querySelectorAll('[data-fbmkt]').forEach(renderFbmkt);
+/* 详情页赔率升降箭头移入按钮内(贴赔率数字), 不在按钮外显示 */
+(function(){document.querySelectorAll('.oline-row').forEach(function(row){var oline=row.querySelector(':scope > .oline'),oarr=row.querySelector(':scope > .oarr');if(!oline){if(oarr)oarr.remove();return;}if(oarr){var dir=oarr.classList.contains('up')?'up':oarr.classList.contains('dn')?'dn':'';if(dir){var odd=oline.querySelector('.oline__odd');if(odd){var a=document.createElement('span');a.className='oarr oarr--in '+dir;a.innerHTML=oarr.innerHTML;odd.appendChild(a);if(!oline.classList.contains('oline--c'))oline.classList.add('oline--arr');}}oarr.remove();}});})();
 
 /* ===== Player tab (详情页) ===== */
 var PLAYERS=[
