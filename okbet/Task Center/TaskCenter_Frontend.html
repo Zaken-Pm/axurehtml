@@ -115,6 +115,11 @@ img{max-width:100%;display:block;}
   padding:12px 14px;display:flex;align-items:center;gap:12px;position:relative;
 }
 .card__badge{position:absolute;left:0;top:0;background:#7a5bd6;color:#fff;font-size:.66rem;padding:2px 8px;border-bottom-right-radius:8px;}
+/* 默认图标（后台「默认图标」选择后前台显示，对应红框位置）*/
+.card__ico{flex:0 0 auto;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:1.5rem;background:radial-gradient(circle at 40% 35%,#ffe6c2,#ffd08a);box-shadow:0 3px 10px rgba(240,145,42,.35);}
+.card__ico--bet{background:radial-gradient(circle at 40% 35%,#bfe0ff,#7fb0ff);box-shadow:0 3px 10px rgba(47,107,255,.3);}
+.card__ico--deposit{background:radial-gradient(circle at 40% 35%,#ffd6a0,#ff9d3d);box-shadow:0 3px 10px rgba(255,122,26,.3);}
+.card__ico--verify{background:radial-gradient(circle at 40% 35%,#bff0d8,#3ee08a);box-shadow:0 3px 10px rgba(38,184,108,.3);}
 .card__main{flex:1;min-width:0;padding-top:6px;}
 .card__title{font-size:.95rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .card__title .info-i{color:var(--c-text-3);font-size:.8rem;margin-left:4px;}
@@ -318,6 +323,7 @@ img{max-width:100%;display:block;}
         <article class="card card--quota">
           <span class="card__badge">每日</span>
           <div class="row1">
+            <div class="card__ico card__ico--deposit" title="默认图标：存款 + 投注">💰</div>
             <div class="card__main">
               <div class="card__title">小额用户·每日充值任务 <span class="tag-new">名额</span></div>
               <div class="card__progress">进度 ₱0 / ₱50 <span class="pct">(0%)</span> · 充值≥₱50 <b style="color:#7fb0ff">AND</b> 投注≥₱200</div>
@@ -461,6 +467,7 @@ img{max-width:100%;display:block;}
         <!-- 去投注 + 倒计时 -->
         <article class="card">
           <span class="card__badge">每日</span>
+          <div class="card__ico card__ico--bet" title="默认图标：投注-单一产品">🎰</div>
           <div class="card__main">
             <div class="card__title">配置单个厂商CQ9电子 <span class="info-i" onclick="showPop('intro')">ⓘ</span></div>
             <div class="card__progress">进度 ₱0 / ₱100 <span class="pct">(0%)</span></div>
@@ -498,6 +505,7 @@ img{max-width:100%;display:block;}
 
         <!-- 去完成 -->
         <article class="card">
+          <div class="card__ico card__ico--verify" title="默认图标：指定验证任务">✅</div>
           <div class="card__main" style="padding-top:0">
             <div class="card__title">KYC认证–不要删除 <span class="info-i">ⓘ</span></div>
             <div class="card__progress">进度 0 / 1</div>

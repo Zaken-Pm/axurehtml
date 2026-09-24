@@ -760,8 +760,18 @@ th.cell-id,td.cell-id{white-space:nowrap;}
         <div class="form__control"><input class="input" placeholder="请输入任务名称"/></div>
       </div>
       <div class="form__row">
-        <label class="form__label">任务标签：</label>
-        <div class="form__control"><select class="select"><option>无</option><option>体育</option><option>电子</option><option>真人</option><option>小游戏</option><option>其他</option></select></div>
+        <label class="form__label">默认图标：</label>
+        <div class="form__control" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <select class="select" id="defaultIcon" onchange="onDefaultIcon()" style="max-width:220px">
+            <option value="none">无</option>
+            <option value="bet1">投注-单一产品</option>
+            <option value="betN">投注-多产品</option>
+            <option value="deposit">存款</option>
+            <option value="deposit_bet">存款 + 投注</option>
+            <option value="verify">指定验证任务</option>
+          </select>
+          <span class="note" id="iconPreview" style="display:flex;align-items:center;gap:6px">预设选择「无」；选择后前台任务卡左侧显示对应图标</span>
+        </div>
       </div>
       <div class="form__row" id="rowCond">
         <label class="form__label"><span class="req">*</span>任务条件：</label>
@@ -807,8 +817,8 @@ th.cell-id,td.cell-id{white-space:nowrap;}
       <div class="form__row" id="rowReward">
         <label class="form__label"><span class="req">*</span>任务奖励：</label>
         <div class="form__control" style="display:flex;gap:10px;flex-wrap:wrap">
-          <select class="select" id="rewardType" onchange="onReward()" style="max-width:200px"><option value="p">积分</option><option value="c">彩金</option></select>
-          <input class="input" value="0" style="flex:1"/>
+          <select class="select" id="rewardType" onchange="onReward()" style="max-width:200px"><option value="p">积分</option><option value="c">彩金</option><option value="fb">免费投注</option><option value="cp">优惠券</option><option value="gd">golden draw</option></select>
+          <input class="input" value="0" style="flex:1" id="rewardVal"/>
         </div>
       </div>
 
@@ -833,6 +843,19 @@ th.cell-id,td.cell-id{white-space:nowrap;}
       <div class="form__row" id="rowChip"  style="display:none">
         <label class="form__label">彩金打码倍数：</label>
         <div class="form__control"><input class="input" value="0" style="max-width:160px"/></div>
+      </div>
+      <div class="form__row" id="rowRewardList" style="display:none">
+        <label class="form__label" id="rewardListLabel">奖励清单：</label>
+        <div class="form__control"><select class="select" id="rewardList" style="max-width:200px"></select></div>
+      </div>
+      <div class="form__row" id="rowGoldenDraw" style="display:none">
+        <label class="form__label">兜底奖励：</label>
+        <div class="form__control" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <span class="tag tag--new">golden draw</span>
+          <span>彩金</span>
+          <input class="input" value="0" placeholder="兜底彩金金额" style="max-width:160px"/>
+          <span class="note">（不需要打码流水）</span>
+        </div>
       </div>
 
 
@@ -1074,9 +1097,31 @@ function gmAll(a,on){
 function gmAllPane(a,on){
   a.closest('.gm__pane').querySelectorAll('.gm__games input[type=checkbox]').forEach(function(c){ c.checked=!!on; });
 }
+function onDefaultIcon(){
+  var v=document.getElementById('defaultIcon').value;
+  var map={ none:'前台不显示默认图标（预设）', bet1:'🎰 投注-单一产品', betN:'🎲 投注-多产品', deposit:'💰 存款', deposit_bet:'💰🎲 存款 + 投注', verify:'✅ 指定验证任务' };
+  var p=document.getElementById('iconPreview');
+  if(p) p.textContent = '前台任务卡左侧图标：'+ (map[v]||'');
+}
 function onReward(){
   var v=document.getElementById('rewardType').value;
   document.getElementById('rowChip').style.display = (v==='c'?'grid':'none');
+  var rowList=document.getElementById('rowRewardList');
+  var rowGD=document.getElementById('rowGoldenDraw');
+  var sel=document.getElementById('rewardList');
+  var lbl=document.getElementById('rewardListLabel');
+  var valInput=document.getElementById('rewardVal');
+  var lists={ fb:['免费旋转','免费投注','道具卡'], cp:['输返券','存送券'] };
+  if(v==='fb'||v==='cp'){
+    rowList.style.display='grid';
+    lbl.textContent = (v==='fb'?'免费投注·奖励清单：':'优惠券·奖励清单：');
+    sel.innerHTML = lists[v].map(function(o){return '<option>'+o+'</option>';}).join('');
+    if(valInput) valInput.style.display='none';
+  }else{
+    rowList.style.display='none';
+    if(valInput) valInput.style.display='';
+  }
+  rowGD.style.display = (v==='gd'?'grid':'none');
 }
 
 /* ===== 组任务配置 ===== */
