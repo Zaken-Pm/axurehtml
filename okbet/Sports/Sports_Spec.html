@@ -91,7 +91,7 @@ code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:
 .mod-head{background:linear-gradient(90deg,#0e1b30,#12203c);padding:13px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);}
 .mod-head .n{width:26px;height:26px;border-radius:6px;background:var(--gold-bg);border:1px solid var(--gold-border);color:var(--gold);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .mod-head h3{font-size:14.5px;color:#fff;font-weight:700;}
-.io{display:grid;grid-template-columns:340px 1fr;}.io-stack{grid-template-columns:1fr;}.io-stack .io-img{border-right:none;border-bottom:1px solid var(--border2);padding:22px 22px 26px;}.io-stack .io-img img{width:100%;max-width:none;}
+.io{display:grid;grid-template-columns:340px 1fr;}.io--full{grid-template-columns:1fr;}.io:has(>.io-spec:only-child){grid-template-columns:1fr;}.io-stack{grid-template-columns:1fr;}.io-stack .io-img{border-right:none;border-bottom:1px solid var(--border2);padding:22px 22px 26px;}.io-stack .io-img img{width:100%;max-width:none;}
 .io-img{background:#07111f;padding:16px;display:flex;flex-direction:column;gap:9px;align-items:center;border-right:1px solid var(--border2);}
 .io-cap{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);background:var(--gold-bg);border:1px solid var(--gold-border);border-radius:4px;padding:2px 9px;align-self:flex-start;}
 .io-img img{width:100%;max-width:300px;border-radius:10px;box-shadow:0 6px 28px rgba(0,0,0,.6);border:1px solid var(--border2);display:block;}
@@ -449,7 +449,7 @@ code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:
 
   <div class="mod">
     <div class="mod-head"><span class="n">4</span><h3>市场页签（All Markets／Player／Picks） <span class="badge badge-new">新增</span></h3></div>
-    <div class="io"><div class="io-spec">
+    <div class="io io--full"><div class="io-spec">
       <table class="spec-table">
         <tr><td>用途</td><td>玩法区顶部三个页签，切换显示不同范围的玩法清单；此列不吸顶，随页面卷动。</td></tr>
         <tr><td>All Markets</td><td>套用<b>生产环境「All Markets」</b>——显示该赛事的<b>全部玩法</b>（完整玩法列表）。</td></tr>
@@ -508,7 +508,7 @@ code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:
 
   <div class="mod">
     <div class="mod-head"><span class="n">8</span><h3>BET TIPS（论坛贴文） <span class="badge badge-new">新增</span></h3></div>
-    <div class="io"><div class="io-spec">
+    <div class="io io--full"><div class="io-spec">
       <table class="spec-table">
         <tr><td>用途</td><td>于赛事下方显示「<b>BET TIPS</b>」提示，内容为该赛事相关的<b>论坛贴文</b>（讨论／分析）。</td></tr>
         <tr><td>来源</td><td><b>抓取论坛贴文</b>：系统撷取该赛事相关的论坛贴文内容显示。</td></tr>

@@ -542,7 +542,7 @@ const tasks = [
 ];
 /* 情境：bet=累积有效投注、topup=累积充值 */
 const scenarios = { 1:{bet:5000,topup:100}, 2:{bet:5000,topup:50}, 3:{bet:500,topup:100} };
-let curScn=1, claimed={};
+let curScn=1, claimed={1:true}; /* 示意：LV1 已领取，故排到最下方 */
 function prevBetLevel(lv){ let best=null; tasks.forEach(t=>{ if(t.type==='bet'&&t.lv<lv&&(!best||t.lv>best.lv))best=t; }); return best; }
 function taskStatus(d){
   if(claimed[d.lv]) return 'done';
@@ -573,7 +573,7 @@ function taskCard(d){
       <span class="level-card__amt">${d.amt}</span>${ticket}</div>${btn}</article>`;
 }
 function renderTasks(){
-  $('#rebateList').innerHTML = tasks.slice().sort((a,b)=>a.lv-b.lv).map(taskCard).join('');
+  $('#rebateList').innerHTML = tasks.slice().sort((a,b)=>{const da=taskStatus(a)==='done'?1:0,db=taskStatus(b)==='done'?1:0; if(da!==db) return da-db; return a.lv-b.lv;}).map(taskCard).join(''); /* 已领取往后排；未领取依 LV 排 */
   const c=tasks.filter(t=>taskStatus(t)==='claim').length;
   const b=$('#badgeRebate'); if(b){ if(c===0){b.style.display='none';} else {b.style.display=''; b.textContent=c;} }
 }
