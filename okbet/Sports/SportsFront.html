@@ -228,7 +228,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .lmatch__top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .lmatch__time{background:#e4ebf7;color:#3a4767;font-size:9.5px;font-weight:800;border-radius:6px;padding:2px 5px;white-space:nowrap;flex:0 0 auto}
 /* 滚球进程(篮球/足球)竞品样式:绿色文字、无底色 */
-.lmatch__time--live{background:transparent;color:#12b866;padding:2px 0;font-size:11px;letter-spacing:.2px}
+.lmatch__time--live{background:transparent;color:#5c6885;padding:2px 0;font-size:11px;letter-spacing:.2px}
 .liveic{flex:0 0 auto;display:inline-flex;width:16px;height:16px}
 .liveic svg{width:16px;height:16px}
 .liveic .arc{fill:none;stroke:#e5202f;stroke-width:2;stroke-linecap:round}
@@ -248,11 +248,11 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .lteam b{margin-left:auto;padding-left:6px;flex:0 0 auto}
 /* 滚球即时比分栏(每队):篮球=当前得分;网球/羽球/桌球=盘/局/分 */
 .lsc{margin-left:auto;display:flex;gap:3px;flex:0 0 auto;padding-left:6px}
-.lsc i{min-width:16px;text-align:center;font-style:normal;font-weight:900;font-size:12.5px;color:#15264a}
-.lsc i.pt{color:#15264a}
+.lsc i{min-width:16px;text-align:center;font-style:normal;font-weight:900;font-size:12.5px;color:#f0a81e}
+.lsc i.pt{color:#f0a81e}
 /* 双行赛事进程(网球:第X盘 + 盘制) */
 .ltime2{display:inline-flex;flex-direction:column;align-items:flex-start;line-height:1.15;padding:0}
-.ltime2 b{font-size:9px;font-weight:800;color:#12b866}
+.ltime2 b{font-size:9px;font-weight:800;color:#5c6885}
 .ltime2 i{font-style:normal;font-size:9px;font-weight:700;color:#8b97b3;letter-spacing:0}
 /* 发球权提示(网球/羽球/乒乓球):竖条 */
 .serve{position:absolute;left:-2px;top:50%;transform:translateY(-50%);width:3px;height:15px;border-radius:2px;background:#12b866}
@@ -566,20 +566,16 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .fbhh{height:34px}
 .fbteam{height:50px;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#22304f;line-height:1.2}
 .fbteam__nm{flex:1 1 0;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
-.fbteam b{color:#e11338;font-weight:900;min-width:12px;text-align:right}
+.fbteam b{color:#f0a81e;font-weight:900;min-width:12px;text-align:right}
 .fbcards{display:inline-flex;gap:3px;align-items:center;flex:0 0 auto}
 .fbcard{display:inline-flex;align-items:center;justify-content:center;min-width:14px;height:15px;padding:0 2px;border-radius:2px;font-size:10px;font-weight:800;line-height:1}
 .fbcard--y{background:#f5c518;color:#3a2e00}
 .fbcard--r{background:#e11338;color:#fff}
 /* ===== 网球 fbmkt 滚球模式 ===== */
 .fbmkt--tennis .fbmkt__teams{flex:0 0 150px;min-width:150px;max-width:150px}
-.fbmkt--tennis .fbteam{height:58px;flex-direction:column;align-items:stretch;justify-content:center;gap:3px}
+.fbmkt--tennis .fbteam{height:58px}
 .fbmkt--tennis .fbcol .ocell{height:58px}
-.fbmkt--tennis .fbteam__top{display:flex;align-items:center;gap:6px;min-width:0}
 .fbmkt--tennis .fbteam__top .lteam__logo{font-size:12px}
-.fbmkt--tennis .fbteam .lsc{margin-left:0;padding-left:28px;gap:8px}
-.fbmkt--tennis .fbteam .lsc i{min-width:14px;text-align:left}
-.fbmkt--tennis .fbteam .lsc .setn{color:#f0a81e}
 .fbcol .ocell.is-sel{border-color:#1f5fe0;box-shadow:inset 0 0 0 1px #1f5fe0;background:#eef4ff}
 .fbcol .ocell--lock{align-items:center;justify-content:center;color:#9aa6bf;background:#f1f4f9;pointer-events:none}
 .fbcol .ocell--lock .lockico{font-size:15px;opacity:.75}
@@ -846,11 +842,6 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
             <div class="ocell"><div class="ocell__lab">-13</div><div class="ocell__val">1.93</div></div>
             <div class="ocell"><div class="ocell__lab">Under 150.5</div><div class="ocell__val">2.16</div></div>
           </div>
-          <div class="smallscore">
-            <span class="ss">18 - 25</span>
-            <span class="ss">20 - 24</span>
-            <span class="ss">20 - 22</span>
-          </div>
           <div class="micons" data-icons></div>
         </div>
         <div class="lmatch" data-when="today">
@@ -895,21 +886,142 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
         </div>
       </div>
 
+      <!-- Basketball · NBA -->
+      <div class="lrow" data-collapse data-lgsport="basketball"><div class="lrow__flag">🇺🇸</div>
+        <div class="lrow__name">NBA</div><span class="lrow__star" data-fav="nba" data-favtype="league">☆</span><span class="lrow__chev">▲</span></div>
+      <div class="lmatches" data-body>
+        <div class="lmatch" data-parlay="yes" data-favmatch="m_nba" data-when="inplay">
+          <div class="lgrid">
+            <div class="lgrid__h tm"><span class="lmatch__time lmatch__time--live">第3节 09'06"</span><span class="lmatch__more" data-goto="detail">218+ ›</span></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap</div><div class="lgrid__h">Total Points</div>
+            <div class="lteam"><span class="lteam__logo" style="background:#552583">LAL</span><span class="lteam__nm">LA Lakers</span><span class="lsc"><i class="pt">112</i></span></div>
+            <div class="ocell"><div class="ocell__lab">Home</div><div class="ocell__val">1.85</div></div>
+            <div class="ocell"><div class="ocell__lab">-4.5</div><div class="ocell__val">1.90</div></div>
+            <div class="ocell"><div class="ocell__lab">Over 220.5</div><div class="ocell__val">1.90</div></div>
+            <div class="lteam"><span class="lteam__logo" style="background:#1d428a">GSW</span><span class="lteam__nm">Golden State</span><span class="lsc"><i class="pt">108</i></span></div>
+            <div class="ocell"><div class="ocell__lab">Away</div><div class="ocell__val">1.95</div></div>
+            <div class="ocell"><div class="ocell__lab">+4.5</div><div class="ocell__val">1.90</div></div>
+            <div class="ocell"><div class="ocell__lab">Under 220.5</div><div class="ocell__val">1.90</div></div>
+          </div>
+          <div class="micons" data-icons></div>
+        </div>
+        <div class="lmatch" data-when="today" style="border-radius:0 0 10px 10px">
+          <div class="lgrid">
+            <div class="lgrid__h tm"><span class="lmatch__time">TODAY 11:00</span><span class="lmatch__more" data-goto="detail">195+ ›</span></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap</div><div class="lgrid__h">Total Points</div>
+            <div class="lteam"><span class="lteam__logo" style="background:#0e2240">DEN</span>Denver Nuggets</div>
+            <div class="ocell"><div class="ocell__lab">Home</div><div class="ocell__val">1.62</div></div>
+            <div class="ocell"><div class="ocell__lab">-3.5</div><div class="ocell__val">1.91</div></div>
+            <div class="ocell"><div class="ocell__lab">Over 228.5</div><div class="ocell__val">1.90</div></div>
+            <div class="lteam"><span class="lteam__logo" style="background:#e56020">PHX</span>Phoenix Suns</div>
+            <div class="ocell"><div class="ocell__lab">Away</div><div class="ocell__val">2.30</div></div>
+            <div class="ocell"><div class="ocell__lab">+3.5</div><div class="ocell__val">1.90</div></div>
+            <div class="ocell"><div class="ocell__lab">Under 228.5</div><div class="ocell__val">1.90</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Basketball · EuroLeague -->
+      <div class="lrow" data-collapse data-lgsport="basketball"><div class="lrow__flag">🇪🇺</div>
+        <div class="lrow__name">EuroLeague</div><span class="lrow__star" data-fav="euro" data-favtype="league">☆</span><span class="lrow__chev">▲</span></div>
+      <div class="lmatches" data-body>
+        <div class="lmatch" data-parlay="yes" data-favmatch="m_euro" data-when="inplay">
+          <div class="lgrid">
+            <div class="lgrid__h tm"><span class="lmatch__time lmatch__time--live">第2节 04'20"</span><span class="lmatch__more" data-goto="detail">132+ ›</span></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap</div><div class="lgrid__h">Total Points</div>
+            <div class="lteam"><span class="lteam__logo" style="background:#e3a51a">RMA</span><span class="lteam__nm">Real Madrid</span><span class="lsc"><i class="pt">44</i></span></div>
+            <div class="ocell"><div class="ocell__lab">Home</div><div class="ocell__val">1.55</div></div>
+            <div class="ocell"><div class="ocell__lab">-5.5</div><div class="ocell__val">1.90</div></div>
+            <div class="ocell"><div class="ocell__lab">Over 158.5</div><div class="ocell__val">1.90</div></div>
+            <div class="lteam"><span class="lteam__logo" style="background:#a50044">BAR</span><span class="lteam__nm">FC Barcelona</span><span class="lsc"><i class="pt">38</i></span></div>
+            <div class="ocell"><div class="ocell__lab">Away</div><div class="ocell__val">2.45</div></div>
+            <div class="ocell"><div class="ocell__lab">+5.5</div><div class="ocell__val">1.90</div></div>
+            <div class="ocell"><div class="ocell__lab">Under 158.5</div><div class="ocell__val">1.90</div></div>
+          </div>
+          <div class="micons" data-icons></div>
+        </div>
+        <div class="lmatch" data-when="today" style="border-radius:0 0 10px 10px">
+          <div class="lgrid">
+            <div class="lgrid__h tm"><span class="lmatch__time">TODAY 02:45</span><span class="lmatch__more" data-goto="detail">120+ ›</span></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap</div><div class="lgrid__h">Total Points</div>
+            <div class="lteam"><span class="lteam__logo" style="background:#004c9b">PAN</span>Panathinaikos</div>
+            <div class="ocell"><div class="ocell__lab">Home</div><div class="ocell__val">1.80</div></div>
+            <div class="ocell"><div class="ocell__lab">-2.5</div><div class="ocell__val">1.90</div></div>
+            <div class="ocell"><div class="ocell__lab">Over 154.5</div><div class="ocell__val">1.90</div></div>
+            <div class="lteam"><span class="lteam__logo" style="background:#c8102e">OLY</span>Olympiacos</div>
+            <div class="ocell"><div class="ocell__lab">Away</div><div class="ocell__val">2.00</div></div>
+            <div class="ocell"><div class="ocell__lab">+2.5</div><div class="ocell__val">1.90</div></div>
+            <div class="ocell"><div class="ocell__lab">Under 154.5</div><div class="ocell__val">1.90</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Basketball · CBA -->
+      <div class="lrow" data-collapse data-lgsport="basketball"><div class="lrow__flag">🇨🇳</div>
+        <div class="lrow__name">CBA</div><span class="lrow__star" data-fav="cba" data-favtype="league">☆</span><span class="lrow__chev">▲</span></div>
+      <div class="lmatches" data-body>
+        <div class="lmatch" data-parlay="yes" data-favmatch="m_cba" data-when="inplay">
+          <div class="lgrid">
+            <div class="lgrid__h tm"><span class="lmatch__time lmatch__time--live">第4节 06'12"</span><span class="lmatch__more" data-goto="detail">96+ ›</span></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap</div><div class="lgrid__h">Total Points</div>
+            <div class="lteam"><span class="lteam__logo" style="background:#c8102e">GD</span><span class="lteam__nm">广东华南虎</span><span class="lsc"><i class="pt">95</i></span></div>
+            <div class="ocell"><div class="ocell__lab">Home</div><div class="ocell__val">1.30</div></div>
+            <div class="ocell"><div class="ocell__lab">-7.5</div><div class="ocell__val">1.90</div></div>
+            <div class="ocell"><div class="ocell__lab">Over 205.5</div><div class="ocell__val">1.90</div></div>
+            <div class="lteam"><span class="lteam__logo" style="background:#f5a201;color:#333">LN</span><span class="lteam__nm">辽宁飞豹</span><span class="lsc"><i class="pt">88</i></span></div>
+            <div class="ocell"><div class="ocell__lab">Away</div><div class="ocell__val">3.40</div></div>
+            <div class="ocell"><div class="ocell__lab">+7.5</div><div class="ocell__val">1.90</div></div>
+            <div class="ocell"><div class="ocell__lab">Under 205.5</div><div class="ocell__val">1.90</div></div>
+          </div>
+          <div class="micons" data-icons></div>
+        </div>
+        <div class="lmatch" data-when="today" style="border-radius:0 0 10px 10px">
+          <div class="lgrid">
+            <div class="lgrid__h tm"><span class="lmatch__time">TODAY 19:35</span><span class="lmatch__more" data-goto="detail">84+ ›</span></div><div class="lgrid__h">Winner</div><div class="lgrid__h">Handicap</div><div class="lgrid__h">Total Points</div>
+            <div class="lteam"><span class="lteam__logo" style="background:#d4111a">ZJ</span>浙江稠州</div>
+            <div class="ocell"><div class="ocell__lab">Home</div><div class="ocell__val">1.72</div></div>
+            <div class="ocell"><div class="ocell__lab">-3.5</div><div class="ocell__val">1.90</div></div>
+            <div class="ocell"><div class="ocell__lab">Over 212.5</div><div class="ocell__val">1.90</div></div>
+            <div class="lteam"><span class="lteam__logo" style="background:#1a6fc4">SH</span>上海久事</div>
+            <div class="ocell"><div class="ocell__lab">Away</div><div class="ocell__val">2.10</div></div>
+            <div class="ocell"><div class="ocell__lab">+3.5</div><div class="ocell__val">1.90</div></div>
+            <div class="ocell"><div class="ocell__lab">Under 212.5</div><div class="ocell__val">1.90</div></div>
+          </div>
+        </div>
+      </div>
+
       <!-- Football · Premier League (上/下半场 + min, Total Goals, 红黄牌/角球, 1X2 含 Draw) -->
       <div class="lrow" data-collapse data-lgsport="football"><div class="lrow__flag">🏴󠁧󠁢󠁥󠁮󠁧󠁿</div>
         <div class="lrow__name">Premier League</div><span class="lrow__star" data-fav="epl" data-favtype="league">☆</span><span class="lrow__chev">▲</span></div>
       <div class="lmatches" data-body>
         <div class="lmatch" data-parlay="yes" data-favmatch="m_epl" data-when="inplay">
           <div class="fbmkt" data-fbmkt="eplLive" data-time="下半场 77'22&quot;" data-live="1" data-more="45+ ›"></div>
-          <div class="smallscore">
-            <span class="neutral" title="中立场">N</span>
-            <span class="ss">⛳ <b>5 - 3</b></span>
-          </div>
           <div class="micons" data-icons></div>
         </div>
         <!-- upcoming (未开赛) → TODAY -->
         <div class="lmatch" data-when="today" style="border-radius:0 0 10px 10px">
           <div class="fbmkt" data-fbmkt="eplUp" data-time="TODAY 22:00" data-more="52+ ›"></div>
+        </div>
+      </div>
+
+      <!-- Football · La Liga -->
+      <div class="lrow" data-collapse data-lgsport="football"><div class="lrow__flag">🇪🇸</div>
+        <div class="lrow__name">La Liga</div><span class="lrow__star" data-fav="laliga" data-favtype="league">☆</span><span class="lrow__chev">▲</span></div>
+      <div class="lmatches" data-body>
+        <div class="lmatch" data-parlay="yes" data-favmatch="m_laliga" data-when="inplay">
+          <div class="fbmkt" data-fbmkt="laligaLive" data-time="下半场 63'10&quot;" data-live="1" data-more="120+ ›"></div>
+          <div class="micons" data-icons></div>
+        </div>
+        <div class="lmatch" data-when="today" style="border-radius:0 0 10px 10px">
+          <div class="fbmkt" data-fbmkt="laligaUp" data-time="TODAY 03:00" data-more="98+ ›"></div>
+        </div>
+      </div>
+
+      <!-- Football · Serie A -->
+      <div class="lrow" data-collapse data-lgsport="football"><div class="lrow__flag">🇮🇹</div>
+        <div class="lrow__name">Serie A</div><span class="lrow__star" data-fav="seriea" data-favtype="league">☆</span><span class="lrow__chev">▲</span></div>
+      <div class="lmatches" data-body>
+        <div class="lmatch" data-parlay="yes" data-favmatch="m_seriea" data-when="inplay">
+          <div class="fbmkt" data-fbmkt="serieaLive" data-time="上半场 32'45&quot;" data-live="1" data-more="110+ ›"></div>
+          <div class="micons" data-icons></div>
+        </div>
+        <div class="lmatch" data-when="today" style="border-radius:0 0 10px 10px">
+          <div class="fbmkt" data-fbmkt="serieaUp" data-time="TODAY 02:45" data-more="88+ ›"></div>
         </div>
       </div>
 
@@ -919,11 +1031,6 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
       <div class="lmatches" data-body>
         <div class="lmatch" data-parlay="yes" data-favmatch="m_ao" data-when="inplay">
           <div class="fbmkt" data-fbmkt="aoLive" data-time="第3盘" data-sub="3盘2胜" data-live="1" data-more="29+ ›"></div>
-          <div class="smallscore">
-            <span class="ss">6 - 3</span>
-            <span class="ss">4 - 6</span>
-            <span class="ss">3 - 2</span>
-          </div>
           <div class="micons" data-icons></div>
         </div>
         <!-- upcoming (未开赛) → TODAY -->
@@ -978,10 +1085,6 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
             <div class="ocell"><div class="ocell__lab">+3.5</div><div class="ocell__val">1.90</div></div>
             <div class="ocell"><div class="ocell__lab">Under 40.5</div><div class="ocell__val">1.95</div></div>
           </div>
-          <div class="smallscore">
-            <span class="ss">21 - 18</span>
-            <span class="ss">15 - 12</span>
-          </div>
           <div class="micons" data-icons></div>
         </div>
       </div>
@@ -1001,11 +1104,6 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
             <div class="ocell"><div class="ocell__lab">Away</div><div class="ocell__val">2.20</div></div>
             <div class="ocell"><div class="ocell__lab">+2.5</div><div class="ocell__val">1.90</div></div>
             <div class="ocell"><div class="ocell__lab">Under 18.5</div><div class="ocell__val">1.92</div></div>
-          </div>
-          <div class="smallscore">
-            <span class="ss">11 - 8</span>
-            <span class="ss">9 - 11</span>
-            <span class="ss">7 - 5</span>
           </div>
           <div class="micons" data-icons></div>
         </div>
@@ -2041,7 +2139,7 @@ function toggleMode(){
       '<div class="lrow__name">'+d.lg+'</div><span class="lrow__star" data-fav="'+d.fav+'" data-favtype="league">☆</span><span class="lrow__chev">▲</span>';
     var body=document.createElement('div');
     body.className='lmatches'; body.setAttribute('data-body','');
-    var bottom = d.bottom ? '<div class="smallscore">'+d.bottom.map(function(s){return '<span class="ss">'+s+'</span>';}).join('')+'</div>' : '';
+    var bottom = ''; /* 滚球小比分(分节比分)已移除 */
     body.innerHTML=
       '<div class="lmatch" data-favmatch="m_'+d.fav+'" data-when="inplay" style="border-radius:0 0 10px 10px">'+
         '<div class="lgrid">'+
@@ -2435,6 +2533,30 @@ var FBMKT={
       {h:'Handicap<br>1st Half',cells:[['0','1.95',''],['0','1.85','']]},
       {h:'Goals O/U<br>1st Half',cells:[['O 1','2.10',''],['U 1','1.72','']]}
     ]},
+  laligaLive:{teams:[{ab:'RMA',bg:'#febe10',nm:'Real Madrid',sc:'1'},{ab:'ATM',bg:'#cb3524',nm:'Atlético Madrid',sc:'1'}],
+    cols:[
+      {h:'1 X 2',cells:[['Home','1.90','up'],['Away','4.00',''],['Draw','3.30','']]},
+      {h:'Handicap',cells:[['-0.5','1.72',''],['+0.5','2.10','dn']]},
+      {h:'Goals O/U',cells:[['O 2.5','1.95',''],['U 2.5','1.85','']]}
+    ]},
+  laligaUp:{teams:[{ab:'FCB',bg:'#a50044',nm:'FC Barcelona',sc:''},{ab:'SEV',bg:'#d81e05',nm:'Sevilla',sc:''}],
+    cols:[
+      {h:'1 X 2',cells:[['Home','1.45',''],['Away','6.50',''],['Draw','4.60','']]},
+      {h:'Handicap',cells:[['-1.5','1.90',''],['+1.5','1.90','']]},
+      {h:'Goals O/U',cells:[['O 3.0','1.90',''],['U 3.0','1.90','']]}
+    ]},
+  serieaLive:{teams:[{ab:'INT',bg:'#0b1560',nm:'Inter Milan',sc:'2'},{ab:'JUV',bg:'#111111',nm:'Juventus',sc:'0'}],
+    cols:[
+      {h:'1 X 2',cells:[['Home','1.40','',],['Away','7.00',''],['Draw','4.50','']]},
+      {h:'Handicap',cells:[['-1.0','1.80','dn'],['+1.0','2.00','']]},
+      {h:'Goals O/U',cells:[['O 2.5','2.10','up'],['U 2.5','1.72','']]}
+    ]},
+  serieaUp:{teams:[{ab:'NAP',bg:'#12a0d7',nm:'Napoli',sc:''},{ab:'ROM',bg:'#8e1f2f',nm:'AS Roma',sc:''}],
+    cols:[
+      {h:'1 X 2',cells:[['Home','1.75',''],['Away','4.50',''],['Draw','3.60','']]},
+      {h:'Handicap',cells:[['-0.5','1.82',''],['+0.5','2.00','']]},
+      {h:'Goals O/U',cells:[['O 2.5','1.88',''],['U 2.5','1.92','']]}
+    ]},
   aoLive:{sport:'tennis',teams:[{nm:'Alina Sabalenka / Tanasiko Nig',serve:true,sc:['1','3','40']},{nm:'Ashleigh Barty / Matt Pavich',serve:false,sc:['1','3','40']}],cols:[
       {h:'1 X 2<br>1st Half',cells:[['Home','-100',''],['Away','1.89','up'],['Draw','1.89','']]},
       {h:'Handicap',cells:[['-0/0.5','1.89','dn'],['-0/0.5','1.89','']]},
@@ -2456,10 +2578,10 @@ function renderFbmkt(el){
   var teams='<div class="fbmkt__teams"><div class="fbhh">'+hh+'</div>'+d.teams.map(function(t,ti){
     if(d.sport==='tennis'){
       var red=(t.serve?' is-fav':'');
-      var sc=t.sc?('<span class="lsc"><i class="setn">'+t.sc[0]+'</i><i>'+t.sc[1]+'</i><i class="pt">'+t.sc[2]+'</i></span>'):'';
-      return '<div class="fbteam fbteam--t'+red+'"><div class="fbteam__top"><span class="lteam__logo" style="background:#1d4ed8">\u265B</span><span class="fbteam__nm">'+t.nm+'</span></div>'+sc+'</div>';
+      var sc=(t.sc&&t.sc[0]!=null)?('<b>'+t.sc[0]+'</b>'):'';
+      return '<div class="fbteam fbteam--t'+red+'"><span class="lteam__logo" style="background:#1d4ed8">\u265B</span><span class="fbteam__nm">'+t.nm+'</span>'+sc+'</div>';
     }
-    return '<div class="fbteam'+(ti===favIdx?' is-fav':'')+'"><span class="lteam__logo" style="background:'+t.bg+'">'+t.ab+'</span><span class="fbteam__nm">'+t.nm+'</span>'+fbCardsHTML(t)+(t.sc?'<b>'+t.sc+'</b>':'')+'</div>';
+    return '<div class="fbteam'+(ti===favIdx?' is-fav':'')+'"><span class="lteam__logo" style="background:'+t.bg+'">'+t.ab+'</span><span class="fbteam__nm">'+t.nm+'</span>'+(t.sc?'<b>'+t.sc+'</b>':'')+'</div>';
   }).join('')+'</div>';
   var scroll='<div class="fbmkt__scroll">'+d.cols.map(function(c){
     return '<div class="fbcol"><div class="fbcol__h">'+c.h+'</div>'+c.cells.map(function(cell){
