@@ -137,9 +137,14 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
   85%{opacity:1;transform:translateY(0)}
   100%{opacity:0;transform:translateY(0)}
 }
-.tips{display:flex;align-items:center;gap:8px;margin:8px 8px 12px;background:#0a1830;border:1px solid rgba(255,255,255,.05);border-radius:8px;padding:8px 10px}
-.tips__tag{background:rgba(61,139,255,.16);color:#5aa2ff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:5px;flex:0 0 auto}
-.tips__txt{font-size:11px;color:#6fa6ff;line-height:1.3}.mcard--plain .mcard__body{background-image:none!important;background:radial-gradient(135% 95% at 50% -12%,#274d88 0%,#152a52 55%,#0c1c38 100%)!important}
+.tips{display:flex;align-items:center;gap:8px;margin:8px 8px 12px;background:#fff;border:1px solid #e6ebf4;border-radius:999px;padding:9px 14px;box-shadow:0 1px 4px rgba(10,20,40,.12)}
+.tips__bell{flex:0 0 auto;display:inline-flex;color:#2f7bea}
+.tips__bell svg{width:16px;height:16px;display:block}
+.tips__txt{font-size:12px;color:#5c6885;font-weight:600;line-height:1.3;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tips[data-tip],.dtips[data-tip]{cursor:pointer}
+/* tip 详情弹窗 */
+.tippop__txt{white-space:pre-line;font-size:14px;line-height:1.6;color:#2a3550}
+.mcard--plain .mcard__body{background-image:none!important;background:radial-gradient(135% 95% at 50% -12%,#274d88 0%,#152a52 55%,#0c1c38 100%)!important}
 
 /* promo */
 .promo{margin:12px var(--s3);border-radius:12px;overflow:hidden;background:linear-gradient(90deg,#1b3f8f,#2f6ad0);
@@ -210,6 +215,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .single span{font-size:12px;padding:6px 10px;transition:background .15s}
 .single .is-act{background:linear-gradient(180deg,#ffcf5a,#f0a81e);color:#6b3d00;font-weight:900}
 .single .is-dim{background:#0a2158;color:#cfe0ff;font-weight:800;padding:6px 9px}
+.single.is-locked{opacity:.45;pointer-events:none}
 
 /* list league row */
 .lrow{display:flex;align-items:center;gap:10px;margin:10px var(--s3) 0;background:linear-gradient(90deg,#e8eefc,#f4f7fd);
@@ -398,24 +404,26 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 
 .dtips{display:flex;align-items:center;gap:8px;margin:8px 0 2px;background:#eef2f9;border-radius:8px;padding:8px 10px}
 .dtips__tag{background:#8794b4;color:#fff;font-size:10px;font-weight:800;padding:2px 6px;border-radius:4px;flex:0 0 auto}
-.dtips__txt{font-size:11px;color:#5c6885;line-height:1.3;flex:1}
+.dtips__txt{font-size:11px;color:#5c6885;line-height:1.3;flex:1;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .dtips__more{color:var(--blue);font-weight:800;font-size:12px;white-space:nowrap}
 
-.expert{margin:12px var(--s3) 0;background:linear-gradient(160deg,#ffe7a0,#ffcf4d);border-radius:14px;padding:14px;box-shadow:var(--shadow)}
-.expert__head{display:flex;align-items:center;gap:8px;font-weight:900;color:#d98a1c;font-size:13px;letter-spacing:.5px}
-.expert__badge{width:24px;height:24px;border-radius:7px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.expert{margin:12px var(--s3) 0;background:linear-gradient(160deg,#eaf3ff,#dcebff);border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(30,70,140,.08)}
+.expert--picks{margin:12px 10px}
+.expert__head{display:flex;align-items:center;gap:8px;font-weight:900;font-style:italic;color:#1a7ae0;font-size:14px;letter-spacing:.5px}
+.expert__badge{width:24px;height:24px;border-radius:7px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 1px 3px rgba(0,0,0,.12)}
 .expert__row{display:flex;align-items:flex-start;gap:12px;margin-top:12px}
-.expert__ava{width:52px;height:52px;border-radius:50%;background:#eaf0f8;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:26px;overflow:hidden;border:2px solid #fff}
-.expert__info{flex:0 0 auto;padding-top:4px}
-.expert__who{font-size:14px;font-weight:800;color:#3a2b00}
+.expert__ava{width:46px;height:46px;border-radius:50%;background:#eaf0f8;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:24px;overflow:hidden;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.expert__info{flex:0 0 auto;padding-top:2px}
+.expert__who{font-size:14px;font-weight:800;color:#1b2233}
 .expert__rate{margin-top:2px;display:flex;align-items:baseline;gap:4px}
-.expert__rate b{font-size:18px;font-weight:900;color:#2a2000}
-.expert__rate small{font-size:11px;color:#9a7a20;font-weight:700}
-.expert__right{flex:1;min-width:0;display:flex;flex-direction:column;gap:14px}
-.expert__desc{font-size:12px;color:#c8912a;font-weight:700;line-height:1.4;padding-top:2px}
-.expert__pick{display:flex;align-items:stretch;justify-content:flex-end;gap:10px}
-.expert__odd{flex:0 0 auto;min-width:130px;background:#fffdf5;border:1px solid #f0dca0;border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;font-weight:900;color:#2a2000;font-size:15px;white-space:nowrap}
-.expert__btn{flex:0 0 auto;background:linear-gradient(180deg,#153e86,#0a2560);color:#ffd24d;font-weight:900;font-size:13px;padding:0 16px;border-radius:10px;border:0;cursor:pointer;white-space:nowrap}
+.expert__rate b{font-size:17px;font-weight:900;color:#12b866}
+.expert__rate small{font-size:11px;color:#8b93a6;font-weight:700}
+.expert__right{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px}
+.expert__desc{font-size:13px;color:#1a7ae0;font-weight:700;line-height:1.4;background:rgba(255,255,255,.55);border-radius:10px;padding:10px 12px;min-height:40px}
+.expert__pick{display:flex;align-items:stretch;gap:10px}
+.expert__odd{flex:0 0 auto;min-width:86px;background:#fff;border:1px solid #d7e5f7;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:4px;padding:10px 12px;font-weight:900;color:#12b866;font-size:15px;white-space:nowrap}
+.expert__odd .edn{color:var(--down)}
+.expert__btn{flex:1;background:linear-gradient(90deg,#43b2ff,#1a7ae0);color:#fff;font-weight:900;font-size:14px;padding:10px 16px;border-radius:10px;border:0;cursor:pointer;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:4px}
 
 .mgroup--mini .mgroup__head{background:linear-gradient(90deg,#16367f,#1a4fd0);font-size:14px}
 /* ===== Player tab ===== */
@@ -1350,7 +1358,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
               <div class="oline-row"><span class="oarr"></span><div class="oline oline--c"><span class="oline__odd">1.07</span></div></div>
             </div>
           </div>
-          <div class="dtips"><span class="dtips__tag">BET TIPS</span><span class="dtips__txt">The Denver Nuggets have led by more than 10 points and have not been overturned in their last 10 games.</span><span class="dtips__more">More Tips ›</span></div>
+          <div class="dtips" data-tip="The Denver Nuggets have led by more than 10 points and have not been overturned in their last 10 games.&#10;本场主队近况极佳，防守端限制对手节奏，后台可于「游戏管理 &gt; 赛事管理」添加／编辑此 Tips（支持换行）。"><span class="dtips__tag">BET TIPS</span><span class="dtips__txt">The Denver Nuggets have led by more than 10 points and have not been overturned in their last 10 games.</span></div>
         </div>
       </div>
 
@@ -1372,24 +1380,6 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
               <div class="oline-row"><span class="oarr"></span><div class="oline" data-sel><span class="oline__hcp">+14.5</span><span class="oline__odd">1.90</span></div></div>
               <div class="oline-row"><span class="oarr up"><svg viewBox="0 0 12 14"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg></span><div class="oline" data-sel><span class="oline__hcp">+15.5</span><span class="oline__odd up">1.79</span></div></div>
               <div class="oline-row"><span class="oarr"></span><div class="oline" data-sel><span class="oline__hcp">+13.5</span><span class="oline__odd">2.02</span></div></div>
-            </div>
-          </div>
-          <!-- EXPERT PICKS -->
-          <div class="expert">
-            <div class="expert__head"><span class="expert__badge">🎖️</span> EXPERT PICKS</div>
-            <div class="expert__row">
-              <div class="expert__ava">🧑</div>
-              <div class="expert__info">
-                <div class="expert__who">Jimmy Oster</div>
-                <div class="expert__rate"><b>87%</b><small>Win Rate</small></div>
-              </div>
-              <div class="expert__right">
-                <div class="expert__desc">Denver Nuggets vs Minnesota Timberwolves Handicap.</div>
-                <div class="expert__pick">
-                  <div class="expert__odd"><span>-14.5</span><span>1.86</span></div>
-                  <button class="expert__btn">Follow BET</button>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -1443,7 +1433,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 
       <!-- ===== PICKS panel ===== -->
       <div data-mpanel="picks" hidden>
-        <div class="picks-empty">🚩 Picks · 热门玩法<br><span>套用生产环境「Popular（热门）」，显示热门精选玩法（此区块示意）。</span></div>
+        <div class="picks-list" id="picksList"></div>
         <div class="spacer"></div>
       </div>
 
@@ -1453,6 +1443,15 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
         <div class="sheet__panel rule-panel">
           <div class="sheet__head"><span id="ruleTitle">Handicap</span><span class="x" data-ruleclose>✕</span></div>
           <div class="sheet__body" id="ruleBody"></div>
+        </div>
+      </div>
+
+      <!-- tip 详情弹窗 -->
+      <div class="sheet" id="tipSheet">
+        <div class="sheet__mask" data-tipclose></div>
+        <div class="sheet__panel rule-panel">
+          <div class="sheet__head"><span>BET TIPS</span><span class="x" data-tipclose>✕</span></div>
+          <div class="sheet__body"><div class="tippop__txt" id="tipBody"></div></div>
         </div>
       </div>
 
@@ -1784,6 +1783,11 @@ function betFromOline(ol){
 
 /* delegate clicks */
 document.body.addEventListener('click',function(e){
+  /* --- BET TIPS 点击:弹窗显示完整 tips(支持换行);优先于卡片进详情 --- */
+  var tipClose=e.target.closest('[data-tipclose]');
+  if(tipClose){ var ts0=document.getElementById('tipSheet'); if(ts0)ts0.classList.remove('is-open'); return; }
+  var tipEl=e.target.closest('[data-tip]');
+  if(tipEl){ var raw=tipEl.getAttribute('data-tip')||'', txt; try{txt=decodeURIComponent(raw);}catch(_){txt=raw;} var tb=document.getElementById('tipBody'); if(tb)tb.textContent=txt; var ts=document.getElementById('tipSheet'); if(ts)ts.classList.add('is-open'); return; }
   /* --- 日期icon:展开/收起后5日面板 --- */
   var calx=e.target.closest('[data-calexpand]');
   if(calx){ var pnl=document.getElementById('calPanel'); var open=pnl.hidden;
@@ -1842,8 +1846,8 @@ document.body.addEventListener('click',function(e){
   if(ol){ var box=ol.closest('.ha'); box.querySelectorAll('.oline').forEach(function(o){o.classList.remove('is-sel');}); ol.classList.add('is-sel'); return; }
   var od=e.target.closest('.oddstab');
   if(od){ var pg=od.getAttribute('data-page');
-    if(pg){ show(pg); }
-    else if(od.hasAttribute('data-when')){ currentWhen=lastDate=od.getAttribute('data-when'); applyFilters();
+    if(pg){ setModeLock(true); forceSingle(); show(pg); }
+    else if(od.hasAttribute('data-when')){ setModeLock(false); currentWhen=lastDate=od.getAttribute('data-when'); applyFilters();
       var cp3=document.getElementById('calPanel'); if(cp3)cp3.hidden=true;
       var cb3=document.querySelector('#oddsTabs [data-calexpand]'); if(cb3)cb3.classList.remove('is-open');
       show('list'); }
@@ -1987,14 +1991,14 @@ function mcardHTML(c,plain){
   var sc=c.sc.split(' - '); var left=sc[0], right=sc.length>1?sc[1]:'';
   return '<article class="mcard'+(plain?' mcard--plain':'')+'" data-goto="detail"'+(c.sport?' data-sbsport="'+c.sport+'"':'')+(c.sbkey?' data-sbleague="'+c.sbkey+'"':'')+(c.state?' data-sbmode="'+c.state+'"':'')+'>'+
     (c.ns?'<span class="ribbon">New Season</span>':'')+
-    '<div class="mcard__head"><span class="lg"></span> '+c.league+(c.voucher?' <span class="voucher">Free Voucher</span>':'')+'</div>'+
+    '<div class="mcard__head"><span class="lg"></span> '+c.league+'</div>'+
     '<div class="mcard__body"><div class="teams">'+
       '<div class="team"><div class="team__logo" style="background:'+c.h.bg+'">'+c.h.ab+'</div><div class="team__name">'+c.h.nm+'</div></div>'+
       '<div class="score"><div class="score__nums">'+left+(right?'<span class="dash">-</span>'+right:'')+'</div><div class="score__period">'+c.pd+'</div><div class="score__time">'+c.tm+'</div></div>'+
       '<div class="team"><div class="team__logo" style="background:'+c.a.bg+'">'+c.a.ab+'</div><div class="team__name">'+c.a.nm+'</div></div>'+
     '</div>'+
     oddsbarHTML(c)+'</div>'+
-    '<div class="tips"><span class="tips__tag">BET TIPS</span><span class="tips__txt">'+c.tip+'</span></div>'+
+    '<div class="tips" data-tip="'+encodeURIComponent(c.tip||'')+'"><span class="tips__bell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span><span class="tips__txt">'+c.tip+'</span></div>'+
   '</article>';
 }
 /* 开赛时间排序键:进行中=0(最近),未开赛依日期+时间 */
@@ -2099,11 +2103,19 @@ function applyFilters(){
 
 /* SINGLE / PARLAY toggle */
 var mode='single';
-function toggleMode(){
-  mode = (mode==='single') ? 'parlay' : 'single';
+var modeLock=false; /* Outright / Ending Card / Ending Game 页锁定为 single,不可切 parlay */
+function renderMode(){
   var L=document.getElementById('modeL'), R=document.getElementById('modeR');
+  if(!L||!R)return;
   if(mode==='single'){ L.textContent='SINGLE'; L.className='is-act'; R.textContent='P'; R.className='is-dim'; }
   else { L.textContent='S'; L.className='is-dim'; R.textContent='PARLAY'; R.className='is-act'; }
+}
+function setModeLock(v){ modeLock=v; var t=document.getElementById('modeToggle'); if(t)t.classList.toggle('is-locked',v); }
+function forceSingle(){ if(mode!=='single'){ mode='single'; renderMode(); applyFilters(); } }
+function toggleMode(){
+  if(modeLock) return; /* 锁定页不可切换 */
+  mode = (mode==='single') ? 'parlay' : 'single';
+  renderMode();
   applyFilters();
 }
 
@@ -2173,26 +2185,9 @@ var IC={
  resv:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.5 1.8M8.5 3.2 5.5 5.6M15.5 3.2l3 2.4"/></svg>'
 };
 /* 由右至左依序:收藏>视频>动画>兑现>预约(靠右对齐,故左到右为反序) */
-var ICONSET=
- '<span class="micon" title="预约投注">'+IC.resv+'</span>'+
- '<span class="micon" title="兑现 Cashout">'+IC.cash+'</span>'+
- '<span class="micon" title="动画">'+IC.anim+'</span>'+
- '<span class="micon" title="视频">'+IC.video+'</span>'+
- '<span class="micon fav-toggle" title="收藏本场赛事">'+IC.fav+'</span>';
-document.querySelectorAll('[data-icons]').forEach(function(el){
-  el.innerHTML=ICONSET;
-  var m=el.closest('[data-favmatch]');
-  var f=el.querySelector('.micon.fav-toggle');
-  if(m&&f){ f.setAttribute('data-fav', m.getAttribute('data-favmatch')); }
-});
-/* 把资讯图示与小比分并到同一行:小比分靠左、图标靠右对齐 */
-document.querySelectorAll('.lmatch').forEach(function(m){
-  var mi=m.querySelector(':scope > .micons'); if(!mi)return;
-  var sc=m.querySelector(':scope > .smallscore');
-  var foot=document.createElement('div'); foot.className='mfoot';
-  m.insertBefore(foot, sc||mi);
-  if(sc)foot.appendChild(sc);
-  foot.appendChild(mi);
+/* 赛事卡底部图标列(预约/兑现/动画/视频/收藏)已移除:直接删除 .micons 栏位 */
+document.querySelectorAll('.lmatch .micons,[data-icons]').forEach(function(el){
+  if(el.classList.contains('micons')) el.remove();
 });
 
 /* ball tab select */
@@ -2210,11 +2205,11 @@ function selectSport(k){
   updateSpecialTabs();
   var s=SPORTS.filter(function(x){return x.k===k;})[0];
   if(!s)return;
-  if(s.feat){ show('home'); }
-  else if(k==='champions'){ show('champions'); }
-  else if(k==='endcard'){ show('endcard'); }
-  else if(k==='endgame'){ show('endgame'); }
-  else { currentWhen='inplay'; applyFilters(); show('list'); }
+  if(s.feat){ setModeLock(false); show('home'); }
+  else if(k==='champions'){ setModeLock(true); forceSingle(); show('champions'); }
+  else if(k==='endcard'){ setModeLock(true); forceSingle(); show('endcard'); }
+  else if(k==='endgame'){ setModeLock(true); forceSingle(); show('endgame'); }
+  else { setModeLock(false); currentWhen='inplay'; applyFilters(); show('list'); }
 }
 
 /* ===== per-sport scoreboards (detail) ===== */
@@ -2875,6 +2870,46 @@ var LIVEIC='<span class="liveic" title="滚球直播"><svg viewBox="0 0 24 24">'
   wrap.addEventListener("dragstart",function(e){ e.preventDefault(); });
   reset();
 })();
+/* ===== Picks 大神推荐 (EXPERT PICKS):三玩法 全场独赢/全场让球/全场大小 =====
+   All Markets:各玩法下方显示第一个大神推荐卡;Picks Tab:显示全部大神推荐卡。
+   同一玩法可有多个推荐。资料示意,实际接后台。 */
+var EX_MATCH='Denver Nuggets Vs Minnesota Timberwolves';
+var EXPERTS=[
+  {mkt:'Winner',      who:'Jimmy Oster', rate:'87%', odds:'1.07', mv:'up'},
+  {mkt:'Handicap',    who:'Jimmy Oster', rate:'87%', odds:'1.89', mv:'up'},
+  {mkt:'Handicap',    who:'Alex Carter', rate:'82%', odds:'1.92', mv:''},
+  {mkt:'Handicap',    who:'Mia Wong',    rate:'79%', odds:'1.85', mv:'dn'},
+  {mkt:'Total Points',who:'Leo Zhang',   rate:'84%', odds:'1.90', mv:'up'},
+  {mkt:'Total Points',who:'Sara Kim',    rate:'80%', odds:'1.75', mv:''}
+];
+function expertCardHTML(p,isPicks){
+  var arr=p.mv==='up'?' <span style="color:#12b866">\u25B2</span>':p.mv==='dn'?' <span class="edn">\u25BC</span>':'';
+  return '<div class="expert'+(isPicks?' expert--picks':'')+'">'+
+    '<div class="expert__head"><span class="expert__badge">\uD83C\uDFC5</span>EXPERT PICKS</div>'+
+    '<div class="expert__row">'+
+      '<div class="expert__ava">\uD83E\uDDD1</div>'+
+      '<div class="expert__info"><div class="expert__who">'+p.who+'</div>'+
+        '<div class="expert__rate"><b>'+p.rate+'</b><small>win rate</small></div></div>'+
+      '<div class="expert__right">'+
+        '<div class="expert__desc">'+EX_MATCH+' '+p.mkt+'.</div>'+
+        '<div class="expert__pick"><div class="expert__odd">'+p.odds+arr+'</div>'+
+          '<button class="expert__btn">Follow Bet \u2197</button></div>'+
+      '</div>'+
+    '</div></div>';
+}
+(function(){
+  var MKTS=['Winner','Handicap','Total Points'];
+  var groups=document.querySelectorAll('#screen-detail [data-mpanel="all"] .mgroup');
+  MKTS.forEach(function(m){
+    var first=EXPERTS.filter(function(p){return p.mkt===m;})[0];
+    if(!first)return;
+    var g=[].slice.call(groups).filter(function(gr){var h=gr.querySelector('.mgroup__head');return h&&h.textContent.replace(/[\u2605\u2606\u25B2\u25BC?]/g,'').trim().indexOf(m)===0;})[0];
+    if(g){ var body=g.querySelector('.mgroup__body'); if(body) body.insertAdjacentHTML('beforeend', expertCardHTML(first,false)); }
+  });
+  var pl=document.getElementById('picksList');
+  if(pl){ pl.innerHTML=EXPERTS.map(function(p){return expertCardHTML(p,true);}).join(''); }
+})();
+
 </script>
 </body>
 </html>
