@@ -178,11 +178,11 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .oddstab--cal.is-open .dcaret{transform:rotate(180deg)}
 .oddstab--cal.is-on::after{display:none}
 /* 更多日期下拉面板 */
-.calpanel{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:40;background:linear-gradient(180deg,#12347f,#0a2158);
-  border-radius:10px;padding:12px;box-shadow:0 12px 30px rgba(6,12,22,.35);display:flex;flex-wrap:wrap;gap:10px}
-.caldate{flex:0 0 calc(33.333% - 7px);box-sizing:border-box;padding:10px 6px;border:none;border-radius:16px;
-  background:#0e295e;color:#cdd9f2;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap}
-.caldate.is-on{background:#ffd24d;color:#0a2158}
+.calpanel{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:40;background:#fff;
+  border:1px solid #e3e9f3;border-radius:12px;padding:12px;box-shadow:0 12px 30px rgba(6,12,22,.18);display:flex;flex-wrap:wrap;gap:10px}
+.caldate{flex:0 0 calc(33.333% - 7px);box-sizing:border-box;padding:11px 6px;border:1px solid #e3e9f3;border-radius:10px;
+  background:#eef1f7;color:#7a879f;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap;text-align:center}
+.caldate.is-on{background:#e7efff;border-color:#bcd2ff;color:var(--blue)}
 /* FEATURE 联赛选择列 */
 .lgsel{position:relative;display:flex;align-items:center;gap:8px;margin:2px var(--s3) 6px}
 .listpad{height:0}
@@ -356,12 +356,15 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .mtab.is-on::after{content:"";position:absolute;left:24%;right:24%;bottom:0;height:3px;background:var(--blue);border-radius:2px}
 
 .mgroup{margin:12px var(--s3) 0}
-.mgroup__head{display:flex;align-items:center;gap:8px;background:linear-gradient(90deg,#123c95,#1f5fe0);
+.mgroup__head{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;background:linear-gradient(90deg,#123c95,#1f5fe0);
   color:#fff;border-radius:10px;padding:11px 12px;font-weight:800;font-size:15px;box-shadow:var(--shadow)}
+.mgroup__title{grid-column:2;min-width:0;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.mgroup__title .t{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mgroup__tools{grid-column:3;justify-self:end;display:inline-flex;align-items:center;gap:8px;flex:0 0 auto}
 .mgroup__head .star{color:#ffffff;cursor:pointer}
 .mgroup__head .star.is-pin{color:#ffd24d}
-.mgroup__head .q{width:18px;height:18px;border-radius:50%;background:#ffb020;color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:900}
-.mgroup__head .chev{margin-left:auto;transition:transform .2s}
+.mgroup__head .q{flex:0 0 auto;width:18px;height:18px;border-radius:50%;background:#ffb020;color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:900}
+.mgroup__head .chev{transition:transform .2s}
 .mgroup.collapsed .mgroup__head .chev{transform:rotate(180deg)}
 .mgroup.collapsed .mgroup__body{display:none}
 .mgroup__body{padding:6px 0 2px}
@@ -375,23 +378,21 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .oline.oline--c{justify-content:center}
 .hacard{background:linear-gradient(180deg,#eef3fb,#e4ecf8);border-radius:12px;padding:10px;position:relative}
 .hacard__lab{font-size:11px;font-weight:800;color:#8b97b3;text-align:right;letter-spacing:1px;margin-bottom:2px}
-.hacard__team{display:flex;align-items:center;gap:8px;margin:0 0 8px;min-height:44px}
-/* 客队镜像:队徽靠外侧(右),队名在内侧,AWAY 标签靠左 */
-.hacard--away .hacard__team{flex-direction:row-reverse}
+/* 队徽置顶置中、队名置中(主/客一致) */
+.hacard__team{display:flex;flex-direction:column;align-items:center;gap:8px;margin:0 0 10px}
 .hacard--away .hacard__lab{text-align:left}
 .hacard__team .lg{width:64px;height:64px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:15px;border:2px solid #e7c96b}
-/* 主队队名靠右(朝中间),距卡片右缘约5px */
-.hacard__team .nm{flex:1 1 auto;text-align:right;margin-right:-5px;font-size:13px;font-weight:800;color:#22304f;line-height:1.2}
-/* 客队队名靠左(朝中间),距卡片左缘约5px */
-.hacard--away .hacard__team .nm{text-align:left;margin-right:0;margin-left:-5px}
+.hacard__team .nm{text-align:center;margin:0;font-size:13px;font-weight:800;color:#22304f;line-height:1.2}
 .oline{display:flex;align-items:center;justify-content:space-between;gap:6px;background:#fff;border:1px solid #dbe4f2;
   border-radius:8px;padding:8px 10px;margin-top:6px;box-shadow:inset 0 -2px 0 #eef2f8}
 .oline__hcp{font-size:13px;font-weight:800;color:#4a5675}
 .oline__odd{font-size:16px;font-weight:900;color:#15264a}
 .oline__odd.up{color:var(--green)} .oline__odd.dn{color:var(--down)}
-.oline.is-sel,.oline.is-selx{background:linear-gradient(180deg,#123c95,#0a2560);border-color:#0a2560}
-.oline.is-sel .oline__hcp,.oline.is-selx .oline__hcp{color:#cfe0ff} .oline.is-sel .oline__odd,.oline.is-selx .oline__odd{color:#ffd24d}
-.oline.is-sel .oline__odd.up,.oline.is-selx .oline__odd.up{color:#37e07a} .oline.is-sel .oline__odd.dn,.oline.is-selx .oline__odd.dn{color:#ff6a5a}
+.oline.is-sel,.oline.is-selx{background:linear-gradient(180deg,#4a9bff,#1f6fe6);border-color:#1f6fe6}
+.oline.is-sel .oline__hcp,.oline.is-selx .oline__hcp{color:#eaf2ff} .oline.is-sel .oline__odd,.oline.is-selx .oline__odd{color:#fff}
+.oline.is-sel .oline__odd.up,.oline.is-selx .oline__odd.up{color:#d6ffe6} .oline.is-sel .oline__odd.dn,.oline.is-selx .oline__odd.dn{color:#ffd9d4}
+/* 选中后整张卡背景套用选中色 */
+.hacard.is-sel{background:linear-gradient(180deg,#dcebff,#c9ddff);box-shadow:inset 0 0 0 1.5px #8fbaff}
 .oline-row{display:flex;align-items:center;gap:5px}
 .oline-row .oline{flex:1;min-width:0}
 .oarr{flex:0 0 13px;display:flex;justify-content:center;align-items:center;line-height:0}
@@ -402,10 +403,11 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .oline__odd .oarr--in{position:absolute;left:100%;top:50%;transform:translateY(-50%);margin-left:2px}
 .oline__odd .oarr--in svg{width:11px;height:13px;display:block}
 
-.dtips{display:flex;align-items:center;gap:8px;margin:8px 0 2px;background:#eef2f9;border-radius:8px;padding:8px 10px}
-.dtips__tag{background:#8794b4;color:#fff;font-size:10px;font-weight:800;padding:2px 6px;border-radius:4px;flex:0 0 auto}
-.dtips__txt{font-size:11px;color:#5c6885;line-height:1.3;flex:1;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.dtips__more{color:var(--blue);font-weight:800;font-size:12px;white-space:nowrap}
+.dtips{display:flex;align-items:center;gap:9px;margin:8px 0 2px;background:#fff;border:1px solid #e6ebf4;border-radius:10px;padding:10px 12px;box-shadow:0 1px 3px rgba(10,20,40,.06)}
+.dtips__bell{flex:0 0 auto;display:inline-flex;color:#2f7bea}
+.dtips__bell svg{width:17px;height:17px;display:block}
+.dtips__txt{font-size:12px;color:#5c6885;line-height:1.4;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dtips__more{color:var(--blue);font-weight:800;font-size:12px;white-space:nowrap;flex:0 0 auto;display:inline-flex;align-items:center;gap:1px}
 
 .expert{margin:12px var(--s3) 0;background:linear-gradient(160deg,#eaf3ff,#dcebff);border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(30,70,140,.08)}
 .expert--picks{margin:12px 10px}
@@ -420,10 +422,10 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .expert__rate small{font-size:11px;color:#8b93a6;font-weight:700}
 .expert__right{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px}
 .expert__desc{font-size:13px;color:#1a7ae0;font-weight:700;line-height:1.4;background:rgba(255,255,255,.55);border-radius:10px;padding:10px 12px;min-height:40px}
-.expert__pick{display:flex;align-items:stretch;gap:10px}
+.expert__pick{display:flex;align-items:stretch;justify-content:flex-end;gap:10px;margin-top:12px}
 .expert__odd{flex:0 0 auto;min-width:86px;background:#fff;border:1px solid #d7e5f7;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:4px;padding:10px 12px;font-weight:900;color:#12b866;font-size:15px;white-space:nowrap}
 .expert__odd .edn{color:var(--down)}
-.expert__btn{flex:1;background:linear-gradient(90deg,#43b2ff,#1a7ae0);color:#fff;font-weight:900;font-size:14px;padding:10px 16px;border-radius:10px;border:0;cursor:pointer;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:4px}
+.expert__btn{flex:0 0 auto;min-width:150px;background:linear-gradient(90deg,#43b2ff,#1a7ae0);color:#fff;font-weight:900;font-size:14px;padding:10px 16px;border-radius:10px;border:0;cursor:pointer;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:4px}
 
 .mgroup--mini .mgroup__head{background:linear-gradient(90deg,#16367f,#1a4fd0);font-size:14px}
 /* ===== Player tab ===== */
@@ -1344,13 +1346,13 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
       <div data-mpanel="all">
       <!-- Winner -->
       <div class="mgroup" data-ord="0">
-        <div class="mgroup__head" data-mcollapse><span class="star is-pin" data-mpin>★</span> Winner <span class="chev" style="margin-left:auto">▲</span></div>
+        <div class="mgroup__head" data-mcollapse><span class="mgroup__title"><span class="t">Winner</span></span><span class="mgroup__tools"><span class="star is-pin" data-mpin>★</span><span class="chev">▲</span></span></div>
         <div class="mgroup__body">
           <div class="ha">
             <div class="hacard">
               <div class="hacard__lab">HOME</div>
               <div class="hacard__team"><span class="lg" style="background:#1d428a">DEN</span><span class="nm">Denver Nuggets</span></div>
-              <div class="oline-row"><div class="oline oline--c is-selx"><span class="oline__odd up">7.40</span></div><span class="oarr up"><svg viewBox="0 0 12 14"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg></span></div>
+              <div class="oline-row"><div class="oline oline--c"><span class="oline__odd up">7.40</span></div><span class="oarr up"><svg viewBox="0 0 12 14"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg></span></div>
             </div>
             <div class="hacard hacard--away">
               <div class="hacard__lab">AWAY</div>
@@ -1358,20 +1360,20 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
               <div class="oline-row"><span class="oarr"></span><div class="oline oline--c"><span class="oline__odd">1.07</span></div></div>
             </div>
           </div>
-          <div class="dtips" data-tip="The Denver Nuggets have led by more than 10 points and have not been overturned in their last 10 games.&#10;本场主队近况极佳，防守端限制对手节奏，后台可于「游戏管理 &gt; 赛事管理」添加／编辑此 Tips（支持换行）。"><span class="dtips__tag">BET TIPS</span><span class="dtips__txt">The Denver Nuggets have led by more than 10 points and have not been overturned in their last 10 games.</span></div>
+          <div class="dtips" data-tip="The Denver Nuggets have led by more than 10 points and have not been overturned in their last 10 games.&#10;本场主队近况极佳，防守端限制对手节奏，后台可于「游戏管理 &gt; 赛事管理」添加／编辑此 Tips（支持换行）。"><span class="dtips__bell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span><span class="dtips__txt">The Denver Nuggets have led by more than 10 points and have not been overturned in their last 10 games.</span><span class="dtips__more">More ›</span></div>
         </div>
       </div>
 
       <!-- Handicap -->
       <div class="mgroup" data-ord="2">
-        <div class="mgroup__head" data-mcollapse><span class="star" data-mpin>☆</span> Handicap <span class="q" data-rule="handicap">?</span><span class="chev" style="margin-left:auto">▲</span></div>
+        <div class="mgroup__head" data-mcollapse><span class="mgroup__title"><span class="t">Handicap</span><span class="q" data-rule="handicap">?</span></span><span class="mgroup__tools"><span class="star" data-mpin>☆</span><span class="chev">▲</span></span></div>
         <div class="mgroup__body">
           <div class="ha">
             <div class="hacard">
               <div class="hacard__lab">HOME</div>
               <div class="hacard__team"><span class="lg" style="background:#1d428a">DEN</span><span class="nm">Denver Nuggets</span></div>
               <div class="oline-row"><div class="oline" data-sel><span class="oline__hcp">-14.5</span><span class="oline__odd up">1.86</span></div><span class="oarr up"><svg viewBox="0 0 12 14"><path d="M6 1L11 6H1Z M6 7L11 12H1Z" fill="currentColor"/></svg></span></div>
-              <div class="oline-row"><div class="oline is-sel" data-sel><span class="oline__hcp">-15.5</span><span class="oline__odd">1.97</span></div><span class="oarr"></span></div>
+              <div class="oline-row"><div class="oline" data-sel><span class="oline__hcp">-15.5</span><span class="oline__odd">1.97</span></div><span class="oarr"></span></div>
               <div class="oline-row"><div class="oline" data-sel><span class="oline__hcp">-13.5</span><span class="oline__odd dn">1.75</span></div><span class="oarr dn"><svg viewBox="0 0 12 14"><path d="M6 13L11 8H1Z M6 7L11 2H1Z" fill="currentColor"/></svg></span></div>
             </div>
             <div class="hacard hacard--away">
@@ -1387,7 +1389,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 
       <!-- Total Points (样式同 Handicap,置于其下方) -->
       <div class="mgroup" data-ord="3">
-        <div class="mgroup__head" data-mcollapse><span class="star" data-mpin>☆</span> Total Points <span class="chev" style="margin-left:auto">▲</span></div>
+        <div class="mgroup__head" data-mcollapse><span class="mgroup__title"><span class="t">Total Points</span></span><span class="mgroup__tools"><span class="star" data-mpin>☆</span><span class="chev">▲</span></span></div>
         <div class="mgroup__body">
           <div class="ha">
             <div class="hacard">
@@ -1404,28 +1406,23 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 
       <!-- collapsed extra markets -->
       <div class="mgroup mgroup--mini collapsed" data-ord="4">
-        <div class="mgroup__head" data-mcollapse><span class="star" data-mpin>☆</span> Assists O/U (incl.OT) <span class="chev" style="margin-left:auto">▲</span></div>
+        <div class="mgroup__head" data-mcollapse><span class="mgroup__title"><span class="t">Assists O/U (incl.OT)</span></span><span class="mgroup__tools"><span class="star" data-mpin>☆</span><span class="chev">▲</span></span></div>
         <div class="mgroup__body"><div class="ha"><div class="hacard"><div class="oline-row"><div class="oline"><span class="oline__hcp">Over 44.5</span><span class="oline__odd">1.90</span></div><span class="oarr"></span></div></div><div class="hacard"><div class="oline-row"><span class="oarr"></span><div class="oline"><span class="oline__hcp">Under 44.5</span><span class="oline__odd">1.90</span></div></div></div></div></div>
       </div>
       <div class="mgroup mgroup--mini collapsed" data-ord="5">
-        <div class="mgroup__head" data-mcollapse><span class="star" data-mpin>☆</span> Sum OF Two Team Last Digit Score (incl.OT) <span class="chev" style="margin-left:auto">▲</span></div>
+        <div class="mgroup__head" data-mcollapse><span class="mgroup__title"><span class="t">Sum OF Two Team Last Digit Score (incl.OT)</span></span><span class="mgroup__tools"><span class="star" data-mpin>☆</span><span class="chev">▲</span></span></div>
         <div class="mgroup__body"><div class="ha"><div class="hacard"><div class="oline-row"><div class="oline"><span class="oline__hcp">Odd</span><span class="oline__odd">1.95</span></div><span class="oarr"></span></div></div><div class="hacard"><div class="oline-row"><span class="oarr"></span><div class="oline"><span class="oline__hcp">Even</span><span class="oline__odd">1.85</span></div></div></div></div></div>
       </div>
       <div class="mgroup mgroup--mini collapsed" data-ord="6">
-        <div class="mgroup__head" data-mcollapse><span class="star" data-mpin>☆</span> DAL Wings (W) Last Digit Score (incl.OT) <span class="chev" style="margin-left:auto">▲</span></div>
+        <div class="mgroup__head" data-mcollapse><span class="mgroup__title"><span class="t">DAL Wings (W) Last Digit Score (incl.OT)</span></span><span class="mgroup__tools"><span class="star" data-mpin>☆</span><span class="chev">▲</span></span></div>
         <div class="mgroup__body"><div class="ha"><div class="hacard"><div class="oline-row"><div class="oline"><span class="oline__hcp">0</span><span class="oline__odd">9.50</span></div><span class="oarr"></span></div></div><div class="hacard"><div class="oline-row"><span class="oarr"></span><div class="oline"><span class="oline__hcp">1</span><span class="oline__odd">9.50</span></div></div></div></div></div>
       </div>
       </div><!-- /all panel -->
 
       <!-- ===== PLAYER panel ===== -->
       <div data-mpanel="player" hidden>
-        <div class="psel" data-playersheet="open"><span id="pselLabel">选择球员 (7/7)</span><span class="psel__chev">⌄</span></div>
-        <div class="pfil">
-          <button class="is-on">全部</button>
-          <button>分</button>
-        </div>
         <div class="mgroup" id="pgroup">
-          <div class="mgroup__head" data-mcollapse><span class="star" data-mpin>☆</span> 球员得分数大小盘 <span class="chev" style="margin-left:auto">▲</span></div>
+          <div class="mgroup__head" data-mcollapse><span class="mgroup__title"><span class="t">球员得分数大小盘</span></span><span class="mgroup__tools"><span class="star" data-mpin>☆</span><span class="chev">▲</span></span></div>
           <div class="mgroup__body" id="playerRows"></div>
         </div>
         <div class="spacer"></div>
@@ -1452,15 +1449,6 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
         <div class="sheet__panel rule-panel">
           <div class="sheet__head"><span>BET TIPS</span><span class="x" data-tipclose>✕</span></div>
           <div class="sheet__body"><div class="tippop__txt" id="tipBody"></div></div>
-        </div>
-      </div>
-
-      <!-- player select sheet -->
-      <div class="sheet" id="playerSheet">
-        <div class="sheet__mask" data-playersheet="close"></div>
-        <div class="sheet__panel">
-          <div class="sheet__head"><span>选择球员 (7/7)</span><span class="x" data-playersheet="close">✕</span></div>
-          <div class="sheet__body" id="playerPick"></div>
         </div>
       </div>
 
@@ -1818,7 +1806,7 @@ document.body.addEventListener('click',function(e){
   if(op0){ var i2=betFromPill(op0); if(i2){ e.stopPropagation(); openBetSheet(i2); return; } }
   var ol0=e.target.closest('.oline');
   if(ol0){ var i3=betFromOline(ol0); if(i3){ e.stopPropagation();
-      var box=ol0.closest('.ha'); if(box){ box.querySelectorAll('.oline').forEach(function(o){o.classList.remove('is-sel');}); ol0.classList.add('is-sel'); }
+      var box=ol0.closest('.ha'); if(box){ box.querySelectorAll('.oline').forEach(function(o){o.classList.remove('is-sel');}); box.querySelectorAll('.hacard').forEach(function(c){c.classList.remove('is-sel');}); ol0.classList.add('is-sel'); var _c=ol0.closest('.hacard'); if(_c)_c.classList.add('is-sel'); }
       openBetSheet(i3); return; } }
 
   var fv=e.target.closest('[data-fav]');
@@ -1843,7 +1831,7 @@ document.body.addEventListener('click',function(e){
   var mc=e.target.closest('[data-mcollapse]');
   if(mc){ mc.parentElement.classList.toggle('collapsed'); return; }
   var ol=e.target.closest('.oline[data-sel]');
-  if(ol){ var box=ol.closest('.ha'); box.querySelectorAll('.oline').forEach(function(o){o.classList.remove('is-sel');}); ol.classList.add('is-sel'); return; }
+  if(ol){ var box=ol.closest('.ha'); box.querySelectorAll('.oline').forEach(function(o){o.classList.remove('is-sel');}); box.querySelectorAll('.hacard').forEach(function(c){c.classList.remove('is-sel');}); ol.classList.add('is-sel'); var _c2=ol.closest('.hacard'); if(_c2)_c2.classList.add('is-sel'); return; }
   var od=e.target.closest('.oddstab');
   if(od){ var pg=od.getAttribute('data-page');
     if(pg){ setModeLock(true); forceSingle(); show(pg); }
@@ -2892,10 +2880,11 @@ function expertCardHTML(p,isPicks){
         '<div class="expert__rate"><b>'+p.rate+'</b><small>win rate</small></div></div>'+
       '<div class="expert__right">'+
         '<div class="expert__desc">'+EX_MATCH+' '+p.mkt+'.</div>'+
-        '<div class="expert__pick"><div class="expert__odd">'+p.odds+arr+'</div>'+
-          '<button class="expert__btn">Follow Bet \u2197</button></div>'+
       '</div>'+
-    '</div></div>';
+    '</div>'+
+    '<div class="expert__pick"><div class="expert__odd">'+p.odds+arr+'</div>'+
+      '<button class="expert__btn" data-exbtn data-exmkt="'+p.mkt+'" data-exodds="'+p.odds+'">Follow Bet \u2197</button></div>'+
+    '</div>';
 }
 (function(){
   var MKTS=['Winner','Handicap','Total Points'];
@@ -2909,6 +2898,32 @@ function expertCardHTML(p,isPicks){
   var pl=document.getElementById('picksList');
   if(pl){ pl.innerHTML=EXPERTS.map(function(p){return expertCardHTML(p,true);}).join(''); }
 })();
+
+/* 专家推荐「Follow Bet」:开启投注页,玩法/赔率/队伍沿用专家投注 */
+function expertFollowBet(btn){
+  var mkt=btn.getAttribute('data-exmkt')||'';
+  var odds=betCleanOdds(btn.getAttribute('data-exodds')||'');
+  var teamEls=[].slice.call(document.querySelectorAll('#screen-detail [data-mpanel="all"] .hacard__team')).slice(0,2);
+  var teams=[], logos=[];
+  teamEls.forEach(function(t){
+    var nm=t.querySelector('.nm'), lg=t.querySelector('.lg');
+    teams.push(nm?nm.textContent.trim():'');
+    logos.push({txt:lg?lg.textContent.trim():'', bg:(lg&&lg.style.background)?lg.style.background:'#123c95'});
+  });
+  var lgEl=document.getElementById('moreLg');
+  var league=lgEl?lgEl.textContent.replace(/[︿﹀▲▼\s]+$/,'').trim():'';
+  openBetSheet({
+    league:league, teamA:teams[0]||'', teamB:teams[1]||'',
+    logoA:(logos[0]||{}).txt, colorA:(logos[0]||{}).bg, logoB:(logos[1]||{}).txt, colorB:(logos[1]||{}).bg,
+    date:'', market:mkt, selLab:mkt, odds:odds,
+    pick:(teams[0]&&teams[1])?(teams[0]+' Vs '+teams[1]):(teams[0]||''),
+    selLogo:(logos[0]||{}).txt, selColor:(logos[0]||{}).bg
+  });
+}
+document.body.addEventListener('click',function(e){
+  var eb=e.target.closest('[data-exbtn]');
+  if(eb){ e.stopPropagation(); expertFollowBet(eb); }
+});
 
 </script>
 </body>
