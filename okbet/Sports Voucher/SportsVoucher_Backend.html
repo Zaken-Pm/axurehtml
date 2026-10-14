@@ -1,0 +1,812 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>体育投注券后台原型</title>
+<script>/* 内嵌在规格文件（iframe）中时一律以浅色显示 */try{if(window.self!==window.top)document.documentElement.setAttribute("data-theme","light");}catch(e){document.documentElement.setAttribute("data-theme","light");}</script>
+<style>
+/* 布局概念：后台原型（侧栏＋主画面），沿用专案 TaskCenter 后台原型的视觉系统
+   字级规则：根字级 18px，全站最小字级 .72rem ≈ 13px（不低于 12px） */
+:root{
+  --c-primary:#2f80ed; --c-primary-d:#1f6fe0; --c-primary-l:#e8f1ff;
+  --c-danger:#d93a3f; --c-danger-l:#fdecec;
+  --c-success:#1a8a50; --c-success-l:#e6f6ee;
+  --c-warn-bg:#e2a23b; --c-warn-fg:#1f1a10;
+  --c-text:#1f2733; --c-text-2:#4a5563; --c-text-3:#667180;
+  --c-border:#d9dfe7; --c-border-2:#eaeef3;
+  --c-bg:#f1f3f7; --c-bg-head:#f5f7fa; --c-surface:#ffffff; --c-hover:#f3f7fe;
+  --c-mask:rgba(15,25,45,.45); --c-shadow:rgba(20,40,80,.16);
+  --radius:8px; --radius-s:5px;
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:24px;
+  --fs-xs:.72rem;  /* 13px：辅助说明、页码 */
+  --fs-sm:.78rem;  /* 14px：表格、表单、按钮 */
+  --fs-md:.84rem;  /* 15px：页签、内文 */
+  --fs-lg:.95rem;  /* 17px：弹窗标题 */
+  --fs-xl:1.3rem;  /* 23px：统计数字 */
+  --font:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC","Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --c-primary:#5b9bf5; --c-primary-d:#7aaff7; --c-primary-l:#1c2c45;
+    --c-danger:#f2777b; --c-danger-l:#3a1f22;
+    --c-success:#4cc98a; --c-success-l:#16332a;
+    --c-warn-bg:#e8b154; --c-warn-fg:#1f1a10;
+    --c-text:#e6eaf0; --c-text-2:#bcc5d0; --c-text-3:#9aa5b3;
+    --c-border:#3a4656; --c-border-2:#2b3440;
+    --c-bg:#151a21; --c-bg-head:#1f2630; --c-surface:#1b2129; --c-hover:#232c38;
+    --c-mask:rgba(0,0,0,.6); --c-shadow:rgba(0,0,0,.5);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --c-primary:#5b9bf5; --c-primary-d:#7aaff7; --c-primary-l:#1c2c45;
+  --c-danger:#f2777b; --c-danger-l:#3a1f22;
+  --c-success:#4cc98a; --c-success-l:#16332a;
+  --c-warn-bg:#e8b154; --c-warn-fg:#1f1a10;
+  --c-text:#e6eaf0; --c-text-2:#bcc5d0; --c-text-3:#9aa5b3;
+  --c-border:#3a4656; --c-border-2:#2b3440;
+  --c-bg:#151a21; --c-bg-head:#1f2630; --c-surface:#1b2129; --c-hover:#232c38;
+  --c-mask:rgba(0,0,0,.6); --c-shadow:rgba(0,0,0,.5);
+  color-scheme:dark;
+}
+
+/* === Base === */
+*{box-sizing:border-box;}
+[hidden]{display:none!important;}
+html{font-size:18px;}
+body{margin:0;font-family:var(--font);color:var(--c-text);background:var(--c-bg);font-size:var(--fs-sm);line-height:1.55;}
+h1,h2,h3{margin:0;font-weight:600;}
+p{margin:0;}
+button{font-family:inherit;cursor:pointer;}
+.link{color:var(--c-primary);cursor:pointer;background:none;border:none;padding:0;font:inherit;font-size:var(--fs-sm);}
+.link:hover{text-decoration:underline;}
+.link--danger{color:var(--c-danger);}
+.num{font-variant-numeric:tabular-nums;}
+:focus-visible{outline:2px solid var(--c-primary);outline-offset:2px;}
+
+/* === App shell：左侧选单 + 主画面 === */
+.app{display:flex;align-items:stretch;min-height:100vh;}
+.sidebar{width:200px;flex:0 0 200px;background:var(--c-surface);border-right:1px solid var(--c-border);}
+.nav__group{padding:14px 16px;font-weight:600;font-size:var(--fs-md);}
+.nav__sub{display:block;width:100%;text-align:left;padding:10px 16px 10px 32px;font-size:var(--fs-sm);color:var(--c-text-2);border:none;background:none;border-left:3px solid transparent;}
+.nav__sub:hover{background:var(--c-hover);}
+.nav__sub--on{background:var(--c-primary-l);color:var(--c-primary);border-left-color:var(--c-primary);font-weight:600;}
+.nav__muted{padding:10px 16px 10px 32px;font-size:var(--fs-sm);color:var(--c-text-3);}
+.main{flex:1;min-width:0;padding-block:var(--sp-4);padding-inline:var(--sp-4);display:flex;flex-direction:column;gap:var(--sp-3);}
+.crumb{font-size:var(--fs-xs);color:var(--c-text-3);}
+.crumb b{color:var(--c-text-2);font-weight:500;}
+
+/* === Panel / 页签 === */
+.panel{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius);min-width:0;}
+.subtabs{display:flex;gap:var(--sp-5);padding-inline:var(--sp-5);border-bottom:1px solid var(--c-border);overflow-x:auto;}
+.subtab{padding:12px 2px;font-size:var(--fs-md);color:var(--c-text-2);background:none;border:none;border-bottom:2px solid transparent;white-space:nowrap;}
+.subtab--on{color:var(--c-primary);border-bottom-color:var(--c-primary);font-weight:600;}
+
+/* === 按钮 === */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:34px;padding:0 16px;border-radius:var(--radius-s);border:1px solid var(--c-border);background:var(--c-surface);color:var(--c-text-2);font-size:var(--fs-sm);white-space:nowrap;}
+.btn:hover{border-color:var(--c-primary);color:var(--c-primary);}
+.btn--primary{background:var(--c-primary);border-color:var(--c-primary);color:#fff;}
+.btn--primary:hover{background:var(--c-primary-d);color:#fff;}
+.btn--warn{background:var(--c-warn-bg);border-color:var(--c-warn-bg);color:var(--c-warn-fg);}
+.btn--warn:hover{color:var(--c-warn-fg);filter:brightness(1.05);}
+.btn--danger{background:var(--c-danger);border-color:var(--c-danger);color:#fff;}
+.btn--danger:hover{color:#fff;filter:brightness(1.05);}
+.btn:disabled{opacity:.45;cursor:not-allowed;}
+
+/* === 筛选列 === */
+.toolbar{display:flex;flex-wrap:wrap;gap:var(--sp-3);align-items:flex-end;padding:var(--sp-4) var(--sp-5);}
+.toolbar__spacer{flex:1 1 auto;}
+.toolbar__btns{display:flex;gap:var(--sp-2);flex-wrap:wrap;}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0;}
+.field__label{font-size:var(--fs-xs);color:var(--c-text-2);}
+.input,.textarea{height:34px;padding:0 10px;border:1px solid var(--c-border);border-radius:var(--radius-s);background:var(--c-surface);color:var(--c-text);font-size:var(--fs-sm);font-family:inherit;min-width:0;}
+.input::placeholder,.textarea::placeholder{color:var(--c-text-3);}
+.textarea{height:auto;min-height:72px;padding:8px 10px;resize:vertical;width:100%;line-height:1.5;}
+.input:focus,.textarea:focus{outline:none;border-color:var(--c-primary);box-shadow:0 0 0 2px var(--c-primary-l);}
+.input:disabled{background:var(--c-bg-head);color:var(--c-text-3);cursor:not-allowed;}
+.is-err{border-color:var(--c-danger)!important;}
+.w-sm{width:150px;} .w-md{width:200px;} .w-lg{width:300px;}
+.range{display:flex;align-items:center;gap:6px;}
+.range .input{width:170px;}
+
+/* === 自定义下拉：面板在栏位正下方展开（不使用系统原生浮层），固定高度可滚动 === */
+.dd{position:relative;display:inline-block;min-width:0;}
+.dd__native{display:none;}
+.dd__btn{width:100%;height:34px;display:flex;align-items:center;gap:8px;padding:0 10px;border:1px solid var(--c-border);border-radius:var(--radius-s);background:var(--c-surface);color:var(--c-text);font-size:var(--fs-sm);text-align:left;}
+.dd__text{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.dd__text.is-ph{color:var(--c-text-3);}
+.dd__arrow{flex:0 0 auto;width:12px;height:12px;color:var(--c-text-3);transition:transform .15s;}
+.dd.is-open .dd__arrow{transform:rotate(180deg);color:var(--c-primary);}
+.dd.is-open .dd__btn{border-color:var(--c-primary);box-shadow:0 0 0 2px var(--c-primary-l);}
+.dd__btn:disabled{background:var(--c-bg-head);color:var(--c-text-3);cursor:not-allowed;}
+.dd__panel{display:none;position:absolute;top:calc(100% + 4px);left:0;min-width:100%;z-index:60;background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--radius-s);box-shadow:0 6px 18px var(--c-shadow);max-height:236px;overflow-y:auto;overscroll-behavior:contain;padding:4px 0;}
+.dd.is-open .dd__panel{display:block;}
+.dd__opt{padding:8px 12px;font-size:var(--fs-sm);color:var(--c-text);cursor:pointer;line-height:1.45;white-space:nowrap;}
+.dd--wrap .dd__opt{white-space:normal;}
+.dd__opt:hover,.dd__opt.is-active{background:var(--c-hover);}
+.dd__opt.is-sel{color:var(--c-primary);font-weight:600;}
+.dd__empty{padding:10px 12px;color:var(--c-text-3);font-size:var(--fs-xs);}
+.frow__ctl .dd{display:block;width:100%;}
+
+/* === 开关 === */
+.switchrow{display:flex;justify-content:space-between;align-items:center;gap:var(--sp-3);margin:var(--sp-4) var(--sp-5) 0;padding:var(--sp-3) var(--sp-4);border:1px solid var(--c-border);border-radius:var(--radius-s);font-size:var(--fs-md);}
+.switch{display:inline-flex;align-items:center;gap:8px;border:none;background:none;color:var(--c-text-3);font-weight:600;font-size:var(--fs-sm);padding:0;}
+.switch__track{width:40px;height:22px;border-radius:11px;background:var(--c-border);position:relative;transition:background .15s;}
+.switch__track::after{content:"";position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s;}
+.switch[aria-checked="true"]{color:var(--c-primary);}
+.switch[aria-checked="true"] .switch__track{background:var(--c-primary);}
+.switch[aria-checked="true"] .switch__track::after{left:21px;}
+
+/* === 表格 === */
+.table-wrap{padding:0 var(--sp-5) var(--sp-4);overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:var(--fs-sm);}
+.data{min-width:900px;}
+thead th{background:var(--c-bg-head);color:var(--c-text-2);font-weight:600;text-align:center;padding:11px 8px;border-bottom:1px solid var(--c-border);white-space:nowrap;}
+tbody td{padding:11px 8px;border-bottom:1px solid var(--c-border-2);text-align:center;color:var(--c-text-2);vertical-align:middle;}
+tbody tr:hover{background:var(--c-hover);}
+td.time,th.time,td.op{white-space:nowrap;}
+td.op .link{margin:0 5px;}
+.cname{max-width:260px;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+td > .cname{margin:0 auto;}
+.namecell{display:flex;gap:6px;align-items:center;justify-content:center;}
+.i18n{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;border:1px solid var(--c-primary);color:var(--c-primary);background:none;font-size:var(--fs-sm);line-height:1;flex:0 0 auto;}
+.empty{padding:var(--sp-5);text-align:center;color:var(--c-text-3);}
+.st--ok{color:var(--c-success);font-weight:600;} .st--no{color:var(--c-danger);font-weight:600;} .st--exp{color:var(--c-text-3);}
+.pager{display:flex;justify-content:flex-end;align-items:center;gap:10px;padding:0 var(--sp-5) var(--sp-4);color:var(--c-text-3);font-size:var(--fs-xs);flex-wrap:wrap;}
+.pg{min-width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border-radius:var(--radius-s);border:1px solid var(--c-border);}
+.pg--on{background:var(--c-primary);border-color:var(--c-primary);color:#fff;}
+.selcount{font-size:var(--fs-xs);color:var(--c-text-2);align-self:center;}
+
+/* === 统计（优惠券记录） === */
+.stats{margin:var(--sp-4) var(--sp-5) 0;border:1px solid var(--c-border);border-radius:var(--radius-s);padding:var(--sp-4);display:flex;flex-direction:column;gap:var(--sp-4);}
+.stats__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-3);}
+.stat{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;}
+.stat__val{font-size:var(--fs-xl);font-weight:700;color:var(--c-text);font-variant-numeric:tabular-nums;}
+.stat__lbl{font-size:var(--fs-sm);color:var(--c-text-2);}
+
+/* === 弹窗 === */
+.mask{position:fixed;inset:0;background:var(--c-mask);display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;z-index:50;overflow-y:auto;}
+.mask--top{z-index:70;align-items:center;}
+.modal{background:var(--c-surface);border-radius:10px;box-shadow:0 18px 48px var(--c-shadow);width:min(860px,100%);display:flex;flex-direction:column;}
+.modal--sm{width:min(440px,100%);}
+.modal--md{width:min(540px,100%);}
+.modal__head{display:flex;justify-content:space-between;align-items:center;padding:var(--sp-4) var(--sp-5);border-bottom:1px solid var(--c-border-2);}
+.modal__title{font-size:var(--fs-lg);}
+.modal__close{border:none;background:none;color:var(--c-text-3);font-size:1.1rem;line-height:1;padding:4px;}
+.modal__body{padding:var(--sp-5);display:flex;flex-direction:column;gap:var(--sp-4);}
+.modal__foot{display:flex;justify-content:flex-end;gap:var(--sp-3);padding:var(--sp-3) var(--sp-5) var(--sp-4);}
+.frow{display:grid;grid-template-columns:160px minmax(0,1fr);gap:var(--sp-3);align-items:start;}
+.frow__label{text-align:right;color:var(--c-text-2);font-size:var(--fs-sm);padding-top:7px;}
+.req{color:var(--c-danger);margin-right:2px;}
+.frow__ctl{min-width:0;display:flex;flex-direction:column;gap:4px;}
+.frow__ctl .input{width:100%;}
+.addon{display:flex;min-width:0;}
+.addon .input{border-radius:var(--radius-s) 0 0 var(--radius-s);flex:1;min-width:0;}
+.addon__suf{display:inline-flex;align-items:center;padding:0 12px;border:1px solid var(--c-border);border-left:none;border-radius:0 var(--radius-s) var(--radius-s) 0;background:var(--c-bg-head);color:var(--c-text-2);font-size:var(--fs-xs);white-space:nowrap;}
+.err{color:var(--c-danger);font-size:var(--fs-xs);}
+.help{color:var(--c-text-3);font-size:var(--fs-xs);}
+.chk{display:flex;gap:16px;font-size:var(--fs-sm);color:var(--c-text-2);}
+.chk label{display:inline-flex;gap:6px;align-items:center;}
+.confirm{display:flex;gap:10px;align-items:flex-start;font-size:var(--fs-md);color:var(--c-text);}
+.confirm__icon{width:22px;height:22px;border-radius:50%;background:var(--c-warn-bg);color:var(--c-warn-fg);display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:var(--fs-xs);flex:0 0 auto;}
+.counter{align-self:flex-end;font-size:var(--fs-xs);color:var(--c-text-3);}
+.userlist{margin:0;padding:10px 12px;border:1px solid var(--c-border);border-radius:var(--radius-s);list-style:none;display:flex;flex-direction:column;gap:4px;max-height:240px;overflow-y:auto;font-size:var(--fs-sm);}
+
+/* === Toast === */
+.toast{position:fixed;left:50%;top:calc(16px + env(safe-area-inset-top, 0px));transform:translateX(-50%);background:var(--c-success-l);color:var(--c-success);border:1px solid var(--c-success);border-radius:var(--radius-s);padding:10px 18px;font-size:var(--fs-sm);z-index:90;box-shadow:0 6px 18px var(--c-shadow);max-width:calc(100% - 32px);}
+.toast--err{background:var(--c-danger-l);color:var(--c-danger);border-color:var(--c-danger);}
+
+/* === 响应式 === */
+@media (max-width:960px){
+  .app{flex-direction:column;}
+  .sidebar{width:auto;flex:none;display:flex;overflow-x:auto;border-right:none;border-bottom:1px solid var(--c-border);}
+  .sidebar .nav__group,.sidebar .nav__muted{display:none;}
+  .nav__sub{width:auto;white-space:nowrap;padding:12px 16px;border-left:none;border-bottom:3px solid transparent;}
+  .nav__sub--on{border-bottom-color:var(--c-primary);}
+  .frow{grid-template-columns:1fr;gap:4px;}
+  .frow__label{text-align:left;padding-top:0;}
+}
+@media (max-width:640px){
+  .stats__grid{grid-template-columns:1fr;}
+  .toolbar .field,.w-sm,.w-md,.w-lg{width:100%;}
+  .toolbar .dd{width:100%!important;}
+  .range{flex-wrap:wrap;} .range .input{flex:1 1 120px;width:auto;}
+  .toolbar__spacer{display:none;}
+}
+@media (prefers-reduced-motion:reduce){ *{transition:none!important;} }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ================= 左侧选单 ================= -->
+  <aside class="sidebar" aria-label="后台选单">
+    <div class="nav__group">积分商城</div>
+    <div class="nav__muted">积分商城设置</div>
+    <div class="nav__muted">商品管理</div>
+    <div class="nav__muted">商品兑换记录</div>
+    <button class="nav__sub" data-go="audit" data-nav="audit">发券审核</button>
+    <button class="nav__sub" data-go="config" data-nav="coupon">优惠券管理</button>
+    <div class="nav__muted">免费旋转管理</div>
+    <div class="nav__muted">黑名单设置</div>
+  </aside>
+
+  <main class="main">
+
+    <!-- ============ 优惠券管理 › 优惠券配置 ============ -->
+    <section data-page="config" hidden>
+      <div class="crumb">位置 › 积分商城 › <b>优惠券管理</b></div>
+      <div class="panel">
+        <div class="subtabs" role="tablist">
+          <button class="subtab subtab--on" data-go="config" role="tab" aria-selected="true">优惠券配置</button>
+          <button class="subtab" data-go="record" role="tab" aria-selected="false">优惠券记录</button>
+        </div>
+        <div class="switchrow">
+          <span>优惠券系统开关</span>
+          <button class="switch" id="sysSwitch" role="switch" aria-checked="true" aria-label="优惠券系统开关"><span class="switch__track" aria-hidden="true"></span><span id="sysSwitchText">开启</span></button>
+        </div>
+        <div class="toolbar">
+          <div class="field"><span class="field__label">币别</span>
+            <select id="cfgCur" class="w-sm" aria-label="币别"><option value="">全部币别</option><option value="PHP">PHP 菲律宾比索</option></select></div>
+          <div class="field"><span class="field__label">优惠券类别</span>
+            <select id="cfgCat" class="w-sm" aria-label="优惠券类别"><option value="">全部优惠券</option><option>存送比例券</option><option>输返券</option><option>中奖加奖券</option><option>体育投注券</option></select></div>
+          <div class="field"><label class="field__label" for="cfgKw">优惠券名称</label>
+            <input class="input w-md" id="cfgKw" placeholder="输入关键字搜索优惠券名称"></div>
+          <div class="toolbar__btns">
+            <button class="btn btn--primary" id="cfgQuery">查询</button>
+            <button class="btn btn--primary" id="cfgAdd">＋ 新增优惠券</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead><tr><th>币种</th><th>优惠券名称</th><th>优惠券类别</th><th>操作人</th><th class="time">创建时间</th><th>操作</th></tr></thead>
+            <tbody id="cfgBody"></tbody>
+          </table>
+        </div>
+        <div class="pager"><span id="cfgTotal">共 0 笔</span><span class="pg pg--on">1</span></div>
+      </div>
+    </section>
+
+    <!-- ============ 优惠券管理 › 优惠券记录 ============ -->
+    <section data-page="record" hidden>
+      <div class="crumb">位置 › 积分商城 › <b>优惠券管理</b></div>
+      <div class="panel">
+        <div class="subtabs" role="tablist">
+          <button class="subtab" data-go="config" role="tab" aria-selected="false">优惠券配置</button>
+          <button class="subtab subtab--on" data-go="record" role="tab" aria-selected="true">优惠券记录</button>
+        </div>
+        <div class="stats">
+          <div class="field"><span class="field__label">统计时间</span>
+            <div class="range"><input class="input num" value="2026-10-13 00:00:00" aria-label="统计开始时间"><span>~</span><input class="input num" value="2026-10-13 23:59:59" aria-label="统计结束时间"></div></div>
+          <div class="stats__grid">
+            <div class="stat"><span class="stat__val" id="stTotal">0</span><span class="stat__lbl">优惠券发放总量（张）</span></div>
+            <div class="stat"><span class="stat__val" id="stRate">0.00%</span><span class="stat__lbl">优惠券使用率</span></div>
+            <div class="stat"><span class="stat__val" id="stBonus">₱0.00</span><span class="stat__lbl">优惠券累计发放彩金</span></div>
+          </div>
+        </div>
+        <div class="toolbar">
+          <div class="field"><span class="field__label">优惠券类别</span>
+            <select id="recCat" class="w-sm" aria-label="优惠券类别"><option value="">全部优惠券</option><option>存送比例券</option><option>输返券</option><option>中奖加奖券</option><option>体育投注券</option></select></div>
+          <div class="field"><span class="field__label">状态</span>
+            <select id="recSt" class="w-sm" aria-label="状态"><option value="">全部状态</option><option>未使用</option><option>待结算</option><option>已使用</option><option>已过期</option></select></div>
+          <div class="field"><span class="field__label">获得方式</span>
+            <select id="recWay" class="w-sm" aria-label="获得方式"><option value="">全部来源</option><option>手动赠送</option><option>积分购买</option><option>周卡活动</option><option>指定召回活动</option><option>推播奖励</option><option>大奖池活动</option><option>XBomb Fiesta</option><option>注单退回</option></select></div>
+          <div class="field"><span class="field__label">获得时间</span>
+            <div class="range"><input class="input num" value="2026-10-01 00:00:00" aria-label="获得开始时间"><span>~</span><input class="input num" value="2026-10-13 23:59:59" aria-label="获得结束时间"></div></div>
+          <div class="field"><label class="field__label" for="recUser">会员账号</label>
+            <input class="input w-sm" id="recUser" placeholder="输入会员账号"></div>
+          <div class="field"><span class="field__label">搜索条件</span>
+            <div style="display:flex;gap:6px">
+              <select id="recKey" class="w-sm" aria-label="搜索条件"><option value="act">活动名称</option><option value="cid">优惠券ID</option></select>
+              <input class="input w-md" id="recKw" placeholder="输入活动名称" aria-label="搜索内容">
+            </div></div>
+          <div class="toolbar__btns">
+            <button class="btn btn--primary" id="recQuery">查询</button>
+            <button class="btn btn--warn" id="recExport">导出</button>
+            <button class="btn btn--primary" id="recGift">赠送优惠券</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data" style="min-width:1120px">
+            <thead><tr><th>会员账号</th><th class="time">获得时间</th><th>活动名称</th><th>获得方式</th><th>优惠券名称</th><th>优惠券ID</th><th>优惠券类别</th><th>状态</th><th>操作人</th><th class="time">操作时间</th><th>备注</th></tr></thead>
+            <tbody id="recBody"></tbody>
+          </table>
+        </div>
+        <div class="pager"><span id="recTotal">共 0 笔</span><span>10 笔/页</span><span class="pg pg--on">1</span></div>
+      </div>
+    </section>
+
+    <!-- ============ 发券审核 › 发券审核 ============ -->
+    <section data-page="audit" hidden>
+      <div class="crumb">位置 › 积分商城 › <b>发券审核</b></div>
+      <div class="panel">
+        <div class="subtabs" role="tablist">
+          <button class="subtab subtab--on" data-go="audit" role="tab" aria-selected="true">发券审核</button>
+          <button class="subtab" data-go="auditlog" role="tab" aria-selected="false">审核记录</button>
+        </div>
+        <div class="toolbar">
+          <div class="field"><label class="field__label" for="audKw">活动名称</label>
+            <input class="input w-md" id="audKw" placeholder="输入活动名称"></div>
+          <div class="field"><span class="field__label">券类型</span>
+            <select id="audType" class="w-sm" aria-label="券类型"><option value="">全部</option><option>优惠券</option><option>免费旋转/投注</option></select></div>
+          <div class="field"><span class="field__label">申请时间</span>
+            <div class="range"><input class="input num" placeholder="开始时间" aria-label="申请开始时间"><span>~</span><input class="input num" placeholder="结束时间" aria-label="申请结束时间"></div></div>
+          <div class="toolbar__btns"><button class="btn btn--primary" id="audQuery">查询</button></div>
+          <span class="toolbar__spacer"></span>
+          <div class="toolbar__btns">
+            <span class="selcount" id="audSel">已勾选 0 笔</span>
+            <button class="btn btn--primary" id="audBatchOk" disabled title="请先勾选要审核的申请">批量通过</button>
+            <button class="btn btn--danger" id="audBatchNo" disabled title="请先勾选要审核的申请">批量拒绝</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data" style="min-width:1100px">
+            <thead><tr><th><input type="checkbox" id="audAll" aria-label="全选本页申请"></th><th>活动名称</th><th>券类型</th><th>券名称</th><th>用户数量</th><th>申请备注</th><th class="time">申请时间</th><th>申请人</th><th>操作</th></tr></thead>
+            <tbody id="audBody"></tbody>
+          </table>
+        </div>
+        <div class="pager"><span id="audTotal">共 0 笔</span><span>20 笔/页</span><span class="pg pg--on">1</span></div>
+      </div>
+    </section>
+
+    <!-- ============ 发券审核 › 审核记录 ============ -->
+    <section data-page="auditlog" hidden>
+      <div class="crumb">位置 › 积分商城 › <b>发券审核</b></div>
+      <div class="panel">
+        <div class="subtabs" role="tablist">
+          <button class="subtab" data-go="audit" role="tab" aria-selected="false">发券审核</button>
+          <button class="subtab subtab--on" data-go="auditlog" role="tab" aria-selected="true">审核记录</button>
+        </div>
+        <div class="toolbar">
+          <div class="field"><label class="field__label" for="logKw">活动名称</label>
+            <input class="input w-md" id="logKw" placeholder="输入活动名称"></div>
+          <div class="field"><span class="field__label">券类型</span>
+            <select id="logType" class="w-sm" aria-label="券类型"><option value="">全部</option><option>优惠券</option><option>免费旋转/投注</option></select></div>
+          <div class="field"><span class="field__label">申请时间</span>
+            <div class="range"><input class="input num" placeholder="开始时间" aria-label="申请开始时间"><span>~</span><input class="input num" placeholder="结束时间" aria-label="申请结束时间"></div></div>
+          <div class="field"><span class="field__label">审核状态</span>
+            <select id="logSt" class="w-sm" aria-label="审核状态"><option value="">全部</option><option>通过</option><option>拒绝</option></select></div>
+          <div class="toolbar__btns"><button class="btn btn--primary" id="logQuery">查询</button></div>
+        </div>
+        <div class="table-wrap">
+          <table class="data" style="min-width:1260px">
+            <thead><tr><th>活动名称</th><th>券类型</th><th>券名称</th><th>用户数量</th><th>申请备注</th><th class="time">申请时间</th><th>申请人</th><th>审核状态</th><th class="time">审核时间</th><th>审核人</th><th>审核备注</th></tr></thead>
+            <tbody id="logBody"></tbody>
+          </table>
+        </div>
+        <div class="pager"><span id="logTotal">共 0 笔</span><span class="pg pg--on">1</span></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ================= 弹窗：新增／编辑优惠券 ================= -->
+<div class="mask" id="mCoupon" hidden role="dialog" aria-modal="true" aria-labelledby="mCouponTitle">
+  <div class="modal">
+    <div class="modal__head"><h2 class="modal__title" id="mCouponTitle">新增优惠券</h2><button class="modal__close" data-close="mCoupon" aria-label="关闭">✕</button></div>
+    <div class="modal__body">
+      <div class="frow"><span class="frow__label"><span class="req">*</span>币种：</span>
+        <div class="frow__ctl"><select id="fCur" aria-label="币种"><option value="PHP">菲律宾比索（PHP）</option></select></div></div>
+      <div class="frow"><label class="frow__label" for="fName"><span class="req">*</span>优惠券名称：</label>
+        <div class="frow__ctl"><input class="input" id="fName" maxlength="100" placeholder="请输入优惠券名称，最多 100 个字">
+          <span class="err" id="eName" hidden>请输入优惠券名称</span></div></div>
+      <div class="frow"><span class="frow__label"><span class="req">*</span>优惠券类别：</span>
+        <div class="frow__ctl"><select id="fCat" aria-label="优惠券类别"><option>存送比例券</option><option>输返券</option><option>中奖加奖券</option><option>体育投注券</option></select></div></div>
+
+      <!-- 存送比例券／输返券／中奖加奖券的配置项（data-for 指定显示于哪些类别） -->
+      <div id="grpLegacy" style="display:flex;flex-direction:column;gap:var(--sp-4)">
+        <div class="frow" data-for="输返券"><label class="frow__label" for="fBetValid"><span class="req">*</span>注单有效期：</label><div class="frow__ctl"><div class="addon"><input class="input" id="fBetValid" value="0"><span class="addon__suf">小时</span></div></div></div>
+        <div class="frow" data-for="存送比例券 输返券 中奖加奖券"><label class="frow__label" for="fRate"><span class="req">*</span>优惠比例：</label><div class="frow__ctl"><div class="addon"><input class="input" id="fRate" value="0"><span class="addon__suf">%</span></div></div></div>
+        <div class="frow" data-for="存送比例券 输返券 中奖加奖券"><label class="frow__label" for="fCap"><span class="req">*</span>单笔奖金上限：</label><div class="frow__ctl"><input class="input" id="fCap" value="0"></div></div>
+        <div class="frow" data-for="存送比例券 输返券 中奖加奖券"><label class="frow__label" for="fFlow"><span class="req">*</span>奖金流水倍数：</label>
+          <div class="frow__ctl">
+            <div class="chk" data-for="存送比例券"><label><input type="checkbox" id="fFlowP"> 本金</label><label><input type="checkbox" id="fFlowB"> 彩金</label></div>
+            <div class="addon"><input class="input" id="fFlow" value="0"><span class="addon__suf">倍</span></div>
+          </div></div>
+        <div class="frow" data-for="存送比例券 输返券 中奖加奖券"><label class="frow__label" for="fFee"><span class="req">*</span>稽核不通过手续费比例：</label><div class="frow__ctl"><div class="addon"><input class="input" id="fFee" value="0"><span class="addon__suf">%</span></div></div></div>
+        <div class="frow" data-for="存送比例券 输返券 中奖加奖券"><label class="frow__label" for="fValidOld"><span class="req">*</span>有效期：</label><div class="frow__ctl"><div class="addon"><input class="input" id="fValidOld" value="0"><span class="addon__suf">小时</span></div></div></div>
+      </div>
+
+      <!-- 体育投注券的配置项 -->
+      <div id="grpSport" hidden style="display:flex;flex-direction:column;gap:var(--sp-4)">
+        <div class="frow"><label class="frow__label" for="fTimes"><span class="req">*</span>投注次数：</label>
+          <div class="frow__ctl"><div class="addon"><input class="input sp-int" id="fTimes" inputmode="numeric" maxlength="9" value="0"><span class="addon__suf">次</span></div>
+            <span class="err" hidden>投注次数须为大于 0 的整数，不可输入小数</span></div></div>
+        <div class="frow"><label class="frow__label" for="fAmt"><span class="req">*</span>单次投注金额：</label>
+          <div class="frow__ctl"><input class="input sp-int" id="fAmt" inputmode="numeric" maxlength="9" value="0">
+            <span class="err" hidden>单次投注金额须为大于 0 的整数，不可输入小数</span></div></div>
+        <div class="frow"><label class="frow__label" for="fValid"><span class="req">*</span>有效期：</label>
+          <div class="frow__ctl"><div class="addon"><input class="input sp-int" id="fValid" inputmode="numeric" maxlength="9" value="0"><span class="addon__suf">小时</span></div>
+            <span class="err" hidden>有效期须为大于 0 的整数，不可输入小数</span></div></div>
+      </div>
+    </div>
+    <div class="modal__foot"><button class="btn" data-close="mCoupon">返回</button><button class="btn btn--primary" id="couponOk">确定</button></div>
+  </div>
+</div>
+
+<!-- ================= 弹窗：赠送优惠券 ================= -->
+<div class="mask" id="mGift" hidden role="dialog" aria-modal="true" aria-labelledby="mGiftTitle">
+  <div class="modal">
+    <div class="modal__head"><h2 class="modal__title" id="mGiftTitle">赠送优惠券</h2><button class="modal__close" data-close="mGift" aria-label="关闭">✕</button></div>
+    <div class="modal__body">
+      <div class="frow"><label class="frow__label" for="gAct"><span class="req">*</span>活动名称：</label>
+        <div class="frow__ctl"><input class="input" id="gAct" placeholder="请输入活动名称，会显示在优惠券记录与审核列表">
+          <span class="err" hidden>请输入活动名称</span></div></div>
+      <div class="frow"><span class="frow__label"><span class="req">*</span>币种：</span>
+        <div class="frow__ctl"><select id="gCur" aria-label="币种"><option value="PHP">菲律宾比索（PHP）</option></select></div></div>
+      <div class="frow"><span class="frow__label"><span class="req">*</span>选择优惠券：</span>
+        <div class="frow__ctl"><select id="gCoupon" class="dd--wrap" aria-label="选择优惠券"></select>
+          <span class="err" id="eCoupon" hidden>请选择要赠送的优惠券</span></div></div>
+      <div class="frow"><label class="frow__label" for="gUsers"><span class="req">*</span>赠送用户：</label>
+        <div class="frow__ctl"><textarea class="textarea" id="gUsers" placeholder="请输入会员账号，多个账号请换行输入"></textarea>
+          <span class="err" hidden>请输入至少一个会员账号</span></div></div>
+      <div class="frow"><label class="frow__label" for="gNote">备注：</label>
+        <div class="frow__ctl"><textarea class="textarea" id="gNote" placeholder="选填，会显示在发券审核的「申请备注」"></textarea></div></div>
+    </div>
+    <div class="modal__foot"><button class="btn" data-close="mGift">返回</button><button class="btn btn--primary" id="giftOk">提交审核</button></div>
+  </div>
+</div>
+
+<!-- ================= 弹窗：审核（通过／拒绝） ================= -->
+<div class="mask" id="mReview" hidden role="dialog" aria-modal="true" aria-labelledby="mReviewTitle">
+  <div class="modal modal--md">
+    <div class="modal__head"><h2 class="modal__title" id="mReviewTitle">通过申请</h2><button class="modal__close" data-close="mReview" aria-label="关闭">✕</button></div>
+    <div class="modal__body">
+      <p class="confirm" id="mReviewMsg">确定通过此发券申请吗？</p>
+      <label for="rvNote" class="field__label">审核备注（选填）</label>
+      <textarea class="textarea" id="rvNote" maxlength="500" placeholder="请输入审核备注，最多 500 字"></textarea>
+      <span class="counter" id="rvCount">0/500</span>
+    </div>
+    <div class="modal__foot"><button class="btn" data-close="mReview">取消</button><button class="btn btn--primary" id="reviewOk">确定通过</button></div>
+  </div>
+</div>
+
+<!-- ================= 弹窗：查看名单 ================= -->
+<div class="mask" id="mUsers" hidden role="dialog" aria-modal="true" aria-labelledby="mUsersTitle">
+  <div class="modal modal--sm">
+    <div class="modal__head"><h2 class="modal__title" id="mUsersTitle">发券名单</h2><button class="modal__close" data-close="mUsers" aria-label="关闭">✕</button></div>
+    <div class="modal__body"><p class="help" id="usersInfo"></p><ul class="userlist" id="usersList"></ul></div>
+    <div class="modal__foot"><button class="btn btn--primary" data-close="mUsers">关闭</button></div>
+  </div>
+</div>
+
+<!-- ================= 弹窗：二次确认 ================= -->
+<div class="mask mask--top" id="mConfirm" hidden role="alertdialog" aria-modal="true" aria-labelledby="mConfirmTitle">
+  <div class="modal modal--sm">
+    <div class="modal__head"><h2 class="modal__title" id="mConfirmTitle">提示</h2><button class="modal__close" data-close="mConfirm" aria-label="关闭">✕</button></div>
+    <div class="modal__body"><p class="confirm"><span class="confirm__icon" aria-hidden="true">!</span><span id="confirmMsg">确认提交吗？</span></p></div>
+    <div class="modal__foot"><button class="btn" data-close="mConfirm">取消</button><button class="btn btn--primary" id="confirmOk">确定</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden role="status"></div>
+
+<script>
+/* =========================================================
+   示例数据
+   ========================================================= */
+var CURSYM = '₱';
+var coupons = [
+  {id:1, cur:'PHP', name:'世界杯体育投注券 3次×₱100', cat:'体育投注券', op:'abc123', time:'2026/10/13 14:02:11', cfg:{times:3, amt:100, valid:72}},
+  {id:2, cur:'PHP', name:'周末足球单注券 1次×₱500', cat:'体育投注券', op:'xyczadmin', time:'2026/10/12 18:40:05', cfg:{times:1, amt:500, valid:48}},
+  {id:3, cur:'PHP', name:'Ntest_中奖加奖卷', cat:'中奖加奖券', op:'kjh789', time:'2026/09/09 11:27:34', cfg:{rate:50, cap:888, flow:2, fee:1, valid:48}},
+  {id:4, cur:'PHP', name:'Ntest_输返卷', cat:'输返券', op:'kjh789', time:'2026/09/09 11:26:36', cfg:{betValid:48, rate:10, cap:500, flow:5, fee:1, valid:240}},
+  {id:5, cur:'PHP', name:'Ntest_存送比例', cat:'存送比例券', op:'kjh789', time:'2026/09/09 11:25:30', cfg:{rate:10, cap:100, flow:5, fee:2, valid:240}},
+  {id:6, cur:'PHP', name:'Deposit≥₱500', cat:'存送比例券', op:'ptsadmin', time:'2026/08/14 15:20:27', cfg:{rate:20, cap:200, flow:2, fee:1, valid:24}}
+];
+var records = [
+  {user:'okbet3302mzq', time:'2026-10-13 16:40', act:'世界杯开幕赠券', way:'注单退回', name:'世界杯体育投注券 3次×₱100', cid:'29911', cat:'体育投注券', st:'未使用', op:'系统', opTime:'2026-10-13 16:40', note:'注单 B0155952339575703561 取消，退回 1 次'},
+  {user:'okbet55501x2a', time:'2026-10-13 14:16', act:'世界杯开幕赠券', way:'手动赠送', name:'世界杯体育投注券 3次×₱100', cid:'29903', cat:'体育投注券', st:'已使用', op:'abc123', opTime:'2026-10-13 14:16', note:'使用后剩余 2 次'},
+  {user:'xnjobe11', time:'2026-10-13 14:16', act:'世界杯开幕赠券', way:'手动赠送', name:'世界杯体育投注券 3次×₱100', cid:'29902', cat:'体育投注券', st:'未使用', op:'abc123', opTime:'2026-10-13 14:16', note:'–'},
+  {user:'okbet7712kd9m', time:'2026-10-10 09:05', act:'周末足球回馈', way:'手动赠送', name:'周末足球单注券 1次×₱500', cid:'29870', cat:'体育投注券', st:'已过期', op:'lmnadmin', opTime:'2026-10-10 09:05', note:'–'},
+  {user:'xnjobe11', time:'2026-10-13 13:25', act:'XBomb Fiesta每日抽奖活动', way:'XBomb Fiesta', name:'10% Deposit Voucher (Max ₱100)', cid:'29861', cat:'存送比例券', st:'未使用', op:'–', opTime:'–', note:'–'},
+  {user:'okbet0469afbr7', time:'2026-10-13 10:02', act:'test232', way:'手动赠送', name:'Ntest_输返卷', cid:'29855', cat:'输返券', st:'已使用', op:'zxc888', opTime:'2026-10-13 10:02', note:'–'}
+];
+var audits = [
+  {id:'a1', act:'世界杯开幕赠券B', type:'优惠券', name:'世界杯体育投注券 3次×₱100', n:1, users:['xcbet26'], note:'–', time:'2026-10-13 14:20', who:'bnm246'},
+  {id:'a2', act:'test232', type:'优惠券', name:'Ntest_输返卷', n:1, users:['okbet0469afbr7'], note:'–', time:'2026-10-13 14:13', who:'xyczadmin'},
+  {id:'a3', act:'fsdafasdfa', type:'优惠券', name:'Ntest_存送比例', n:2, users:['xcbet26','okbet55501x2a'], note:'回流用户', time:'2026-10-02 18:10', who:'qwe456'},
+  {id:'a4', act:'sdfse', type:'免费旋转/投注', name:'YGR_S 免費', n:1, users:['xcbet26'], note:'–', time:'2026-10-02 18:09', who:'mnoadmin'}
+];
+var auditLogs = [
+  {act:'世界杯开幕赠券', type:'优惠券', name:'世界杯体育投注券 3次×₱100', n:1, note:'–', time:'2026-10-13 14:15', who:'hjk555', st:'通过', rTime:'2026-10-13 14:16', rWho:'abc123', rNote:'test'},
+  {act:'足球周测试', type:'优惠券', name:'周末足球单注券 1次×₱500', n:1, note:'–', time:'2026-10-09 10:00', who:'qwe456', st:'拒绝', rTime:'2026-10-09 10:30', rWho:'rty321', rNote:'名单有误'},
+  {act:'sdfse', type:'免费旋转/投注', name:'YGR_S 免費', n:1, note:'–', time:'2026-10-13 13:03', who:'mnoadmin', st:'通过', rTime:'2026-10-13 13:03', rWho:'mnoadmin', rNote:'–'},
+  {act:'dsafsf', type:'优惠券', name:'Ntest_存送比例', n:1, note:'–', time:'2026-10-02 18:11', who:'qwe456', st:'通过', rTime:'2026-10-07 18:24', rWho:'uvwadmin', rNote:'111'}
+];
+
+/* =========================================================
+   工具函数
+   ========================================================= */
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+function pad(n){ return (n<10?'0':'')+n; }
+function nowStr(sep){ var d=new Date(); return d.getFullYear()+sep+pad(d.getMonth()+1)+sep+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes()); }
+/* 名称栏：最多两行，超出以「…」截断，滑鼠移入显示完整名称 */
+function nameCell(s){ return '<div class="cname" title="'+esc(s)+'">'+esc(s)+'</div>'; }
+function emptyRow(cols){ return '<tr><td colspan="'+cols+'" class="empty">查无符合条件的资料</td></tr>'; }
+var toastTimer;
+function toast(msg,isErr){ var t=$('toast'); t.textContent=(isErr?'✕ ':'✓ ')+msg; t.classList.toggle('toast--err',!!isErr); t.hidden=false; clearTimeout(toastTimer); toastTimer=setTimeout(function(){t.hidden=true;},2400); }
+function openM(id){ $(id).hidden=false; }
+function closeM(id){ $(id).hidden=true; ddCloseAll(); }
+
+/* =========================================================
+   自定义下拉：原生 <select> 隐藏，只负责保存值与触发 change；
+   画面上用按钮＋面板呈现，面板在栏位正下方展开、最多约 6 项高度，超出可滚动
+   ========================================================= */
+function ddInit(sel){
+  if(sel.dataset.dd) return; sel.dataset.dd='1';
+  var wrap=document.createElement('div');
+  wrap.className='dd'+(sel.classList.contains('dd--wrap')?' dd--wrap':'')+(sel.className.match(/w-(sm|md|lg)/)?' '+sel.className.match(/w-(sm|md|lg)/)[0]:'');
+  sel.parentNode.insertBefore(wrap,sel); wrap.appendChild(sel); sel.classList.add('dd__native');
+  var btn=document.createElement('button'); btn.type='button'; btn.className='dd__btn';
+  btn.setAttribute('aria-haspopup','listbox'); btn.setAttribute('aria-expanded','false');
+  if(sel.getAttribute('aria-label')) btn.setAttribute('aria-label',sel.getAttribute('aria-label'));
+  btn.innerHTML='<span class="dd__text"></span><svg class="dd__arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4.5l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var panel=document.createElement('div'); panel.className='dd__panel'; panel.setAttribute('role','listbox');
+  wrap.appendChild(btn); wrap.appendChild(panel);
+  btn.addEventListener('click',function(e){ e.stopPropagation(); var open=!wrap.classList.contains('is-open'); ddCloseAll(); if(open){ ddSync(wrap); wrap.classList.add('is-open'); btn.setAttribute('aria-expanded','true'); var s=panel.querySelector('.is-sel'); if(s) s.scrollIntoView({block:'nearest'}); } });
+  new MutationObserver(function(){ ddSync(wrap); }).observe(sel,{childList:true});
+  sel.addEventListener('change',function(){ ddSync(wrap); });
+  ddSync(wrap);
+}
+function ddSync(wrap){
+  var sel=wrap.querySelector('.dd__native'), panel=wrap.querySelector('.dd__panel'), btn=wrap.querySelector('.dd__btn');
+  panel.innerHTML='';
+  if(!sel.options.length){ panel.innerHTML='<div class="dd__empty">暂无可选项目</div>'; }
+  [].forEach.call(sel.options,function(op,i){
+    var d=document.createElement('div');
+    d.className='dd__opt'+(i===sel.selectedIndex?' is-sel':''); d.setAttribute('role','option');
+    d.setAttribute('aria-selected',i===sel.selectedIndex?'true':'false'); d.textContent=op.textContent; d.title=op.textContent;
+    d.addEventListener('click',function(e){ e.stopPropagation(); ddCloseAll(); if(sel.selectedIndex!==i){ sel.selectedIndex=i; sel.dispatchEvent(new Event('change',{bubbles:true})); } ddSync(wrap); });
+    panel.appendChild(d);
+  });
+  var op=sel.options[sel.selectedIndex], txt=wrap.querySelector('.dd__text');
+  txt.textContent=op?op.textContent:''; txt.classList.toggle('is-ph',!op||op.value==='');
+  btn.disabled=sel.disabled;
+}
+function ddSyncAll(){ document.querySelectorAll('.dd').forEach(ddSync); }
+function ddCloseAll(){ var c=false; document.querySelectorAll('.dd.is-open').forEach(function(d){ d.classList.remove('is-open'); d.querySelector('.dd__btn').setAttribute('aria-expanded','false'); c=true; }); return c; }
+document.querySelectorAll('select').forEach(ddInit);
+
+/* =========================================================
+   页面切换（网址可带 #config / #record / #audit / #auditlog）
+   ========================================================= */
+var PAGES=['config','record','audit','auditlog'];
+function go(p){
+  if(PAGES.indexOf(p)<0) p='config';
+  document.querySelectorAll('[data-page]').forEach(function(s){ s.hidden=s.getAttribute('data-page')!==p; });
+  var nav=(p==='config'||p==='record')?'coupon':'audit';
+  document.querySelectorAll('.nav__sub').forEach(function(b){ b.classList.toggle('nav__sub--on',b.getAttribute('data-nav')===nav); });
+  try{ history.replaceState(null,'','#'+p); }catch(e){}
+  ddCloseAll(); window.scrollTo(0,0);
+}
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.dd')) ddCloseAll();
+  var g=e.target.closest('[data-go]'); if(g){ go(g.getAttribute('data-go')); return; }
+  var c=e.target.closest('[data-close]'); if(c){ closeM(c.getAttribute('data-close')); return; }
+  if(e.target.classList && e.target.classList.contains('mask')) closeM(e.target.id);
+});
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Escape') return;
+  if(ddCloseAll()) return;
+  var open=[].slice.call(document.querySelectorAll('.mask')).filter(function(m){return !m.hidden;});
+  if(open.length) closeM(open[open.length-1].id);
+});
+window.addEventListener('hashchange',function(){ go(location.hash.replace('#','')); });
+
+/* 优惠券系统开关 */
+$('sysSwitch').onclick=function(){
+  var on=this.getAttribute('aria-checked')!=='true';
+  this.setAttribute('aria-checked',on?'true':'false'); $('sysSwitchText').textContent=on?'开启':'关闭';
+  toast(on?'优惠券系统已开启':'优惠券系统已关闭');
+};
+
+/* =========================================================
+   优惠券配置：列表
+   ========================================================= */
+function renderCfg(){
+  var cur=$('cfgCur').value, cat=$('cfgCat').value, kw=$('cfgKw').value.trim();
+  var rows=coupons.filter(function(c){ return (!cur||c.cur===cur)&&(!cat||c.cat===cat)&&(!kw||c.name.indexOf(kw)>-1); });
+  $('cfgBody').innerHTML = rows.length ? rows.map(function(c){
+    return '<tr><td>'+c.cur+'</td><td><div class="namecell">'+nameCell(c.name)+'<button class="i18n" data-i18n="'+c.id+'" title="设定此名称的多语系翻译" aria-label="多语系翻译">+</button></div></td>'
+      +'<td>'+c.cat+'</td><td>'+esc(c.op)+'</td><td class="time num">'+c.time+'</td>'
+      +'<td class="op"><button class="link" data-edit="'+c.id+'">编辑</button><button class="link link--danger" data-del="'+c.id+'">删除</button></td></tr>';
+  }).join('') : emptyRow(6);
+  $('cfgTotal').textContent='共 '+rows.length+' 笔';
+}
+$('cfgQuery').onclick=renderCfg;
+$('cfgBody').addEventListener('click',function(e){
+  var ed=e.target.closest('[data-edit]'), dl=e.target.closest('[data-del]'), tr=e.target.closest('[data-i18n]');
+  if(ed) openCoupon('edit',+ed.getAttribute('data-edit'));
+  if(tr) toast('多语系翻译设定（沿用现有国际化列表）');
+  if(dl){ var id=+dl.getAttribute('data-del'), c=coupons.filter(function(x){return x.id===id;})[0];
+    askConfirm('确认删除优惠券「'+c.name+'」吗？删除后无法恢复。',function(){ coupons=coupons.filter(function(x){return x.id!==id;}); renderCfg(); fillGift(); toast('删除成功'); }); }
+});
+
+/* =========================================================
+   新增／编辑优惠券：依「优惠券类别」切换配置项
+   ========================================================= */
+var editingId=null;
+function applyCat(){
+  var cat=$('fCat').value, sport=(cat==='体育投注券');
+  $('grpSport').hidden=!sport; $('grpLegacy').hidden=sport;
+  document.querySelectorAll('#grpLegacy [data-for]').forEach(function(el){ el.hidden=el.getAttribute('data-for').split(' ').indexOf(cat)<0; });
+}
+function resetSport(){ document.querySelectorAll('.sp-int').forEach(function(i){ i.value='0'; setErr(i,false); }); }  /* 预设 0，与其他类别一致 */
+function resetLegacy(){ ['fBetValid','fRate','fCap','fFlow','fFee','fValidOld'].forEach(function(id){ $(id).value='0'; }); $('fFlowP').checked=false; $('fFlowB').checked=false; }
+$('fCat').addEventListener('change',function(){ resetSport(); resetLegacy(); applyCat(); });
+
+function openCoupon(mode,id){
+  editingId=(mode==='edit')?id:null;
+  $('mCouponTitle').textContent=(mode==='edit')?'编辑优惠券':'新增优惠券';
+  $('eName').hidden=true; $('fName').classList.remove('is-err');
+  resetSport(); resetLegacy();
+  if(mode==='edit'){
+    var c=coupons.filter(function(x){return x.id===id;})[0];
+    $('fName').value=c.name; $('fCat').value=c.cat;
+    if(c.cat==='体育投注券'){ $('fTimes').value=c.cfg.times; $('fAmt').value=c.cfg.amt; $('fValid').value=c.cfg.valid; }
+    else { $('fRate').value=c.cfg.rate||0; $('fCap').value=c.cfg.cap||0; $('fFlow').value=c.cfg.flow||0; $('fFee').value=c.cfg.fee||0; $('fValidOld').value=c.cfg.valid||0; $('fBetValid').value=c.cfg.betValid||0; }
+  } else { $('fName').value=''; $('fCat').value='存送比例券'; }
+  /* 编辑时：币种与类别不可修改 */
+  var lock=(mode==='edit');
+  $('fCur').disabled=$('fCat').disabled=lock;
+  ddSyncAll(); applyCat(); openM('mCoupon');
+}
+$('cfgAdd').onclick=function(){ openCoupon('add'); };
+
+/* 体育投注券栏位验证：必须是大于 0 的整数（不可留空、0、负数、小数、非数字） */
+function setErr(input,on){ input.classList.toggle('is-err',on); var e=input.closest('.frow__ctl').querySelector('.err'); if(e) e.hidden=!on; }
+function checkInt(input){
+  var v=input.value.trim();
+  if(/^\d+$/.test(v) && +v>0){ input.value=String(+v); setErr(input,false); return true; }  /* 去除空白与前导 0 */
+  setErr(input,true); return false;
+}
+document.querySelectorAll('.sp-int').forEach(function(i){
+  i.addEventListener('blur',function(){ checkInt(i); });
+  i.addEventListener('input',function(){ if(i.classList.contains('is-err')) checkInt(i); });
+});
+$('fName').addEventListener('input',function(){ if(this.value.trim()){ this.classList.remove('is-err'); $('eName').hidden=true; } });
+
+$('couponOk').onclick=function(){
+  var ok=true;
+  if(!$('fName').value.trim()){ $('fName').classList.add('is-err'); $('eName').hidden=false; ok=false; }
+  if($('fCat').value==='体育投注券'){ document.querySelectorAll('.sp-int').forEach(function(i){ if(!checkInt(i)) ok=false; }); }
+  if(!ok){ toast('请修正红框标示的栏位后再提交',true); return; }
+  askConfirm(editingId?'确认保存对此优惠券的修改吗？':'确认新增此优惠券吗？',function(){
+    var cat=$('fCat').value, sport=(cat==='体育投注券');
+    var cfg=sport?{times:+$('fTimes').value, amt:+$('fAmt').value, valid:+$('fValid').value}:{rate:+$('fRate').value, cap:+$('fCap').value, flow:+$('fFlow').value, fee:+$('fFee').value, valid:+$('fValidOld').value, betValid:+$('fBetValid').value};
+    if(editingId){ coupons.forEach(function(c){ if(c.id===editingId){ c.name=$('fName').value.trim(); c.cfg=cfg; } }); }
+    else { coupons.unshift({id:Date.now(), cur:$('fCur').value, name:$('fName').value.trim(), cat:cat, op:'abc123', time:nowStr('/')+':00', cfg:cfg}); }
+    var wasEdit=!!editingId;
+    closeM('mCoupon'); renderCfg(); fillGift(); toast(wasEdit?'修改成功':'新增成功');
+  });
+};
+
+/* 二次确认框 */
+var confirmCb=null;
+function askConfirm(msg,cb){ $('confirmMsg').textContent=msg; confirmCb=cb; openM('mConfirm'); }
+$('confirmOk').onclick=function(){ closeM('mConfirm'); var cb=confirmCb; confirmCb=null; if(cb) cb(); };
+
+/* =========================================================
+   优惠券记录：统计＋列表
+   ========================================================= */
+$('recKey').addEventListener('change',function(){ $('recKw').placeholder=this.value==='cid'?'输入优惠券ID':'输入活动名称'; $('recKw').value=''; });
+function renderRec(){
+  var cat=$('recCat').value, st=$('recSt').value, way=$('recWay').value, u=$('recUser').value.trim(), key=$('recKey').value, kw=$('recKw').value.trim();
+  var rows=records.filter(function(r){ return (!cat||r.cat===cat)&&(!st||r.st===st)&&(!way||r.way===way)&&(!u||r.user.indexOf(u)>-1)&&(!kw||(key==='cid'?r.cid===kw:r.act.indexOf(kw)>-1)); });
+  $('recBody').innerHTML = rows.length ? rows.map(function(r){
+    return '<tr><td>'+esc(r.user)+'</td><td class="time num">'+r.time+'</td><td>'+nameCell(r.act)+'</td><td>'+esc(r.way)+'</td><td>'+nameCell(r.name)+'</td><td class="num">'+r.cid+'</td>'
+      +'<td class="time">'+r.cat+'</td><td class="time"><span class="'+(r.st==='已过期'?'st--exp':'')+'">'+r.st+'</span></td><td>'+esc(r.op)+'</td><td class="time num">'+r.opTime+'</td><td style="min-width:9.5em;max-width:15em">'+esc(r.note)+'</td></tr>';
+  }).join('') : emptyRow(11);
+  $('recTotal').textContent='共 '+rows.length+' 笔';
+  /* 发放总量、使用率：含体育投注券；累计发放彩金：不含体育投注券（示例值） */
+  var used=records.filter(function(r){return r.st==='已使用';}).length;
+  $('stTotal').textContent=records.length;
+  $('stRate').textContent=(records.length?(used/records.length*100):0).toFixed(2)+'%';
+  $('stBonus').textContent=CURSYM+'150.00';
+}
+$('recQuery').onclick=renderRec;
+$('recExport').onclick=function(){ toast('已导出目前筛选结果的优惠券记录'); };
+
+/* 赠送优惠券 */
+function fillGift(){
+  var cur=$('gCur').value;
+  $('gCoupon').innerHTML='<option value="">请选择优惠券</option>'+coupons.filter(function(c){return c.cur===cur;}).map(function(c){ return '<option value="'+c.id+'">'+esc(c.name)+'（'+c.cat+'）</option>'; }).join('');
+}
+function fieldErr(el,on){ el.classList.toggle('is-err',on); var e=el.closest('.frow__ctl').querySelector('.err'); if(e) e.hidden=!on; }
+$('recGift').onclick=function(){
+  $('gAct').value=''; $('gUsers').value=''; $('gNote').value=''; fillGift();
+  fieldErr($('gAct'),false); fieldErr($('gUsers'),false); $('eCoupon').hidden=true; $('gCoupon').parentNode.querySelector('.dd__btn').classList.remove('is-err');
+  openM('mGift');
+};
+$('gCoupon').addEventListener('change',function(){ if(this.value){ $('eCoupon').hidden=true; this.parentNode.querySelector('.dd__btn').classList.remove('is-err'); } });
+$('giftOk').onclick=function(){
+  var act=$('gAct').value.trim(), cid=$('gCoupon').value;
+  var users=$('gUsers').value.split(/\n+/).map(function(s){return s.trim();}).filter(Boolean);
+  fieldErr($('gAct'),!act); fieldErr($('gUsers'),!users.length);
+  $('eCoupon').hidden=!!cid; $('gCoupon').parentNode.querySelector('.dd__btn').classList.toggle('is-err',!cid);
+  if(!act||!cid||!users.length){ toast('请修正红框标示的栏位后再提交',true); return; }
+  var c=coupons.filter(function(x){return String(x.id)===cid;})[0];
+  audits.unshift({id:'a'+Date.now(), act:act, type:'优惠券', name:c.name, n:users.length, users:users, note:$('gNote').value.trim()||'–', time:nowStr('-'), who:'abc123'});
+  closeM('mGift'); renderAud(); toast('申请提交成功，等待审核（可至「发券审核」查看）');
+};
+
+/* =========================================================
+   发券审核
+   ========================================================= */
+function renderAud(){
+  var t=$('audType').value, kw=$('audKw').value.trim();
+  var rows=audits.filter(function(a){ return (!t||a.type===t)&&(!kw||a.act.indexOf(kw)>-1); });
+  $('audBody').innerHTML = rows.length ? rows.map(function(a){
+    return '<tr><td><input type="checkbox" class="audChk" value="'+a.id+'" aria-label="勾选 '+esc(a.act)+'"></td><td>'+nameCell(a.act)+'</td><td>'+a.type+'</td>'
+      +'<td>'+nameCell(a.name)+'</td><td class="num">'+a.n+'</td><td>'+esc(a.note)+'</td><td class="time num">'+a.time+'</td><td>'+esc(a.who)+'</td>'
+      +'<td class="op"><button class="link" data-rv="ok" data-id="'+a.id+'">通过</button><button class="link link--danger" data-rv="no" data-id="'+a.id+'">拒绝</button><button class="link" data-users="'+a.id+'">查看名单</button><button class="link" data-exp="'+a.id+'">导出名单</button></td></tr>';
+  }).join('') : emptyRow(9);
+  $('audTotal').textContent='共 '+rows.length+' 笔';
+  $('audAll').checked=false; syncBatch();
+}
+function syncBatch(){ var n=document.querySelectorAll('.audChk:checked').length; $('audBatchOk').disabled=$('audBatchNo').disabled=!n; $('audSel').textContent='已勾选 '+n+' 笔'; }
+$('audQuery').onclick=renderAud;
+$('audAll').onchange=function(){ var on=this.checked; document.querySelectorAll('.audChk').forEach(function(c){ c.checked=on; }); syncBatch(); };
+var reviewIds=[], reviewPass=true;
+function openReview(ids,pass){
+  reviewIds=ids; reviewPass=pass;
+  var batch=ids.length>1;
+  $('mReviewTitle').textContent=(batch?'批量':'')+(pass?'通过申请':'拒绝申请');
+  $('mReviewMsg').textContent=pass
+    ?'确定通过'+(batch?'已勾选的 '+ids.length+' 笔':'此笔')+'发券申请吗？通过后会立即发券给名单内的会员。'
+    :'确定拒绝'+(batch?'已勾选的 '+ids.length+' 笔':'此笔')+'发券申请吗？拒绝后不会发券。';
+  $('reviewOk').textContent=pass?'确定通过':'确定拒绝';
+  $('reviewOk').className='btn '+(pass?'btn--primary':'btn--danger');
+  $('rvNote').value=''; $('rvCount').textContent='0/500'; openM('mReview');
+}
+$('audBody').addEventListener('change',function(e){ if(e.target.classList.contains('audChk')) syncBatch(); });
+$('audBody').addEventListener('click',function(e){
+  var rv=e.target.closest('[data-rv]'), us=e.target.closest('[data-users]'), ex=e.target.closest('[data-exp]');
+  if(rv) openReview([rv.getAttribute('data-id')],rv.getAttribute('data-rv')==='ok');
+  if(us){ var a=audits.filter(function(x){return x.id===us.getAttribute('data-users');})[0];
+    $('usersInfo').textContent='活动「'+a.act+'」共 '+a.users.length+' 位会员'; $('usersList').innerHTML=a.users.map(function(u){return '<li>'+esc(u)+'</li>';}).join(''); openM('mUsers'); }
+  if(ex) toast('已导出此申请的会员名单');
+});
+function checkedIds(){ return [].map.call(document.querySelectorAll('.audChk:checked'),function(c){return c.value;}); }
+$('audBatchOk').onclick=function(){ openReview(checkedIds(),true); };
+$('audBatchNo').onclick=function(){ openReview(checkedIds(),false); };
+$('rvNote').addEventListener('input',function(){ $('rvCount').textContent=this.value.length+'/500'; });
+$('reviewOk').onclick=function(){
+  var note=$('rvNote').value.trim()||'–', t=nowStr('-');
+  audits.filter(function(a){return reviewIds.indexOf(a.id)>-1;}).forEach(function(a){
+    auditLogs.unshift({act:a.act, type:a.type, name:a.name, n:a.n, note:a.note, time:a.time, who:a.who, st:reviewPass?'通过':'拒绝', rTime:t, rWho:'abc123', rNote:note});
+    /* 通过：名单内每位会员各发 1 张，写入优惠券记录（状态：未使用）；拒绝：不发券 */
+    if(reviewPass && a.type==='优惠券'){
+      var c=coupons.filter(function(x){return x.name===a.name;})[0];
+      a.users.forEach(function(u,i){ records.unshift({user:u, time:t, act:a.act, way:'手动赠送', name:a.name, cid:String(30000+records.length+i), cat:c?c.cat:'存送比例券', st:'未使用', op:'abc123', opTime:t, note:'–'}); });
+    }
+  });
+  var n=reviewIds.length;
+  audits=audits.filter(function(a){return reviewIds.indexOf(a.id)<0;});
+  closeM('mReview'); renderAud(); renderLog(); renderRec();
+  toast(reviewPass?'已通过 '+n+' 笔申请，优惠券已发放':'已拒绝 '+n+' 笔申请');
+};
+
+/* =========================================================
+   审核记录
+   ========================================================= */
+function renderLog(){
+  var t=$('logType').value, s=$('logSt').value, kw=$('logKw').value.trim();
+  var rows=auditLogs.filter(function(a){ return (!t||a.type===t)&&(!s||a.st===s)&&(!kw||a.act.indexOf(kw)>-1); });
+  $('logBody').innerHTML = rows.length ? rows.map(function(a){
+    return '<tr><td>'+nameCell(a.act)+'</td><td>'+a.type+'</td><td>'+nameCell(a.name)+'</td><td class="num">'+a.n+'</td><td>'+esc(a.note)+'</td>'
+      +'<td class="time num">'+a.time+'</td><td>'+esc(a.who)+'</td><td><span class="'+(a.st==='通过'?'st--ok':'st--no')+'">'+a.st+'</span></td><td class="time num">'+a.rTime+'</td><td>'+esc(a.rWho)+'</td><td>'+esc(a.rNote)+'</td></tr>';
+  }).join('') : emptyRow(11);
+  $('logTotal').textContent='共 '+rows.length+' 笔';
+}
+$('logQuery').onclick=renderLog;
+
+/* ===== 初始化 ===== */
+renderCfg(); renderRec(); renderAud(); renderLog(); fillGift();
+go(location.hash.replace('#',''));
+</script>
+</body>
+</html>
