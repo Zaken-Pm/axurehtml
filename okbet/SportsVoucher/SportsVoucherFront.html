@@ -926,6 +926,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .bs2__step button{flex:0 0 48px;background:#eef1f6;font-size:20px;color:#1d2b4a}
 .bs2__step span{flex:1;display:flex;align-items:center;justify-content:center;font-size:15px;color:#1d2b4a}
 .bs2__err{font-size:12px;color:#e5484d;margin-top:-4px}
+.bs2__input.is-err{border-color:#e5484d}
 .bs2__win{display:flex;justify-content:flex-end;gap:18px;font-size:13px;color:#1d2b4a;flex-wrap:wrap}
 .bs2__win b{color:#f39800;font-weight:400}
 
@@ -945,7 +946,8 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .bs2__vamt{font-size:19px;font-weight:700;color:#1d2b4a}
 .bs2__vlab{font-size:12px;color:#7a6a52}
 .bs2__vicon{width:32px;height:32px}
-.bs2__vexp{font-size:12px;color:#8a7a62}
+.bs2__vexp{font-size:12px;color:#8a7a62;display:inline-flex;align-items:center;gap:4px;font-variant-numeric:tabular-nums}
+.bs2__vclock{width:12px;height:12px;flex:0 0 auto}
 .bs2__vexp.is-soon{color:#f28c00}
 .bs2__vcard.is-off .bs2__vexp{color:#9aa3b2}
 .bs2__vcnt{flex:0 0 auto;display:flex;align-items:center;padding:0 16px;font-size:20px;font-weight:700;color:#f58300}
@@ -3201,17 +3203,32 @@ var bsBalance=168.55;
 var bsVouchers=[
   {id:'v1', amt:100, times:10, hrsLeft:70},
   {id:'v2', amt:500, times:3,  hrsLeft:46},
-  {id:'v3', amt:50,  times:1,  hrsLeft:5},
+  {id:'v3', amt:50,  times:1,  hrsLeft:0.75},
   {id:'v4', amt:1000,times:2,  hrsLeft:236},
   {id:'v5', amt:20000,times:1, hrsLeft:20}
 ];
 /* 效期：依后台「有效期（小时）」自发券时起算；原型以「距今剩余小时」换算出到期时间 */
 bsVouchers.forEach(function(v){ var d=new Date(Date.now()+v.hrsLeft*3600000); d.setSeconds(0,0); v.expire=d; });
+function bsLeftTxt(exp){
+  /* 剩余 ≥ 24 小时：「天数d hh:mm」（例 9d 19:58）；未满 24 小时：hh:mm */
+  var m=Math.max(0,Math.floor((exp-Date.now())/60000)), p=function(n){return (n<10?'0':'')+n;};
+  var d=Math.floor(m/1440), h=Math.floor(m%1440/60), mi=m%60;
+  return (d>0?d+'d ':'')+p(h)+':'+p(mi);
+}
+/* 每秒检查：更新倒数文字；到期的券从清单移除（已选则取消选择） */
+setInterval(function(){
+  var now=Date.now(), gone=bsVouchers.filter(function(v){return v.expire<=now;});
+  if(gone.length){
+    gone.forEach(function(v){ if(BS.vSel===v.id) BS.vSel=null; });
+    bsVouchers=bsVouchers.filter(function(v){return v.expire>now;});
+    if(document.getElementById('betSheet').classList.contains('is-open') && BS.view==='input') bsRender();
+    return;
+  }
+  document.querySelectorAll('.bs2__vexp[data-exp]').forEach(function(el){ var t=el.querySelector('.bs2__vleft'); var nt=bsLeftTxt(+el.getAttribute('data-exp')); if(t.textContent!==nt) t.textContent=nt; });
+},1000);
 function bsExpireHTML(v){
-  var d=v.expire, p=function(n){return (n<10?'0':'')+n;};
-  var txt='Valid until '+d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes());
-  var hrs=Math.max(0,Math.ceil((d-Date.now())/3600000));
-  return '<span class="bs2__vexp">'+txt+'</span>';
+  /* 效期倒数：剩余 ≥ 24 小时显示「9d 19:58」，未满 24 小时显示 hh:mm；每分钟更新；倒数至 00:00 即从清单移除 */
+  return '<span class="bs2__vexp" data-exp="'+v.expire.getTime()+'"><svg class="bs2__vclock" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.3" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.6V8l2.4 1.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="bs2__vleft">'+bsLeftTxt(v.expire)+'</span></span>';
 }
 /* 原型情境（由左侧「情境切换」面板控制） */
 var DEMO={market:'open', outcome:'ok', reserve:true, limit:'std', oddsAuto:false, couponSys:true};
@@ -3236,6 +3253,8 @@ function bsLimitErrHTML(){
     : '所选券的单次投注金额 '+amt+' 高于最大投注限额 ₱'+BS_LIMIT_MAX.toLocaleString('en-US')+'，请选择其他券')+'</div>';
 }
 /* 可赢金额使用的赔率：开启预约时以预约赔率计算 */
+/* 一般金额投注：已输入金额且低于最小限额 */
+function bsBelowMin(){ return !BS.voucherOn && BS.mode==='normal' && !!BS.stake && (parseFloat(BS.stake)||0)<BS_LIMIT_MIN; }
 function bsWinOdds(){ return (BS.reserveOn&&DEMO.reserve&&BS.mode==='normal')?BS.resOdds:bsOdds(); }
 function bsVoucher(id){ return bsVouchers.filter(function(v){return v.id===id;})[0]||null; }
 function bsToast(msg){ var t=document.getElementById('bsToast'); t.textContent=msg; t.hidden=false; clearTimeout(bsToast._t); bsToast._t=setTimeout(function(){t.hidden=true;},1800); }
@@ -3295,9 +3314,11 @@ function bsWinHTML(){
   return '<div class="bs2__win"><span>To Win：<b>'+bsMoney(win)+'</b></span>'+right+'</div>';
 }
 function bsInputHTML(closed){
-  var h='<div class="bs2__inrow"><div class="bs2__input"><span class="bs2__cur">PHP</span><span class="bs2__amt">'+(BS.stake?bsEsc(Number(BS.stake).toLocaleString('en-US')):'')+'</span>'
+  var below=!closed && bsBelowMin();
+  var h='<div class="bs2__inrow"><div class="bs2__input'+(below?' is-err':'')+'"><span class="bs2__cur">PHP</span><span class="bs2__amt">'+(BS.stake?bsEsc(Number(BS.stake).toLocaleString('en-US')):'')+'</span>'
     +(BS.stake?'':'<span class="bs2__limit">Limit '+BS_LIMIT_MIN+'-'+BS_LIMIT_MAX.toLocaleString('en-US')+'</span>')+(closed?'':'<span class="bs2__caret"></span>')+'</div>'
     +'</div>';
+  if(below) h+='<div class="bs2__err" role="alert">Bet amount is below the minimum limit</div>';
   if(!closed) h+=bsResStepHTML();
   return h;
 }
@@ -3335,8 +3356,8 @@ function bsRender(){
     else { h+=bsInputHTML(closed)+bsWinHTML()+(closed?'':bsKeysHTML()); }
     h+= BS.mode==='end'
       ? '<div class="bs2__btns"><button class="bs2__btn bs2__btn--orange" data-bsplace'+(bsLimitErr()?' disabled':'')+'>Place Bet</button></div>'
-      : '<div class="bs2__btns">'+(DEMO.reserve?'<button class="bs2__btn bs2__btn--blue" data-bsres'+(closed?' disabled':'')+'>'+(BS.reserveOn?'Cancel':'+ Cadangan')+'</button>':'')
-        +'<button class="bs2__btn bs2__btn--orange" data-bsplace'+(closed||bsLimitErr()?' disabled':'')+'>Place Bet</button></div>';
+      : '<div class="bs2__btns">'+(DEMO.reserve?'<button class="bs2__btn bs2__btn--blue" data-bsres'+(closed?' disabled':'')+'>'+(BS.reserveOn?'Cancel':'+ Booking')+'</button>':'')
+        +'<button class="bs2__btn bs2__btn--orange" data-bsplace'+(closed||bsLimitErr()||bsBelowMin()?' disabled':'')+'>Place Bet</button></div>';
     h+='<div class="bs2__note">*This project does not support cross betting</div>';
   } else {
     var stake=BS.used?BS.used.amt:bsStakeNum();
@@ -3622,7 +3643,7 @@ function mbCardHTML(b){
   }
   /* 金额区：预约注单显示 Book bet amount；已结算显示 Win/Lose；其余显示 To Win */
   var left=(b.resv?'Book bet amount: ':'Stake: ')+'<b>'+mbMoney(b.stake)+'</b>';
-  var canPromo=settled&&b.res==='lose'&&!b.voucher&&!b.promoDone;   /* 输的一般注单可领输返券；用券注单不显示 */
+  var canPromo=settled&&b.res==='lose'&&!b.promoDone;   /* 输的注单可领输返券（用券注单同样适用，沿用既有规则） */
   var right=settled&&!b.resv?'Win/Lose <b'+(b.res==='win'?' class="mb__wl--win"':b.res==='lose'?' class="mb__wl--lose"':'')+'>'+mbMoney(b.winLose||0)+'</b>'+(canPromo?'<button class="mb__promo" data-pmopen="'+b.id+'" aria-label="Promotions">+</button>':''):'To Win: <b>'+mbMoney(settled?(b.winLose>0?b.winLose:0):(b.st==='expired'?0:b.maxWin))+'</b>';
   h+='<div class="mb__stake"><span class="lbl">'+left+'</span><span class="r">'+right+'</span></div>';
   return h+'</article>';
