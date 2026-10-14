@@ -3255,6 +3255,8 @@ function bsLimitErrHTML(){
 /* 可赢金额使用的赔率：开启预约时以预约赔率计算 */
 /* 一般金额投注：已输入金额且低于最小限额 */
 function bsBelowMin(){ return !BS.voucherOn && BS.mode==='normal' && !!BS.stake && (parseFloat(BS.stake)||0)<BS_LIMIT_MIN; }
+/* 开启 SportsVoucher 但尚未选券：Place Bet 反灰不可点 */
+function bsNoVoucher(){ return BS.voucherOn && !BS.vSel; }
 function bsWinOdds(){ return (BS.reserveOn&&DEMO.reserve&&BS.mode==='normal')?BS.resOdds:bsOdds(); }
 function bsVoucher(id){ return bsVouchers.filter(function(v){return v.id===id;})[0]||null; }
 function bsToast(msg){ var t=document.getElementById('bsToast'); t.textContent=msg; t.hidden=false; clearTimeout(bsToast._t); bsToast._t=setTimeout(function(){t.hidden=true;},1800); }
@@ -3355,9 +3357,9 @@ function bsRender(){
     if(BS.voucherOn && !closed){ h+=bsVoucherResHTML()+bsVoucherHTML()+bsWinHTML(); }
     else { h+=bsInputHTML(closed)+bsWinHTML()+(closed?'':bsKeysHTML()); }
     h+= BS.mode==='end'
-      ? '<div class="bs2__btns"><button class="bs2__btn bs2__btn--orange" data-bsplace'+(bsLimitErr()?' disabled':'')+'>Place Bet</button></div>'
+      ? '<div class="bs2__btns"><button class="bs2__btn bs2__btn--orange" data-bsplace'+(bsLimitErr()||bsNoVoucher()?' disabled':'')+'>Place Bet</button></div>'
       : '<div class="bs2__btns">'+(DEMO.reserve?'<button class="bs2__btn bs2__btn--blue" data-bsres'+(closed?' disabled':'')+'>'+(BS.reserveOn?'Cancel':'+ Booking')+'</button>':'')
-        +'<button class="bs2__btn bs2__btn--orange" data-bsplace'+(closed||bsLimitErr()||bsBelowMin()?' disabled':'')+'>Place Bet</button></div>';
+        +'<button class="bs2__btn bs2__btn--orange" data-bsplace'+(closed||bsLimitErr()||bsBelowMin()||bsNoVoucher()?' disabled':'')+'>Place Bet</button></div>';
     h+='<div class="bs2__note">*This project does not support cross betting</div>';
   } else {
     var stake=BS.used?BS.used.amt:bsStakeNum();
