@@ -652,8 +652,13 @@ code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:
             <ul class="rule-list">
               <li class="rule-item"><div class="rule-num">1</div><div class="rule-text">新增栏位「<strong>免费投注</strong>」，位于「投注金额」右侧（示意图红框）。</div></li>
               <li class="rule-item"><div class="rule-num">2</div><div class="rule-text">数值＝统计区间内<strong>使用体育投注券下注的金额合计</strong>（券面额加总），<strong>显示整数</strong>（不显示小数位）加千分位，例 <code>1,300</code>；无用券注单显示 <code>0</code>。总计列为各游戏类型加总。</div></li>
-              <li class="rule-item"><div class="rule-num">3</div><div class="rule-text">「投注金额」<strong>不包含</strong>用券注单的金额（只计现金投注）；用券金额只计入「免费投注」，两栏分开统计。</div></li>
             </ul>
+            <table class="data-table" style="margin-top:10px"><thead><tr><th style="width:260px">栏位</th><th>用券注单（免费投注）的计算方式</th></tr></thead><tbody>
+              <tr><td>投注次数</td><td><strong>计入</strong>（用券注单算 1 次）</td></tr>
+              <tr><td>投注人数</td><td><strong>计入</strong>（用券下注的会员算投注人）</td></tr>
+              <tr><td>投注金额</td><td><strong>不计入</strong>（只计现金投注）</td></tr>
+              <tr><td>免费投注 <span class="badge badge-new">新增</span></td><td>用券金额只计入此栏，与「投注金额」分开统计</td></tr>
+            </tbody></table>
             <div class="sub-title">已结算区（按结算时间统计） <span class="badge badge-change">统计口径异动</span></div>
             <table class="data-table"><thead><tr><th style="width:260px">栏位（示意图黄底）</th><th>用券注单（免费投注）的计算方式</th></tr></thead><tbody>
               <tr><td>有效投注数</td><td><strong>不计入</strong></td></tr>
@@ -665,10 +670,9 @@ code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:
               <tr><td>会员盈利率</td><td><strong>不计入</strong></td></tr>
               <tr><td>输赢金额</td><td><strong>仅计入赢的部分</strong>：用券注单赢 → 以<strong>总派彩金额</strong>（券面额 × 赔率）计入；用券注单输 → 不计入（视为 0）</td></tr>
             </tbody></table>
-            <div class="callout info"><span>ℹ️</span><div>投注区的投注次数、投注人数沿用既有统计方式（含用券注单）；投注金额不含用券金额（见上方第 3 点）。</div></div>
             <div class="callout tip"><span>🧮</span><div style="width:100%"><b>范例：</b>今日篮球有 2 笔用券注单——A 用 ₱100 券 @7.40 赢、B 用 ₱500 券输。
               <ul style="margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px">
-                <li>投注区：「投注金额」<b>不含</b>这 600，「免费投注」＝ <code>600</code>。</li>
+                <li>投注区：「投注次数」+2、「投注人数」含 A、B；「投注金额」<b>不含</b>这 600，「免费投注」＝ <code>600</code>。</li>
                 <li>已结算区：有效投注数／人数／金额、今日结算注单总投注额、会员输赢（不含退水、免费投注）、会员盈利率皆<b>不含</b> A、B；今日结算注单<b>含</b> A、B（+2 笔）。</li>
                 <li>输赢金额：<b>只计 A</b>（赢），以总派彩 <code>100 × 7.40 = 740</code> 计入；B（输）不计入。</li>
               </ul></div></div>
@@ -775,7 +779,7 @@ code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:
         <tr><td>用券注单结算 · 赢</td><td>派彩＝券面额×赔率入余额；Win/Lose 显示总派彩</td></tr>
         <tr><td>用券注单结算 · 输</td><td>无派彩；Win/Lose 显示 −券金额</td></tr>
         <tr><td>余额为 0</td><td>仍可用券下注</td></tr>
-        <tr><td>后台球类报表 · 用券注单</td><td>投注区计入「免费投注」、不计入「投注金额」；已结算区不计入有效投注数／人数／金额、今日结算注单总投注额、会员输赢（不含退水、免费投注）、会员盈利率；今日结算注单计入；输赢金额只计用券赢的注单，以总派彩金额计入</td></tr>
+        <tr><td>后台球类报表 · 用券注单</td><td>投注区计入投注次数、投注人数、「免费投注」，不计入「投注金额」；已结算区不计入有效投注数／人数／金额、今日结算注单总投注额、会员输赢（不含退水、免费投注）、会员盈利率；今日结算注单计入；输赢金额只计用券赢的注单，以总派彩金额计入</td></tr>
         <tr><td>后台历史注单(New) · 用券注单</td><td>备注栏另起一行显示 <code>SportsVoucher</code>；有效下注金额 0.00</td></tr>
         <tr><td>编辑券配置</td><td>已发出的券不变；之后发出的是新券</td></tr>
         <tr><td>删除券配置</td><td>不可再赠送；已发出的券可用到期</td></tr>
