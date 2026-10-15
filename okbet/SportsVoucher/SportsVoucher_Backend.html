@@ -673,7 +673,7 @@ $('couponOk').onclick=function(){
   var ok=true;
   if(!$('fName').value.trim()){ $('fName').classList.add('is-err'); $('eName').hidden=false; ok=false; }
   if($('fCat').value==='体育投注券'){ document.querySelectorAll('.sp-int').forEach(function(i){ if(!checkInt(i)) ok=false; }); }
-  if(!ok){ toast('请修正红框标示的栏位后再提交',true); return; }
+  if(!ok){ return; }   /* 有错误：栏位红框＋红字提示，「确定」不送出、无 toast */
   askConfirm(editingId?'确认保存对此优惠券的修改吗？':'确认新增此优惠券吗？',function(){
     var cat=$('fCat').value, sport=(cat==='体育投注券');
     var cfg=sport?{times:+$('fTimes').value, amt:+$('fAmt').value, valid:+$('fValid').value}:{rate:+$('fRate').value, cap:+$('fCap').value, flow:+$('fFlow').value, fee:+$('fFee').value, valid:+$('fValidOld').value, betValid:+$('fBetValid').value};
@@ -727,7 +727,7 @@ $('giftOk').onclick=function(){
   var users=$('gUsers').value.split(/\n+/).map(function(s){return s.trim();}).filter(Boolean);
   fieldErr($('gAct'),!act); fieldErr($('gUsers'),!users.length);
   $('eCoupon').hidden=!!cid; $('gCoupon').parentNode.querySelector('.dd__btn').classList.toggle('is-err',!cid);
-  if(!act||!cid||!users.length){ toast('请修正红框标示的栏位后再提交',true); return; }
+  if(!act||!cid||!users.length){ return; }   /* 有错误：栏位红框＋红字提示，「提交审核」不送出、无 toast */
   var c=coupons.filter(function(x){return String(x.id)===cid;})[0];
   audits.unshift({id:'a'+Date.now(), act:act, type:'优惠券', name:c.name, n:users.length, users:users, note:$('gNote').value.trim()||'–', time:nowStr('-'), who:'abc123'});
   closeM('mGift'); renderAud(); toast('申请提交成功，等待审核（可至「发券审核」查看）');

@@ -3356,13 +3356,13 @@ function bsRender(){
   if(BS.view==='input'){
     var closed=(DEMO.market==='closed' && BS.mode==='normal');
     h+=bsHeadHTML(false)+bsSelHTML()+bsChipsHTML(true);
-    if(DEMO.couponSys) h+=bsSvHTML(closed);   /* 后台关闭优惠券系统时，SportsVoucher 栏位整个隐藏 */
+    if(DEMO.couponSys && BS.mode!=='end') h+=bsSvHTML(closed);   /* 后台关闭优惠券系统时，SportsVoucher 栏位整个隐藏；ENDING CARD 不可使用投注券，不显示此栏位 */
     if(BS.voucherOn && !closed){ h+=bsVoucherResHTML()+bsVoucherHTML()+bsWinHTML(); }
     else { h+=bsInputHTML(closed)+bsWinHTML()+(closed?'':bsKeysHTML()); }
     h+= BS.mode==='end'
       ? '<div class="bs2__btns"><button class="bs2__btn bs2__btn--orange" data-bsplace'+(bsLimitErr()||bsNoVoucher()?' disabled':'')+'>Place Bet</button></div>'
       : '<div class="bs2__btns">'+(DEMO.reserve?'<button class="bs2__btn bs2__btn--blue" data-bsres'+(closed?' disabled':'')+'>'+(BS.reserveOn?'Cancel':'+ Booking')+'</button>':'')
-        +'<button class="bs2__btn bs2__btn--orange" data-bsplace'+(closed||bsLimitErr()||bsBelowMin()||bsNoVoucher()?' disabled':'')+'>Place Bet</button></div>';
+        +'<button class="bs2__btn bs2__btn--orange" data-bsplace'+(closed||bsLimitErr()||bsBelowMin()||bsNoVoucher()||(BS.reserveOn&&BS.resErr)?' disabled':'')+'>Place Bet</button></div>';
     h+='<div class="bs2__note">*This project does not support cross betting</div>';
   } else {
     var stake=BS.used?BS.used.amt:bsStakeNum();
@@ -3393,7 +3393,7 @@ function openBetSheet(info){
   bsRender(); document.getElementById('betSheet').classList.add('is-open');
 }
 function openEndSheet(info){
-  BS.mode='end'; BS.info=info; if(BS.view!=='input'){ bsResetInput(); }
+  BS.mode='end'; BS.info=info; BS.voucherOn=false; BS.vSel=null; if(BS.view!=='input'){ bsResetInput(); }
   bsRender(); document.getElementById('betSheet').classList.add('is-open');
 }
 function closeBetSheet(){ document.getElementById('betSheet').classList.remove('is-open'); clearTimeout(bsPlace._t); }
