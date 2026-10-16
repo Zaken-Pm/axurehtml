@@ -223,10 +223,10 @@ tbody tr:nth-child(even){background:#fafbfc}
 
 /* --- 后台条件 grid mockup（阶级 × 两项目标值） --- */
 .mk-thr{width:332px;flex-shrink:0;border:1px dashed var(--c-line);border-radius:6px;padding:10px;display:flex;flex-direction:column;gap:8px}
-.mk-thr .gr{display:grid;grid-template-columns:64px 120px 120px;gap:6px 10px;align-items:center}
+.mk-thr .gr{display:grid;grid-template-columns:40px 1fr 1fr 1fr;gap:6px 10px;align-items:center}
 .mk-thr .gh{font-size:11px;line-height:16px;color:var(--c-muted);font-weight:700;white-space:nowrap;width:max-content}
 .mk-thr .gl{font-size:12px;line-height:18px;color:var(--c-text-2);white-space:nowrap;width:max-content}
-.mk-mini-input{display:inline-flex;align-items:center;flex-shrink:0;height:26px;padding:0 8px;border:1px solid var(--c-line);border-radius:5px;background:#fff;color:var(--c-muted);font-size:11px;line-height:16px;width:120px}
+.mk-mini-input{display:inline-flex;align-items:center;flex-shrink:0;height:26px;padding:0 8px;border:1px solid var(--c-line);border-radius:5px;background:#fff;color:var(--c-muted);font-size:11px;line-height:16px;width:100%}
 
 /* --- 前台手机弹窗 mockup（Flex 版，无 absolute） --- */
 .mk-phone{width:300px;flex-shrink:0;background:#12203a;border-radius:26px;padding:10px;display:flex;flex-direction:column}
@@ -631,7 +631,7 @@ tbody tr:last-child td{border-bottom:none}
 
 /* 三个阈值条件——同一阶级下三项目标值并排配置，新增阶级为共用的独立按钮 */
 .thr-grid-wrap{border:1px dashed var(--border);border-radius:6px;padding:16px;margin-bottom:14px}
-.thr-grid-row{display:grid;grid-template-columns:88px repeat(2,1fr);gap:10px 20px;align-items:center;margin-bottom:12px}
+.thr-grid-row{display:grid;grid-template-columns:88px repeat(3,1fr);gap:10px 20px;align-items:center;margin-bottom:12px}
 .thr-grid-row:last-of-type{margin-bottom:0}
 .thr-grid-head{margin-bottom:14px}
 .thr-col-title{font-weight:600;color:var(--text);font-size:13px;text-align:center}
@@ -1227,7 +1227,7 @@ tbody tr:last-child td{border-bottom:none}
 
       <div class=&quot;notice&quot;>
         <span>⚠</span>
-        <span>提示：保存后推播条件将立即生效并纳入排程计算，所有条件皆以「今日」为计算区间。用户标签为必填单选；「账户余额」为必填条件，采单一目标值设置，不分阶级；「有效投注、用户负盈利」为选填条件（留空表示该项不启用），可依阶级各自设置，填写时不可为 0 或负数，最多可配置 10 个阶级（新增阶级为共用按钮，两项条件同步增减），且下一层目标值不可小于上一层。</span>
+        <span>提示：保存后推播条件将立即生效并纳入排程计算，所有条件皆以「今日」为计算区间。用户标签为必填单选；「账户余额」为必填条件，采单一目标值设置，不分阶级；「充值、有效投注、用户负盈利」为选填条件（留空表示该项不启用），可依阶级各自设置，填写时不可为 0 或负数，最多可配置 10 个阶级（新增阶级为共用按钮，三项条件同步增减），且下一层目标值不可小于上一层。</span>
       </div>
 
       <!-- 区块 0：基本信息 -->
@@ -1261,7 +1261,7 @@ tbody tr:last-child td{border-bottom:none}
         <div class=&quot;section-title&quot;>触发条件</div>
 
         <div class=&quot;hint&quot;>
-          「账户余额」为必填条件，采单一目标值设置，不分阶级；「有效投注、用户负盈利」为选填条件，可依阶级各自设置（留空＝不启用该条件）；填写时不可为 0 或负数（输入负号将自动去除）；最多 10 阶级，「新增阶级」为共用按钮，两项条件同步新增/删除阶级，且下一层目标值不可小于上一层。
+          「账户余额」为必填条件，采单一目标值设置，不分阶级；「充值、有效投注、用户负盈利」为选填条件，可依阶级各自设置（留空＝不启用该条件）；填写时不可为 0 或负数（输入负号将自动去除）；最多 10 阶级，「新增阶级」为共用按钮，三项条件同步新增/删除阶级，且下一层目标值不可小于上一层。
         </div>
 
         <div class=&quot;form-row&quot;>
@@ -1320,6 +1320,7 @@ const VIP_TAGS  = ['VIP 0','VIP 1','VIP 2','VIP 3','VIP 4','VIP 5','VIP 6','VIP 
 /* 两项按阶级配置的阈值条件：key、显示名、比较符；皆为选填，皆不可输入负数。
    账户余额为独立配置的单一目标值（必填，小于等于目标值），不列入此阶级化阵列 */
 const THRESHOLDS = [
+  {key:'dep', name:'充值',       cmp:'≥', cmpText:'大于等于'},
   {key:'bet', name:'有效投注',   cmp:'≥', cmpText:'大于等于'},
   {key:'ngr', name:'用户负盈利', cmp:'≥', cmpText:'大于等于'},
 ];
@@ -1327,12 +1328,11 @@ const THRESHOLDS = [
 /* 推送奖励——「活动推送」仅限定有角标的活动（有勾选才推送，未勾选则不推送） */
 const BADGE_ACTIVITIES = ['盈利活动','消费活动','每日特别返水','每日特别加码','游戏挑战赛'];
 /* 推送奖励——奖品类型；礼金/积分为输入数量，其余三种为下拉选择奖品内容 */
-const GIFT_TYPES = ['礼金','积分','免费旋转','免费投注','优惠券','道具卡'];
+const GIFT_TYPES = ['礼金','积分','免费旋转','免费投注','优惠券'];
 const GIFT_OPTIONS = {
   '免费旋转': ['免费旋转JILI','免费旋转FKG','免费旋转FC'],
   '免费投注': ['免费投注ONlive','免费投注Mini'],
   '优惠券':   ['20% Loss Cashback','10% Loss Cashback','10% Deposit Voucher (Max ₱500)'],
-  '道具卡':   ['VP道具卡','道具卡VP全部游戏','特色道具卡'],
 };
 
 /* ============================================================
@@ -1341,7 +1341,7 @@ const GIFT_OPTIONS = {
 let pushList = [
   {
     id:1, name:'VIP3大R Slot近7日推播', vip:'VIP 3',
-    balance:3000, bet:[50000], ngr:[2000], thrLv:2,
+    balance:3000, dep:[1000], bet:[50000], ngr:[2000], thrLv:2,
     rewards:[
       {pushBadge:true, giftType:'礼金', giftValue:'100', turnover:'2000'},
       {pushBadge:false, giftType:'免费旋转', giftValue:'免费旋转JILI', turnover:''}
@@ -1350,7 +1350,7 @@ let pushList = [
   },
   {
     id:2, name:'VIP1回归召回推播', vip:'VIP 1',
-    balance:10000, bet:[10000,30000,60000], ngr:[], thrLv:3,
+    balance:10000, dep:[500,1000,2000], bet:[10000,30000,60000], ngr:[], thrLv:3,
     rewards:[
       {pushBadge:true, giftType:'积分', giftValue:'500', turnover:''},
       {pushBadge:true, giftType:'优惠券', giftValue:'20% Loss Cashback', turnover:''},
@@ -1360,7 +1360,7 @@ let pushList = [
   },
   {
     id:3, name:'VIP7净输赢风险监控推播', vip:'VIP 7',
-    balance:4000, bet:[], ngr:[500,1000,2000,5000], thrLv:4,
+    balance:4000, dep:[], bet:[], ngr:[500,1000,2000,5000], thrLv:4,
     rewards:[
       {pushBadge:true, giftType:'礼金', giftValue:'50', turnover:'1000'},
       {pushBadge:true, giftType:'积分', giftValue:'300', turnover:''},
@@ -1450,7 +1450,7 @@ function blankForm(){
   return {
     name:'', vip:'',
     balance:'',   // 账户余额——独立配置，单一目标值，不分阶级
-    bet:Array(10).fill(''), ngr:Array(10).fill(''),
+    dep:Array(10).fill(''), bet:Array(10).fill(''), ngr:Array(10).fill(''),
     thrLv:1,   // 两项按阶级配置的条件共用同一个阶级数（新增/删除阶级为共用按钮），最多 10 阶
     rewards:Array.from({length:10}, blankRewardLv)   // 每个阶级各自的推送奖励设定，阶级数与 thrLv 共用
   };
@@ -1562,6 +1562,7 @@ function fmtLevelCell(r, i){
   // 账户余额已独立于「目标用户」右侧单独列示，此处只显示按阶级配置的有效投注/用户负盈利
   if(i>=r.thrLv) return '<span class=&quot;none&quot;>—</span>';
   const lines=[];
+  if(r.dep &amp;&amp; r.dep[i]!==undefined) lines.push(`充值 ≥${Number(r.dep[i]).toLocaleString()}`);
   if(r.bet[i]!==undefined) lines.push(`有效投注 ≥${Number(r.bet[i]).toLocaleString()}`);
   if(r.ngr[i]!==undefined) lines.push(`负盈利 ≥${Number(r.ngr[i]).toLocaleString()}`);
   if(lines.length===0) return '<span class=&quot;none&quot;>—</span>';
@@ -1622,7 +1623,7 @@ function openForm(id){
     form.balance = r.balance!==undefined &amp;&amp; r.balance!==null ? r.balance : '';
     // 把已保存的阶级数组回填进 10 格输入；两项条件共用同一阶级数，取两者最大值（并以已保存的 thrLv 为准）
     let maxLv=1;
-    ['bet','ngr'].forEach(k=>{
+    THRESHOLDS.map(t=>t.key).forEach(k=>{
       const vals=r[k]||[];
       form[k]=Array(10).fill('');
       vals.forEach((v,i)=>{ if(i<10) form[k][i]=v; });
@@ -1744,7 +1745,7 @@ function addLv(){
 function removeLv(){
   if(form.thrLv>1){
     form.thrLv--;
-    ['bet','ngr'].forEach(k=>{ form[k][form.thrLv]=''; });
+    THRESHOLDS.map(t=>t.key).forEach(k=>{ form[k][form.thrLv]=''; });
     form.rewards[form.thrLv]=blankRewardLv();
     buildThresholds();
     buildRewardsTable();
@@ -1823,7 +1824,7 @@ function renderGiftValueCell(i){
     }
     return html;
   }
-  // 免费旋转 / 免费投注 / 优惠券 / 道具卡——下拉选择奖品内容
+  // 免费旋转 / 免费投注 / 优惠券——下拉选择奖品内容
   const opts = GIFT_OPTIONS[rw.giftType] || [];
   return `
     <select class=&quot;select&quot; style=&quot;width:100%&quot; onchange=&quot;onGiftValueSelect(${i},this.value)&quot;>
@@ -1891,7 +1892,7 @@ function saveForm(){
   const balanceRes=collectBalance();
   if(balanceRes.err){ showError('err-balance', balanceRes.err); ok=false; }
   else res.balance=balanceRes.val;
-  for(const k of ['bet','ngr']){
+  for(const k of THRESHOLDS.map(t=>t.key)){
     const r=collectThreshold(k);
     if(r.err){ showError('err-'+k, r.err); ok=false; }
     else res[k]=r.vals;
@@ -2210,7 +2211,7 @@ initPopup();
             <ul class="rule-list ok">
               <li><span class="k">礼金</span> → <span class="k-blue">仅关闭弹窗、不做页面导向</span>。</li>
               <li><span class="k">积分</span> → 导向<span class="k-blue">「积分商城」</span>。</li>
-              <li><span class="k">免费旋转 / 免费投注 / 优惠券 / 道具卡</span> → 导向<span class="k-blue">「我的优惠券」</span>。</li>
+              <li><span class="k">免费旋转 / 免费投注 / 优惠券</span> → 导向<span class="k-blue">「我的优惠券」</span>。</li>
             </ul>
           </div>
           <div class="rule-group">
@@ -2321,9 +2322,9 @@ initPopup();
               <span class="h">触发条件</span>
               <div class="mk-inline"><span class="req">*</span><span class="c-form-label">账户余额 ≤</span><span class="c-input c-w120 ph">目标值</span></div>
               <div class="mk-thr">
-                <div class="gr"><span class="gh"></span><span class="gh">有效投注 ≥</span><span class="gh">用户负盈利 ≥</span></div>
-                <div class="gr"><span class="gl">阶级1</span><span class="mk-mini-input">目标值</span><span class="mk-mini-input">目标值</span></div>
-                <div class="gr"><span class="gl">阶级2</span><span class="mk-mini-input">目标值</span><span class="mk-mini-input">目标值</span></div>
+                <div class="gr"><span class="gh"></span><span class="gh">充值 ≥</span><span class="gh">有效投注 ≥</span><span class="gh">用户负盈利 ≥</span></div>
+                <div class="gr"><span class="gl">阶级1</span><span class="mk-mini-input">目标值</span><span class="mk-mini-input">目标值</span><span class="mk-mini-input">目标值</span></div>
+                <div class="gr"><span class="gl">阶级2</span><span class="mk-mini-input">目标值</span><span class="mk-mini-input">目标值</span><span class="mk-mini-input">目标值</span></div>
               </div>
             </div>
             <div class="mk-fsec">
@@ -2339,7 +2340,7 @@ initPopup();
             <span class="ni">⚠</span>
             <div class="nt">
               <span>保存后立即生效并纳入排程；所有条件皆以<span class="k-red">「今日」</span>为计算区间。</span>
-              <span>用户标签必填单选；账户余额必填、单一目标值不分阶级；有效投注、用户负盈利为选填、可依阶级各自设置。</span>
+              <span>用户标签必填单选；账户余额必填、单一目标值不分阶级；<span class="k-green">充值</span>、有效投注、用户负盈利为选填、可依阶级各自设置。</span>
             </div>
           </div>
           <div class="rule-group">
@@ -2360,9 +2361,26 @@ initPopup();
             <span class="rg-title src">3.2.3 触发条件（输入框限制 · 规范 3.1.6）</span>
             <ul class="rule-list">
               <li><span class="k">账户余额</span>：必填、单一目标值、<span class="k">不分阶级</span>；判断为<span class="k">「小于等于（≤）目标值」</span>；不可为 0 或负数。</li>
-              <li><span class="k">有效投注（≥）</span>、<span class="k">用户负盈利（≥）</span>：选填、可依阶级各自设置；<span class="k">留空＝该阶不启用此条件</span>；不可为 0 或负数（输入负号自动去除）。</li>
-              <li>最多 <span class="k">10 阶</span>；「新增阶级」为<span class="k">共用按钮</span>，两项条件<span class="k">同步</span>增减阶级。</li>
+              <li><span class="k-green">充值（≥）</span>、<span class="k">有效投注（≥）</span>、<span class="k">用户负盈利（≥）</span>：选填、可依阶级各自设置；<span class="k">留空＝该阶不启用此条件</span>；不可为 0 或负数（输入负号自动去除）。「充值」显示于「有效投注」左侧。</li>
+              <li>最多 <span class="k">10 阶</span>；「新增阶级」为<span class="k">共用按钮</span>，<span class="k">三项条件</span>（充值、有效投注、用户负盈利）<span class="k">同步</span>增减阶级。</li>
               <li>递增校验：<span class="k-red">下一层目标值不可小于上一层</span>。</li>
+            </ul>
+          </div>
+          <div class="rule-group">
+            <span class="rg-title src">3.2.3.1 【新增】充值 触发条件（单独说明）</span>
+            <div class="notice notice-blue" style="width:100%">
+              <span class="ni">✦</span>
+              <div class="nt">
+                <span><b>本次新增</b>：后台「触发条件」新增 <b>「充值」</b> 栏，显示于 <b>「有效投注」左侧</b>，同为<b>选填</b>。</span>
+                <span>其设定方式与「有效投注、用户负盈利」<b>完全相同</b>，仅为多一个可配置的触发维度。</span>
+              </div>
+            </div>
+            <ul class="rule-list">
+              <li>条件比较：<span class="k">「大于等于（≥）目标值」</span>；计算区间以<span class="k">「今日」</span>为准（与其他触发条件一致）。</li>
+              <li>依阶级各自设置；<span class="k">留空＝该阶不启用</span>；不可为 0 或负数；<span class="k-red">下一层目标值不可小于上一层</span>。</li>
+              <li>阶级数与其他触发条件<span class="k">共用</span>，「新增阶级」为共用按钮，三项条件同步增减。</li>
+              <li>列表显示：各「阶级N」格新增 <span class="k">「充值 ≥N」</span>，位于「有效投注」之前。</li>
+              <li>与推送奖励之关系：阶级数一致；是否触发仍依该阶已启用之全部条件同时满足判定。</li>
             </ul>
           </div>
           <div class="rule-group">
@@ -2370,9 +2388,9 @@ initPopup();
             <ul class="rule-list">
               <li>阶级数<span class="k">与触发条件共用</span>（在触发条件区新增／删除阶级）。</li>
               <li><span class="k">活动推送</span>：勾选「推送角标相关活动」才推送；限角标活动：<span class="k">盈利活动 / 消费活动 / 每日特别返水 / 每日特别加码 / 游戏挑战赛</span>。</li>
-              <li><span class="k">奖品类型</span>（选填，下拉）：<span class="k">礼金 / 积分 / 免费旋转 / 免费投注 / 优惠券 / 道具卡</span>。</li>
+              <li><span class="k">奖品类型</span>（选填，下拉）：<span class="k">礼金 / 积分 / 免费旋转 / 免费投注 / 优惠券</span>。</li>
               <li>礼金、积分 → <span class="k">输入数量</span>；礼金另需输入<span class="k">「所需流水倍数」</span>。</li>
-              <li>免费旋转 / 免费投注 / 优惠券 / 道具卡 → <span class="k">下拉选奖品内容</span>（来源：JILI／FKG／FC；ONlive／Mini；20%／10% Loss Cashback、10% Deposit Voucher 等；道具卡：VP道具卡／道具卡VP全部游戏／特色道具卡）。</li>
+              <li>免费旋转 / 免费投注 / 优惠券 → <span class="k">下拉选奖品内容</span>（来源：JILI／FKG／FC；ONlive／Mini；20%／10% Loss Cashback、10% Deposit Voucher 等）。</li>
               <li><span class="k-red">每个阶级的「活动推送」与「奖品类型」至少需择一配置，不可两者皆空</span>（此为红字提示，显示于推送奖励区）。</li>
             </ul>
           </div>
@@ -2596,7 +2614,7 @@ initPopup();
               <li>该次有勾选<span class="k">「推送角标活动」</span>时，最前方加注<span class="k-blue">「推送活动、」</span>。</li>
               <li><span class="k">礼金</span>：显示「礼金 N」。</li>
               <li><span class="k">积分</span>：显示「积分 N」。</li>
-              <li><span class="k">免费旋转 / 免费投注 / 优惠券 / 道具卡</span>：显示「类型 + 奖品内容」（如：免费旋转 JILI、优惠券 20% Loss Cashback）。</li>
+              <li><span class="k">免费旋转 / 免费投注 / 优惠券</span>：显示「类型 + 奖品内容」（如：免费旋转 JILI、优惠券 20% Loss Cashback）。</li>
               <li>仅推送活动、无奖品：仅显示<span class="k-blue">「推送活动」</span>；两者皆无：显示「—」。</li>
             </ul>
           </div>
@@ -2667,7 +2685,6 @@ initPopup();
               <li>两页面「全部来源」下拉<span class="k-green">新增一项「推播奖励」</span>。</li>
               <li>免费项目记录来源清单：手动赠送、签到奖励、积分购买、兑换码、召回活动、邀请好友、邀请转盘、<span class="k-green">推播奖励（新增）</span>。</li>
               <li>优惠券记录来源清单：手动赠送、积分购买、周卡活动、召回活动、<span class="k-green">推播奖励（新增）</span>。</li>
-              <li>表格栏位「活动名称」：显示<span class="k-green">「推播名称」（新增）</span>配置的内容。</li>
             </ul>
           </div>
           <div class="rule-group">
@@ -3000,6 +3017,7 @@ initPopup();
             <thead><tr><th class="cell-c">分类</th><th>项目</th><th>说明 / 对应页签</th></tr></thead>
             <tbody>
               <tr><td class="cell-c"><span class="tag-cell tc-new">新增</span></td><td>智能推播总开关</td><td>列表页顶端，预设关闭（对应 3.1）</td></tr>
+              <tr><td class="cell-c"><span class="tag-cell tc-new">新增</span></td><td>触发条件 · 新增「充值」</td><td>显示于「有效投注」左侧，选填，规则同有效投注/负盈利（对应 3.2.3.1）</td></tr>
               <tr><td class="cell-c"><span class="tag-cell tc-new">新增</span></td><td>新增／编辑推播条件表单</td><td>基本信息、目标用户、触发条件、推送奖励（对应 3.2）</td></tr>
               <tr><td class="cell-c"><span class="tag-cell tc-new">新增</span></td><td>推播列表页面</td><td>条件清单、查询、开启/关闭、编辑、删除、新增（对应 3.3）</td></tr>
               <tr><td class="cell-c"><span class="tag-cell tc-new">新增</span></td><td>推播记录页面</td><td>会员领取明细、查询、导出（对应 3.4）</td></tr>
