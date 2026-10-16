@@ -291,7 +291,7 @@ td > .cname{margin:0 auto;}
           <div class="field"><span class="field__label">状态</span>
             <select id="recSt" class="w-sm" aria-label="状态"><option value="">全部状态</option><option>未使用</option><option>待结算</option><option>已使用</option><option>已过期</option></select></div>
           <div class="field"><span class="field__label">获得方式</span>
-            <select id="recWay" class="w-sm" aria-label="获得方式"><option value="">全部来源</option><option>手动赠送</option><option>积分购买</option><option>周卡活动</option><option>指定召回活动</option><option>推播奖励</option><option>大奖池活动</option><option>XBomb Fiesta</option><option>注单退回</option></select></div>
+            <select id="recWay" class="w-sm" aria-label="获得方式"><option value="">全部来源</option><option>手动赠送</option><option>积分购买</option><option>周卡活动</option><option>指定召回活动</option><option>推播奖励</option><option>大奖池活动</option><option>XBomb Fiesta</option></select></div>
           <div class="field"><span class="field__label">获得时间</span>
             <div class="range"><input class="input num" value="2026-10-01 00:00:00" aria-label="获得开始时间"><span>~</span><input class="input num" value="2026-10-13 23:59:59" aria-label="获得结束时间"></div></div>
           <div class="field"><label class="field__label" for="recUser">会员账号</label>
@@ -410,9 +410,6 @@ td > .cname{margin:0 auto;}
 
       <!-- 体育投注券的配置项 -->
       <div id="grpSport" hidden style="display:flex;flex-direction:column;gap:var(--sp-4)">
-        <div class="frow"><label class="frow__label" for="fTimes"><span class="req">*</span>投注次数：</label>
-          <div class="frow__ctl"><div class="addon"><input class="input sp-int" id="fTimes" inputmode="numeric" maxlength="9" value="0"><span class="addon__suf">次</span></div>
-            <span class="err" hidden>投注次数须为大于 0 的整数，不可输入小数</span></div></div>
         <div class="frow"><label class="frow__label" for="fAmt"><span class="req">*</span>单次投注金额：</label>
           <div class="frow__ctl"><input class="input sp-int" id="fAmt" inputmode="numeric" maxlength="9" value="0">
             <span class="err" hidden>单次投注金额须为大于 0 的整数，不可输入小数</span></div></div>
@@ -488,30 +485,30 @@ td > .cname{margin:0 auto;}
    ========================================================= */
 var CURSYM = '₱';
 var coupons = [
-  {id:1, cur:'PHP', name:'世界杯体育投注券 3次×₱100', cat:'体育投注券', op:'abc123', time:'2026/10/13 14:02:11', cfg:{times:3, amt:100, valid:72}},
-  {id:2, cur:'PHP', name:'周末足球单注券 1次×₱500', cat:'体育投注券', op:'xyczadmin', time:'2026/10/12 18:40:05', cfg:{times:1, amt:500, valid:48}},
+  {id:1, cur:'PHP', name:'世界杯体育投注券 ₱100', cat:'体育投注券', op:'abc123', time:'2026/10/13 14:02:11', cfg:{amt:100, valid:72}},
+  {id:2, cur:'PHP', name:'周末足球单注券 ₱500', cat:'体育投注券', op:'xyczadmin', time:'2026/10/12 18:40:05', cfg:{amt:500, valid:48}},
   {id:3, cur:'PHP', name:'Ntest_中奖加奖卷', cat:'中奖加奖券', op:'kjh789', time:'2026/09/09 11:27:34', cfg:{rate:50, cap:888, flow:2, fee:1, valid:48}},
   {id:4, cur:'PHP', name:'Ntest_输返卷', cat:'输返券', op:'kjh789', time:'2026/09/09 11:26:36', cfg:{betValid:48, rate:10, cap:500, flow:5, fee:1, valid:240}},
   {id:5, cur:'PHP', name:'Ntest_存送比例', cat:'存送比例券', op:'kjh789', time:'2026/09/09 11:25:30', cfg:{rate:10, cap:100, flow:5, fee:2, valid:240}},
   {id:6, cur:'PHP', name:'Deposit≥₱500', cat:'存送比例券', op:'ptsadmin', time:'2026/08/14 15:20:27', cfg:{rate:20, cap:200, flow:2, fee:1, valid:24}}
 ];
 var records = [
-  {user:'okbet3302mzq', time:'2026-10-13 16:40', act:'世界杯开幕赠券', way:'注单退回', name:'世界杯体育投注券 3次×₱100', cid:'29911', cat:'体育投注券', st:'未使用', op:'系统', opTime:'2026-10-13 16:40', note:'注单 B0155952339575703561 取消，退回 1 次'},
-  {user:'okbet55501x2a', time:'2026-10-13 14:16', act:'世界杯开幕赠券', way:'手动赠送', name:'世界杯体育投注券 3次×₱100', cid:'29903', cat:'体育投注券', st:'已使用', op:'abc123', opTime:'2026-10-13 14:16', note:'使用后剩余 2 次'},
-  {user:'xnjobe11', time:'2026-10-13 14:16', act:'世界杯开幕赠券', way:'手动赠送', name:'世界杯体育投注券 3次×₱100', cid:'29902', cat:'体育投注券', st:'未使用', op:'abc123', opTime:'2026-10-13 14:16', note:'–'},
-  {user:'okbet7712kd9m', time:'2026-10-10 09:05', act:'周末足球回馈', way:'手动赠送', name:'周末足球单注券 1次×₱500', cid:'29870', cat:'体育投注券', st:'已过期', op:'lmnadmin', opTime:'2026-10-10 09:05', note:'–'},
+  {user:'okbet3302mzq', time:'2026-10-13 14:16', act:'世界杯开幕赠券', way:'手动赠送', name:'世界杯体育投注券 ₱100', cid:'29911', cat:'体育投注券', st:'未使用', op:'系统', opTime:'2026-10-13 16:40', note:'注单 B0155952339575703561 取消，已退回'},
+  {user:'okbet55501x2a', time:'2026-10-13 14:16', act:'世界杯开幕赠券', way:'手动赠送', name:'世界杯体育投注券 ₱100', cid:'29903', cat:'体育投注券', st:'已使用', op:'abc123', opTime:'2026-10-13 14:16', note:'–'},
+  {user:'xnjobe11', time:'2026-10-13 14:16', act:'世界杯开幕赠券', way:'手动赠送', name:'世界杯体育投注券 ₱100', cid:'29902', cat:'体育投注券', st:'未使用', op:'abc123', opTime:'2026-10-13 14:16', note:'–'},
+  {user:'okbet7712kd9m', time:'2026-10-10 09:05', act:'周末足球回馈', way:'手动赠送', name:'周末足球单注券 ₱500', cid:'29870', cat:'体育投注券', st:'已过期', op:'lmnadmin', opTime:'2026-10-10 09:05', note:'–'},
   {user:'xnjobe11', time:'2026-10-13 13:25', act:'XBomb Fiesta每日抽奖活动', way:'XBomb Fiesta', name:'10% Deposit Voucher (Max ₱100)', cid:'29861', cat:'存送比例券', st:'未使用', op:'–', opTime:'–', note:'–'},
   {user:'okbet0469afbr7', time:'2026-10-13 10:02', act:'test232', way:'手动赠送', name:'Ntest_输返卷', cid:'29855', cat:'输返券', st:'已使用', op:'zxc888', opTime:'2026-10-13 10:02', note:'–'}
 ];
 var audits = [
-  {id:'a1', act:'世界杯开幕赠券B', type:'优惠券', name:'世界杯体育投注券 3次×₱100', n:1, users:['xcbet26'], note:'–', time:'2026-10-13 14:20', who:'bnm246'},
+  {id:'a1', act:'世界杯开幕赠券B', type:'优惠券', name:'世界杯体育投注券 ₱100', n:1, users:['xcbet26'], note:'–', time:'2026-10-13 14:20', who:'bnm246'},
   {id:'a2', act:'test232', type:'优惠券', name:'Ntest_输返卷', n:1, users:['okbet0469afbr7'], note:'–', time:'2026-10-13 14:13', who:'xyczadmin'},
   {id:'a3', act:'fsdafasdfa', type:'优惠券', name:'Ntest_存送比例', n:2, users:['xcbet26','okbet55501x2a'], note:'回流用户', time:'2026-10-02 18:10', who:'qwe456'},
   {id:'a4', act:'sdfse', type:'免费旋转/投注', name:'YGR_S 免費', n:1, users:['xcbet26'], note:'–', time:'2026-10-02 18:09', who:'mnoadmin'}
 ];
 var auditLogs = [
-  {act:'世界杯开幕赠券', type:'优惠券', name:'世界杯体育投注券 3次×₱100', n:1, note:'–', time:'2026-10-13 14:15', who:'hjk555', st:'通过', rTime:'2026-10-13 14:16', rWho:'abc123', rNote:'test'},
-  {act:'足球周测试', type:'优惠券', name:'周末足球单注券 1次×₱500', n:1, note:'–', time:'2026-10-09 10:00', who:'qwe456', st:'拒绝', rTime:'2026-10-09 10:30', rWho:'rty321', rNote:'名单有误'},
+  {act:'世界杯开幕赠券', type:'优惠券', name:'世界杯体育投注券 ₱100', n:1, note:'–', time:'2026-10-13 14:15', who:'hjk555', st:'通过', rTime:'2026-10-13 14:16', rWho:'abc123', rNote:'test'},
+  {act:'足球周测试', type:'优惠券', name:'周末足球单注券 ₱500', n:1, note:'–', time:'2026-10-09 10:00', who:'qwe456', st:'拒绝', rTime:'2026-10-09 10:30', rWho:'rty321', rNote:'名单有误'},
   {act:'sdfse', type:'免费旋转/投注', name:'YGR_S 免費', n:1, note:'–', time:'2026-10-13 13:03', who:'mnoadmin', st:'通过', rTime:'2026-10-13 13:03', rWho:'mnoadmin', rNote:'–'},
   {act:'dsafsf', type:'优惠券', name:'Ntest_存送比例', n:1, note:'–', time:'2026-10-02 18:11', who:'qwe456', st:'通过', rTime:'2026-10-07 18:24', rWho:'uvwadmin', rNote:'111'}
 ];
@@ -646,7 +643,7 @@ function openCoupon(mode,id){
   if(mode==='edit'){
     var c=coupons.filter(function(x){return x.id===id;})[0];
     $('fName').value=c.name; $('fCat').value=c.cat;
-    if(c.cat==='体育投注券'){ $('fTimes').value=c.cfg.times; $('fAmt').value=c.cfg.amt; $('fValid').value=c.cfg.valid; }
+    if(c.cat==='体育投注券'){ $('fAmt').value=c.cfg.amt; $('fValid').value=c.cfg.valid; }
     else { $('fRate').value=c.cfg.rate||0; $('fCap').value=c.cfg.cap||0; $('fFlow').value=c.cfg.flow||0; $('fFee').value=c.cfg.fee||0; $('fValidOld').value=c.cfg.valid||0; $('fBetValid').value=c.cfg.betValid||0; }
   } else { $('fName').value=''; $('fCat').value='存送比例券'; }
   /* 编辑时：币种与类别不可修改 */
@@ -676,7 +673,7 @@ $('couponOk').onclick=function(){
   if(!ok){ return; }   /* 有错误：栏位红框＋红字提示，「确定」不送出、无 toast */
   askConfirm(editingId?'确认保存对此优惠券的修改吗？':'确认新增此优惠券吗？',function(){
     var cat=$('fCat').value, sport=(cat==='体育投注券');
-    var cfg=sport?{times:+$('fTimes').value, amt:+$('fAmt').value, valid:+$('fValid').value}:{rate:+$('fRate').value, cap:+$('fCap').value, flow:+$('fFlow').value, fee:+$('fFee').value, valid:+$('fValidOld').value, betValid:+$('fBetValid').value};
+    var cfg=sport?{amt:+$('fAmt').value, valid:+$('fValid').value}:{rate:+$('fRate').value, cap:+$('fCap').value, flow:+$('fFlow').value, fee:+$('fFee').value, valid:+$('fValidOld').value, betValid:+$('fBetValid').value};
     if(editingId){ coupons.forEach(function(c){ if(c.id===editingId){ c.name=$('fName').value.trim(); c.cfg=cfg; } }); }
     else { coupons.unshift({id:Date.now(), cur:$('fCur').value, name:$('fName').value.trim(), cat:cat, op:'abc123', time:nowStr('/')+':00', cfg:cfg}); }
     var wasEdit=!!editingId;

@@ -937,15 +937,19 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .bs2__key:active{background:#eef3fb}
 
 /* SportsVoucher 卡片列表：与键盘同高，可上下滑动 */
-.bs2__vlist{height:188px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:9px 8px 4px 2px;overscroll-behavior:contain}
+.bs2__vlist{height:270px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:9px 8px 4px 2px;overscroll-behavior:contain}
 .bs2__vcard{position:relative;flex:0 0 auto;display:flex;align-items:stretch;min-height:60px;border-radius:8px;border:1.5px solid #f3d7ad;background:#fff8ee;text-align:left;overflow:visible}
-.bs2__vstub{flex:0 0 64px;padding:0 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:6px 0 0 6px;
+.bs2__vstub{flex:0 0 84px;padding:0 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:6px 0 0 6px;
   background:linear-gradient(135deg,#ffb21e,#f58300);color:#fff;font-size:12px;font-weight:700;letter-spacing:.2px;border-right:2px dashed #fff8ee}
 .bs2__vstub i{font-style:normal;font-size:11px;font-weight:400;opacity:.95}
 .bs2__vmid{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;padding:6px 12px;gap:1px}
-.bs2__vamt{font-size:19px;font-weight:700;color:#1d2b4a}
-.bs2__vlab{font-size:12px;color:#7a6a52}
-.bs2__vicon{width:32px;height:32px}
+.bs2__vamt{flex:0 0 auto;display:flex;align-items:center;padding:0 16px;font-size:26px;font-weight:700;color:#e5484d}   /* 金额置于卡片右侧，红字、字级加大 */
+.bs2__vlab{font-size:15px;font-weight:600;color:#5c4a30;white-space:nowrap}
+.bs2__vicon{width:44px;height:44px}
+.bs2__vbody{flex:1;min-width:0;display:flex;flex-direction:column}
+.bs2__vtop{display:flex;align-items:center}
+.bs2__vna{font-size:11px;line-height:1.3;color:#a08f74;padding:0 12px 7px;margin-top:-2px}   /* 不适用玩法备注 */
+.bs2__vcard.is-off .bs2__vna{color:#a7aebb}
 .bs2__vexp{font-size:12px;color:#8a7a62;display:inline-flex;align-items:center;gap:4px;font-variant-numeric:tabular-nums}
 .bs2__vclock{width:12px;height:12px;flex:0 0 auto}
 .bs2__vexp.is-soon{color:#f28c00}
@@ -958,11 +962,11 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .bs2__vcard.is-sel.is-err::after{content:"!";background:#e5484d}
 .bs2__vcard.is-sel.is-err .bs2__vcnt{color:#e5484d}
 .bs2__vcard.is-off{cursor:not-allowed;background:#f4f5f7;border-color:#dfe3ea}
-.bs2__vcard.is-off .bs2__vamt{color:#9aa3b2}
+.bs2__vcard.is-off .bs2__vamt{color:#b4bac5}
 .bs2__vcard.is-off .bs2__vstub{background:#9aa3b2;border-right-color:#f4f5f7}
 .bs2__vcard.is-off .bs2__vcnt{color:#8a93a3}
 .bs2__vlab--err{color:#e5484d}
-.bs2__vempty{height:188px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:12px;color:#8a97b3;background:#f3f5f9;border-radius:8px}
+.bs2__vempty{height:270px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:12px;color:#8a97b3;background:#f3f5f9;border-radius:8px}
 .bs2__vempty svg{width:150px;height:108px;display:block}
 
 /* 优惠条、按钮、备注 */
@@ -3203,19 +3207,19 @@ var BS_PROMO='优惠：优惠券名称中奖10%优惠券名称中奖10%最大展
 var bsBalance=168.55;
 /* 玩家持有的 SportsVoucher（单次投注金额、剩余使用次数） */
 var bsVouchers=[
-  {id:'v1', amt:100, times:10, hrsLeft:70},
-  {id:'v2', amt:500, times:3,  hrsLeft:46},
+  {id:'v1', amt:100, times:1, hrsLeft:70},
+  {id:'v2', amt:500, times:1,  hrsLeft:46},
   {id:'v3', amt:50,  times:1,  hrsLeft:0.75},
-  {id:'v4', amt:1000,times:2,  hrsLeft:236},
+  {id:'v4', amt:1000,times:1,  hrsLeft:236},
   {id:'v5', amt:20000,times:1, hrsLeft:20}
 ];
 /* 效期：依后台「有效期（小时）」自发券时起算；原型以「距今剩余小时」换算出到期时间 */
-bsVouchers.forEach(function(v){ var d=new Date(Date.now()+v.hrsLeft*3600000); d.setSeconds(0,0); v.expire=d; });
+bsVouchers.forEach(function(v,i){ v.expire=new Date(Date.now()+v.hrsLeft*3600000-(i*7+12)*1000); });
 function bsLeftTxt(exp){
-  /* 剩余 ≥ 24 小时：「天数d hh:mm」（例 9d 19:58）；未满 24 小时：hh:mm */
-  var m=Math.max(0,Math.floor((exp-Date.now())/60000)), p=function(n){return (n<10?'0':'')+n;};
-  var d=Math.floor(m/1440), h=Math.floor(m%1440/60), mi=m%60;
-  return (d>0?d+'d ':'')+p(h)+':'+p(mi);
+  /* 剩余 ≥ 24 小时：「天数d hh:mm:ss」（例 9d 19:58:30）；未满 24 小时：hh:mm:ss；每秒倒数 */
+  var t=Math.max(0,Math.floor((exp-Date.now())/1000)), p=function(n){return (n<10?'0':'')+n;};
+  var d=Math.floor(t/86400), h=Math.floor(t%86400/3600), mi=Math.floor(t%3600/60), se=t%60;
+  return (d>0?d+'d ':'')+p(h)+':'+p(mi)+':'+p(se);
 }
 /* 每秒检查：更新倒数文字；到期的券从清单移除（已选则取消选择） */
 setInterval(function(){
@@ -3229,7 +3233,7 @@ setInterval(function(){
   document.querySelectorAll('.bs2__vexp[data-exp]').forEach(function(el){ var t=el.querySelector('.bs2__vleft'); var nt=bsLeftTxt(+el.getAttribute('data-exp')); if(t.textContent!==nt) t.textContent=nt; });
 },1000);
 function bsExpireHTML(v){
-  /* 效期倒数：剩余 ≥ 24 小时显示「9d 19:58」，未满 24 小时显示 hh:mm；每分钟更新；倒数至 00:00 即从清单移除 */
+  /* 效期倒数：剩余 ≥ 24 小时显示「9d 19:58:30」，未满 24 小时显示 hh:mm:ss；每秒更新；倒数至 00:00:00 即从清单移除 */
   return '<span class="bs2__vexp" data-exp="'+v.expire.getTime()+'"><svg class="bs2__vclock" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.3" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.6V8l2.4 1.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="bs2__vleft">'+bsLeftTxt(v.expire)+'</span></span>';
 }
 /* 原型情境（由左侧「情境切换」面板控制） */
@@ -3305,11 +3309,13 @@ function bsVoucherHTML(){
   var mine=bsMine(), list=mine.filter(function(v){return !bsOutOfLimit(v);}).sort(byExp).concat(mine.filter(function(v){return bsOutOfLimit(v);}).sort(byExp));
   return '<div class="bs2__vlist" role="listbox" aria-label="选择 SportsVoucher">'+list.map(function(v){
     var sel=v.id===BS.vSel, out=bsOutOfLimit(v);
-    var lab='<span class="bs2__vlab">Amount per bet</span>';   /* 超出限额的券只反灰，不另显示提示文字 */
+    var lab='<span class="bs2__vlab">Sports Voucher</span>';   /* 超出限额的券只反灰，不另显示提示文字 */
     return '<button class="bs2__vcard'+(sel?' is-sel':'')+(out?' is-off':'')+'" role="option" aria-selected="'+sel+'" aria-disabled="'+(out?'true':'false')+'"'+(out?' disabled':'')+' data-bsv="'+v.id+'">'
       +'<span class="bs2__vstub" title="SportsVoucher"><svg class="bs2__vicon" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 9a2 2 0 0 1 2-2h20a2 2 0 0 1 2 2v3.2a3.8 3.8 0 0 0 0 7.6V23a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3.2a3.8 3.8 0 0 0 0-7.6z" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/><circle cx="16" cy="16" r="5.6" fill="none" stroke="#fff" stroke-width="1.6"/><path d="M16 13.2l2.3 1.7-.9 2.7h-2.8l-.9-2.7z" fill="#fff"/><path d="M16 10.4v2.8M18.3 14.9l2.6-.9M17.4 17.6l1.6 2.3M14.6 17.6l-1.6 2.3M13.7 14.9l-2.6-.9" stroke="#fff" stroke-width="1.2"/></svg></span>'
-      +'<span class="bs2__vmid"><span class="bs2__vamt">₱'+bsMoney(v.amt).replace(/\.00$/,'')+'</span>'+lab+bsExpireHTML(v)+'</span>'
-      +'<span class="bs2__vcnt">x'+v.times+'</span></button>';
+      +'<span class="bs2__vbody"><span class="bs2__vtop"><span class="bs2__vmid">'+lab+bsExpireHTML(v)+'</span>'
+      +'<span class="bs2__vamt">₱'+bsMoney(v.amt).replace(/\.00$/,'')+'</span></span>'
+      +'<span class="bs2__vna">Not for: Outrights, Ending Card, Ending Game, Parlay</span></span>'
+      +'</button>';   /* 一张券只能使用 1 次，不显示次数 */
   }).join('')+'</div>';
 }
 function bsWinHTML(){
@@ -3602,14 +3608,14 @@ var MB_BETS=[
   {id:'b7', st:'unsettled', type:'single', sport:'🏀', pick:'Denver Nuggets', line:'', odds:'7.40', live:false, market:'Basketball / Winner', score:'', league:'NBAPLAYOFFS-Semifinal', match:'Denver Nuggets vs Minnesota Timberwolves', time:mbDate(0,'11:20:31'), no:'B0155957580787215976', stake:100, maxWin:740, voucher:true},
   {id:'b8', st:'settled', type:'single', sport:'⚽', pick:'Kabuscorp SCP', line:'', odds:'8.60', live:false, market:'Football / 1 X 2', score:'', league:'Angola Girabola', match:'Atletico Petroleos de Luanda vs Kabuscorp SCP', time:mbDate(0,'14:37:28'), settle:mbDate(0,'14:39:13'), no:'B0155957580787215974', stake:200, winLose:0, cancelled:true},
   {id:'b9', st:'settled', type:'single', sport:'⚽', pick:'Kabuscorp SCP', line:'', odds:'8.43', live:false, market:'Football / 1 X 2', score:'', league:'Angola Girabola', match:'Atletico Petroleos de Luanda vs Kabuscorp SCP', time:mbDate(0,'14:05:28'), settle:mbDate(0,'14:07:13'), no:'B0155952315892985446', stake:1000, winLose:0, resv:true, cancelled:true},
-  {id:'b10', st:'settled', type:'single', sport:'🏀', pick:'Denver Nuggets', line:'', odds:'7.40', live:false, market:'Basketball / Winner', score:'', league:'NBAPLAYOFFS-Semifinal', match:'Denver Nuggets vs Minnesota Timberwolves', time:mbDate(1,'20:10:05'), settle:mbDate(1,'22:41:37'), no:'B0155952315892985447', stake:100, winLose:740, voucher:true, res:'win'},
+  {id:'b10', st:'settled', type:'single', sport:'🏀', pick:'Denver Nuggets', line:'', odds:'7.40', live:false, market:'Basketball / Winner', score:'', league:'NBAPLAYOFFS-Semifinal', match:'Denver Nuggets vs Minnesota Timberwolves', time:mbDate(1,'20:10:05'), settle:mbDate(1,'22:41:37'), no:'B0155952315892985447', stake:100, winLose:640, voucher:true, res:'win'},
   /* 已结算 · 输／赢注单示意（结果标记 Lose / Win） */
   {id:'b14', st:'settled', type:'single', sport:'🏀', pick:'Barnaul', line:'', odds:'1.92', live:true, market:'Basketball / Winner', score:'', league:'Russia IPBL 3x3 Pro Division', match:'Barnaul vs Novosibirsk', time:mbDate(0,'11:11:56'), settle:mbDate(0,'11:49:41'), no:'B0155988647395482009', stake:200, winLose:-200, res:'lose'},
-  {id:'b16', st:'settled', type:'single', sport:'⚽', pick:'Kashima Antlers', line:'+0.5', odds:'1.85', live:true, market:'Football / Handicap', score:'0-2', league:'Japan J1 League', match:'Vissel Kobe vs Kashima Antlers', time:mbDate(0,'10:02:47'), settle:mbDate(0,'11:05:33'), no:'B0155988647395482011', stake:100, winLose:0, res:'lose', voucher:true},
+  {id:'b16', st:'settled', type:'single', sport:'⚽', pick:'Kashima Antlers', line:'+0.5', odds:'1.85', live:true, market:'Football / Handicap', score:'0-2', league:'Japan J1 League', match:'Vissel Kobe vs Kashima Antlers', time:mbDate(0,'10:02:47'), settle:mbDate(0,'11:05:33'), no:'B0155988647395482011', stake:100, winLose:-100, res:'lose', voucher:true},
   {id:'b15', st:'settled', type:'single', sport:'⚽', pick:'Vissel Kobe', line:'-0.5', odds:'2.05', live:false, market:'Football / Handicap', score:'', league:'Japan J1 League', match:'Vissel Kobe vs Kashima Antlers', time:mbDate(0,'09:20:14'), settle:mbDate(0,'11:05:33'), no:'B0155988647395482010', stake:300, winLose:315, res:'win'},
   /* 已结算 · 预约注单示意（Book bet amount），各日期页签都有一笔 */
   {id:'b12', st:'settled', type:'single', sport:'⚽', pick:'Kabuscorp SCP', line:'', odds:'8.43', live:false, market:'Football / 1 X 2', score:'', league:'Angola Girabola', match:'Atletico Petroleos de Luanda vs Kabuscorp SCP', time:mbDate(1,'14:05:28'), settle:mbDate(1,'14:07:13'), no:'B0155952315892985464', stake:1000, winLose:0, resv:true, cancelled:true},
-  {id:'b13', st:'settled', type:'single', sport:'⚽', pick:"NTV Beleza Women's(W)", line:'0', odds:'1.92', live:true, market:'Football / Handicap', score:'1-1', league:"Japan Women's Professional Football League", match:"NTV Beleza Women's(W) vs Mynavi Sendai Ladies(W)", time:mbDate(3,'12:40:22'), settle:mbDate(3,'14:52:10'), no:'B0155952315892985465', stake:100, winLose:192, resv:true, voucher:true},
+  {id:'b13', st:'settled', type:'single', sport:'⚽', pick:"NTV Beleza Women's(W)", line:'0', odds:'1.92', live:true, market:'Football / Handicap', score:'1-1', league:"Japan Women's Professional Football League", match:"NTV Beleza Women's(W) vs Mynavi Sendai Ladies(W)", time:mbDate(3,'12:40:22'), settle:mbDate(3,'14:52:10'), no:'B0155952315892985465', stake:100, winLose:92, resv:true, voucher:true},
   {id:'b11', st:'settled', type:'parlay', sport:'🏀', title:'3x1 Parlay', legs:[['Vissel Kobe','2/2.5','1.94'],['Over','2/2.5','1.94'],['Luton Town','','1.94']], time:mbDate(4,'13:05:09'), settle:mbDate(4,'22:15:00'), no:'B0155952315892985448', stake:500, winLose:-500}
 ];
 var MB_LAST=[];   /* Ending Game 分页：末尾比分 / Ending Game 注单 */
@@ -3662,7 +3668,7 @@ function mbLastHTML(b){
 }
 function mbSumHTML(rows){
   var stake=0, valid=0, win=0, wl=0;
-  rows.forEach(function(b){ if(!b.voucher) stake+=b.stake; if(!b.cancelled && !b.voucher) valid+=b.stake;  /* 用券注单：不计入 Total Bet、有效投注；计入注单数、Potential win；Total Win/Loss 输计 0、赢计总派彩 */ win+=(b.maxWin||0); wl+=(b.voucher?Math.max(0,b.winLose||0):(b.winLose||0)); });
+  rows.forEach(function(b){ stake+=b.stake; if(!b.cancelled && !b.voucher) valid+=b.stake;  /* 用券注单：计入 Total Bet、注单数、Potential win、Total Win/Loss（正常计算）；不计入有效投注 */ win+=(b.maxWin||0); wl+=(b.winLose||0); });
   if(MB.st==='settled') return '<div class="mb__sum" style="--cols:4"><div><span>Total Bet Amount</span><b>'+mbMoney(stake)+'</b></div><div><span>Total Valid Bet</span><b>'+mbMoney(valid)+'</b></div><div><span>Total Number of Bets</span><b>'+rows.length+'</b></div><div><span>Total Win/Loss</span><b>'+mbMoney(wl)+'</b></div></div>';
   return '<div class="mb__sum" style="--cols:3"><div><span>Total Bet Amount</span><b>'+mbMoney(stake)+'</b></div><div><span>Total Number of Bets</span><b>'+rows.length+'</b></div><div><span>Potential win</span><b>'+mbMoney(win)+'</b></div></div>';
 }
