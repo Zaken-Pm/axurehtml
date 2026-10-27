@@ -275,7 +275,8 @@ code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:
               <tr><td>单关，盘口开放</td><td>可操作</td><td>显示</td></tr>
               <tr><td>单关，盘口已关闭（见前台规则 5）</td><td>反灰不可点</td><td>显示</td></tr>
               <tr><td>OUTRIGHTS（见前台规则 6）</td><td>反灰不可点</td><td>不显示</td></tr>
-              <tr><td>没有任何可用券</td><td>可操作；开启后若完全没有券显示缺省页，只有限额外的券则显示反灰清单（见前台规则 2）</td><td><code>0 available</code></td></tr>
+              <tr><td>会员没有任何体育投注券（未过期未使用为 0 张）</td><td colspan="2"><strong>整个 SportsVoucher 栏位不显示</strong>（开关不出现），只能一般金额投注</td></tr>
+              <tr><td>有券但本盘口全部限额外</td><td>可操作；开启后显示反灰清单（见前台规则 2）</td><td><code>0 available</code></td></tr>
               <tr><td>ENDING CARD、ENDING GAME、串关</td><td colspan="2">不显示此栏位（见前台规则 7、8、9）</td></tr>
               <tr><td>后台优惠券系统开关关闭</td><td colspan="2">体育投注页的 SportsVoucher <strong>整个栏位隐藏</strong>（所有玩法）</td></tr>
             </tbody></table>
@@ -285,7 +286,7 @@ code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:
 
       <div class="mod"><div class="mod-head"><span class="n">2</span><h3>券清单 · 排序 · 限额 <span class="badge badge-new">新增</span></h3></div>
         <div class="io">
-          <div class="io-img"><span class="io-cap">前台截图 · 选中券</span><span class="io-cap">前台截图 · 限额 200–800</span><span class="io-cap">前台截图 · 没有券（缺省页）</span></div>
+          <div class="io-img"><span class="io-cap">前台截图 · 选中券</span><span class="io-cap">前台截图 · 限额 200–800</span><span class="io-cap">前台截图 · 没有券（不显示栏位）</span></div>
           <div class="io-spec">
             <div class="sub-title">卡片内容（由左至右）</div>
             <table class="spec-table">
@@ -317,12 +318,10 @@ code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:
               <tr><td>金额 &gt; 最大限额</td><td>反灰、不可点</td><td>最后</td><td>否</td></tr>
             </tbody></table>
             <div class="callout info"><span>ℹ️</span><div>投注页开着时若限额改变、已选的券变成限额外 → <b>自动取消选择</b>。</div></div>
-            <div class="sub-title">缺省页 <span class="badge badge-new">新增</span></div>
+            <div class="sub-title">没有可用券时的显示 <span class="badge badge-change">异动</span></div>
             <ul class="rule-list">
-              <li class="rule-item"><div class="rule-num">1</div><div class="rule-text"><strong>条件：</strong>会员<strong>没有任何体育投注券</strong>（未过期且未使用的券为 0 张），开启 SportsVoucher 开关后，券清单区显示缺省页。</div></li>
-              <li class="rule-item"><div class="rule-num">2</div><div class="rule-text"><strong>内容：</strong>缺省图示＋文案 <code>There does not have any content.</code>，沿用「我的优惠券」空页的图示样式；区块高度同券清单。</div></li>
-              <li class="rule-item"><div class="rule-num">3</div><div class="rule-text">只有限额外的券时<strong>不显示缺省页</strong>，照常显示反灰的券。</div></li>
-              <li class="rule-item"><div class="rule-num">4</div><div class="rule-text">显示缺省页时 <code>To Win</code> 为 <code>0.00</code>、<code>Place Bet</code> 反灰不可点；关闭开关即恢复一般金额投注。</div></li>
+              <li class="rule-item"><div class="rule-num">1</div><div class="rule-text"><strong>会员没有任何体育投注券</strong>（未过期且未使用的券为 0 张）：投注页<strong>不显示 SportsVoucher 栏位</strong>（开关不出现），只能一般金额投注（见前台规则 1）。</div></li>
+              <li class="rule-item"><div class="rule-num">2</div><div class="rule-text"><strong>有券、但本盘口全部限额外：</strong>栏位照常显示、开关可开启；开启后<strong>显示反灰券清单</strong>（全部不可选），<code>n available</code> 为 <code>0</code>、<code>To Win</code> 为 <code>0.00</code>、<code>Place Bet</code> 反灰不可点；关闭开关即恢复一般金额投注。</div></li>
             </ul>
             <div class="sub-title">To Win</div>
             <table class="data-table"><thead><tr><th>情况</th><th>To Win</th><th>右侧</th></tr></thead><tbody>
@@ -387,7 +386,7 @@ code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:
           <div class="io-spec">
             <ul class="rule-list">
               <li class="rule-item"><div class="rule-num">1</div><div class="rule-text"><strong>盘口已关闭：</strong><ul style="margin:4px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px"><li>选项色块变灰，第二行 <code>Market closed</code>，不显示赔率。</li><li>SportsVoucher 开关反灰。</li><li>金额栏不可输入、无键盘。</li><li><code>Booking</code> 与 <code>Place Bet</code> 反灰。</li></ul></div></li>
-              <li class="rule-item"><div class="rule-num">2</div><div class="rule-text"><strong>没有任何可用的券</strong>（全部用完、过期或从未领取）：开关可开启，开启后显示缺省页（见前台规则 2「缺省页」）。</div></li>
+              <li class="rule-item"><div class="rule-num">2</div><div class="rule-text"><strong>会员没有任何体育投注券</strong>（全部用完、过期或从未领取）：<strong>不显示 SportsVoucher 栏位</strong>（开关不出现），只能一般金额投注（见前台规则 1）。</div></li>
               <li class="rule-item"><div class="rule-num">3</div><div class="rule-text"><strong>全部券都在限额外：</strong>清单照常显示（全部反灰），<code>0 available</code>。</div></li>
             </ul>
           </div>
@@ -789,8 +788,8 @@ code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:
         <tr><td>9</td><td>单关</td><td>—</td><td>—</td><td>预约中</td><td>成交，券已过期或已使用</td><td>预约单失败 → Expired · <code>Booking failed</code></td><td>不变</td></tr>
         <tr><td>10</td><td>单关</td><td>开放</td><td>已选</td><td>任意</td><td>限额改变，已选券变限额外</td><td>自动取消选择，反灰排最后</td><td>不变</td></tr>
         <tr><td>11</td><td>单关</td><td>已关闭</td><td>—</td><td>—</td><td>打开投注页</td><td><code>Market closed</code>；开关／Booking／Place Bet 反灰</td><td>不变</td></tr>
-        <tr><td>12</td><td>单关</td><td>开放</td><td>—</td><td>关</td><td>会员没有任何体育投注券，开启开关</td><td><code>0 available</code>；券清单区显示缺省页 <code>There does not have any content.</code>，<code>Place Bet</code> 反灰</td><td>—</td></tr>
-        <tr><td>13</td><td>单关</td><td>开放</td><td>—</td><td>关</td><td>只有限额外的券，开启开关</td><td><code>0 available</code>；显示反灰券清单（不显示缺省页）</td><td>—</td></tr>
+        <tr><td>12</td><td>单关</td><td>开放</td><td>—</td><td>关</td><td>会员没有任何体育投注券</td><td><strong>不显示 SportsVoucher 栏位</strong>（开关不出现），只能一般金额投注</td><td>—</td></tr>
+        <tr><td>13</td><td>单关</td><td>开放</td><td>—</td><td>关</td><td>有券但全部限额外，开启开关</td><td><code>0 available</code>；栏位照常显示，开启后显示反灰券清单</td><td>—</td></tr>
         <tr><td>14</td><td>单关</td><td>开放</td><td>已选</td><td>任意</td><td>关闭开关</td><td>清除选择，回金额输入</td><td>不变</td></tr>
         <tr><td>15</td><td>OUTRIGHTS</td><td>开放</td><td>—</td><td>—</td><td>打开投注页</td><td>开关反灰，只能一般投注</td><td>—</td></tr>
         <tr><td>16</td><td>ENDING CARD</td><td>—</td><td>—</td><td>—</td><td>点比分格打开投注单</td><td>无 SportsVoucher 栏位，只能一般金额投注</td><td>—</td></tr>
