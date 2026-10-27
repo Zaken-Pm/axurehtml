@@ -216,18 +216,18 @@ code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:
 
       <div class="sub-title">输半／赢半（Half Lose／Half Win）说明 <span class="badge badge-new">新增</span></div>
       <div class="callout info"><span>ℹ️</span><div style="width:100%"><b>什么是「输半」「赢半」</b><ul style="margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px"><li>出现在亚洲盘的四分之一盘口（如让球 <code>0/0.5</code>、大小 <code>2/2.5</code>）：投注额一半算在较小盘、一半算在较大盘，赛果落在两者之间时：<strong>输半</strong>＝一半投注额判输、另一半退回；<strong>赢半</strong>＝一半投注额判赢、另一半退回。</li><li>后台备注显示 <code>Settle:half lose</code>／<code>Settle:half win</code>。</li><li>一般注单范例：₱200 输半 → 输 ₱100、退回 ₱100，输赢金额 <code>-100.00</code>；₱200 @1.90 赢半 → 赢 ₱90、退回 ₱100，输赢金额 <code>90.00</code>。</li></ul></div></div>
-      <div class="callout danger"><span>⛔</span><div style="width:100%"><b>用券注单遇到「输半」</b><ul style="margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px"><li>券已使用，<strong>不退回次数</strong>（与注单取消／作废会恢复为未使用不同）。</li><li><strong>退回一半现金</strong>（券面额 ÷ 2）入会员余额。范例：₱100 券输半 → 退回 ₱50。</li><li>输赢正常显示：前台 <code>Win/Lose</code>、后台「输赢金额」为 <code>-50.00</code>。</li></ul></div></div>
-      <div class="callout tip"><span>🧮</span><div style="width:100%"><b>用券注单遇到「赢半」</b><ul style="margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px"><li>派彩＝<strong>券面额 ÷ 2 × 赔率＋券面额 ÷ 2</strong>：赢的一半按赔率派彩，另一半本金也一并退回。</li><li>范例：₱100 券 @1.90 赢半 → <code>50 × 1.90 ＋ 50 ＝ 145</code> 入余额。</li><li>输赢正常显示：前台 <code>Win/Lose</code>、后台「输赢金额」为 <code>45.00</code>（145 − 100）。</li></ul></div></div>
+      <div class="callout danger"><span>⛔</span><div style="width:100%"><b>用券注单遇到「输半」</b><ul style="margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px"><li>券已使用，<strong>不退回次数</strong>（与注单取消／作废会恢复为未使用不同）。</li><li><strong>退回一半现金</strong>（券面额 ÷ 2）入会员余额。范例：₱100 券输半 → 退回 ₱50。</li><li>输赢正常显示：前台 <code>Win/Lose</code>、后台「输赢金额」为 <code>50.00</code>（＝派彩，即退回的一半现金）。</li></ul></div></div>
+      <div class="callout tip"><span>🧮</span><div style="width:100%"><b>用券注单遇到「赢半」</b><ul style="margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px"><li>派彩＝<strong>券面额 ÷ 2 × 赔率＋券面额 ÷ 2</strong>：赢的一半按赔率派彩，另一半本金也一并退回。</li><li>范例：₱100 券 @1.90 赢半 → <code>50 × 1.90 ＋ 50 ＝ 145</code> 入余额。</li><li>输赢正常显示：前台 <code>Win/Lose</code>、后台「输赢金额」为 <code>145.00</code>（＝派彩）。</li></ul></div></div>
 
       <div class="sub-title">用券注单派彩与输赢（结算结果一览） <span class="badge badge-new">新增</span></div>
       <div class="card" style="padding:0;overflow:hidden;"><table class="data-table"><thead><tr><th>结算结果</th><th>入会员余额</th><th>输赢（正常显示）</th><th>范例（₱100 券）</th></tr></thead><tbody>
-        <tr><td>赢</td><td>券面额 × 赔率</td><td>派彩 − 券面额</td><td>@7.40：入余额 <code>740</code>，输赢 <code>640.00</code></td></tr>
-        <tr><td>赢半</td><td>券面额 ÷ 2 × 赔率 ＋ 券面额 ÷ 2</td><td>派彩 − 券面额</td><td>@1.90：入余额 <code>145</code>，输赢 <code>45.00</code></td></tr>
-        <tr><td>输</td><td><code>0</code></td><td>派彩（＝ <code>0</code>）</td><td>入余额 <code>0</code>，输赢 <code>0.00</code></td></tr>
-        <tr><td>输半</td><td>券面额 ÷ 2（退回一半现金）</td><td>−券面额 ÷ 2</td><td>入余额 <code>50</code>，输赢 <code>-50.00</code></td></tr>
-        <tr><td>注单取消／作废</td><td><code>0</code>（原券恢复为未使用）</td><td><code>0</code></td><td>入余额 <code>0</code>，输赢 <code>0.00</code></td></tr>
+        <tr><td>赢</td><td>券面额 × 赔率</td><td>派彩（＝入会员余额）</td><td>@7.40：入余额 <code>740</code>，输赢 <code>740.00</code></td></tr>
+        <tr><td>赢半</td><td>券面额 ÷ 2 × 赔率 ＋ 券面额 ÷ 2</td><td>派彩（＝入会员余额）</td><td>@1.90：入余额 <code>145</code>，输赢 <code>145.00</code></td></tr>
+        <tr><td>输</td><td><code>0</code></td><td>派彩（＝入会员余额）</td><td>入余额 <code>0</code>，输赢 <code>0.00</code></td></tr>
+        <tr><td>输半</td><td>券面额 ÷ 2（退回一半现金）</td><td>派彩（＝入会员余额）</td><td>入余额 <code>50</code>，输赢 <code>50.00</code></td></tr>
+        <tr><td>注单取消／作废</td><td><code>0</code>（原券恢复为未使用）</td><td>派彩（＝入会员余额）</td><td>入余额 <code>0</code>，输赢 <code>0.00</code></td></tr>
       </tbody></table></div>
-      <div class="callout info"><span>ℹ️</span><div>前台 <code>Win/Lose</code>、注单页 <code>Total Win/Loss</code>、后台体育注单「输赢金额」、各报表的输赢栏位，皆以此表的「输赢」为准（用券注单「输」＝派彩为 <code>0</code>，其余与一般注单的算法相同）。</div></div>
+      <div class="callout info"><span>ℹ️</span><div>前台 <code>Win/Lose</code>、注单页 <code>Total Win/Loss</code>、后台体育注单「输赢金额」、各报表的输赢栏位，皆以此表的「输赢」为准：<strong>用券注单的「输赢」一律＝派彩金额（即入会员余额）</strong>；因券非现金本金，与一般注单「派彩 − 本金」的算法不同。</div></div>
 
       <div class="sub-title">投注统计口径 <span class="badge badge-new">新增</span></div>
       <div class="card" style="padding:0;overflow:hidden;"><table class="data-table"><thead><tr><th style="width:300px">项目</th><th>用券注单</th></tr></thead><tbody>
@@ -249,6 +249,7 @@ code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:
         <li class="rule-item"><div class="rule-num">4</div><div class="rule-text">用券下注<strong>不检查余额</strong>，余额为 0 也可下注。</div></li>
         <li class="rule-item"><div class="rule-num">5</div><div class="rule-text">券面额需在该盘口<strong>投注限额内</strong>才可选；限额外的券反灰不可选（不显示提示文字），并<strong>排序在清单下方</strong>。</div></li>
         <li class="rule-item"><div class="rule-num">6</div><div class="rule-text">编辑券配置<strong>不影响已发出的券</strong>；之后发出的是新券，与旧券无关。删除券配置后已发出的券仍可使用到期。</div></li>
+        <li class="rule-item"><div class="rule-num">7</div><div class="rule-text">用券注单<strong>不支持 Cash Out（提前结算）</strong>：用券的<strong>未结注单</strong>在注单页<strong>不出现 Cash Out 功能</strong>（按钮不显示），只能等赛事结算；含预约（Booking）成交后的用券注单。</div></li>
       </ul></div>
     </div>
 
@@ -446,7 +447,8 @@ code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:
           <div class="io-spec">
             <ul class="rule-list">
               <li class="rule-item"><div class="rule-num">1</div><div class="rule-text"><strong>用券注单：</strong>卡片右上角显示 <code>SportsVoucher</code> 标记，<strong>四种状态都显示</strong>；Stake 显示券面额。</div></li>
-              <li class="rule-item"><div class="rule-num">2</div><div class="rule-text"><strong>Win/Lose：</strong>用券注单<strong>正常显示</strong>（例 ₱100 @7.40 赢 → <code>640.00</code>；输 → <code>0.00</code>，即输＝派彩），计算见通用规则「结算结果一览」。</div></li>
+              <li class="rule-item"><div class="rule-num">2</div><div class="rule-text"><strong>Win/Lose：</strong>用券注单 Win/Lose <strong>一律＝派彩金额</strong>（例 ₱100 @7.40 赢 → <code>740.00</code>；输 → <code>0.00</code>；输半 → <code>50.00</code>），计算见通用规则「结算结果一览」。</div></li>
+              <li class="rule-item"><div class="rule-num">3</div><div class="rule-text"><strong>Cash Out：</strong>用券的<strong>未结注单（Unsettled）不出现 Cash Out 功能</strong>——按钮不显示、不提供提前结算；含预约成交后的用券注单。</div></li>
             </ul>
             <div class="sub-title">汇总列 · 用券注单是否计入 <span class="badge badge-change">异动</span></div>
             <table class="data-table"><thead><tr><th>状态</th><th>栏位（左→右）</th><th>用券注单</th></tr></thead><tbody>
@@ -612,7 +614,7 @@ code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:
             <table class="data-table"><thead><tr><th>栏位（左→右）</th><th>用券注单</th><th>范例（₱100 券）</th></tr></thead><tbody>
               <tr><td>画面输入金额／下注金额（法币／系统币）</td><td><strong>计入</strong>，＝券面额</td><td><code>100.00/100.00</code></td></tr>
               <tr><td>有效下注金额（法币／系统币）</td><td><strong>不计入</strong>，显示 <code>0.00</code></td><td><code>0.00</code></td></tr>
-              <tr><td>输赢金额（法币／系统币）</td><td><strong>计入</strong>，正常计算（见通用规则「结算结果一览」）</td><td>赢 @7.40 <code>640.00</code>／赢半 @1.90 <code>45.00</code>／输 <code>0.00</code>／输半 <code>-50.00</code>／注单取消 <code>0.00</code></td></tr>
+              <tr><td>输赢金额（法币／系统币）</td><td><strong>计入</strong>，正常计算（见通用规则「结算结果一览」）</td><td>赢 @7.40 <code>740.00</code>／赢半 @1.90 <code>145.00</code>／输 <code>0.00</code>／输半 <code>50.00</code>／注单取消 <code>0.00</code></td></tr>
             </tbody></table></div>
         </div>
       </div>
@@ -663,11 +665,11 @@ code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:
               <tr><td>免费投注数 <span class="badge badge-new">新增</span></td><td><span class="pill pill-on">计入</span>　只统计用券注单</td></tr>
               <tr><td>免费投注输赢 <span class="badge badge-new">新增</span></td><td><span class="pill pill-on">计入</span>　只统计用券注单</td></tr>
             </tbody></table>
-            <div class="callout tip"><span>🧮</span><div style="width:100%"><b>范例：</b>今日篮球有 2 笔用券注单——A 用 ₱100 券 @7.40 赢（+640）、B 用 ₱500 券输（0，输＝派彩）。
+            <div class="callout tip"><span>🧮</span><div style="width:100%"><b>范例：</b>今日篮球有 2 笔用券注单——A 用 ₱100 券 @7.40 赢（+740）、B 用 ₱500 券输（0）。
               <ul style="margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px">
                 <li>投注区：「投注次数」+2、「投注人数」含 A、B、「投注金额」含 600、「免费投注」＝ <code>600</code>。</li>
                 <li>已结算区：有效投注数／人数／金额、会员输赢（不含退水、免费投注）、会员盈利率皆<b>不含</b> A、B；今日结算注单 +2 笔、今日结算注单总投注额含 600。</li>
-                <li>输赢金额：含 A、B（+640、0）；「免费投注数」＝ <code>2</code>；「免费投注输赢」＝ <code>640.00</code>。</li>
+                <li>输赢金额：含 A、B（+740、0）；「免费投注数」＝ <code>2</code>；「免费投注输赢」＝ <code>740.00</code>。</li>
               </ul></div></div>
           </div>
         </div>
@@ -800,21 +802,23 @@ code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:
         <tr><td>22</td><td>My voucher</td><td>—</td><td>—</td><td>—</td><td>Unused 点 Use now</td><td>导向体育首页</td><td>—</td></tr>
         <tr><td>23</td><td>My Bets 汇总</td><td>—</td><td>—</td><td>—</td><td>Scheduled／Unsettled 有用券注单</td><td>Total Bet Amount、Total Number of Bets、Potential win 皆含</td><td>—</td></tr>
         <tr><td>24</td><td>My Bets 汇总</td><td>—</td><td>—</td><td>—</td><td>Settled 有用券注单</td><td>Total Bet Amount、Total Number of Bets、Total Win/Loss 含；Total Valid Bet 不含</td><td>—</td></tr>
-        <tr><td>25</td><td>单关</td><td>—</td><td>—</td><td>—</td><td>用券注单结算 · 赢（₱100 @7.40）</td><td>派彩 740 入余额；Win/Lose、后台输赢金额 <code>640.00</code></td><td>已使用</td></tr>
-        <tr><td>26</td><td>单关</td><td>—</td><td>—</td><td>—</td><td>用券注单结算 · 赢半（₱100 @1.90）</td><td>派彩 145（50 × 1.90 ＋ 50）入余额；Win/Lose、后台输赢金额 <code>45.00</code></td><td>已使用</td></tr>
+        <tr><td>25</td><td>单关</td><td>—</td><td>—</td><td>—</td><td>用券注单结算 · 赢（₱100 @7.40）</td><td>派彩 740 入余额；Win/Lose、后台输赢金额 <code>740.00</code>（＝派彩）</td><td>已使用</td></tr>
+        <tr><td>26</td><td>单关</td><td>—</td><td>—</td><td>—</td><td>用券注单结算 · 赢半（₱100 @1.90）</td><td>派彩 145（50 × 1.90 ＋ 50）入余额；Win/Lose、后台输赢金额 <code>145.00</code>（＝派彩）</td><td>已使用</td></tr>
         <tr><td>27</td><td>单关</td><td>—</td><td>—</td><td>—</td><td>用券注单结算 · 输（₱100）</td><td>无派彩；Win/Lose、后台输赢金额 <code>0.00</code>（输＝派彩）</td><td>已使用</td></tr>
-        <tr><td>28</td><td>单关</td><td>—</td><td>—</td><td>—</td><td>用券注单结算 · 输半（₱100）</td><td>退回 ₱50 现金入余额，不退回次数；Win/Lose、后台输赢金额 <code>-50.00</code></td><td>已使用</td></tr>
+        <tr><td>28</td><td>单关</td><td>—</td><td>—</td><td>—</td><td>用券注单结算 · 输半（₱100）</td><td>退回 ₱50 现金入余额，不退回次数；Win/Lose、后台输赢金额 <code>50.00</code>（＝派彩）</td><td>已使用</td></tr>
         <tr><td>29</td><td>单关</td><td>—</td><td>—</td><td>—</td><td>用券注单取消／作废</td><td>Win/Lose <code>0.00</code>；原券恢复为未使用、重新出现在券清单与 My voucher <code>Unused</code>，有效期自退回时间重新计算</td><td>恢复为未使用</td></tr>
+        <tr><td>30</td><td>单关</td><td>—</td><td>—</td><td>—</td><td>用券未结注单，查看注单页 Unsettled</td><td><strong>不出现 Cash Out 功能</strong>（按钮不显示），不可提前结算</td><td>已使用</td></tr>
       </tbody></table></div>
 
       <div class="sub-title">边界与异常</div>
       <div class="card" style="padding:0;overflow:hidden;"><table class="data-table"><thead><tr><th style="width:230px">情境</th><th>处理</th></tr></thead><tbody>
         <tr><td>已成交的用券注单被取消／作废</td><td>注单显示 <code>Bet Cancellation</code>；<strong>原券恢复为未使用</strong>，有效期自退回时间重新计算；后台同一笔记录状态改回未使用，备注 <code>注单 {订单号} 取消，已退回</code></td></tr>
         <tr><td>券在投注页开着时到期</td><td>倒数至 <code>00:00:00</code> 即自动从清单移除（已选则取消选择），<code>n available</code> 同步减少</td></tr>
-        <tr><td>用券注单结算 · 赢</td><td>派彩＝券面额 × 赔率入余额；输赢正常显示（派彩 − 券面额）</td></tr>
-        <tr><td>用券注单结算 · 赢半</td><td>派彩＝券面额 ÷ 2 × 赔率＋券面额 ÷ 2 入余额（例 ₱100 @1.90 → 145）；输赢 <code>45.00</code></td></tr>
+        <tr><td>用券未结注单 · Cash Out</td><td>用券的未结注单<strong>不出现 Cash Out 功能</strong>（按钮不显示），不提供提前结算；含预约成交后的用券注单</td></tr>
+        <tr><td>用券注单结算 · 赢</td><td>派彩＝券面额 × 赔率入余额；输赢＝派彩金额</td></tr>
+        <tr><td>用券注单结算 · 赢半</td><td>派彩＝券面额 ÷ 2 × 赔率＋券面额 ÷ 2 入余额（例 ₱100 @1.90 → 145）；输赢 <code>145.00</code>（＝派彩）</td></tr>
         <tr><td>用券注单结算 · 输</td><td>无派彩；输赢 <code>0</code>（输＝派彩）</td></tr>
-        <tr><td>用券注单结算 · 输半</td><td>退回一半现金（券面额 ÷ 2）入余额，不退回次数；输赢 <code>-券面额 ÷ 2</code></td></tr>
+        <tr><td>用券注单结算 · 输半</td><td>退回一半现金（券面额 ÷ 2）入余额，不退回次数；输赢＝派彩金额（券面额 ÷ 2）</td></tr>
         <tr><td>余额为 0</td><td>仍可用券下注</td></tr>
         <tr><td>后台球类报表 · 用券注单</td><td>投注区：投注次数、投注人数、投注金额、免费投注皆计入；已结算区：有效投注数／人数／金额、会员输赢（不含退水、免费投注）、会员盈利率不计入，今日结算注单、今日结算注单总投注额、输赢金额、免费投注数、免费投注输赢计入</td></tr>
         <tr><td>后台体育注单 · 用券注单</td><td>备注另起一行 <code>SportsVoucher</code>；画面输入金额／下注金额＝券面额；有效下注金额 <code>0.00</code>；输赢金额正常计算</td></tr>
