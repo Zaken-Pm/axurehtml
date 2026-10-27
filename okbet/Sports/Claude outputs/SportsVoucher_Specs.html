@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>需求规格 · Sports Voucher 体育投注券</title>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#080e1c;--card:#0d1a2e;--card2:#111f38;--border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);
+  --gold:#F5BA35;--gold2:#FFD166;--gold-bg:rgba(245,186,53,.1);--gold-border:rgba(245,186,53,.3);
+  --green:#2DDC7C;--green-bg:rgba(45,220,124,.1);--green-border:rgba(45,220,124,.3);
+  --red:#FF5757;--red-bg:rgba(255,87,87,.1);--red-border:rgba(255,87,87,.3);
+  --blue:#4B9FFF;--blue-bg:rgba(75,159,255,.1);--blue-border:rgba(75,159,255,.3);
+  --purple:#B98BFF;--purple-bg:rgba(185,139,255,.12);--purple-border:rgba(185,139,255,.35);
+  --gray-bg:rgba(139,163,192,.08);--text:#EFF4FA;--text2:#8BA3C0;--text3:#7C93AE;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+button{font:inherit;appearance:none;-webkit-appearance:none;}
+html,body{overflow-x:hidden;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI','PingFang SC','Noto Sans SC','Microsoft YaHei',sans-serif;font-size:14px;line-height:1.65;}
+.top{position:sticky;top:0;z-index:900;height:52px;display:flex;align-items:center;gap:16px;padding:0 24px;background:rgba(8,14,28,.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);}
+.top .brand{font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--gold);white-space:nowrap;}
+.mtabs{display:flex;gap:8px;margin-left:8px;}
+.mtab{font-size:13px;font-weight:700;padding:7px 20px;border-radius:20px;cursor:pointer;border:1px solid var(--border2);background:rgba(255,255,255,.05);color:var(--text);}
+.mtab:hover{color:#fff;background:rgba(255,255,255,.09);}
+.mtab.active{background:var(--gold);color:#000;border-color:var(--gold);}
+.mtab-chg{color:var(--green);background:var(--green-bg);border-color:var(--green-border);}
+.mtab-chg:hover{color:var(--green);background:rgba(52,211,153,.16);}
+.mtab-chg.active{background:var(--green);color:#04140d;border-color:var(--green);}
+.mtab-badge{display:inline-block;min-width:17px;padding:0 5px;margin-left:4px;border-radius:9px;background:rgba(255,255,255,.14);font-size:11px;line-height:16px;text-align:center;vertical-align:1px;}
+.mtab-chg.active .mtab-badge{background:rgba(0,0,0,.22);}
+.wrap{max-width:1180px;margin:0 auto;padding:26px 24px 80px;}
+.mview{display:none;} .mview.active{display:block;}
+
+.doc-header{background:linear-gradient(135deg,#0d1a30,#10213f 60%,#0c1829);border:1px solid var(--border2);border-radius:16px;padding:30px 36px;margin-bottom:24px;position:relative;overflow:hidden;}
+.doc-header::after{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(245,186,53,.06),transparent 70%);}
+.doc-eyebrow{display:inline-flex;gap:6px;font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--gold);background:var(--gold-bg);border:1px solid var(--gold-border);border-radius:4px;padding:3px 10px;margin-bottom:14px;}
+.doc-title{font-size:24px;font-weight:800;color:#fff;margin-bottom:6px;}
+.doc-title em{color:var(--gold);font-style:normal;}
+.doc-desc{font-size:13.5px;color:var(--text2);margin-bottom:18px;}
+.doc-meta{display:flex;flex-wrap:wrap;gap:10px;}
+.meta-chip{font-size:12px;color:var(--text2);background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:5px 12px;}
+.meta-chip strong{color:var(--text);}
+
+.stabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:22px;border-bottom:1px solid var(--border);padding-bottom:10px;}
+.stab{font-size:12.5px;padding:7px 15px;border-radius:8px;cursor:pointer;color:var(--text);background:rgba(255,255,255,.04);border:1px solid var(--border2);font-weight:600;}
+.stab:hover{color:#fff;background:rgba(255,255,255,.09);}
+.stab.active{color:var(--gold);background:var(--gold-bg);border-color:var(--gold-border);font-weight:700;}
+.spanel{display:none;} .spanel.active{display:block;}
+.panel-title{font-size:18px;font-weight:800;color:#fff;margin-bottom:4px;}
+.panel-sub{font-size:12.5px;color:var(--text3);margin-bottom:18px;}
+
+.sub-title{font-size:14px;font-weight:700;color:var(--gold2);margin:20px 0 10px;display:flex;align-items:center;gap:8px;}
+.sub-title::before{content:'';width:4px;height:15px;background:var(--gold);border-radius:2px;}
+.badge{display:inline-flex;gap:4px;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:4px;}
+.badge-new{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);}
+.badge-change{background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-border);}
+.badge-del{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);}
+.badge-clr{background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-border);}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin-bottom:14px;}
+.card-title{font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--text2);margin-bottom:12px;display:flex;gap:8px;align-items:center;}
+.spec-table,.data-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+.spec-table tr{border-bottom:1px solid var(--border);}.spec-table tr:last-child{border-bottom:none;}
+.spec-table td:first-child{width:120px;font-size:12px;color:var(--text2);font-weight:600;padding:9px 12px;background:rgba(255,255,255,.02);vertical-align:top;white-space:nowrap;}
+.spec-table td:last-child{padding:9px 12px;}
+.data-table th{background:#0c1828;color:var(--text2);font-weight:600;text-align:left;padding:8px 11px;border-bottom:1px solid var(--border);white-space:nowrap;}
+.data-table td{padding:8px 11px;border-bottom:1px solid var(--border);vertical-align:top;}
+.data-table tr:hover td{background:rgba(255,255,255,.02);}
+.callout{border-radius:9px;padding:12px 15px;margin:10px 0;display:flex;gap:9px;align-items:flex-start;font-size:12.5px;}
+.callout.info{background:var(--blue-bg);border:1px solid var(--blue-border);}
+.callout.warn{background:var(--gold-bg);border:1px solid var(--gold-border);}
+.callout.tip{background:var(--green-bg);border:1px solid var(--green-border);}
+.callout.danger{background:var(--red-bg);border:1px solid var(--red-border);}
+.callout b,.callout strong{color:var(--gold2);}
+.rule-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.rule-item{display:flex;gap:10px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12.5px;}
+.rule-num{width:20px;height:20px;flex-shrink:0;background:var(--card2);border:1px solid var(--border2);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text2);}
+.rule-text strong{color:var(--gold);}
+code{background:var(--gold-bg);color:var(--gold2);padding:1px 6px;border-radius:4px;font-size:12px;}
+.pill{display:inline-block;font-size:11.5px;padding:2px 8px;border-radius:20px;}
+.pill-on{background:var(--green-bg);color:var(--green);}
+
+/* 图文对照 */
+.mod{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px;}
+.mod-head{background:linear-gradient(90deg,#0e1b30,#12203c);padding:13px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);}
+.mod-head .n{width:26px;height:26px;border-radius:6px;background:var(--gold-bg);border:1px solid var(--gold-border);color:var(--gold);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.mod-head h3{font-size:14.5px;color:#fff;font-weight:700;}
+.io{display:grid;grid-template-columns:330px 1fr;}
+.io-img{background:#07111f;padding:16px;display:flex;flex-direction:column;gap:9px;align-items:center;border-right:1px solid var(--border2);}
+.io-cap{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);background:var(--gold-bg);border:1px solid var(--gold-border);border-radius:4px;padding:2px 9px;align-self:flex-start;}
+.io-img img{width:100%;border-radius:10px;box-shadow:0 6px 28px rgba(0,0,0,.6);border:1px solid var(--border2);display:block;}
+/* 图上文下（后台截图放大用） */
+.io.io-stack{grid-template-columns:1fr;}
+.io.io-stack .io-img{border-right:none;border-bottom:1px solid var(--border2);padding:22px 22px 26px;}
+.io.io-stack .io-img img{width:100%;}
+.io-spec{padding:18px 22px;min-width:0;}
+@media(max-width:820px){.io{grid-template-columns:1fr;} .io-img{border-right:none;border-bottom:1px solid var(--border2);}}
+
+/* 流程/时间轴 */
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:6px 0;background:#0a1424;border:1px solid var(--border2);border-radius:10px;padding:34px 16px 16px;overflow-x:auto;}
+.flow-node{padding:9px 13px;border:1px solid var(--border2);border-radius:8px;background:#0d1930;font-size:12px;font-weight:600;white-space:nowrap;text-align:center;}
+.flow-node.start{border-color:var(--blue-border);background:var(--blue-bg);color:var(--blue);}
+.flow-node.end{border-color:var(--green-border);background:var(--green-bg);color:var(--green);}
+.flow-node.warn{border-color:var(--red-border);background:var(--red-bg);color:var(--red);}
+.flow-arrow{color:var(--text3);padding:0 24px;position:relative;white-space:nowrap;}
+.flow-arrow small{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:13px;font-weight:600;color:var(--gold2);white-space:nowrap;}
+.timeline{display:flex;background:#0a1424;border:1px solid var(--border2);border-radius:10px;overflow:hidden;margin:8px 0;}
+.tl-seg{flex:1;padding:13px 15px;border-right:1px solid var(--border);}.tl-seg:last-child{border-right:none;}
+.tl-seg b{display:block;color:var(--gold2);font-size:12px;margin-bottom:3px;}.tl-seg span{font-size:11.5px;color:var(--text2);}
+
+/* 原型预览 */
+.proto-wide{width:100vw;position:relative;left:50%;transform:translateX(-50%);}
+.proto-wide-inner{max-width:1760px;margin:0 auto;padding:0 24px;}
+.proto-toggle{display:flex;gap:8px;margin-bottom:12px;}
+.proto-btn{font-size:12.5px;font-weight:700;padding:7px 18px;border-radius:8px;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--text2);}
+.proto-btn.active{background:var(--gold);color:#000;border-color:var(--gold);}
+.proto-stage{border:1px solid var(--border2);border-radius:12px;overflow-x:auto;background:#0a0918;}
+.proto-frame{width:100%;min-width:1400px;border:none;display:none;background:#0a0918;}
+.proto-frame.fe{height:900px;} .proto-frame.be{height:1500px;}
+.proto-frame.active{display:block;}
+.note{font-size:12px;color:var(--text3);margin-top:8px;}
+
+/* Sports Voucher 补充：同一区块多张截图 */
+.io-img img+.io-cap{margin-top:10px;}
+.io-img img{max-width:300px;}
+.io.io-stack .io-img img{max-width:100%;}
+.mod>.io-spec{padding:18px 22px;}
+/* 流程箭头：标签放进箭头本身，宽度随标签撑开，避免压到后方节点 */
+.flow{padding:16px 16px;gap:10px 0;}
+.flow-arrow{display:flex;flex-direction:column;align-items:center;gap:2px;padding:0 22px;}
+.flow-arrow small{position:static;transform:none;font-size:12.5px;line-height:1.3;}
+/* 内嵌原型一律以浅色显示（不跟随规格页的深色） */
+.proto-frame{color-scheme:light;}
+.proto-frame.be{background:#f5f7fa;}
+.proto-stage:has(.proto-frame.be.active){background:#f5f7fa;}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <span class="brand">🎫 SPORTS VOUCHER 规格</span>
+  <div class="mtabs">
+    <button class="mtab active" data-m="spec">规则说明</button>
+    <button class="mtab" data-m="proto">原型预览</button>
+    <button class="mtab mtab-chg" data-m="chg">🔧 本次调整</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="doc-header">
+    <div class="doc-eyebrow">📋 需求规格文件</div>
+    <h1 class="doc-title">Sports Voucher · <em>体育投注券</em></h1>
+    <p class="doc-desc">营运可发放「固定金额、单次使用、限时有效」的体育投注券给会员；会员在体育单关投注时直接用券下注、不动用自己的余额。用于赛事营销（如世界杯开幕赠券）、拉新与回流，并可在后台追踪每张券的状态。</p>
+    <div class="doc-meta">
+      <div class="meta-chip"><span>版本</span> <strong>v1</strong></div>
+      <div class="meta-chip"><span>后台位置</span> <strong>积分商城 › 优惠券管理／发券审核</strong></div>
+      <div class="meta-chip"><span>前台位置</span> <strong>体育 › Bet Slip／My Bets Slip</strong></div>
+      <div class="meta-chip"><span>关联原型</span> <strong>前台 · 后台</strong></div>
+    </div>
+  </div>
+
+
+  <!-- ===================== 主分页：规则说明 ===================== -->
+  <div class="mview active" data-m="spec">
+    <div class="stabs">
+      <button class="stab active" data-s="common">通用规则</button>
+      <button class="stab" data-s="fe">前台规则</button>
+      <button class="stab" data-s="be">后台规则</button>
+      <button class="stab" data-s="logic">判断逻辑</button>
+      <button class="stab" data-s="scn">情境穷举</button>
+    </div>
+
+    <!-- 通用规则 -->
+    <div class="spanel active" data-s="common">
+      <div class="panel-title">通用规则</div>
+      <div class="panel-sub">名词定义 · 券的生命周期 · 使用与退回 · 派彩与统计口径 · 系统开关</div>
+
+      <div class="sub-title">名词定义</div>
+      <div class="card" style="padding:0;overflow:hidden;"><table class="spec-table">
+        <tr><td>体育投注券</td><td>后台称「体育投注券」，前台显示 <code>SportsVoucher</code>。属于「优惠券」的一个类别（与存送比例券、输返券、中奖加奖券并列）。</td></tr>
+        <tr><td>单次投注金额</td><td>券面额。用券下注的<strong>固定金额</strong>，会员不可修改；<strong>整数</strong>，币种依券的币种。</td></tr>
+        <tr><td>使用次数</td><td><strong>一张券只能使用 1 次</strong>，下注成功即变为「已使用」。</td></tr>
+        <tr><td>有效期</td><td>单位<strong>小时</strong>。自券<strong>发放到会员账户</strong>起算；到期未使用即作废。到期时间＝发放时间＋有效期，精确到分钟。</td></tr>
+        <tr><td>投注限额</td><td><ul style="margin:4px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px"><li>该盘口的最小／最大投注金额，沿用现有限额来源。</li><li>前台显示 <code>Limit {最小限额}-{最大限额}</code>，数值依各盘口实际限额带入（如 <code>Limit 1-9,999</code>、<code>Limit 200-800</code>）。</li></ul></td></tr>
+        <tr><td>预约投注</td><td>前台按钮 <code>Booking</code>。设定预约赔率，盘口赔率匹配成功时才成交。</td></tr>
+      </table></div>
+
+      <div class="sub-title">券的生命周期 <span class="badge badge-new">新增</span></div>
+      <div class="flow">
+        <div class="flow-node start">发券审核通过</div><div class="flow-arrow"><small>入账</small>→</div>
+        <div class="flow-node">未使用</div><div class="flow-arrow"><small>下注成功</small>→</div>
+        <div class="flow-node end">已使用</div><div class="flow-arrow"><small>注单取消／作废</small>→</div>
+        <div class="flow-node">恢复为未使用<br><span style="font-weight:400;color:var(--text2)">有效期重新计算</span></div>
+      </div>
+      <div class="callout danger"><span>⛔</span><div style="width:100%"><b>到期</b><ul style="margin:4px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px"><li>「未使用」的券到期即变为<b>已过期</b>。</li><li><b>体育投注页移除不显示</b>；My voucher 移至 <code>Expired</code>。</li></ul><div style="margin-top:6px"><b>已使用</b></div><ul style="margin:4px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px"><li>下注成功后即从体育投注页清单<b>移除不显示</b>。</li><li>My voucher 移至 <code>Used</code>。</li><li>后台状态维持「已使用」，到期后也不改为「已过期」。</li></ul></div></div>
+      <div class="callout info"><span>📌</span><div>每张券在后台「优惠券记录」是<b>一笔记录</b>，状态只有三种：<b>未使用／已使用／已过期</b>（「待结算」不适用于体育投注券）。</div></div>
+
+      <div class="sub-title">使用、退回与派彩 <span class="badge badge-new">新增</span></div>
+      <div class="card" style="padding:0;overflow:hidden;"><table class="data-table"><thead><tr><th style="width:300px">情境</th><th>券</th><th>会员余额</th></tr></thead><tbody>
+        <tr><td>用券下注，投注成功</td><td><strong>变为已使用</strong></td><td>不检查、不扣除</td></tr>
+        <tr><td>投注失败（<code>Betting failed</code>）</td><td>仍为未使用</td><td>不变</td></tr>
+        <tr><td>赔率已变更导致失败 → 按 <code>Accept and bet</code> 重送成功</td><td>重送成功时变为已使用</td><td>不变</td></tr>
+        <tr><td>预约投注：送出预约</td><td>仍为未使用</td><td>不变</td></tr>
+        <tr><td>预约投注：预约赔率匹配成功（成交）</td><td><strong>成交当下变为已使用</strong></td><td>不变</td></tr>
+        <tr><td>预约投注：成交当下券已过期或已使用</td><td>不变；<strong>此预约单状态变更为失败</strong>（注单页 Expired · <code>Booking failed</code>）</td><td>不变</td></tr>
+        <tr><td>预约投注：未成交、取消</td><td>仍为未使用</td><td>不变</td></tr>
+        <tr><td>已成交的用券注单被取消／作废（Void、赛事取消等）</td><td><strong>退回次数：原券恢复为未使用</strong>（同一张券、券 ID 不变），<strong>有效期自退回时间重新计算</strong>（小时数同原券配置）</td><td>不变</td></tr>
+        <tr><td>用券注单结算 · 赢</td><td>—</td><td>派彩＝<strong>券面额 × 赔率（含本金）</strong>，入会员余额</td></tr>
+        <tr><td>用券注单结算 · 赢半 <span class="badge badge-new">新增</span></td><td>—</td><td>派彩＝<strong>券面额 ÷ 2 × 赔率＋券面额 ÷ 2</strong>，入会员余额</td></tr>
+        <tr><td>用券注单结算 · 输</td><td>—</td><td>无派彩</td></tr>
+        <tr><td>用券注单结算 · 输半 <span class="badge badge-new">新增</span></td><td>不退回次数</td><td><strong>退回一半现金</strong>（券面额 ÷ 2），入会员余额</td></tr>
+      </tbody></table></div>
+
+      <div class="sub-title">输半／赢半（Half Lose／Half Win）说明 <span class="badge badge-new">新增</span></div>
+      <div class="callout info"><span>ℹ️</span><div style="width:100%"><b>什么是「输半」「赢半」</b><ul style="margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px"><li>出现在亚洲盘的四分之一盘口（如让球 <code>0/0.5</code>、大小 <code>2/2.5</code>）：投注额一半算在较小盘、一半算在较大盘，赛果落在两者之间时：<strong>输半</strong>＝一半投注额判输、另一半退回；<strong>赢半</strong>＝一半投注额判赢、另一半退回。</li><li>后台备注显示 <code>Settle:half lose</code>／<code>Settle:half win</code>。</li><li>一般注单范例：₱200 输半 → 输 ₱100、退回 ₱100，输赢金额 <code>-100.00</code>；₱200 @1.90 赢半 → 赢 ₱90、退回 ₱100，输赢金额 <code>90.00</code>。</li></ul></div></div>
+      <div class="callout danger"><span>⛔</span><div style="width:100%"><b>用券注单遇到「输半」</b><ul style="margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px"><li>券已使用，<strong>不退回次数</strong>（与注单取消／作废会恢复为未使用不同）。</li><li><strong>退回一半现金</strong>（券面额 ÷ 2）入会员余额。范例：₱100 券输半 → 退回 ₱50。</li><li>输赢正常显示：前台 <code>Win/Lose</code>、后台「输赢金额」为 <code>-50.00</code>。</li></ul></div></div>
+      <div class="callout tip"><span>🧮</span><div style="width:100%"><b>用券注单遇到「赢半」</b><ul style="margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px"><li>派彩＝<strong>券面额 ÷ 2 × 赔率＋券面额 ÷ 2</strong>：赢的一半按赔率派彩，另一半本金也一并退回。</li><li>范例：₱100 券 @1.90 赢半 → <code>50 × 1.90 ＋ 50 ＝ 145</code> 入余额。</li><li>输赢正常显示：前台 <code>Win/Lose</code>、后台「输赢金额」为 <code>45.00</code>（145 − 100）。</li></ul></div></div>
+
+      <div class="sub-title">用券注单派彩与输赢（结算结果一览） <span class="badge badge-new">新增</span></div>
+      <div class="card" style="padding:0;overflow:hidden;"><table class="data-table"><thead><tr><th>结算结果</th><th>入会员余额</th><th>输赢（正常显示）</th><th>范例（₱100 券）</th></tr></thead><tbody>
+        <tr><td>赢</td><td>券面额 × 赔率</td><td>派彩 − 券面额</td><td>@7.40：入余额 <code>740</code>，输赢 <code>640.00</code></td></tr>
+        <tr><td>赢半</td><td>券面额 ÷ 2 × 赔率 ＋ 券面额 ÷ 2</td><td>派彩 − 券面额</td><td>@1.90：入余额 <code>145</code>，输赢 <code>45.00</code></td></tr>
+        <tr><td>输</td><td><code>0</code></td><td>派彩（＝ <code>0</code>）</td><td>入余额 <code>0</code>，输赢 <code>0.00</code></td></tr>
+        <tr><td>输半</td><td>券面额 ÷ 2（退回一半现金）</td><td>−券面额 ÷ 2</td><td>入余额 <code>50</code>，输赢 <code>-50.00</code></td></tr>
+        <tr><td>注单取消／作废</td><td><code>0</code>（原券恢复为未使用）</td><td><code>0</code></td><td>入余额 <code>0</code>，输赢 <code>0.00</code></td></tr>
+      </tbody></table></div>
+      <div class="callout info"><span>ℹ️</span><div>前台 <code>Win/Lose</code>、注单页 <code>Total Win/Loss</code>、后台体育注单「输赢金额」、各报表的输赢栏位，皆以此表的「输赢」为准（用券注单「输」＝派彩为 <code>0</code>，其余与一般注单的算法相同）。</div></div>
+
+      <div class="sub-title">投注统计口径 <span class="badge badge-new">新增</span></div>
+      <div class="card" style="padding:0;overflow:hidden;"><table class="data-table"><thead><tr><th style="width:300px">项目</th><th>用券注单</th></tr></thead><tbody>
+        <tr><td>Total Bet Amount（总投注金额）</td><td><span class="pill pill-on">计入</span>　以券面额计</td></tr>
+        <tr><td>Total Valid Bet（有效投注）</td><td><strong style="color:var(--red)">不计入</strong></td></tr>
+        <tr><td>打码量</td><td><strong style="color:var(--red)">不计入</strong></td></tr>
+        <tr><td>Win/Lose（注单页单张卡片）</td><td><span class="pill pill-on">计入</span>　正常显示（见上方「结算结果一览」）</td></tr>
+        <tr><td>注单页汇总列</td><td>逐项见前台规则 10「汇总列」</td></tr>
+      </tbody></table></div>
+
+      <div class="sub-title">优惠券系统开关 <span class="badge badge-change">异动</span></div>
+      <div class="callout danger"><span>🚫</span><div style="width:100%">后台「优惠券管理 › 优惠券配置」的<b>「优惠券系统开关」关闭</b>时：<ul style="margin:4px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px"><li>前台所有玩法投注页的 <b>SportsVoucher 栏位同步隐藏</b>，只能一般金额投注。</li><li>会员已领取的券暂时无法使用，有效期照常计算。</li><li>开关重新开启后恢复显示。</li></ul></div></div>
+
+      <div class="sub-title">共通规则</div>
+      <div class="card"><ul class="rule-list">
+        <li class="rule-item"><div class="rule-num">1</div><div class="rule-text">适用玩法：<strong>单关（早盘／滚球）、单关预约</strong>。</div></li>
+        <li class="rule-item"><div class="rule-num">2</div><div class="rule-text">不适用玩法：<strong>OUTRIGHTS、ENDING CARD、ENDING GAME、串关</strong>，不可使用体育投注券。</div></li>
+        <li class="rule-item"><div class="rule-num">3</div><div class="rule-text">一次下注只能使用<strong>一张券</strong>；<strong>一张券只能使用 1 次</strong>。</div></li>
+        <li class="rule-item"><div class="rule-num">4</div><div class="rule-text">用券下注<strong>不检查余额</strong>，余额为 0 也可下注。</div></li>
+        <li class="rule-item"><div class="rule-num">5</div><div class="rule-text">券面额需在该盘口<strong>投注限额内</strong>才可选；限额外的券反灰不可选（不显示提示文字），并<strong>排序在清单下方</strong>。</div></li>
+        <li class="rule-item"><div class="rule-num">6</div><div class="rule-text">编辑券配置<strong>不影响已发出的券</strong>；之后发出的是新券，与旧券无关。删除券配置后已发出的券仍可使用到期。</div></li>
+      </ul></div>
+    </div>
+
+    <!-- 前台规则（图文对照） -->
+    <div class="spanel" data-s="fe">
+      <div class="panel-title">前台规则</div>
+      <div class="panel-sub">图文对照 · 左为前台原型截图、右为对应规格</div>
+
+      <div class="mod"><div class="mod-head"><span class="n">1</span><h3>投注页 · SportsVoucher 开关 <span class="badge badge-new">新增</span></h3></div>
+        <div class="io">
+          <div class="io-img"><span class="io-cap">前台截图 · 开关关闭</span><span class="io-cap">前台截图 · 开关开启</span><span class="io-cap">前台截图 · 优惠券系统关闭</span></div>
+          <div class="io-spec">
+            <ul class="rule-list">
+              <li class="rule-item"><div class="rule-num">1</div><div class="rule-text"><strong>位置：</strong>投注选项色块下方、金额栏上方。内容：券图示＋<code>SportsVoucher</code>＋<code>n available</code>（例 <code>4 available</code>）＋开关。</div></li>
+              <li class="rule-item"><div class="rule-num">2</div><div class="rule-text"><strong>n 的计算：</strong>同时符合「<strong>未过期、未使用、单次投注金额在本盘口限额内</strong>」的券张数；限额外的券不计入。</div></li>
+              <li class="rule-item"><div class="rule-num">3</div><div class="rule-text"><strong>预设：</strong>每次打开投注页，开关一律为<strong>关闭</strong>。</div></li>
+              <li class="rule-item"><div class="rule-num">4</div><div class="rule-text"><strong>开启：</strong>隐藏金额输入栏、数字键盘与 <code>Balance</code>；改显示券清单（见前台规则 2）与 <code>To Win</code>。</div></li>
+              <li class="rule-item"><div class="rule-num">5</div><div class="rule-text"><strong>关闭：</strong>清除已选的券，恢复金额输入栏、数字键盘、<code>To Win</code> 与 <code>Balance</code>。</div></li>
+              <li class="rule-item"><div class="rule-num">6</div><div class="rule-text"><span class="badge badge-change">异动</span> 原 <code>Parlay</code> 按钮位置改为 <code>+ Booking</code>；移除优惠提示条。</div></li>
+            </ul>
+            <div class="sub-title">开关状态</div>
+            <table class="data-table"><thead><tr><th>条件</th><th>开关</th><th>n available</th></tr></thead><tbody>
+              <tr><td>单关，盘口开放</td><td>可操作</td><td>显示</td></tr>
+              <tr><td>单关，盘口已关闭（见前台规则 5）</td><td>反灰不可点</td><td>显示</td></tr>
+              <tr><td>OUTRIGHTS（见前台规则 6）</td><td>反灰不可点</td><td>不显示</td></tr>
+              <tr><td>没有任何可用券</td><td>可操作；开启后若完全没有券显示缺省页，只有限额外的券则显示反灰清单（见前台规则 2）</td><td><code>0 available</code></td></tr>
+              <tr><td>ENDING CARD、ENDING GAME、串关</td><td colspan="2">不显示此栏位（见前台规则 7、8、9）</td></tr>
+              <tr><td>后台优惠券系统开关关闭</td><td colspan="2">体育投注页的 SportsVoucher <strong>整个栏位隐藏</strong>（所有玩法）</td></tr>
+            </tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod"><div class="mod-head"><span class="n">2</span><h3>券清单 · 排序 · 限额 <span class="badge badge-new">新增</span></h3></div>
+        <div class="io">
+          <div class="io-img"><span class="io-cap">前台截图 · 选中券</span><span class="io-cap">前台截图 · 限额 200–800</span><span class="io-cap">前台截图 · 没有券（缺省页）</span></div>
+          <div class="io-spec">
+            <div class="sub-title">卡片内容（由左至右）</div>
+            <table class="spec-table">
+              <tr><td>左侧图示</td><td>券图示（图示区块加大）；限额外的券反灰不可选（见下方「限额判断」）。</td></tr>
+              <tr><td>中间第一行</td><td>固定文案 <code>Sports Voucher</code>（体育投注券英文名称），字级加大。</td></tr>
+              <tr><td>中间第二行 · 效期倒数</td><td><ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px">
+                <li>时钟图示＋剩余有效时间，依后台「有效期（小时）」自发券时起算倒数。</li>
+                <li><strong>剩余 ≥ 24 小时：</strong>显示「天数<code>d</code> <code>hh:mm:ss</code>」，例 <code>9d 19:58:30</code>＝9 天 19 小时 58 分 30 秒；刚好 1 天显示 <code>1d 00:00:00</code>；天数不补 0。</li>
+                <li><strong>未满 24 小时：</strong>显示 <code>hh:mm:ss</code>，例 <code>23:59:59</code>、<code>00:44:32</code>。</li>
+                <li><strong>每秒倒数更新</strong>。</li>
+                <li>倒数至 <code>00:00:00</code> 时该券<strong>自动从清单移除</strong>（已选则取消选择）。</li>
+              </ul></td></tr>
+              <tr><td>下方 · 不适用玩法备注 <span class="badge badge-new">新增</span></td><td>效期倒数下方显示 <code>Not for: Outrights, Ending Card, Ending Game, Parlay</code>（对应通用规则「不适用玩法」）；横跨卡片中间至右侧，过长自动换行；每张券都显示，限额外的券同步反灰。</td></tr>
+              <tr><td>右侧金额</td><td>单次投注金额，位于卡片<strong>右侧</strong>，<strong>红字、字级加大</strong>；例 <code>₱100</code>、<code>₱20,000</code>：币种符号＋整数＋千分位、不显示小数；最多 9 位数，单行完整显示。</td></tr>
+                          </table>
+            <div class="sub-title">交互</div>
+            <ul class="rule-list">
+              <li class="rule-item"><div class="rule-num">1</div><div class="rule-text">清单区固定约 <strong>3 张卡</strong>高度，超过可上下滑动；选券或画面更新时保留滑动位置。</div></li>
+              <li class="rule-item"><div class="rule-num">2</div><div class="rule-text">点可用的券 → <strong>选中</strong>；同时只能选 1 张；再点同一张取消选择。</div></li>
+              <li class="rule-item"><div class="rule-num">3</div><div class="rule-text">用券下注成功后，该券<strong>即从清单移除</strong>（一张券只能使用 1 次）；该注单若被取消／作废，券<strong>重新出现在清单</strong>，依新的到期时间倒数。<strong>过期的券在体育投注页移除不显示</strong>。</div></li>
+              <li class="rule-item"><div class="rule-num">4</div><div class="rule-text"><strong>限额外的券：</strong>依用券规范，单次投注金额不在本盘口限额内的券<strong>反灰、不可点选</strong>，<strong>不显示</strong>限额提示文字，并排在清单最后（见下方「排序」「限额判断」）。</div></li>
+            </ul>
+            <div class="sub-title">排序 <span class="badge badge-change">异动</span></div>
+            <div class="callout warn"><span>↕️</span><div>可选的券在上，依<b>到期时间由近到远</b>；<b>不能使用的券（限额外）排在最后</b>，同样依到期时间由近到远。</div></div>
+            <div class="sub-title">限额判断</div>
+            <table class="data-table"><thead><tr><th>单次投注金额 vs 本盘口限额</th><th>卡片</th><th>位置</th><th>计入 n</th></tr></thead><tbody>
+              <tr><td>最小 ≤ 金额 ≤ 最大</td><td>可选</td><td>上方</td><td><span class="pill pill-on">是</span></td></tr>
+              <tr><td>金额 &lt; 最小限额</td><td>反灰、不可点</td><td>最后</td><td>否</td></tr>
+              <tr><td>金额 &gt; 最大限额</td><td>反灰、不可点</td><td>最后</td><td>否</td></tr>
+            </tbody></table>
+            <div class="callout info"><span>ℹ️</span><div>投注页开着时若限额改变、已选的券变成限额外 → <b>自动取消选择</b>。</div></div>
+            <div class="sub-title">缺省页 <span class="badge badge-new">新增</span></div>
+            <ul class="rule-list">
+              <li class="rule-item"><div class="rule-num">1</div><div class="rule-text"><strong>条件：</strong>会员<strong>没有任何体育投注券</strong>（未过期且未使用的券为 0 张），开启 SportsVoucher 开关后，券清单区显示缺省页。</div></li>
+              <li class="rule-item"><div class="rule-num">2</div><div class="rule-text"><strong>内容：</strong>缺省图示＋文案 <code>There does not have any content.</code>，沿用「我的优惠券」空页的图示样式；区块高度同券清单。</div></li>
+              <li class="rule-item"><div class="rule-num">3</div><div class="rule-text">只有限额外的券时<strong>不显示缺省页</strong>，照常显示反灰的券。</div></li>
+              <li class="rule-item"><div class="rule-num">4</div><div class="rule-text">显示缺省页时 <code>To Win</code> 为 <code>0.00</code>、<code>Place Bet</code> 反灰不可点；关闭开关即恢复一般金额投注。</div></li>
+            </ul>
+            <div class="sub-title">To Win</div>
+            <table class="data-table"><thead><tr><th>情况</th><th>To Win</th><th>右侧</th></tr></thead><tbody>
+              <tr><td>开关关闭</td><td>输入金额 × 赔率</td><td><code>Balance</code></td></tr>
+              <tr><td>开关开启、未选券</td><td><code>0.00</code>（Place Bet 反灰）</td><td>不显示</td></tr>
+              <tr><td>开关开启、已选券</td><td>券面额 × 赔率</td><td>不显示（无 Balance、无限额）</td></tr>
+              <tr><td>开启预约</td><td>以<strong>预约赔率</strong>计算</td><td>同上</td></tr>
+            </tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod"><div class="mod-head"><span class="n">3</span><h3>下注与投注结果 <span class="badge badge-change">异动</span></h3></div>
+        <div class="io">
+          <div class="io-img"><span class="io-cap">前台截图 · 处理中</span><span class="io-cap">前台截图 · 用券成功</span><span class="io-cap">前台截图 · 投注失败</span><span class="io-cap">前台截图 · 赔率已变更</span></div>
+          <div class="io-spec">
+            <div class="sub-title">Place Bet 检查（开关开启时）</div>
+            <ul class="rule-list">
+              <li class="rule-item"><div class="rule-num">1</div><div class="rule-text">开启 SportsVoucher 但<strong>未选券</strong>：<code>Place Bet</code> <strong>反灰不可点</strong>；选券后恢复可点，取消选择又变回反灰。</div></li>
+              <li class="rule-item"><div class="rule-num">2</div><div class="rule-text">开启预约且预约赔率 ＜ 当前赔率 → 预约栏红框＋错误文案，<code>Place Bet</code> <b>反灰不可点</b>（见前台规则 4）。</div></li>
+              <li class="rule-item"><div class="rule-num">3</div><div class="rule-text">盘口已关闭 → <code>Place Bet</code> 反灰（见前台规则 5）。</div></li>
+              <li class="rule-item"><div class="rule-num">4</div><div class="rule-text">券面额已由前台规则 2 保证在限额内，送出时<strong>不再做限额判断</strong>；<strong>不检查余额</strong>。</div></li>
+            </ul>
+            <div class="sub-title">结果状态</div>
+            <table class="data-table"><thead><tr><th>状态</th><th>提示文案</th><th>按钮</th><th>券</th></tr></thead><tbody>
+              <tr><td>处理中</td><td><code>The order is being processed......</code></td><td>Details、Other betting 皆反灰</td><td>不变</td></tr>
+              <tr><td>成功</td><td><code>Your Bet Was Placed Successfully</code></td><td><code>Details</code> → 注单页 Sports／Unsettled；<code>Other betting</code> → 关闭投注页</td><td><strong>变为已使用</strong></td></tr>
+              <tr><td>失败</td><td><code>Betting failed, please try again.</code></td><td><code>Back</code> → 回投注页（开关重置为关闭）；<code>Other betting</code> → 关闭</td><td>仍为未使用</td></tr>
+              <tr><td>赔率已变更</td><td><code>Betting failed, Odds have changed.</code></td><td><code>Back</code>；红色 <code>Accept and bet</code> → 以新赔率重送</td><td>仍为未使用（重送成功才变为已使用）</td></tr>
+            </tbody></table>
+            <div class="sub-title">结果资讯列 <span class="badge badge-change">异动</span></div>
+            <table class="spec-table">
+              <tr><td>左上</td><td><code>To Win: 182.00</code></td></tr>
+              <tr><td>右上</td><td>一般下注 <code>Balance: 168.55</code>；<strong>用券下注改为 <code>SportsVoucher: 100.00</code></strong>（本次使用的券面额）。</td></tr>
+              <tr><td>第二行</td><td><code>Order Number: B17919…</code>（过长<strong>不换行</strong>，超出以「…」截断）／下注时间 <code>MM-DD-YYYY HH:mm:ss</code>。</td></tr>
+              <tr><td>第三行</td><td>仅预约：<code>Reservation Odds: @1.92</code>。</td></tr>
+              <tr><td>选项色块</td><td>保留在结果页上方：LIVE 标记（滚球）、玩法、选项、<code>EU Odds</code>。</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod"><div class="mod-head"><span class="n">4</span><h3>预约投注 Booking × SportsVoucher <span class="badge badge-new">新增</span></h3></div>
+        <div class="io">
+          <div class="io-img"><span class="io-cap">前台截图 · 用券＋预约</span><span class="io-cap">前台截图 · 预约赔率过低</span><span class="io-cap">前台截图 · 预约成功</span></div>
+          <div class="io-spec">
+            <ul class="rule-list">
+              <li class="rule-item"><div class="rule-num">1</div><div class="rule-text"><strong>按钮：</strong><code>+ Booking</code> 位于原 Parlay 按钮位置（Place Bet 左侧）；点击开启预约，按钮变 <code>Cancel</code>；再点关闭。</div></li>
+              <li class="rule-item"><div class="rule-num">2</div><div class="rule-text"><strong>预约赔率栏</strong> <code>− @1.92 +</code>：预设＝当前赔率＋0.10；每次 ±0.01；最低 1.01。开关关闭时在金额栏下方；<strong>开关开启时在券清单上方</strong>。</div></li>
+              <li class="rule-item"><div class="rule-num">3</div><div class="rule-text"><strong>预约赔率 ＜ 当前赔率：</strong><ul style="margin:4px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px"><li>预约栏红框，下方红字 <code>The reservation odds cannot be lower than handicap odds</code>。</li><li>显示红字期间 <code>Place Bet</code> <b>反灰不可点</b>。</li><li>调回 ≥ 当前赔率后红框与红字消失，<code>Place Bet</code> 恢复可点。</li></ul></div></li>
+              <li class="rule-item"><div class="rule-num">4</div><div class="rule-text"><strong>成功：</strong><ul style="margin:4px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px"><li>提示 <code>Your Reservation Was Placed Successfully</code>＋<code>Reservation Odds</code>。</li><li>右上显示 <code>SportsVoucher: 金额</code>。</li><li><code>Details</code> → 注单页 Scheduled。</li></ul></div></li>
+              <li class="rule-item"><div class="rule-num">5</div><div class="rule-text"><strong>使用时点：</strong>送出预约时券<strong>仍为未使用</strong>；<strong>预约赔率匹配成功（成交）当下才变为已使用</strong>。</div></li>
+              <li class="rule-item"><div class="rule-num">6</div><div class="rule-text"><strong>不锁定券：</strong><ul style="margin:4px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px"><li>预约期间该券仍显示在券清单，仍可用于其他投注。</li><li><strong>成交当下若该券已过期或已使用，此预约单状态变更为失败</strong>（注单页 Expired · <code>Booking failed</code>）。</li></ul></div></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod"><div class="mod-head"><span class="n">5</span><h3>封盘 / 无可用券 <span class="badge badge-new">新增</span></h3></div>
+        <div class="io">
+          <div class="io-img"><span class="io-cap">前台截图 · 盘口已关闭</span></div>
+          <div class="io-spec">
+            <ul class="rule-list">
+              <li class="rule-item"><div class="rule-num">1</div><div class="rule-text"><strong>盘口已关闭：</strong><ul style="margin:4px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px"><li>选项色块变灰，第二行 <code>Market closed</code>，不显示赔率。</li><li>SportsVoucher 开关反灰。</li><li>金额栏不可输入、无键盘。</li><li><code>Booking</code> 与 <code>Place Bet</code> 反灰。</li></ul></div></li>
+              <li class="rule-item"><div class="rule-num">2</div><div class="rule-text"><strong>没有任何可用的券</strong>（全部用完、过期或从未领取）：开关可开启，开启后显示缺省页（见前台规则 2「缺省页」）。</div></li>
+              <li class="rule-item"><div class="rule-num">3</div><div class="rule-text"><strong>全部券都在限额外：</strong>清单照常显示（全部反灰），<code>0 available</code>。</div></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod"><div class="mod-head"><span class="n">6</span><h3>OUTRIGHTS · 不可使用 <span class="badge badge-new">新增</span></h3></div>
+        <div class="io">
+          <div class="io-img"><span class="io-cap">前台截图 · OUTRIGHTS 投注页</span></div>
+          <div class="io-spec">
+            <ul class="rule-list">
+              <li class="rule-item"><div class="rule-num">1</div><div class="rule-text">点联赛展开候选队伍与赔率，点赔率打开 Bet Slip；玩法显示 <code>Outrights · Winner</code>，标题列显示 <code>OUTRIGHTS</code>。</div></li>
+              <li class="rule-item"><div class="rule-num">2</div><div class="rule-text">SportsVoucher 栏位<strong>显示但反灰不可点</strong>；不显示 <code>n available</code>；<strong>不另显示说明文字</strong>。只能一般金额投注。</div></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod"><div class="mod-head"><span class="n">7</span><h3>ENDING CARD · 不可使用</h3></div>
+        <div class="io">
+          <div class="io-img"><span class="io-cap">前台截图 · ENDING CARD 投注单</span></div>
+          <div class="io-spec">
+            <ul class="rule-list">
+              <li class="rule-item"><div class="rule-num">1</div><div class="rule-text">ENDING CARD 投注单<strong>不显示 SportsVoucher 栏位</strong>，不可使用体育投注券，只能一般金额投注。</div></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod"><div class="mod-head"><span class="n">8</span><h3>ENDING GAME · 不可使用</h3></div>
+        <div class="io">
+          <div class="io-img"><span class="io-cap">前台截图 · Card Details</span></div>
+          <div class="io-spec">
+            <ul class="rule-list">
+              <li class="rule-item"><div class="rule-num">1</div><div class="rule-text">ENDING GAME 投注单（<code>Card Details</code>）<strong>不显示 SportsVoucher 栏位</strong>，不可使用体育投注券，只能一般金额投注。</div></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod"><div class="mod-head"><span class="n">9</span><h3>串关 Parlay · 不可使用 <span class="badge badge-change">异动</span></h3></div>
+        <div class="io">
+          <div class="io-img"><span class="io-cap">前台截图 · 串关模式</span><span class="io-cap">前台截图 · Parlay Bet</span></div>
+          <div class="io-spec">
+            <ul class="rule-list">
+              <li class="rule-item"><div class="rule-num">1</div><div class="rule-text"><strong>切换：</strong>赛事列表右上 <code>SINGLE | P</code> 切换钮切换单关／串关；投注页本身不再有 Parlay 按钮。</div></li>
+              <li class="rule-item"><div class="rule-num">2</div><div class="rule-text"><code>Parlay Bet</code> 页<strong>不显示 SportsVoucher 栏位</strong>，不可使用体育投注券，只能一般金额投注。</div></li>
+              <li class="rule-item"><div class="rule-num">3</div><div class="rule-text"><strong>清空购物车：</strong>串关模式下点 <code>SINGLE | P</code>、<code>OUTRIGHTS</code>、<code>ENDING CARD</code>、<code>ENDING GAME</code> 任一项，串关清单清空。</div></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod"><div class="mod-head"><span class="n">10</span><h3>注单页 My Bets Slip <span class="badge badge-change">异动</span></h3></div>
+        <div class="io">
+          <div class="io-img"><span class="io-cap">前台截图 · Scheduled</span><span class="io-cap">前台截图 · Expired</span><span class="io-cap">前台截图 · Unsettled</span><span class="io-cap">前台截图 · Settled</span><span class="io-cap">前台截图 · 用券赢</span><span class="io-cap">前台截图 · 用券输</span></div>
+          <div class="io-spec">
+            <ul class="rule-list">
+              <li class="rule-item"><div class="rule-num">1</div><div class="rule-text"><strong>用券注单：</strong>卡片右上角显示 <code>SportsVoucher</code> 标记，<strong>四种状态都显示</strong>；Stake 显示券面额。</div></li>
+              <li class="rule-item"><div class="rule-num">2</div><div class="rule-text"><strong>Win/Lose：</strong>用券注单<strong>正常显示</strong>（例 ₱100 @7.40 赢 → <code>640.00</code>；输 → <code>0.00</code>，即输＝派彩），计算见通用规则「结算结果一览」。</div></li>
+            </ul>
+            <div class="sub-title">汇总列 · 用券注单是否计入 <span class="badge badge-change">异动</span></div>
+            <table class="data-table"><thead><tr><th>状态</th><th>栏位（左→右）</th><th>用券注单</th></tr></thead><tbody>
+              <tr><td rowspan="3">Scheduled／Unsettled</td><td><code>Total Bet Amount</code>（总投注金额）</td><td><span class="pill pill-on">计入</span>　以券面额计</td></tr>
+              <tr><td><code>Total Number of Bets</code>（总投注数量）</td><td><span class="pill pill-on">计入</span></td></tr>
+              <tr><td><code>Potential win</code>（最高可赢）</td><td><span class="pill pill-on">计入</span>　以「券面额 × 赔率」计</td></tr>
+              <tr><td rowspan="4">Settled</td><td><code>Total Bet Amount</code>（总投注金额）</td><td><span class="pill pill-on">计入</span>　以券面额计</td></tr>
+              <tr><td><code>Total Valid Bet</code>（总有效投注）</td><td><strong style="color:var(--red)">不计入</strong>（亦不含取消单）</td></tr>
+              <tr><td><code>Total Number of Bets</code>（总投注数量）</td><td><span class="pill pill-on">计入</span></td></tr>
+              <tr><td><code>Total Win/Loss</code>（总输赢）</td><td><span class="pill pill-on">计入</span>　正常计算（各卡 Win/Lose 加总）</td></tr>
+              <tr><td>Expired</td><td colspan="2">不显示汇总列</td></tr>
+            </tbody></table>
+            <div class="callout tip"><span>🧮</span><div style="width:100%"><b>范例（Settled · Today）</b><div style="margin-top:6px">注单：</div><ul style="margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px"><li>现金单 ₱200 输（−200）</li><li>现金单 ₱300 赢（+315）</li><li>用券单 ₱100 输（0，输＝派彩）</li><li>取消单 2 笔（₱200、预约 ₱1,000）</li></ul><div style="margin-top:6px">汇总列结果：</div><ul style="margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px"><li><code>Total Bet Amount 1,800.00</code>（含用券 ₱100）</li><li><code>Total Valid Bet 500.00</code>（不含用券、不含取消单）</li><li><code>Total Number of Bets 5</code></li><li><code>Total Win/Loss 115.00</code>（−200 ＋ 315 ＋ 0）</li></ul></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod"><div class="mod-head"><span class="n">11</span><h3>My voucher · 体育投注券 <span class="badge badge-new">新增</span></h3></div>
+        <div class="io">
+          <div class="io-img"><span class="io-cap">静态示意 · Unused</span><span class="io-cap">静态示意 · Used</span><span class="io-cap">静态示意 · Expired</span></div>
+          <div class="io-spec">
+            <ul class="rule-list">
+              <li class="rule-item"><div class="rule-num">1</div><div class="rule-text"><strong>入口：</strong><ul style="margin:4px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px"><li>沿用既有 <code>My voucher</code> 页（页签 <code>Unused</code>／<code>Unsettled</code>／<code>Used</code>／<code>Expired</code>，括号内为张数）。</li><li>会员获得体育投注券后，此页<strong>同步显示</strong>，与其他券混合列示、沿用既有排序。</li><li>页签张数含体育投注券。</li></ul></div></li>
+              <li class="rule-item"><div class="rule-num">2</div><div class="rule-text"><strong>卡片内容：</strong><ul style="margin:4px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px"><li><b>左侧：</b>体育投注券卡图，底部标签 <code>SPORTS</code>。</li><li><b>中间第一行：</b>券名称，一行显示，过长以「…」截断。</li><li><b>中间第二行：</b><code>For sports betting</code>。</li><li><b>中间标签：</b><code>Issued Date: MM/DD/YYYY HH:mm:ss</code>（发券时间）、<code>Expiry Date: MM/DD/YYYY HH:mm:ss</code>（到期时间）。</li><li><b>右侧：</b>比照输返券版型，依序为<strong>单次投注金额</strong>（只显示金额，例 <code>₱100</code>）、<code>Sports Voucher</code>、按钮。</li></ul></div></li>
+              <li class="rule-item"><div class="rule-num">3</div><div class="rule-text"><strong>使用后：</strong>一张券只能使用 1 次，下注成功后卡片移到 <code>Used</code>，按钮变灰不可点。</div></li>
+            </ul>
+            <div class="sub-title">各页签显示条件</div>
+            <table class="data-table"><thead><tr><th>页签</th><th>显示条件</th><th>按钮</th></tr></thead><tbody>
+              <tr><td><code>Unused</code></td><td>未过期且<strong>未使用</strong>（含注单取消后恢复的券，到期时间为重新计算后的时间）</td><td>蓝色 <code>Use now</code> → <strong>导向体育首页</strong></td></tr>
+              <tr><td><code>Unsettled</code></td><td colspan="2">体育投注券<strong>不显示</strong>于此页签</td></tr>
+              <tr><td><code>Used</code></td><td><strong>已使用</strong></td><td>灰色 <code>Used</code>（不可点）</td></tr>
+              <tr><td><code>Expired</code></td><td>到期时仍未使用</td><td>灰色 <code>Expired</code>（不可点）</td></tr>
+            </tbody></table>
+            <div class="callout info"><span>ℹ️</span><div><code>Used</code>／<code>Expired</code> 卡片<b>不显示</b>右上 ⓘ 说明图示。</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 后台规则（图文对照） -->
+    <div class="spanel" data-s="be">
+      <div class="panel-title">后台规则</div>
+      <div class="panel-sub">图文对照 · 上为后台原型截图、下为对应规格</div>
+
+      <div class="mod"><div class="mod-head"><span class="n">1</span><h3>优惠券配置列表 <span class="badge badge-change">异动</span></h3></div>
+        <div class="io io-stack">
+          <div class="io-img"><span class="io-cap">后台截图 · 优惠券配置</span></div>
+          <div class="io-spec"><ul class="rule-list">
+            <li class="rule-item"><div class="rule-num">1</div><div class="rule-text">筛选「优惠券类别」：全部优惠券／存送比例券／输返券／中奖加奖券／<strong>体育投注券</strong>（新增）。</div></li>
+            <li class="rule-item"><div class="rule-num">2</div><div class="rule-text">列表栏位不变：币种／优惠券名称／优惠券类别／操作人／创建时间／操作。优惠券名称<strong>最多两行，超出以「…」截断</strong>，滑鼠移入显示全名；名称后「+」为多语系翻译（沿用）。</div></li>
+            <li class="rule-item"><div class="rule-num">3</div><div class="rule-text"><strong>优惠券系统开关：</strong>关闭时前台 SportsVoucher 栏位同步隐藏（见通用规则）。</div></li>
+            <li class="rule-item"><div class="rule-num">4</div><div class="rule-text"><strong>删除：</strong>二次确认 <code>确认删除优惠券「名称」吗？删除后无法恢复。</code> → toast <code>删除成功</code>。删除后不可再赠送；已发出的券不受影响。</div></li>
+          </ul></div>
+        </div>
+      </div>
+
+      <div class="mod"><div class="mod-head"><span class="n">2</span><h3>新增 / 编辑优惠券 · 体育投注券 <span class="badge badge-new">新增</span></h3></div>
+        <div class="io io-stack">
+          <div class="io-img"><span class="io-cap">后台截图 · 新增（体育投注券）</span><span class="io-cap">后台截图 · 类别下拉</span><span class="io-cap">后台截图 · 栏位检查</span><span class="io-cap">后台截图 · 编辑</span></div>
+          <div class="io-spec">
+            <div class="sub-title">栏位</div>
+            <table class="data-table"><thead><tr><th>栏位</th><th>控件 / 来源 / 预设</th><th>限制</th><th>错误文案</th></tr></thead><tbody>
+              <tr><td>* 币种</td><td>下拉；系统已开放币种</td><td>编辑时不可修改（反灰）</td><td>—</td></tr>
+              <tr><td>* 优惠券名称</td><td>输入框；占位 <code>请输入优惠券名称，最多 100 个字</code></td><td>必填；≤100 字；去除前后空白</td><td><code>请输入优惠券名称</code></td></tr>
+              <tr><td>* 优惠券类别</td><td>下拉：存送比例券／输返券／中奖加奖券／<strong>体育投注券</strong>；新增预设存送比例券</td><td>编辑时不可修改（反灰）</td><td>—</td></tr>
+              <tr><td>* 单次投注金额 <span class="badge badge-new">新增</span></td><td>输入框（无后缀）；预设 <code>0</code>；币种依「币种」栏</td><td rowspan="2"><strong>必填、大于 0 的整数</strong>；不可留空／0／负数／小数／非数字；最多 9 位数；自动去除前导 0</td><td><code>单次投注金额须为大于 0 的整数，不可输入小数</code></td></tr>
+              <tr><td>* 有效期 <span class="badge badge-new">新增</span></td><td>输入框＋后缀「小时」；预设 <code>0</code></td><td><code>有效期须为大于 0 的整数，不可输入小数</code></td></tr>
+            </tbody></table>
+            <div class="sub-title">依类别显示的配置项</div>
+            <table class="data-table"><thead><tr><th>配置项</th><th>存送比例券</th><th>输返券</th><th>中奖加奖券</th><th>体育投注券</th></tr></thead><tbody>
+              <tr><td>注单有效期</td><td>—</td><td>✓</td><td>—</td><td>—</td></tr>
+              <tr><td>优惠比例／单笔奖金上限／奖金流水倍数／稽核不通过手续费比例／有效期</td><td>✓</td><td>✓</td><td>✓</td><td>—</td></tr>
+              <tr><td><strong>单次投注金额／有效期（小时）</strong></td><td>—</td><td>—</td><td>—</td><td>✓</td></tr>
+            </tbody></table>
+            <div class="sub-title">交互</div>
+            <ul class="rule-list">
+              <li class="rule-item"><div class="rule-num">1</div><div class="rule-text">切换类别：下方配置项立即替换，所有配置项数值重置为 <code>0</code>。</div></li>
+              <li class="rule-item"><div class="rule-num">2</div><div class="rule-text">检查时机：<strong>离开栏位时检查</strong>；已显示错误的栏位，输入时即时重新检查，正确后红框与红字消失。</div></li>
+              <li class="rule-item"><div class="rule-num">3</div><div class="rule-text">按「确定」有错误 → 只显示各栏位红框＋红字提示，<strong>「确定」点击无反应</strong>（不送出、无 toast）。</div></li>
+              <li class="rule-item"><div class="rule-num">4</div><div class="rule-text"><strong>无误 → 二次确认：</strong><ul style="margin:4px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px"><li>新增：<code>确认新增此优惠券吗？</code>；编辑：<code>确认保存对此优惠券的修改吗？</code>。</li><li>确认后关闭弹窗、刷新列表，toast <code>✓ 新增成功</code>／<code>✓ 修改成功</code>。</li><li>新增时操作人＝当前后台账号、创建时间＝当下；编辑不改变操作人与创建时间。</li></ul></div></li>
+              <li class="rule-item"><div class="rule-num">5</div><div class="rule-text">「返回」或 ✕ 关闭弹窗，不保存。</div></li>
+              <li class="rule-item"><div class="rule-num">6</div><div class="rule-text"><strong>编辑不影响已发出的券：</strong>编辑后再发出的是新券，与旧券无关；旧券维持发券当下的配置。</div></li>
+            </ul>
+            <div class="callout info"><span>ℹ️</span><div>新增／编辑页<b>不显示栏位说明文字</b>（如「每张券的单次投注金额」），规则以本规格为准。</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod"><div class="mod-head"><span class="n">3</span><h3>优惠券记录 <span class="badge badge-change">异动</span></h3></div>
+        <div class="io io-stack">
+          <div class="io-img"><span class="io-cap">后台截图 · 优惠券记录</span></div>
+          <div class="io-spec">
+            <div class="sub-title">筛选</div>
+            <ul class="rule-list">
+              <li class="rule-item"><div class="rule-num">1</div><div class="rule-text">优惠券类别：新增「<strong>体育投注券</strong>」。</div></li>
+              <li class="rule-item"><div class="rule-num">2</div><div class="rule-text">状态：全部状态／未使用／待结算／已使用／已过期（体育投注券只会出现未使用、已使用、已过期）。</div></li>
+              <li class="rule-item"><div class="rule-num">3</div><div class="rule-text">获得方式、搜索条件、导出沿用；导出包含体育投注券。</div></li>
+            </ul>
+            <div class="sub-title">体育投注券的状态与备注</div>
+            <table class="data-table"><thead><tr><th>状态</th><th>条件</th><th>备注栏</th></tr></thead><tbody>
+              <tr><td>未使用</td><td>尚未下注成功、未到期</td><td>一般发券 <code>–</code>；注单取消退回后 <code>注单 {订单号} 取消，已退回</code></td></tr>
+              <tr><td>已使用</td><td>下注成功（一张券只能使用 1 次）</td><td><code>–</code></td></tr>
+              <tr><td>已过期</td><td>到期时仍未使用</td><td><code>–</code>（体育投注页已移除不显示）</td></tr>
+            </tbody></table>
+            <div class="callout info"><span>ℹ️</span><div>备注栏最小宽度约 9.5 个字，超过约 15 个字换行。</div></div>
+            <div class="sub-title">注单取消退回 <span class="badge badge-new">新增</span></div>
+            <table class="spec-table">
+              <tr><td>记录</td><td><strong>沿用原券的同一笔记录</strong>，不新增记录；优惠券ID、会员、活动、名称、类别、获得方式、获得时间皆不变</td></tr>
+              <tr><td>状态</td><td>已使用 → <strong>未使用</strong></td></tr>
+              <tr><td>到期时间</td><td><strong>自退回时间重新计算</strong>（小时数同原券配置）</td></tr>
+              <tr><td>操作人／操作时间</td><td>系统／退回当下</td></tr>
+              <tr><td>备注</td><td><code>注单 {订单号} 取消，已退回</code></td></tr>
+            </table>
+            <div class="callout tip"><span>🧩</span><div><b>范例：</b>券 ID 29903 于 10/13 14:16 发放（有效期 72 小时），10/14 09:00 下注成功 → 已使用；10/14 20:00 注单取消 → 同一笔记录恢复为未使用，到期时间改为 10/17 20:00。</div></div>
+            <div class="sub-title">统计区</div>
+            <table class="data-table"><thead><tr><th>指标</th><th>含体育投注券</th><th>计算</th></tr></thead><tbody>
+              <tr><td>优惠券发放总量（张）</td><td><span class="pill pill-on">包含</span></td><td>统计时间内发出的张数；注单取消退回不重复计算</td></tr>
+              <tr><td>优惠券使用率</td><td><span class="pill pill-on">包含</span></td><td>「已使用」张数 ÷ 发放总量</td></tr>
+              <tr><td>优惠券累计发放彩金</td><td>不包含</td><td>沿用；用券注单派彩不计入</td></tr>
+            </tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod"><div class="mod-head"><span class="n">4</span><h3>赠送优惠券 <span class="badge badge-change">异动</span></h3></div>
+        <div class="io io-stack">
+          <div class="io-img"><span class="io-cap">后台截图 · 赠送优惠券</span></div>
+          <div class="io-spec">
+            <table class="data-table"><thead><tr><th>栏位</th><th>规则</th><th>错误文案</th></tr></thead><tbody>
+              <tr><td>* 活动名称</td><td>必填；显示在优惠券记录与审核列表</td><td><code>请输入活动名称</code></td></tr>
+              <tr><td>* 币种</td><td>下拉，来源同新增优惠券</td><td>—</td></tr>
+              <tr><td>* 选择优惠券</td><td>来源：所选币种下全部优惠券（<strong>含体育投注券</strong>），格式「名称（类别）」；预设 <code>请选择优惠券</code>；名称过长换行</td><td><code>请选择要赠送的优惠券</code></td></tr>
+              <tr><td>* 赠送用户</td><td>会员账号，一行一个；空行忽略</td><td><code>请输入至少一个会员账号</code></td></tr>
+              <tr><td>备注</td><td>选填；显示在发券审核的「申请备注」</td><td>—</td></tr>
+            </tbody></table>
+            <div class="callout tip"><span>✅</span><div>「提交审核」：有错误 → 只显示各栏位红框＋红字提示，<strong>按钮点击无反应</strong>（不送出、无 toast）；无误 → 关闭弹窗，toast <code>✓ 申请提交成功，等待审核（可至「发券审核」查看）</code>。</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mod"><div class="mod-head"><span class="n">5</span><h3>发券审核 / 审核记录 <span class="badge badge-change">异动</span></h3></div>
+        <div class="io io-stack">
+          <div class="io-img"><span class="io-cap">后台截图 · 发券审核</span><span class="io-cap">后台截图 · 通过申请</span><span class="io-cap">后台截图 · 审核记录</span></div>
+          <div class="io-spec"><ul class="rule-list">
+            <li class="rule-item"><div class="rule-num">1</div><div class="rule-text">体育投注券申请：「券类型」显示「优惠券」，「券名称」显示券名称；券类型筛选沿用（全部／优惠券／免费旋转/投注）。</div></li>
+            <li class="rule-item"><div class="rule-num">2</div><div class="rule-text"><strong>通过：</strong>名单内每位会员各发 1 张，写入优惠券记录（未使用），<strong>有效期自通过当下起算</strong>。toast <code>✓ 已通过 n 笔申请，优惠券已发放</code>。</div></li>
+            <li class="rule-item"><div class="rule-num">3</div><div class="rule-text"><strong>拒绝：</strong>不发券。toast <code>✓ 已拒绝 n 笔申请</code>。</div></li>
+            <li class="rule-item"><div class="rule-num">4</div><div class="rule-text">确认文案：<code>确定通过此笔发券申请吗？通过后会立即发券给名单内的会员。</code>／<code>确定拒绝此笔发券申请吗？拒绝后不会发券。</code>；批量时「此笔」改为「已勾选的 n 笔」。</div></li>
+            <li class="rule-item"><div class="rule-num">5</div><div class="rule-text">审核备注选填、最多 500 字，右下字数 <code>0/500</code>。未勾选时「批量通过」「批量拒绝」反灰。</div></li>
+            <li class="rule-item"><div class="rule-num">6</div><div class="rule-text">审核后移出发券审核、写入审核记录（审核状态 通过绿字／拒绝红字、审核时间、审核人、审核备注）。申请人、审核人为后台账号。</div></li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="mod"><div class="mod-head"><span class="n">6</span><h3>体育注单 · 备注与金额栏位 <span class="badge badge-change">异动</span></h3></div>
+        <div class="io io-stack">
+          <div class="io-img"><span class="io-cap">静态示意 · 体育注单</span></div>
+          <div class="io-spec"><ul class="rule-list">
+            <li class="rule-item"><div class="rule-num">1</div><div class="rule-text"><strong>使用体育投注券下注的注单</strong>，「备注」栏在原有内容（如 <code>SABA</code>、<code>Settle:win</code>）之后<strong>另起一行显示 <code>SportsVoucher</code></strong>，用以辨识用券注单。</div></li>
+            <li class="rule-item"><div class="rule-num">2</div><div class="rule-text">适用所有用券注单状态（未结算、已结算、已取消），含预约（Booking）成交的用券注单；未使用券的注单不显示。</div></li>
+            </ul>
+            <div class="sub-title">用券注单金额栏位 <span class="badge badge-new">新增</span></div>
+            <table class="data-table"><thead><tr><th>栏位（左→右）</th><th>用券注单</th><th>范例（₱100 券）</th></tr></thead><tbody>
+              <tr><td>画面输入金额／下注金额（法币／系统币）</td><td><strong>计入</strong>，＝券面额</td><td><code>100.00/100.00</code></td></tr>
+              <tr><td>有效下注金额（法币／系统币）</td><td><strong>不计入</strong>，显示 <code>0.00</code></td><td><code>0.00</code></td></tr>
+              <tr><td>输赢金额（法币／系统币）</td><td><strong>计入</strong>，正常计算（见通用规则「结算结果一览」）</td><td>赢 @7.40 <code>640.00</code>／赢半 @1.90 <code>45.00</code>／输 <code>0.00</code>／输半 <code>-50.00</code>／注单取消 <code>0.00</code></td></tr>
+            </tbody></table></div>
+        </div>
+      </div>
+      <div class="mod"><div class="mod-head"><span class="n">7</span><h3>平台报表 · 体育免费投注 <span class="badge badge-change">异动</span></h3></div>
+        <div class="io io-stack">
+          <div class="io-img"><span class="io-cap">静态示意 · 平台报表（日报表）</span><span class="io-cap">静态示意 · 平台报表（月报表）</span></div>
+          <div class="io-spec">
+            <ul class="rule-list">
+              <li class="rule-item"><div class="rule-num">1</div><div class="rule-text"><strong>日报表、月报表</strong>皆新增两个栏位，位于「免费旋转数量」右侧，依序为「体育免费投注输赢」「体育免费投注数量」（示意图红框）。</div></li>
+              <li class="rule-item"><div class="rule-num">2</div><div class="rule-text">栏位选择器同步新增这两个选项；日报表的「导出」包含这两个栏位（月报表无导出）。</div></li>
+              <li class="rule-item"><div class="rule-num">3</div><div class="rule-text">日报表「合计」列为各日加总、月报表「总计」列为各月加总。</div></li>
+            </ul>
+            <table class="data-table"><thead><tr><th style="width:220px">新增栏位（左→右）</th><th>数值</th></tr></thead><tbody>
+              <tr><td>体育免费投注输赢 <span class="badge badge-new">新增</span></td><td>统计区间内已结算的用券注单<strong>输赢金额加总</strong>（不含撤单）；与球类报表「免费投注输赢」口径相同，金额两位小数</td></tr>
+              <tr><td>体育免费投注数量 <span class="badge badge-new">新增</span></td><td>统计区间内<strong>已结算的用券注单笔数</strong>（不含撤单）；与球类报表「免费投注数」口径相同，整数</td></tr>
+            </tbody></table>
+          </div>
+        </div>
+      </div>
+      <div class="mod"><div class="mod-head"><span class="n">8</span><h3>球类报表 · 免费投注 <span class="badge badge-change">异动</span></h3></div>
+        <div class="io io-stack">
+          <div class="io-img"><span class="io-cap">静态示意 · 球类报表</span></div>
+          <div class="io-spec">
+            <div class="sub-title">新增栏位 <span class="badge badge-new">新增</span></div>
+            <table class="data-table"><thead><tr><th style="width:200px">栏位</th><th style="width:220px">位置</th><th>数值</th></tr></thead><tbody>
+              <tr><td>免费投注</td><td>投注区，「投注金额」右侧</td><td>统计区间内<strong>用券下注的金额合计</strong>（券面额加总），显示整数加千分位，例 <code>1,300</code>；无则 <code>0</code></td></tr>
+              <tr><td>免费投注数</td><td>已结算区，「输赢金额」右侧</td><td>统计区间内<strong>已结算的用券注单笔数</strong>（不含撤单）；无则 <code>0</code></td></tr>
+              <tr><td>免费投注输赢</td><td>已结算区，「免费投注数」右侧</td><td>上述用券注单的<strong>输赢金额加总</strong>，正负号与「输赢金额」栏一致；无则 <code>0.00</code></td></tr>
+            </tbody></table>
+            <div class="callout info"><span>ℹ️</span><div>总计列为各游戏类型加总。</div></div>
+            <div class="sub-title">投注区（按投注时间统计） · 用券注单是否计入</div>
+            <table class="data-table"><thead><tr><th style="width:260px">栏位（左→右）</th><th>用券注单</th></tr></thead><tbody>
+              <tr><td>投注次数</td><td><span class="pill pill-on">计入</span>　用券注单算 1 次</td></tr>
+              <tr><td>投注人数</td><td><span class="pill pill-on">计入</span>　用券下注的会员算投注人</td></tr>
+              <tr><td>投注金额</td><td><span class="pill pill-on">计入</span>　以券面额计</td></tr>
+              <tr><td>免费投注 <span class="badge badge-new">新增</span></td><td><span class="pill pill-on">计入</span>　只统计用券金额</td></tr>
+            </tbody></table>
+            <div class="sub-title">已结算区（按结算时间统计） · 用券注单是否计入</div>
+            <table class="data-table"><thead><tr><th style="width:260px">栏位（左→右）</th><th>用券注单</th></tr></thead><tbody>
+              <tr><td>有效投注数</td><td><strong style="color:var(--red)">不计入</strong></td></tr>
+              <tr><td>有效投注人数</td><td><strong style="color:var(--red)">不计入</strong>（只用券下注的会员不算有效投注人）</td></tr>
+              <tr><td>有效投注金额</td><td><strong style="color:var(--red)">不计入</strong></td></tr>
+              <tr><td>今日结算注单（不含撤单）</td><td><span class="pill pill-on">计入</span>　用券注单结算后算 1 笔</td></tr>
+              <tr><td>今日结算注单总投注额（不含撤单）</td><td><span class="pill pill-on">计入</span>　以券面额计</td></tr>
+              <tr><td>会员输赢，不含退水、免费投注 <span class="badge badge-change">栏位更名</span></td><td><strong style="color:var(--red)">不计入</strong>。栏位名称由「会员输赢，不含退水」改为「会员输赢，不含退水、免费投注」</td></tr>
+              <tr><td>会员盈利率</td><td><strong style="color:var(--red)">不计入</strong></td></tr>
+              <tr><td>输赢金额</td><td><span class="pill pill-on">计入</span>　正常计算（赢、赢半、输、输半皆计入）</td></tr>
+              <tr><td>免费投注数 <span class="badge badge-new">新增</span></td><td><span class="pill pill-on">计入</span>　只统计用券注单</td></tr>
+              <tr><td>免费投注输赢 <span class="badge badge-new">新增</span></td><td><span class="pill pill-on">计入</span>　只统计用券注单</td></tr>
+            </tbody></table>
+            <div class="callout tip"><span>🧮</span><div style="width:100%"><b>范例：</b>今日篮球有 2 笔用券注单——A 用 ₱100 券 @7.40 赢（+640）、B 用 ₱500 券输（0，输＝派彩）。
+              <ul style="margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px">
+                <li>投注区：「投注次数」+2、「投注人数」含 A、B、「投注金额」含 600、「免费投注」＝ <code>600</code>。</li>
+                <li>已结算区：有效投注数／人数／金额、会员输赢（不含退水、免费投注）、会员盈利率皆<b>不含</b> A、B；今日结算注单 +2 笔、今日结算注单总投注额含 600。</li>
+                <li>输赢金额：含 A、B（+640、0）；「免费投注数」＝ <code>2</code>；「免费投注输赢」＝ <code>640.00</code>。</li>
+              </ul></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="mod"><div class="mod-head"><span class="n">9</span><h3>会员报表 · 体育报表 · 免费投注 <span class="badge badge-change">异动</span></h3></div>
+        <div class="io io-stack">
+          <div class="io-img"><span class="io-cap">静态示意 · 会员报表 › 体育报表</span></div>
+          <div class="io-spec">
+            <ul class="rule-list">
+              <li class="rule-item"><div class="rule-num">1</div><div class="rule-text">新增三个栏位（示意图红框），两个栏位更名（示意图红字）；「导出会员注单报表」同步包含新栏位与新名称。</div></li>
+              <li class="rule-item"><div class="rule-num">2</div><div class="rule-text">总计列为各会员加总。</div></li>
+            </ul>
+            <div class="sub-title">新增栏位 <span class="badge badge-new">新增</span></div>
+            <table class="data-table"><thead><tr><th style="width:200px">栏位</th><th style="width:240px">位置</th><th>数值</th></tr></thead><tbody>
+              <tr><td>免费投注</td><td>投注区，「投注金额」右侧</td><td>该会员<strong>用券下注的金额合计</strong>（券面额加总）</td></tr>
+              <tr><td>免费投注数</td><td>已结算区，「实际输赢（含退水、免费投注）」右侧</td><td>该会员<strong>已结算的用券注单笔数</strong>（不含撤单）</td></tr>
+              <tr><td>免费投注输赢</td><td>已结算区，「免费投注数」右侧</td><td>上述用券注单的<strong>输赢金额加总</strong></td></tr>
+            </tbody></table>
+            <div class="sub-title">投注区 · 用券注单是否计入</div>
+            <table class="data-table"><thead><tr><th style="width:260px">栏位（左→右）</th><th>用券注单</th></tr></thead><tbody>
+              <tr><td>下注笔数</td><td><span class="pill pill-on">计入</span></td></tr>
+              <tr><td>投注金额</td><td><span class="pill pill-on">计入</span>　以券面额计</td></tr>
+              <tr><td>免费投注 <span class="badge badge-new">新增</span></td><td><span class="pill pill-on">计入</span>　只统计用券金额</td></tr>
+            </tbody></table>
+            <div class="sub-title">已结算区 · 用券注单是否计入</div>
+            <table class="data-table"><thead><tr><th style="width:260px">栏位（左→右）</th><th>用券注单</th></tr></thead><tbody>
+              <tr><td>注单数</td><td><span class="pill pill-on">计入</span></td></tr>
+              <tr><td>投注额</td><td><span class="pill pill-on">计入</span>　以券面额计</td></tr>
+              <tr><td>有效投注数</td><td><strong style="color:var(--red)">不计入</strong></td></tr>
+              <tr><td>有效投注金额</td><td><strong style="color:var(--red)">不计入</strong></td></tr>
+              <tr><td>会员输赢（不含退水、免费投注） <span class="badge badge-change">栏位更名</span></td><td><strong style="color:var(--red)">不计入</strong>。名称由「会员输赢（不含退水）」改为「会员输赢（不含退水、免费投注）」</td></tr>
+              <tr><td>实际输赢（含退水、免费投注） <span class="badge badge-change">栏位更名</span></td><td><span class="pill pill-on">计入</span>　正常计算。名称由「实际输赢（含退水）」改为「实际输赢（含退水、免费投注）」</td></tr>
+              <tr><td>免费投注数 <span class="badge badge-new">新增</span></td><td><span class="pill pill-on">计入</span>　只统计用券注单</td></tr>
+              <tr><td>免费投注输赢 <span class="badge badge-new">新增</span></td><td><span class="pill pill-on">计入</span>　只统计用券注单</td></tr>
+            </tbody></table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 判断逻辑 -->
+    <div class="spanel" data-s="logic">
+      <div class="panel-title">判断逻辑</div>
+      <div class="panel-sub">下注判断 · 预约用券 · 券可用判断 · 券清单排序</div>
+
+      <div class="sub-title">用券下注判断流程</div>
+      <div class="card" style="padding:20px 22px">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12.5px;text-align:center">
+          <div style="padding:7px 16px;border-radius:20px;background:var(--gray-bg);border:1px solid var(--border2);color:var(--text2)">开启 SportsVoucher</div>
+          <div style="color:var(--text3)">↓</div>
+          <div style="padding:10px 14px;border-radius:10px;background:var(--red-bg);border:1px solid var(--red-border);color:var(--text);max-width:560px">未选券 → <code>Place Bet</code> <b>反灰不可点</b></div>
+          <div style="color:var(--text3)">↓ 选券后，会员择一操作</div>
+          <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;width:100%;align-items:flex-start">
+            <div style="flex:1;min-width:240px;max-width:400px;display:flex;flex-direction:column;gap:8px;align-items:center">
+              <div style="padding:10px 14px;border-radius:10px;background:var(--blue-bg);border:1px solid var(--blue-border);color:var(--text);font-weight:700;width:100%">操作 A · 一般投注</div>
+              <div style="color:var(--text3)">↓</div>
+              <div style="padding:7px 16px;border-radius:20px;background:var(--gray-bg);border:1px solid var(--border2);color:var(--text2)">直接点击 <code>Place Bet</code></div>
+              <div style="color:var(--text3)">↓</div>
+              <div style="padding:9px 12px;border-radius:10px;background:#0d1930;border:1px solid var(--border2);width:100%">处理中 <code>The order is being processed......</code></div>
+              <div style="color:var(--text3)">↓</div>
+              <div style="padding:9px 12px;border-radius:10px;background:var(--green-bg);border:1px solid var(--green-border);width:100%">成功 → 券<b>变为已使用</b>、从清单移除</div>
+              <div style="padding:9px 12px;border-radius:10px;background:var(--gold-bg);border:1px solid var(--gold-border);width:100%">失败 / 赔率已变 → 券<b>仍为未使用</b>（可 <code>Accept and bet</code> 重送）</div>
+            </div>
+            <div style="flex:1;min-width:240px;max-width:400px;display:flex;flex-direction:column;gap:8px;align-items:center">
+              <div style="padding:10px 14px;border-radius:10px;background:var(--purple-bg);border:1px solid var(--purple-border);color:#fff;font-weight:700;width:100%">操作 B · 预约投注</div>
+              <div style="color:var(--text3)">↓</div>
+              <div style="padding:7px 16px;border-radius:20px;background:var(--gray-bg);border:1px solid var(--border2);color:var(--text2)">点击 <code>+ Booking</code>，设定预约赔率</div>
+              <div style="color:var(--text3)">↓</div>
+              <div style="padding:9px 12px;border-radius:10px;background:var(--red-bg);border:1px solid var(--red-border);width:100%">预约赔率 ＜ 当前赔率 → 预约栏红框＋红字，<code>Place Bet</code> <b>反灰不可点</b></div>
+              <div style="color:var(--text3)">↓ 调整为预约赔率 ≥ 当前赔率</div>
+              <div style="padding:7px 16px;border-radius:20px;background:var(--gray-bg);border:1px solid var(--border2);color:var(--text2)">点击 <code>Place Bet</code></div>
+              <div style="color:var(--text3)">↓</div>
+              <div style="padding:9px 12px;border-radius:10px;background:#0d1930;border:1px solid var(--border2);width:100%">预约成功（券<b>仍为未使用、不锁定</b>）→ Scheduled</div>
+              <div style="color:var(--text3)">↓ 预约赔率匹配成功当下</div>
+              <div style="padding:9px 12px;border-radius:10px;background:var(--green-bg);border:1px solid var(--green-border);width:100%">券未过期且未使用 → 券<b>变为已使用</b>、成交 → Unsettled</div>
+              <div style="padding:9px 12px;border-radius:10px;background:var(--red-bg);border:1px solid var(--red-border);width:100%">券已过期或已使用 → <b>预约单失败</b> → Expired · <code>Booking failed</code></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sub-title">券是否出现在清单 / 可否选取</div>
+      <div class="card" style="padding:0;overflow:hidden;"><table class="data-table"><thead><tr><th>优惠券系统开关</th><th>玩法</th><th>券已过期</th><th>券已使用</th><th>面额在限额内</th><th>呈现</th></tr></thead><tbody>
+        <tr><td>关闭</td><td>任意</td><td>—</td><td>—</td><td>—</td><td>体育投注页 SportsVoucher 栏位隐藏</td></tr>
+        <tr><td>开启</td><td>OUTRIGHTS</td><td>—</td><td>—</td><td>—</td><td>栏位反灰不可点</td></tr>
+        <tr><td>开启</td><td>ENDING CARD／ENDING GAME／串关</td><td>—</td><td>—</td><td>—</td><td>无此栏位</td></tr>
+        <tr><td>开启</td><td>单关</td><td>是</td><td>—</td><td>—</td><td>体育投注页不显示</td></tr>
+        <tr><td>开启</td><td>单关</td><td>否</td><td>是</td><td>—</td><td>不显示（已使用）</td></tr>
+        <tr><td>开启</td><td>单关</td><td>否</td><td>否</td><td>否</td><td>显示、反灰不可选，排最后</td></tr>
+        <tr><td>开启</td><td>单关</td><td>否</td><td>否</td><td>是</td><td>显示、可选，计入 n available</td></tr>
+      </tbody></table></div>
+
+      <div class="sub-title">券清单排序</div>
+      <div class="flow">
+        <div class="flow-node start">可选的券</div><div class="flow-arrow"><small>到期近 → 远</small>→</div>
+        <div class="flow-node warn">不能使用的券（限额外）</div><div class="flow-arrow"><small>到期近 → 远</small>→</div>
+        <div class="flow-node">清单底部</div>
+      </div>
+      <div class="callout tip"><span>🧩</span><div style="width:100%"><b>范例</b>（限额 200–800），清单由上至下：<ul style="margin:4px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px"><li>₱500（<code>1d 21:59:39</code>）</li><li>₱50（<code>00:44:32</code>，反灰）</li><li>₱20,000（<code>19:59:18</code>，反灰）</li><li>₱100（<code>2d 21:59:46</code>，反灰）</li><li>₱1,000（<code>9d 19:59:25</code>，反灰）</li></ul></div></div>
+    </div>
+
+    <!-- 情境穷举 -->
+    <div class="spanel" data-s="scn">
+      <div class="panel-title">情境穷举</div>
+      <div class="panel-sub">QA / 测试用</div>
+
+      <div class="sub-title">用券下注情境矩阵</div>
+      <div class="card" style="padding:0;overflow:hidden;"><table class="data-table"><thead><tr><th>#</th><th>玩法</th><th>盘口</th><th>选券</th><th>预约</th><th>操作／事件</th><th>呈现</th><th>券</th></tr></thead><tbody>
+        <tr><td>1</td><td>单关</td><td>开放</td><td>未选</td><td>关</td><td>—</td><td><code>Place Bet</code> 反灰不可点</td><td>未使用</td></tr>
+        <tr><td>2</td><td>单关</td><td>开放</td><td>已选</td><td>关</td><td>成功</td><td>成功页，右上 <code>SportsVoucher: 券面额</code>；回投注页该券已移除</td><td>变为已使用</td></tr>
+        <tr><td>3</td><td>单关</td><td>开放</td><td>已选</td><td>关</td><td>失败</td><td><code>Betting failed, please try again.</code></td><td>仍为未使用</td></tr>
+        <tr><td>4</td><td>单关</td><td>开放</td><td>已选</td><td>关</td><td>赔率已变</td><td><code>Betting failed, Odds have changed.</code>＋<code>Accept and bet</code></td><td>仍为未使用</td></tr>
+        <tr><td>5</td><td>单关</td><td>开放</td><td>已选</td><td>关</td><td>#4 后 Accept and bet 成功</td><td>成功页（新赔率）</td><td>变为已使用</td></tr>
+        <tr><td>6</td><td>单关</td><td>开放</td><td>已选</td><td>开，≥ 当前</td><td>Place Bet</td><td><code>Your Reservation Was Placed Successfully</code></td><td>仍为未使用</td></tr>
+        <tr><td>7</td><td>单关</td><td>开放</td><td>已选</td><td>开，＜ 当前</td><td>调整预约赔率</td><td>预约栏红框＋红字，<code>Place Bet</code> 反灰不可点</td><td>仍为未使用</td></tr>
+        <tr><td>8</td><td>单关</td><td>—</td><td>—</td><td>预约中</td><td>成交，券未过期且未使用</td><td>Scheduled → Unsettled</td><td>变为已使用</td></tr>
+        <tr><td>9</td><td>单关</td><td>—</td><td>—</td><td>预约中</td><td>成交，券已过期或已使用</td><td>预约单失败 → Expired · <code>Booking failed</code></td><td>不变</td></tr>
+        <tr><td>10</td><td>单关</td><td>开放</td><td>已选</td><td>任意</td><td>限额改变，已选券变限额外</td><td>自动取消选择，反灰排最后</td><td>不变</td></tr>
+        <tr><td>11</td><td>单关</td><td>已关闭</td><td>—</td><td>—</td><td>打开投注页</td><td><code>Market closed</code>；开关／Booking／Place Bet 反灰</td><td>不变</td></tr>
+        <tr><td>12</td><td>单关</td><td>开放</td><td>—</td><td>关</td><td>会员没有任何体育投注券，开启开关</td><td><code>0 available</code>；券清单区显示缺省页 <code>There does not have any content.</code>，<code>Place Bet</code> 反灰</td><td>—</td></tr>
+        <tr><td>13</td><td>单关</td><td>开放</td><td>—</td><td>关</td><td>只有限额外的券，开启开关</td><td><code>0 available</code>；显示反灰券清单（不显示缺省页）</td><td>—</td></tr>
+        <tr><td>14</td><td>单关</td><td>开放</td><td>已选</td><td>任意</td><td>关闭开关</td><td>清除选择，回金额输入</td><td>不变</td></tr>
+        <tr><td>15</td><td>OUTRIGHTS</td><td>开放</td><td>—</td><td>—</td><td>打开投注页</td><td>开关反灰，只能一般投注</td><td>—</td></tr>
+        <tr><td>16</td><td>ENDING CARD</td><td>—</td><td>—</td><td>—</td><td>点比分格打开投注单</td><td>无 SportsVoucher 栏位，只能一般金额投注</td><td>—</td></tr>
+        <tr><td>17</td><td>ENDING GAME</td><td>—</td><td>—</td><td>—</td><td>点比分格</td><td>Card Details，无 SportsVoucher</td><td>—</td></tr>
+        <tr><td>18</td><td>串关</td><td>—</td><td>—</td><td>—</td><td>打开 Parlay Bet</td><td>无 SportsVoucher 栏位</td><td>—</td></tr>
+        <tr><td>19</td><td>任意</td><td>—</td><td>—</td><td>—</td><td>后台关闭优惠券系统开关</td><td>体育投注页 SportsVoucher 栏位隐藏</td><td>不变</td></tr>
+        <tr><td>20</td><td>My voucher</td><td>—</td><td>—</td><td>—</td><td>券下注成功</td><td>移到 Used</td><td>已使用</td></tr>
+        <tr><td>21</td><td>My voucher</td><td>—</td><td>—</td><td>—</td><td>券到期仍未使用</td><td>移到 Expired</td><td>已过期</td></tr>
+        <tr><td>22</td><td>My voucher</td><td>—</td><td>—</td><td>—</td><td>Unused 点 Use now</td><td>导向体育首页</td><td>—</td></tr>
+        <tr><td>23</td><td>My Bets 汇总</td><td>—</td><td>—</td><td>—</td><td>Scheduled／Unsettled 有用券注单</td><td>Total Bet Amount、Total Number of Bets、Potential win 皆含</td><td>—</td></tr>
+        <tr><td>24</td><td>My Bets 汇总</td><td>—</td><td>—</td><td>—</td><td>Settled 有用券注单</td><td>Total Bet Amount、Total Number of Bets、Total Win/Loss 含；Total Valid Bet 不含</td><td>—</td></tr>
+        <tr><td>25</td><td>单关</td><td>—</td><td>—</td><td>—</td><td>用券注单结算 · 赢（₱100 @7.40）</td><td>派彩 740 入余额；Win/Lose、后台输赢金额 <code>640.00</code></td><td>已使用</td></tr>
+        <tr><td>26</td><td>单关</td><td>—</td><td>—</td><td>—</td><td>用券注单结算 · 赢半（₱100 @1.90）</td><td>派彩 145（50 × 1.90 ＋ 50）入余额；Win/Lose、后台输赢金额 <code>45.00</code></td><td>已使用</td></tr>
+        <tr><td>27</td><td>单关</td><td>—</td><td>—</td><td>—</td><td>用券注单结算 · 输（₱100）</td><td>无派彩；Win/Lose、后台输赢金额 <code>0.00</code>（输＝派彩）</td><td>已使用</td></tr>
+        <tr><td>28</td><td>单关</td><td>—</td><td>—</td><td>—</td><td>用券注单结算 · 输半（₱100）</td><td>退回 ₱50 现金入余额，不退回次数；Win/Lose、后台输赢金额 <code>-50.00</code></td><td>已使用</td></tr>
+        <tr><td>29</td><td>单关</td><td>—</td><td>—</td><td>—</td><td>用券注单取消／作废</td><td>Win/Lose <code>0.00</code>；原券恢复为未使用、重新出现在券清单与 My voucher <code>Unused</code>，有效期自退回时间重新计算</td><td>恢复为未使用</td></tr>
+      </tbody></table></div>
+
+      <div class="sub-title">边界与异常</div>
+      <div class="card" style="padding:0;overflow:hidden;"><table class="data-table"><thead><tr><th style="width:230px">情境</th><th>处理</th></tr></thead><tbody>
+        <tr><td>已成交的用券注单被取消／作废</td><td>注单显示 <code>Bet Cancellation</code>；<strong>原券恢复为未使用</strong>，有效期自退回时间重新计算；后台同一笔记录状态改回未使用，备注 <code>注单 {订单号} 取消，已退回</code></td></tr>
+        <tr><td>券在投注页开着时到期</td><td>倒数至 <code>00:00:00</code> 即自动从清单移除（已选则取消选择），<code>n available</code> 同步减少</td></tr>
+        <tr><td>用券注单结算 · 赢</td><td>派彩＝券面额 × 赔率入余额；输赢正常显示（派彩 − 券面额）</td></tr>
+        <tr><td>用券注单结算 · 赢半</td><td>派彩＝券面额 ÷ 2 × 赔率＋券面额 ÷ 2 入余额（例 ₱100 @1.90 → 145）；输赢 <code>45.00</code></td></tr>
+        <tr><td>用券注单结算 · 输</td><td>无派彩；输赢 <code>0</code>（输＝派彩）</td></tr>
+        <tr><td>用券注单结算 · 输半</td><td>退回一半现金（券面额 ÷ 2）入余额，不退回次数；输赢 <code>-券面额 ÷ 2</code></td></tr>
+        <tr><td>余额为 0</td><td>仍可用券下注</td></tr>
+        <tr><td>后台球类报表 · 用券注单</td><td>投注区：投注次数、投注人数、投注金额、免费投注皆计入；已结算区：有效投注数／人数／金额、会员输赢（不含退水、免费投注）、会员盈利率不计入，今日结算注单、今日结算注单总投注额、输赢金额、免费投注数、免费投注输赢计入</td></tr>
+        <tr><td>后台体育注单 · 用券注单</td><td>备注另起一行 <code>SportsVoucher</code>；画面输入金额／下注金额＝券面额；有效下注金额 <code>0.00</code>；输赢金额正常计算</td></tr>
+        <tr><td>平台报表／会员报表 · 用券注单</td><td>见后台规则 7、9</td></tr>
+        <tr><td>编辑券配置</td><td>已发出的券不变；之后发出的是新券</td></tr>
+        <tr><td>删除券配置</td><td>不可再赠送；已发出的券可用到期</td></tr>
+        <tr><td>优惠券系统开关关闭→开启</td><td>体育投注页 SportsVoucher 栏位隐藏 → 恢复显示；期间券有效期照常计算</td></tr>
+      </tbody></table></div>
+
+      <div class="sub-title">时间相关情境</div>
+      <div class="card" style="padding:0;overflow:hidden;"><table class="data-table"><thead><tr><th style="width:230px">事件</th><th>时点/规则</th></tr></thead><tbody>
+        <tr><td>券有效期起算</td><td>发券审核<strong>通过当下</strong>（注单取消退回：自退回当下重新计算）</td></tr>
+        <tr><td>券到期</td><td>起算时间＋有效期（小时），精确到分钟</td></tr>
+        <tr><td>范例</td><td>10/13 14:16 通过、有效期 72 小时 → 10/16 14:16 到期</td></tr>
+        <tr><td>预约用券时点</td><td>预约赔率匹配成功当下，券变为已使用</td></tr>
+        <tr><td>预约中券到期</td><td>成交当下判断：已过期 → 预约单失败</td></tr>
+      </tbody></table></div>
+
+      <div class="sub-title">后台栏位检查（单次投注金额／有效期）</div>
+      <div class="card" style="padding:0;overflow:hidden;"><table class="data-table"><thead><tr><th style="width:230px">输入值</th><th>结果</th></tr></thead><tbody>
+        <tr><td>留空</td><td><strong style="color:var(--red)">错误</strong></td></tr>
+        <tr><td>0（含预设值未修改）</td><td><strong style="color:var(--red)">错误</strong></td></tr>
+        <tr><td>负数（-5）</td><td><strong style="color:var(--red)">错误</strong></td></tr>
+        <tr><td>小数（1.5）</td><td><strong style="color:var(--red)">错误</strong></td></tr>
+        <tr><td>非数字（abc）</td><td><strong style="color:var(--red)">错误</strong></td></tr>
+        <tr><td>前导 0（007）</td><td><span class="pill pill-on">通过</span>　自动改为 7</td></tr>
+        <tr><td>前后空白（ 72 ）</td><td><span class="pill pill-on">通过</span>　自动去除空白</td></tr>
+        <tr><td>1 ～ 999,999,999</td><td><span class="pill pill-on">通过</span></td></tr>
+        <tr><td>超过 9 位数</td><td>无法输入第 10 位</td></tr>
+      </tbody></table></div>
+    </div>
+
+  </div>
+
+  <!-- ===================== 主分页：原型预览 ===================== -->
+  <div class="mview" data-m="proto">
+   <div class="proto-wide"><div class="proto-wide-inner">
+    <div class="proto-toggle">
+      <button class="proto-btn active" data-p="fe">前台原型</button>
+      <button class="proto-btn" data-p="be">后台原型</button>
+    </div>
+    <div class="proto-stage">
+      <iframe class="proto-frame fe active" data-p="fe" title="前台原型" src="about:blank"></iframe>
+      <iframe class="proto-frame be" data-p="be" title="后台原型" src="about:blank"></iframe>
+    </div>
+    <p class="note">前台原型即附件 SportsVoucherFront（左下「情境切换」可切换开盘／封盘、下注结果、投注限额、赔率变化、优惠券系统开关、预约投注）；后台原型含优惠券配置 → 优惠券记录 → 赠送优惠券 → 发券审核 → 审核记录，皆保留原始交互、可直接操作（各页内部亦可滚动）。</p>
+   </div></div>
+  </div>
+
+
+  <div class="mview" data-m="chg">
+    <div class="doc-header">
+    <div class="doc-eyebrow" style="color:var(--green);background:var(--green-bg);border-color:var(--green-border)">🔧 本次调整</div>
+    <p class="doc-desc" style="margin:6px 0 0">交付开发后如有规格变更，将依版本记录于此。</p>
+  </div>
+  </div>
+</div>
+
+<script>
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+$$('.mtab').forEach(t=>t.addEventListener('click',()=>{
+  const m=t.dataset.m;
+  $$('.mtab').forEach(x=>x.classList.toggle('active',x.dataset.m===m));
+  $$('.mview').forEach(v=>v.classList.toggle('active',v.dataset.m===m));
+  window.scrollTo({top:0,behavior:'smooth'});
+}));
+$$('.stab').forEach(t=>t.addEventListener('click',()=>{
+  const s=t.dataset.s;
+  $$('.stab').forEach(x=>x.classList.toggle('active',x.dataset.s===s));
+  $$('.spanel').forEach(p=>p.classList.toggle('active',p.dataset.s===s));
+}));
+$$('.proto-btn').forEach(b=>b.addEventListener('click',()=>{
+  const p=b.dataset.p;
+  $$('.proto-btn').forEach(x=>x.classList.toggle('active',x.dataset.p===p));
+  $$('.proto-frame').forEach(f=>f.classList.toggle('active',f.dataset.p===p));
+}));
+</script>
+
+</body>
+</html>
