@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>节庆特别活动 · 后台原型</title>
+<style>
+/* =====================================================================
+   节庆特别活动 后台原型（XmasEvent）
+   —— 以 X-BOMB_Backend 为基底；步骤 1～3、5、6 及派奖审核／活动报表沿用，
+      仅「步骤4 活动条件」依圣诞节线上/线下活动需求 V1.0 改版。
+   —— 单一 HTML；vanilla JS 驱动步骤向导、动态表格、弹窗、条件字段与基本校验。
+   ===================================================================== */
+:root{
+  --primary:#2b7de9; --primary-d:#1f66c4; --green:#2fae5a; --red:#e5544b;
+  --border:#dcdfe6; --border-l:#e9edf2; --text:#303133; --text-2:#606266; --text-3:#909399;
+  --ph:#c0c4cc; --bg:#f4f6f9; --panel:#fff; --blue-l:#ecf3fe; --radius:4px;
+}
+*{box-sizing:border-box;}
+html{font-size:14px;}
+body{margin:0;font-family:"PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+  color:var(--text);background:var(--bg);display:flex;min-height:100vh;font-size:14px;}
+:focus-visible{outline:2px solid var(--primary);outline-offset:1px;}
+
+/* ---------- 左侧菜单 ---------- */
+.side{width:200px;flex:0 0 200px;background:#fff;border-right:1px solid var(--border-l);
+  height:100vh;position:sticky;top:0;overflow-y:auto;}
+.side__logo{height:52px;display:flex;align-items:center;gap:8px;padding:0 16px;font-weight:700;color:var(--primary);
+  border-bottom:1px solid var(--border-l);}
+.side__item{display:flex;align-items:center;gap:10px;padding:11px 16px;color:var(--text-2);cursor:pointer;font-size:13.5px;}
+.side__item:hover{background:#f5f7fa;}
+.side__item .badge{margin-left:auto;background:var(--red);color:#fff;border-radius:10px;font-size:11px;padding:0 6px;line-height:16px;}
+.side__item.is-parent{color:var(--primary);background:var(--blue-l);font-weight:600;}
+.side__sub{padding:8px 0 8px 0;background:#fafbfc;}
+.side__subitem{padding:8px 16px 8px 40px;font-size:13px;color:var(--text-2);cursor:pointer;border-left:3px solid transparent;}
+.side__subitem:hover{color:var(--primary);}
+.side__subitem.is-active{color:var(--primary);border-left-color:var(--primary);background:#eef4ff;font-weight:600;}
+
+/* ---------- 右侧主体 ---------- */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.crumb{height:44px;display:flex;align-items:center;gap:6px;padding:0 20px;font-size:13px;color:var(--text-3);
+  background:#fff;border-bottom:1px solid var(--border-l);}
+.crumb b{color:var(--text);font-weight:600;}
+.tabbar{display:flex;gap:6px;padding:8px 20px;background:#fff;border-bottom:1px solid var(--border-l);flex-wrap:wrap;}
+.tabchip{font-size:12.5px;padding:3px 10px;border:1px solid var(--border);border-radius:3px;color:var(--text-2);background:#fff;display:flex;gap:6px;align-items:center;}
+.tabchip.is-active{background:var(--primary);color:#fff;border-color:var(--primary);}
+.tabchip .x{opacity:.6;}
+.content{padding:16px 20px;flex:1;}
+
+/* ---------- 通用元件 ---------- */
+.btn{border:1px solid var(--border);background:#fff;color:var(--text-2);padding:7px 15px;border-radius:var(--radius);
+  cursor:pointer;font-size:13.5px;line-height:1;}
+.btn:hover{color:var(--primary);border-color:var(--primary);}
+.btn--primary{background:var(--primary);border-color:var(--primary);color:#fff;}
+.btn--primary:hover{background:var(--primary-d);color:#fff;}
+.btn--green{background:var(--green);border-color:var(--green);color:#fff;}
+.btn--green:hover{filter:brightness(1.05);color:#fff;}
+.btn--red{color:var(--red);border-color:#f5c6c2;}
+.btn--red:hover{background:var(--red);color:#fff;border-color:var(--red);}
+.btn--sm{padding:5px 10px;font-size:12.5px;}
+.btn--text{border:none;background:none;padding:2px 6px;}
+.btn--link{border:none;background:none;color:var(--primary);cursor:pointer;padding:2px 4px;font-size:13px;}
+.btn--link.red{color:var(--red);}
+.op-sep{color:var(--border);margin:0 3px;font-size:12px;}
+.input,.select{height:34px;border:1px solid var(--border);border-radius:var(--radius);padding:0 10px;font-size:13.5px;
+  color:var(--text);background:#fff;width:100%;}
+.input::placeholder{color:var(--ph);}
+.input:focus,.select:focus{border-color:var(--primary);outline:none;}
+.input.is-error,.select.is-error{border-color:var(--red);}
+.input:disabled,.select:disabled{background:#f5f7fa;color:var(--text-3);cursor:not-allowed;}
+.radio:has(input:disabled){color:var(--text-3);cursor:not-allowed;}
+.switch:has(input:disabled){cursor:not-allowed;}
+.switch:has(input:disabled) .track{background:#f0f2f5;}
+select.select{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' stroke='%23909399' fill='none' stroke-width='1.5'/></svg>");
+  background-repeat:no-repeat;background-position:right 10px center;padding-right:26px;}
+.req{color:var(--red);margin-right:2px;}
+.hint{font-size:12px;color:var(--text-3);margin-top:4px;}
+.hint--warn{color:#e6a23c;}
+.hint--err{color:var(--red);}
+.card{background:var(--panel);border-radius:6px;padding:20px;box-shadow:0 1px 2px rgba(0,0,0,.03);}
+.sec-title{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--text);margin:0 0 16px;font-size:14.5px;}
+.sec-title::before{content:"";width:4px;height:15px;background:var(--primary);border-radius:2px;}
+.form-row{display:grid;grid-template-columns:130px 1fr;align-items:center;gap:12px;margin-bottom:16px;max-width:640px;}
+.form-row>label{color:var(--text-2);font-size:13.5px;text-align:right;}
+.radio{display:inline-flex;align-items:center;gap:6px;margin-right:24px;cursor:pointer;color:var(--text-2);}
+.radio input{accent-color:var(--primary);}
+.switch{position:relative;width:42px;height:22px;flex:0 0 auto;cursor:pointer;}
+.switch input{opacity:0;width:0;height:0;position:absolute;}
+.switch .track{position:absolute;inset:0;background:#dcdfe6;border-radius:11px;transition:.2s;}
+.switch .track::before{content:"";position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:2px;left:2px;transition:.2s;}
+.switch input:checked + .track{background:var(--primary);}
+.switch input:checked + .track::before{transform:translateX(20px);}
+.chk:has(input:checked){color:var(--primary);}
+
+/* 表格 */
+.tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.tbl th{background:#f5f7fa;color:var(--text-2);font-weight:600;padding:9px 8px;border:1px solid var(--border-l);text-align:center;white-space:nowrap;}
+.tbl td{padding:7px 8px;border:1px solid var(--border-l);text-align:center;vertical-align:middle;}
+.tbl .input,.tbl .select{height:30px;font-size:12.5px;}
+/* 表格内错误提示：绝对定位固定在储存格底部，出现/消失都不改变版面高度；
+   并为每一列 tbody 储存格统一预留提示位，确保有无错误、各栏输入框皆对齐不跑版。 */
+.tbl tbody td{position:relative;padding-bottom:22px;}
+.tbl .hint--err{position:absolute;left:8px;right:6px;bottom:3px;margin:0;padding:0;
+  font-size:11px;line-height:1.2;white-space:nowrap;text-align:left;
+  overflow:hidden;text-overflow:ellipsis;z-index:5;pointer-events:none;}
+.prefix-wrap{display:flex;align-items:center;}
+.prefix-wrap .prefix{height:30px;line-height:30px;padding:0 8px;background:#f5f7fa;border:1px solid var(--border);border-right:none;border-radius:4px 0 0 4px;color:var(--text-3);font-size:12.5px;}
+.prefix-wrap .input{border-radius:0 4px 4px 0;}
+.suffix-wrap{display:flex;align-items:center;}
+.suffix-wrap .input{border-radius:4px 0 0 4px;border-right:none;}
+.suffix-wrap .suffix{height:30px;line-height:30px;padding:0 8px;background:#f5f7fa;border:1px solid var(--border);border-radius:0 4px 4px 0;color:var(--text-3);font-size:12.5px;}
+
+/* 向导两栏 */
+.wizard{display:grid;grid-template-columns:210px minmax(0,1fr);gap:16px;}
+.steps{background:#fff;border-radius:6px;padding:18px 6px;height:max-content;}
+.step{display:flex;align-items:center;gap:10px;padding:11px 16px;color:var(--text-3);font-size:13.5px;cursor:pointer;}
+.step .num{width:22px;height:22px;border-radius:50%;border:1px solid #c0c4cc;display:grid;place-items:center;font-size:12px;flex:0 0 auto;}
+.step.is-done{color:var(--text-2);}
+.step.is-done .num{background:var(--primary);border-color:var(--primary);color:#fff;}
+.step.is-active{color:var(--primary);font-weight:600;}
+.step.is-active .num{background:var(--primary);border-color:var(--primary);color:#fff;}
+.wizard__body{background:#fff;border-radius:6px;}
+.wizard__head{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border-l);}
+.wizard__head h3{margin:0;color:var(--primary);font-size:15px;}
+.wizard__actions{display:flex;gap:10px;}
+.wizard__panel{padding:22px 24px;display:none;}
+.wizard__panel.is-active{display:block;}
+.panel-desc{color:var(--text-3);font-size:12.5px;margin:0 0 16px;}
+.block{border:1px solid var(--border-l);border-radius:6px;margin-bottom:18px;}
+.block__head{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:#fafbfc;border-bottom:1px solid var(--border-l);}
+.block__head h4{margin:0;font-size:13.5px;color:var(--text);}
+.block__head h4 .req{font-size:13.5px;}
+.block__body{padding:14px;overflow-x:auto;}
+
+/* VIP 页签 */
+.vip-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;align-items:center;}
+.vip-tab{padding:5px 12px;border:1px solid var(--border);border-radius:4px;font-size:12.5px;color:var(--text-2);cursor:pointer;background:#fff;}
+.vip-tab.is-active{background:var(--primary);color:#fff;border-color:var(--primary);}
+.vip-tab.is-disabled{opacity:.45;cursor:not-allowed;}
+.applyall{display:inline-flex;align-items:center;gap:6px;margin-left:8px;font-size:12.5px;color:var(--text-2);cursor:pointer;}
+.applyall input{accent-color:var(--primary);}
+
+/* 弹窗 */
+.mask{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:50;}
+.mask.is-open{display:flex;}
+.modal{background:#fff;border-radius:8px;width:min(620px,92vw);max-height:86vh;display:flex;flex-direction:column;overflow:hidden;}
+.modal--sm{width:min(440px,92vw);}
+.modal__head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border-l);font-weight:600;}
+.modal__head .x{cursor:pointer;color:var(--text-3);border:none;background:none;font-size:18px;}
+.modal__body{padding:16px 18px;overflow-y:auto;}
+.modal__foot{padding:12px 18px;display:flex;justify-content:flex-end;gap:10px;border-top:1px solid var(--border-l);}
+label.chk{display:inline-flex;gap:6px;align-items:center;cursor:pointer;}
+label.chk input{accent-color:var(--primary);}
+
+/* 提交预览 */
+.pv{width:100%;border-collapse:collapse;font-size:13px;}
+.pv th{background:#f5f7fa;padding:10px;border:1px solid var(--border-l);text-align:left;}
+.pv td{padding:10px 14px;border:1px solid var(--border-l);vertical-align:top;}
+.pv .pv-step{width:130px;font-weight:600;color:var(--primary);background:#fafbfc;}
+.pv-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 30px;}
+.pv-grid .k{color:var(--text-3);}
+.pv-grid .kv{display:flex;gap:8px;}
+
+/* 时间区间选择器 */
+.dp-wrap{position:relative;}
+.dp-trigger{padding-right:32px;cursor:pointer;background:#fff;}
+.dp-icon{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--text-3);pointer-events:none;font-size:13px;}
+.dp-pop{position:absolute;z-index:70;background:#fff;border:1px solid var(--border);border-radius:6px;
+  box-shadow:0 6px 24px rgba(0,0,0,.15);padding:12px;display:none;width:560px;max-width:92vw;}
+.dp-pop.is-open{display:block;}
+.dp-head{display:flex;align-items:center;gap:6px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border-l);flex-wrap:wrap;}
+.dp-input{border:1px solid var(--border);border-radius:4px;padding:5px 8px;font-size:12.5px;color:var(--text);width:100px;}
+.dp-input.dp-time{width:88px;}
+.dp-arrow{color:var(--text-3);}
+.dp-cals{display:flex;gap:16px;}
+.dp-cal{flex:1;min-width:0;}
+.dp-cal-head{display:flex;align-items:center;margin-bottom:6px;font-size:13px;font-weight:600;}
+.dp-nav{border:none;background:none;cursor:pointer;color:var(--text-2);font-size:15px;padding:2px 6px;}
+.dp-nav:hover{color:var(--primary);}
+.dp-cal-title{flex:1;text-align:center;}
+.dp-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;font-size:12px;text-align:center;}
+.dp-cal-grid .dow{color:var(--text-3);padding:4px 0;font-weight:600;}
+.dp-day{padding:6px 0;border-radius:4px;cursor:pointer;color:var(--text);}
+.dp-day:hover{background:var(--blue-l);}
+.dp-day.is-empty{visibility:hidden;cursor:default;}
+.dp-day.is-start,.dp-day.is-end{background:var(--primary);color:#fff;}
+.dp-day.is-in-range{background:var(--blue-l);}
+.dp-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border-l);}
+
+/* toast */
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-12px);background:#fff;border:1px solid var(--border);
+  border-left:4px solid var(--green);box-shadow:0 4px 16px rgba(0,0,0,.12);padding:10px 18px;border-radius:6px;font-size:13px;
+  opacity:0;transition:.25s;z-index:80;}
+.toast.err{border-left-color:var(--red);}
+.toast.is-show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* 活动列表 */
+.list-filters{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:14px;}
+.list-filters .fld{display:flex;align-items:center;gap:8px;}
+.list-filters label{color:var(--text-2);font-size:13px;white-space:nowrap;}
+.list-filters .input,.list-filters .select{width:150px;height:34px;}
+.list-tbl{width:100%;border-collapse:collapse;font-size:13px;background:#fff;}
+.list-tbl th{background:#fafbfc;padding:11px 10px;border-bottom:1px solid var(--border-l);color:var(--text-2);text-align:left;white-space:nowrap;}
+.list-tbl td{padding:11px 10px;border-bottom:1px solid var(--border-l);color:var(--text-2);}
+.tag-on{color:var(--green);} .tag-off{color:var(--red);}
+.mini-note{font-size:12px;color:var(--text-3);margin-top:10px;}
+/* 派奖审核 / 活动报表 */
+.tbl-scroll{overflow-x:auto;}
+.refresh-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;color:var(--text-2);font-size:13px;}
+.rtabs{display:flex;gap:26px;border-bottom:1px solid var(--border-l);margin:-4px 0 16px;}
+.rtab{padding:10px 2px;font-size:14px;color:var(--text-3);cursor:pointer;border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;}
+.rtab.is-active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600;}
+.report-totals{display:flex;gap:22px;justify-content:flex-end;margin:0 0 12px;font-size:13px;color:var(--text-2);}
+.report-totals b{font-weight:800;}
+.report-totals .m{color:var(--red);} .report-totals .p{color:var(--primary);} .report-totals .c{color:var(--green);}
+.hl{color:var(--primary);font-weight:600;}
+/* ---------- 节庆特别活动：步骤4 新增元件 ---------- */
+.block__head .sub{font-weight:400;font-size:12px;color:var(--text-2);}
+.block__head-r{display:flex;align-items:center;gap:10px;}
+.wizard__panel[data-panel="4"] section{scroll-margin-top:16px;}
+.block.is-off .block__body{opacity:.45;pointer-events:none;}
+.tag-new{display:inline-block;font-size:11px;font-weight:600;color:#fff;background:var(--red);border-radius:3px;padding:0 5px;line-height:17px;margin-left:6px;vertical-align:1px;}
+
+/* 奖励数量储存格（依奖励类型切换） */
+.rv{display:flex;align-items:center;gap:6px;min-width:0;}
+.rv .suffix-wrap,.rv .prefix-wrap{flex:1;min-width:0;}
+.rv .select{flex:1;min-width:0;}
+.rv .js-name{flex:1.2;min-width:0;}
+.rv-phys{display:flex;flex-direction:column;gap:6px;width:100%;min-width:0;}
+.rv-phys__row{display:flex;gap:6px;min-width:0;}
+.rv-phys__row .input{flex:1;min-width:0;}
+.upl{display:flex;align-items:center;gap:8px;min-width:0;font-size:12px;color:var(--text-3);text-align:left;}
+.upl__btn{flex:none;}
+.upl__btn.is-error{border-color:var(--red);color:var(--red);}
+.upl__tip{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.upl__thumb{flex:none;width:48px;height:48px;object-fit:cover;border:1px solid var(--border);border-radius:4px;background:#fafbfc;cursor:zoom-in;}
+.upl__name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-2);}
+.img-viewer{max-width:min(520px,90vw);max-height:70vh;object-fit:contain;display:block;margin:0 auto;}
+.sum-line{display:flex;align-items:center;gap:10px;padding:8px 2px 0;font-size:12.5px;color:var(--text-2);}
+.sum-line b{font-weight:700;}
+.sum-line .warn{color:var(--red);font-weight:600;}
+
+/* 签到宝箱页签 / 状态徽章 */
+.box-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.box-tab{padding:5px 12px;border:1px solid var(--border);border-radius:4px;font-size:12.5px;color:var(--text-2);cursor:pointer;background:#fff;display:inline-flex;align-items:center;gap:6px;}
+.box-tab.is-active{background:var(--primary);color:#fff;border-color:var(--primary);}
+.st{font-size:11px;line-height:16px;padding:0 6px;border-radius:8px;}
+.st--ok{background:#e7f6ec;color:#1f8a46;}
+.st--bad{background:#fdecea;color:#c4372f;}
+.box-tab.is-active .st{background:rgba(255,255,255,.25);color:#fff;}
+.boxrate{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;}
+.boxrate__item{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--text-2);}
+.subrow td{background:#fbfcfe;text-align:left;}
+.subrow__inner{display:flex;flex-direction:column;gap:8px;padding:4px 4px 0;}
+.subrow__head{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--text);font-weight:600;}
+
+/* 期间返水：目标输入 */
+.goal-grid{display:flex;flex-direction:column;gap:6px;}
+.goal-grid .prefix-wrap .prefix{min-width:58px;text-align:center;}
+
+/* 投注量计算比例 */
+.ratio-tag{font-size:12px;color:var(--text-3);}
+.prov-group{border:1px solid var(--border-l);border-radius:6px;margin-bottom:10px;}
+.prov-group__head{padding:8px 12px;background:#f7f9fc;font-weight:600;color:var(--primary);display:flex;align-items:center;gap:8px;font-size:13px;}
+.prov-group__head .cnt{margin-left:auto;font-weight:400;color:var(--text-3);font-size:12px;}
+.prov-group__grid{padding:10px 12px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
+.prov-group__grid label{font-size:12.5px;color:var(--text-2);overflow-wrap:anywhere;}
+.modal--lg{width:min(980px,96vw);}
+.modal__toolbar{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;}
+@media(max-width:1100px){ .boxrate{grid-template-columns:repeat(3,minmax(0,1fr));} .prov-group__grid{grid-template-columns:repeat(2,minmax(0,1fr));} }
+@media(max-width:1100px){ .wizard{grid-template-columns:minmax(0,1fr);} .side{display:none;} }
+</style>
+</head>
+<body>
+
+<!-- ============ 左侧菜单（简化，沿用图例结构） ============ -->
+<aside class="side">
+  <div class="side__logo">⬡ OKbet Admin</div>
+  <div class="side__item">📤 提现管理 <span class="badge">0</span></div>
+  <div class="side__item">📊 数据报表</div>
+  <div class="side__item">🎮 游戏管理</div>
+  <div class="side__item">💳 充值配置</div>
+  <div class="side__item">📁 活动配置 <span class="badge">99+</span></div>
+  <div class="side__item is-parent">⚙️ 活动配置（新）</div>
+  <div class="side__sub">
+    <div class="side__subitem is-active" data-page="list">活动列表</div>
+    <div class="side__subitem">派奖审核</div>
+    <div class="side__subitem">活动报表</div>
+  </div>
+  <div class="side__item">🎁 抽奖活动管理</div>
+  <div class="side__item">🧩 系统管理 <span class="badge">0</span></div>
+</aside>
+
+<!-- ============ 右侧主体 ============ -->
+<div class="main">
+  <div class="crumb">位置 › 活动配置(新) › <b id="crumbTail">活动列表</b></div>
+  <div class="tabbar">
+    <span class="tabchip">银行支付配置 <span class="x">×</span></span>
+    <span class="tabchip">每日首充活动 <span class="x">×</span></span>
+    <span class="tabchip">会员 <span class="x">×</span></span>
+    <span class="tabchip is-active" id="tabMain">活动列表 <span class="x">×</span></span>
+  </div>
+
+  <div class="content">
+
+    <!-- ============ 页面：活动列表 ============ -->
+    <section id="pageList" class="card">
+      <div class="list-filters">
+        <div class="fld"><label>模板：</label>
+          <select class="select" id="tplFilter">
+            <option>全选</option><option>预约活动</option><option>周卡活动</option>
+            <option>联名挑战活动</option><option>节庆特别活动</option>
+          </select></div>
+        <div class="fld"><label>活动ID：</label><input class="input" placeholder=""></div>
+        <div class="fld"><label>活动名：</label><input class="input" placeholder=""></div>
+        <div class="fld"><label>状态：</label>
+          <select class="select"><option>全部</option><option>开启</option><option>关闭</option></select></div>
+        <button class="btn btn--primary">🔍 搜索</button>
+        <button class="btn btn--primary" id="btnNew" style="margin-left:auto">＋ 新增活动</button>
+      </div>
+      <table class="list-tbl" style="min-width:1360px">
+        <thead><tr>
+          <th>ID</th><th>排序</th><th>状态</th><th>起止时间</th><th>币种</th><th>语系</th>
+          <th>活动模板</th><th>活动名称</th><th>预览图片</th><th>黑名单</th><th>指定代理</th>
+          <th>参与/中奖人数</th><th>彩金所需流水倍数</th><th>操作</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>191</td><td>0</td><td class="tag-on">开启</td><td>26/11/16<br>26/12/31</td><td>PHP</td><td>预设</td>
+            <td><b>节庆特别活动</b></td><td>Christmas Activities 2026</td><td><button class="btn btn--primary btn--sm">上传</button></td><td>—</td><td>—</td>
+            <td>0 / 0</td><td>1</td>
+            <td><button class="btn--link" data-edit>编辑</button><span class="op-sep">|</span><button class="btn--link red" data-del>删除</button><br><button class="btn--link red" data-close>关闭</button></td></tr>
+          <tr><td>190</td><td>0</td><td class="tag-on">开启</td><td>26/08/21<br>26/10/31</td><td>PHP</td><td>预设</td>
+            <td>联名挑战活动</td><td>X-Bomb Lucky Blast</td><td><button class="btn btn--primary btn--sm">上传</button></td><td>—</td><td>—</td>
+            <td>0 / 0</td><td>1</td>
+            <td><button class="btn--link">编辑</button><span class="op-sep">|</span><button class="btn--link red" data-del>删除</button><br><button class="btn--link red">关闭</button></td></tr>
+          <tr><td>184</td><td>0</td><td class="tag-off">关闭</td><td>26/07/30<br>26/08/08</td><td>PHP</td><td>—</td>
+            <td>周卡活动</td><td>最新周卡</td><td><button class="btn btn--primary btn--sm">上传</button></td><td>—</td><td>—</td>
+            <td>4 / 4</td><td>—</td>
+            <td><button class="btn--link">编辑</button><span class="op-sep">|</span><button class="btn--link red" data-del>删除</button><br><button class="btn--link">开启</button></td></tr>
+          <tr><td>183</td><td>0</td><td class="tag-on">开启</td><td>26/07/01<br>26/07/14</td><td>PHP</td><td>—</td>
+            <td>周卡活动</td><td>周卡时间到期测试</td><td><button class="btn btn--primary btn--sm">上传</button></td><td>—</td><td>—</td>
+            <td>3 / 3</td><td>—</td>
+            <td><button class="btn--link">编辑</button><span class="op-sep">|</span><button class="btn--link red" data-del>删除</button><br><button class="btn--link red">关闭</button></td></tr>
+        </tbody>
+      </table>
+      <p class="mini-note">点「＋ 新增活动」或第一列（ID 191）「编辑」进入「节庆特别活动」配置向导；其余列为既有活动示意，不可操作编辑。</p>
+    </section>
+
+    <!-- ============ 页面：配置向导 ============ -->
+    <section id="pageWizard" style="display:none">
+      <div class="wizard">
+        <!-- 步骤条 -->
+        <nav class="steps" id="stepRail">
+          <div class="step is-active" data-step="1"><span class="num">1</span>活动模板设置</div>
+          <div class="step" data-step="2"><span class="num">2</span>活动图片</div>
+          <div class="step" data-step="3"><span class="num">3</span>参与对象与名单</div>
+          <div class="step" data-step="4"><span class="num">4</span>活动条件</div>
+          <div class="step" data-step="5"><span class="num">5</span>风控条件</div>
+          <div class="step" data-step="6"><span class="num">6</span>提交预览</div>
+        </nav>
+
+        <div class="wizard__body">
+          <div class="wizard__head">
+            <h3>活动配置步骤</h3>
+            <div class="wizard__actions">
+              <button class="btn" id="btnPrev">上一步</button>
+              <button class="btn btn--primary" id="btnNext">下一步</button>
+              <button class="btn btn--green" id="btnSubmit" style="display:none">提交</button>
+              <button class="btn btn--red" id="btnExit">退出编辑</button>
+            </div>
+          </div>
+
+          <!-- 步骤1 活动模板设置 -->
+          <div class="wizard__panel is-active" data-panel="1">
+            <p class="panel-desc">将活动模板配置保存至系统，系统将自动配置相关功能。</p>
+            <div class="sec-title">活动模板</div>
+            <div class="form-row"><label><span class="req">*</span>活动类型：</label>
+              <select class="select" id="fType"><option selected>节庆特别活动</option><option>联名挑战活动</option><option>周卡活动</option><option>预约活动</option></select></div>
+            <div class="form-row"><label><span class="req">*</span>活动名称：</label>
+              <input class="input" id="fName" placeholder="请输入"></div>
+            <div class="form-row"><label><span class="req">*</span>币种：</label>
+              <select class="select" id="fCur"><option>PHP</option><option>USD</option></select></div>
+            <div class="form-row"><label>状态：</label>
+              <div><label class="radio"><input type="radio" name="status" value="关闭" checked>关闭</label>
+                   <label class="radio"><input type="radio" name="status" value="开启">开启</label>
+                   <p class="hint hint--warn">· 同期仅能开启一个「节庆特别活动」：已有相同活动进行中时，保存／开启将被挡下并提示「检测到相同活动正在进行中」，须先<b>关闭</b>或<b>删除</b>既有活动。</p></div></div>
+            <div class="sec-title" style="margin-top:24px">时间设定</div>
+            <div class="form-row"><label><span class="req">*</span>活动时间：</label>
+              <div class="dp-wrap"><input class="input dp-trigger" id="fActTime" type="text" readonly placeholder="开始时间 ~ 结束时间"><span class="dp-icon">📅</span></div></div>
+            <p class="hint hint--warn">· 活动时间到期：<b>停止计算／产生新奖励</b>；已获得的奖励仍可领取。<br>
+              · 「签到活动、每日返水、期间返水」统一以本活动时间计算。<br>
+              · 「状态」开关为手动强制下架（关闭：<b>仅隐藏入口、停算；不影响用户已获得的奖励，重开各状态维持不变</b>，需二次确认）；同期仅能开启一个节庆特别活动。</p>
+          </div>
+
+          <!-- 步骤2 活动图片 -->
+          <div class="wizard__panel" data-panel="2">
+            <p class="panel-desc">设置首页浮窗图片、活动列表图片及活动备注。活动列表图片用于前台 Rewards → Promotion 分类显示（Event time／标题依步骤1配置，排序照旧依有无角标）。</p>
+            <div class="sec-title">首页浮窗设置</div>
+            <div style="margin-bottom:14px">
+              <label class="radio"><input type="radio" name="float" checked>关闭</label>
+              <label class="radio"><input type="radio" name="float">开启</label></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:820px">
+              <div class="block"><div class="block__head"><h4>PC 图片</h4></div>
+                <div class="block__body" style="text-align:center;color:var(--text-3);padding:32px">⬆<br>点击上传图片</div></div>
+              <div class="block"><div class="block__head"><h4>H5 图片</h4></div>
+                <div class="block__body" style="text-align:center;color:var(--text-3);padding:32px">⬆<br>点击上传图片</div></div>
+            </div>
+            <p class="hint">图片格式：png、bmp、jpg、gif、webp；大小限制 5MB 内。</p>
+            <div class="form-row" style="margin-top:12px"><label>排序：</label><input class="input" id="fSort" value="0" style="max-width:120px"></div>
+            <hr style="border:none;border-top:1px solid var(--border-l);margin:18px 0">
+            <div class="sec-title">活动列表设置</div>
+            <div style="margin-bottom:14px">
+              <label class="radio"><input type="radio" name="listShow" checked>开启</label>
+              <label class="radio"><input type="radio" name="listShow">关闭</label></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:820px">
+              <div class="block"><div class="block__head"><h4>PC 图片</h4></div>
+                <div class="block__body" style="text-align:center;color:var(--text-3);padding:32px">⬆<br>点击上传图片</div></div>
+              <div class="block"><div class="block__head"><h4>H5 图片</h4></div>
+                <div class="block__body" style="text-align:center;color:var(--text-3);padding:32px">⬆<br>点击上传图片</div></div>
+            </div>
+            <p class="hint">用于前台 Rewards → Promotion 列表；图片格式：png、bmp、jpg、gif、webp；大小限制 5MB 内。</p>
+            <div class="form-row" style="margin-top:12px"><label>排序：</label><input class="input" id="fListSort" value="0" style="max-width:120px"></div>
+            <div class="sec-title" style="margin-top:12px">备注</div>
+            <textarea class="input" id="fRemark" style="height:80px;padding:8px 10px;max-width:820px" placeholder="请输入备注内容…（仅供内部参考，不显示给用户）"></textarea>
+          </div>
+
+          <!-- 步骤3 参与对象与名单 -->
+          <div class="wizard__panel" data-panel="3">
+            <p class="panel-desc">设置活动的参与对象与黑名单规则（参照其他活动，无调整）。</p>
+            <div class="sec-title">参与对象设置</div>
+            <div class="form-row"><label>1. 充值层级：</label><select class="select" disabled><option>全选</option></select></div>
+            <div class="form-row"><label>2. 指定代理：</label>
+              <div><label class="radio"><input type="radio" name="agent" checked disabled>不指定</label>
+                   <label class="radio"><input type="radio" name="agent" disabled>指定代理线</label></div></div>
+            <div class="form-row"><label>3. 新会员限制：</label>
+              <label class="switch"><input type="checkbox" disabled><span class="track"></span></label></div>
+            <div class="form-row"><label>4. 会员等级：</label><select class="select" disabled><option>全选</option></select></div>
+            <div class="form-row"><label>5. 用户标签：</label><select class="select" disabled><option>请选择用户标签</option></select></div>
+            <div class="sec-title" style="margin-top:20px">黑名单设置</div>
+            <div class="form-row"><label>黑名单：</label><input class="input" placeholder="请输入，以逗号分隔多个用户名"></div>
+            <div class="form-row"><label>用户标签：</label><select class="select" disabled><option>请选择用户标签</option></select></div>
+          </div>
+
+          <!-- 步骤4 活动条件（节庆特别活动：本次唯一调整的步骤） -->
+          <div class="wizard__panel" data-panel="4">
+
+
+            <!-- 4-1 签到活动配置 -->
+            <section class="block" id="secSign">
+              <div class="block__head"><h4><span class="req">*</span>签到活动配置<span class="tag-new">新增</span>
+                <span class="sub">（每日可签到 1 次；断签后连续天数重置，从第一天重新计算）</span></h4></div>
+              <div class="block__body">
+                <table class="tbl" style="min-width:860px;table-layout:fixed">
+                  <thead><tr>
+                    <th style="width:130px">连续签到天数</th><th style="width:220px">签到奖励类型</th><th>奖励数量</th><th style="width:190px">额外随机宝箱</th>
+                  </tr></thead>
+                  <tbody id="signBody"></tbody>
+                </table>
+                <p class="hint">· 每天的签到奖励固定 <b>1 项</b>，奖励类型：彩金、积分、抽奖券（Golden Draw Ticket）、免费投注、优惠券。<br>
+                  · 「第三天以上(含)」：连续签到达第 3 天起，每日发放「第三天以上(含)」签到奖励；开启「额外随机宝箱」时，再依各宝箱中奖率随机发放 1 款签到宝箱，宝箱中奖率合计须等于 100%。</p>
+              </div>
+            </section>
+
+            <!-- 4-2 签到宝箱配置 -->
+            <section class="block" id="secBox">
+              <div class="block__head"><h4><span class="req" id="boxReq">*</span>签到宝箱配置<span class="tag-new">新增</span>
+                <span class="sub">（开启「额外随机宝箱」时至少配置 1 款；最多 6 款，每款固定 9 项奖励，开启时依中奖率随机抽出 1 项）</span></h4>
+                <span class="ratio-tag" id="boxOffNote" style="display:none">「额外随机宝箱」已关闭，本区块免填</span></div>
+              <div class="block__body">
+                <div class="box-tabs" id="boxTabs" role="tablist" aria-label="签到宝箱"></div>
+                <table class="tbl" style="min-width:780px;table-layout:fixed">
+                  <thead><tr><th style="width:60px">#</th><th style="width:230px">奖励类型</th><th>奖励数量</th><th style="width:170px">中奖率</th></tr></thead>
+                  <tbody id="boxBody"></tbody>
+                </table>
+                <div class="sum-line" id="boxSum"></div>
+                <p class="hint">奖励类型：彩金、积分、抽奖券（Golden Draw Ticket）、免费投注、优惠券、实体奖品（填写奖品名称＋奖励价值＋上传小图）。<br>
+                  · 「额外随机宝箱」开启：6 款中<b>至少须配置 1 款</b>，其余可整款留空；关闭：本区块免填。<br>
+                  · 一旦开始填写该款宝箱，固定 9 项奖励皆须完整（不可新增、删除），且中奖率合计须等于 100%；已配置的宝箱才可于上方「随机宝箱中奖率」填写中奖率。</p>
+              </div>
+            </section>
+
+            <!-- 4-3 每日返水配置（沿用；移除挑战任务、刮刮卡） -->
+            <section class="block" id="secRebate">
+              <div class="block__head"><h4><span class="req">*</span>每日返水配置 <span class="sub">（VIP 分级配置；已移除「挑战任务、刮刮卡」）</span></h4>
+                <button class="btn btn--primary btn--sm" id="btnAddLevel">＋ 新增等级</button></div>
+              <div class="block__body">
+                <div class="vip-tabs" id="vipTabs"></div>
+                <label class="applyall"><input type="checkbox" id="applyAll">套用至其他等级（勾选后其余 VIP 等级套用 VIP0 配置、不可再编辑）</label>
+                <table class="tbl" style="margin-top:10px;min-width:680px">
+                  <thead><tr>
+                    <th style="width:60px">等级</th><th style="width:130px">任务条件</th><th style="width:190px">任务目标</th>
+                    <th style="width:80px">奖励物</th><th>奖励金额</th><th style="width:60px">操作</th>
+                  </tr></thead>
+                  <tbody id="rebateBody"></tbody>
+                </table>
+                <p class="hint">任务目标／奖励金额：不可为空、0 或小数点；任务目标需依同「任务条件」逐级递增。奖励金额一律为固定金额。等级最低 LV1，最多 LV20。<br>
+                  「有效投注」进度套用下方「投注量计算比例」折算。</p>
+              </div>
+            </section>
+
+            <!-- 4-4 期间返水任务 -->
+            <section class="block" id="secPeriod">
+              <div class="block__head"><h4><span class="req">*</span>期间返水任务<span class="tag-new">新增</span>
+                <span class="sub">（依活动期间累计计算；不分 VIP）</span></h4>
+                <button class="btn btn--primary btn--sm" id="btnAddPeriod">＋ 新增等级</button></div>
+              <div class="block__body">
+                <table class="tbl" style="min-width:860px">
+                  <thead><tr>
+                    <th style="width:60px">等级</th><th style="width:150px">任务条件</th><th style="width:260px">任务目标</th>
+                    <th>宝箱奖励（9 项）</th><th style="width:60px">操作</th>
+                  </tr></thead>
+                  <tbody id="periodBody"></tbody>
+                </table>
+                <p class="hint">任务条件：投注、充值、投注+充值（须同时达成两项目标）。任务目标不可为空、0 或小数点，且需依同「任务条件」逐级递增。等级最低 LV1，最多 LV50。<br>
+                  「投注」进度套用下方「投注量计算比例」折算；每级宝箱固定 9 项奖励，中奖率合计须等于 100%。</p>
+              </div>
+            </section>
+
+            <!-- 4-5 投注量计算比例 -->
+            <section class="block" id="secRatio">
+              <div class="block__head"><h4>投注量计算比例<span class="tag-new">新增</span>
+                <span class="sub">（套用「每日返水配置」「期间返水任务」的投注量；未设定的游戏商按 100% 计算）</span></h4></div>
+              <div class="block__body">
+                <table class="tbl" style="min-width:820px;table-layout:fixed">
+                  <thead><tr>
+                    <th style="width:110px">游戏类型</th><th style="width:190px">流水计算比例</th><th>套用游戏商</th>
+                  </tr></thead>
+                  <tbody id="ratioBody"></tbody>
+                </table>
+                <p class="hint">· 点「选择游戏商」勾选要套用折扣的游戏商；同一游戏类型内被勾选的游戏商套用同一「流水计算比例」。<br>
+                  · 比例为 0～100 的整数；Slot／Live／Mini：已勾选游戏商时比例必填，已填比例时须至少勾选 1 家游戏商。<br>
+                  · Sport 仅配置比例、不可选择游戏商，比例套用全部体育游戏商；留空按 100% 计算。</p>
+              </div>
+            </section>
+
+            <!-- 4-6 彩金所需流水倍数（沿用） -->
+            <section id="secOther">
+              <div class="form-row"><label>彩金所需流水倍数：</label>
+                <input class="input" id="fWager" placeholder="0.01～999999.99（可空；不可为 0）" style="max-width:220px"></div>
+            </section>
+          </div>
+
+          <!-- 步骤5 风控条件 -->
+          <div class="wizard__panel" data-panel="5">
+            <p class="panel-desc">设置活动的风险控制规则，确保活动安全进行（参照其他活动，无调整）。</p>
+            <div class="sec-title">风险检测设置</div>
+            <div class="form-row"><label>同 IP 检测：</label><label class="switch"><input type="checkbox"><span class="track"></span></label></div>
+            <div class="form-row"><label>同手机号检测：</label><label class="switch"><input type="checkbox" checked><span class="track"></span></label></div>
+            <div class="form-row"><label>同姓名检测：</label><label class="switch"><input type="checkbox"><span class="track"></span></label></div>
+            <div class="form-row"><label>同 email 检测：</label><label class="switch"><input type="checkbox" checked><span class="track"></span></label></div>
+            <div class="block" style="max-width:640px;margin-top:8px">
+              <div class="block__head"><h4 style="color:var(--red)">自动拒绝</h4></div>
+              <div class="block__body">
+                <div class="form-row" style="margin-bottom:12px"><label>自动拒绝：</label>
+                  <label class="switch"><input type="checkbox" id="autoReject"><span class="track"></span></label></div>
+                <div class="form-row" style="margin-bottom:0"><label>触发条件：</label>
+                  <div style="display:flex;align-items:center;gap:8px;color:var(--text-2)">当违反
+                    <input class="input" id="rejectN" value="0" style="width:80px" disabled> 笔以上，将自动拒绝</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 步骤6 提交预览 -->
+          <div class="wizard__panel" data-panel="6">
+            <p class="panel-desc">请确认以下活动配置信息，确认无误后点击「提交」按钮。</p>
+            <table class="pv"><tbody id="previewBody"></tbody></table>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 页面：派奖审核 ============ -->
+    <section id="pageAudit" class="card" style="display:none">
+      <div class="list-filters">
+        <div class="fld"><label>活动ID：</label><input class="input" placeholder="请输入"></div>
+        <div class="fld"><label>会员帐号：</label><input class="input" placeholder="请输入"></div>
+        <div class="fld"><label for="auType">奖励类型：</label>
+          <select class="select" id="auType"><option value="">全选</option><option>礼金</option><option>积分</option><option>免费投注券</option><option>免费旋转券</option><option>优惠券</option><option>道具卡</option><option>抽奖券</option><option>实体奖品</option></select></div>
+        <div class="fld"><label for="auAct">活动类型：</label>
+          <select class="select" id="auAct"><option value="">全选</option><option>预约活动</option><option>周卡活动</option><option>联名挑战活动</option><option>节庆特别活动</option></select></div>
+        <div class="fld"><label>状态：</label>
+          <select class="select" id="auStatus"><option value="">全部</option><option>待审核</option><option>审核通过</option><option>审核不通过</option></select></div>
+        <div class="fld"><label>申请时间：</label><input class="input dp-trigger" readonly placeholder="开始时间 ~ 结束时间" style="width:230px"></div>
+        <button class="btn btn--primary" id="auSearch">🔍 搜索</button>
+        <button class="btn btn--primary">⬇ 导出</button>
+      </div>
+      <div class="refresh-row">
+        <label class="switch"><input type="checkbox"><span class="track"></span></label>
+        <input class="input" value="30" style="width:60px;height:30px;text-align:center"> 秒自动刷新
+      </div>
+      <div class="tbl-scroll">
+      <table class="list-tbl" style="min-width:1180px">
+        <thead><tr>
+          <th>活动ID</th><th>会员帐号</th><th>活动类型</th><th>活动名称</th><th>奖励类型</th><th>奖励金额/内容</th>
+          <th>状态</th><th>申请时间</th><th>审核人</th><th>审核时间</th><th style="min-width:220px">备注</th><th>操作</th>
+        </tr></thead>
+        <tbody id="auditBody"></tbody>
+      </table>
+      </div>
+      <p class="mini-note">「联名挑战活动」的奖励状态一律「审核通过」、审核人一律「自动审核」（无需人工审核）。<br>
+        「节庆特别活动」：用户<b>每获得 1 个奖励即新增 1 笔记录</b>（签到奖励、签到宝箱、每日返水、期间返水宝箱各自独立成笔；同一天签到获得签到奖励＋随机宝箱为 2 笔）；除实体奖品外，状态一律「审核通过」、审核人一律「自动审核」，申请时间＝审核时间＝奖励发放时间；备注记录奖励来源。<br>
+        「节庆特别活动」的<b>实体奖品</b>例外，采<b>人工审核</b>：发放时状态为「待审核」，审核人／审核时间显示「—」；操作栏点「通过」或「拒绝」（拒绝须填原因）后，写入审核人账号与审核时间，审核结果不可再修改。</p>
+    </section>
+
+    <!-- ============ 页面：活动报表 ============ -->
+    <section id="pageReport" class="card" style="display:none">
+      <div class="rtabs">
+        <button class="rtab is-active" data-rtab="award">活动奖励统计</button>
+        <button class="rtab" data-rtab="data">活动数据统计</button>
+      </div>
+
+      <!-- 子页：活动奖励统计 -->
+      <div id="reportAward">
+        <div class="list-filters">
+          <div class="fld"><label>活动 ID：</label><input class="input" placeholder="请输入"></div>
+          <div class="fld"><label>活动类型：</label>
+            <select class="select"><option>全选</option><option>预约活动</option><option>周卡活动</option><option>联名挑战活动</option><option>节庆特别活动</option></select></div>
+          <div class="fld"><label>奖励类型：</label>
+            <select class="select"><option>全选</option><option>礼金</option><option>积分</option><option>免费投注券</option><option>免费旋转券</option><option>优惠券</option><option>道具卡</option></select></div>
+          <div class="fld"><label>起始日期 ~ 结束日期：</label><input class="input dp-trigger" readonly placeholder="开始时间 ~ 结束时间" style="width:230px"></div>
+          <button class="btn btn--primary">🔍 搜寻</button>
+          <button class="btn btn--primary">⬇ 导出</button>
+        </div>
+        <div class="report-totals">总金额：<b class="m">46,742.00</b>　总积分：<b class="p">39,834.00</b>　总免费券：<b class="c">485</b></div>
+        <div class="tbl-scroll">
+        <table class="list-tbl" style="min-width:1080px">
+          <thead><tr>
+            <th>日期</th><th>活动类型</th><th>活动ID</th><th>活动名称</th><th>奖励类型</th><th>奖励内容</th>
+            <th>参与人数</th><th>领取次数</th><th>派发金额(系统币)</th><th>积分小计</th><th>券张数</th>
+          </tr></thead>
+          <tbody id="awardBody"></tbody>
+        </table>
+        </div>
+        <p class="mini-note">「联名挑战活动」奖励类型一律「礼金」；若奖励来自刮刮卡，活动类型附加括号显示为「联名挑战活动(刮刮卡)」。</p>
+      </div>
+
+      <!-- 子页：活动数据统计 -->
+      <div id="reportData" style="display:none">
+        <div class="list-filters">
+          <div class="fld"><label>活动 ID：</label><input class="input" placeholder="请输入"></div>
+          <div class="fld"><label>会员账号：</label><input class="input" placeholder="请输入"></div>
+          <div class="fld"><label>活动类型：</label>
+            <select class="select"><option>全选</option><option>预约活动</option><option>周卡活动</option><option>联名挑战活动</option><option>节庆特别活动</option></select></div>
+          <div class="fld"><label>奖励类型：</label>
+            <select class="select"><option>全选</option><option>礼金</option><option>积分</option><option>免费投注券</option><option>免费旋转券</option><option>优惠券</option><option>道具卡</option></select></div>
+          <div class="fld"><label>状态：</label>
+            <select class="select"><option>全部</option><option>待审核</option><option>已通过</option><option>已拒绝</option></select></div>
+          <button class="btn btn--primary">🔍 搜寻</button>
+          <button class="btn btn--primary">⬇ 导出</button>
+        </div>
+        <div class="tbl-scroll">
+        <table class="list-tbl" style="min-width:1080px">
+          <thead><tr>
+            <th>活动ID</th><th>会员账号</th><th>活动类型</th><th>活动名称</th><th>奖励类型</th><th>奖励内容</th>
+            <th>天数</th><th>申请领取时间</th><th>审核时间</th><th>状态</th>
+          </tr></thead>
+          <tbody id="dataBody"></tbody>
+        </table>
+        </div>
+        <p class="mini-note">「联名挑战活动」：天数固定「-」；申请领取时间与审核时间一致；状态一律「已通过」；刮刮卡奖励活动类型加括号「联名挑战活动(刮刮卡)」。</p>
+      </div>
+
+    </section>
+
+  </div>
+</div>
+
+<!-- ============ 弹窗：关闭活动确认 ============ -->
+<div class="mask" id="closeMask">
+  <div class="modal modal--sm">
+    <div class="modal__head">提示 <button class="x" data-close-modal>×</button></div>
+    <div class="modal__body">⚠️ 关闭活动将强制终止整个活动，所有持有有效奖励的会员将无法继续领取剩余奖励周期。确定关闭？</div>
+    <div class="modal__foot">
+      <button class="btn" data-close-modal>Cancel</button>
+      <button class="btn btn--primary" id="closeConfirm">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 弹窗：删除活动确认 ============ -->
+<div class="mask" id="delMask">
+  <div class="modal modal--sm">
+    <div class="modal__head">删除确认 <button class="x" data-close-modal>×</button></div>
+    <div class="modal__body">⚠️ 确定要删除此活动吗？删除后该活动将从列表中移除，且无法复原。</div>
+    <div class="modal__foot">
+      <button class="btn" data-close-modal>取消</button>
+      <button class="btn btn--red" id="delConfirm">确定删除</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 弹窗：期间返水 · 宝箱奖励配置 ============ -->
+<div class="mask" id="periodMask">
+  <div class="modal modal--lg" role="dialog" aria-modal="true" aria-labelledby="periodTitle">
+    <div class="modal__head"><span id="periodTitle">LV1 宝箱奖励配置</span> <button class="x" data-close-modal aria-label="关闭">×</button></div>
+    <div class="modal__body">
+      <div class="modal__toolbar">
+        <span id="periodTaskInfo" style="font-size:12.5px;color:var(--text-2)"></span>
+        <button class="btn btn--sm" id="btnCopyPrev" style="margin-left:auto">复制上一级奖励</button>
+      </div>
+      <table class="tbl" style="min-width:760px;table-layout:fixed">
+        <thead><tr><th style="width:60px">#</th><th style="width:230px">奖励类型</th><th>奖励数量</th><th style="width:170px">中奖率</th></tr></thead>
+        <tbody id="periodRwBody"></tbody>
+      </table>
+      <div class="sum-line" id="periodRwSum"></div>
+      <p class="hint">固定 9 项奖励（不可新增、删除），每项皆必填；中奖率合计须等于 100%。奖励类型：彩金、积分、抽奖券（Golden Draw Ticket）、免费投注、优惠券、实体奖品（奖品名称上限 30 字＋奖励价值＋小图）。</p>
+    </div>
+    <div class="modal__foot">
+      <button class="btn" data-close-modal>取消</button>
+      <button class="btn btn--primary" id="periodConfirm">确认</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 弹窗：选择游戏商（投注量计算比例） ============ -->
+<div class="mask" id="provMask">
+  <div class="modal modal--lg" role="dialog" aria-modal="true" aria-labelledby="provTitle">
+    <div class="modal__head"><span id="provTitle">选择游戏商</span> <button class="x" data-close-modal aria-label="关闭">×</button></div>
+    <div class="modal__body">
+      <div class="modal__toolbar">
+        <label class="chk" style="font-weight:600"><input type="checkbox" id="provAll">全选</label>
+        <span id="provCount" style="font-size:12.5px;color:var(--text-2)"></span>
+      </div>
+      <div id="provList"></div>
+    </div>
+    <div class="modal__foot">
+      <button class="btn" data-close-modal>取消</button>
+      <button class="btn btn--primary" id="provConfirm">确认</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 弹窗：实体奖品人工审核 ============ -->
+<div class="mask" id="auditMask">
+  <div class="modal modal--sm" role="dialog" aria-modal="true" aria-labelledby="auTitle">
+    <div class="modal__head"><span id="auTitle">审核</span> <button class="x" data-close-modal aria-label="关闭">×</button></div>
+    <div class="modal__body">
+      <p id="auInfo" style="margin:0 0 12px;line-height:1.7;font-size:13px;color:var(--text-2)"></p>
+      <p id="auPassTip" class="hint hint--warn" style="margin:0">确定通过此笔实体奖品？通过后请依线下流程安排寄送／领取，审核结果不可再修改。</p>
+      <div id="auReasonRow">
+        <label for="auReason" style="font-size:13px;color:var(--text-2)"><span class="req">*</span>拒绝原因：</label>
+        <textarea class="input" id="auReason" maxlength="100" style="height:80px;padding:8px 10px;margin-top:6px" placeholder="请输入拒绝原因（必填，上限 100 字）"></textarea>
+        <div style="display:flex;justify-content:space-between"><p class="hint hint--err" id="auReasonErr" style="display:none;margin:4px 0 0">请输入拒绝原因</p>
+          <span class="hint" id="auReasonCnt" style="margin-left:auto">0/100</span></div>
+      </div>
+    </div>
+    <div class="modal__foot">
+      <button class="btn" data-close-modal>取消</button>
+      <button class="btn btn--primary" id="auConfirm">确定</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 弹窗：小图放大预览 ============ -->
+<div class="mask" id="imgMask" style="z-index:60">
+  <div class="modal modal--sm" role="dialog" aria-modal="true" aria-labelledby="imgTitle">
+    <div class="modal__head"><span id="imgTitle">小图预览</span> <button class="x" data-close-modal aria-label="关闭">×</button></div>
+    <div class="modal__body"><img class="img-viewer" id="imgView" alt=""></div>
+  </div>
+</div>
+
+<div class="dp-pop" id="dpPop">
+  <div class="dp-head">
+    <input class="dp-input" id="dpStartDate" placeholder="Start Date" readonly>
+    <input class="dp-input dp-time" id="dpStartTime" type="time">
+    <span class="dp-arrow">→</span>
+    <input class="dp-input" id="dpEndDate" placeholder="End Date" readonly>
+    <input class="dp-input dp-time" id="dpEndTime" type="time">
+  </div>
+  <div class="dp-cals">
+    <div class="dp-cal" id="dpCal0"><div class="dp-cal-head"><button class="dp-nav" data-nav="prev">‹</button><span class="dp-cal-title"></span><span style="width:22px"></span></div><div class="dp-cal-grid"></div></div>
+    <div class="dp-cal" id="dpCal1"><div class="dp-cal-head"><span style="width:22px"></span><span class="dp-cal-title"></span><button class="dp-nav" data-nav="next">›</button></div><div class="dp-cal-grid"></div></div>
+  </div>
+  <div class="dp-foot">
+    <button class="btn btn--sm" id="dpClear">Clear</button>
+    <button class="btn btn--primary btn--sm" id="dpOk">OK</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =====================================================================
+   后台原型交互（白话注解）
+   ===================================================================== */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+function toast(msg,err){const t=$('#toast');t.textContent=msg;t.className='toast'+(err?' err':'')+' is-show';
+  clearTimeout(t._t);t._t=setTimeout(()=>t.className='toast'+(err?' err':''),2200);}
+
+/* ---------- 比例（%）输入超过 100 即时提示 ---------- */
+function pctHintHtml(cls){ return `<p class="hint hint--err ${cls}" style="visibility:hidden">比例配置不得超过100%</p>`; }
+function attachPctGuard(input,hintEl){
+  const check=()=>{ const over=input.value!==''&&Number(input.value)>100; input.classList.toggle('is-error',over); if(hintEl) hintEl.style.visibility=over?'visible':'hidden'; };
+  input.addEventListener('input',check); check();
+}
+
+/* ---------- 页面切换：列表 / 向导 / 派奖审核 / 活动报表 ---------- */
+function hideAuxPages(){ ['#pageAudit','#pageReport'].forEach(id=>{const e=$(id); if(e)e.style.display='none';}); }
+function setActiveSub(title){ $$('.side__subitem').forEach(s=>s.classList.toggle('is-active', s.textContent.trim()===title)); }
+let isEditMode=false;
+function showWizard(on,label){
+  hideAuxPages();
+  $('#pageList').style.display=on?'none':'';
+  $('#pageWizard').style.display=on?'':'none';
+  const tag=label||'新增活动'; isEditMode=(tag==='编辑活动');
+  $('#crumbTail').textContent=on?tag:'活动列表';
+  $('#tabMain').firstChild.textContent=on?tag+' ':'活动列表 ';
+  if(!on) setActiveSub('活动列表');
+  if(on){ gotoStep(1); renderStep4(); }
+}
+/* 派奖审核 / 活动报表 页面切换 */
+function showAux(name){
+  const map={audit:['#pageAudit','派奖审核'],report:['#pageReport','活动报表']};
+  const [sel,title]=map[name];
+  $('#pageList').style.display='none'; $('#pageWizard').style.display='none'; hideAuxPages();
+  $(sel).style.display='';
+  $('#crumbTail').textContent=title; $('#tabMain').firstChild.textContent=title+' '; setActiveSub(title);
+}
+/* 左侧子菜单绑定 */
+$$('.side__subitem').forEach(s=>{ const t=s.textContent.trim();
+  s.addEventListener('click',()=>{
+    if(t==='活动列表') showWizard(false);
+    else if(t==='派奖审核'){ showAux('audit'); renderAudit(); }
+    else if(t==='活动报表'){ showAux('report'); renderReport(); }
+  });
+});
+
+/* ---------- 派奖审核：资料与渲染 ---------- */
+/* 规则：联名挑战活动 → 状态一律「审核通过」、审核人一律「自动审核」 */
+const auditRows=[
+  /* 节庆特别活动：每获得 1 个奖励＝1 笔；备注记录奖励来源 */
+  ['191','vip_king88','节庆特别活动','Christmas Activities 2026','实体奖品','蓝牙耳机（价值 PHP 9,000.00）','待审核','2026-12-03 20:11:47','—','—','User VIP Level 8, Period Rebate LV5 Chest (Bet ≥ 20,000)'],
+  ['191','member07','节庆特别活动','Christmas Activities 2026','实体奖品','圣诞限定礼盒（价值 PHP 7,500.00）','审核通过','2026-11-30 21:40:12','admin01','2026-12-01 10:30:00','User VIP Level 5, Check-in Day 9, Random Chest 5'],
+  ['191','member02','节庆特别活动','Christmas Activities 2026','优惠券','存送券20%-本金+彩金2倍-有效期24小时','审核通过','2026-11-22 15:21:08','自动审核','2026-11-22 15:21:08','User VIP Level 2, Period Rebate LV1 Chest (Bet ≥ 1,000)'],
+  ['191','member01','节庆特别活动','Christmas Activities 2026','礼金','PHP 5.00','审核通过','2026-11-19 00:00:05','自动审核','2026-11-19 00:00:05','User VIP Level 3, Daily Rebate LV2 (Deposit ≥ 200)'],
+  ['191','member01','节庆特别活动','Christmas Activities 2026','免费投注券','PT电子免费旋转 ×1','审核通过','2026-11-18 10:05:12','自动审核','2026-11-18 10:05:12','User VIP Level 3, Check-in Day 3, Random Chest 2'],
+  ['191','member01','节庆特别活动','Christmas Activities 2026','抽奖券','Golden Draw Ticket ×1','审核通过','2026-11-18 10:05:12','自动审核','2026-11-18 10:05:12','User VIP Level 3, Check-in Day 3 Reward'],
+  ['191','member01','节庆特别活动','Christmas Activities 2026','积分','100 pts','审核通过','2026-11-17 09:58:40','自动审核','2026-11-17 09:58:40','User VIP Level 3, Check-in Day 2 Reward'],
+  ['191','member01','节庆特别活动','Christmas Activities 2026','礼金','PHP 10.00','审核通过','2026-11-16 10:02:15','自动审核','2026-11-16 10:02:15','User VIP Level 3, Check-in Day 1 Reward'],
+  ['190','member01','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 100.00','审核通过','2026-08-21 12:03:11','自动审核','2026-08-21 12:03:11','User VIP Level 1, LV3 Base Reward 100'],
+  ['190','member02','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 115.00','审核通过','2026-08-21 12:10:44','自动审核','2026-08-21 12:10:44','User VIP Level 1, LV3 Base Reward 100, Challenge 3 +15%'],
+  ['190','member03','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 200.00','审核通过','2026-08-22 12:00:02','自动审核','2026-08-22 12:00:02','User VIP Level 1, Scratch Card N2-1 Reward 200'],
+  ['184','xnjobe10','周卡活动','最新周卡','礼金','PHP 12.00','审核通过','2026-08-06 13:49:53','自动审核','2026-08-06 13:44:00','—'],
+  ['184','ody002','周卡活动','最新周卡','礼金','PHP 23.00','审核不通过','—','自动审核','2026-08-06 00:04:00','未完成额外任务'],
+];
+function statusTag(s){ const cls=/不通过|拒绝/.test(s)?'tag-off':(/通过/.test(s)?'tag-on':''); 
+  return `<span class="${cls}" ${s==='待审核'?'style="color:#e6a23c;font-weight:600"':''}>${s}</span>`; }
+function renderAudit(){
+  const ft=$('#auType').value, fa=$('#auAct').value, fs=$('#auStatus').value;
+  const rows=auditRows.filter(r=>(!ft||r[4]===ft)&&(!fa||r[2]===fa)&&(!fs||r[6]===fs));
+  if(!rows.length){ $('#auditBody').innerHTML='<tr><td colspan="12" style="text-align:center;color:var(--text-3);padding:28px">暂无数据</td></tr>'; return; }
+  $('#auditBody').innerHTML=rows.map(r=>{
+    const isX=r[2]===TPL;
+    return `<tr>
+      <td>${r[0]}</td><td>${r[1]}</td><td class="${isX?'hl':''}">${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td style="max-width:240px">${r[5]}</td>
+      <td>${statusTag(r[6])}</td><td>${r[7]}</td><td>${r[8]}</td><td>${r[9]}</td><td>${r[10]}</td>
+      <td style="white-space:nowrap">${r[6]==='待审核'?`<button class="btn--link" data-au-pass="${auditRows.indexOf(r)}">通过</button><span class="op-sep">|</span><button class="btn--link red" data-au-reject="${auditRows.indexOf(r)}">拒绝</button>`:'—'}</td></tr>`;
+  }).join('');
+  $$('[data-au-pass]').forEach(b=>b.onclick=()=>openAuditModal(+b.dataset.auPass,'pass'));
+  $$('[data-au-reject]').forEach(b=>b.onclick=()=>openAuditModal(+b.dataset.auReject,'reject'));
+}
+/* 实体奖品人工审核：通过／拒绝（拒绝须填原因） */
+let auIdx=-1, auMode='';
+function openAuditModal(i,mode){
+  auIdx=i; auMode=mode; const r=auditRows[i];
+  $('#auTitle').textContent=mode==='pass'?'审核通过确认':'审核拒绝';
+  $('#auInfo').innerHTML=`会员帐号：<b>${r[1]}</b><br>奖励内容：<b>${r[5]}</b><br>奖励来源：${r[10]}`;
+  $('#auReasonRow').style.display=mode==='reject'?'':'none';
+  $('#auReason').value=''; $('#auReasonCnt').textContent='0/100'; $('#auReason').classList.remove('is-error'); $('#auReasonErr').style.display='none';
+  $('#auPassTip').style.display=mode==='pass'?'':'none';
+  $('#auConfirm').className='btn '+(mode==='pass'?'btn--primary':'btn--red'); $('#auConfirm').textContent=mode==='pass'?'确定通过':'确定拒绝';
+  $('#auditMask').classList.add('is-open');
+}
+$('#auReason').addEventListener('input',e=>{ $('#auReasonCnt').textContent=e.target.value.length+'/100';
+  if(e.target.value.trim()){ e.target.classList.remove('is-error'); $('#auReasonErr').style.display='none'; } });
+$('#auConfirm').addEventListener('click',()=>{
+  const r=auditRows[auIdx]; if(!r) return;
+  if(auMode==='reject'){ const v=$('#auReason').value.trim();
+    if(!v){ $('#auReason').classList.add('is-error'); $('#auReasonErr').style.display='block'; return; }
+    r[10]=r[10]+'；拒绝原因：'+v; }
+  const d=new Date(), p=n=>String(n).padStart(2,'0');
+  r[6]=auMode==='pass'?'审核通过':'审核不通过'; r[8]='admin01';
+  r[9]=`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+  $('#auditMask').classList.remove('is-open'); renderAudit();
+  toast(auMode==='pass'?'审核通过，请依线下流程安排实体奖品寄送／领取':'已拒绝该笔实体奖品');
+});
+
+/* ---------- 活动报表：子页切换 + 资料 ---------- */
+$$('.rtab').forEach(b=>b.addEventListener('click',()=>{
+  $$('.rtab').forEach(x=>x.classList.remove('is-active')); b.classList.add('is-active');
+  const k=b.dataset.rtab;
+  $('#reportAward').style.display=k==='award'?'':'none';
+  $('#reportData').style.display=k==='data'?'':'none';
+}));
+
+/* 活动奖励统计：联名挑战活动奖励类型一律「礼金」；刮刮卡奖励→活动类型加(刮刮卡) */
+const awardRows=[
+  ['2026-08-21','联名挑战活动','190','X-Bomb Lucky Blast','礼金','PHP 7','120','118','826.00','0.00','0'],
+  ['2026-08-21','联名挑战活动(刮刮卡)','190','X-Bomb Lucky Blast','礼金','PHP 100','33','33','3,300.00','0.00','0'],
+  ['2026-08-22','联名挑战活动','190','X-Bomb Lucky Blast','礼金','PHP 25','96','90','2,250.00','0.00','0'],
+  ['2026-08-06','周卡活动','184','最新周卡','礼金','PHP 12','1','1','12.00','0.00','0'],
+  ['2026-08-05','周卡活动','184','最新周卡','积分','22 pts','1','1','0.00','22.00','0'],
+];
+/* 活动数据统计：联名挑战活动 → 天数「-」、申请领取时间=审核时间、状态「已通过」；刮刮卡加(刮刮卡) */
+const dataRows=[
+  ['190','member01','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 7','-','2026-08-21 12:03:11','2026-08-21 12:03:11','已通过'],
+  ['190','member03','联名挑战活动(刮刮卡)','X-Bomb Lucky Blast','礼金','PHP 100','-','2026-08-22 12:00:02','2026-08-22 12:00:02','已通过'],
+  ['190','member02','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 25','-','2026-08-21 12:10:44','2026-08-21 12:10:44','已通过'],
+  ['183','xnjobe11','周卡活动','周卡时间到期活动测试','礼金','PHP 17','Day 7','—','—','待审核'],
+];
+$('#auSearch').addEventListener('click',renderAudit);
+
+function renderReport(){
+  $('#awardBody').innerHTML=awardRows.map(r=>{
+    const isX=/联名挑战活动/.test(r[1]);
+    return `<tr><td>${r[0]}</td><td class="${isX?'hl':''}">${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td>
+      <td>${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td>${r[9]}</td><td>${r[10]}</td></tr>`;
+  }).join('');
+  $('#dataBody').innerHTML=dataRows.map(r=>{
+    const isX=/联名挑战活动/.test(r[2]);
+    return `<tr><td>${r[0]}</td><td>${r[1]}</td><td class="${isX?'hl':''}">${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td>
+      <td>${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td>${statusTag(r[9])}</td></tr>`;
+  }).join('');
+}
+function resetWizardFields(blank){
+  /* blank=true → 新增活动：动态表格全部留空，由用户自行填写；
+     blank=false → 编辑既有活动：带入该活动的示范配置。 */
+  /* ---- 步骤1 活动模板 ---- */
+  $('#fType').value=TPL; $('#fName').value=''; $('#fCur').value='PHP';
+  $('input[name=status][value="关闭"]').checked=true;
+  $('#fActTime').value='';
+  ['#fName','#fActTime'].forEach(s=>$(s).classList.remove('is-error'));
+
+  /* ---- 步骤2 活动图片 ---- */
+  const floatR=$$('input[name=float]'); if(floatR[0]) floatR[0].checked=true;
+  if($('#fSort')) $('#fSort').value='0';
+  if($('#fRemark')) $('#fRemark').value='';
+
+  /* ---- 步骤4 活动条件：依模式还原成「空白」或「示范值」再重画 ---- */
+  s4Strict=false;
+  sign       = clone(blank?BLANK_SIGN:SAMPLE_SIGN);
+  boxes      = blank?[0,1,2,3,4,5].map(nineRewards):clone(SAMPLE_BOXES); curBox=0;
+  rebateRows = clone(blank?BLANK_REBATE:SAMPLE_REBATE);
+  periodRows = blank?[newPeriod()]:samplePeriod();
+  ratio      = blank?BLANK_RATIO():SAMPLE_RATIO();
+  curVip = 0; if($('#applyAll')) $('#applyAll').checked=false;
+  if($('#fWager')){ $('#fWager').value=blank?'':'1'; $('#fWager').classList.remove('is-error'); }
+  renderStep4();
+
+  /* ---- 步骤5 风控条件：还原默认开关（同手机号/同email 预设开） ---- */
+  const sw=$$('#pageWizard [data-panel="5"] .switch input');
+  if(sw[0]) sw[0].checked=false;  // 同 IP
+  if(sw[1]) sw[1].checked=true;   // 同手机号
+  if(sw[2]) sw[2].checked=false;  // 同姓名
+  if(sw[3]) sw[3].checked=true;   // 同 email
+  if($('#autoReject')) $('#autoReject').checked=false;
+  if($('#rejectN')){ $('#rejectN').disabled=true; $('#rejectN').value='0'; }
+}
+/* 既有活动的实际配置（示意：新增/编辑后的活动都会写入此表，供再次编辑读取） */
+const ACTIVITY_DATA={191:{type:'节庆特别活动',name:'Christmas Activities 2026',cur:'PHP',status:'开启',
+  actTime:'2026-11-16 00:00 ~ 2026-12-31 23:59'}};
+let editingActId=null;  // null=新增；否则为正在编辑的活动 ID
+let pendingDelRow=null; // 待删除的活动列表行
+let pendingCloseRow=null; // 待关闭的活动列表行
+
+/* 从列表行反推活动资料（供静态示意行、或资料表尚无纪录的行使用；活动时间沿用原本储存格） */
+function rowToAct(tr){
+  const t=i=>tr.children[i]?tr.children[i].textContent.trim():'';
+  return {sort:t(1),status:t(2),cur:t(4),type:t(6),name:t(7),wager:t(12)};
+}
+
+/* 把「活动时间」字串（2026-08-21 00:00 ~ 2026-10-31 23:59）转成列表的两行 yy/mm/dd 显示 */
+function actTimeToCell(v){
+  const p=dpParse(v);
+  if(!p) return '—';
+  const f=d=>{const yy=String(d.getFullYear()).slice(2),mm=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');return `${yy}/${mm}/${dd}`;};
+  return `${f(p.start)}<br>${f(p.end)}`;
+}
+/* 取下一个活动 ID（现有最大值 +1） */
+function nextActId(){ let mx=0; $$('#pageList tbody tr').forEach(tr=>{const n=parseInt(tr.children[0].textContent,10); if(n>mx)mx=n;}); return mx+1; }
+
+/* 填充/更新一行活动（会保留原有「参与/中奖」数值），并重新绑定该行的操作按钮 */
+function fillRow(tr,a){
+  const sort     = (a.sort!==undefined) ? a.sort : (tr.children[1]?tr.children[1].textContent.trim():'0');
+  const lang     = tr.children[5] ? tr.children[5].textContent.trim() : '预设';
+  const preview  = tr.children[8] ? tr.children[8].innerHTML : '<button class="btn btn--primary btn--sm">上传</button>';
+  const black    = tr.children[9] ? tr.children[9].textContent.trim() : '—';
+  const agent    = tr.children[10]? tr.children[10].textContent.trim(): '—';
+  const prevJoin = tr.children[11]? tr.children[11].textContent.trim(): '0 / 0';
+  const wager    = (a.wager!==undefined) ? a.wager : (tr.children[12]?tr.children[12].textContent.trim():'—');
+  const timeCell = (a.actTime!==undefined) ? actTimeToCell(a.actTime)
+                 : (tr.children[3] ? tr.children[3].innerHTML : '—');
+  const actionBtn = a.status==='开启'
+      ? '<button class="btn--link red" data-close>关闭</button>'
+      : '<button class="btn--link" data-open>开启</button>';
+  tr.innerHTML=`<td>${a.id}</td><td>${sort}</td><td class="${a.status==='开启'?'tag-on':'tag-off'}">${a.status}</td><td>${timeCell}</td><td>${a.cur}</td><td>${lang}</td>
+    <td><b>${a.type}</b></td><td>${a.name}</td><td>${preview}</td><td>${black}</td><td>${agent}</td>
+    <td>${prevJoin}</td><td>${wager}</td>
+    <td><button class="btn--link" data-edit>编辑</button><span class="op-sep">|</span><button class="btn--link red" data-del>删除</button><br>${actionBtn}</td>`;
+  bindRowActions(tr);
+}
+
+/* 为一行绑定「编辑 / 开启 / 关闭」行为（静态示意行若无 data-edit 则维持原样、不绑定） */
+function bindRowActions(tr){
+  const eb=$('[data-edit]',tr);  if(eb) eb.onclick=()=>openEditRow(tr);
+  const cb=$('[data-close]',tr); if(cb) cb.onclick=()=>{ pendingCloseRow=tr; $('#closeMask').classList.add('is-open'); };
+  const db=$('[data-del]',tr);   if(db) db.onclick=()=>{ pendingDelRow=tr; $('#delMask').classList.add('is-open'); };
+  const ob=$('[data-open]',tr);  if(ob) ob.onclick=()=>{
+    const id=tr.children[0].textContent.trim();
+    const d=ACTIVITY_DATA[id] || rowToAct(tr);
+    if(d.type===TPL && activeXbombExists(id)){ toast('检测到相同活动正在进行中',true); return; }
+    d.status='开启'; ACTIVITY_DATA[id]=d; fillRow(tr,{id,...d});
+    toast('活动已开启（示意）');
+  };
+}
+
+/* 进入编辑：先整体初始化，再把该活动资料回填到步骤1 */
+function openEditRow(tr){
+  const id=tr.children[0].textContent.trim();
+  editingActId=id;
+  resetWizardFields(false);   // 编辑既有活动 → 带入示范配置
+  const d=ACTIVITY_DATA[id];
+  if(d){
+    $('#fType').value=d.type; $('#fName').value=d.name; $('#fCur').value=d.cur;
+    const sr=$(`input[name=status][value="${d.status}"]`); if(sr) sr.checked=true;
+    $('#fActTime').value=d.actTime||'';
+  }
+  showWizard(true,'编辑活动');
+}
+
+/* 新增：清空追踪 ID → 全部初始化 → 进向导 */
+$('#btnNew').addEventListener('click',()=>{ editingActId=null; resetWizardFields(true); showWizard(true,'新增活动'); });
+/* 初始为现有各行绑定操作（仅带 data-edit/data-close 的行会被接管） */
+$$('#pageList tbody tr').forEach(bindRowActions);
+
+/* 删除确认：确定后移除该行，并从资料表清掉，让列表即时更新 */
+$('#delConfirm').addEventListener('click',()=>{
+  if(pendingDelRow){
+    const id=pendingDelRow.children[0].textContent.trim();
+    if(ACTIVITY_DATA[id]) delete ACTIVITY_DATA[id];
+    pendingDelRow.remove();
+    pendingDelRow=null;
+    toast('活动已删除（示意）');
+  }
+  $('#delMask').classList.remove('is-open');
+});
+
+/* 关闭确认：确定后状态改「关闭」并即时更新列表（关闭后同期名额释出，可再开启新的节庆特别活动） */
+$('#closeConfirm').addEventListener('click',()=>{
+  if(pendingCloseRow){
+    const tr=pendingCloseRow, id=tr.children[0].textContent.trim();
+    const d=ACTIVITY_DATA[id] || rowToAct(tr);
+    d.status='关闭'; ACTIVITY_DATA[id]=d; fillRow(tr,{id,...d});
+    toast('活动已关闭（示意）');
+  }
+  pendingCloseRow=null;
+  $('#closeMask').classList.remove('is-open');
+});
+$('#btnExit').addEventListener('click',()=>showWizard(false));
+
+/* 步骤1 输入框：一旦填入有效值即清除红框（错误提示随修正而消失） */
+$('#fName').addEventListener('input',e=>{ if(e.target.value.trim()) e.target.classList.remove('is-error'); });
+
+/* ---------- 步骤导航 ---------- */
+let curStep=1; const LAST=6;
+function gotoStep(n){
+  curStep=n;
+  $$('#stepRail .step').forEach(s=>{const k=+s.dataset.step;
+    s.classList.toggle('is-active',k===n); s.classList.toggle('is-done',k<n);});
+  $$('.wizard__panel').forEach(p=>p.classList.toggle('is-active',+p.dataset.panel===n));
+  $('#btnPrev').style.visibility = n===1?'hidden':'visible';
+  $('#btnNext').style.display = n===LAST?'none':'';
+  $('#btnSubmit').style.display = n===LAST?'':'none';
+  if(n===6) buildPreview();
+}
+$$('#stepRail .step').forEach(s=>s.addEventListener('click',()=>gotoStep(+s.dataset.step)));
+$('#btnPrev').addEventListener('click',()=>gotoStep(Math.max(1,curStep-1)));
+$('#btnNext').addEventListener('click',()=>{ if(validateStep(curStep)) gotoStep(Math.min(LAST,curStep+1)); });
+function activeXbombExists(excludeId){
+  return [...$$('#pageList tbody tr')].some(tr=>{
+    const id=tr.children[0]?tr.children[0].textContent.trim():'';
+    if(String(id)===String(excludeId)) return false;
+    const isX=tr.children[6] && tr.children[6].textContent.trim()===TPL;
+    const st=tr.querySelector('.tag-on,.tag-off');
+    return isX && st && st.textContent.trim()==='开启';
+  });
+}
+$('#btnSubmit').addEventListener('click',()=>{
+  /* 提交前再把关键步骤校验一次，避免用户用左侧步骤条跳过必填 */
+  if(!validateStep(1)){ gotoStep(1); return; }
+  if(!validateStep(4)){ gotoStep(4); return; }
+
+  const a={
+    type:$('#fType').value, name:$('#fName').value.trim(), cur:$('#fCur').value,
+    status:$('input[name=status]:checked').value,
+    actTime:$('#fActTime').value,
+    wager:($('#fWager').value.trim()||'—')
+  };
+
+  /* 规则：同一时间只能有一个「节庆特别活动」处于开启 */
+  if(a.type===TPL && a.status==='开启' && activeXbombExists(editingActId)){
+    toast('检测到相同活动正在进行中',true); return;
+  }
+
+  if(editingActId){
+    /* 编辑：更新对应行 + 同步资料表 */
+    ACTIVITY_DATA[editingActId]={type:a.type,name:a.name,cur:a.cur,status:a.status,actTime:a.actTime};
+    const tr=$$('#pageList tbody tr').find(r=>r.children[0].textContent.trim()===String(editingActId));
+    if(tr) fillRow(tr,{id:editingActId,...a});
+    toast('活动配置已保存（示意）');
+  }else{
+    /* 新增：产生新 ID，插到列表最上方，并写入资料表让它之后可编辑 */
+    const id=nextActId();
+    ACTIVITY_DATA[id]={type:a.type,name:a.name,cur:a.cur,status:a.status,actTime:a.actTime};
+    const tr=document.createElement('tr');
+    fillRow(tr,{id,...a});
+    const body=$('#pageList tbody'); body.insertBefore(tr,body.firstChild);
+    toast('活动新增成功（示意）');
+  }
+  showWizard(false);
+});
+
+/* ---------- 基本校验（示意：仅挡关键必填） ---------- */
+function dpTimeEnd(str){
+  const m=str && str.match(/(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2})$/);
+  return m?new Date(`${m[1]}T${m[2]}:00`):null;
+}
+function validateStep(n){
+  if(n===1){
+    const name=$('#fName'); if(!name.value.trim()){name.classList.add('is-error');toast('活动名称必填',true);return false;}
+    name.classList.remove('is-error');
+    const actTime=$('#fActTime');
+    if(!actTime.value.trim()){actTime.classList.add('is-error');toast('活动时间必填',true);return false;}
+    actTime.classList.remove('is-error');
+  }
+  if(n===4){
+    /* 按下一步／提交：切换为严格模式（空值也标红）→ 重画 → 依区块顺序挡下第一个错误并捲动定位 */
+    s4Strict=true; renderStep4();
+    if(!wagerOk()) $('#fWager').classList.add('is-error'); else $('#fWager').classList.remove('is-error');
+    const bad=SECTIONS.find(([,,fn])=>!fn());
+    if(bad){
+      if(bad[0]==='box'){ const k=boxNoneErr()?0:boxes.findIndex((r,i)=>boxTouched(i)&&!rewardsOk(r)); if(k>=0&&k!==curBox){ curBox=k; renderBoxes(); } }
+      document.getElementById(bad[1]).scrollIntoView({behavior:'smooth',block:'start'});
+      toast(typeof bad[3]==='function'?bad[3]():bad[3],true); return false;
+    }
+  }
+  return true;
+}
+
+/* =====================================================================
+   步骤4 活动条件（节庆特别活动）
+   ===================================================================== */
+const TPL='节庆特别活动';
+let s4Strict=false;   // false=仅即时提示格式错误；按「下一步／提交」后=true，空值也标红
+
+function sanInt(v){ return v.replace(/[^\d.]/g,'').split('.')[0]; }
+function sanDec2(v){ v=v.replace(/[^\d.]/g,''); const p=v.split('.'); return p.length>1? p[0]+'.'+p.slice(1).join('').slice(0,2) : v; }
+function sanWager(v){ v=v.replace(/[^\d.]/g,''); const i=v.indexOf('.'); if(i===-1) return v.slice(0,8); return v.slice(0,i).slice(0,8)+'.'+v.slice(i+1).replace(/\./g,'').slice(0,2); }
+function curCode(){ return $('#fCur')?$('#fCur').value:'PHP'; }
+const clone=o=>JSON.parse(JSON.stringify(o));
+
+/* ---------- 奖励下拉来源（示意：实际由「免费投注管理」「优惠券管理」带入启用中的项目） ---------- */
+const FREEBET_LIST=['PT免费投注','PT电子免费旋转','PT_S freeBet test','PS单钱包','PS_S 免費','PT_S freespin test','VP_S test'];
+const COUPON_LIST=['存送10%-有效期240小时-本金+彩金5倍流水','输返10%-有效期240小时 奖金流水5倍流水 -注单有效期48','中奖加奖10%-有效期240小时 -奖金流水8倍',
+  '存送券1%-有效期1小时-本金1倍流水','存送券20%-本金+彩金2倍-有效期24小时','存送券10%-彩金3倍-有效期200小时','输返券10%-奖金流水3倍-有效期200小时-注单有效期1小时'];
+const RW_TYPES=['彩金','积分','抽奖券','免费投注','优惠券','实体奖品'];
+const RW_LABEL={'抽奖券':'抽奖券（Golden Draw Ticket）'};
+const newReward=()=>({type:'',name:'',val:'',pick:'',img:'',imgName:'',rate:''});
+const RW_COUNT=9;   // 宝箱奖励固定 9 项（签到宝箱、期间返水宝箱共用；不可新增、删除）
+const nineRewards=()=>Array.from({length:RW_COUNT},newReward);
+/* 实体奖品小图：格式与大小限制（沿用后台图片上传规范） */
+const IMG_TYPES=['image/png','image/jpeg','image/gif','image/webp','image/bmp'], IMG_MAX_MB=5;
+const SAMPLE_IMG='data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><rect width="96" height="96" rx="12" fill="#fdecea"/><rect x="18" y="40" width="60" height="40" rx="4" fill="#e5544b"/><rect x="14" y="30" width="68" height="14" rx="3" fill="#c4372f"/><rect x="43" y="30" width="10" height="50" fill="#f6c343"/><path d="M48 30c-8-14-22-12-18-2 3 6 18 2 18 2zm0 0c8-14 22-12 18-2-3 6-18 2-18 2z" fill="#f6c343"/></svg>`);   // 宝箱奖励项数（签到宝箱、期间返水宝箱共用）
+
+/* ---------- 奖励列：通用元件（签到奖励／签到宝箱／期间返水宝箱共用） ----------
+   o = { label:第一栏文字, rate:是否有中奖率栏, physical:是否可选实体奖品, onChange:回调 } */
+function rewardErrors(r,o,strict){
+  const e={};
+  if(!r.type){ if(strict) e.type='请选择奖励类型'; }
+  else if(r.type==='免费投注'||r.type==='优惠券'){ if(!r.pick&&strict) e.val=r.type==='免费投注'?'请选择免费投注':'请选择优惠券'; }
+  else if(r.type==='实体奖品'){
+    /* 实体奖品：奖品名称 → 奖励价值 → 小图，依序提示第一个错误；e.field 标记要标红的栏位 */
+    if(!r.name.trim()){ if(strict){ e.val='请输入奖品名称'; e.field='name'; } }
+    else if(r.val===''){ if(strict){ e.val='请输入奖励价值'; e.field='val'; } }
+    else if(!(Number(r.val)>0)){ e.val='奖励价值不可为 0'; e.field='val'; }
+    else if(!r.img&&strict){ e.val='请上传小图'; e.field='img'; }
+    if(!e.val && r.val!=='' && !(Number(r.val)>0)){ e.val='奖励价值不可为 0'; e.field='val'; }
+  }
+  else{
+    if(r.val===''){ if(strict) e.val='请输入奖励数量'; }
+    else if(!(Number(r.val)>0)) e.val='不可为 0';
+  }
+  if(o.rate){
+    if(r.rate===''){ if(strict) e.rate='请输入中奖率'; }
+    else if(Number(r.rate)>100) e.rate='中奖率不得超过100%';
+  }
+  return e;
+}
+const rewardOk=(r,o)=>Object.keys(rewardErrors(r,o,true)).length===0;
+const rateSum=rows=>Math.round(rows.reduce((a,r)=>a+(Number(r.rate)||0),0)*100)/100;
+const rewardsOk=rows=>rows.every(r=>rewardOk(r,{rate:true,physical:true}))&&rateSum(rows)===100;
+
+function rvHtml(r){
+  const num=ph=>`<input class="input js-val" value="${r.val}" placeholder="${ph}" aria-label="${ph}">`;   // 不显示单位
+  const sel=(list,ph)=>`<select class="select js-pick" title="${r.pick||ph}"><option value="">${ph}</option>${list.map(x=>`<option ${r.pick===x?'selected':''}>${x}</option>`).join('')}</select>`;
+  switch(r.type){
+    case '彩金':
+    case '积分':
+    case '抽奖券': return num('请输入奖励数量');
+    case '免费投注': return sel(FREEBET_LIST,'请选择免费投注');
+    case '优惠券':   return sel(COUPON_LIST,'选择优惠券');
+    case '实体奖品': {
+      const esc=v=>String(v||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+      const up = r.img
+        ? `<img class="upl__thumb js-img-view" src="${r.img}" alt="奖品小图预览：${esc(r.name)||'实体奖品'}" title="点击放大预览">
+           <span class="upl__name" title="${esc(r.imgName)}">${esc(r.imgName)||'已上传'}</span>
+           <button type="button" class="btn--link red js-img-del">删除</button>`
+        : `<button type="button" class="btn btn--sm upl__btn js-img-pick">⬆ 上传小图</button>
+           <span class="upl__tip" title="png、jpg、gif、webp、bmp；${IMG_MAX_MB}MB 内">png、jpg、gif、webp、bmp；${IMG_MAX_MB}MB 内</span>`;
+      return `<div class="rv-phys">
+        <div class="rv-phys__row"><input class="input js-name" value="${esc(r.name)}" placeholder="奖品名称" maxlength="30" aria-label="奖品名称">${num('奖励价值')}</div>
+        <div class="upl">${up}<input type="file" class="js-file" accept="${IMG_TYPES.join(',')}" hidden aria-label="选择奖品小图"></div></div>`;
+    }
+    default: return `<input class="input" disabled placeholder="请先选择奖励类型">`;
+  }
+}
+function paintReward(tr,r,o){
+  const e=rewardErrors(r,o,o.strictFn?o.strictFn():(s4Strict||o.forceStrict));
+  const put=(sel,msg,fields)=>{ const h=$(sel,tr); if(h){ h.textContent=msg||''; h.style.visibility=msg?'visible':'hidden'; }
+    fields.forEach(f=>f&&f.classList.toggle('is-error',!!msg)); };
+  put('.js-e-type',e.type,[$('.js-rtype',tr)]);
+  const nm=$('.js-name',tr); if(nm) nm.classList.remove('is-error');
+  const fields = e.field==='name'?[nm] : e.field==='img'?[] : [$('.js-val',tr),$('.js-pick',tr)];
+  put('.js-e-val',e.val,fields);
+  if(e.field==='val'||!e.field){ /* 已由 put 处理 */ } else { const v=$('.js-val',tr); if(v) v.classList.remove('is-error'); }
+  const img=$('.upl__btn',tr); if(img) img.classList.toggle('is-error',e.field==='img');
+  if(o.rate) put('.js-e-rate',e.rate,[$('.js-rate',tr)]);
+}
+function openImgViewer(src,title){
+  $('#imgView').src=src; $('#imgView').alt='奖品小图：'+(title||''); $('#imgTitle').textContent='小图预览'+(title?' · '+title:'');
+  $('#imgMask').classList.add('is-open');
+}
+function bindRv(tr,r,o){
+  const v=$('.js-val',tr);
+  if(v) v.addEventListener('input',e=>{ e.target.value=r.type==='实体奖品'?sanDec2(e.target.value):sanInt(e.target.value); r.val=e.target.value; paintReward(tr,r,o); o.onChange&&o.onChange(); });
+  const nm=$('.js-name',tr);
+  if(nm) nm.addEventListener('input',e=>{ r.name=e.target.value; paintReward(tr,r,o); o.onChange&&o.onChange(); });
+  const p=$('.js-pick',tr);
+  if(p) p.addEventListener('change',e=>{ r.pick=e.target.value; e.target.title=r.pick; paintReward(tr,r,o); o.onChange&&o.onChange(); });
+  /* 上传小图：点按钮开启本地资料夹选择档案；校验格式／大小后显示预览图 */
+  const file=$('.js-file',tr), redraw=()=>{ $('.js-rv',tr).innerHTML=rvHtml(r); bindRv(tr,r,o); paintReward(tr,r,o); o.onChange&&o.onChange(); };
+  $$('.js-img-pick',tr).forEach(btn=>btn.addEventListener('click',()=>file&&file.click()));
+  if(file) file.addEventListener('change',()=>{
+    const f=file.files&&file.files[0]; if(!f) return;
+    if(!IMG_TYPES.includes(f.type)){ toast('图片格式仅支持 png、jpg、gif、webp、bmp',true); file.value=''; return; }
+    if(f.size>IMG_MAX_MB*1024*1024){ toast('图片大小不可超过 '+IMG_MAX_MB+'MB',true); file.value=''; return; }
+    const rd=new FileReader();
+    rd.onload=()=>{ r.img=rd.result; r.imgName=f.name; redraw(); toast('小图上传成功'); };
+    rd.onerror=()=>toast('图片读取失败，请重新上传',true);
+    rd.readAsDataURL(f);
+  });
+  const del=$('.js-img-del',tr);
+  if(del) del.addEventListener('click',()=>{ r.img=''; r.imgName=''; redraw(); toast('已删除小图'); });
+  const view=$('.js-img-view',tr);
+  if(view) view.addEventListener('click',()=>openImgViewer(r.img,r.name||r.imgName));
+}
+function buildRewardRow(r,o){
+  const tr=document.createElement('tr');
+  const types=RW_TYPES.filter(t=>o.physical||t!=='实体奖品');
+  tr.innerHTML=`<td>${o.label}</td>
+    <td><select class="select js-rtype" aria-label="奖励类型"><option value="">请选择</option>${types.map(t=>`<option value="${t}" ${r.type===t?'selected':''}>${RW_LABEL[t]||t}</option>`).join('')}</select>
+      <p class="hint hint--err js-e-type" style="visibility:hidden"></p></td>
+    <td><div class="rv js-rv">${rvHtml(r)}</div><p class="hint hint--err js-e-val" style="visibility:hidden"></p></td>
+    ${o.rate?`<td><div class="suffix-wrap"><input class="input js-rate" value="${r.rate}" placeholder="0～100"><span class="suffix">%</span></div>
+      <p class="hint hint--err js-e-rate" style="visibility:hidden"></p></td>`:''}`;
+  $('.js-rtype',tr).addEventListener('change',e=>{
+    r.type=e.target.value; r.name=''; r.val=''; r.pick=''; r.img=''; r.imgName='';       // 切换类型 → 清空原奖励数量
+    $('.js-rv',tr).innerHTML=rvHtml(r); bindRv(tr,r,o); paintReward(tr,r,o); o.onChange&&o.onChange(); });
+  if(o.rate) $('.js-rate',tr).addEventListener('input',e=>{ e.target.value=sanDec2(e.target.value); r.rate=e.target.value; paintReward(tr,r,o); o.onChange&&o.onChange(); });
+  bindRv(tr,r,o); paintReward(tr,r,o);
+  return tr;
+}
+function sumLineHtml(rows,strict){
+  if(strict===undefined) strict=s4Strict;
+  const s=rateSum(rows), any=rows.some(r=>r.rate!==''), bad=(any||strict)&&s!==100;
+  return `中奖率合计 <b style="color:${bad?'var(--red)':(any?'var(--green)':'var(--text-2)')}">${s}</b>%`+(bad?` <span class="warn">中奖率合计需等于100%</span>`:'');
+}
+
+/* ---------- 4-1 签到活动配置 ---------- */
+const SIGN_DAYS=['第一天','第二天','第三天以上(含)'];
+let sign={days:[newReward(),newReward(),newReward()],boxOn:true,boxRates:['','','','','','']};
+const SAMPLE_SIGN={days:[{type:'彩金',name:'',val:'10',pick:'',img:false,rate:''},{type:'积分',name:'',val:'100',pick:'',img:false,rate:''},{type:'抽奖券',name:'',val:'1',pick:'',img:false,rate:''}],
+  boxOn:true,boxRates:['40','25','15','12','8','']};
+const BLANK_SIGN={days:[newReward(),newReward(),newReward()],boxOn:true,boxRates:['','','','','','']};
+/* 宝箱「已配置」＝该款任一栏位有填写；未配置的宝箱中奖率视为 0、输入框停用 */
+const boxTouched=k=>boxes[k].some(r=>r.type||r.rate||r.val||r.pick||r.name);
+const configuredBoxes=()=>[0,1,2,3,4,5].filter(boxTouched);
+const boxRateSum=()=>Math.round(configuredBoxes().reduce((a,k)=>a+(Number(sign.boxRates[k])||0),0)*100)/100;
+const SIGN_OPT={rate:false,physical:false};
+function boxRateOk(){ const ks=configuredBoxes();
+  if(!ks.length) return true;   // 「至少配置 1 款」由签到宝箱区块校验
+  return ks.every(k=>sign.boxRates[k]!==''&&Number(sign.boxRates[k])<=100) && boxRateSum()===100; }
+function signOk(){ return sign.days.every(r=>rewardOk(r,SIGN_OPT)) && (!sign.boxOn || boxRateOk()); }
+function renderSign(){
+  const tb=$('#signBody'); tb.innerHTML='';
+  sign.days.forEach((r,i)=>{
+    const tr=buildRewardRow(r,{...SIGN_OPT,label:`<b>${SIGN_DAYS[i]}</b>`,onChange:null});
+    const td=document.createElement('td');
+    td.innerHTML= i<2 ? '<span style="color:var(--text-3)">—</span>'
+      : `<div style="display:flex;align-items:center;gap:8px;justify-content:center">
+          <label class="switch" aria-label="额外随机宝箱"><input type="checkbox" id="boxOn" ${sign.boxOn?'checked':''}><span class="track"></span></label>
+          <span id="boxOnTxt" style="font-size:12.5px;color:var(--text-2)">${sign.boxOn?'开启':'关闭'}</span></div>`;
+    tr.appendChild(td); tb.appendChild(tr);
+  });
+  /* 第三天以上(含)：随机宝箱中奖率子列 */
+  const sub=document.createElement('tr'); sub.className='subrow';
+  sub.innerHTML=`<td colspan="4"><div class="subrow__inner">
+      <div class="subrow__head">随机宝箱中奖率 <span style="font-weight:400;color:var(--text-3);font-size:12px">（第三天以上(含) 每次签到依下列中奖率随机发放 1 款宝箱；仅已配置的宝箱可填写，可填 0 表示不发放该款）</span></div>
+      <div class="boxrate">${sign.boxRates.map((v,k)=>`<div class="boxrate__item"><span>宝箱${k+1}</span>
+        <div class="suffix-wrap"><input class="input js-br" data-k="${k}" value="${v}" placeholder="0～100" aria-label="宝箱${k+1}中奖率"><span class="suffix">%</span></div></div>`).join('')}</div>
+      <div class="sum-line" id="boxRateSum"></div></div></td>`;
+  tb.appendChild(sub);
+  $$('.js-br',sub).forEach(inp=>inp.addEventListener('input',e=>{ e.target.value=sanDec2(e.target.value); sign.boxRates[+e.target.dataset.k]=e.target.value; paintBoxRate(); }));
+  $('#boxOn').addEventListener('change',e=>{ sign.boxOn=e.target.checked; renderSign(); renderBoxes();
+    toast(sign.boxOn?'已开启额外随机宝箱':'已关闭额外随机宝箱：第三天以上(含)仅发放签到奖励'); });
+  paintBoxRate();
+}
+function paintBoxRate(){
+  const el=$('#boxRateSum'); if(!el) return;
+  /* 未配置的宝箱：清空中奖率并停用；随机宝箱关闭：全部停用 */
+  $$('.js-br').forEach(i=>{ const k=+i.dataset.k, on=sign.boxOn&&boxTouched(k);
+    if(!on && boxTouched(k)===false){ sign.boxRates[k]=''; i.value=''; }
+    i.disabled=!on; i.placeholder=boxTouched(k)?'0～100':'未配置'; });
+  if(!sign.boxOn){ el.innerHTML='<span style="color:var(--text-3)">额外随机宝箱已关闭，免填</span>'; $$('.js-br').forEach(i=>i.classList.remove('is-error')); return; }
+  const ks=configuredBoxes();
+  if(!ks.length){ el.innerHTML='<span style="color:var(--text-3)">尚未配置签到宝箱：请于下方「签到宝箱配置」至少配置 1 款后填写中奖率</span>'; return; }
+  const s=boxRateSum(), any=ks.some(k=>sign.boxRates[k]!==''), bad=(any||s4Strict)&&s!==100;
+  el.innerHTML=`宝箱中奖率合计 <b style="color:${bad?'var(--red)':(any?'var(--green)':'var(--text-2)')}">${s}</b>%`+(bad?' <span class="warn">宝箱中奖率合计需等于100%</span>':'');
+  $$('.js-br').forEach(i=>{ if(i.disabled){ i.classList.remove('is-error'); return; }
+    i.classList.toggle('is-error',(s4Strict&&i.value==='')||Number(i.value)>100||(bad&&i.value!=='')); });
+}
+
+/* ---------- 4-2 签到宝箱配置（6 款 × 固定 9 项） ---------- */
+let boxes=[0,1,2,3,4,5].map(nineRewards);
+let curBox=0;
+function sampleBox(k){
+  const m=k+1, R=(type,val,rate,extra={})=>({type,name:'',val:String(val),pick:'',img:'',imgName:'',rate,...extra});
+  return [R('彩金',5*m,'30'),R('积分',50*m,'20'),R('免费投注','','15',{pick:FREEBET_LIST[k%FREEBET_LIST.length]}),
+    R('优惠券','','10',{pick:COUPON_LIST[k%COUPON_LIST.length]}),R('抽奖券',m,'8'),R('彩金',20*m,'7'),R('积分',300*m,'5'),R('抽奖券',3*m,'4'),
+    k>=4 ? R('实体奖品',1500*m,'1',{name:k===4?'圣诞限定礼盒':'蓝牙耳机',img:SAMPLE_IMG,imgName:k===4?'xmas_giftbox.png':'earphone.png'})
+         : R('彩金',100*m,'1')];
+}
+const SAMPLE_BOXES=[0,1,2,3,4].map(sampleBox).concat([nineRewards()]);   // 宝箱6 未配置（示意非必填）
+const BOX_OPT={rate:true,physical:true};
+const boxNoneErr=()=>sign.boxOn&&configuredBoxes().length===0;   // 开启随机宝箱却 1 款都未配置
+function boxesOk(){ return !sign.boxOn || (!boxNoneErr() && boxes.every((rows,k)=>!boxTouched(k)||rewardsOk(rows))); }
+function renderBoxes(){
+  const sec=$('#secBox'); sec.classList.toggle('is-off',!sign.boxOn); $('#boxOffNote').style.display=sign.boxOn?'none':'';
+  $('#boxReq').style.display=sign.boxOn?'':'none';   // 随机宝箱开启才为必填
+  const tabs=$('#boxTabs'); tabs.innerHTML='';
+  boxes.forEach((rows,k)=>{
+    const b=document.createElement('button'); b.type='button'; b.setAttribute('role','tab'); b.setAttribute('aria-selected',k===curBox);
+    b.className='box-tab'+(k===curBox?' is-active':'');
+    b.textContent=`宝箱${k+1}`;
+    b.addEventListener('click',()=>{ curBox=k; renderBoxes(); });
+    tabs.appendChild(b);
+  });
+  const tb=$('#boxBody'); tb.innerHTML='';
+  const rows=boxes[curBox];
+  const k=curBox;
+  /* 非必填：该款宝箱尚未填写任何栏位时，不显示必填错误；开始填写后才依严格模式校验 */
+  const strictFn=()=>s4Strict&&boxTouched(k);
+  const boxSum=()=>boxTouched(k)?sumLineHtml(rows,strictFn())
+    :(s4Strict&&boxNoneErr()?'<span class="warn">开启「额外随机宝箱」时，至少需配置 1 款签到宝箱</span>':'<span style="color:var(--text-3)">此款宝箱未配置</span>');
+  const refresh=()=>{ $('#boxSum').innerHTML=boxSum(); $$('#boxBody tr').forEach((tr,i)=>paintReward(tr,rows[i],{...BOX_OPT,strictFn})); paintBoxRate(); };
+  rows.forEach((r,i)=>tb.appendChild(buildRewardRow(r,{...BOX_OPT,label:i+1,strictFn,onChange:refresh})));
+  $('#boxSum').innerHTML=boxSum();
+}
+
+/* ---------- 4-3 每日返水配置（沿用 X-BOMB；移除挑战任务、刮刮卡栏位） ---------- */
+let curVip=0;
+function renderVipTabs(){
+  const wrap=$('#vipTabs'); const applied=$('#applyAll').checked;
+  wrap.innerHTML='';
+  for(let i=0;i<=10;i++){
+    const el=document.createElement('span');
+    el.className='vip-tab'+(i===curVip?' is-active':'')+((applied&&i!==0)?' is-disabled':'');
+    el.textContent='VIP'+i;
+    el.addEventListener('click',()=>{ if(applied&&i!==0) return; curVip=i; renderVipTabs(); toast('切换到 VIP'+i+'（示意：各等级各别配置）'); });
+    wrap.appendChild(el);
+  }
+}
+$('#applyAll').addEventListener('change',()=>{ if($('#applyAll').checked) curVip=0; renderVipTabs(); });
+
+let rebateRows=[{cond:'有效投注',goal:'',amt:''}];
+const SAMPLE_REBATE=[{cond:'有效投注',goal:'200',amt:'3'},{cond:'充值',goal:'200',amt:'5'},{cond:'有效投注',goal:'1000',amt:'12'}];
+const BLANK_REBATE=[{cond:'有效投注',goal:'',amt:''}];
+function validateGoalOrder(strict){
+  let orderBad=false, anyBad=false;
+  const prevGoalByCond={};
+  $$('#rebateBody tr').forEach(tr=>{
+    const goal=$('.js-goal',tr); if(!goal) return;
+    const cond=$('.js-cond',tr).value; const hint=$('.js-goal-hint',tr);
+    const hasValue=goal.value!==''; const val=Number(goal.value);
+    let invalid=false, orderInvalid=false, msg='';
+    if(hasValue){
+      if(val<=0){ invalid=true; msg='不可为 0'; }
+      const prev=Object.prototype.hasOwnProperty.call(prevGoalByCond,cond)?prevGoalByCond[cond]:null;
+      if(!invalid && prev!==null && val<=prev){ invalid=true; orderInvalid=true; orderBad=true; msg='任务目标不可小于或等于同任务条件'; }
+    } else if(strict){ invalid=true; msg='请输入任务目标'; }
+    if(invalid) anyBad=true;
+    goal.classList.toggle('is-error',invalid);
+    if(hint){ hint.textContent=msg; hint.style.visibility=invalid?'visible':'hidden'; }
+    if(hasValue && !isNaN(val)) prevGoalByCond[cond]=val;
+  });
+  return {orderBad,anyBad};
+}
+function rebateOk(){
+  const prev={};
+  return rebateRows.every(r=>{ if(!(Number(r.goal)>0)||!(Number(r.amt)>0)) return false;
+    if(prev[r.cond]!==undefined && Number(r.goal)<=prev[r.cond]) return false; prev[r.cond]=Number(r.goal); return true; });
+}
+function paintRebateAmt(tr,r){
+  const amt=$('.js-amt',tr), h=$('.js-amt-hint',tr);
+  const msg = r.amt==='' ? (s4Strict?'请输入奖励金额':'') : (Number(r.amt)>0?'':'不可为 0');
+  amt.classList.toggle('is-error',!!msg); h.textContent=msg; h.style.visibility=msg?'visible':'hidden';
+}
+function renderRebate(){
+  const tb=$('#rebateBody'); tb.innerHTML='';
+  rebateRows.forEach((r,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td>LV${i+1}</td>
+      <td><select class="select js-cond"><option ${r.cond==='有效投注'?'selected':''}>有效投注</option><option ${r.cond==='充值'?'selected':''}>充值</option></select></td>
+      <td><div class="prefix-wrap"><span class="prefix">≥</span><input class="input js-goal" value="${r.goal}"></div>
+        <p class="hint hint--err js-goal-hint" style="visibility:hidden"></p></td>
+      <td>彩金</td>
+      <td><div class="suffix-wrap"><input class="input js-amt" value="${r.amt}" placeholder="固定金额"><span class="suffix">${curCode()}</span></div>
+        <p class="hint hint--err js-amt-hint" style="visibility:hidden"></p></td>
+      <td><button class="btn--link red js-del">删除</button></td>`;
+    $('.js-cond',tr).addEventListener('change',e=>{ r.cond=e.target.value; validateGoalOrder(s4Strict); });
+    $('.js-goal',tr).addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r.goal=e.target.value; validateGoalOrder(s4Strict); });
+    $('.js-amt',tr).addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r.amt=e.target.value; paintRebateAmt(tr,r); });
+    $('.js-del',tr).addEventListener('click',()=>{ if(rebateRows.length<=1){toast('至少保留 LV1',true);return;}
+      rebateRows.splice(i,1); renderRebate(); });
+    tb.appendChild(tr); paintRebateAmt(tr,r);
+  });
+  validateGoalOrder(s4Strict);
+}
+$('#btnAddLevel').addEventListener('click',()=>{
+  if(rebateRows.length>=20){toast('等级最多 LV20',true);return;}
+  rebateRows.push({cond:'有效投注',goal:'',amt:''}); renderRebate();
+});
+
+/* ---------- 4-4 期间返水任务（最多 LV50；每级固定 9 项宝箱奖励） ---------- */
+const PERIOD_CONDS=['投注','充值','投注+充值'];
+const newPeriod=()=>({cond:'投注',bet:'',dep:'',rewards:nineRewards()});
+let periodRows=[newPeriod()];
+function samplePeriod(){
+  const conds=['投注','投注','充值','投注+充值','投注'];
+  const bets=['1000','3000','','8000','20000'], deps=['','','2000','5000',''];
+  return conds.map((c,i)=>({cond:c,bet:bets[i],dep:deps[i],rewards:sampleBox(i).map(r=>({...r,val:r.val?String(Number(r.val)*(i+1)):r.val}))}));
+}
+const needBet=c=>c!=='充值', needDep=c=>c!=='投注';
+/* 回传每列各目标的错误讯息（同任务条件逐级递增） */
+function periodGoalErrors(strict){
+  const prev={}, out=[];
+  periodRows.forEach(r=>{
+    const e={};
+    [['bet',needBet(r.cond),'投注'],['dep',needDep(r.cond),'充值']].forEach(([k,need,lab])=>{
+      if(!need) return;
+      const v=r[k];
+      if(v===''){ if(strict) e[k]='请输入'+lab+'目标'; return; }
+      if(!(Number(v)>0)){ e[k]='不可为 0'; return; }
+      const p=prev[r.cond]&&prev[r.cond][k];
+      if(p!==undefined && Number(v)<=p) e[k]='不可小于或等于同任务条件上一级';
+    });
+    prev[r.cond]=prev[r.cond]||{};
+    if(needBet(r.cond)&&Number(r.bet)>0) prev[r.cond].bet=Number(r.bet);
+    if(needDep(r.cond)&&Number(r.dep)>0) prev[r.cond].dep=Number(r.dep);
+    out.push(e);
+  });
+  return out;
+}
+function periodOk(){ const ge=periodGoalErrors(true); return periodRows.every((r,i)=>Object.keys(ge[i]).length===0 && rewardsOk(r.rewards)); }
+function paintPeriodGoals(){
+  const ge=periodGoalErrors(s4Strict);
+  $$('#periodBody tr').forEach((tr,i)=>{
+    ['bet','dep'].forEach(k=>{ const inp=$('.js-'+k,tr), h=$('.js-'+k+'-hint',tr); if(!inp) return;
+      const m=ge[i][k]; inp.classList.toggle('is-error',!!m); h.textContent=m||''; h.style.display=m?'block':'none'; });
+  });
+}
+function periodRwStatus(r){
+  const ok=rewardsOk(r.rewards), touched=r.rewards.some(x=>x.type||x.rate);
+  const n=r.rewards.filter(x=>rewardOk(x,BOX_OPT)).length, N=r.rewards.length;
+  if(ok) return `<span class="st st--ok">已配置 ${N}/${N} · 合计100%</span>`;
+  if(!touched) return s4Strict?`<span class="st st--bad">未配置</span>`:`<span class="ratio-tag">未配置</span>`;
+  return `<span class="st st--bad">未完成 ${n}/${N} · 合计${rateSum(r.rewards)}%</span>`;
+}
+function renderPeriod(){
+  const tb=$('#periodBody'); tb.innerHTML='';
+  periodRows.forEach((r,i)=>{
+    const tr=document.createElement('tr');
+    const goalIn=(k,lab)=>`<div><div class="prefix-wrap"><span class="prefix">${lab} ≥</span><input class="input js-${k}" value="${r[k]}" placeholder="请输入正整数"></div>
+      <p class="hint hint--err js-${k}-hint" style="display:none;position:static;margin-top:2px"></p></div>`;
+    tr.innerHTML=`<td>LV${i+1}</td>
+      <td><select class="select js-pcond">${PERIOD_CONDS.map(c=>`<option ${r.cond===c?'selected':''}>${c}</option>`).join('')}</select></td>
+      <td style="text-align:left"><div class="goal-grid">${needBet(r.cond)?goalIn('bet','投注'):''}${needDep(r.cond)?goalIn('dep','充值'):''}</div></td>
+      <td><div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
+        <span class="js-rwst">${periodRwStatus(r)}</span><button class="btn btn--sm js-rw">配置奖励</button></div></td>
+      <td><button class="btn--link red js-del">删除</button></td>`;
+    $('.js-pcond',tr).addEventListener('change',e=>{ r.cond=e.target.value;
+      if(!needBet(r.cond)) r.bet=''; if(!needDep(r.cond)) r.dep='';          // 切换条件 → 清空不适用的目标
+      renderPeriod(); });
+    ['bet','dep'].forEach(k=>{ const inp=$('.js-'+k,tr); if(inp) inp.addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r[k]=e.target.value; paintPeriodGoals(); }); });
+    $('.js-rw',tr).addEventListener('click',()=>openPeriodModal(i));
+    $('.js-del',tr).addEventListener('click',()=>{ if(periodRows.length<=1){toast('至少保留 LV1',true);return;}
+      periodRows.splice(i,1); renderPeriod(); });
+    tb.appendChild(tr);
+  });
+  paintPeriodGoals();
+}
+$('#btnAddPeriod').addEventListener('click',()=>{
+  if(periodRows.length>=50){toast('等级最多 LV50',true);return;}
+  const last=periodRows[periodRows.length-1];
+  periodRows.push({...newPeriod(),cond:last?last.cond:'投注'}); renderPeriod();
+});
+/* 宝箱奖励弹窗：编辑草稿，确认时才写回；须完整且合计 100% 才可确认 */
+let pmIdx=-1, pmDraft=null;
+const PM_OPT=()=>({rate:true,physical:true,forceStrict:pmDraft&&pmDraft._strict});
+function renderPeriodModal(){
+  const tb=$('#periodRwBody'); tb.innerHTML='';
+  const refresh=()=>{ $('#periodRwSum').innerHTML=sumLineHtml(pmDraft,s4Strict||pmDraft._strict); };
+  pmDraft.forEach((r,i)=>tb.appendChild(buildRewardRow(r,{...PM_OPT(),label:i+1,onChange:refresh})));
+  refresh();
+}
+function sumLineHtmlStrict(rows,strict){ return sumLineHtml(rows,!!strict); }
+function openPeriodModal(i){
+  pmIdx=i; pmDraft=clone(periodRows[i].rewards); pmDraft._strict=false;
+  const r=periodRows[i];
+  $('#periodTitle').textContent=`LV${i+1} 宝箱奖励配置`;
+  $('#periodTaskInfo').innerHTML=`任务条件：<b>${r.cond}</b>　目标：${needBet(r.cond)?'投注 ≥ '+(r.bet||'—'):''}${r.cond==='投注+充值'?'、':''}${needDep(r.cond)?'充值 ≥ '+(r.dep||'—'):''}`;
+  $('#btnCopyPrev').disabled=i===0; $('#btnCopyPrev').style.opacity=i===0?.45:1;
+  renderPeriodModal();
+  $('#periodMask').classList.add('is-open');
+}
+$('#btnCopyPrev').addEventListener('click',()=>{
+  if(pmIdx<=0) return;
+  const keep=pmDraft._strict; pmDraft=clone(periodRows[pmIdx-1].rewards); pmDraft._strict=keep;
+  renderPeriodModal(); toast('已复制 LV'+pmIdx+' 的奖励配置');
+});
+$('#periodConfirm').addEventListener('click',()=>{
+  if(!rewardsOk(pmDraft)){
+    pmDraft._strict=true; renderPeriodModal();
+    const s=rateSum(pmDraft);
+    toast(pmDraft.every(r=>rewardOk(r,BOX_OPT))?'中奖率合计需等于100%（目前 '+s+'%）':'奖励配置有必填/格式错误，请检查红框',true); return;
+  }
+  periodRows[pmIdx].rewards=pmDraft.map(r=>({...r}));
+  $('#periodMask').classList.remove('is-open'); renderPeriod();
+  toast('LV'+(pmIdx+1)+' 宝箱奖励已保存');
+});
+
+/* ---------- 4-5 投注量计算比例（Slot／Live／Sport／Mini） ---------- */
+const uniq=a=>[...new Set(a.filter(Boolean))];
+/* 依「生产环境一级分类」：棋牌＝Slot（介面一律显示 Slot）、真人＝Live、体育＝Sport、游乐场＝Mini（捕鱼目前无游戏商，不列入） */
+const GAME_CATS=[
+  {key:'Slot',groups:[{name:'Slot',provs:uniq(['OkGames','TPG','FunkyGame','PG','CQ9 Gaming','JILI','AdvantPlay','OKSLOTS Mini','EVO','RealTime Gaming','PlayStar Gaming','FC Gaming','King Maker','JDB Gaming','PRAGMATIC PLAY','UU Slots','YGR','Playtech','RICH88','Realistic','Yellow Bat','BNG','OMNIPLAY','ACEWIN','JILIFISH','MI Games','Vertex Play','VA','FunkyGame(S)','VPLUS SLOT'])}]},
+  {key:'Live',groups:[{name:'真人',provs:['EVO','SA Gaming','WE Gaming','ONLIVE','Playtech','PRAGMATIC PLAY','SEXY CASINO']}]},
+  {key:'Sport',fixed:true,groups:[{name:'体育',provs:['OKPlay']}]},   // Sport：仅配置比例，套用全部体育游戏商，不可选择游戏商
+  {key:'Mini',groups:[{name:'游乐场',provs:['Mini Games']}]},
+];
+const catTotal=c=>c.groups.reduce((a,g)=>a+g.provs.length,0);
+const BLANK_RATIO=()=>Object.fromEntries(GAME_CATS.map(c=>[c.key,{pct:'',sel:[]}]));
+let ratio=BLANK_RATIO();
+const SAMPLE_RATIO=()=>({Slot:{pct:'100',sel:['Slot|JILI','Slot|PG','Slot|JILIFISH']},Live:{pct:'50',sel:['真人|EVO','真人|SA Gaming']},Sport:{pct:'30',sel:[]},Mini:{pct:'',sel:[]}});
+function ratioErr(c){
+  const r=ratio[c.key];
+  if(r.pct!==''&&Number(r.pct)>100) return {pct:'比例配置不得超过100%'};
+  if(c.fixed) return {};   // Sport：留空＝100%
+  if(r.sel.length&&r.pct==='') return {pct:'请输入流水计算比例'};
+  if(r.pct!==''&&!r.sel.length) return {sel:'请选择游戏商'};
+  return {};
+}
+function ratioOk(){ return GAME_CATS.every(c=>Object.keys(ratioErr(c)).length===0); }
+function renderRatio(){
+  const tb=$('#ratioBody'); tb.innerHTML='';
+  GAME_CATS.forEach(c=>{
+    const r=ratio[c.key], tr=document.createElement('tr');
+    const names=r.sel.map(x=>x.split('|')[1]+(c.groups.length>1?'（'+x.split('|')[0]+'）':''));
+    tr.innerHTML=`<td><b>${c.key}</b></td>
+      <td><div class="suffix-wrap"><input class="input js-pct" value="${r.pct}" placeholder="0～100"><span class="suffix">%</span></div>
+        <p class="hint hint--err js-pct-hint" style="visibility:hidden"></p></td>
+      <td style="text-align:left">${c.fixed
+        ? `<span style="font-size:12.5px;color:var(--text-2)">套用全部体育游戏商（不可选择游戏商）；留空按 100% 计算</span>`
+        : `<div style="display:flex;align-items:center;gap:10px;min-width:0">
+        <button class="btn btn--sm js-pick-prov" style="flex:none">选择游戏商</button>
+        <span style="flex:none;font-size:12.5px;color:var(--text-2)">已选 <b class="hl">${r.sel.length}</b> / ${catTotal(c)}</span>
+        <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--text-3)" title="${names.join('、')}">${names.join('、')||'未勾选（全部按 100% 计算）'}</span></div>`}
+        <p class="hint hint--err js-sel-hint" style="visibility:hidden"></p></td>`;
+    const paint=()=>{ const e=ratioErr(c);
+      $('.js-pct',tr).classList.toggle('is-error',!!e.pct); $('.js-pct-hint',tr).textContent=e.pct||''; $('.js-pct-hint',tr).style.visibility=e.pct?'visible':'hidden';
+      $('.js-sel-hint',tr).textContent=e.sel||''; $('.js-sel-hint',tr).style.visibility=e.sel?'visible':'hidden'; };
+    $('.js-pct',tr).addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r.pct=e.target.value; paint(); });
+    const pk=$('.js-pick-prov',tr); if(pk) pk.addEventListener('click',()=>openProvModal(c));
+    tb.appendChild(tr); paint();
+  });
+}
+let provCat=null;
+function openProvModal(c){
+  provCat=c; const sel=new Set(ratio[c.key].sel);
+  const gn=c.groups.map(g=>g.name).filter(n=>n!==c.key);
+  $('#provTitle').textContent=`选择游戏商 · ${c.key}${gn.length?'（'+gn.join('／')+'）':''}`;
+  $('#provList').innerHTML=c.groups.map(g=>`<div class="prov-group">
+      <div class="prov-group__head"><label class="chk"><input type="checkbox" class="js-g">${g.name}</label><span class="cnt js-gc"></span></div>
+      <div class="prov-group__grid">${g.provs.map(p=>`<label class="chk"><input type="checkbox" class="js-p" value="${g.name}|${p}" ${sel.has(g.name+'|'+p)?'checked':''}>${p}</label>`).join('')}</div></div>`).join('');
+  $$('#provList .prov-group').forEach(box=>{
+    $('.js-g',box).addEventListener('change',e=>{ $$('.js-p',box).forEach(x=>x.checked=e.target.checked); syncProv(); });
+    $$('.js-p',box).forEach(x=>x.addEventListener('change',syncProv));
+  });
+  syncProv(); $('#provMask').classList.add('is-open');
+}
+function syncProv(){
+  $$('#provList .prov-group').forEach(box=>{ const all=$$('.js-p',box), on=all.filter(x=>x.checked).length;
+    $('.js-g',box).checked=on===all.length; $('.js-g',box).indeterminate=on>0&&on<all.length; $('.js-gc',box).textContent=`${on} / ${all.length}`; });
+  const all=$$('#provList .js-p'), on=all.filter(x=>x.checked).length;
+  $('#provAll').checked=on===all.length; $('#provAll').indeterminate=on>0&&on<all.length;
+  $('#provCount').textContent=`已勾选 ${on} / ${all.length} 家游戏商`;
+}
+$('#provAll').addEventListener('change',e=>{ $$('#provList .js-p').forEach(x=>x.checked=e.target.checked); syncProv(); });
+$('#provConfirm').addEventListener('click',()=>{
+  ratio[provCat.key].sel=$$('#provList .js-p').filter(x=>x.checked).map(x=>x.value);
+  $('#provMask').classList.remove('is-open'); renderRatio(); toast(provCat.key+' 套用游戏商已更新');
+});
+
+/* ---------- 4-6 彩金所需流水倍数 ---------- */
+function wagerOk(){ const wv=$('#fWager').value.trim(), wn=Number(wv); return wv===''||(wn>=0.01&&wn<=999999.99&&/^\d{1,8}(\.\d{1,2})?$/.test(wv)); }
+
+/* ---------- 步骤4 各区块校验（下一步／提交时依序检查） ---------- */
+const SECTIONS=[
+  ['sign','secSign',signOk,'签到活动配置未完成：请检查奖励类型／奖励数量，及已配置宝箱的中奖率合计需等于100%'],
+  ['box','secBox',boxesOk,()=>boxNoneErr()?'开启「额外随机宝箱」时，至少需配置 1 款签到宝箱':'签到宝箱配置未完成：已开始填写的宝箱须 9 项奖励皆完整，且中奖率合计需等于100%'],
+  ['rebate','secRebate',rebateOk,'每日返水配置有必填/格式错误，或任务目标未依同任务条件逐级递增'],
+  ['period','secPeriod',periodOk,'期间返水任务未完成：请检查任务目标，及各等级宝箱奖励（9 项、合计100%）'],
+  ['ratio','secRatio',ratioOk,'投注量计算比例有误：Slot／Live／Mini 已勾选游戏商须填比例、已填比例须勾选游戏商；比例 0～100'],
+  ['other','secOther',wagerOk,'彩金所需流水倍数须为 0.01～999999.99（最多 8 位整数＋2 位小数、不可为 0）'],
+];
+
+function renderStep4(){ renderSign(); renderBoxes(); renderVipTabs(); renderRebate(); renderPeriod(); renderRatio(); }
+/* 步骤1 币种变更 → 重画（每日返水奖励金额单位） */
+$('#fCur').addEventListener('change',()=>renderStep4());
+
+$$('[data-close-modal]').forEach(b=>b.addEventListener('click',e=>{
+  pendingCloseRow=null; pendingDelRow=null;           /* 取消/× → 清掉待处理的活动列表行 */
+  e.target.closest('.mask').classList.remove('is-open');
+}));
+
+/* ---------- 自动拒绝：开关联动输入框 ---------- */
+$('#autoReject').addEventListener('change',e=>$('#rejectN').disabled=!e.target.checked);
+
+/* ---------- 流水倍数：可留空、不可填0；填入有效值即清除红框 ---------- */
+$('#fWager').addEventListener('input',e=>{ e.target.value=sanWager(e.target.value); const v=e.target.value, n=Number(v); if(v===''||(n>=0.01&&n<=999999.99)) e.target.classList.remove('is-error'); });
+
+/* ---------- 提交预览 ---------- */
+function buildPreview(){
+  const status=$('input[name=status]:checked').value;
+  const sw=$$('#pageWizard [data-panel="5"] .switch input');
+  const yn=x=>x&&x.checked?'是':'否';
+  const applyAll=$('#applyAll').checked;
+  /* 步骤4 摘要 */
+  const rwTxt=r=>!r.type?'—':(r.type==='免费投注'||r.type==='优惠券')?`${r.type}：${r.pick||'—'}`
+      :r.type==='实体奖品'?`实体奖品「${r.name||'—'}」（价值 ${r.val||'—'}${r.img?'，已上传小图':''}）`
+      :`${RW_LABEL[r.type]||r.type} ×${r.val||'—'}`;
+  const ratioTxt=GAME_CATS.map(c=>{const r=ratio[c.key]; if(c.fixed) return `${c.key} ${r.pct||100}%（全部游戏商）`; return r.sel.length?`${c.key} ${r.pct}%（${r.sel.length} 家）`:`${c.key} 100%`;}).join('；');
+  const pConds=PERIOD_CONDS.map(c=>`${c} ${periodRows.filter(r=>r.cond===c).length}`).join(' / ');
+  const floatOn=$$('input[name=float]')[1]?$$('input[name=float]')[1].checked:false;
+  const listOn=$$('input[name=listShow]')[0]?$$('input[name=listShow]')[0].checked:false;
+  const rows=[
+    ['① 活动模板设置',[
+      ['活动ID',(typeof editingActId!=='undefined'&&editingActId)?editingActId:'—'],['模板类型',$('#fType').value],
+      ['状态',status],['活动币种',$('#fCur').value],
+      ['活动名称',$('#fName').value||'—'],['活动时间',$('#fActTime').value||'—']]],
+    ['② 活动图片',[
+      ['首页浮窗',floatOn?'开启':'关闭'],['PC 图片','已上传'],
+      ['H5 图片','已上传'],['首页浮窗排序',$('#fSort').value||'0'],
+      ['活动列表',listOn?'开启':'关闭'],['活动列表 PC 图片','已上传'],
+      ['活动列表 H5 图片','已上传'],['活动列表排序',$('#fListSort').value||'0'],
+      ['备注',$('#fRemark').value||'—']]],
+    ['③ 参与对象与名单',[
+      ['充值层级','全选'],['指定代理','不指定'],
+      ['新会员限制','否'],['会员等级','全选'],
+      ['用户标签','—'],['用户标签(排除)','—'],
+      ['黑名单用户名','—']]],
+    ['④ 活动条件',[
+      ['签到奖励·第一天',rwTxt(sign.days[0])],['签到奖励·第二天',rwTxt(sign.days[1])],
+      ['签到奖励·第三天以上(含)',rwTxt(sign.days[2])],['额外随机宝箱',sign.boxOn?('开启（'+(configuredBoxes().map(k=>'宝箱'+(k+1)+' '+(sign.boxRates[k]||'—')+'%').join('、')||'—')+'）'):'关闭'],
+      ['签到宝箱配置',sign.boxOn?('已配置 '+configuredBoxes().length+' 款（'+(configuredBoxes().map(k=>'宝箱'+(k+1)).join('、')||'—')+'）'+(configuredBoxes().length?' × 9 项奖励':'')):'—（随机宝箱关闭）'],['每日返水·VIP 配置数',applyAll?'1 个（套用至其他等级）':'11 个'],
+      ['每日返水配置',rebateRows.length+' 个等级'],['期间返水任务',periodRows.length+' 个等级（'+pConds+'）'],
+      ['投注量计算比例',ratioTxt],['彩金所需流水倍数',$('#fWager').value||'—'],
+      ['审核方式','自动审核']]],
+    ['⑤ 风控条件',[
+      ['同 IP 检测',yn(sw[0])],['同姓名检测',yn(sw[2])],
+      ['同手机号检测',yn(sw[1])],['同 email 检测',yn(sw[3])],
+      ['自动拒绝',$('#autoReject').checked?('是（'+$('#rejectN').value+' 笔）'):'—']]],
+  ];
+  $('#previewBody').innerHTML=rows.map(([step,kvs])=>`<tr>
+    <td class="pv-step">${step}</td>
+    <td><div class="pv-grid">${kvs.map(([k,v])=>`<div class="kv"><span class="k">${k}：</span><span>${v}</span></div>`).join('')}</div></td>
+  </tr>`).join('');
+}
+
+/* ---------- 时间区间选择器 ---------- */
+const dp={target:null,base:null,start:null,end:null};
+function dpFmt(d){const p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;}
+function dpParse(str){
+  const m=str && str.match(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}) ~ (\d{4}-\d{2}-\d{2}) (\d{2}:\d{2})$/);
+  if(!m) return null;
+  return {start:new Date(m[1]+'T00:00:00'),startTime:m[2],end:new Date(m[3]+'T00:00:00'),endTime:m[4]};
+}
+function dpSyncInputs(){
+  $('#dpStartDate').value=dp.start?dpFmt(dp.start):'';
+  $('#dpEndDate').value=dp.end?dpFmt(dp.end):'';
+}
+function dpRender(){
+  [0,1].forEach(i=>{
+    const m=new Date(dp.base.getFullYear(),dp.base.getMonth()+i,1);
+    $('#dpCal'+i+' .dp-cal-title').textContent=`${m.getFullYear()}年${m.getMonth()+1}月`;
+    const grid=$('#dpCal'+i+' .dp-cal-grid'); grid.innerHTML='';
+    ['日','一','二','三','四','五','六'].forEach(d=>{const el=document.createElement('div');el.className='dow';el.textContent=d;grid.appendChild(el);});
+    const firstDow=m.getDay(); const days=new Date(m.getFullYear(),m.getMonth()+1,0).getDate();
+    for(let k=0;k<firstDow;k++){const el=document.createElement('div');el.className='dp-day is-empty';grid.appendChild(el);}
+    for(let d=1;d<=days;d++){
+      const cur=new Date(m.getFullYear(),m.getMonth(),d);
+      const el=document.createElement('div'); el.className='dp-day'; el.textContent=d;
+      if(dp.start&&+cur===+dp.start) el.classList.add('is-start');
+      if(dp.end&&+cur===+dp.end) el.classList.add('is-end');
+      if(dp.start&&dp.end&&cur>dp.start&&cur<dp.end) el.classList.add('is-in-range');
+      el.addEventListener('click',()=>dpPick(cur));
+      grid.appendChild(el);
+    }
+  });
+}
+function dpPick(date){
+  if(!dp.start || (dp.start&&dp.end)){ dp.start=date; dp.end=null; }
+  else if(date<dp.start){ dp.end=dp.start; dp.start=date; }
+  else{ dp.end=date; }
+  dpSyncInputs(); dpRender();
+}
+function dpOpen(input){
+  dp.target=input;
+  const parsed=dpParse(input.value);
+  dp.start=parsed?parsed.start:null; dp.end=parsed?parsed.end:null;
+  $('#dpStartTime').value=parsed?parsed.startTime:'00:00';
+  $('#dpEndTime').value=parsed?parsed.endTime:'23:59';
+  const now=new Date();
+  dp.base=parsed?new Date(parsed.start.getFullYear(),parsed.start.getMonth(),1):new Date(now.getFullYear(),now.getMonth(),1);
+  dpSyncInputs(); dpRender();
+  const r=input.getBoundingClientRect(); const pop=$('#dpPop');
+  pop.style.top=(r.bottom+window.scrollY+4)+'px';
+  pop.style.left=(r.left+window.scrollX)+'px';
+  pop.classList.add('is-open');
+}
+function dpClose(){ $('#dpPop').classList.remove('is-open'); dp.target=null; }
+$$('#dpPop [data-nav]').forEach(b=>b.addEventListener('click',()=>{
+  dp.base=new Date(dp.base.getFullYear(),dp.base.getMonth()+(b.dataset.nav==='prev'?-1:1),1); dpRender();
+}));
+$('#dpClear').addEventListener('click',()=>{
+  dp.start=null; dp.end=null;
+  if(dp.target){ dp.target.value=''; dp.target.classList.remove('is-error'); }
+  dpClose();
+});
+$('#dpOk').addEventListener('click',()=>{
+  if(!dp.start||!dp.end){ toast('请选择完整的起止日期',true); return; }
+  const st=$('#dpStartTime').value||'00:00', et=$('#dpEndTime').value||'23:59';
+  if(dp.target){ dp.target.value=`${dpFmt(dp.start)} ${st} ~ ${dpFmt(dp.end)} ${et}`; dp.target.classList.remove('is-error'); }
+  dpClose();
+});
+$$('.dp-trigger').forEach(inp=>inp.addEventListener('click',e=>{ e.stopPropagation(); dpOpen(inp); }));
+$('#dpPop').addEventListener('click',e=>e.stopPropagation());
+document.addEventListener('click',()=>{ if(dp.target) dpClose(); });
+
+/* ---------- 初始化 ---------- */
+renderStep4();
+</script>
+</body>
+</html>

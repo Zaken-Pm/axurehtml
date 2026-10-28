@@ -149,10 +149,6 @@ select.select{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg
 .modal__head .x{cursor:pointer;color:var(--text-3);border:none;background:none;font-size:18px;}
 .modal__body{padding:16px 18px;overflow-y:auto;}
 .modal__foot{padding:12px 18px;display:flex;justify-content:flex-end;gap:10px;border-top:1px solid var(--border-l);}
-.game-provider{border:1px solid var(--border-l);border-radius:6px;margin-bottom:10px;}
-.game-provider__head{padding:9px 12px;background:#f7f9fc;font-weight:600;color:var(--primary);display:flex;align-items:center;gap:8px;}
-.game-provider__grid{padding:10px 12px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
-.game-provider__grid label{display:flex;gap:6px;align-items:center;font-size:12.5px;color:var(--text-2);}
 label.chk{display:inline-flex;gap:6px;align-items:center;cursor:pointer;}
 label.chk input{accent-color:var(--primary);}
 
@@ -260,6 +256,10 @@ label.chk input{accent-color:var(--primary);}
 
 /* 期间返水：目标输入 */
 .goal-grid{display:flex;flex-direction:column;gap:6px;}
+.prate{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;}
+.prate__item{display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:var(--text-3);text-align:left;}
+.prate .input{height:30px;padding:0 6px;}
+.prate-sum{font-size:12px;color:var(--text-2);text-align:left;margin-top:4px;}
 .goal-grid .prefix-wrap .prefix{min-width:58px;text-align:center;}
 
 /* 投注量计算比例 */
@@ -392,7 +392,7 @@ label.chk input{accent-color:var(--primary);}
             <div class="form-row"><label><span class="req">*</span>活动时间：</label>
               <div class="dp-wrap"><input class="input dp-trigger" id="fActTime" type="text" readonly placeholder="开始时间 ~ 结束时间"><span class="dp-icon">📅</span></div></div>
             <p class="hint hint--warn">· 活动时间到期：<b>停止计算／产生新奖励</b>；已获得的奖励仍可领取。<br>
-              · 「签到活动、每日返水、期间返水、线下活动门票资格」统一以本活动时间计算。<br>
+              · 「签到活动、每日返水、期间返水」统一以本活动时间计算。<br>
               · 「状态」开关为手动强制下架（关闭：<b>仅隐藏入口、停算；不影响用户已获得的奖励，重开各状态维持不变</b>，需二次确认）；同期仅能开启一个节庆特别活动。</p>
           </div>
 
@@ -505,25 +505,43 @@ label.chk input{accent-color:var(--primary);}
             <!-- 4-4 期间返水任务 -->
             <section class="block" id="secPeriod">
               <div class="block__head"><h4><span class="req">*</span>期间返水任务<span class="tag-new">新增</span>
-                <span class="sub">（依活动期间累计计算；不分 VIP；完成当前等级即解锁下一等级）</span></h4>
+                <span class="sub">（依活动期间累计计算；不分 VIP）</span></h4>
                 <button class="btn btn--primary btn--sm" id="btnAddPeriod">＋ 新增等级</button></div>
               <div class="block__body">
-                <table class="tbl" style="min-width:860px">
+                <table class="tbl" style="min-width:880px">
                   <thead><tr>
-                    <th style="width:60px">等级</th><th style="width:150px">任务条件</th><th style="width:260px">任务目标</th>
-                    <th>宝箱奖励（9 项）</th><th style="width:60px">操作</th>
+                    <th style="width:56px">等级</th><th style="width:124px">任务条件</th><th style="width:200px">任务目标</th>
+                    <th>随机宝箱中奖率（%）</th><th style="width:56px">操作</th>
                   </tr></thead>
                   <tbody id="periodBody"></tbody>
                 </table>
-                <p class="hint">任务条件：投注、充值、投注+充值（须同时达成两项目标）。任务目标不可为空、0 或小数点，且需依同「任务条件」逐级递增。等级最低 LV1，最多 LV50。<br>
-                  「投注」进度套用下方「投注量计算比例」折算；每级宝箱固定 9 项奖励，中奖率合计须等于 100%。</p>
+                <p class="hint">· 任务条件：投注、充值、投注+充值（须同时达成两项目标）。任务目标不可为空、0 或小数点，且需依同「任务条件」逐级递增。等级最低 LV1，最多 LV50。<br>
+                  · 达成该等级目标后，依该等级「随机宝箱中奖率」随机发放 1 款「返水任务宝箱」；仅已于下方「返水任务宝箱配置」配置的宝箱可填写，中奖率合计须等于 100%，可填 0 表示该等级不发放该款。<br>
+                  · 「投注」进度套用下方「投注量计算比例」折算。</p>
               </div>
             </section>
 
-            <!-- 4-5 投注量计算比例 -->
+            <!-- 4-5 返水任务宝箱配置（与签到宝箱相同） -->
+            <section class="block" id="secPBox">
+              <div class="block__head"><h4><span class="req">*</span>返水任务宝箱配置<span class="tag-new">新增</span>
+                <span class="sub">（至少配置 1 款；最多 6 款，每款固定 9 项奖励，开启时依中奖率随机抽出 1 项）</span></h4></div>
+              <div class="block__body">
+                <div class="box-tabs" id="pboxTabs" role="tablist" aria-label="返水任务宝箱"></div>
+                <table class="tbl" style="min-width:780px;table-layout:fixed">
+                  <thead><tr><th style="width:60px">#</th><th style="width:230px">奖励类型</th><th>奖励数量</th><th style="width:170px">中奖率</th></tr></thead>
+                  <tbody id="pboxBody"></tbody>
+                </table>
+                <div class="sum-line" id="pboxSum"></div>
+                <p class="hint">奖励类型：彩金、积分、抽奖券（Golden Draw Ticket）、免费投注、优惠券、实体奖品（填写奖品名称＋奖励价值＋上传小图）。<br>
+                  · 6 款中<b>至少须配置 1 款</b>，其余可整款留空。<br>
+                  · 一旦开始填写该款宝箱，固定 9 项奖励皆须完整（不可新增、删除），且中奖率合计须等于 100%；已配置的宝箱才可于上方各等级「随机宝箱中奖率」填写中奖率。</p>
+              </div>
+            </section>
+
+            <!-- 4-6 投注量计算比例 -->
             <section class="block" id="secRatio">
               <div class="block__head"><h4>投注量计算比例<span class="tag-new">新增</span>
-                <span class="sub">（套用「每日返水配置」「期间返水任务」的投注量；未勾选的游戏商按 100% 计算）</span></h4></div>
+                <span class="sub">（套用「每日返水配置」「期间返水任务」的投注量；未设定的游戏商按 100% 计算）</span></h4></div>
               <div class="block__body">
                 <table class="tbl" style="min-width:820px;table-layout:fixed">
                   <thead><tr>
@@ -532,32 +550,15 @@ label.chk input{accent-color:var(--primary);}
                   <tbody id="ratioBody"></tbody>
                 </table>
                 <p class="hint">· 点「选择游戏商」勾选要套用折扣的游戏商；同一游戏类型内被勾选的游戏商套用同一「流水计算比例」。<br>
-                  · 比例为 0～100 的整数；已勾选游戏商时比例必填，已填比例时须至少勾选 1 家游戏商。</p>
+                  · 比例为 0～100 的整数；Slot／Live／Mini：已勾选游戏商时比例必填，已填比例时须至少勾选 1 家游戏商。<br>
+                  · Sport 仅配置比例，比例套用全部体育游戏商；留空按 100% 计算。</p>
               </div>
             </section>
 
-            <!-- 4-6 线下活动门票资格 -->
-            <section class="block" id="secTicket">
-              <div class="block__head"><h4>线下活动门票资格<span class="tag-new">新增</span>
-                <span class="sub">（非必填；活动时间内有效投注达标即获得门票资格）</span></h4></div>
-              <div class="block__body">
-                <div class="form-row" style="margin-bottom:6px"><label for="fTicketBet">有效投注目标：</label>
-                  <div><div class="prefix-wrap"><span class="prefix" style="height:34px;line-height:34px">≥</span><input class="input" id="fTicketBet" placeholder="留空＝不开放线下门票资格"></div>
-                    <p class="hint hint--err" id="ticketBetErr" style="display:none"></p></div></div>
-                <p class="hint">· 留空：本活动不开放线下门票资格（前台不显示门票入口、不计算资格）；填写：须为正整数，不可为 0 或小数点。<br>
-                  · 计算期间＝步骤1「活动时间」；有效投注依原始有效投注累计，不套用「投注量计算比例」。达标名单于「活动报表 › 线下门票资格名单」导出。</p>
-              </div>
-            </section>
-
-            <!-- 4-7 流水倍数 + 游戏范围（沿用） -->
+            <!-- 4-7 彩金所需流水倍数（沿用） -->
             <section id="secOther">
               <div class="form-row"><label>彩金所需流水倍数：</label>
                 <input class="input" id="fWager" placeholder="0.01～999999.99（可空；不可为 0）" style="max-width:220px"></div>
-              <div class="form-row"><label><span class="req">*</span>适用游戏范围：</label>
-                <div style="display:flex;align-items:center;gap:12px">
-                  <button class="btn" id="btnGames">请选择游戏</button>
-                  <span id="gamesCount" style="font-size:13px;color:var(--text-2)"></span></div></div>
-              <p class="hint">预设全选（全选范围含体育）。</p>
             </section>
           </div>
 
@@ -620,7 +621,7 @@ label.chk input{accent-color:var(--primary);}
       </table>
       </div>
       <p class="mini-note">「联名挑战活动」的奖励状态一律「审核通过」、审核人一律「自动审核」（无需人工审核）。<br>
-        「节庆特别活动」：用户<b>每获得 1 个奖励即新增 1 笔记录</b>（签到奖励、签到宝箱、每日返水、期间返水宝箱各自独立成笔；同一天签到获得签到奖励＋随机宝箱为 2 笔）；除实体奖品外，状态一律「审核通过」、审核人一律「自动审核」，申请时间＝审核时间＝奖励发放时间；备注记录奖励来源。线下门票资格非奖励，不写入派奖审核（见「活动报表 › 线下门票资格名单」）。<br>
+        「节庆特别活动」：用户<b>每获得 1 个奖励即新增 1 笔记录</b>（签到奖励、签到宝箱、每日返水、期间返水（返水任务宝箱）各自独立成笔；同一天签到获得签到奖励＋随机宝箱为 2 笔）；除实体奖品外，状态一律「审核通过」、审核人一律「自动审核」，申请时间＝审核时间＝奖励发放时间；备注记录奖励来源。<br>
         「节庆特别活动」的<b>实体奖品</b>例外，采<b>人工审核</b>：发放时状态为「待审核」，审核人／审核时间显示「—」；操作栏点「通过」或「拒绝」（拒绝须填原因）后，写入审核人账号与审核时间，审核结果不可再修改。</p>
     </section>
 
@@ -629,7 +630,6 @@ label.chk input{accent-color:var(--primary);}
       <div class="rtabs">
         <button class="rtab is-active" data-rtab="award">活动奖励统计</button>
         <button class="rtab" data-rtab="data">活动数据统计</button>
-        <button class="rtab" data-rtab="ticket">线下门票资格名单<span class="tag-new">新增</span></button>
       </div>
 
       <!-- 子页：活动奖励统计 -->
@@ -683,46 +683,8 @@ label.chk input{accent-color:var(--primary);}
         <p class="mini-note">「联名挑战活动」：天数固定「-」；申请领取时间与审核时间一致；状态一律「已通过」；刮刮卡奖励活动类型加括号「联名挑战活动(刮刮卡)」。</p>
       </div>
 
-      <!-- 子页：线下门票资格名单（节庆特别活动） -->
-      <div id="reportTicket" style="display:none">
-        <div class="list-filters">
-          <div class="fld"><label for="tkActId">活动 ID：</label><input class="input" id="tkActId" placeholder="请输入"></div>
-          <div class="fld"><label for="tkUser">会员账号：</label><input class="input" id="tkUser" placeholder="请输入"></div>
-          <div class="fld"><label>达标时间：</label><input class="input dp-trigger" id="tkTime" readonly placeholder="开始时间 ~ 结束时间" style="width:230px"></div>
-          <button class="btn btn--primary" id="tkSearch">🔍 搜寻</button>
-          <button class="btn btn--primary" id="tkExport">⬇ 导出</button>
-        </div>
-        <div class="report-totals" id="tkTotals"></div>
-        <div class="tbl-scroll">
-        <table class="list-tbl" style="min-width:1000px">
-          <thead><tr>
-            <th>活动ID</th><th>活动名称</th><th>会员账号</th><th>VIP 等级</th>
-            <th>有效投注目标</th><th>达标时累计有效投注</th><th>达标时间</th>
-          </tr></thead>
-          <tbody id="ticketBody"></tbody>
-        </table>
-        </div>
-        <p class="mini-note">· 仅记录「节庆特别活动」中<b>已达标</b>的用户（未达标者不写入名单）；有效投注依原始有效投注计算，不套用「投注量计算比例」。<br>
-          · 达标时间＝累计有效投注首次 ≥ 目标的时间；达标后资格不会因后续投注变动而取消，名单内容不再更新。<br>
-          · 「导出」按当前筛选条件导出 Excel，供线下活动核对使用。</p>
-      </div>
     </section>
 
-  </div>
-</div>
-
-<!-- ============ 弹窗：选择游戏 ============ -->
-<div class="mask" id="gameMask">
-  <div class="modal">
-    <div class="modal__head">请选择游戏 <button class="x" data-close-modal>×</button></div>
-    <div class="modal__body">
-      <label class="chk" style="font-weight:600;margin-bottom:8px"><input type="checkbox" id="gameAll" checked>全选</label>
-      <div id="gameList"></div>
-    </div>
-    <div class="modal__foot">
-      <button class="btn" data-close-modal>取消</button>
-      <button class="btn btn--primary" id="gameConfirm">确认</button>
-    </div>
   </div>
 </div>
 
@@ -746,29 +708,6 @@ label.chk input{accent-color:var(--primary);}
     <div class="modal__foot">
       <button class="btn" data-close-modal>取消</button>
       <button class="btn btn--red" id="delConfirm">确定删除</button>
-    </div>
-  </div>
-</div>
-
-<!-- ============ 弹窗：期间返水 · 宝箱奖励配置 ============ -->
-<div class="mask" id="periodMask">
-  <div class="modal modal--lg" role="dialog" aria-modal="true" aria-labelledby="periodTitle">
-    <div class="modal__head"><span id="periodTitle">LV1 宝箱奖励配置</span> <button class="x" data-close-modal aria-label="关闭">×</button></div>
-    <div class="modal__body">
-      <div class="modal__toolbar">
-        <span id="periodTaskInfo" style="font-size:12.5px;color:var(--text-2)"></span>
-        <button class="btn btn--sm" id="btnCopyPrev" style="margin-left:auto">复制上一级奖励</button>
-      </div>
-      <table class="tbl" style="min-width:760px;table-layout:fixed">
-        <thead><tr><th style="width:60px">#</th><th style="width:230px">奖励类型</th><th>奖励数量</th><th style="width:170px">中奖率</th></tr></thead>
-        <tbody id="periodRwBody"></tbody>
-      </table>
-      <div class="sum-line" id="periodRwSum"></div>
-      <p class="hint">固定 9 项奖励（不可新增、删除），每项皆必填；中奖率合计须等于 100%。奖励类型：彩金、积分、抽奖券（Golden Draw Ticket）、免费投注、优惠券、实体奖品（奖品名称上限 30 字＋奖励价值＋小图）。</p>
-    </div>
-    <div class="modal__foot">
-      <button class="btn" data-close-modal>取消</button>
-      <button class="btn btn--primary" id="periodConfirm">确认</button>
     </div>
   </div>
 </div>
@@ -891,9 +830,9 @@ $$('.side__subitem').forEach(s=>{ const t=s.textContent.trim();
 /* 规则：联名挑战活动 → 状态一律「审核通过」、审核人一律「自动审核」 */
 const auditRows=[
   /* 节庆特别活动：每获得 1 个奖励＝1 笔；备注记录奖励来源 */
-  ['191','vip_king88','节庆特别活动','Christmas Activities 2026','实体奖品','蓝牙耳机（价值 PHP 9,000.00）','待审核','2026-12-03 20:11:47','—','—','User VIP Level 8, Period Rebate LV5 Chest (Bet ≥ 20,000)'],
+  ['191','vip_king88','节庆特别活动','Christmas Activities 2026','实体奖品','蓝牙耳机（价值 PHP 9,000.00）','待审核','2026-12-03 20:11:47','—','—','User VIP Level 8, Period Rebate LV5 (Bet ≥ 20,000), Random Chest 5'],
   ['191','member07','节庆特别活动','Christmas Activities 2026','实体奖品','圣诞限定礼盒（价值 PHP 7,500.00）','审核通过','2026-11-30 21:40:12','admin01','2026-12-01 10:30:00','User VIP Level 5, Check-in Day 9, Random Chest 5'],
-  ['191','member02','节庆特别活动','Christmas Activities 2026','优惠券','存送券20%-本金+彩金2倍-有效期24小时','审核通过','2026-11-22 15:21:08','自动审核','2026-11-22 15:21:08','User VIP Level 2, Period Rebate LV1 Chest (Bet ≥ 1,000)'],
+  ['191','member02','节庆特别活动','Christmas Activities 2026','优惠券','存送券20%-本金+彩金2倍-有效期24小时','审核通过','2026-11-22 15:21:08','自动审核','2026-11-22 15:21:08','User VIP Level 2, Period Rebate LV1 (Bet ≥ 1,000), Random Chest 1'],
   ['191','member01','节庆特别活动','Christmas Activities 2026','礼金','PHP 5.00','审核通过','2026-11-19 00:00:05','自动审核','2026-11-19 00:00:05','User VIP Level 3, Daily Rebate LV2 (Deposit ≥ 200)'],
   ['191','member01','节庆特别活动','Christmas Activities 2026','免费投注券','PT电子免费旋转 ×1','审核通过','2026-11-18 10:05:12','自动审核','2026-11-18 10:05:12','User VIP Level 3, Check-in Day 3, Random Chest 2'],
   ['191','member01','节庆特别活动','Christmas Activities 2026','抽奖券','Golden Draw Ticket ×1','审核通过','2026-11-18 10:05:12','自动审核','2026-11-18 10:05:12','User VIP Level 3, Check-in Day 3 Reward'],
@@ -953,8 +892,6 @@ $$('.rtab').forEach(b=>b.addEventListener('click',()=>{
   const k=b.dataset.rtab;
   $('#reportAward').style.display=k==='award'?'':'none';
   $('#reportData').style.display=k==='data'?'':'none';
-  $('#reportTicket').style.display=k==='ticket'?'':'none';
-  if(k==='ticket') renderTicketReport();
 }));
 
 /* 活动奖励统计：联名挑战活动奖励类型一律「礼金」；刮刮卡奖励→活动类型加(刮刮卡) */
@@ -972,25 +909,7 @@ const dataRows=[
   ['190','member02','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 25','-','2026-08-21 12:10:44','2026-08-21 12:10:44','已通过'],
   ['183','xnjobe11','周卡活动','周卡时间到期活动测试','礼金','PHP 17','Day 7','—','—','待审核'],
 ];
-/* 线下门票资格名单（示意资料） */
-const ticketRows=[   // 仅已达标用户
-  ['191','Christmas Activities 2026','vip_king88','VIP8','50,000','50,320.50','2026-11-17 22:03:11'],
-  ['191','Christmas Activities 2026','member01','VIP3','50,000','51,200.00','2026-11-21 18:42:05'],
-  ['191','Christmas Activities 2026','member05','VIP1','50,000','50,000.00','2026-11-27 09:15:33'],
-];
 $('#auSearch').addEventListener('click',renderAudit);
-function renderTicketReport(){
-  const uid=$('#tkUser').value.trim(), aid=$('#tkActId').value.trim(), tr=dpRange($('#tkTime').value);
-  const rows=ticketRows.filter(r=>(!uid||r[2].includes(uid))&&(!aid||r[0]===aid)&&(!tr||(new Date(r[6].replace(' ','T'))>=tr.s&&new Date(r[6].replace(' ','T'))<=tr.e)));
-  $('#ticketBody').innerHTML=rows.length?rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td>
-      <td>${r[4]}</td><td>${r[5]}</td><td>${r[6]}</td></tr>`).join('')
-    :`<tr><td colspan="7" style="text-align:center;color:var(--text-3);padding:28px">暂无数据</td></tr>`;
-  $('#tkTotals').innerHTML=`已达标人数：<b class="c">${ticketRows.length}</b>　查询结果：<b>${rows.length}</b> 笔`;
-  return rows.length;
-}
-$('#tkSearch').addEventListener('click',renderTicketReport);
-$('#tkExport').addEventListener('click',()=>{ const n=renderTicketReport();
-  if(!n){ toast('暂无数据可导出',true); return; } toast(`已导出 ${n} 笔资格名单（示意）`); });
 
 function renderReport(){
   $('#awardBody').innerHTML=awardRows.map(r=>{
@@ -1021,14 +940,14 @@ function resetWizardFields(blank){
   /* ---- 步骤4 活动条件：依模式还原成「空白」或「示范值」再重画 ---- */
   s4Strict=false;
   sign       = clone(blank?BLANK_SIGN:SAMPLE_SIGN);
-  boxes      = blank?[0,1,2,3,4,5].map(nineRewards):clone(SAMPLE_BOXES); curBox=0;
+  SBOX.boxes = blank?[0,1,2,3,4,5].map(nineRewards):clone(SAMPLE_BOXES); SBOX.cur=0;
+  PBOX.boxes = blank?[0,1,2,3,4,5].map(nineRewards):clone(SAMPLE_PBOXES); PBOX.cur=0;
   rebateRows = clone(blank?BLANK_REBATE:SAMPLE_REBATE);
   periodRows = blank?[newPeriod()]:samplePeriod();
   ratio      = blank?BLANK_RATIO():SAMPLE_RATIO();
-  $('#fTicketBet').value  = blank?'':'50000';
   curVip = 0; if($('#applyAll')) $('#applyAll').checked=false;
   if($('#fWager')){ $('#fWager').value=blank?'':'1'; $('#fWager').classList.remove('is-error'); }
-  renderStep4(); buildGameList();
+  renderStep4();
 
   /* ---- 步骤5 风控条件：还原默认开关（同手机号/同email 预设开） ---- */
   const sw=$$('#pageWizard [data-panel="5"] .switch input');
@@ -1222,7 +1141,8 @@ function validateStep(n){
     if(!wagerOk()) $('#fWager').classList.add('is-error'); else $('#fWager').classList.remove('is-error');
     const bad=SECTIONS.find(([,,fn])=>!fn());
     if(bad){
-      if(bad[0]==='box'){ const k=boxNoneErr()?0:boxes.findIndex((r,i)=>boxTouched(i)&&!rewardsOk(r)); if(k>=0&&k!==curBox){ curBox=k; renderBoxes(); } }
+      const set=bad[0]==='box'?SBOX:bad[0]==='pbox'?PBOX:null;
+      if(set){ const k=set.firstBad(); if(k>=0&&k!==set.cur){ set.cur=k; set.render(); } }
       document.getElementById(bad[1]).scrollIntoView({behavior:'smooth',block:'start'});
       toast(typeof bad[3]==='function'?bad[3]():bad[3],true); return false;
     }
@@ -1376,8 +1296,8 @@ const SAMPLE_SIGN={days:[{type:'彩金',name:'',val:'10',pick:'',img:false,rate:
   boxOn:true,boxRates:['40','25','15','12','8','']};
 const BLANK_SIGN={days:[newReward(),newReward(),newReward()],boxOn:true,boxRates:['','','','','','']};
 /* 宝箱「已配置」＝该款任一栏位有填写；未配置的宝箱中奖率视为 0、输入框停用 */
-const boxTouched=k=>boxes[k].some(r=>r.type||r.rate||r.val||r.pick||r.name);
-const configuredBoxes=()=>[0,1,2,3,4,5].filter(boxTouched);
+const boxTouched=k=>SBOX.touched(k);
+const configuredBoxes=()=>SBOX.configured();
 const boxRateSum=()=>Math.round(configuredBoxes().reduce((a,k)=>a+(Number(sign.boxRates[k])||0),0)*100)/100;
 const SIGN_OPT={rate:false,physical:false};
 function boxRateOk(){ const ks=configuredBoxes();
@@ -1423,9 +1343,37 @@ function paintBoxRate(){
     i.classList.toggle('is-error',(s4Strict&&i.value==='')||Number(i.value)>100||(bad&&i.value!=='')); });
 }
 
-/* ---------- 4-2 签到宝箱配置（6 款 × 固定 9 项） ---------- */
-let boxes=[0,1,2,3,4,5].map(nineRewards);
-let curBox=0;
+/* ---------- 宝箱组元件（6 款 × 固定 9 项）：签到宝箱、返水任务宝箱共用 ----------
+   cfg = { tabs, body, sum：容器选择器；enabled()：是否须配置；noneMsg：一款都未配置时的错误；
+           onRender()：重画后额外处理；onRefresh()：内容变更后连动（如中奖率栏位启停） } */
+function makeBoxSet(cfg){
+  const S={boxes:[0,1,2,3,4,5].map(nineRewards),cur:0,cfg};
+  S.touched=k=>S.boxes[k].some(r=>r.type||r.rate||r.val||r.pick||r.name);
+  S.configured=()=>[0,1,2,3,4,5].filter(S.touched);
+  S.noneErr=()=>cfg.enabled()&&S.configured().length===0;
+  S.ok=()=>!cfg.enabled()||(!S.noneErr()&&S.boxes.every((rows,k)=>!S.touched(k)||rewardsOk(rows)));
+  S.firstBad=()=>S.noneErr()?0:S.boxes.findIndex((r,i)=>S.touched(i)&&!rewardsOk(r));
+  S.render=()=>{
+    cfg.onRender&&cfg.onRender();
+    const tabs=$(cfg.tabs); tabs.innerHTML='';
+    S.boxes.forEach((rows,k)=>{
+      const b=document.createElement('button'); b.type='button'; b.setAttribute('role','tab'); b.setAttribute('aria-selected',k===S.cur);
+      b.className='box-tab'+(k===S.cur?' is-active':''); b.textContent=`宝箱${k+1}`;
+      b.addEventListener('click',()=>{ S.cur=k; S.render(); });
+      tabs.appendChild(b);
+    });
+    const tb=$(cfg.body); tb.innerHTML='';
+    const k=S.cur, rows=S.boxes[k];
+    /* 未填写任何栏位的宝箱不显示必填错误；开始填写后才依严格模式校验 */
+    const strictFn=()=>s4Strict&&S.touched(k);
+    const sumHtml=()=>S.touched(k)?sumLineHtml(rows,strictFn())
+      :(s4Strict&&S.noneErr()?`<span class="warn">${cfg.noneMsg}</span>`:'<span style="color:var(--text-3)">此款宝箱未配置</span>');
+    const refresh=()=>{ $(cfg.sum).innerHTML=sumHtml(); $$(cfg.body+' tr').forEach((tr,i)=>paintReward(tr,rows[i],{...BOX_OPT,strictFn})); cfg.onRefresh&&cfg.onRefresh(); };
+    rows.forEach((r,i)=>tb.appendChild(buildRewardRow(r,{...BOX_OPT,label:i+1,strictFn,onChange:refresh})));
+    $(cfg.sum).innerHTML=sumHtml();
+  };
+  return S;
+}
 function sampleBox(k){
   const m=k+1, R=(type,val,rate,extra={})=>({type,name:'',val:String(val),pick:'',img:'',imgName:'',rate,...extra});
   return [R('彩金',5*m,'30'),R('积分',50*m,'20'),R('免费投注','','15',{pick:FREEBET_LIST[k%FREEBET_LIST.length]}),
@@ -1433,32 +1381,18 @@ function sampleBox(k){
     k>=4 ? R('实体奖品',1500*m,'1',{name:k===4?'圣诞限定礼盒':'蓝牙耳机',img:SAMPLE_IMG,imgName:k===4?'xmas_giftbox.png':'earphone.png'})
          : R('彩金',100*m,'1')];
 }
-const SAMPLE_BOXES=[0,1,2,3,4].map(sampleBox).concat([nineRewards()]);   // 宝箱6 未配置（示意非必填）
 const BOX_OPT={rate:true,physical:true};
-const boxNoneErr=()=>sign.boxOn&&configuredBoxes().length===0;   // 开启随机宝箱却 1 款都未配置
-function boxesOk(){ return !sign.boxOn || (!boxNoneErr() && boxes.every((rows,k)=>!boxTouched(k)||rewardsOk(rows))); }
-function renderBoxes(){
-  const sec=$('#secBox'); sec.classList.toggle('is-off',!sign.boxOn); $('#boxOffNote').style.display=sign.boxOn?'none':'';
-  $('#boxReq').style.display=sign.boxOn?'':'none';   // 随机宝箱开启才为必填
-  const tabs=$('#boxTabs'); tabs.innerHTML='';
-  boxes.forEach((rows,k)=>{
-    const b=document.createElement('button'); b.type='button'; b.setAttribute('role','tab'); b.setAttribute('aria-selected',k===curBox);
-    b.className='box-tab'+(k===curBox?' is-active':'');
-    b.textContent=`宝箱${k+1}`;
-    b.addEventListener('click',()=>{ curBox=k; renderBoxes(); });
-    tabs.appendChild(b);
-  });
-  const tb=$('#boxBody'); tb.innerHTML='';
-  const rows=boxes[curBox];
-  const k=curBox;
-  /* 非必填：该款宝箱尚未填写任何栏位时，不显示必填错误；开始填写后才依严格模式校验 */
-  const strictFn=()=>s4Strict&&boxTouched(k);
-  const boxSum=()=>boxTouched(k)?sumLineHtml(rows,strictFn())
-    :(s4Strict&&boxNoneErr()?'<span class="warn">开启「额外随机宝箱」时，至少需配置 1 款签到宝箱</span>':'<span style="color:var(--text-3)">此款宝箱未配置</span>');
-  const refresh=()=>{ $('#boxSum').innerHTML=boxSum(); $$('#boxBody tr').forEach((tr,i)=>paintReward(tr,rows[i],{...BOX_OPT,strictFn})); paintBoxRate(); };
-  rows.forEach((r,i)=>tb.appendChild(buildRewardRow(r,{...BOX_OPT,label:i+1,strictFn,onChange:refresh})));
-  $('#boxSum').innerHTML=boxSum();
-}
+
+/* ---------- 4-2 签到宝箱配置 ---------- */
+const SBOX=makeBoxSet({tabs:'#boxTabs',body:'#boxBody',sum:'#boxSum',
+  enabled:()=>sign.boxOn, noneMsg:'开启「额外随机宝箱」时，至少需配置 1 款签到宝箱',
+  onRender:()=>{ $('#secBox').classList.toggle('is-off',!sign.boxOn); $('#boxOffNote').style.display=sign.boxOn?'none':'';
+    $('#boxReq').style.display=sign.boxOn?'':'none'; },   // 随机宝箱开启才为必填
+  onRefresh:()=>paintBoxRate()});
+const SAMPLE_BOXES=[0,1,2,3,4].map(sampleBox).concat([nineRewards()]);   // 宝箱6 未配置（示意非必填）
+const boxNoneErr=()=>SBOX.noneErr();
+const boxesOk=()=>SBOX.ok();
+const renderBoxes=()=>SBOX.render();
 
 /* ---------- 4-3 每日返水配置（沿用 X-BOMB；移除挑战任务、刮刮卡栏位） ---------- */
 let curVip=0;
@@ -1535,14 +1469,15 @@ $('#btnAddLevel').addEventListener('click',()=>{
   rebateRows.push({cond:'有效投注',goal:'',amt:''}); renderRebate();
 });
 
-/* ---------- 4-4 期间返水任务（最多 LV50；每级固定 9 项宝箱奖励） ---------- */
+/* ---------- 4-4 期间返水任务（最多 LV50；每级配置「随机宝箱中奖率」） ---------- */
 const PERIOD_CONDS=['投注','充值','投注+充值'];
-const newPeriod=()=>({cond:'投注',bet:'',dep:'',rewards:nineRewards()});
+const newPeriod=()=>({cond:'投注',bet:'',dep:'',rates:['','','','','','']});
 let periodRows=[newPeriod()];
 function samplePeriod(){
   const conds=['投注','投注','充值','投注+充值','投注'];
   const bets=['1000','3000','','8000','20000'], deps=['','','2000','5000',''];
-  return conds.map((c,i)=>({cond:c,bet:bets[i],dep:deps[i],rewards:sampleBox(i).map(r=>({...r,val:r.val?String(Number(r.val)*(i+1)):r.val}))}));
+  const rates=[['60','30','10','0','0',''],['40','30','20','10','0',''],['30','30','20','15','5',''],['20','25','25','20','10',''],['10','20','25','30','15','']];
+  return conds.map((c,i)=>({cond:c,bet:bets[i],dep:deps[i],rates:rates[i]}));
 }
 const needBet=c=>c!=='充值', needDep=c=>c!=='投注';
 /* 回传每列各目标的错误讯息（同任务条件逐级递增） */
@@ -1565,20 +1500,32 @@ function periodGoalErrors(strict){
   });
   return out;
 }
-function periodOk(){ const ge=periodGoalErrors(true); return periodRows.every((r,i)=>Object.keys(ge[i]).length===0 && rewardsOk(r.rewards)); }
+/* 各等级随机宝箱中奖率：仅已配置的返水任务宝箱可填；未配置的宝箱由「返水任务宝箱配置」校验，不在此重复报错 */
+const pRateSum=r=>Math.round(PBOX.configured().reduce((a,k)=>a+(Number(r.rates[k])||0),0)*100)/100;
+function pRateOk(r){ const ks=PBOX.configured(); if(!ks.length) return true;
+  return ks.every(k=>r.rates[k]!==''&&Number(r.rates[k])<=100) && pRateSum(r)===100; }
+function periodOk(){ const ge=periodGoalErrors(true); return periodRows.every((r,i)=>Object.keys(ge[i]).length===0 && pRateOk(r)); }
+function paintPeriodRates(){
+  const ks=PBOX.configured();
+  $$('#periodBody tr').forEach((tr,i)=>{
+    const r=periodRows[i]; if(!r) return;
+    $$('.js-pr',tr).forEach(inp=>{ const k=+inp.dataset.k, on=PBOX.touched(k);
+      if(!on){ r.rates[k]=''; inp.value=''; }
+      inp.disabled=!on; inp.placeholder=on?'0～100':'未配置'; });
+    const el=$('.js-pr-sum',tr);
+    if(!ks.length){ el.innerHTML='<span style="color:var(--text-3)">请先于下方「返水任务宝箱配置」配置宝箱</span>'; $$('.js-pr',tr).forEach(x=>x.classList.remove('is-error')); return; }
+    const s=pRateSum(r), any=ks.some(k=>r.rates[k]!==''), bad=(any||s4Strict)&&s!==100;
+    el.innerHTML=`中奖率合计 <b style="color:${bad?'var(--red)':(any?'var(--green)':'var(--text-2)')}">${s}</b>%`+(bad?' <span class="warn" style="color:var(--red);font-weight:600">需等于100%</span>':'');
+    $$('.js-pr',tr).forEach(x=>{ if(x.disabled){ x.classList.remove('is-error'); return; }
+      x.classList.toggle('is-error',(s4Strict&&x.value==='')||Number(x.value)>100||(bad&&x.value!=='')); });
+  });
+}
 function paintPeriodGoals(){
   const ge=periodGoalErrors(s4Strict);
   $$('#periodBody tr').forEach((tr,i)=>{
     ['bet','dep'].forEach(k=>{ const inp=$('.js-'+k,tr), h=$('.js-'+k+'-hint',tr); if(!inp) return;
       const m=ge[i][k]; inp.classList.toggle('is-error',!!m); h.textContent=m||''; h.style.display=m?'block':'none'; });
   });
-}
-function periodRwStatus(r){
-  const ok=rewardsOk(r.rewards), touched=r.rewards.some(x=>x.type||x.rate);
-  const n=r.rewards.filter(x=>rewardOk(x,BOX_OPT)).length, N=r.rewards.length;
-  if(ok) return `<span class="st st--ok">已配置 ${N}/${N} · 合计100%</span>`;
-  if(!touched) return s4Strict?`<span class="st st--bad">未配置</span>`:`<span class="ratio-tag">未配置</span>`;
-  return `<span class="st st--bad">未完成 ${n}/${N} · 合计${rateSum(r.rewards)}%</span>`;
 }
 function renderPeriod(){
   const tb=$('#periodBody'); tb.innerHTML='';
@@ -1589,76 +1536,49 @@ function renderPeriod(){
     tr.innerHTML=`<td>LV${i+1}</td>
       <td><select class="select js-pcond">${PERIOD_CONDS.map(c=>`<option ${r.cond===c?'selected':''}>${c}</option>`).join('')}</select></td>
       <td style="text-align:left"><div class="goal-grid">${needBet(r.cond)?goalIn('bet','投注'):''}${needDep(r.cond)?goalIn('dep','充值'):''}</div></td>
-      <td><div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
-        <span class="js-rwst">${periodRwStatus(r)}</span><button class="btn btn--sm js-rw">配置奖励</button></div></td>
+      <td><div class="prate">${r.rates.map((v,k)=>`<label class="prate__item">宝箱${k+1}
+          <input class="input js-pr" data-k="${k}" value="${v}" aria-label="LV${i+1} 宝箱${k+1}中奖率（%）"></label>`).join('')}</div>
+        <div class="prate-sum js-pr-sum"></div></td>
       <td><button class="btn--link red js-del">删除</button></td>`;
     $('.js-pcond',tr).addEventListener('change',e=>{ r.cond=e.target.value;
       if(!needBet(r.cond)) r.bet=''; if(!needDep(r.cond)) r.dep='';          // 切换条件 → 清空不适用的目标
       renderPeriod(); });
     ['bet','dep'].forEach(k=>{ const inp=$('.js-'+k,tr); if(inp) inp.addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r[k]=e.target.value; paintPeriodGoals(); }); });
-    $('.js-rw',tr).addEventListener('click',()=>openPeriodModal(i));
+    $$('.js-pr',tr).forEach(inp=>inp.addEventListener('input',e=>{ e.target.value=sanDec2(e.target.value); r.rates[+e.target.dataset.k]=e.target.value; paintPeriodRates(); }));
     $('.js-del',tr).addEventListener('click',()=>{ if(periodRows.length<=1){toast('至少保留 LV1',true);return;}
       periodRows.splice(i,1); renderPeriod(); });
     tb.appendChild(tr);
   });
-  paintPeriodGoals();
+  paintPeriodGoals(); paintPeriodRates();
 }
 $('#btnAddPeriod').addEventListener('click',()=>{
   if(periodRows.length>=50){toast('等级最多 LV50',true);return;}
   const last=periodRows[periodRows.length-1];
   periodRows.push({...newPeriod(),cond:last?last.cond:'投注'}); renderPeriod();
 });
-/* 宝箱奖励弹窗：编辑草稿，确认时才写回；须完整且合计 100% 才可确认 */
-let pmIdx=-1, pmDraft=null;
-const PM_OPT=()=>({rate:true,physical:true,forceStrict:pmDraft&&pmDraft._strict});
-function renderPeriodModal(){
-  const tb=$('#periodRwBody'); tb.innerHTML='';
-  const refresh=()=>{ $('#periodRwSum').innerHTML=sumLineHtml(pmDraft,s4Strict||pmDraft._strict); };
-  pmDraft.forEach((r,i)=>tb.appendChild(buildRewardRow(r,{...PM_OPT(),label:i+1,onChange:refresh})));
-  refresh();
-}
-function sumLineHtmlStrict(rows,strict){ return sumLineHtml(rows,!!strict); }
-function openPeriodModal(i){
-  pmIdx=i; pmDraft=clone(periodRows[i].rewards); pmDraft._strict=false;
-  const r=periodRows[i];
-  $('#periodTitle').textContent=`LV${i+1} 宝箱奖励配置`;
-  $('#periodTaskInfo').innerHTML=`任务条件：<b>${r.cond}</b>　目标：${needBet(r.cond)?'投注 ≥ '+(r.bet||'—'):''}${r.cond==='投注+充值'?'、':''}${needDep(r.cond)?'充值 ≥ '+(r.dep||'—'):''}`;
-  $('#btnCopyPrev').disabled=i===0; $('#btnCopyPrev').style.opacity=i===0?.45:1;
-  renderPeriodModal();
-  $('#periodMask').classList.add('is-open');
-}
-$('#btnCopyPrev').addEventListener('click',()=>{
-  if(pmIdx<=0) return;
-  const keep=pmDraft._strict; pmDraft=clone(periodRows[pmIdx-1].rewards); pmDraft._strict=keep;
-  renderPeriodModal(); toast('已复制 LV'+pmIdx+' 的奖励配置');
-});
-$('#periodConfirm').addEventListener('click',()=>{
-  if(!rewardsOk(pmDraft)){
-    pmDraft._strict=true; renderPeriodModal();
-    const s=rateSum(pmDraft);
-    toast(pmDraft.every(r=>rewardOk(r,BOX_OPT))?'中奖率合计需等于100%（目前 '+s+'%）':'奖励配置有必填/格式错误，请检查红框',true); return;
-  }
-  periodRows[pmIdx].rewards=pmDraft.map(r=>({...r}));
-  $('#periodMask').classList.remove('is-open'); renderPeriod();
-  toast('LV'+(pmIdx+1)+' 宝箱奖励已保存');
-});
+/* ---------- 4-5 返水任务宝箱配置（与签到宝箱相同；须至少配置 1 款） ---------- */
+const PBOX=makeBoxSet({tabs:'#pboxTabs',body:'#pboxBody',sum:'#pboxSum',
+  enabled:()=>true, noneMsg:'至少需配置 1 款返水任务宝箱',
+  onRefresh:()=>paintPeriodRates()});
+const SAMPLE_PBOXES=[0,1,2,3,4].map(k=>sampleBox(k).map(r=>({...r,val:r.val?String(Number(r.val)*2):r.val}))).concat([nineRewards()]);   // 宝箱6 未配置
 
-/* ---------- 4-5 投注量计算比例（Slot／Live／Sport／Mini） ---------- */
+/* ---------- 4-6 投注量计算比例（Slot／Live／Sport／Mini） ---------- */
 const uniq=a=>[...new Set(a.filter(Boolean))];
 /* 依「生产环境一级分类」：棋牌＝Slot（介面一律显示 Slot）、真人＝Live、体育＝Sport、游乐场＝Mini（捕鱼目前无游戏商，不列入） */
 const GAME_CATS=[
   {key:'Slot',groups:[{name:'Slot',provs:uniq(['OkGames','TPG','FunkyGame','PG','CQ9 Gaming','JILI','AdvantPlay','OKSLOTS Mini','EVO','RealTime Gaming','PlayStar Gaming','FC Gaming','King Maker','JDB Gaming','PRAGMATIC PLAY','UU Slots','YGR','Playtech','RICH88','Realistic','Yellow Bat','BNG','OMNIPLAY','ACEWIN','JILIFISH','MI Games','Vertex Play','VA','FunkyGame(S)','VPLUS SLOT'])}]},
   {key:'Live',groups:[{name:'真人',provs:['EVO','SA Gaming','WE Gaming','ONLIVE','Playtech','PRAGMATIC PLAY','SEXY CASINO']}]},
-  {key:'Sport',groups:[{name:'体育',provs:['OKPlay']}]},
+  {key:'Sport',fixed:true,groups:[{name:'体育',provs:['OKPlay']}]},   // Sport：仅配置比例，套用全部体育游戏商，不可选择游戏商
   {key:'Mini',groups:[{name:'游乐场',provs:['Mini Games']}]},
 ];
 const catTotal=c=>c.groups.reduce((a,g)=>a+g.provs.length,0);
 const BLANK_RATIO=()=>Object.fromEntries(GAME_CATS.map(c=>[c.key,{pct:'',sel:[]}]));
 let ratio=BLANK_RATIO();
-const SAMPLE_RATIO=()=>({Slot:{pct:'100',sel:['Slot|JILI','Slot|PG','Slot|JILIFISH']},Live:{pct:'50',sel:['真人|EVO','真人|SA Gaming']},Sport:{pct:'30',sel:['体育|OKPlay']},Mini:{pct:'',sel:[]}});
+const SAMPLE_RATIO=()=>({Slot:{pct:'100',sel:['Slot|JILI','Slot|PG','Slot|JILIFISH']},Live:{pct:'50',sel:['真人|EVO','真人|SA Gaming']},Sport:{pct:'30',sel:[]},Mini:{pct:'',sel:[]}});
 function ratioErr(c){
   const r=ratio[c.key];
   if(r.pct!==''&&Number(r.pct)>100) return {pct:'比例配置不得超过100%'};
+  if(c.fixed) return {};   // Sport：留空＝100%
   if(r.sel.length&&r.pct==='') return {pct:'请输入流水计算比例'};
   if(r.pct!==''&&!r.sel.length) return {sel:'请选择游戏商'};
   return {};
@@ -1672,16 +1592,18 @@ function renderRatio(){
     tr.innerHTML=`<td><b>${c.key}</b></td>
       <td><div class="suffix-wrap"><input class="input js-pct" value="${r.pct}" placeholder="0～100"><span class="suffix">%</span></div>
         <p class="hint hint--err js-pct-hint" style="visibility:hidden"></p></td>
-      <td style="text-align:left"><div style="display:flex;align-items:center;gap:10px;min-width:0">
+      <td style="text-align:left">${c.fixed
+        ? `<span style="font-size:12.5px;color:var(--text-2)">套用全部体育游戏商；留空按 100% 计算</span>`
+        : `<div style="display:flex;align-items:center;gap:10px;min-width:0">
         <button class="btn btn--sm js-pick-prov" style="flex:none">选择游戏商</button>
         <span style="flex:none;font-size:12.5px;color:var(--text-2)">已选 <b class="hl">${r.sel.length}</b> / ${catTotal(c)}</span>
-        <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--text-3)" title="${names.join('、')}">${names.join('、')||'未勾选（全部按 100% 计算）'}</span></div>
+        <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--text-3)" title="${names.join('、')}">${names.join('、')||'未勾选（全部按 100% 计算）'}</span></div>`}
         <p class="hint hint--err js-sel-hint" style="visibility:hidden"></p></td>`;
     const paint=()=>{ const e=ratioErr(c);
       $('.js-pct',tr).classList.toggle('is-error',!!e.pct); $('.js-pct-hint',tr).textContent=e.pct||''; $('.js-pct-hint',tr).style.visibility=e.pct?'visible':'hidden';
       $('.js-sel-hint',tr).textContent=e.sel||''; $('.js-sel-hint',tr).style.visibility=e.sel?'visible':'hidden'; };
     $('.js-pct',tr).addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r.pct=e.target.value; paint(); });
-    $('.js-pick-prov',tr).addEventListener('click',()=>openProvModal(c));
+    const pk=$('.js-pick-prov',tr); if(pk) pk.addEventListener('click',()=>openProvModal(c));
     tb.appendChild(tr); paint();
   });
 }
@@ -1712,24 +1634,6 @@ $('#provConfirm').addEventListener('click',()=>{
   $('#provMask').classList.remove('is-open'); renderRatio(); toast(provCat.key+' 套用游戏商已更新');
 });
 
-/* ---------- 4-6 线下活动门票资格 ---------- */
-/* 非必填：留空＝不开放；有填写才校验（正整数、不可为 0） */
-function ticketErrors(){
-  const e={}, bv=$('#fTicketBet').value;
-  if(bv!=='' && !(Number(bv)>0)) e.bet='不可为 0';
-  return e;
-}
-function ticketOk(){ return Object.keys(ticketErrors()).length===0; }
-function paintTicket(){
-  const e=ticketErrors();
-  [['bet','#fTicketBet','#ticketBetErr']].forEach(([k,i,h])=>{
-    $(i).classList.toggle('is-error',!!e[k]); $(h).textContent=e[k]||''; $(h).style.display=e[k]?'block':'none'; });
-}
-$('#fTicketBet').addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); paintTicket(); });
-/* 「YYYY-MM-DD HH:mm ~ YYYY-MM-DD HH:mm」→ 起讫 Date */
-function dpRange(str){ const m=str&&str.match(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}) ~ (\d{4}-\d{2}-\d{2}) (\d{2}:\d{2})$/);
-  return m?{s:new Date(m[1]+'T'+m[2]),e:new Date(m[3]+'T'+m[4])}:null; }
-
 /* ---------- 4-7 彩金所需流水倍数 ---------- */
 function wagerOk(){ const wv=$('#fWager').value.trim(), wn=Number(wv); return wv===''||(wn>=0.01&&wn<=999999.99&&/^\d{1,8}(\.\d{1,2})?$/.test(wv)); }
 
@@ -1738,52 +1642,16 @@ const SECTIONS=[
   ['sign','secSign',signOk,'签到活动配置未完成：请检查奖励类型／奖励数量，及已配置宝箱的中奖率合计需等于100%'],
   ['box','secBox',boxesOk,()=>boxNoneErr()?'开启「额外随机宝箱」时，至少需配置 1 款签到宝箱':'签到宝箱配置未完成：已开始填写的宝箱须 9 项奖励皆完整，且中奖率合计需等于100%'],
   ['rebate','secRebate',rebateOk,'每日返水配置有必填/格式错误，或任务目标未依同任务条件逐级递增'],
-  ['period','secPeriod',periodOk,'期间返水任务未完成：请检查任务目标，及各等级宝箱奖励（9 项、合计100%）'],
-  ['ratio','secRatio',ratioOk,'投注量计算比例有误：已勾选游戏商须填比例、已填比例须勾选游戏商，比例 0～100'],
-  ['ticket','secTicket',ticketOk,'线下活动门票资格：有效投注目标不可为 0（留空表示不开放）'],
+  ['period','secPeriod',periodOk,'期间返水任务未完成：请检查任务目标，及各等级随机宝箱中奖率（已配置宝箱合计需等于100%）'],
+  ['pbox','secPBox',()=>PBOX.ok(),()=>PBOX.noneErr()?'至少需配置 1 款返水任务宝箱':'返水任务宝箱配置未完成：已开始填写的宝箱须 9 项奖励皆完整，且中奖率合计需等于100%'],
+  ['ratio','secRatio',ratioOk,'投注量计算比例有误：Slot／Live／Mini 已勾选游戏商须填比例、已填比例须勾选游戏商；比例 0～100'],
   ['other','secOther',wagerOk,'彩金所需流水倍数须为 0.01～999999.99（最多 8 位整数＋2 位小数、不可为 0）'],
 ];
 
-function renderStep4(){ renderSign(); renderBoxes(); renderVipTabs(); renderRebate(); renderPeriod(); renderRatio(); paintTicket(); }
+function renderStep4(){ renderSign(); renderBoxes(); renderVipTabs(); renderRebate(); PBOX.render(); renderPeriod(); renderRatio(); }
 /* 步骤1 币种变更 → 重画（每日返水奖励金额单位） */
 $('#fCur').addEventListener('change',()=>renderStep4());
 
-/* ---------- 游戏选择弹窗 ---------- */
-const providers={
-  '体育':['体育'],
-  'JILI':['梅杜莎','Boxing King Title Match','Chicken Dash','Clover Coins 3x3','Drop Ball','King Arthur','Lucky Bingo','Party Ape'],
-  'PlayStar Gaming':['777','Athena–Lucky Spread','HIYAS GEMS','Knight Arthur','LUCKY ACE','Super Gems','SUPER WIN'],
-  'Mini Games':['CG52','CG53–Poker'],
-  'TPG':['8 Dragons','African Buffalo 2','Aztec Empire','Black Myth: Wukong 3','DJ Rock','Fortune Tiger','Mahjong House','Super 777'],
-  'JILI电子':['Boxing King','Charge/Buffalo','Chin Shi Huang','Crazy777','Feng Shen','Golden Empire','Mega Ace','Super Ace','Thor X'],
-  'PG':['Baccarat Deluxe','Buffalo Win','Circus Delight','Dragon\'s Treasure Quest','Fortune Gods','Lucky Neko','Mahjong Ways 2','Medusa II'],
-  'Evolution LIVECASINO':['Auto Lightning Roulette','Blackjack Party','Crazy Time A DNT','Dragon Tiger','Football Studio','Mega Ball']
-};
-let totalGames=0;
-function buildGameList(){
-  const list=$('#gameList'); list.innerHTML=''; totalGames=0;
-  Object.entries(providers).forEach(([prov,games])=>{
-    totalGames+=games.length;
-    const box=document.createElement('div'); box.className='game-provider';
-    box.innerHTML=`<div class="game-provider__head"><label class="chk"><input type="checkbox" class="js-prov" checked>${prov}</label></div>
-      <div class="game-provider__grid">${games.map(g=>`<label class="chk"><input type="checkbox" class="js-game" checked>${g}</label>`).join('')}</div>`;
-    const prov_cb=$('.js-prov',box);
-    prov_cb.addEventListener('change',()=>{$$('.js-game',box).forEach(c=>c.checked=prov_cb.checked); syncGameCount();});
-    $$('.js-game',box).forEach(c=>c.addEventListener('change',syncGameCount));
-    list.appendChild(box);
-  });
-  syncGameCount();
-}
-function syncGameCount(){
-  const n=$$('#gameList .js-game:checked').length;
-  $('#gameAll').checked = n===$$('#gameList .js-game').length;
-  $('#gamesCount').textContent=`已选择 ${n} 个游戏（全选范围含体育）`;
-  return n;
-}
-$('#gameAll').addEventListener('change',()=>{ const on=$('#gameAll').checked;
-  $$('#gameList .js-game, #gameList .js-prov').forEach(c=>c.checked=on); syncGameCount(); });
-$('#btnGames').addEventListener('click',()=>$('#gameMask').classList.add('is-open'));
-$('#gameConfirm').addEventListener('click',()=>{ $('#gameMask').classList.remove('is-open'); toast('已更新适用游戏范围'); });
 $$('[data-close-modal]').forEach(b=>b.addEventListener('click',e=>{
   pendingCloseRow=null; pendingDelRow=null;           /* 取消/× → 清掉待处理的活动列表行 */
   e.target.closest('.mask').classList.remove('is-open');
@@ -1805,7 +1673,7 @@ function buildPreview(){
   const rwTxt=r=>!r.type?'—':(r.type==='免费投注'||r.type==='优惠券')?`${r.type}：${r.pick||'—'}`
       :r.type==='实体奖品'?`实体奖品「${r.name||'—'}」（价值 ${r.val||'—'}${r.img?'，已上传小图':''}）`
       :`${RW_LABEL[r.type]||r.type} ×${r.val||'—'}`;
-  const ratioTxt=GAME_CATS.map(c=>{const r=ratio[c.key]; return r.sel.length?`${c.key} ${r.pct}%（${r.sel.length} 家）`:`${c.key} 100%`;}).join('；');
+  const ratioTxt=GAME_CATS.map(c=>{const r=ratio[c.key]; if(c.fixed) return `${c.key} ${r.pct||100}%（全部游戏商）`; return r.sel.length?`${c.key} ${r.pct}%（${r.sel.length} 家）`:`${c.key} 100%`;}).join('；');
   const pConds=PERIOD_CONDS.map(c=>`${c} ${periodRows.filter(r=>r.cond===c).length}`).join(' / ');
   const floatOn=$$('input[name=float]')[1]?$$('input[name=float]')[1].checked:false;
   const listOn=$$('input[name=listShow]')[0]?$$('input[name=listShow]')[0].checked:false;
@@ -1830,8 +1698,9 @@ function buildPreview(){
       ['签到奖励·第三天以上(含)',rwTxt(sign.days[2])],['额外随机宝箱',sign.boxOn?('开启（'+(configuredBoxes().map(k=>'宝箱'+(k+1)+' '+(sign.boxRates[k]||'—')+'%').join('、')||'—')+'）'):'关闭'],
       ['签到宝箱配置',sign.boxOn?('已配置 '+configuredBoxes().length+' 款（'+(configuredBoxes().map(k=>'宝箱'+(k+1)).join('、')||'—')+'）'+(configuredBoxes().length?' × 9 项奖励':'')):'—（随机宝箱关闭）'],['每日返水·VIP 配置数',applyAll?'1 个（套用至其他等级）':'11 个'],
       ['每日返水配置',rebateRows.length+' 个等级'],['期间返水任务',periodRows.length+' 个等级（'+pConds+'）'],
-      ['投注量计算比例',ratioTxt],['线下门票资格',$('#fTicketBet').value?('开放（活动时间内有效投注 ≥ '+$('#fTicketBet').value+'）'):'不开放'],['彩金所需流水倍数',$('#fWager').value||'—'],
-      ['适用游戏范围','全部'],['审核方式','自动审核']]],
+      ['返水任务宝箱配置','已配置 '+PBOX.configured().length+' 款（'+(PBOX.configured().map(k=>'宝箱'+(k+1)).join('、')||'—')+'）'+(PBOX.configured().length?' × 9 项奖励':'')],
+      ['投注量计算比例',ratioTxt],['彩金所需流水倍数',$('#fWager').value||'—'],
+      ['审核方式','自动审核']]],
     ['⑤ 风控条件',[
       ['同 IP 检测',yn(sw[0])],['同姓名检测',yn(sw[2])],
       ['同手机号检测',yn(sw[1])],['同 email 检测',yn(sw[3])],
@@ -1901,20 +1770,20 @@ $$('#dpPop [data-nav]').forEach(b=>b.addEventListener('click',()=>{
 $('#dpClear').addEventListener('click',()=>{
   dp.start=null; dp.end=null;
   if(dp.target){ dp.target.value=''; dp.target.classList.remove('is-error'); }
-  dpClose(); if(typeof paintTicket==='function') paintTicket();
+  dpClose();
 });
 $('#dpOk').addEventListener('click',()=>{
   if(!dp.start||!dp.end){ toast('请选择完整的起止日期',true); return; }
   const st=$('#dpStartTime').value||'00:00', et=$('#dpEndTime').value||'23:59';
   if(dp.target){ dp.target.value=`${dpFmt(dp.start)} ${st} ~ ${dpFmt(dp.end)} ${et}`; dp.target.classList.remove('is-error'); }
-  dpClose(); paintTicket();
+  dpClose();
 });
 $$('.dp-trigger').forEach(inp=>inp.addEventListener('click',e=>{ e.stopPropagation(); dpOpen(inp); }));
 $('#dpPop').addEventListener('click',e=>e.stopPropagation());
 document.addEventListener('click',()=>{ if(dp.target) dpClose(); });
 
 /* ---------- 初始化 ---------- */
-renderStep4(); buildGameList();
+renderStep4();
 </script>
 </body>
 </html>
