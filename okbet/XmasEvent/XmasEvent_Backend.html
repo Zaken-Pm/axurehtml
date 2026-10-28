@@ -219,15 +219,9 @@ label.chk input{accent-color:var(--primary);}
 .report-totals .m{color:var(--red);} .report-totals .p{color:var(--primary);} .report-totals .c{color:var(--green);}
 .hl{color:var(--primary);font-weight:600;}
 /* ---------- 节庆特别活动：步骤4 新增元件 ---------- */
-.anchor-bar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px;padding:10px 12px;background:#fafbfc;border:1px solid var(--border-l);border-radius:6px;position:sticky;top:0;z-index:20;}
-.anchor-bar__label{font-size:12.5px;color:var(--text-3);align-self:center;}
-.anchor-chip{font-size:12.5px;padding:4px 10px;border:1px solid var(--border);border-radius:14px;background:#fff;color:var(--text-2);cursor:pointer;}
-.anchor-chip:hover{color:var(--primary);border-color:var(--primary);}
-.anchor-chip .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:5px;vertical-align:1px;}
-.anchor-chip .dot.is-bad{background:var(--red);}
 .block__head .sub{font-weight:400;font-size:12px;color:var(--text-2);}
 .block__head-r{display:flex;align-items:center;gap:10px;}
-.wizard__panel[data-panel="4"] section{scroll-margin-top:72px;}
+.wizard__panel[data-panel="4"] section{scroll-margin-top:16px;}
 .block.is-off .block__body{opacity:.45;pointer-events:none;}
 .tag-new{display:inline-block;font-size:11px;font-weight:600;color:#fff;background:var(--red);border-radius:3px;padding:0 5px;line-height:17px;margin-left:6px;vertical-align:1px;}
 
@@ -454,17 +448,6 @@ label.chk input{accent-color:var(--primary);}
           <!-- 步骤4 活动条件（节庆特别活动：本次唯一调整的步骤） -->
           <div class="wizard__panel" data-panel="4">
 
-            <!-- 快速定位：区块较多，提供锚点；圆点显示该区块是否已完整配置 -->
-            <nav class="anchor-bar" aria-label="步骤4 区块快速定位">
-              <span class="anchor-bar__label">快速定位：</span>
-              <button type="button" class="anchor-chip" data-anchor="secSign"><span class="dot" data-dot="sign"></span>签到活动</button>
-              <button type="button" class="anchor-chip" data-anchor="secBox"><span class="dot" data-dot="box"></span>签到宝箱</button>
-              <button type="button" class="anchor-chip" data-anchor="secRebate"><span class="dot" data-dot="rebate"></span>每日返水</button>
-              <button type="button" class="anchor-chip" data-anchor="secPeriod"><span class="dot" data-dot="period"></span>期间返水</button>
-              <button type="button" class="anchor-chip" data-anchor="secRatio"><span class="dot" data-dot="ratio"></span>投注量计算比例</button>
-              <button type="button" class="anchor-chip" data-anchor="secTicket"><span class="dot" data-dot="ticket"></span>线下门票资格</button>
-              <button type="button" class="anchor-chip" data-anchor="secOther"><span class="dot" data-dot="other"></span>流水倍数／游戏范围</button>
-            </nav>
 
             <!-- 4-1 签到活动配置 -->
             <section class="block" id="secSign">
@@ -1410,7 +1393,7 @@ function signOk(){ return sign.days.every(r=>rewardOk(r,SIGN_OPT)) && (!sign.box
 function renderSign(){
   const tb=$('#signBody'); tb.innerHTML='';
   sign.days.forEach((r,i)=>{
-    const tr=buildRewardRow(r,{...SIGN_OPT,label:`<b>${SIGN_DAYS[i]}</b>`,onChange:updateAnchors});
+    const tr=buildRewardRow(r,{...SIGN_OPT,label:`<b>${SIGN_DAYS[i]}</b>`,onChange:null});
     const td=document.createElement('td');
     td.innerHTML= i<2 ? '<span style="color:var(--text-3)">—</span>'
       : `<div style="display:flex;align-items:center;gap:8px;justify-content:center">
@@ -1426,8 +1409,8 @@ function renderSign(){
         <div class="suffix-wrap"><input class="input js-br" data-k="${k}" value="${v}" placeholder="0～100" aria-label="宝箱${k+1}中奖率"><span class="suffix">%</span></div></div>`).join('')}</div>
       <div class="sum-line" id="boxRateSum"></div></div></td>`;
   tb.appendChild(sub);
-  $$('.js-br',sub).forEach(inp=>inp.addEventListener('input',e=>{ e.target.value=sanDec2(e.target.value); sign.boxRates[+e.target.dataset.k]=e.target.value; paintBoxRate(); updateAnchors(); }));
-  $('#boxOn').addEventListener('change',e=>{ sign.boxOn=e.target.checked; renderSign(); renderBoxes(); updateAnchors();
+  $$('.js-br',sub).forEach(inp=>inp.addEventListener('input',e=>{ e.target.value=sanDec2(e.target.value); sign.boxRates[+e.target.dataset.k]=e.target.value; paintBoxRate(); }));
+  $('#boxOn').addEventListener('change',e=>{ sign.boxOn=e.target.checked; renderSign(); renderBoxes();
     toast(sign.boxOn?'已开启额外随机宝箱':'已关闭额外随机宝箱：第三天以上(含)仅发放签到奖励'); });
   paintBoxRate();
 }
@@ -1480,14 +1463,14 @@ function renderBoxes(){
   const strictFn=()=>s4Strict&&boxTouched(k);
   const boxSum=()=>boxTouched(k)?sumLineHtml(rows,strictFn())
     :(s4Strict&&boxNoneErr()?'<span class="warn">开启「额外随机宝箱」时，至少需配置 1 款签到宝箱</span>':'<span style="color:var(--text-3)">此款宝箱未配置</span>');
-  const refresh=()=>{ $('#boxSum').innerHTML=boxSum(); $$('#boxBody tr').forEach((tr,i)=>paintReward(tr,rows[i],{...BOX_OPT,strictFn})); paintBoxRate(); updateAnchors(); };
+  const refresh=()=>{ $('#boxSum').innerHTML=boxSum(); $$('#boxBody tr').forEach((tr,i)=>paintReward(tr,rows[i],{...BOX_OPT,strictFn})); paintBoxRate(); };
   rows.forEach((r,i)=>{
     const tr=buildRewardRow(r,{...BOX_OPT,label:i+1,strictFn,onChange:refresh});
     const td=document.createElement('td');
     td.innerHTML=`<button class="btn--link red js-box-del" ${rows.length<=RW_MIN?'disabled style="opacity:.4;cursor:not-allowed" title="最少保留 5 项"':''}>删除</button>`;
     $('.js-box-del',td).addEventListener('click',()=>{
       if(rows.length<=RW_MIN){ toast('宝箱奖励最少保留 5 项',true); return; }
-      rows.splice(i,1); renderBoxes(); paintBoxRate(); updateAnchors(); });
+      rows.splice(i,1); renderBoxes(); paintBoxRate(); });
     tr.appendChild(td); tb.appendChild(tr);
   });
   $('#boxCount').textContent=rows.length;
@@ -1497,7 +1480,7 @@ function renderBoxes(){
 $('#btnAddBoxRw').addEventListener('click',()=>{
   const rows=boxes[curBox];
   if(rows.length>=RW_MAX){ toast('宝箱奖励最多 9 项',true); return; }
-  rows.push(newReward()); renderBoxes(); updateAnchors();
+  rows.push(newReward()); renderBoxes();
 });
 
 /* ---------- 4-3 每日返水配置（沿用 X-BOMB；移除挑战任务、刮刮卡栏位） ---------- */
@@ -1561,18 +1544,18 @@ function renderRebate(){
       <td><div class="suffix-wrap"><input class="input js-amt" value="${r.amt}" placeholder="固定金额"><span class="suffix">${curCode()}</span></div>
         <p class="hint hint--err js-amt-hint" style="visibility:hidden"></p></td>
       <td><button class="btn--link red js-del">删除</button></td>`;
-    $('.js-cond',tr).addEventListener('change',e=>{ r.cond=e.target.value; validateGoalOrder(s4Strict); updateAnchors(); });
-    $('.js-goal',tr).addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r.goal=e.target.value; validateGoalOrder(s4Strict); updateAnchors(); });
-    $('.js-amt',tr).addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r.amt=e.target.value; paintRebateAmt(tr,r); updateAnchors(); });
+    $('.js-cond',tr).addEventListener('change',e=>{ r.cond=e.target.value; validateGoalOrder(s4Strict); });
+    $('.js-goal',tr).addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r.goal=e.target.value; validateGoalOrder(s4Strict); });
+    $('.js-amt',tr).addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r.amt=e.target.value; paintRebateAmt(tr,r); });
     $('.js-del',tr).addEventListener('click',()=>{ if(rebateRows.length<=1){toast('至少保留 LV1',true);return;}
-      rebateRows.splice(i,1); renderRebate(); updateAnchors(); });
+      rebateRows.splice(i,1); renderRebate(); });
     tb.appendChild(tr); paintRebateAmt(tr,r);
   });
   validateGoalOrder(s4Strict);
 }
 $('#btnAddLevel').addEventListener('click',()=>{
   if(rebateRows.length>=20){toast('等级最多 LV20',true);return;}
-  rebateRows.push({cond:'有效投注',goal:'',amt:''}); renderRebate(); updateAnchors();
+  rebateRows.push({cond:'有效投注',goal:'',amt:''}); renderRebate();
 });
 
 /* ---------- 4-4 期间返水任务（最多 LV50；每级 5～9 项宝箱奖励） ---------- */
@@ -1639,11 +1622,11 @@ function renderPeriod(){
       <td><button class="btn--link red js-del">删除</button></td>`;
     $('.js-pcond',tr).addEventListener('change',e=>{ r.cond=e.target.value;
       if(!needBet(r.cond)) r.bet=''; if(!needDep(r.cond)) r.dep='';          // 切换条件 → 清空不适用的目标
-      renderPeriod(); updateAnchors(); });
-    ['bet','dep'].forEach(k=>{ const inp=$('.js-'+k,tr); if(inp) inp.addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r[k]=e.target.value; paintPeriodGoals(); updateAnchors(); }); });
+      renderPeriod(); });
+    ['bet','dep'].forEach(k=>{ const inp=$('.js-'+k,tr); if(inp) inp.addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r[k]=e.target.value; paintPeriodGoals(); }); });
     $('.js-rw',tr).addEventListener('click',()=>openPeriodModal(i));
     $('.js-del',tr).addEventListener('click',()=>{ if(periodRows.length<=1){toast('至少保留 LV1',true);return;}
-      periodRows.splice(i,1); renderPeriod(); updateAnchors(); });
+      periodRows.splice(i,1); renderPeriod(); });
     tb.appendChild(tr);
   });
   paintPeriodGoals();
@@ -1651,7 +1634,7 @@ function renderPeriod(){
 $('#btnAddPeriod').addEventListener('click',()=>{
   if(periodRows.length>=50){toast('等级最多 LV50',true);return;}
   const last=periodRows[periodRows.length-1];
-  periodRows.push({...newPeriod(),cond:last?last.cond:'投注'}); renderPeriod(); updateAnchors();
+  periodRows.push({...newPeriod(),cond:last?last.cond:'投注'}); renderPeriod();
 });
 /* 宝箱奖励弹窗：编辑草稿，确认时才写回；须完整且合计 100% 才可确认 */
 let pmIdx=-1, pmDraft=null;
@@ -1698,7 +1681,7 @@ $('#periodConfirm').addEventListener('click',()=>{
     toast(pmDraft.every(r=>rewardOk(r,BOX_OPT))?'中奖率合计需等于100%（目前 '+s+'%）':'奖励配置有必填/格式错误，请检查红框',true); return;
   }
   periodRows[pmIdx].rewards=pmDraft.map(r=>({...r}));
-  $('#periodMask').classList.remove('is-open'); renderPeriod(); updateAnchors();
+  $('#periodMask').classList.remove('is-open'); renderPeriod();
   toast('LV'+(pmIdx+1)+' 宝箱奖励已保存');
 });
 
@@ -1739,7 +1722,7 @@ function renderRatio(){
     const paint=()=>{ const e=ratioErr(c);
       $('.js-pct',tr).classList.toggle('is-error',!!e.pct); $('.js-pct-hint',tr).textContent=e.pct||''; $('.js-pct-hint',tr).style.visibility=e.pct?'visible':'hidden';
       $('.js-sel-hint',tr).textContent=e.sel||''; $('.js-sel-hint',tr).style.visibility=e.sel?'visible':'hidden'; };
-    $('.js-pct',tr).addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r.pct=e.target.value; paint(); updateAnchors(); });
+    $('.js-pct',tr).addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r.pct=e.target.value; paint(); });
     $('.js-pick-prov',tr).addEventListener('click',()=>openProvModal(c));
     tb.appendChild(tr); paint();
   });
@@ -1768,7 +1751,7 @@ function syncProv(){
 $('#provAll').addEventListener('change',e=>{ $$('#provList .js-p').forEach(x=>x.checked=e.target.checked); syncProv(); });
 $('#provConfirm').addEventListener('click',()=>{
   ratio[provCat.key].sel=$$('#provList .js-p').filter(x=>x.checked).map(x=>x.value);
-  $('#provMask').classList.remove('is-open'); renderRatio(); updateAnchors(); toast(provCat.key+' 套用游戏商已更新');
+  $('#provMask').classList.remove('is-open'); renderRatio(); toast(provCat.key+' 套用游戏商已更新');
 });
 
 /* ---------- 4-6 线下活动门票资格 ---------- */
@@ -1784,7 +1767,7 @@ function paintTicket(){
   [['bet','#fTicketBet','#ticketBetErr']].forEach(([k,i,h])=>{
     $(i).classList.toggle('is-error',!!e[k]); $(h).textContent=e[k]||''; $(h).style.display=e[k]?'block':'none'; });
 }
-$('#fTicketBet').addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); paintTicket(); updateAnchors(); });
+$('#fTicketBet').addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); paintTicket(); });
 /* 「YYYY-MM-DD HH:mm ~ YYYY-MM-DD HH:mm」→ 起讫 Date */
 function dpRange(str){ const m=str&&str.match(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}) ~ (\d{4}-\d{2}-\d{2}) (\d{2}:\d{2})$/);
   return m?{s:new Date(m[1]+'T'+m[2]),e:new Date(m[3]+'T'+m[4])}:null; }
@@ -1792,7 +1775,7 @@ function dpRange(str){ const m=str&&str.match(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}
 /* ---------- 4-7 彩金所需流水倍数 ---------- */
 function wagerOk(){ const wv=$('#fWager').value.trim(), wn=Number(wv); return wv===''||(wn>=0.01&&wn<=999999.99&&/^\d{1,8}(\.\d{1,2})?$/.test(wv)); }
 
-/* ---------- 快速定位：区块完成度圆点 ---------- */
+/* ---------- 步骤4 各区块校验（下一步／提交时依序检查） ---------- */
 const SECTIONS=[
   ['sign','secSign',signOk,'签到活动配置未完成：请检查奖励类型／奖励数量，及已配置宝箱的中奖率合计需等于100%'],
   ['box','secBox',boxesOk,()=>boxNoneErr()?'开启「额外随机宝箱」时，至少需配置 1 款签到宝箱':'签到宝箱配置未完成：已开始填写的宝箱须 5～9 项奖励皆完整，且中奖率合计需等于100%'],
@@ -1802,10 +1785,8 @@ const SECTIONS=[
   ['ticket','secTicket',ticketOk,'线下活动门票资格：有效投注目标不可为 0（留空表示不开放）'],
   ['other','secOther',wagerOk,'彩金所需流水倍数须为 0.01～999999.99（最多 8 位整数＋2 位小数、不可为 0）'],
 ];
-function updateAnchors(){ SECTIONS.forEach(([k,,fn])=>{ const d=$(`[data-dot="${k}"]`); if(d) d.classList.toggle('is-bad',!fn()); }); }
-$$('.anchor-chip').forEach(b=>b.addEventListener('click',()=>{ const t=document.getElementById(b.dataset.anchor); if(t) t.scrollIntoView({behavior:'smooth',block:'start'}); }));
 
-function renderStep4(){ renderSign(); renderBoxes(); renderVipTabs(); renderRebate(); renderPeriod(); renderRatio(); paintTicket(); updateAnchors(); }
+function renderStep4(){ renderSign(); renderBoxes(); renderVipTabs(); renderRebate(); renderPeriod(); renderRatio(); paintTicket(); }
 /* 步骤1 币种变更 → 重画（每日返水奖励金额单位） */
 $('#fCur').addEventListener('change',()=>renderStep4());
 
@@ -1854,7 +1835,7 @@ $$('[data-close-modal]').forEach(b=>b.addEventListener('click',e=>{
 $('#autoReject').addEventListener('change',e=>$('#rejectN').disabled=!e.target.checked);
 
 /* ---------- 流水倍数：可留空、不可填0；填入有效值即清除红框 ---------- */
-$('#fWager').addEventListener('input',e=>{ e.target.value=sanWager(e.target.value); const v=e.target.value, n=Number(v); if(v===''||(n>=0.01&&n<=999999.99)) e.target.classList.remove('is-error'); updateAnchors(); });
+$('#fWager').addEventListener('input',e=>{ e.target.value=sanWager(e.target.value); const v=e.target.value, n=Number(v); if(v===''||(n>=0.01&&n<=999999.99)) e.target.classList.remove('is-error'); });
 
 /* ---------- 提交预览 ---------- */
 function buildPreview(){
@@ -1962,13 +1943,13 @@ $$('#dpPop [data-nav]').forEach(b=>b.addEventListener('click',()=>{
 $('#dpClear').addEventListener('click',()=>{
   dp.start=null; dp.end=null;
   if(dp.target){ dp.target.value=''; dp.target.classList.remove('is-error'); }
-  dpClose(); if(typeof paintTicket==='function'){ paintTicket(); updateAnchors(); }
+  dpClose(); if(typeof paintTicket==='function') paintTicket();
 });
 $('#dpOk').addEventListener('click',()=>{
   if(!dp.start||!dp.end){ toast('请选择完整的起止日期',true); return; }
   const st=$('#dpStartTime').value||'00:00', et=$('#dpEndTime').value||'23:59';
   if(dp.target){ dp.target.value=`${dpFmt(dp.start)} ${st} ~ ${dpFmt(dp.end)} ${et}`; dp.target.classList.remove('is-error'); }
-  dpClose(); paintTicket(); updateAnchors();   // 活动时间／门票期间变更 → 重新检查「须落在活动时间内」
+  dpClose(); paintTicket();
 });
 $$('.dp-trigger').forEach(inp=>inp.addEventListener('click',e=>{ e.stopPropagation(); dpOpen(inp); }));
 $('#dpPop').addEventListener('click',e=>e.stopPropagation());
