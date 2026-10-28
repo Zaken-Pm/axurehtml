@@ -484,8 +484,8 @@ label.chk input{accent-color:var(--primary);}
 
             <!-- 4-2 签到宝箱配置 -->
             <section class="block" id="secBox">
-              <div class="block__head"><h4>签到宝箱配置<span class="tag-new">新增</span>
-                <span class="sub">（非必填；最多 6 款，每款 5～9 项奖励，开启时依中奖率随机抽出 1 项）</span></h4>
+              <div class="block__head"><h4><span class="req" id="boxReq">*</span>签到宝箱配置<span class="tag-new">新增</span>
+                <span class="sub">（开启「额外随机宝箱」时至少配置 1 款；最多 6 款，每款 5～9 项奖励，开启时依中奖率随机抽出 1 项）</span></h4>
                 <span class="ratio-tag" id="boxOffNote" style="display:none">「额外随机宝箱」已关闭，本区块免填</span></div>
               <div class="block__body">
                 <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px">
@@ -499,8 +499,8 @@ label.chk input{accent-color:var(--primary);}
                 </table>
                 <div class="sum-line" id="boxSum"></div>
                 <p class="hint">奖励类型：彩金、积分、抽奖券（Golden Draw Ticket）、免费投注、优惠券、实体奖品（填写奖品名称＋奖励价值＋上传小图）。<br>
-                  · 宝箱可不配置（整款留空）；一旦开始填写该款宝箱，奖励须 5～9 项、每项皆完整，且中奖率合计须等于 100%。<br>
-                  · 已配置的宝箱才可于上方「随机宝箱中奖率」填写中奖率；开启「额外随机宝箱」时至少须配置 1 款宝箱。</p>
+                  · 「额外随机宝箱」开启：6 款中<b>至少须配置 1 款</b>，其余可整款留空；关闭：本区块免填。<br>
+                  · 一旦开始填写该款宝箱，奖励须 5～9 项、每项皆完整，且中奖率合计须等于 100%；已配置的宝箱才可于上方「随机宝箱中奖率」填写中奖率。</p>
               </div>
             </section>
 
@@ -1245,9 +1245,9 @@ function validateStep(n){
     if(!wagerOk()) $('#fWager').classList.add('is-error'); else $('#fWager').classList.remove('is-error');
     const bad=SECTIONS.find(([,,fn])=>!fn());
     if(bad){
-      if(bad[0]==='box'){ const k=boxes.findIndex((r,i)=>boxTouched(i)&&!rewardsOk(r)); if(k>=0&&k!==curBox){ curBox=k; renderBoxes(); } }
+      if(bad[0]==='box'){ const k=boxNoneErr()?0:boxes.findIndex((r,i)=>boxTouched(i)&&!rewardsOk(r)); if(k>=0&&k!==curBox){ curBox=k; renderBoxes(); } }
       document.getElementById(bad[1]).scrollIntoView({behavior:'smooth',block:'start'});
-      toast(bad[3],true); return false;
+      toast(typeof bad[3]==='function'?bad[3]():bad[3],true); return false;
     }
   }
   return true;
@@ -1321,7 +1321,7 @@ function rvHtml(r){
       const up = r.img
         ? `<img class="upl__thumb js-img-view" src="${r.img}" alt="奖品小图预览：${esc(r.name)||'实体奖品'}" title="点击放大预览">
            <span class="upl__name" title="${esc(r.imgName)}">${esc(r.imgName)||'已上传'}</span>
-           <button type="button" class="btn--link js-img-pick">更换</button><span class="op-sep">|</span><button type="button" class="btn--link red js-img-del">删除</button>`
+           <button type="button" class="btn--link red js-img-del">删除</button>`
         : `<button type="button" class="btn btn--sm upl__btn js-img-pick">⬆ 上传小图</button>
            <span class="upl__tip" title="png、jpg、gif、webp、bmp；${IMG_MAX_MB}MB 内">png、jpg、gif、webp、bmp；${IMG_MAX_MB}MB 内</span>`;
       return `<div class="rv-phys">
@@ -1361,8 +1361,8 @@ function bindRv(tr,r,o){
     const f=file.files&&file.files[0]; if(!f) return;
     if(!IMG_TYPES.includes(f.type)){ toast('图片格式仅支持 png、jpg、gif、webp、bmp',true); file.value=''; return; }
     if(f.size>IMG_MAX_MB*1024*1024){ toast('图片大小不可超过 '+IMG_MAX_MB+'MB',true); file.value=''; return; }
-    const had=!!r.img, rd=new FileReader();
-    rd.onload=()=>{ r.img=rd.result; r.imgName=f.name; redraw(); toast(had?'小图已更换':'小图上传成功'); };
+    const rd=new FileReader();
+    rd.onload=()=>{ r.img=rd.result; r.imgName=f.name; redraw(); toast('小图上传成功'); };
     rd.onerror=()=>toast('图片读取失败，请重新上传',true);
     rd.readAsDataURL(f);
   });
@@ -1405,7 +1405,8 @@ const configuredBoxes=()=>[0,1,2,3,4,5].filter(boxTouched);
 const boxRateSum=()=>Math.round(configuredBoxes().reduce((a,k)=>a+(Number(sign.boxRates[k])||0),0)*100)/100;
 const SIGN_OPT={rate:false,physical:false};
 function boxRateOk(){ const ks=configuredBoxes();
-  return ks.length>0 && ks.every(k=>sign.boxRates[k]!==''&&Number(sign.boxRates[k])<=100) && boxRateSum()===100; }
+  if(!ks.length) return true;   // 「至少配置 1 款」由签到宝箱区块校验
+  return ks.every(k=>sign.boxRates[k]!==''&&Number(sign.boxRates[k])<=100) && boxRateSum()===100; }
 function signOk(){ return sign.days.every(r=>rewardOk(r,SIGN_OPT)) && (!sign.boxOn || boxRateOk()); }
 function renderSign(){
   const tb=$('#signBody'); tb.innerHTML='';
@@ -1439,7 +1440,7 @@ function paintBoxRate(){
     i.disabled=!on; i.placeholder=boxTouched(k)?'0～100':'未配置'; });
   if(!sign.boxOn){ el.innerHTML='<span style="color:var(--text-3)">额外随机宝箱已关闭，免填</span>'; $$('.js-br').forEach(i=>i.classList.remove('is-error')); return; }
   const ks=configuredBoxes();
-  if(!ks.length){ el.innerHTML=`<span class="${s4Strict?'warn':''}" style="${s4Strict?'':'color:var(--text-3)'}">尚未配置签到宝箱：请于下方「签到宝箱配置」至少配置 1 款</span>`; return; }
+  if(!ks.length){ el.innerHTML='<span style="color:var(--text-3)">尚未配置签到宝箱：请于下方「签到宝箱配置」至少配置 1 款后填写中奖率</span>'; return; }
   const s=boxRateSum(), any=ks.some(k=>sign.boxRates[k]!==''), bad=(any||s4Strict)&&s!==100;
   el.innerHTML=`宝箱中奖率合计 <b style="color:${bad?'var(--red)':(any?'var(--green)':'var(--text-2)')}">${s}</b>%`+(bad?' <span class="warn">宝箱中奖率合计需等于100%</span>':'');
   $$('.js-br').forEach(i=>{ if(i.disabled){ i.classList.remove('is-error'); return; }
@@ -1460,9 +1461,11 @@ const SAMPLE_BOXES=[0,1,2,3,4].map(sampleBox).concat([fiveRewards()]);   // 宝�
 ['30','25','15','14','1'].forEach((v,i)=>SAMPLE_BOXES[1][i].rate=v);
 SAMPLE_BOXES[1].push({type:'积分',name:'',val:'500',pick:'',img:false,rate:'10'},{type:'抽奖券',name:'',val:'2',pick:'',img:false,rate:'5'});
 const BOX_OPT={rate:true,physical:true};
-function boxesOk(){ return !sign.boxOn || boxes.every((rows,k)=>!boxTouched(k)||rewardsOk(rows)); }
+const boxNoneErr=()=>sign.boxOn&&configuredBoxes().length===0;   // 开启随机宝箱却 1 款都未配置
+function boxesOk(){ return !sign.boxOn || (!boxNoneErr() && boxes.every((rows,k)=>!boxTouched(k)||rewardsOk(rows))); }
 function renderBoxes(){
   const sec=$('#secBox'); sec.classList.toggle('is-off',!sign.boxOn); $('#boxOffNote').style.display=sign.boxOn?'none':'';
+  $('#boxReq').style.display=sign.boxOn?'':'none';   // 随机宝箱开启才为必填
   const tabs=$('#boxTabs'); tabs.innerHTML='';
   boxes.forEach((rows,k)=>{
     const b=document.createElement('button'); b.type='button'; b.setAttribute('role','tab'); b.setAttribute('aria-selected',k===curBox);
@@ -1476,7 +1479,8 @@ function renderBoxes(){
   const k=curBox;
   /* 非必填：该款宝箱尚未填写任何栏位时，不显示必填错误；开始填写后才依严格模式校验 */
   const strictFn=()=>s4Strict&&boxTouched(k);
-  const boxSum=()=>boxTouched(k)?sumLineHtml(rows,strictFn()):'<span style="color:var(--text-3)">此款宝箱未配置（非必填）</span>';
+  const boxSum=()=>boxTouched(k)?sumLineHtml(rows,strictFn())
+    :(s4Strict&&boxNoneErr()?'<span class="warn">开启「额外随机宝箱」时，至少需配置 1 款签到宝箱</span>':'<span style="color:var(--text-3)">此款宝箱未配置</span>');
   const refresh=()=>{ $('#boxSum').innerHTML=boxSum(); $$('#boxBody tr').forEach((tr,i)=>paintReward(tr,rows[i],{...BOX_OPT,strictFn})); paintBoxRate(); updateAnchors(); };
   rows.forEach((r,i)=>{
     const tr=buildRewardRow(r,{...BOX_OPT,label:i+1,strictFn,onChange:refresh});
@@ -1791,8 +1795,8 @@ function wagerOk(){ const wv=$('#fWager').value.trim(), wn=Number(wv); return wv
 
 /* ---------- 快速定位：区块完成度圆点 ---------- */
 const SECTIONS=[
-  ['sign','secSign',signOk,'签到活动配置未完成：请检查奖励类型／奖励值；开启额外随机宝箱时须至少配置 1 款宝箱，且已配置宝箱的中奖率合计需等于100%'],
-  ['box','secBox',boxesOk,'签到宝箱配置未完成：已开始填写的宝箱须 5～9 项奖励皆完整，且中奖率合计需等于100%'],
+  ['sign','secSign',signOk,'签到活动配置未完成：请检查奖励类型／奖励值，及已配置宝箱的中奖率合计需等于100%'],
+  ['box','secBox',boxesOk,()=>boxNoneErr()?'开启「额外随机宝箱」时，至少需配置 1 款签到宝箱':'签到宝箱配置未完成：已开始填写的宝箱须 5～9 项奖励皆完整，且中奖率合计需等于100%'],
   ['rebate','secRebate',rebateOk,'每日返水配置有必填/格式错误，或任务目标未依同任务条件逐级递增'],
   ['period','secPeriod',periodOk,'期间返水任务未完成：请检查任务目标，及各等级宝箱奖励（5～9 项、合计100%）'],
   ['ratio','secRatio',ratioOk,'投注量计算比例有误：已勾选游戏商须填比例、已填比例须勾选游戏商，比例 0～100'],
