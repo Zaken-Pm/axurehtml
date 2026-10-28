@@ -231,14 +231,14 @@ label.chk input{accent-color:var(--primary);}
 .block.is-off .block__body{opacity:.45;pointer-events:none;}
 .tag-new{display:inline-block;font-size:11px;font-weight:600;color:#fff;background:var(--red);border-radius:3px;padding:0 5px;line-height:17px;margin-left:6px;vertical-align:1px;}
 
-/* 奖励值储存格（依奖励类型切换） */
+/* 奖励数量储存格（依奖励类型切换） */
 .rv{display:flex;align-items:center;gap:6px;min-width:0;}
 .rv .suffix-wrap,.rv .prefix-wrap{flex:1;min-width:0;}
 .rv .select{flex:1;min-width:0;}
 .rv .js-name{flex:1.2;min-width:0;}
 .rv-phys{display:flex;flex-direction:column;gap:6px;width:100%;min-width:0;}
 .rv-phys__row{display:flex;gap:6px;min-width:0;}
-.rv-phys__row .suffix-wrap{flex:1;min-width:0;}
+.rv-phys__row .input{flex:1;min-width:0;}
 .upl{display:flex;align-items:center;gap:8px;min-width:0;font-size:12px;color:var(--text-3);text-align:left;}
 .upl__btn{flex:none;}
 .upl__btn.is-error{border-color:var(--red);color:var(--red);}
@@ -473,7 +473,7 @@ label.chk input{accent-color:var(--primary);}
               <div class="block__body">
                 <table class="tbl" style="min-width:860px;table-layout:fixed">
                   <thead><tr>
-                    <th style="width:130px">连续签到天数</th><th style="width:220px">签到奖励类型</th><th>奖励值</th><th style="width:190px">额外随机宝箱</th>
+                    <th style="width:130px">连续签到天数</th><th style="width:220px">签到奖励类型</th><th>奖励数量</th><th style="width:190px">额外随机宝箱</th>
                   </tr></thead>
                   <tbody id="signBody"></tbody>
                 </table>
@@ -494,7 +494,7 @@ label.chk input{accent-color:var(--primary);}
                   <button class="btn btn--primary btn--sm" id="btnAddBoxRw">＋ 新增奖励</button>
                 </div>
                 <table class="tbl" style="min-width:840px;table-layout:fixed">
-                  <thead><tr><th style="width:60px">#</th><th style="width:230px">奖励类型</th><th>奖励值</th><th style="width:170px">中奖率</th><th style="width:64px">操作</th></tr></thead>
+                  <thead><tr><th style="width:60px">#</th><th style="width:230px">奖励类型</th><th>奖励数量</th><th style="width:170px">中奖率</th><th style="width:64px">操作</th></tr></thead>
                   <tbody id="boxBody"></tbody>
                 </table>
                 <div class="sum-line" id="boxSum"></div>
@@ -783,7 +783,7 @@ label.chk input{accent-color:var(--primary);}
         <button class="btn btn--primary btn--sm" id="btnAddPmRw">＋ 新增奖励</button>
       </div>
       <table class="tbl" style="min-width:760px;table-layout:fixed">
-        <thead><tr><th style="width:60px">#</th><th style="width:230px">奖励类型</th><th>奖励值</th><th style="width:170px">中奖率</th><th style="width:64px">操作</th></tr></thead>
+        <thead><tr><th style="width:60px">#</th><th style="width:230px">奖励类型</th><th>奖励数量</th><th style="width:170px">中奖率</th><th style="width:64px">操作</th></tr></thead>
         <tbody id="periodRwBody"></tbody>
       </table>
       <div class="sum-line" id="periodRwSum"></div>
@@ -1293,7 +1293,7 @@ function rewardErrors(r,o,strict){
     if(!e.val && r.val!=='' && !(Number(r.val)>0)){ e.val='奖励价值不可为 0'; e.field='val'; }
   }
   else{
-    if(r.val===''){ if(strict) e.val=r.type==='抽奖券'?'请输入张数':'请输入奖励数'; }
+    if(r.val===''){ if(strict) e.val='请输入奖励数量'; }
     else if(!(Number(r.val)>0)) e.val='不可为 0';
   }
   if(o.rate){
@@ -1307,13 +1307,12 @@ const rateSum=rows=>Math.round(rows.reduce((a,r)=>a+(Number(r.rate)||0),0)*100)/
 const rewardsOk=rows=>rows.every(r=>rewardOk(r,{rate:true,physical:true}))&&rateSum(rows)===100;
 
 function rvHtml(r){
-  const c=curCode();
-  const sfx=(ph,unit)=>`<div class="suffix-wrap"><input class="input js-val" value="${r.val}" placeholder="${ph}"><span class="suffix">${unit}</span></div>`;
+  const num=ph=>`<input class="input js-val" value="${r.val}" placeholder="${ph}" aria-label="${ph}">`;   // 不显示单位
   const sel=(list,ph)=>`<select class="select js-pick" title="${r.pick||ph}"><option value="">${ph}</option>${list.map(x=>`<option ${r.pick===x?'selected':''}>${x}</option>`).join('')}</select>`;
   switch(r.type){
-    case '彩金':   return sfx('请输入奖励数',c);
-    case '积分':   return sfx('请输入奖励数','分');
-    case '抽奖券': return sfx('请输入张数','张');
+    case '彩金':
+    case '积分':
+    case '抽奖券': return num('请输入奖励数量');
     case '免费投注': return sel(FREEBET_LIST,'请选择免费投注');
     case '优惠券':   return sel(COUPON_LIST,'选择优惠券');
     case '实体奖品': {
@@ -1325,7 +1324,7 @@ function rvHtml(r){
         : `<button type="button" class="btn btn--sm upl__btn js-img-pick">⬆ 上传小图</button>
            <span class="upl__tip" title="png、jpg、gif、webp、bmp；${IMG_MAX_MB}MB 内">png、jpg、gif、webp、bmp；${IMG_MAX_MB}MB 内</span>`;
       return `<div class="rv-phys">
-        <div class="rv-phys__row"><input class="input js-name" value="${esc(r.name)}" placeholder="奖品名称" maxlength="30" aria-label="奖品名称">${sfx('奖励价值',c)}</div>
+        <div class="rv-phys__row"><input class="input js-name" value="${esc(r.name)}" placeholder="奖品名称" maxlength="30" aria-label="奖品名称">${num('奖励价值')}</div>
         <div class="upl">${up}<input type="file" class="js-file" accept="${IMG_TYPES.join(',')}" hidden aria-label="选择奖品小图"></div></div>`;
     }
     default: return `<input class="input" disabled placeholder="请先选择奖励类型">`;
@@ -1381,7 +1380,7 @@ function buildRewardRow(r,o){
     ${o.rate?`<td><div class="suffix-wrap"><input class="input js-rate" value="${r.rate}" placeholder="0～100"><span class="suffix">%</span></div>
       <p class="hint hint--err js-e-rate" style="visibility:hidden"></p></td>`:''}`;
   $('.js-rtype',tr).addEventListener('change',e=>{
-    r.type=e.target.value; r.name=''; r.val=''; r.pick=''; r.img=''; r.imgName='';       // 切换类型 → 清空原奖励值
+    r.type=e.target.value; r.name=''; r.val=''; r.pick=''; r.img=''; r.imgName='';       // 切换类型 → 清空原奖励数量
     $('.js-rv',tr).innerHTML=rvHtml(r); bindRv(tr,r,o); paintReward(tr,r,o); o.onChange&&o.onChange(); });
   if(o.rate) $('.js-rate',tr).addEventListener('input',e=>{ e.target.value=sanDec2(e.target.value); r.rate=e.target.value; paintReward(tr,r,o); o.onChange&&o.onChange(); });
   bindRv(tr,r,o); paintReward(tr,r,o);
@@ -1795,7 +1794,7 @@ function wagerOk(){ const wv=$('#fWager').value.trim(), wn=Number(wv); return wv
 
 /* ---------- 快速定位：区块完成度圆点 ---------- */
 const SECTIONS=[
-  ['sign','secSign',signOk,'签到活动配置未完成：请检查奖励类型／奖励值，及已配置宝箱的中奖率合计需等于100%'],
+  ['sign','secSign',signOk,'签到活动配置未完成：请检查奖励类型／奖励数量，及已配置宝箱的中奖率合计需等于100%'],
   ['box','secBox',boxesOk,()=>boxNoneErr()?'开启「额外随机宝箱」时，至少需配置 1 款签到宝箱':'签到宝箱配置未完成：已开始填写的宝箱须 5～9 项奖励皆完整，且中奖率合计需等于100%'],
   ['rebate','secRebate',rebateOk,'每日返水配置有必填/格式错误，或任务目标未依同任务条件逐级递增'],
   ['period','secPeriod',periodOk,'期间返水任务未完成：请检查任务目标，及各等级宝箱奖励（5～9 项、合计100%）'],
@@ -1807,7 +1806,7 @@ function updateAnchors(){ SECTIONS.forEach(([k,,fn])=>{ const d=$(`[data-dot="${
 $$('.anchor-chip').forEach(b=>b.addEventListener('click',()=>{ const t=document.getElementById(b.dataset.anchor); if(t) t.scrollIntoView({behavior:'smooth',block:'start'}); }));
 
 function renderStep4(){ renderSign(); renderBoxes(); renderVipTabs(); renderRebate(); renderPeriod(); renderRatio(); paintTicket(); updateAnchors(); }
-/* 步骤1 币种变更 → 奖励值单位跟着更新 */
+/* 步骤1 币种变更 → 重画（每日返水奖励金额单位） */
 $('#fCur').addEventListener('change',()=>renderStep4());
 
 /* ---------- 游戏选择弹窗 ---------- */
@@ -1865,8 +1864,8 @@ function buildPreview(){
   const applyAll=$('#applyAll').checked;
   /* 步骤4 摘要 */
   const rwTxt=r=>!r.type?'—':(r.type==='免费投注'||r.type==='优惠券')?`${r.type}：${r.pick||'—'}`
-      :r.type==='实体奖品'?`实体奖品「${r.name||'—'}」（价值 ${r.val||'—'} ${$('#fCur').value}${r.img?'，已上传小图':''}）`
-      :`${RW_LABEL[r.type]||r.type} ${r.val||'—'}${r.type==='彩金'?' '+$('#fCur').value:r.type==='积分'?' 分':' 张'}`;
+      :r.type==='实体奖品'?`实体奖品「${r.name||'—'}」（价值 ${r.val||'—'}${r.img?'，已上传小图':''}）`
+      :`${RW_LABEL[r.type]||r.type} ×${r.val||'—'}`;
   const ratioTxt=GAME_CATS.map(c=>{const r=ratio[c.key]; return r.sel.length?`${c.key} ${r.pct}%（${r.sel.length} 家）`:`${c.key} 100%`;}).join('；');
   const pConds=PERIOD_CONDS.map(c=>`${c} ${periodRows.filter(r=>r.cond===c).length}`).join(' / ');
   const floatOn=$$('input[name=float]')[1]?$$('input[name=float]')[1].checked:false;
