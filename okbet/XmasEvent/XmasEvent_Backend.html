@@ -531,12 +531,12 @@ label.chk input{accent-color:var(--primary);}
               <div class="block__body">
                 <table class="tbl" style="min-width:820px;table-layout:fixed">
                   <thead><tr>
-                    <th style="width:100px">游戏类型</th><th style="width:160px">对应一级分类</th><th style="width:170px">流水计算比例</th><th>套用游戏商</th>
+                    <th style="width:110px">游戏类型</th><th style="width:190px">流水计算比例</th><th>套用游戏商</th>
                   </tr></thead>
                   <tbody id="ratioBody"></tbody>
                 </table>
                 <p class="hint">· 点「选择游戏商」勾选要套用折扣的游戏商；同一游戏类型内被勾选的游戏商套用同一「流水计算比例」。<br>
-                  · 游戏商清单依生产环境一级分类：Slot、真人＝Live、体育＝Sport、游乐场＝Mini。比例为 0～100 的整数；已勾选游戏商时比例必填，已填比例时须至少勾选 1 家游戏商。</p>
+                  · 比例为 0～100 的整数；已勾选游戏商时比例必填，已填比例时须至少勾选 1 家游戏商。</p>
               </div>
             </section>
 
@@ -1711,7 +1711,7 @@ function renderRatio(){
   GAME_CATS.forEach(c=>{
     const r=ratio[c.key], tr=document.createElement('tr');
     const names=r.sel.map(x=>x.split('|')[1]+(c.groups.length>1?'（'+x.split('|')[0]+'）':''));
-    tr.innerHTML=`<td><b>${c.key}</b></td><td style="font-size:12.5px;color:var(--text-2)">${c.groups.map(g=>g.name).join('、')}</td>
+    tr.innerHTML=`<td><b>${c.key}</b></td>
       <td><div class="suffix-wrap"><input class="input js-pct" value="${r.pct}" placeholder="0～100"><span class="suffix">%</span></div>
         <p class="hint hint--err js-pct-hint" style="visibility:hidden"></p></td>
       <td style="text-align:left"><div style="display:flex;align-items:center;gap:10px;min-width:0">
