@@ -214,6 +214,9 @@ label.chk input{accent-color:var(--primary);}
 .report-totals b{font-weight:800;}
 .report-totals .m{color:var(--red);} .report-totals .p{color:var(--primary);} .report-totals .c{color:var(--green);}
 .hl{color:var(--primary);font-weight:600;}
+/* 报表：日期／时间／状态等栏不换行（表格可横向捲动），奖励内容栏允许换行 */
+#awardBody td,#dataBody td{white-space:nowrap;}
+#awardBody td:nth-child(6),#dataBody td:nth-child(6){white-space:normal;min-width:200px;}
 /* ---------- 节庆特别活动：步骤4 新增元件 ---------- */
 .block__head .sub{font-weight:400;font-size:12px;color:var(--text-2);}
 .block__head-r{display:flex;align-items:center;gap:10px;}
@@ -310,7 +313,7 @@ label.chk input{accent-color:var(--primary);}
       <div class="list-filters">
         <div class="fld"><label>模板：</label>
           <select class="select" id="tplFilter">
-            <option>全选</option><option>预约活动</option><option>周卡活动</option>
+            <option value="">全选</option><option>预约活动</option><option>周卡活动</option>
             <option>联名挑战活动</option><option>节庆特别活动</option>
           </select></div>
         <div class="fld"><label>活动ID：</label><input class="input" placeholder=""></div>
@@ -430,13 +433,13 @@ label.chk input{accent-color:var(--primary);}
           <div class="wizard__panel" data-panel="3">
             <p class="panel-desc">设置活动的参与对象与黑名单规则（参照其他活动，无调整）。</p>
             <div class="sec-title">参与对象设置</div>
-            <div class="form-row"><label>1. 充值层级：</label><select class="select" disabled><option>全选</option></select></div>
+            <div class="form-row"><label>1. 充值层级：</label><select class="select" disabled><option value="">全选</option></select></div>
             <div class="form-row"><label>2. 指定代理：</label>
               <div><label class="radio"><input type="radio" name="agent" checked disabled>不指定</label>
                    <label class="radio"><input type="radio" name="agent" disabled>指定代理线</label></div></div>
             <div class="form-row"><label>3. 新会员限制：</label>
               <label class="switch"><input type="checkbox" disabled><span class="track"></span></label></div>
-            <div class="form-row"><label>4. 会员等级：</label><select class="select" disabled><option>全选</option></select></div>
+            <div class="form-row"><label>4. 会员等级：</label><select class="select" disabled><option value="">全选</option></select></div>
             <div class="form-row"><label>5. 用户标签：</label><select class="select" disabled><option>请选择用户标签</option></select></div>
             <div class="sec-title" style="margin-top:20px">黑名单设置</div>
             <div class="form-row"><label>黑名单：</label><input class="input" placeholder="请输入，以逗号分隔多个用户名"></div>
@@ -461,7 +464,7 @@ label.chk input{accent-color:var(--primary);}
                 <div class="sum-line" id="boxSum"></div>
                 <p class="hint">奖励类型：彩金、积分、抽奖券（Golden Draw Ticket）、免费投注、优惠券、实体奖品（填写奖品名称＋奖励价值＋上传小图）。<br>
                   · 「额外随机宝箱」开启：6 款中<b>至少须配置 1 款</b>，其余可整款留空；关闭：本区块仍可正常配置，但非必填（不会发放签到宝箱）。<br>
-                  · 一旦开始填写该款宝箱，固定 9 项奖励皆须完整（不可新增、删除），且中奖率合计须等于 100%；已配置的宝箱才可于下方「签到活动配置」的「随机宝箱中奖率」填写中奖率。</p>
+                  · 宝箱一旦配置任 1 项奖励，其余 8 项奖励皆须配置（固定 9 项、不可新增或删除），且中奖率合计须等于 100%；已配置的宝箱才可于下方「签到活动配置」的「随机宝箱中奖率」填写中奖率。</p>
               </div>
             </section>
 
@@ -513,7 +516,7 @@ label.chk input{accent-color:var(--primary);}
                 <div class="sum-line" id="pboxSum"></div>
                 <p class="hint">奖励类型：彩金、积分、抽奖券（Golden Draw Ticket）、免费投注、优惠券、实体奖品（填写奖品名称＋奖励价值＋上传小图）。<br>
                   · 30 款中<b>至少须配置 1 款</b>，其余可整款留空。<br>
-                  · 一旦开始填写该款宝箱，固定 9 项奖励皆须完整（不可新增、删除），且中奖率合计须等于 100%；已配置的宝箱才会出现在下方「期间返水任务」各等级「奖励」下拉清单。<br>
+                  · 宝箱一旦配置任 1 项奖励，其余 8 项奖励皆须配置（固定 9 项、不可新增或删除），且中奖率合计须等于 100%；已配置的宝箱才会出现在下方「期间返水任务」各等级「奖励」下拉清单。<br>
                   · 已被等级选用的宝箱若清空成未配置，该等级「奖励」会一并清空，需重新选择。</p>
               </div>
             </section>
@@ -635,15 +638,15 @@ label.chk input{accent-color:var(--primary);}
       <div id="reportAward">
         <div class="list-filters">
           <div class="fld"><label>活动 ID：</label><input class="input" placeholder="请输入"></div>
-          <div class="fld"><label>活动类型：</label>
-            <select class="select"><option>全选</option><option>预约活动</option><option>周卡活动</option><option>联名挑战活动</option><option>节庆特别活动</option></select></div>
-          <div class="fld"><label>奖励类型：</label>
-            <select class="select"><option>全选</option><option>礼金</option><option>积分</option><option>免费投注券</option><option>免费旋转券</option><option>优惠券</option><option>道具卡</option></select></div>
+          <div class="fld"><label for="awAct">活动类型：</label>
+            <select class="select" id="awAct"><option value="">全选</option><option>预约活动</option><option>周卡活动</option><option>联名挑战活动</option><option>节庆特别活动</option></select></div>
+          <div class="fld"><label for="awType">奖励类型：</label>
+            <select class="select" id="awType"><option value="">全选</option><option>礼金</option><option>积分</option><option>免费投注券</option><option>免费旋转券</option><option>优惠券</option><option>道具卡</option><option>抽奖券</option><option>实体奖品</option></select></div>
           <div class="fld"><label>起始日期 ~ 结束日期：</label><input class="input dp-trigger" readonly placeholder="开始时间 ~ 结束时间" style="width:230px"></div>
-          <button class="btn btn--primary">🔍 搜寻</button>
+          <button class="btn btn--primary" id="awSearch">🔍 搜寻</button>
           <button class="btn btn--primary">⬇ 导出</button>
         </div>
-        <div class="report-totals">总金额：<b class="m">46,742.00</b>　总积分：<b class="p">39,834.00</b>　总免费券：<b class="c">485</b></div>
+        <div class="report-totals" id="awTotals"></div>
         <div class="tbl-scroll">
         <table class="list-tbl" style="min-width:1080px">
           <thead><tr>
@@ -653,7 +656,9 @@ label.chk input{accent-color:var(--primary);}
           <tbody id="awardBody"></tbody>
         </table>
         </div>
-        <p class="mini-note">「联名挑战活动」奖励类型一律「礼金」；若奖励来自刮刮卡，活动类型附加括号显示为「联名挑战活动(刮刮卡)」。</p>
+        <p class="mini-note"><b>合并规则（各活动通用）</b>：活动类型不加括号；<b>同一日期＋同一活动 ID＋同一奖励类型</b>合并为 1 列（不分奖励来源）。<b>奖励内容只显示单一奖励</b>：礼金、积分当日若有多种金额／点数，只显示单位「PHP」「PTS」（金额、点数见派发金额、积分小计）；免费投注券、优惠券、抽奖券、实体奖品依奖励项目各自成列，奖励内容为该项目名称。参与人数为去重人数；领取次数、派发金额、积分小计、券张数为加总。<br>
+          「联名挑战活动」：奖励类型一律「礼金」，同日返水与刮刮卡奖励合并为 1 列。<br>
+          「节庆特别活动」：签到、签到宝箱、每日返水、返水任务宝箱等来源依合并规则合并。彩金记为「礼金」计入派发金额，积分计入积分小计，免费投注券／优惠券／抽奖券计入券张数；实体奖品仅统计「审核通过」的笔数（领取次数），不计入派发金额。</p>
       </div>
 
       <!-- 子页：活动数据统计 -->
@@ -661,13 +666,13 @@ label.chk input{accent-color:var(--primary);}
         <div class="list-filters">
           <div class="fld"><label>活动 ID：</label><input class="input" placeholder="请输入"></div>
           <div class="fld"><label>会员账号：</label><input class="input" placeholder="请输入"></div>
-          <div class="fld"><label>活动类型：</label>
-            <select class="select"><option>全选</option><option>预约活动</option><option>周卡活动</option><option>联名挑战活动</option><option>节庆特别活动</option></select></div>
-          <div class="fld"><label>奖励类型：</label>
-            <select class="select"><option>全选</option><option>礼金</option><option>积分</option><option>免费投注券</option><option>免费旋转券</option><option>优惠券</option><option>道具卡</option></select></div>
-          <div class="fld"><label>状态：</label>
-            <select class="select"><option>全部</option><option>待审核</option><option>已通过</option><option>已拒绝</option></select></div>
-          <button class="btn btn--primary">🔍 搜寻</button>
+          <div class="fld"><label for="dtAct">活动类型：</label>
+            <select class="select" id="dtAct"><option value="">全选</option><option>预约活动</option><option>周卡活动</option><option>联名挑战活动</option><option>节庆特别活动</option></select></div>
+          <div class="fld"><label for="dtType">奖励类型：</label>
+            <select class="select" id="dtType"><option value="">全选</option><option>礼金</option><option>积分</option><option>免费投注券</option><option>免费旋转券</option><option>优惠券</option><option>道具卡</option><option>抽奖券</option><option>实体奖品</option></select></div>
+          <div class="fld"><label for="dtStatus">状态：</label>
+            <select class="select" id="dtStatus"><option value="">全部</option><option>待审核</option><option>已通过</option><option>已拒绝</option></select></div>
+          <button class="btn btn--primary" id="dtSearch">🔍 搜寻</button>
           <button class="btn btn--primary">⬇ 导出</button>
         </div>
         <div class="tbl-scroll">
@@ -679,7 +684,8 @@ label.chk input{accent-color:var(--primary);}
           <tbody id="dataBody"></tbody>
         </table>
         </div>
-        <p class="mini-note">「联名挑战活动」：天数固定「-」；申请领取时间与审核时间一致；状态一律「已通过」；刮刮卡奖励活动类型加括号「联名挑战活动(刮刮卡)」。</p>
+        <p class="mini-note">「联名挑战活动」：天数固定「-」；申请领取时间与审核时间一致；状态一律「已通过」；活动类型不加括号。<br>
+          「节庆特别活动」：用户每获得 1 个奖励＝1 笔（与派奖审核一致），活动类型不加括号；天数：签到相关奖励显示连续签到天数（Day N），其余为「-」；除实体奖品外状态一律「已通过」、申请领取时间＝审核时间；实体奖品依人工审核结果显示「待审核／已通过／已拒绝」，待审核时审核时间为「—」。</p>
       </div>
 
     </section>
@@ -893,35 +899,66 @@ $$('.rtab').forEach(b=>b.addEventListener('click',()=>{
   $('#reportData').style.display=k==='data'?'':'none';
 }));
 
-/* 活动奖励统计：联名挑战活动奖励类型一律「礼金」；刮刮卡奖励→活动类型加(刮刮卡) */
+/* 活动奖励统计：活动类型不加括号；同一日期＋同一活动ID＋同一奖励类型合并为 1 列（不分奖励来源）。
+   奖励内容只显示单一奖励：礼金／积分当日有多种金额时只显示单位「PHP」「PTS」；券类、实体奖品依项目各自成列。
+   参与人数为去重人数；领取次数、派发金额、积分小计、券张数加总。 */
 const awardRows=[
-  ['2026-08-21','联名挑战活动','190','X-Bomb Lucky Blast','礼金','PHP 7','120','118','826.00','0.00','0'],
-  ['2026-08-21','联名挑战活动(刮刮卡)','190','X-Bomb Lucky Blast','礼金','PHP 100','33','33','3,300.00','0.00','0'],
+  /* 节庆特别活动 */
+  /* 实体奖品「待审核」（vip_king88 蓝牙耳机）审核通过前不计入统计 */
+  ['2026-11-30','节庆特别活动','191','Christmas Activities 2026','实体奖品','圣诞限定礼盒（价值 PHP 7,500）','1','1','0.00','0.00','0'],
+  ['2026-11-22','节庆特别活动','191','Christmas Activities 2026','优惠券','存送券20%-本金+彩金2倍-有效期24小时','18','18','0.00','0.00','18'],
+  ['2026-11-19','节庆特别活动','191','Christmas Activities 2026','礼金','PHP','250','263','2,500.00','0.00','0'],   // 复数礼金示意：每日返水 PHP 5×205 次 ＋ 签到宝箱开出 PHP 25×58 次 → 同日＋同活动ID＋同为礼金合并，金额不同故奖励内容只显示「PHP」（参与人数去重 250；金额 1,025＋1,475）
+  ['2026-11-18','节庆特别活动','191','Christmas Activities 2026','免费投注券','PT电子免费旋转 ×1','64','64','0.00','0.00','64'],
+  ['2026-11-18','节庆特别活动','191','Christmas Activities 2026','抽奖券','Golden Draw Ticket ×1','312','312','0.00','0.00','312'],
+  ['2026-11-17','节庆特别活动','191','Christmas Activities 2026','积分','100 PTS','356','356','0.00','35,600.00','0'],
+  ['2026-11-16','节庆特别活动','191','Christmas Activities 2026','礼金','PHP 10','402','402','4,020.00','0.00','0'],
+  ['2026-08-21','联名挑战活动','190','X-Bomb Lucky Blast','礼金','PHP','140','151','4,126.00','0.00','0'],   // 同日＋同活动ID＋同为礼金，含 PHP 7、PHP 100 两种金额 → 合并且奖励内容只显示「PHP」（参与人数去重 140；领取次数 118+33；金额 826+3,300）
   ['2026-08-22','联名挑战活动','190','X-Bomb Lucky Blast','礼金','PHP 25','96','90','2,250.00','0.00','0'],
   ['2026-08-06','周卡活动','184','最新周卡','礼金','PHP 12','1','1','12.00','0.00','0'],
-  ['2026-08-05','周卡活动','184','最新周卡','积分','22 pts','1','1','0.00','22.00','0'],
+  ['2026-08-05','周卡活动','184','最新周卡','积分','22 PTS','1','1','0.00','22.00','0'],
 ];
-/* 活动数据统计：联名挑战活动 → 天数「-」、申请领取时间=审核时间、状态「已通过」；刮刮卡加(刮刮卡) */
+/* 活动数据统计：联名挑战活动 → 天数「-」、申请领取时间=审核时间、状态「已通过」；活动类型不加括号 */
 const dataRows=[
+  /* 节庆特别活动（与派奖审核同一批纪录） */
+  ['191','vip_king88','节庆特别活动','Christmas Activities 2026','实体奖品','蓝牙耳机（价值 PHP 9,000.00）','-','2026-12-03 20:11:47','—','待审核'],
+  ['191','member07','节庆特别活动','Christmas Activities 2026','实体奖品','圣诞限定礼盒（价值 PHP 7,500.00）','Day 9','2026-11-30 21:40:12','2026-12-01 10:30:00','已通过'],
+  ['191','member02','节庆特别活动','Christmas Activities 2026','优惠券','存送券20%-本金+彩金2倍-有效期24小时','-','2026-11-22 15:21:08','2026-11-22 15:21:08','已通过'],
+  ['191','member01','节庆特别活动','Christmas Activities 2026','礼金','PHP 5.00','-','2026-11-19 00:00:05','2026-11-19 00:00:05','已通过'],
+  ['191','member01','节庆特别活动','Christmas Activities 2026','免费投注券','PT电子免费旋转 ×1','Day 3','2026-11-18 10:05:12','2026-11-18 10:05:12','已通过'],
+  ['191','member01','节庆特别活动','Christmas Activities 2026','抽奖券','Golden Draw Ticket ×1','Day 3','2026-11-18 10:05:12','2026-11-18 10:05:12','已通过'],
+  ['191','member01','节庆特别活动','Christmas Activities 2026','积分','100 pts','Day 2','2026-11-17 09:58:40','2026-11-17 09:58:40','已通过'],
+  ['191','member01','节庆特别活动','Christmas Activities 2026','礼金','PHP 10.00','Day 1','2026-11-16 10:02:15','2026-11-16 10:02:15','已通过'],
   ['190','member01','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 7','-','2026-08-21 12:03:11','2026-08-21 12:03:11','已通过'],
-  ['190','member03','联名挑战活动(刮刮卡)','X-Bomb Lucky Blast','礼金','PHP 100','-','2026-08-22 12:00:02','2026-08-22 12:00:02','已通过'],
+  ['190','member03','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 100','-','2026-08-22 12:00:02','2026-08-22 12:00:02','已通过'],
   ['190','member02','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 25','-','2026-08-21 12:10:44','2026-08-21 12:10:44','已通过'],
   ['183','xnjobe11','周卡活动','周卡时间到期活动测试','礼金','PHP 17','Day 7','—','—','待审核'],
 ];
 $('#auSearch').addEventListener('click',renderAudit);
 
+const actBase=t=>t;   // 活动类型已不加括号，直接比对
+const emptyRow=n=>`<tr><td colspan="${n}" style="text-align:center;color:var(--text-3);padding:28px">暂无数据</td></tr>`;
 function renderReport(){
-  $('#awardBody').innerHTML=awardRows.map(r=>{
-    const isX=/联名挑战活动/.test(r[1]);
+  const aA=$('#awAct').value, aT=$('#awType').value;
+  const aRows=awardRows.filter(r=>(!aA||actBase(r[1])===aA)&&(!aT||r[4]===aT));
+  $('#awardBody').innerHTML=aRows.length?aRows.map(r=>{
+    const isX=/联名挑战活动|节庆特别活动/.test(r[1]);
     return `<tr><td>${r[0]}</td><td class="${isX?'hl':''}">${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td>
       <td>${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td>${r[9]}</td><td>${r[10]}</td></tr>`;
-  }).join('');
-  $('#dataBody').innerHTML=dataRows.map(r=>{
-    const isX=/联名挑战活动/.test(r[2]);
+  }).join(''):emptyRow(11);
+  /* 合计依目前筛选结果计算 */
+  const num=v=>Number(String(v).replace(/,/g,''))||0, fmt=n=>n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const tM=aRows.reduce((a,r)=>a+num(r[8]),0), tP=aRows.reduce((a,r)=>a+num(r[9]),0), tC=aRows.reduce((a,r)=>a+num(r[10]),0);
+  $('#awTotals').innerHTML=`总金额：<b class="m">${fmt(tM)}</b>　总积分：<b class="p">${fmt(tP)}</b>　总券张数：<b class="c">${tC}</b>`;
+  const dA=$('#dtAct').value, dT=$('#dtType').value, dS=$('#dtStatus').value;
+  const dRows=dataRows.filter(r=>(!dA||actBase(r[2])===dA)&&(!dT||r[4]===dT)&&(!dS||r[9]===dS));
+  $('#dataBody').innerHTML=dRows.length?dRows.map(r=>{
+    const isX=/联名挑战活动|节庆特别活动/.test(r[2]);
     return `<tr><td>${r[0]}</td><td>${r[1]}</td><td class="${isX?'hl':''}">${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td>
       <td>${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td>${statusTag(r[9])}</td></tr>`;
-  }).join('');
+  }).join(''):emptyRow(10);
 }
+$('#awSearch').addEventListener('click',renderReport);
+$('#dtSearch').addEventListener('click',renderReport);
 function resetWizardFields(blank){
   /* blank=true → 新增活动：动态表格全部留空，由用户自行填写；
      blank=false → 编辑既有活动：带入该活动的示范配置。 */
@@ -1366,7 +1403,11 @@ function makeBoxSet(cfg){
     const k=S.cur, rows=S.boxes[k];
     /* 未填写任何栏位的宝箱不显示必填错误；开始填写后才依严格模式校验 */
     const strictFn=()=>s4Strict&&S.touched(k);
-    const sumHtml=()=>S.touched(k)?sumLineHtml(rows,strictFn())
+    /* 一旦配置任 1 项奖励，其余 8 项皆须配置：即时显示完成项数与提醒 */
+    const doneHtml=()=>{ const n=rows.filter(r=>rewardOk(r,BOX_OPT)).length, left=RW_COUNT-n;
+      return `<span style="margin-right:14px">奖励已完成 <b style="color:${left?'var(--red)':'var(--green)'}">${n}</b> / ${RW_COUNT} 项</span>`
+        +(left?`<span class="warn" style="margin-right:14px">尚有 ${left} 项奖励未配置完成（一旦配置任 1 项，9 项皆须配置）</span>`:''); };
+    const sumHtml=()=>S.touched(k)?doneHtml()+sumLineHtml(rows,strictFn())
       :(s4Strict&&S.noneErr()?`<span class="warn">${cfg.noneMsg}</span>`:'<span style="color:var(--text-3)">此款宝箱未配置</span>');
     const refresh=()=>{ $(cfg.sum).innerHTML=sumHtml(); $$(cfg.body+' tr').forEach((tr,i)=>paintReward(tr,rows[i],{...BOX_OPT,strictFn})); cfg.onRefresh&&cfg.onRefresh(); };
     rows.forEach((r,i)=>tb.appendChild(buildRewardRow(r,{...BOX_OPT,label:i+1,strictFn,onChange:refresh})));
@@ -1636,10 +1677,10 @@ function wagerOk(){ const wv=$('#fWager').value.trim(), wn=Number(wv); return wv
 
 /* ---------- 步骤4 各区块校验（下一步／提交时依序检查） ---------- */
 const SECTIONS=[
-  ['box','secBox',boxesOk,()=>boxNoneErr()?'开启「额外随机宝箱」时，至少需配置 1 款签到宝箱':'签到宝箱配置未完成：已开始填写的宝箱须 9 项奖励皆完整，且中奖率合计需等于100%'],
+  ['box','secBox',boxesOk,()=>boxNoneErr()?'开启「额外随机宝箱」时，至少需配置 1 款签到宝箱':'签到宝箱配置未完成：宝箱一旦配置任 1 项奖励，其余 8 项皆须配置，且中奖率合计需等于100%'],
   ['sign','secSign',signOk,'签到活动配置未完成：请检查奖励类型／奖励数量，及已配置宝箱的中奖率合计需等于100%'],
   ['rebate','secRebate',rebateOk,'每日返水配置有必填/格式错误，或任务目标未依同任务条件逐级递增'],
-  ['pbox','secPBox',()=>PBOX.ok(),()=>PBOX.noneErr()?'至少需配置 1 款返水任务宝箱':'返水任务宝箱配置未完成：已开始填写的宝箱须 9 项奖励皆完整，且中奖率合计需等于100%'],
+  ['pbox','secPBox',()=>PBOX.ok(),()=>PBOX.noneErr()?'至少需配置 1 款返水任务宝箱':'返水任务宝箱配置未完成：宝箱一旦配置任 1 项奖励，其余 8 项皆须配置，且中奖率合计需等于100%'],
   ['period','secPeriod',periodOk,'期间返水任务未完成：请检查任务目标，及各等级「奖励」须选择 1 款返水任务宝箱'],
   ['ratio','secRatio',ratioOk,'投注量计算比例有误：Slot／Live／Mini 已勾选游戏商须填比例、已填比例须勾选游戏商；比例 0～100'],
   ['other','secOther',wagerOk,'彩金所需流水倍数须为 0.01～999999.99（最多 8 位整数＋2 位小数、不可为 0）'],
