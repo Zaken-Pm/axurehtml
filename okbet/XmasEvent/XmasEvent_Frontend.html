@@ -145,7 +145,7 @@ button{font:inherit;cursor:pointer;}
 .keybar__lb{font-size:.72rem;font-weight:900;line-height:1.2;}
 .keybar__lb small{display:block;font-weight:600;font-size:.67rem;opacity:.8;}
 .keybar__n{margin-left:auto;font-size:1.4rem;font-weight:900;font-style:italic;line-height:1;}
-/* 循环任务卡 */
+/* 特别任务卡 */
 .cycle{padding:var(--space-3);border-radius:16px;margin-bottom:var(--space-4);border:2px solid #8fb3ff;
   background:radial-gradient(1.5px 1.5px at 85% 25%,#fff 50%,transparent 51%),radial-gradient(1.5px 1.5px at 60% 70%,#fff 50%,transparent 51%),
     linear-gradient(180deg,#2c3f9e 0%,#4a2a9e 100%);}
@@ -156,13 +156,15 @@ button{font:inherit;cursor:pointer;}
 .cycle__foot{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--space-2);align-items:center;margin-top:var(--space-2);}
 .cycle__reward{font-size:.72rem;font-weight:800;color:var(--gold-1);display:flex;align-items:center;gap:6px;min-width:0;}
 .cycle__reward svg{width:26px;height:26px;flex:none;}
+.cycle__upd{display:flex;align-items:center;gap:4px;font-size:.67rem;color:var(--muted);margin:6px 0 0;}
+.ikey{display:inline-block;width:1.15em;height:1.15em;vertical-align:-.25em;}
 .cycle__done{display:block;font-size:.67rem;font-weight:600;color:var(--muted);}
 .cycle .btn-gold{padding:8px 16px;font-size:.72rem;white-space:nowrap;}
 .task{background:linear-gradient(180deg,#eef4ff,#d8e6ff);color:var(--ink);border-radius:12px;padding:6px 10px;}
 .task__row{display:flex;justify-content:space-between;gap:6px;font-size:.67rem;font-weight:800;white-space:nowrap;}
 .task .bar{background:#b9cdf5;height:9px;margin:3px 0 4px;}
 .task .bar__fill{background:linear-gradient(90deg,#4fa8ff,#2f6bff);}
-/* 循环任务宝箱 */
+/* 特别任务宝箱 */
 .sec-title{margin:0 0 2px;font-size:.85rem;font-weight:900;font-style:italic;color:var(--gold-1);text-align:center;}
 .sec-note{margin:0 0 var(--space-3);font-size:.67rem;color:var(--muted);text-align:center;}
 .chests{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-2);}
@@ -328,7 +330,7 @@ button{font:inherit;cursor:pointer;}
       <ul id="bombList" style="list-style:none;margin:0;padding:0"></ul>
     </section>
 
-    <!-- 分页：Christmas Activities（循环任务＋循环任务宝箱）：无气泡角标、无一键领取 -->
+    <!-- 分页：Christmas Activities（特别任务＋特别任务宝箱）：无气泡角标、无一键领取 -->
     <section class="panel" id="panelXmas" role="tabpanel" aria-labelledby="tabXmas">
       <div class="keybar">
         <span id="keyIco"></span>
@@ -336,9 +338,10 @@ button{font:inherit;cursor:pointer;}
         <span class="keybar__n" id="keyNum" aria-live="polite">0</span>
       </div>
       <article class="cycle" aria-labelledby="cycleTitle">
-        <div class="cycle__head" id="cycleTitle">Bet Task <span class="chip">REPEATABLE</span></div>
+        <div class="cycle__head" id="cycleTitle">Special Task <span class="chip">REPEATABLE</span></div>
         <p class="cycle__desc" id="cycleDesc"></p>
         <div class="task" id="cycleTask"></div>
+        <p class="cycle__upd" id="cycleUpd"></p>
         <div class="cycle__foot">
           <div class="cycle__reward" id="cycleReward"></div>
           <button class="btn-gold" id="btnBetNow">BET NOW ›</button>
@@ -355,6 +358,7 @@ button{font:inherit;cursor:pointer;}
     <h2>原型控制（模拟资料）</h2>
     <div class="ctrl">
       <button data-sim="bet">模拟投注 +10,000</button>
+      <button data-sim="tick">模拟 20 分钟更新</button>
       <button data-sim="dep">模拟充值 +5,000</button>
       <button data-sim="nextday">模拟次日</button>
       <button data-sim="break">模拟断签</button>
@@ -376,7 +380,7 @@ button{font:inherit;cursor:pointer;}
     <h3>② Tab 气泡角标</h3>
     <ul>
       <li><b>仅 BOMB MISSION 显示</b>：该分页「已达成未领取」的每日返水任务数；0 不显示、超过 99 显示「99+」，领取（含一键领取）后即时更新。</li>
-      <li>Christmas Activities <b>不显示气泡角标</b>（循环任务达标即自动发放宝箱钥匙，无待领取状态）。</li>
+      <li>Christmas Activities <b>不显示气泡角标</b>（特别任务达标即自动发放宝箱钥匙，无待领取状态）。</li>
     </ul>
 
     <h3>③ One-Click Reclaim（一键领取）</h3>
@@ -392,13 +396,14 @@ button{font:inherit;cursor:pointer;}
       <li>弹窗展示该宝箱全部 9 项奖励（3×3），点「Draw」后金框沿格子跑动、逐渐减速，停在抽中项；抽中项放大＋金色光芒，其余变暗。</li>
       <li>参考图为「8 格奖励＋中央 Draw」，因后台宝箱固定 9 项，Draw 按钮移至格子下方。</li>
       <li>抽中实体奖品：显示「Under review」，由后台派奖审核人工处理。</li>
-      <li>签到随机宝箱：按钮为「Draw」，不消耗钥匙。循环任务宝箱：按钮为「Draw · 🔑×N」，<b>按下 Draw 当下才扣除钥匙</b>；开启弹窗后未按 Draw 直接关闭不扣钥匙。</li>
+      <li>签到随机宝箱：按钮为「Draw」，不消耗钥匙。特别任务宝箱：按钮为「Draw · 🔑×N」，<b>按下 Draw 当下才扣除钥匙</b>；开启弹窗后未按 Draw 直接关闭不扣钥匙。</li>
       <li>每个宝箱可点「View pool」预览 9 项奖励（不抽奖）。</li>
     </ul>
 
     <h3>⑤ BOMB MISSION（每日返水＋挑战任务）</h3>
     <ul>
       <li>依后台「每日返水配置」（当前 VIP 等级）列出 LV；状态 CLAIM／LOCKED（显示进度）／Claimed。充值任务金框。</li>
+      <li>后台该级勾选「赠送道具」→ 奖励显示「₱X + 🔑×N」，领取时同步发放宝箱钥匙（不受挑战加成影响）；Claimed 卡同样显示。</li>
       <li>后台该级勾选「挑战任务 · 触发」→ 卡片标「CHALLENGE」并提示「Claim to unlock a challenge」。</li>
       <li>领取该级时<b>必定触发 1 个挑战</b>：依「挑战任务配置」的触发机率抽出挑战（示范：挑战1 奖励提升 20%／触发 60%／获奖 60%；挑战2 提升 50%／触发 40%／获奖 50%）。</li>
       <li>挑战弹窗显示 2 张背面卡牌，用户点选 1 张翻开：依该挑战获奖机率判定，<b>WIN</b>＝领取 基础奖励 ×(1＋奖励提升)；<b>MISS</b>＝领取基础奖励（不会失去基础奖励）。翻开后另一张同步亮出。</li>
@@ -407,16 +412,18 @@ button{font:inherit;cursor:pointer;}
       <li>金额显示至小数点后 2 位，第 3 位无条件舍去。</li>
     </ul>
 
-    <h3>⑥ Christmas Activities（循环任务＋循环任务宝箱）</h3>
+    <h3>⑥ Christmas Activities（特别任务＋特别任务宝箱）</h3>
     <ul>
       <li>页首「My Chest Keys」＝目前持有宝箱钥匙数（累计获得 − 已消耗）。</li>
-      <li><b>循环任务</b>（后台「循环任务配置」，条件固定投注）：活动期间每累计有效投注达任务目标（示范 5,000）即<b>自动发放</b>奖励数量个「宝箱钥匙」（示范 1 个），进度归零重新累计、可无限次重复；无 CLAIM 按钮、无气泡、无一键领取。</li>
-      <li>进度条＝本轮累计／任务目标；下方显示已完成次数与累计获得钥匙数。单笔投注跨越多轮时一次发放多轮钥匙（例：剩 1,350 达标，投注 10,000 → 完成 2 轮，进度 1,350／5,000）。</li>
+      <li>钥匙来源：① 特别任务；② BOMB MISSION 每日返水有勾选「赠送道具」的等级，领取时即时发放（示范 LV2 ×1、LV3 ×2）。</li>
+      <li><b>特别任务</b>（后台「特别任务配置」，条件固定投注；标题「Special Task」）：活动期间每累计有效投注达任务目标（示范 5,000）即<b>自动发放</b>奖励数量个「宝箱钥匙」（示范 1 个），进度归零重新累计、可无限次重复；无 CLAIM 按钮、无气泡、无一键领取。</li>
+      <li><b>每 20 分钟更新一次</b>（:00／:20／:40）：投注后进度条与钥匙不会即时变动，于下次更新时一并计入；卡片显示「Progress &amp; keys update every 20 mins · Last updated HH:MM」。原型以「模拟 20 分钟更新」按钮示意。</li>
+      <li>进度条＝本轮累计／任务目标；下方显示已完成次数与特别任务累计获得钥匙数。同一时段完成多轮时一次发放多轮钥匙（例：剩 1,350 达标，该时段投注 10,000 → 完成 2 轮，进度 1,350／5,000）。</li>
       <li>「BET NOW ›」导向游戏大厅（原型以 toast 示意）。</li>
-      <li><b>循环任务宝箱</b>（后台「循环任务宝箱配置」）：只显示后台有配置的宝箱（示范 5 个），依编号排序，每箱显示最高价值奖励（Chance to Win …）与道具消耗数量（示范 1／2／3／5／10 把钥匙）。</li>
+      <li><b>特别任务宝箱</b>（后台「特别任务宝箱配置」）：固定 4 个宝箱（后台皆必填），依编号排序，每箱显示最高价值奖励（Chance to Win …）与道具消耗数量（示范 1／2／3／5 把钥匙）。宝箱内各项中奖率依后台配置（可至小数点后 4 位，合计不需 100%，依比重换算）。</li>
       <li>钥匙足够：金框＋「OPEN · 🔑×N」可点；不足：按钮停用并提示「Need N more keys」。同一宝箱可重复开启，右上显示已开启次数。</li>
       <li>开启扣除的钥匙记录于后台「活动道具消耗统计」（备注记录开启的宝箱）。</li>
-      <li><b>最高级宝箱</b>（道具消耗数量最高者，示范 Chest 5）：卡片加<b>扫光效果</b>（斜向光带由左至右扫过，约 3 秒循环一次）＋金框与「TOP」标签；钥匙是否足够都持续扫光。若多个宝箱消耗数量并列最高，皆套用。系统设定「减少动态效果」时不播放扫光。</li>
+      <li><b>最高级宝箱</b>（道具消耗数量最高者，示范 Chest 4）：卡片加<b>扫光效果</b>（斜向光带由左至右扫过，约 3 秒循环一次）＋金框与「TOP」标签；钥匙是否足够都持续扫光。若多个宝箱消耗数量并列最高，皆套用。系统设定「减少动态效果」时不播放扫光。</li>
     </ul>
   </aside>
 </div>
@@ -469,7 +476,7 @@ const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelect
 const clone=o=>JSON.parse(JSON.stringify(o));
 function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('is-show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('is-show'),2200); }
 /* 金额：小数点后 2 位，第 3 位无条件舍去 */
-const money=n=>'₱'+(Math.floor(n*100)/100).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const money=n=>'₱'+(Math.floor(n*100+1e-6)/100).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 const int=n=>Number(n).toLocaleString('en-US');
 
 /* ---------- 图示（原创 SVG） ---------- */
@@ -516,25 +523,25 @@ const SIGN_BOXES=[mkBox(1,R('cash','₱100',1,{amt:100})),mkBox(2,R('cash','₱2
   mkBox(4,R('cash','₱500',1,{amt:500})),mkBox(5,R('gift','Xmas Gift Box',1,{physical:true})),mkBox(6,R('phone','iPhone',1,{physical:true}))];
 const SIGN_BOX_RATE=[40,25,15,12,8,0];
 
-/* BOMB MISSION：每日返水（当前 VIP 等级）；trigger＝后台「挑战任务 · 触发」 */
-const BOMB_TASKS=[{lv:1,cond:'bet',goal:200,reward:3},{lv:2,cond:'dep',goal:200,reward:5,trigger:true},{lv:3,cond:'bet',goal:1000,reward:12,trigger:true},
+/* BOMB MISSION：每日返水（当前 VIP 等级）；gift＝后台「赠送道具」奖励数量；trigger＝后台「挑战任务 · 触发」 */
+const BOMB_TASKS=[{lv:1,cond:'bet',goal:200,reward:3},{lv:2,cond:'dep',goal:200,reward:5,gift:1,trigger:true},{lv:3,cond:'bet',goal:1000,reward:12,gift:2,trigger:true},
   {lv:4,cond:'bet',goal:3000,reward:30},{lv:5,cond:'dep',goal:1000,reward:20},{lv:6,cond:'bet',goal:8000,reward:88}];
 /* 挑战任务配置（全等级共用）：up＝奖励提升 %、appear＝触发机率 %（加总 100）、win＝获奖机率 % */
 const CHALLENGES=[{no:1,up:20,appear:60,win:60},{no:2,up:50,appear:40,win:50}];
 
-/* Christmas Activities：循环任务（条件固定投注；单一目标、可重复）＋循环任务宝箱 */
-const CYCLE={goal:5000,qty:1};        // 每累计有效投注 5,000 → 宝箱钥匙 ×1
+/* Christmas Activities：特别任务（条件固定投注；单一目标、可重复）＋特别任务宝箱 */
+const CYCLE={goal:5000,qty:1,every:20};   // 每累计有效投注 5,000 → 宝箱钥匙 ×1；进度与奖励每 20 分钟更新一次
 const KEY_NAME='Chest Key';           // 后台道具名称「宝箱钥匙」
 const XBOX=k=>{ const m=k+1, tops=[R('cash','₱100',1,{amt:100}),R('phone','iPhone',1,{physical:true}),R('cash','₱1,000',1,{amt:1000}),
-  R('gift','Xmas Gift Box',1,{physical:true}),R('cash','₱100,000',1,{amt:100000})];
+  R('gift','Xmas Gift Box',1,{physical:true}),R('cash','₱100,000',1,{amt:100000})].filter((_,i)=>i!==3);
   return mkBox(m*2,tops[k]); };
-/* 后台 10 个宝箱中示范配置 5 个；未配置的宝箱前台不显示 */
-const CHESTS=[1,2,3,5,10].map((cost,k)=>({no:k+1,cost,box:XBOX(k),art:['chest','phone','cash','gift','chest'][k]}));
+/* 后台固定 4 个宝箱（皆必填） */
+const CHESTS=[1,2,3,5].map((cost,k)=>({no:k+1,cost,box:XBOX(k),art:['cash','phone','gift','chest'][k]}));
 const TOP_COST=Math.max(...CHESTS.map(C=>C.cost));   // 最高级宝箱＝道具消耗数量最高者（加扫光效果）
 const topOf=box=>box[box.length-1];   // 主视觉＝宝箱内最高价值奖励（示范资料放在第 9 项）
 
 /* ---------- 用户状态 ---------- */
-const INIT={streak:2,checked:false,dayBet:1250,dayDep:200,bombClaimed:{1:{amt:3}},xBet:13650,keysUsed:0,opened:{}};   // xBet＝活动期间累计有效投注（示范：已完成 2 轮 → 2 把钥匙）
+const INIT={streak:2,checked:false,dayBet:1250,dayDep:200,bombClaimed:{1:{amt:3}},bombKeys:0,xBet:13650,xPend:0,updAt:14*60+20,keysUsed:0,opened:{}};   // xBet＝已结算的活动累计有效投注；xPend＝尚未结算（每 20 分钟更新）；bombKeys＝每日返水赠送的钥匙（示范：已完成 2 轮 → 2 把钥匙）
 let S=clone(INIT);
 
 /* ---------- 签到区 ---------- */
@@ -606,8 +613,9 @@ function renderBomb(){
     const act= got?`<div class="locked"><b>✓</b>Claimed</div>`
              : done?`<button class="btn-gold" data-bomb="${t.lv}">CLAIM</button>`
              : `<div class="locked"><b>🔒</b>LOCKED</div>`;
-    const rw= got?`Received ${money(got.amt)}${got.ch?` <span class="mission__ch">Challenge ${got.ch} ${got.win?'WIN +'+CHALLENGES[got.ch-1].up+'%':'· base reward'}</span>`:''}`
-            : `Reward ${money(t.reward)}${t.trigger?'<span class="mission__ch">Claim to unlock a challenge (up to +'+Math.max(...CHALLENGES.map(c=>c.up))+'%)</span>':''}`;
+    const kk=n=>n?` + ${ICON.key.replace('<svg','<svg class="ikey"')}×${n}`:'';
+    const rw= got?`Received ${money(got.amt)}${kk(t.gift)}${got.ch?` <span class="mission__ch">Challenge ${got.ch} ${got.win?'WIN +'+CHALLENGES[got.ch-1].up+'%':'· base reward'}</span>`:''}`
+            : `Reward ${money(t.reward)}${kk(t.gift)}${t.trigger?'<span class="mission__ch">Claim to unlock a challenge (up to +'+Math.max(...CHALLENGES.map(c=>c.up))+'%)</span>':''}`;
     return `<li class="mission ${t.cond==='dep'?'mission--deposit':''} ${got?'mission--claimed':''}">
       <div class="lv-heart">${HEART(got?'#8a86a8':done?'#ff3d8b':'#9c8ad6')}<span>LV${t.lv}</span></div>
       <div style="min-width:0">
@@ -620,16 +628,20 @@ function renderBomb(){
   $$('[data-bomb]').forEach(b=>b.addEventListener('click',()=>{
     const lv=+b.dataset.bomb; if(S.bombClaimed[lv]||CH) return;          // 幂等
     const t=BOMB_TASKS.find(x=>x.lv===lv);
-    if(t.trigger){ runChallenges([t],res=>toast(`+${money(res[0].amt)} claimed (LV${lv})`)); return; }
-    S.bombClaimed[lv]={amt:t.reward}; toast(`+${money(t.reward)} claimed (LV${lv})`); renderAll();
+    if(t.trigger){ runChallenges([t],res=>toast(`+${money(res[0].amt)}${keyTxt(t.gift)} claimed (LV${lv})`)); return; }
+    S.bombClaimed[lv]={amt:t.reward}; giveKeys(t); toast(`+${money(t.reward)}${keyTxt(t.gift)} claimed (LV${lv})`); renderAll();
   }));
 }
+/* 每日返水赠送道具：领取当下发放（挑战加成只作用于彩金） */
+const giveKeys=t=>{ if(t.gift) S.bombKeys+=t.gift; };
+const keyTxt=n=>n?` + ${KEY_NAME} ×${n}`:'';
 $('#btnReclaimBomb').addEventListener('click',()=>{
   const list=bombClaimable(); if(!list.length||CH) return;
   const plain=list.filter(t=>!t.trigger), chal=list.filter(t=>t.trigger);
-  plain.forEach(t=>S.bombClaimed[t.lv]={amt:t.reward});
+  plain.forEach(t=>{ S.bombClaimed[t.lv]={amt:t.reward}; giveKeys(t); });
+  const keys=list.reduce((a,t)=>a+(t.gift||0),0);
   const done=res=>{ const all=[...plain.map(t=>({amt:t.reward})),...res], sum=all.reduce((a,r)=>a+r.amt,0);
-    toast(`${all.length} reward${all.length>1?'s':''} claimed · Total ${money(sum)}`); renderAll(); };
+    toast(`${all.length} reward${all.length>1?'s':''} claimed · Total ${money(sum)}${keyTxt(keys)}`); renderAll(); };
   if(chal.length){ renderAll(); runChallenges(chal,done); } else done([]);
 });
 
@@ -648,12 +660,12 @@ function showChallenge(){
 }
 function flipCard(i){
   const {t,c,win}=CH.cur; if(CH.cur.flipped) return; CH.cur.flipped=true;
-  const amt=win?Math.floor(t.reward*(1+c.up/100)*100)/100:t.reward;
+  const amt=win?Math.floor(t.reward*(100+c.up)+1e-6)/100:t.reward;   // 加 1e-6 避免浮点误差（如 12×1.2）
   $$('#chCards .flip__card').forEach((b,k)=>{ const mine=k===i, w=mine?win:!win; b.disabled=true;
     b.className=`flip__card ${w?'flip__card--win':'flip__card--lose'} ${mine?'flip__card--pick':'flip__card--other'}`;
     b.innerHTML=w?`WIN<br>+${c.up}%`:'MISS'; });
-  $('#chResult').innerHTML=win?`You won! LV${t.lv} reward <b>${money(t.reward)} → ${money(amt)}</b>`:`Not this time. You still get <b>${money(amt)}</b>`;
-  S.bombClaimed[t.lv]={amt,ch:c.no,win}; CH.results.push({amt});
+  $('#chResult').innerHTML=(win?`You won! LV${t.lv} reward <b>${money(t.reward)} → ${money(amt)}</b>`:`Not this time. You still get <b>${money(amt)}</b>`)+(t.gift?`<br><b>+ ${KEY_NAME} ×${t.gift}</b>`:'');
+  S.bombClaimed[t.lv]={amt,ch:c.no,win}; giveKeys(t); CH.results.push({amt});
   const ok=$('#chOk'); ok.hidden=false; ok.textContent=CH.idx<CH.queue.length-1?'Next Challenge ›':'Collect'; ok.focus(); renderAll();
 }
 $('#chOk').addEventListener('click',()=>{
@@ -662,8 +674,10 @@ $('#chOk').addEventListener('click',()=>{
   $('#chMask').classList.remove('is-open'); const {done,results}=CH; CH=null; done&&done(results); renderAll();
 });
 
-/* ---------- Christmas Activities：循环任务＋循环任务宝箱 ---------- */
-const keysEarned=()=>Math.floor(S.xBet/CYCLE.goal)*CYCLE.qty;            // 每达标 1 轮自动发放 qty 把钥匙
+/* ---------- Christmas Activities：特别任务＋特别任务宝箱 ---------- */
+const taskKeys=()=>Math.floor(S.xBet/CYCLE.goal)*CYCLE.qty;               // 特别任务：每达标 1 轮发放 qty 把钥匙（依已结算投注）
+const keysEarned=()=>taskKeys()+S.bombKeys;                               // ＋每日返水赠送
+const hhmm=m=>`${String(Math.floor(m/60)%24).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;
 const keysLeft=()=>keysEarned()-S.keysUsed;
 function renderXmas(){
   const rounds=Math.floor(S.xBet/CYCLE.goal), cur=S.xBet%CYCLE.goal, keys=keysLeft();
@@ -671,7 +685,8 @@ function renderXmas(){
   $('#cycleDesc').innerHTML=`Every <b>${int(CYCLE.goal)}</b> valid bets during the event = <b>${KEY_NAME} ×${CYCLE.qty}</b>. Progress resets after each round · Unlimited rounds.`;
   $('#cycleTask').innerHTML=`<div class="task__row"><span>Valid bets (this round)</span><span>${int(cur)} / ${int(CYCLE.goal)}</span></div>
     <div class="bar"><div class="bar__fill" style="width:${cur/CYCLE.goal*100}%"></div></div>`;
-  $('#cycleReward').innerHTML=`${ICON.key}<span>Reward: ${KEY_NAME} ×${CYCLE.qty}<span class="cycle__done">Completed ${int(rounds)} time${rounds===1?'':'s'} · ${int(keysEarned())} key${keysEarned()===1?'':'s'} earned</span></span>`;
+  $('#cycleUpd').innerHTML=`🕒 Progress &amp; keys update every ${CYCLE.every} mins · Last updated ${hhmm(S.updAt)}`;
+  $('#cycleReward').innerHTML=`${ICON.key}<span>Reward: ${KEY_NAME} ×${CYCLE.qty}<span class="cycle__done">Completed ${int(rounds)} time${rounds===1?'':'s'} · ${int(taskKeys())} key${taskKeys()===1?'':'s'} earned</span></span>`;
   $('#chestList').innerHTML=CHESTS.map(C=>{
     const top=topOf(C.box), ok=keys>=C.cost, n=S.opened[C.no]||0, best=C.cost===TOP_COST;
     return `<li class="chest ${ok?'chest--ok':''} ${best?'chest--top':''}">
@@ -710,7 +725,7 @@ const RING=[0,1,2,5,8,7,6,3,4];
 $('#btnDraw').addEventListener('click',()=>{
   if(!BX||BX.running) return;
   if(BX.done){ closeBox(); return; }
-  if(BX.onDraw&&BX.onDraw()===false) return;                        // 循环任务宝箱：按下 Draw 当下扣除钥匙
+  if(BX.onDraw&&BX.onDraw()===false) return;                        // 特别任务宝箱：按下 Draw 当下扣除钥匙
   BX.running=true; $('#btnDraw').disabled=true;
   const win=weighted(BX.box.map(r=>r.rate)), tiles=$$('#grid9 .tile');
   const stopPos=RING.indexOf(win), total=RING.length*2+stopPos;   // 至少跑 2 圈
@@ -751,10 +766,12 @@ function renderReclaim(){
 function renderAll(){ renderSign(); renderBomb(); renderXmas(); renderReclaim(); sim(); }
 
 /* ---------- 原型控制（模拟） ---------- */
-function sim(){ $('#simState').textContent=`今日投注 ${int(S.dayBet)}｜今日充值 ${int(S.dayDep)}｜活动累计投注 ${int(S.xBet)}｜宝箱钥匙 获得 ${keysEarned()}／消耗 ${S.keysUsed}／剩余 ${keysLeft()}｜连续签到 ${S.streak} 天｜今日${S.checked?'已':'未'}签到`; }
+function sim(){ $('#simState').textContent=`今日投注 ${int(S.dayBet)}｜今日充值 ${int(S.dayDep)}｜活动累计投注（已结算）${int(S.xBet)}｜待结算投注 ${int(S.xPend)}｜宝箱钥匙 获得 ${keysEarned()}（特别任务 ${taskKeys()}＋每日返水 ${S.bombKeys}）／消耗 ${S.keysUsed}／剩余 ${keysLeft()}｜连续签到 ${S.streak} 天｜今日${S.checked?'已':'未'}签到`; }
 $$('[data-sim]').forEach(b=>b.addEventListener('click',()=>{
   const k=b.dataset.sim;
-  if(k==='bet'){ const k0=keysEarned(); S.dayBet+=10000; S.xBet+=10000; const g=keysEarned()-k0; toast(`模拟投注 +10,000${g?` · 循环任务完成 ${g/CYCLE.qty} 轮，获得宝箱钥匙 ×${g}`:''}`); }
+  if(k==='bet'){ S.dayBet+=10000; S.xPend+=10000; toast('模拟投注 +10,000（特别任务进度于下次 20 分钟更新时计入）'); }
+  if(k==='tick'){ const k0=taskKeys(); S.xBet+=S.xPend; S.xPend=0; S.updAt+=CYCLE.every; const g=taskKeys()-k0;
+    toast(`已更新（${hhmm(S.updAt)}）${g?` · 特别任务完成 ${g/CYCLE.qty} 轮，获得宝箱钥匙 ×${g}`:' · 本次无新增钥匙'}`); }
   if(k==='dep'){ S.dayDep+=5000; toast('模拟充值 +5,000'); }
   if(k==='nextday'){ if(!S.checked) S.streak=0; S.checked=false; S.dayBet=0; S.dayDep=0; S.bombClaimed={}; toast(S.streak?'已进入次日':'昨日未签到 → 断签，连续天数归 0'); }
   if(k==='break'){ S.streak=0; S.checked=false; toast('已模拟断签'); }
