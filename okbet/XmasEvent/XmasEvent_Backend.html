@@ -110,6 +110,8 @@ select.select{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg
 .suffix-wrap .input{border-radius:4px 0 0 4px;border-right:none;}
 .suffix-wrap .suffix{height:30px;line-height:30px;padding:0 8px;background:#f5f7fa;border:1px solid var(--border);border-radius:0 4px 4px 0;color:var(--text-3);font-size:12.5px;}
 
+/* 前后缀不换行（如「有效投注 ≥」「个道具」「个／次」） */
+.prefix-wrap .prefix,.suffix-wrap .suffix{white-space:nowrap;flex:none;}
 /* 向导两栏 */
 .wizard{display:grid;grid-template-columns:210px minmax(0,1fr);gap:16px;}
 .steps{background:#fff;border-radius:6px;padding:18px 6px;height:max-content;}
@@ -206,6 +208,7 @@ label.chk input{accent-color:var(--primary);}
 .mini-note{font-size:12px;color:var(--text-3);margin-top:10px;}
 /* 派奖审核 / 活动报表 */
 .tbl-scroll{overflow-x:auto;}
+#itemBody td{white-space:nowrap;vertical-align:top;}
 .refresh-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;color:var(--text-2);font-size:13px;}
 .rtabs{display:flex;gap:26px;border-bottom:1px solid var(--border-l);margin:-4px 0 16px;}
 .rtab{padding:10px 2px;font-size:14px;color:var(--text-3);cursor:pointer;border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;}
@@ -257,7 +260,7 @@ label.chk input{accent-color:var(--primary);}
 .subrow__inner{display:flex;flex-direction:column;gap:8px;padding:4px 4px 0;}
 .subrow__head{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--text);font-weight:600;}
 
-/* 期间返水：目标输入 */
+/* 任务目标输入 */
 .goal-grid{display:flex;flex-direction:row;gap:8px;align-items:flex-start;}   /* 投注+充值：两个目标同一行 */
 .goal-grid>div{flex:1;min-width:0;}
 .pbox-pick{display:flex;flex-direction:column;gap:2px;text-align:left;}
@@ -393,7 +396,7 @@ label.chk input{accent-color:var(--primary);}
             <div class="form-row"><label><span class="req">*</span>活动时间：</label>
               <div class="dp-wrap"><input class="input dp-trigger" id="fActTime" type="text" readonly placeholder="开始时间 ~ 结束时间"><span class="dp-icon">📅</span></div></div>
             <p class="hint hint--warn">· 活动时间到期：<b>停止计算／产生新奖励</b>；已获得的奖励仍可领取。<br>
-              · 「签到活动、每日返水、期间返水」统一以本活动时间计算。<br>
+              · 「签到活动、每日返水、循环任务」统一以本活动时间计算。<br>
               · 「状态」开关为手动强制下架（关闭：<b>仅隐藏入口、停算；不影响用户已获得的奖励，重开各状态维持不变</b>，需二次确认）；同期仅能开启一个节庆特别活动。</p>
           </div>
 
@@ -486,64 +489,79 @@ label.chk input{accent-color:var(--primary);}
 
             <!-- 4-3 每日返水配置（沿用；移除挑战任务、刮刮卡） -->
             <section class="block" id="secRebate">
-              <div class="block__head"><h4><span class="req">*</span>每日返水配置 <span class="sub">（VIP 分级配置；已移除「挑战任务、刮刮卡」）</span></h4>
+              <div class="block__head"><h4><span class="req">*</span>每日返水配置 <span class="sub">（VIP 分级配置；含挑战任务触发，已移除刮刮卡）</span></h4>
                 <button class="btn btn--primary btn--sm" id="btnAddLevel">＋ 新增等级</button></div>
               <div class="block__body">
                 <div class="vip-tabs" id="vipTabs"></div>
                 <label class="applyall"><input type="checkbox" id="applyAll">套用至其他等级（勾选后其余 VIP 等级套用 VIP0 配置、不可再编辑）</label>
-                <table class="tbl" style="margin-top:10px;min-width:680px">
+                <table class="tbl" style="margin-top:10px;min-width:760px">
                   <thead><tr>
                     <th style="width:60px">等级</th><th style="width:130px">任务条件</th><th style="width:190px">任务目标</th>
-                    <th style="width:80px">奖励物</th><th>奖励金额</th><th style="width:60px">操作</th>
+                    <th style="width:80px">奖励物</th><th>奖励金额</th><th style="width:90px">挑战任务</th><th style="width:60px">操作</th>
                   </tr></thead>
                   <tbody id="rebateBody"></tbody>
                 </table>
                 <p class="hint">任务目标／奖励金额：不可为空、0 或小数点；任务目标需依同「任务条件」逐级递增。奖励金额一律为固定金额。等级最低 LV1，最多 LV20。<br>
+                  「挑战任务」勾选「触发」：用户领取该级奖励时必定触发 1 个挑战（翻牌），挑战依下方「挑战任务配置」的触发机率决定；有任一级勾选时，挑战任务配置至少需 1 个。<br>
                   「有效投注」进度套用下方「投注量计算比例」折算。</p>
               </div>
             </section>
 
-            <!-- 4-4 返水任务宝箱配置（与签到宝箱相同） -->
-            <section class="block" id="secPBox">
-              <div class="block__head"><h4><span class="req">*</span>返水任务宝箱配置<span class="tag-new">新增</span>
-                <span class="sub">（至少配置 1 款；最多 30 款，每款固定 9 项奖励，开启时依中奖率随机抽出 1 项）</span></h4></div>
+            <!-- 4-4 挑战任务配置（沿用 X-BOMB） -->
+            <section class="block" id="secChallenge">
+              <div class="block__head"><h4>挑战任务配置 <span class="sub">（与 VIP 等级无关·全等级共用）</span></h4>
+                <button class="btn btn--primary btn--sm" id="btnAddChallenge">＋ 新增挑战</button></div>
               <div class="block__body">
-                <div class="box-tabs" id="pboxTabs" role="tablist" aria-label="返水任务宝箱"></div>
+                <table class="tbl" style="min-width:560px">
+                  <thead><tr><th style="width:70px">挑战</th><th>奖励提升</th><th>触发机率</th><th>获奖机率</th><th style="width:60px">操作</th></tr></thead>
+                  <tbody id="challengeBody"></tbody>
+                </table>
+                <p class="hint">非必填；可全部删除不设置挑战（此时「每日返水配置」不可勾选触发）。如有设置：奖励提升／触发机率／获奖机率<b>皆为整数</b>、不可为空或 0（单位 %）；<b>触发机率为所有挑战加总须等于 100%</b>；获奖机率＝该挑战翻牌胜率、各自不得超过 100%；奖励提升无上限。最多 挑战5。</p>
+              </div>
+            </section>
+
+            <!-- 4-5 循环任务宝箱配置（与签到宝箱相同＋道具消耗数量） -->
+            <section class="block" id="secPBox">
+              <div class="block__head"><h4><span class="req">*</span>循环任务宝箱配置<span class="tag-new">新增</span>
+                <span class="sub">（至少配置 1 款；最多 10 款，每款固定 9 项奖励；用户消耗道具「宝箱钥匙」开启，依中奖率随机抽出 1 项）</span></h4></div>
+              <div class="block__body">
+                <div class="box-tabs" id="pboxTabs" role="tablist" aria-label="循环任务宝箱"></div>
+                <div class="form-row" style="margin:0 0 10px;max-width:none;grid-template-columns:auto 220px 1fr">
+                  <label for="pboxCost" style="text-align:left"><span class="req" id="pboxCostReq">*</span>道具消耗数量：</label>
+                  <div class="suffix-wrap"><input class="input" id="pboxCost" placeholder="请输入正整数" style="height:34px"><span class="suffix" style="height:34px;line-height:34px">个／次</span></div>
+                  <p class="hint hint--err" id="pboxCostErr" style="margin:0;display:none"></p>
+                </div>
                 <table class="tbl" style="min-width:780px;table-layout:fixed">
                   <thead><tr><th style="width:60px">#</th><th style="width:230px">奖励类型</th><th>奖励数量</th><th style="width:170px">中奖率</th></tr></thead>
                   <tbody id="pboxBody"></tbody>
                 </table>
                 <div class="sum-line" id="pboxSum"></div>
                 <p class="hint">奖励类型：彩金、积分、抽奖券（Golden Draw Ticket）、免费投注、优惠券、实体奖品（填写奖品名称＋奖励价值＋上传小图）。<br>
-                  · 30 款中<b>至少须配置 1 款</b>，其余可整款留空。<br>
-                  · 宝箱一旦配置任 1 项奖励，其余 8 项奖励皆须配置（固定 9 项、不可新增或删除），且中奖率合计须等于 100%；已配置的宝箱才会出现在下方「期间返水任务」各等级「奖励」下拉清单。<br>
-                  · 已被等级选用的宝箱若清空成未配置，该等级「奖励」会一并清空，需重新选择。</p>
+                  · 10 款中<b>至少须配置 1 款</b>，其余可整款留空。<br>
+                  · 宝箱一旦配置任 1 项奖励（或填写道具消耗数量），其余 8 项奖励皆须配置（固定 9 项、不可新增或删除），且中奖率合计须等于 100%。<br>
+                  · <b>道具消耗数量</b>：开启该款宝箱 1 次需消耗的道具数（道具由下方「循环任务配置」获得）；宝箱有配置时必填，须为大于 0 的整数。</p>
               </div>
             </section>
 
-            <!-- 4-5 期间返水任务 -->
+            <!-- 4-6 循环任务配置（单一目标，可重复达成） -->
             <section class="block" id="secPeriod">
-              <div class="block__head"><h4><span class="req">*</span>期间返水任务<span class="tag-new">新增</span>
-                <span class="sub">（依活动期间累计计算；不分 VIP）</span></h4>
-                <button class="btn btn--primary btn--sm" id="btnAddPeriod">＋ 新增等级</button></div>
+              <div class="block__head"><h4><span class="req">*</span>循环任务配置<span class="tag-new">新增</span>
+                <span class="sub">（依活动期间累计计算；不分 VIP；每达成 1 次目标即获得道具，可重复达成）</span></h4></div>
               <div class="block__body">
-                <table class="tbl" style="min-width:880px">
-                  <thead><tr>
-                    <th style="width:56px">等级</th><th style="width:124px">任务条件</th><th>任务目标</th>
-                    <th style="width:200px">奖励</th><th style="width:56px">操作</th>
-                  </tr></thead>
-                  <tbody id="periodBody"></tbody>
+                <table class="tbl" style="min-width:620px">
+                  <thead><tr><th style="width:140px">任务条件</th><th>任务目标</th><th>奖励数量</th></tr></thead>
+                  <tbody id="cycleBody"></tbody>
                 </table>
-                <p class="hint">· 任务条件：投注、充值、投注+充值（须同时达成两项目标）。任务目标不可为空、0 或小数点，且需依同「任务条件」逐级递增。等级最低 LV1，最多 LV50。<br>
-                  · 奖励：每个等级选择 1 款「返水任务宝箱」（必填），达成该等级目标后发放该宝箱；下拉清单仅列出已于上方「返水任务宝箱配置」配置的宝箱，不同等级可选择同一款。<br>
-                  · 「投注」进度套用下方「投注量计算比例」折算。</p>
+                <p class="hint">· 活动期间每累计有效投注达「任务目标」，即获得「奖励数量」个道具，进度归零重新累计，可重复达成、不限次数。<br>
+                  · 道具用于开启上方「循环任务宝箱」，每款宝箱消耗数依该宝箱「道具消耗数量」。<br>
+                  · 任务目标、奖励数量皆必填，须为大于 0 的整数。</p>
               </div>
             </section>
 
-            <!-- 4-6 投注量计算比例 -->
+            <!-- 4-7 投注量计算比例 -->
             <section class="block" id="secRatio">
               <div class="block__head"><h4>投注量计算比例<span class="tag-new">新增</span>
-                <span class="sub">（套用「每日返水配置」「期间返水任务」的投注量；未设定的游戏商按 100% 计算）</span></h4></div>
+                <span class="sub">（套用「每日返水配置」「循环任务配置」的投注量；未设定的游戏商按 100% 计算）</span></h4></div>
               <div class="block__body">
                 <table class="tbl" style="min-width:820px;table-layout:fixed">
                   <thead><tr>
@@ -557,7 +575,7 @@ label.chk input{accent-color:var(--primary);}
               </div>
             </section>
 
-            <!-- 4-7 彩金所需流水倍数（沿用） -->
+            <!-- 4-8 彩金所需流水倍数（沿用） -->
             <section id="secOther">
               <div class="form-row"><label>彩金所需流水倍数：</label>
                 <input class="input" id="fWager" placeholder="0.01～999999.99（可空；不可为 0）" style="max-width:220px"></div>
@@ -623,7 +641,7 @@ label.chk input{accent-color:var(--primary);}
       </table>
       </div>
       <p class="mini-note">「联名挑战活动」的奖励状态一律「审核通过」、审核人一律「自动审核」（无需人工审核）。<br>
-        「节庆特别活动」：用户<b>每获得 1 个奖励即新增 1 笔记录</b>（签到奖励、签到宝箱、每日返水、期间返水（返水任务宝箱）各自独立成笔；同一天签到获得签到奖励＋随机宝箱为 2 笔）；除实体奖品外，状态一律「审核通过」、审核人一律「自动审核」，申请时间＝审核时间＝奖励发放时间；备注记录奖励来源。<br>
+        「节庆特别活动」：用户<b>每获得 1 个奖励即新增 1 笔记录</b>（签到奖励、签到宝箱、每日返水、挑战加成、循环任务宝箱各自独立成笔；同一天签到获得签到奖励＋随机宝箱为 2 笔）；除实体奖品外，状态一律「审核通过」、审核人一律「自动审核」，申请时间＝审核时间＝奖励发放时间；备注记录奖励来源。<br>
         「节庆特别活动」的<b>实体奖品</b>例外，采<b>人工审核</b>：发放时状态为「待审核」，审核人／审核时间显示「—」；操作栏点「通过」或「拒绝」（拒绝须填原因）后，写入审核人账号与审核时间，审核结果不可再修改。</p>
     </section>
 
@@ -632,6 +650,7 @@ label.chk input{accent-color:var(--primary);}
       <div class="rtabs">
         <button class="rtab is-active" data-rtab="award">活动奖励统计</button>
         <button class="rtab" data-rtab="data">活动数据统计</button>
+        <button class="rtab" data-rtab="item">活动道具消耗统计<span class="tag-new">新增</span></button>
       </div>
 
       <!-- 子页：活动奖励统计 -->
@@ -658,7 +677,7 @@ label.chk input{accent-color:var(--primary);}
         </div>
         <p class="mini-note"><b>合并规则（各活动通用）</b>：活动类型不加括号；<b>同一日期＋同一活动 ID＋同一奖励类型</b>合并为 1 列（不分奖励来源）。<b>奖励内容只显示单一奖励</b>：礼金、积分当日若有多种金额／点数，只显示单位「PHP」「PTS」（金额、点数见派发金额、积分小计）；免费投注券、优惠券、抽奖券、实体奖品依奖励项目各自成列，奖励内容为该项目名称。参与人数为去重人数；领取次数、派发金额、积分小计、券张数为加总。<br>
           「联名挑战活动」：奖励类型一律「礼金」，同日返水与刮刮卡奖励合并为 1 列。<br>
-          「节庆特别活动」：签到、签到宝箱、每日返水、返水任务宝箱等来源依合并规则合并。彩金记为「礼金」计入派发金额，积分计入积分小计，免费投注券／优惠券／抽奖券计入券张数；实体奖品仅统计「审核通过」的笔数（领取次数），不计入派发金额。</p>
+          「节庆特别活动」：签到、签到宝箱、每日返水、挑战、循环任务宝箱等来源依合并规则合并。彩金记为「礼金」计入派发金额，积分计入积分小计，免费投注券／优惠券／抽奖券计入券张数；实体奖品仅统计「审核通过」的笔数（领取次数），不计入派发金额。</p>
       </div>
 
       <!-- 子页：活动数据统计 -->
@@ -686,6 +705,31 @@ label.chk input{accent-color:var(--primary);}
         </div>
         <p class="mini-note">「联名挑战活动」：天数固定「-」；申请领取时间与审核时间一致；状态一律「已通过」；活动类型不加括号。<br>
           「节庆特别活动」：用户每获得 1 个奖励＝1 笔（与派奖审核一致），活动类型不加括号；天数：签到相关奖励显示连续签到天数（Day N），其余为「-」；除实体奖品外状态一律「已通过」、申请领取时间＝审核时间；实体奖品依人工审核结果显示「待审核／已通过／已拒绝」，待审核时审核时间为「—」。</p>
+      </div>
+
+      <!-- 子页：活动道具消耗统计 -->
+      <div id="reportItem" style="display:none">
+        <div class="list-filters">
+          <div class="fld"><label for="itActId">活动 ID：</label><input class="input" id="itActId" placeholder="请输入"></div>
+          <div class="fld"><label for="itUser">会员账号：</label><input class="input" id="itUser" placeholder="请输入"></div>
+          <div class="fld"><label for="itAct">活动类型：</label>
+            <select class="select" id="itAct"><option value="">全选</option><option>节庆特别活动</option></select></div>
+          <div class="fld"><label>起始日期 ~ 结束日期：</label><input class="input dp-trigger" id="itTime" readonly placeholder="开始时间 ~ 结束时间" style="width:230px"></div>
+          <button class="btn btn--primary" id="itSearch">🔍 搜寻</button>
+          <button class="btn btn--primary" id="itExport">⬇ 导出</button>
+        </div>
+        <div class="report-totals" id="itTotals"></div>
+        <div class="tbl-scroll">
+        <table class="list-tbl" style="min-width:1080px">
+          <thead><tr>
+            <th>日期</th><th>活动类型</th><th>活动ID</th><th>活动名称</th><th>会员账号</th><th>获得数量</th><th>消耗数量</th><th>剩余数量</th><th style="min-width:300px">备注</th>
+          </tr></thead>
+          <tbody id="itemBody"></tbody>
+        </table>
+        </div>
+        <p class="mini-note">· 仅列出有道具机制的活动；<b>依每个会员记录</b>：同一日期＋同一活动 ID＋同一会员账号汇总为 1 列；当日无获得也无消耗的会员不列出。<br>
+          · 获得数量＝该会员当日获得的道具数（节庆特别活动：循环任务每达成 1 次发放「奖励数量」个）；消耗数量＝该会员当日开启宝箱消耗的道具数；剩余数量＝截至当日该会员持有、尚未使用的道具数（累计获得－累计消耗）。<br>
+          · 备注：记录道具名称及当日开启了哪些宝箱，格式「道具名称｜宝箱N 开启 X 次（消耗 Y）」，多款宝箱逐行列出；当日无开启时显示「当日未开启宝箱」。节庆特别活动的道具为「宝箱钥匙」。</p>
       </div>
 
     </section>
@@ -835,9 +879,9 @@ $$('.side__subitem').forEach(s=>{ const t=s.textContent.trim();
 /* 规则：联名挑战活动 → 状态一律「审核通过」、审核人一律「自动审核」 */
 const auditRows=[
   /* 节庆特别活动：每获得 1 个奖励＝1 笔；备注记录奖励来源 */
-  ['191','vip_king88','节庆特别活动','Christmas Activities 2026','实体奖品','蓝牙耳机（价值 PHP 9,000.00）','待审核','2026-12-03 20:11:47','—','—','User VIP Level 8, Period Rebate LV5 (Bet ≥ 20,000), Chest 5'],
+  ['191','vip_king88','节庆特别活动','Christmas Activities 2026','实体奖品','蓝牙耳机（价值 PHP 9,000.00）','待审核','2026-12-03 20:11:47','—','—','User VIP Level 8, Cycle Task Chest 5 (cost 10 items)'],
   ['191','member07','节庆特别活动','Christmas Activities 2026','实体奖品','圣诞限定礼盒（价值 PHP 7,500.00）','审核通过','2026-11-30 21:40:12','admin01','2026-12-01 10:30:00','User VIP Level 5, Check-in Day 9, Random Chest 5'],
-  ['191','member02','节庆特别活动','Christmas Activities 2026','优惠券','存送券20%-本金+彩金2倍-有效期24小时','审核通过','2026-11-22 15:21:08','自动审核','2026-11-22 15:21:08','User VIP Level 2, Period Rebate LV1 (Bet ≥ 1,000), Chest 1'],
+  ['191','member02','节庆特别活动','Christmas Activities 2026','优惠券','存送券20%-本金+彩金2倍-有效期24小时','审核通过','2026-11-22 15:21:08','自动审核','2026-11-22 15:21:08','User VIP Level 2, Cycle Task Chest 1 (cost 1 item)'],
   ['191','member01','节庆特别活动','Christmas Activities 2026','礼金','PHP 5.00','审核通过','2026-11-19 00:00:05','自动审核','2026-11-19 00:00:05','User VIP Level 3, Daily Rebate LV2 (Deposit ≥ 200)'],
   ['191','member01','节庆特别活动','Christmas Activities 2026','免费投注券','PT电子免费旋转 ×1','审核通过','2026-11-18 10:05:12','自动审核','2026-11-18 10:05:12','User VIP Level 3, Check-in Day 3, Random Chest 2'],
   ['191','member01','节庆特别活动','Christmas Activities 2026','抽奖券','Golden Draw Ticket ×1','审核通过','2026-11-18 10:05:12','自动审核','2026-11-18 10:05:12','User VIP Level 3, Check-in Day 3 Reward'],
@@ -897,7 +941,39 @@ $$('.rtab').forEach(b=>b.addEventListener('click',()=>{
   const k=b.dataset.rtab;
   $('#reportAward').style.display=k==='award'?'':'none';
   $('#reportData').style.display=k==='data'?'':'none';
+  $('#reportItem').style.display=k==='item'?'':'none';
+  if(k==='item') renderItemReport();
 }));
+
+/* 活动道具消耗统计（示意资料，依日期由近到远）：依每个会员记录
+   [日期, 活动类型, 活动ID, 活动名称, 会员账号, 获得, 消耗, 剩余, 道具名称, [[宝箱编号, 开启次数, 消耗数]...]]
+   宝箱道具消耗数对应后台示范：宝箱1=1、宝箱2=2、宝箱3=3、宝箱4=5、宝箱5=10 */
+const ITEM_ACT=['节庆特别活动','191','Christmas Activities 2026'];
+const itemRows=[
+  ['2026-11-20',...ITEM_ACT,'member05',3,0,3,'宝箱钥匙',[]],
+  ['2026-11-19',...ITEM_ACT,'vip_king88',15,13,4,'宝箱钥匙',[[1,3,3],[5,1,10]]],
+  ['2026-11-19',...ITEM_ACT,'member02',5,5,0,'宝箱钥匙',[[4,1,5]]],
+  ['2026-11-18',...ITEM_ACT,'member01',1,0,2,'宝箱钥匙',[]],
+  ['2026-11-17',...ITEM_ACT,'vip_king88',12,10,2,'宝箱钥匙',[[5,1,10]]],
+  ['2026-11-17',...ITEM_ACT,'member01',3,3,1,'宝箱钥匙',[[3,1,3]]],
+  ['2026-11-16',...ITEM_ACT,'member02',4,4,0,'宝箱钥匙',[[2,2,4]]],
+  ['2026-11-16',...ITEM_ACT,'member01',2,1,1,'宝箱钥匙',[[1,1,1]]],
+];
+function renderItemReport(){
+  const aid=$('#itActId').value.trim(), uid=$('#itUser').value.trim(), act=$('#itAct').value,
+        tr=(()=>{ const m=$('#itTime').value.match(/^(\d{4}-\d{2}-\d{2}).*~ (\d{4}-\d{2}-\d{2})/); return m?{s:m[1],e:m[2]}:null; })();
+  const rows=itemRows.filter(r=>(!aid||r[2]===aid)&&(!uid||r[4].includes(uid))&&(!act||r[1]===act)&&(!tr||(r[0]>=tr.s&&r[0]<=tr.e)));
+  $('#itemBody').innerHTML=rows.length?rows.map(r=>{
+    const note=r[9].length?r[9].map(([k,n,c])=>`${r[8]}｜宝箱${k} 开启 ${n.toLocaleString()} 次（消耗 ${c.toLocaleString()}）`).join('<br>'):`${r[8]}｜当日未开启宝箱`;
+    return `<tr><td>${r[0]}</td><td class="hl">${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td>
+      <td>${r[5].toLocaleString()}</td><td>${r[6].toLocaleString()}</td><td>${r[7].toLocaleString()}</td><td style="white-space:normal;line-height:1.6">${note}</td></tr>`;
+  }).join(''):'<tr><td colspan="9" style="text-align:center;color:var(--text-3);padding:28px">暂无数据</td></tr>';
+  const g=rows.reduce((a,r)=>a+r[5],0), c=rows.reduce((a,r)=>a+r[6],0), users=new Set(rows.map(r=>r[4])).size;
+  $('#itTotals').innerHTML=`会员数：<b>${users}</b>　总获得：<b class="p">${g.toLocaleString()}</b>　总消耗：<b class="m">${c.toLocaleString()}</b>　查询结果：<b>${rows.length}</b> 笔`;
+  return rows.length;
+}
+$('#itSearch').addEventListener('click',renderItemReport);
+$('#itExport').addEventListener('click',()=>{ const n=renderItemReport(); if(!n){ toast('暂无数据可导出',true); return; } toast(`已导出 ${n} 笔道具消耗统计（示意）`); });
 
 /* 活动奖励统计：活动类型不加括号；同一日期＋同一活动ID＋同一奖励类型合并为 1 列（不分奖励来源）。
    奖励内容只显示单一奖励：礼金／积分当日有多种金额时只显示单位「PHP」「PTS」；券类、实体奖品依项目各自成列。
@@ -977,9 +1053,10 @@ function resetWizardFields(blank){
   s4Strict=false;
   sign       = clone(blank?BLANK_SIGN:SAMPLE_SIGN);
   SBOX.boxes = blank?[0,1,2,3,4,5].map(nineRewards):clone(SAMPLE_BOXES); SBOX.cur=0;
-  PBOX.boxes = blank?PBOX.blank():clone(SAMPLE_PBOXES); PBOX.cur=0;
+  PBOX.boxes = blank?PBOX.blank():clone(SAMPLE_PBOXES); PBOX.cost=blank?PBOX.blankCost():clone(SAMPLE_PCOST); PBOX.cur=0;
   rebateRows = clone(blank?BLANK_REBATE:SAMPLE_REBATE);
-  periodRows = blank?[newPeriod()]:samplePeriod();
+  challengeRows = clone(blank?BLANK_CHALLENGE:SAMPLE_CHALLENGE);
+  cycle      = clone(blank?BLANK_CYCLE:SAMPLE_CYCLE);
   ratio      = blank?BLANK_RATIO():SAMPLE_RATIO();
   curVip = 0; if($('#applyAll')) $('#applyAll').checked=false;
   if($('#fWager')){ $('#fWager').value=blank?'':'1'; $('#fWager').classList.remove('is-error'); }
@@ -1177,7 +1254,7 @@ function validateStep(n){
     if(!wagerOk()) $('#fWager').classList.add('is-error'); else $('#fWager').classList.remove('is-error');
     const bad=SECTIONS.find(([,,fn])=>!fn());
     if(bad){
-      const set=bad[0]==='box'?SBOX:bad[0]==='pbox'?PBOX:null;
+      const set=bad[0]==='box'?SBOX:bad[0]==='pbox'?PBOX:null;   // 宝箱类：切到第一款有问题的宝箱
       if(set){ const k=set.firstBad(); if(k>=0&&k!==set.cur){ set.cur=k; set.render(); } }
       document.getElementById(bad[1]).scrollIntoView({behavior:'smooth',block:'start'});
       toast(typeof bad[3]==='function'?bad[3]():bad[3],true); return false;
@@ -1205,13 +1282,13 @@ const COUPON_LIST=['存送10%-有效期240小时-本金+彩金5倍流水','输�
 const RW_TYPES=['彩金','积分','抽奖券','免费投注','优惠券','实体奖品'];
 const RW_LABEL={'抽奖券':'抽奖券（Golden Draw Ticket）'};
 const newReward=()=>({type:'',name:'',val:'',pick:'',img:'',imgName:'',rate:''});
-const RW_COUNT=9;   // 宝箱奖励固定 9 项（签到宝箱、期间返水宝箱共用；不可新增、删除）
+const RW_COUNT=9;   // 宝箱奖励固定 9 项（签到宝箱、循环任务宝箱共用；不可新增、删除）
 const nineRewards=()=>Array.from({length:RW_COUNT},newReward);
 /* 实体奖品小图：格式与大小限制（沿用后台图片上传规范） */
 const IMG_TYPES=['image/png','image/jpeg','image/gif','image/webp','image/bmp'], IMG_MAX_MB=5;
-const SAMPLE_IMG='data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><rect width="96" height="96" rx="12" fill="#fdecea"/><rect x="18" y="40" width="60" height="40" rx="4" fill="#e5544b"/><rect x="14" y="30" width="68" height="14" rx="3" fill="#c4372f"/><rect x="43" y="30" width="10" height="50" fill="#f6c343"/><path d="M48 30c-8-14-22-12-18-2 3 6 18 2 18 2zm0 0c8-14 22-12 18-2-3 6-18 2-18 2z" fill="#f6c343"/></svg>`);   // 宝箱奖励项数（签到宝箱、期间返水宝箱共用）
+const SAMPLE_IMG='data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><rect width="96" height="96" rx="12" fill="#fdecea"/><rect x="18" y="40" width="60" height="40" rx="4" fill="#e5544b"/><rect x="14" y="30" width="68" height="14" rx="3" fill="#c4372f"/><rect x="43" y="30" width="10" height="50" fill="#f6c343"/><path d="M48 30c-8-14-22-12-18-2 3 6 18 2 18 2zm0 0c8-14 22-12 18-2-3 6-18 2-18 2z" fill="#f6c343"/></svg>`);
 
-/* ---------- 奖励列：通用元件（签到奖励／签到宝箱／期间返水宝箱共用） ----------
+/* ---------- 奖励列：通用元件（签到奖励／签到宝箱／循环任务宝箱共用） ----------
    o = { label:第一栏文字, rate:是否有中奖率栏, physical:是否可选实体奖品, onChange:回调 } */
 function rewardErrors(r,o,strict){
   const e={};
@@ -1237,7 +1314,7 @@ function rewardErrors(r,o,strict){
 }
 const rewardOk=(r,o)=>Object.keys(rewardErrors(r,o,true)).length===0;
 const rateSum=rows=>Math.round(rows.reduce((a,r)=>a+(Number(r.rate)||0),0)*100)/100;
-const rewardsOk=rows=>rows.every(r=>rewardOk(r,{rate:true,physical:true}))&&rateSum(rows)===100;
+const rewardsOk=(rows,o={rate:true,physical:true})=>rows.every(r=>rewardOk(r,o))&&rateSum(rows)===100;
 
 function rvHtml(r){
   const num=ph=>`<input class="input js-val" value="${r.val}" placeholder="${ph}" aria-label="${ph}">`;   // 不显示单位
@@ -1379,17 +1456,21 @@ function paintBoxRate(){
     i.classList.toggle('is-error',(s4Strict&&i.value==='')||Number(i.value)>100||(bad&&i.value!=='')); });
 }
 
-/* ---------- 宝箱组元件（N 款 × 固定 9 项）：签到宝箱（6 款）、返水任务宝箱（30 款）共用 ----------
-   cfg = { count：宝箱款数（预设 6）；tabs, body, sum：容器选择器；enabled()：是否须配置；noneMsg：一款都未配置时的错误；
+/* ---------- 宝箱组元件（N 款 × 固定 9 项）：签到宝箱（6 款）、循环任务宝箱（10 款）共用 ----------
+   cfg = { count：宝箱款数（预设 6）；cost：每款含「道具消耗数量」；tabs, body, sum：容器选择器；enabled()：是否须配置；noneMsg：一款都未配置时的错误；
            onRender()：重画后额外处理；onRefresh()：内容变更后连动（如中奖率栏位启停） } */
 function makeBoxSet(cfg){
   const N=cfg.count||6, IDX=Array.from({length:N},(_,i)=>i);
-  const S={boxes:IDX.map(nineRewards),cur:0,cfg,count:N,blank:()=>IDX.map(nineRewards)};
-  S.touched=k=>S.boxes[k].some(r=>r.type||r.rate||r.val||r.pick||r.name);
+  const OPT={...BOX_OPT};
+  const S={boxes:IDX.map(nineRewards),cost:IDX.map(()=>''),cur:0,cfg,count:N,blank:()=>IDX.map(nineRewards),blankCost:()=>IDX.map(()=>'')};
+  S.touched=k=>S.boxes[k].some(r=>r.type||r.rate||r.val||r.pick||r.name)||(cfg.cost&&S.cost[k]!=='');
   S.configured=()=>IDX.filter(S.touched);
   S.noneErr=()=>cfg.enabled()&&S.configured().length===0;
-  S.ok=()=>!S.noneErr()&&S.boxes.every((rows,k)=>!S.touched(k)||rewardsOk(rows));   // 已填写的宝箱一律校验；enabled() 只决定是否须「至少配置 1 款」
-  S.firstBad=()=>S.noneErr()?0:S.boxes.findIndex((r,i)=>S.touched(i)&&!rewardsOk(r));
+  S.costErr=(k,strict)=>{ if(!cfg.cost||!S.touched(k)) return ''; const v=S.cost[k];
+    if(v==='') return strict?'请输入道具消耗数量':''; return Number(v)>0?'':'须为大于 0 的整数'; };
+  S.boxOk=k=>!S.touched(k)||(rewardsOk(S.boxes[k],OPT)&&!S.costErr(k,true));
+  S.ok=()=>!S.noneErr()&&IDX.every(S.boxOk);   // 已填写的宝箱一律校验；enabled() 只决定是否须「至少配置 1 款」
+  S.firstBad=()=>S.noneErr()?0:IDX.findIndex(k=>!S.boxOk(k));
   S.render=()=>{
     cfg.onRender&&cfg.onRender();
     const tabs=$(cfg.tabs); tabs.innerHTML='';
@@ -1404,14 +1485,19 @@ function makeBoxSet(cfg){
     /* 未填写任何栏位的宝箱不显示必填错误；开始填写后才依严格模式校验 */
     const strictFn=()=>s4Strict&&S.touched(k);
     /* 一旦配置任 1 项奖励，其余 8 项皆须配置：即时显示完成项数与提醒 */
-    const doneHtml=()=>{ const n=rows.filter(r=>rewardOk(r,BOX_OPT)).length, left=RW_COUNT-n;
+    const doneHtml=()=>{ const n=rows.filter(r=>rewardOk(r,OPT)).length, left=RW_COUNT-n;
       return `<span style="margin-right:14px">奖励已完成 <b style="color:${left?'var(--red)':'var(--green)'}">${n}</b> / ${RW_COUNT} 项</span>`
         +(left?`<span class="warn" style="margin-right:14px">尚有 ${left} 项奖励未配置完成（一旦配置任 1 项，9 项皆须配置）</span>`:''); };
     const sumHtml=()=>S.touched(k)?doneHtml()+sumLineHtml(rows,strictFn())
       :(s4Strict&&S.noneErr()?`<span class="warn">${cfg.noneMsg}</span>`:'<span style="color:var(--text-3)">此款宝箱未配置</span>');
-    const refresh=()=>{ $(cfg.sum).innerHTML=sumHtml(); $$(cfg.body+' tr').forEach((tr,i)=>paintReward(tr,rows[i],{...BOX_OPT,strictFn})); cfg.onRefresh&&cfg.onRefresh(); };
-    rows.forEach((r,i)=>tb.appendChild(buildRewardRow(r,{...BOX_OPT,label:i+1,strictFn,onChange:refresh})));
-    $(cfg.sum).innerHTML=sumHtml();
+    /* 道具消耗数量（每款宝箱一栏） */
+    const paintCost=()=>{ if(!cfg.cost) return; const m=S.costErr(k,strictFn()), inp=$(cfg.cost), h=$(cfg.costErr);
+      inp.classList.toggle('is-error',!!m); h.textContent=m; h.style.display=m?'block':'none'; };
+    const refresh=()=>{ $(cfg.sum).innerHTML=sumHtml(); $$(cfg.body+' tr').forEach((tr,i)=>paintReward(tr,rows[i],{...OPT,strictFn})); paintCost(); cfg.onRefresh&&cfg.onRefresh(); };
+    rows.forEach((r,i)=>tb.appendChild(buildRewardRow(r,{...OPT,label:i+1,strictFn,onChange:refresh})));
+    if(cfg.cost){ const inp=$(cfg.cost); inp.value=S.cost[k];
+      inp.oninput=e=>{ e.target.value=sanInt(e.target.value); S.cost[k]=e.target.value; refresh(); }; }
+    $(cfg.sum).innerHTML=sumHtml(); paintCost();
   };
   return S;
 }
@@ -1450,9 +1536,9 @@ function renderVipTabs(){
 }
 $('#applyAll').addEventListener('change',()=>{ if($('#applyAll').checked) curVip=0; renderVipTabs(); });
 
-let rebateRows=[{cond:'有效投注',goal:'',amt:''}];
-const SAMPLE_REBATE=[{cond:'有效投注',goal:'200',amt:'3'},{cond:'充值',goal:'200',amt:'5'},{cond:'有效投注',goal:'1000',amt:'12'}];
-const BLANK_REBATE=[{cond:'有效投注',goal:'',amt:''}];
+let rebateRows=[{cond:'有效投注',goal:'',amt:'',trigger:false}];
+const SAMPLE_REBATE=[{cond:'有效投注',goal:'200',amt:'3',trigger:false},{cond:'充值',goal:'200',amt:'5',trigger:true},{cond:'有效投注',goal:'1000',amt:'12',trigger:true}];
+const BLANK_REBATE=[{cond:'有效投注',goal:'',amt:'',trigger:false}];
 function validateGoalOrder(strict){
   let orderBad=false, anyBad=false;
   const prevGoalByCond={};
@@ -1495,7 +1581,9 @@ function renderRebate(){
       <td>彩金</td>
       <td><div class="suffix-wrap"><input class="input js-amt" value="${r.amt}" placeholder="固定金额"><span class="suffix">${curCode()}</span></div>
         <p class="hint hint--err js-amt-hint" style="visibility:hidden"></p></td>
+      <td><label class="chk"><input type="checkbox" class="js-trigger" ${r.trigger?'checked':''}>触发</label></td>
       <td><button class="btn--link red js-del">删除</button></td>`;
+    $('.js-trigger',tr).addEventListener('change',e=>{ r.trigger=e.target.checked; paintChallengeNeed(); });
     $('.js-cond',tr).addEventListener('change',e=>{ r.cond=e.target.value; validateGoalOrder(s4Strict); });
     $('.js-goal',tr).addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r.goal=e.target.value; validateGoalOrder(s4Strict); });
     $('.js-amt',tr).addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r.amt=e.target.value; paintRebateAmt(tr,r); });
@@ -1507,98 +1595,83 @@ function renderRebate(){
 }
 $('#btnAddLevel').addEventListener('click',()=>{
   if(rebateRows.length>=20){toast('等级最多 LV20',true);return;}
-  rebateRows.push({cond:'有效投注',goal:'',amt:''}); renderRebate();
+  rebateRows.push({cond:'有效投注',goal:'',amt:'',trigger:false}); renderRebate();
 });
 
-/* ---------- 4-4 期间返水任务（最多 LV50；每级「奖励」选择 1 款返水任务宝箱） ---------- */
-const PERIOD_CONDS=['投注','充值','投注+充值'];
-const newPeriod=()=>({cond:'投注',bet:'',dep:'',box:''});   // box：返水任务宝箱索引（'' = 未选择）
-let periodRows=[newPeriod()];
-function samplePeriod(){
-  const conds=['投注','投注','充值','投注+充值','投注'];
-  const bets=['1000','3000','','8000','20000'], deps=['','','2000','5000',''];
-  return conds.map((c,i)=>({cond:c,bet:bets[i],dep:deps[i],box:String(i)}));   // LV1～LV5 → 宝箱1～宝箱5
+/* ---------- 4-4 挑战任务配置（沿用 X-BOMB；最多 5 个，非必填） ---------- */
+let challengeRows=[];
+const SAMPLE_CHALLENGE=[{up:'20',appear:'60',win:'60'},{up:'50',appear:'40',win:'50'}];
+const BLANK_CHALLENGE=[];
+const challengeAppearSum=()=>challengeRows.reduce((a,r)=>a+(Number(r.appear)||0),0);
+const anyTrigger=()=>rebateRows.some(r=>r.trigger);
+function challengeErr(r,k,strict){ const v=r[k];
+  if(v==='') return strict?'请输入':''; if(!(Number(v)>0)) return '不可为 0';
+  if(k==='win'&&Number(v)>100) return '比例配置不得超过100%'; return ''; }
+function challengeOk(){
+  if(anyTrigger()&&!challengeRows.length) return false;
+  if(!challengeRows.length) return true;
+  return challengeRows.every(r=>['up','appear','win'].every(k=>!challengeErr(r,k,true))) && challengeAppearSum()===100;
 }
-const needBet=c=>c!=='充值', needDep=c=>c!=='投注';
-/* 回传每列各目标的错误讯息（同任务条件逐级递增） */
-function periodGoalErrors(strict){
-  const prev={}, out=[];
-  periodRows.forEach(r=>{
-    const e={};
-    [['bet',needBet(r.cond),'投注'],['dep',needDep(r.cond),'充值']].forEach(([k,need,lab])=>{
-      if(!need) return;
-      const v=r[k];
-      if(v===''){ if(strict) e[k]='请输入'+lab+'目标'; return; }
-      if(!(Number(v)>0)){ e[k]='不可为 0'; return; }
-      const p=prev[r.cond]&&prev[r.cond][k];
-      if(p!==undefined && Number(v)<=p) e[k]='不可小于或等于同任务条件上一级';
-    });
-    prev[r.cond]=prev[r.cond]||{};
-    if(needBet(r.cond)&&Number(r.bet)>0) prev[r.cond].bet=Number(r.bet);
-    if(needDep(r.cond)&&Number(r.dep)>0) prev[r.cond].dep=Number(r.dep);
-    out.push(e);
+function paintChallenge(){
+  const rows=[...$('#challengeBody').children], sum=challengeAppearSum();
+  const sumBad=challengeRows.length&&(s4Strict||challengeRows.some(r=>r.appear!==''))&&sum!==100;
+  rows.forEach((tr,i)=>{ const r=challengeRows[i]; if(!r) return;
+    ['up','appear','win'].forEach(k=>{ const inp=$('.js-'+k,tr), h=$('.js-'+k+'-hint',tr);
+      let m=challengeErr(r,k,s4Strict); if(!m&&k==='appear'&&sumBad&&i===rows.length-1) m='触发机率总计须等于100%（目前 '+sum+'%）';
+      inp.classList.toggle('is-error',!!m||(k==='appear'&&sumBad)); h.textContent=m; h.style.visibility=m?'visible':'hidden'; });
   });
-  return out;
+  paintChallengeNeed();
 }
-/* 各等级奖励：须选择 1 款「已配置」的返水任务宝箱；一款都未配置时由「返水任务宝箱配置」报错，不在此重复 */
-function pBoxErr(r,strict){
-  if(!PBOX.configured().length) return '';
-  if(r.box===''||!PBOX.touched(+r.box)) return strict?'请选择返水任务宝箱':'';
-  return '';
+/* 每日返水有勾选「触发」却未设置挑战 → 提示 */
+function paintChallengeNeed(){
+  const need=anyTrigger()&&!challengeRows.length;
+  let el=$('#challengeNeed');
+  if(!el){ el=document.createElement('p'); el.id='challengeNeed'; el.className='hint hint--err'; $('#secChallenge .block__body').prepend(el); }
+  el.textContent=need?'「每日返水配置」已有等级勾选「触发」，挑战任务配置至少需 1 个':''; el.style.display=need?'block':'none';
 }
-function periodOk(){ const ge=periodGoalErrors(true); return periodRows.every((r,i)=>Object.keys(ge[i]).length===0 && !pBoxErr(r,true)); }
-function paintPeriodBox(){
-  const ks=PBOX.configured();
-  $$('#periodBody tr').forEach((tr,i)=>{
-    const r=periodRows[i]; if(!r) return;
-    if(r.box!==''&&!PBOX.touched(+r.box)) r.box='';          // 已选宝箱被清空成未配置 → 一并清空
-    const sel=$('.js-pbox',tr), h=$('.js-pbox-hint',tr);
-    sel.innerHTML=`<option value="">${ks.length?'请选择返水任务宝箱':'请先配置返水任务宝箱'}</option>`+ks.map(k=>`<option value="${k}" ${String(k)===r.box?'selected':''}>宝箱${k+1}</option>`).join('');
-    sel.disabled=!ks.length;
-    const m=pBoxErr(r,s4Strict); sel.classList.toggle('is-error',!!m); h.textContent=m; h.style.display=m?'block':'none';
-  });
-}
-function paintPeriodGoals(){
-  const ge=periodGoalErrors(s4Strict);
-  $$('#periodBody tr').forEach((tr,i)=>{
-    ['bet','dep'].forEach(k=>{ const inp=$('.js-'+k,tr), h=$('.js-'+k+'-hint',tr); if(!inp) return;
-      const m=ge[i][k]; inp.classList.toggle('is-error',!!m); h.textContent=m||''; h.style.display=m?'block':'none'; });
-  });
-}
-function renderPeriod(){
-  const tb=$('#periodBody'); tb.innerHTML='';
-  periodRows.forEach((r,i)=>{
+function renderChallenge(){
+  const tb=$('#challengeBody'); tb.innerHTML='';
+  challengeRows.forEach((r,i)=>{
     const tr=document.createElement('tr');
-    const goalIn=(k,lab)=>`<div><div class="prefix-wrap"><span class="prefix">${lab} ≥</span><input class="input js-${k}" value="${r[k]}" placeholder="请输入正整数"></div>
-      <p class="hint hint--err js-${k}-hint" style="display:none;position:static;margin-top:2px"></p></div>`;
-    tr.innerHTML=`<td>LV${i+1}</td>
-      <td><select class="select js-pcond">${PERIOD_CONDS.map(c=>`<option ${r.cond===c?'selected':''}>${c}</option>`).join('')}</select></td>
-      <td style="text-align:left"><div class="goal-grid">${needBet(r.cond)?goalIn('bet','投注'):''}${needDep(r.cond)?goalIn('dep','充值'):''}</div></td>
-      <td><div class="pbox-pick"><select class="select js-pbox" aria-label="LV${i+1} 奖励（返水任务宝箱）"></select>
-        <p class="hint hint--err js-pbox-hint" style="display:none;position:static;margin-top:2px"></p></div></td>
-      <td><button class="btn--link red js-del">删除</button></td>`;
-    $('.js-pcond',tr).addEventListener('change',e=>{ r.cond=e.target.value;
-      if(!needBet(r.cond)) r.bet=''; if(!needDep(r.cond)) r.dep='';          // 切换条件 → 清空不适用的目标
-      renderPeriod(); });
-    ['bet','dep'].forEach(k=>{ const inp=$('.js-'+k,tr); if(inp) inp.addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r[k]=e.target.value; paintPeriodGoals(); }); });
-    $('.js-pbox',tr).addEventListener('change',e=>{ r.box=e.target.value; paintPeriodBox(); });
-    $('.js-del',tr).addEventListener('click',()=>{ if(periodRows.length<=1){toast('至少保留 LV1',true);return;}
-      periodRows.splice(i,1); renderPeriod(); });
+    const cell=(k)=>`<td><div class="suffix-wrap"><input class="input js-${k}" value="${r[k]}" placeholder="整数"><span class="suffix">%</span></div>
+      <p class="hint hint--err js-${k}-hint" style="visibility:hidden"></p></td>`;
+    tr.innerHTML=`<td>挑战${i+1}</td>${cell('up')}${cell('appear')}${cell('win')}<td><button class="btn--link red js-del">删除</button></td>`;
+    ['up','appear','win'].forEach(k=>$('.js-'+k,tr).addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r[k]=e.target.value; paintChallenge(); }));
+    $('.js-del',tr).addEventListener('click',()=>{ challengeRows.splice(i,1); renderChallenge(); });
     tb.appendChild(tr);
   });
-  paintPeriodGoals(); paintPeriodBox();
+  if(!challengeRows.length) tb.innerHTML='<tr><td colspan="5" style="color:var(--text-3);padding:16px">未设置挑战（非必填）</td></tr>';
+  paintChallenge();
 }
-$('#btnAddPeriod').addEventListener('click',()=>{
-  if(periodRows.length>=50){toast('等级最多 LV50',true);return;}
-  const last=periodRows[periodRows.length-1];
-  periodRows.push({...newPeriod(),cond:last?last.cond:'投注'}); renderPeriod();
+$('#btnAddChallenge').addEventListener('click',()=>{
+  if(challengeRows.length>=5){toast('挑战最多 5 个',true);return;}
+  challengeRows.push({up:'',appear:'',win:''}); renderChallenge();
 });
-/* ---------- 4-5 返水任务宝箱配置（与签到宝箱相同；30 款、须至少配置 1 款） ---------- */
-const PBOX=makeBoxSet({count:30,tabs:'#pboxTabs',body:'#pboxBody',sum:'#pboxSum',
-  enabled:()=>true, noneMsg:'至少需配置 1 款返水任务宝箱',
-  onRefresh:()=>paintPeriodBox()});   // 配置变动 → 更新各等级「奖励」下拉清单
+
+/* ---------- 4-6 循环任务配置：任务条件固定「投注」，单一目标可重复达成，奖励＝道具数量 ---------- */
+let cycle={goal:'',qty:''};
+const SAMPLE_CYCLE={goal:'5000',qty:'1'}, BLANK_CYCLE={goal:'',qty:''};
+function cycleErr(k,strict){ const v=cycle[k]; if(v==='') return strict?(k==='goal'?'请输入任务目标':'请输入奖励数量'):''; return Number(v)>0?'':'须为大于 0 的整数'; }
+const cycleOk=()=>!cycleErr('goal',true)&&!cycleErr('qty',true);
+function paintCycle(){ ['goal','qty'].forEach(k=>{ const m=cycleErr(k,s4Strict), inp=$('#cy_'+k), h=$('#cy_'+k+'_hint');
+  inp.classList.toggle('is-error',!!m); h.textContent=m; h.style.visibility=m?'visible':'hidden'; }); }
+function renderCycle(){
+  $('#cycleBody').innerHTML=`<tr>
+    <td>投注</td>
+    <td><div class="prefix-wrap"><span class="prefix">有效投注 ≥</span><input class="input" id="cy_goal" value="${cycle.goal}" placeholder="请输入正整数"></div>
+      <p class="hint hint--err" id="cy_goal_hint" style="visibility:hidden"></p></td>
+    <td><div class="suffix-wrap"><input class="input" id="cy_qty" value="${cycle.qty}" placeholder="请输入正整数"><span class="suffix">个道具</span></div>
+      <p class="hint hint--err" id="cy_qty_hint" style="visibility:hidden"></p></td></tr>`;
+  ['goal','qty'].forEach(k=>$('#cy_'+k).addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); cycle[k]=e.target.value; paintCycle(); }));
+  paintCycle();
+}
+/* ---------- 4-5 循环任务宝箱配置（与签到宝箱相同；10 款、须至少配置 1 款；每款含道具消耗数量） ---------- */
+const PBOX=makeBoxSet({count:10,cost:'#pboxCost',costErr:'#pboxCostErr',tabs:'#pboxTabs',body:'#pboxBody',sum:'#pboxSum',
+  enabled:()=>true, noneMsg:'至少需配置 1 款循环任务宝箱'});
 /* 示范：宝箱1～6 已配置，其余 24 款留空 */
-const SAMPLE_PBOXES=Array.from({length:30},(_,k)=>k<6?sampleBox(k).map(r=>({...r,val:r.val?String(Number(r.val)*2):r.val})):nineRewards());
+/* 示范：宝箱1～5 已配置，其余 5 款留空 */
+const SAMPLE_PBOXES=Array.from({length:10},(_,k)=>k<5?sampleBox(k).map(r=>({...r,val:r.val?String(Number(r.val)*2):r.val})):nineRewards());
+const SAMPLE_PCOST=['1','2','3','5','10','','','','',''];
 
 /* ---------- 4-6 投注量计算比例（Slot／Live／Sport／Mini） ---------- */
 const uniq=a=>[...new Set(a.filter(Boolean))];
@@ -1680,13 +1753,14 @@ const SECTIONS=[
   ['box','secBox',boxesOk,()=>boxNoneErr()?'开启「额外随机宝箱」时，至少需配置 1 款签到宝箱':'签到宝箱配置未完成：宝箱一旦配置任 1 项奖励，其余 8 项皆须配置，且中奖率合计需等于100%'],
   ['sign','secSign',signOk,'签到活动配置未完成：请检查奖励类型／奖励数量，及已配置宝箱的中奖率合计需等于100%'],
   ['rebate','secRebate',rebateOk,'每日返水配置有必填/格式错误，或任务目标未依同任务条件逐级递增'],
-  ['pbox','secPBox',()=>PBOX.ok(),()=>PBOX.noneErr()?'至少需配置 1 款返水任务宝箱':'返水任务宝箱配置未完成：宝箱一旦配置任 1 项奖励，其余 8 项皆须配置，且中奖率合计需等于100%'],
-  ['period','secPeriod',periodOk,'期间返水任务未完成：请检查任务目标，及各等级「奖励」须选择 1 款返水任务宝箱'],
+  ['challenge','secChallenge',challengeOk,()=>anyTrigger()&&!challengeRows.length?'「每日返水配置」已有等级勾选触发，挑战任务配置至少需 1 个':'挑战任务配置有误：各栏皆为整数、不可为空或 0，触发机率总计须等于100%，获奖机率不得超过100%'],
+  ['pbox','secPBox',()=>PBOX.ok(),()=>PBOX.noneErr()?'至少需配置 1 款循环任务宝箱':'循环任务宝箱配置未完成：已配置宝箱须填道具消耗数量，9 项奖励皆须配置，且中奖率合计需等于100%'],
+  ['period','secPeriod',cycleOk,'循环任务配置未完成：任务目标、奖励数量皆须为大于 0 的整数'],
   ['ratio','secRatio',ratioOk,'投注量计算比例有误：Slot／Live／Mini 已勾选游戏商须填比例、已填比例须勾选游戏商；比例 0～100'],
   ['other','secOther',wagerOk,'彩金所需流水倍数须为 0.01～999999.99（最多 8 位整数＋2 位小数、不可为 0）'],
 ];
 
-function renderStep4(){ renderSign(); renderBoxes(); renderVipTabs(); renderRebate(); PBOX.render(); renderPeriod(); renderRatio(); }
+function renderStep4(){ renderSign(); renderBoxes(); renderVipTabs(); renderRebate(); renderChallenge(); PBOX.render(); renderCycle(); renderRatio(); }
 /* 步骤1 币种变更 → 重画（每日返水奖励金额单位） */
 $('#fCur').addEventListener('change',()=>renderStep4());
 
@@ -1712,7 +1786,6 @@ function buildPreview(){
       :r.type==='实体奖品'?`实体奖品「${r.name||'—'}」（价值 ${r.val||'—'}${r.img?'，已上传小图':''}）`
       :`${RW_LABEL[r.type]||r.type} ×${r.val||'—'}`;
   const ratioTxt=GAME_CATS.map(c=>{const r=ratio[c.key]; if(c.fixed) return `${c.key} ${r.pct||100}%（全部游戏商）`; return r.sel.length?`${c.key} ${r.pct}%（${r.sel.length} 家）`:`${c.key} 100%`;}).join('；');
-  const pConds=PERIOD_CONDS.map(c=>`${c} ${periodRows.filter(r=>r.cond===c).length}`).join(' / ');
   const floatOn=$$('input[name=float]')[1]?$$('input[name=float]')[1].checked:false;
   const listOn=$$('input[name=listShow]')[0]?$$('input[name=listShow]')[0].checked:false;
   const rows=[
@@ -1736,10 +1809,10 @@ function buildPreview(){
       ['签到奖励·第一天',rwTxt(sign.days[0])],['签到奖励·第二天',rwTxt(sign.days[1])],
       ['签到奖励·第三天以上(含)',rwTxt(sign.days[2])],['额外随机宝箱',sign.boxOn?('开启（'+(configuredBoxes().map(k=>'宝箱'+(k+1)+' '+(sign.boxRates[k]||'—')+'%').join('、')||'—')+'）'):'关闭'],
       ['每日返水·VIP 配置数',applyAll?'1 个（套用至其他等级）':'11 个'],
-      ['每日返水配置',rebateRows.length+' 个等级'],
-      ['返水任务宝箱配置','已配置 '+PBOX.configured().length+' 款（'+(PBOX.configured().map(k=>'宝箱'+(k+1)).join('、')||'—')+'）'+(PBOX.configured().length?' × 9 项奖励':'')],
-      ['期间返水任务',periodRows.length+' 个等级（'+pConds+'）'],
-      ['期间返水·各等级奖励',periodRows.map((r,i)=>'LV'+(i+1)+' 宝箱'+(r.box!==''?(+r.box+1):'—')).join('、')],
+      ['每日返水配置',rebateRows.length+' 个等级（触发挑战 '+rebateRows.filter(r=>r.trigger).length+' 个）'],
+      ['挑战任务配置',challengeRows.length?challengeRows.length+' 个（'+challengeRows.map((r,i)=>'挑战'+(i+1)+' +'+(r.up||'—')+'%／触发'+(r.appear||'—')+'%／获奖'+(r.win||'—')+'%').join('；')+'）':'未设置'],
+      ['循环任务宝箱配置','已配置 '+PBOX.configured().length+' 款（'+(PBOX.configured().map(k=>'宝箱'+(k+1)+' 消耗'+(PBOX.cost[k]||'—')+'个').join('、')||'—')+'）'+(PBOX.configured().length?' × 9 项奖励':'')],
+      ['循环任务配置',cycle.goal&&cycle.qty?('投注 ≥ '+cycle.goal+' → '+cycle.qty+' 个道具（可重复达成）'):'—'],
       ['投注量计算比例',ratioTxt],['彩金所需流水倍数',$('#fWager').value||'—'],
       ['审核方式','自动审核']]],
     ['⑤ 风控条件',[
