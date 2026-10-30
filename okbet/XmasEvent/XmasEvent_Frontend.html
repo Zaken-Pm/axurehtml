@@ -58,15 +58,25 @@ button{font:inherit;cursor:pointer;}
   radial-gradient(36px 20px at 62% 100%,#fff 98%,transparent),radial-gradient(44px 24px at 90% 100%,#fff 98%,transparent);opacity:.95;}
 
 /* === 7 日签到 === */
-.signin{margin:-26px var(--space-3) var(--space-4);padding:28px var(--space-3) var(--space-3);border-radius:var(--radius);position:relative;
+.board{position:relative;z-index:2;margin:-30px var(--space-3) 12px;padding:26px var(--space-3) var(--space-3);border-radius:16px;
+  display:grid;grid-template-columns:92px minmax(0,1fr);gap:var(--space-2);align-items:center;
+  background:radial-gradient(120% 90% at 0% 100%,rgba(255,111,216,.35),transparent 60%),linear-gradient(180deg,#6a1f9c,#3b0f6e);
+  border:2px solid #ff7ad9;box-shadow:0 0 0 3px rgba(255,122,217,.22) inset,0 8px 20px rgba(0,0,0,.4);}
+.board__title{position:absolute;top:-14px;left:50%;transform:translateX(-50%) skewX(-10deg);white-space:nowrap;margin:0;padding:3px 22px;
+  font-size:.8rem;font-weight:900;font-style:italic;color:#fff;letter-spacing:.04em;text-shadow:0 2px 0 #8a0f6a;
+  background:repeating-linear-gradient(115deg,#ff4fb8 0 10px,#e0359f 10px 20px);border:2px solid #ffd6f5;border-radius:8px;}
+.board__mascot{align-self:end;margin:-14px 0 -8px;}
+.board__mascot svg{width:100%;height:auto;display:block;}
+.board__rows{display:flex;flex-direction:column;gap:8px;min-width:0;}
+.board__lb{margin:0 0 3px;font-size:.72rem;font-weight:800;font-style:italic;color:#ffd34d;}
+.board__val{display:flex;align-items:center;gap:8px;padding:3px 12px 3px 4px;border-radius:999px;background:rgba(20,4,40,.6);border:1px solid rgba(255,122,217,.45);}
+.board__val svg{width:26px;height:26px;flex:none;}
+.board__val b{margin-left:auto;font-size:1.05rem;font-weight:900;font-style:italic;color:#ffe27a;letter-spacing:.03em;}
+.board + .signin{margin-top:0;}
+.signin{margin:-26px var(--space-3) var(--space-3);padding:2px var(--space-2) 0;border-radius:var(--radius);position:relative;
   background:linear-gradient(180deg,#3a1fb0,#24137a);border:3px solid #ff5a6e;box-shadow:0 0 0 3px #ffd2d8 inset,0 8px 20px rgba(0,0,0,.4);}
-.signin__ribbon{position:absolute;top:-18px;left:50%;transform:translateX(-50%);white-space:nowrap;padding:4px 18px;border-radius:999px;
-  background:linear-gradient(180deg,#ff6a7c,var(--red-d));border:2px solid var(--gold-1);font-weight:900;font-style:italic;font-size:.85rem;
-  color:var(--gold-1);text-shadow:0 2px 0 #7a0016;}
-.signin__streak{text-align:center;font-size:.67rem;color:var(--muted);margin:0 0 var(--space-3);}
-.signin__streak b{color:var(--gold-1);}
 .days-wrap{position:relative;margin:0 -4px;}
-.days{display:flex;gap:4px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding:6px 4px 8px;
+.days{display:flex;gap:4px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding:8px 4px 6px;
   scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.35) transparent;cursor:grab;-webkit-overflow-scrolling:touch;}
 .days.is-drag{cursor:grabbing;scroll-snap-type:none;scroll-behavior:auto;}
 .days::-webkit-scrollbar{height:4px;} .days::-webkit-scrollbar-thumb{background:rgba(255,255,255,.35);border-radius:4px;}
@@ -75,19 +85,26 @@ button{font:inherit;cursor:pointer;}
   background:rgba(20,10,70,.85);color:var(--gold-1);font-weight:900;display:grid;place-items:center;z-index:3;font-size:.8rem;line-height:1;}
 .days-nav--prev{left:-8px;} .days-nav--next{right:-8px;}
 .days-nav:disabled{opacity:0;pointer-events:none;}
-.day{position:relative;border-radius:10px;padding:6px 2px 4px;text-align:center;background:linear-gradient(180deg,#4b33d1,#2a1a8e);
+.day{position:relative;border-radius:10px;padding:3px 2px 4px;text-align:center;background:linear-gradient(180deg,#4b33d1,#2a1a8e);
   border:1px solid rgba(255,255,255,.25);min-width:0;}
 .day__label{font-size:.67rem;font-weight:700;white-space:nowrap;}
-.day__icon{display:block;width:100%;aspect-ratio:1;max-width:44px;margin:2px auto 0;}
-.day__rw{display:block;font-size:.67rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.day__ico{position:relative;display:block;width:100%;max-width:40px;margin:1px auto 0;}
+.day__icon{display:block;width:100%;aspect-ratio:1;}
+.day__mb{position:absolute;right:-4px;top:-2px;width:50%;}
+.day__mb svg{display:block;width:100%;height:auto;}
+/* 奖励数量直接叠在图示上（底部置中） */
+.day__rw{position:absolute;left:50%;bottom:-3px;transform:translateX(-50%);max-width:120%;padding:0 4px;border-radius:999px;font-size:.67rem;font-weight:900;line-height:1.3;
+  color:#fff;background:rgba(20,8,60,.85);border:1px solid rgba(255,255,255,.35);white-space:nowrap;}
 .day--done{opacity:.55;}
 .day--done::after{content:"✓";position:absolute;inset:0;display:grid;place-items:center;font-size:1.3rem;font-weight:900;color:var(--green);
   text-shadow:0 0 4px #000;}
 .day--today{border:2px solid var(--gold-1);box-shadow:0 0 0 2px rgba(255,226,122,.35),0 0 14px rgba(255,226,122,.7);animation:pulse 1.4s ease-in-out infinite;}
 .day--future{filter:saturate(.7);}
+.day--today{cursor:pointer;}
+.day--today:focus-visible{outline:3px solid #fff;outline-offset:1px;}
+.day__tap{position:absolute;top:-7px;left:50%;transform:translateX(-50%);font-size:.67rem;font-weight:900;font-style:italic;line-height:1.2;
+  padding:0 6px;border-radius:999px;color:var(--gold-ink);background:linear-gradient(180deg,#fff3b0,var(--gold-2));box-shadow:0 1px 3px rgba(0,0,0,.4);white-space:nowrap;}
 @keyframes pulse{50%{box-shadow:0 0 0 2px rgba(255,226,122,.2),0 0 22px rgba(255,226,122,.95);}}
-.signin__btn{display:block;width:100%;margin-top:var(--space-3);}
-.signin__note{font-size:.67rem;color:var(--muted);text-align:center;margin:var(--space-2) 0 0;}
 
 /* === 按钮 === */
 .btn-gold{border:none;border-radius:999px;padding:10px 16px;font-weight:900;font-style:italic;color:var(--gold-ink);font-size:.8rem;
@@ -109,6 +126,9 @@ button{font:inherit;cursor:pointer;}
 .bubble{position:absolute;top:-6px;right:6px;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--red);color:#fff;
   font-size:.67rem;font-weight:800;line-height:20px;text-align:center;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4);font-style:normal;}
 .bubble[hidden]{display:none;}
+/* 红点（无数字）：Christmas Activities 剩余 PAROL 足够最低奖池 1 抽时显示 */
+.dot{position:absolute;top:-3px;right:12px;width:12px;height:12px;border-radius:50%;background:var(--red);border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4);}
+.dot[hidden]{display:none;}
 
 /* === 分页内容 === */
 .panel{padding:var(--space-3) var(--space-3) var(--space-5);}
@@ -138,24 +158,12 @@ button{font:inherit;cursor:pointer;}
 .locked{font-size:.67rem;color:var(--muted);text-align:center;min-width:78px;}
 .locked b{display:block;font-size:.85rem;}
 
-/* Christmas Activities：PAROL 余额（前后台道具名称统一为 PAROL） */
-.keybar{display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) var(--space-3);border-radius:14px;margin-bottom:var(--space-3);
-  background:linear-gradient(180deg,#ffe9a8,#e0b24a);color:var(--gold-ink);}
-.keybar svg{width:40px;height:40px;flex:none;display:block;}
-.keybar__lb{font-size:.72rem;font-weight:900;line-height:1.2;}
-.keybar__lb small{display:block;font-weight:600;font-size:.67rem;opacity:.8;}
-.keybar__n{margin-left:auto;font-size:1.4rem;font-weight:900;font-style:italic;line-height:1;}
 /* 特别任务卡 */
 .cycle{padding:var(--space-3);border-radius:16px;margin-bottom:var(--space-4);border:2px solid #8fb3ff;
   background:radial-gradient(1.5px 1.5px at 85% 25%,#fff 50%,transparent 51%),radial-gradient(1.5px 1.5px at 60% 70%,#fff 50%,transparent 51%),
     linear-gradient(180deg,#2c3f9e 0%,#4a2a9e 100%);}
 .cycle__head{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:.8rem;font-weight:900;font-style:italic;}
-.cycle__desc{font-size:.67rem;color:var(--muted);margin:4px 0 0;}
-.cycle__desc b{color:var(--gold-1);}
 .cycle .task{margin-top:var(--space-2);}
-.cycle__head .cycle__bet{margin-left:auto;background:none;border:none;color:#d7e4ff;font-size:.67rem;font-weight:700;font-style:normal;text-decoration:underline;padding:0;}
-.cycle__note{margin:4px 0 0;font-size:.67rem;color:var(--muted);}
-.cycle .btn-gold:disabled{cursor:progress;}
 .cycle__foot{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--space-2);align-items:center;margin-top:var(--space-2);}
 .cycle__reward{font-size:.72rem;font-weight:800;color:var(--gold-1);display:flex;align-items:center;gap:6px;min-width:0;}
 .cycle__reward svg{width:26px;height:26px;flex:none;}
@@ -359,17 +367,36 @@ button{font:inherit;cursor:pointer;}
       <div class="hero__snow"></div>
     </section>
 
+    <!-- 今日奖励看板（签到上方；两分页共用） -->
+    <section class="board" aria-labelledby="boardTitle">
+      <h2 class="board__title" id="boardTitle">TODAY'S REWARD BOARD</h2>
+      <div class="board__mascot" aria-hidden="true"><svg viewBox="0 0 100 110">
+        <ellipse cx="50" cy="104" rx="34" ry="5" fill="rgba(0,0,0,.25)"/>
+        <circle cx="50" cy="78" r="27" fill="#fff"/><circle cx="50" cy="43" r="20" fill="#fff"/>
+        <path d="M28 36 Q50 2 74 32 L70 36 Z" fill="#e8344b"/><rect x="26" y="32" width="50" height="8" rx="4" fill="#fff"/><circle cx="78" cy="22" r="6" fill="#fff"/>
+        <path d="M74 32 Q82 24 78 22" stroke="#e8344b" stroke-width="6" fill="none" stroke-linecap="round"/>
+        <circle cx="43" cy="45" r="2.6" fill="#2a1446"/><circle cx="57" cy="45" r="2.6" fill="#2a1446"/>
+        <path d="M50 49 l12 3 -12 3z" fill="#ff8a1f"/><path d="M43 55 q7 5 14 0" stroke="#2a1446" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <circle cx="38" cy="51" r="3" fill="#ffb3d1"/><circle cx="62" cy="51" r="3" fill="#ffb3d1"/>
+        <path d="M30 60 h40 v8 h-40z" fill="#ff4fb8"/><path d="M58 66 v16 h8 v-16z" fill="#e0359f"/>
+        <circle cx="50" cy="76" r="2.6" fill="#2a1446"/><circle cx="50" cy="86" r="2.6" fill="#2a1446"/>
+        <path d="M24 72 L8 58" stroke="#8a4a12" stroke-width="3" stroke-linecap="round"/><path d="M8 58 l-4 -4 M8 58 l-5 1" stroke="#8a4a12" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M76 72 L92 60" stroke="#8a4a12" stroke-width="3" stroke-linecap="round"/>
+        <g transform="translate(84 40) scale(.42)"><path d="M24 2 L29.6 16.3 L45 17 L33 26.7 L37.2 41.6 L24 33.2 L10.8 41.6 L15 26.7 L3 17 L18.4 16.3 Z" fill="#ffd34d" stroke="#fff" stroke-width="2"/></g>
+      </svg></div>
+      <div class="board__rows">
+        <div><p class="board__lb">Bomb Mission Claimed</p><div class="board__val" id="boardCash"></div></div>
+        <div><p class="board__lb">My PAROL</p><div class="board__val" id="boardParol"></div></div>
+      </div>
+    </section>
+
     <!-- 7 日签到（两分页共用；不计入 Tab 气泡与一键领取） -->
-    <section class="signin" aria-labelledby="signTitle">
-      <h2 class="signin__ribbon" id="signTitle">DAILY CHECK-IN REWARD</h2>
-      <p class="signin__streak" id="streakTxt"></p>
+    <section class="signin" aria-label="Daily check-in reward">
       <div class="days-wrap">
         <button class="days-nav days-nav--prev" id="daysPrev" aria-label="向左滑动">‹</button>
         <ol class="days" id="days" style="list-style:none;margin:0" aria-label="签到日历（可左右滑动）"></ol>
         <button class="days-nav days-nav--next" id="daysNext" aria-label="向右滑动">›</button>
       </div>
-      <button class="btn-gold signin__btn" id="btnCheckin"></button>
-      <p class="signin__note">Swipe to see all days · Day 3+: daily reward + 1 random Mystery Box. Missing a day resets your streak.</p>
     </section>
 
     <!-- Tabs -->
@@ -379,7 +406,7 @@ button{font:inherit;cursor:pointer;}
         <span class="tab__txt">BOMB MISSION</span><span class="bubble" id="bubbleBomb" hidden></span></button>
       <button class="tab" role="tab" id="tabXmas" aria-controls="panelXmas" aria-selected="true" data-tab="xmas">
         <svg class="tab__ico" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12,2 19,14 15,14 20,21 4,21 9,14 5,14" fill="#1f9d55"/><rect x="10.5" y="21" width="3" height="2" fill="#7a4a1f"/><circle cx="12" cy="3" r="1.6" fill="#ffd34d"/></svg>
-        <span class="tab__txt">Christmas Activities</span></button>
+        <span class="tab__txt">Christmas Activities</span><span class="dot" id="dotXmas" hidden></span></button>
     </div>
 
     <!-- 分页：BOMB MISSION（每日返水任务） -->
@@ -388,26 +415,20 @@ button{font:inherit;cursor:pointer;}
         <p class="reclaim__info" id="bombReclaimInfo" style="margin:0"></p>
         <button class="btn-gold" id="btnReclaimBomb">One-Click Reclaim</button>
       </div>
+      <!-- 特别任务（自动发放 PAROL；位于一键领取下方、LV 列表上方） -->
+      <article class="cycle" aria-labelledby="cycleTitle">
+        <div class="cycle__head" id="cycleTitle">Special Task <span class="chip">REPEATABLE</span></div>
+        <div class="task" id="cycleTask"></div>
+        <div class="cycle__foot">
+          <div class="cycle__reward" id="cycleReward"></div>
+          <button class="btn-gold" id="btnBetNow">BET NOW ›</button>
+        </div>
+      </article>
       <ul id="bombList" style="list-style:none;margin:0;padding:0"></ul>
     </section>
 
     <!-- 分页：Christmas Activities（特别任务＋特别任务宝箱）：无气泡角标、无一键领取 -->
     <section class="panel" id="panelXmas" role="tabpanel" aria-labelledby="tabXmas">
-      <div class="keybar">
-        <span id="keyIco"></span>
-        <p class="keybar__lb" style="margin:0">My PAROL<small>Use PAROL to draw from the Christmas Prize Pools</small></p>
-        <span class="keybar__n" id="keyNum" aria-live="polite" aria-label="PAROL 数量">0</span>
-      </div>
-      <article class="cycle" aria-labelledby="cycleTitle">
-        <div class="cycle__head" id="cycleTitle">Special Task <span class="chip">REPEATABLE</span><button class="cycle__bet" id="btnBetNow">Bet now ›</button></div>
-        <p class="cycle__desc" id="cycleDesc"></p>
-        <div class="task" id="cycleTask"></div>
-        <p class="cycle__note">Progress updates when you tap CLAIM</p>
-        <div class="cycle__foot">
-          <div class="cycle__reward" id="cycleReward"></div>
-          <button class="btn-gold" id="btnTaskClaim">CLAIM</button>
-        </div>
-      </article>
       <h3 class="sec-title">Christmas Prize Pools</h3>
       <p class="sec-note">Tap a pool to view prizes · Draw 1, 5 or 10 times with PAROL</p>
       <ul class="pools" id="poolList" aria-label="奖池"></ul>
@@ -427,21 +448,29 @@ button{font:inherit;cursor:pointer;}
     </div>
     <p class="state" id="simState"></p>
 
+    <h3>⓪ TODAY'S REWARD BOARD（今日奖励看板，签到上方）</h3>
+    <ul>
+      <li>位于 Hero 下方、签到区上方，两分页共用；左侧为原创雪人插图，右侧两栏数值。</li>
+      <li><b>Bomb Mission Claimed</b>：今日 BOMB MISSION 已领取的彩金合计（含挑战任务加成），显示至小数点后 2 位（第 3 位无条件舍去），不显示货币符号；每日 00:00 归零（原型「模拟次日」）。不含签到、宝箱、奖池抽中的彩金。</li>
+      <li><b>My PAROL</b>：目前剩余 PAROL 数量（全页唯一的 PAROL 余额显示；Christmas Activities 分页已移除重复的余额条）。</li>
+      <li>领取、一键领取、挑战翻牌、抽奖扣除、特别任务发放后即时更新。</li>
+    </ul>
+
     <h3>① DAILY CHECK-IN REWARD（签到区）</h3>
     <ul>
       <li>位于 Tab 上方、两分页共用；<b>不计入 Tab 气泡与一键领取</b>。</li>
-      <li>每日可签到 1 次，点「CHECK IN」即领取当日签到奖励：Day 1、Day 2 各 1 项；Day 3 起每日＝「第三天以上(含)」签到奖励＋1 款随机签到宝箱（依后台中奖率）。</li>
+      <li>每日可签到 1 次，<b>点击「今天」那格奖励图示即完成签到</b>并领取当日签到奖励：Day 1、Day 2 各 1 项；Day 3 起每日＝「第三天以上(含)」签到奖励＋1 款随机签到宝箱（依后台中奖率）。</li>
       <li>随机宝箱随即开启「Mystery Box」弹窗（见 ④）。后台关闭「额外随机宝箱」时只发签到奖励、不开弹窗。</li>
-      <li>状态：已签到（灰＋✓）、今日可签（金框呼吸光）、未到（一般）。断签后连续天数归 0，从 Day 1 重新计算。</li>
+      <li>状态：已签到（灰＋✓）、今日可签（金框呼吸光＋上方「TAP」标签，可点击／键盘 Enter）、未到（一般，不可点）。签到后该格转为已签到。断签后连续天数归 0，从 Day 1 重新计算。</li>
       <li>签到不限 7 天：日历列出 Day 1～Day 46（活动天数，11/16～12/31），<b>可左右滑动</b>（手机触控滑动、桌机拖曳或点两侧箭头，一次 3 格）；约露出 6.5 格提示可滑动，到底时该侧箭头隐藏。</li>
       <li>进入页面／签到后，自动捲动让「今天」那格出现在可视范围（左侧保留前一天）。</li>
-      <li>标题由「7-DAY DAILY REWARD」改为「DAILY CHECK-IN REWARD」。</li>
+      <li>为缩减区块高度：<b>移除</b>标题「DAILY CHECK-IN REWARD」、连续签到天数文字、「CHECK IN」按钮与下方说明文字；<b>奖励数量直接叠在图示底部</b>（深色小胶囊），第三天起的 Mystery Box 小图示移至图示右上。拖曳滑动日历后放开不视为点击。</li>
     </ul>
 
     <h3>② Tab 气泡角标</h3>
     <ul>
       <li><b>仅 BOMB MISSION 显示</b>：该分页「已达成未领取」的每日返水任务数；0 不显示、超过 99 显示「99+」，领取（含一键领取）后即时更新。</li>
-      <li>Christmas Activities <b>不显示气泡角标</b>（特别任务达标即自动发放 PAROL，无待领取状态）。</li>
+      <li>Christmas Activities <b>不显示数字气泡</b>，改为<b>红点</b>：剩余 PAROL ≥ 4 个奖池中最低的「道具消耗数量」（即至少可抽最低奖池 1 次，示范 1 个）时显示红点；不足时隐藏。获得／抽奖扣除后即时更新。</li>
     </ul>
 
     <h3>③ One-Click Reclaim（一键领取）</h3>
@@ -473,15 +502,16 @@ button{font:inherit;cursor:pointer;}
       <li>金额显示至小数点后 2 位，第 3 位无条件舍去。</li>
     </ul>
 
-    <h3>⑥ Christmas Activities（特别任务＋特别任务奖池）</h3>
+    <h3>⑥ 特别任务（BOMB MISSION 分页）＋ 特别任务奖池（Christmas Activities 分页）</h3>
     <ul>
       <li><b>道具名称</b>：前台固定显示「PAROL」（菲律宾圣诞星灯造型图示），前后台道具名称统一（后台报表、说明亦显示 PAROL）；不提供后台配置。</li>
-      <li>页首「My PAROL」＝目前持有 PAROL 数（累计获得 − 已消耗）。</li>
+      <li>PAROL 余额显示于上方 TODAY'S REWARD BOARD「My PAROL」（累计获得 − 已消耗）；Christmas Activities 分页不再重复显示。奖池详情弹窗内另显示目前持有数。</li>
       <li>PAROL 来源：① 特别任务；② BOMB MISSION 每日返水有勾选「赠送道具」的等级，领取时即时发放（示范 LV2 ×1、LV3 ×2）。</li>
-      <li><b>特别任务</b>（后台「特别任务配置」，条件固定投注；标题「Special Task」）：活动期间每累计有效投注达任务目标（示范 5,000）可得奖励数量个 PAROL（示范 1 个），进度归零重新累计、可无限次重复。无气泡、无一键领取。</li>
-      <li><b>手动领取</b>：点击「CLAIM」后才查询投注报表（按钮显示「CHECKING…」、不可重复点击），依<b>自上次领取后新增的有效投注</b>计算完成轮数，一次配发「轮数 × 奖励数量」个 PAROL，余数保留至下次；有配发 toast「+PAROL ×N claimed」，无完成轮数 toast「No completed rounds yet · Keep betting!」。无 20 分钟更新限制，可随时点击。</li>
-      <li>进度条＝上次领取时查询到的本轮累计／任务目标（未点 CLAIM 前不会更新，卡片注明「Progress updates when you tap CLAIM」）；下方显示已完成次数与特别任务累计获得 PAROL 数。例：上次领取时剩 1,350 达标，之后投注 10,000 → 点 CLAIM 完成 2 轮、得 PAROL ×2，进度 1,350／5,000。</li>
-      <li>标题右侧「Bet now ›」导向游戏大厅（原型以 toast 示意）。</li>
+      <li><b>位置</b>：特别任务卡位于 <b>BOMB MISSION 分页</b>，「One-Click Reclaim」下方、LV 任务列表上方；不计入 BOMB MISSION 气泡与一键领取。Christmas Activities 分页只保留奖池。</li>
+      <li><b>特别任务</b>（后台「特别任务配置」，条件固定投注；标题「Special Task」）：活动期间每累计有效投注达任务目标（示范 5,000）即<b>自动发放</b>奖励数量个 PAROL（示范 1 个），进度归零重新累计、可无限次重复；无 CLAIM 按钮、无气泡、无一键领取。</li>
+      <li><b>更新频率</b>：系统约每 20～30 分钟更新一次进度并自动发放 PAROL（同一次更新内完成多轮则一次发放）。卡片不显示说明文字（已移除任务说明与更新频率提示），只保留标题、进度条、奖励与 BET NOW。原型为方便演示，模拟投注后即时计入。</li>
+      <li>进度条＝本轮累计／任务目标；下方显示已完成次数与特别任务累计获得 PAROL 数。例：剩 1,350 达标，投注 10,000 → 完成 2 轮、得 PAROL ×2，进度 1,350／5,000。</li>
+      <li>「BET NOW ›」导向游戏大厅（原型以 toast 示意）。</li>
       <li><b>特别任务奖池</b>（后台「特别任务奖池配置」，固定 4 个、皆必填）：列表以 2×2 显示 <b>4 个奖池卡</b>（Pool 名称、主视觉、Grand Prize＝该奖池最高价值奖励、「PAROL×N / draw」＝道具消耗数量、VIEW POOL ›）；<b>点击奖池卡后才开启奖池详情</b>。</li>
       <li>奖池详情（弹窗）：Pool 名称、已抽次数（Drawn ×N）与目前持有 PAROL、大奖、9 项奖励一览（大奖排第一并金框），以及「1 Draw／5 Draws／10 Draws」三个按钮，按钮下方显示所需 PAROL（＝道具消耗数量 × 抽数，无折扣）。右上「✕」、点遮罩或 Esc 关闭回到奖池列表。</li>
       <li>PAROL 不足该抽数所需：该按钮停用；连 1 抽都不足时，面板下方提示「Need N more PAROL to draw」。</li>
@@ -626,7 +656,7 @@ const TOP_COST=Math.max(...CHESTS.map(C=>C.cost));   // 最高级奖池＝道具
 const topOf=box=>box[box.length-1];   // 主视觉＝宝箱内最高价值奖励（示范资料放在第 9 项）
 
 /* ---------- 用户状态 ---------- */
-const INIT={streak:2,checked:false,dayBet:1250,dayDep:200,bombClaimed:{1:{amt:3}},bombKeys:0,xBet:13650,xClaimed:8650,keysUsed:0,bonusKeys:0,opened:{},pool:0};   // xBet＝活动累计有效投注（系统实际）；xClaimed＝上次点击领取时查询到的累计投注（前台进度依此显示）；示范：点 CLAIM 可再领 1 个
+const INIT={streak:2,checked:false,dayBet:1250,dayDep:200,bombClaimed:{1:{amt:3}},bombKeys:0,xBet:13650,keysUsed:0,bonusKeys:0,opened:{},pool:0};   // xBet＝活动累计有效投注（示范：已完成 2 轮 → 自动发放 2 个 PAROL）；bombKeys＝每日返水赠送的 PAROL
 let S=clone(INIT);
 
 /* ---------- 签到区 ---------- */
@@ -640,16 +670,12 @@ function renderSign(){
   $('#days').innerHTML=Array.from({length:ACTIVITY_DAYS},(_,i)=>{
     const d=i+1, rw=signRewardOf(d);
     const st=d<=S.streak?'done':(d===S.streak+1&&!S.checked?'today':'future');
-    const ico=d>=3?`<span style="position:relative;display:block">${ICON[rw.type].replace('<svg','<svg class="day__icon"')}<span style="position:absolute;right:-2px;bottom:-2px;width:55%">${ICON.mystery}</span></span>`
-                  :ICON[rw.type].replace('<svg','<svg class="day__icon"');
-    return `<li class="day day--${st}" aria-label="Day ${d}，${st==='done'?'已签到':st==='today'?'今日可签到':'未到'}">
-      <span class="day__label">Day ${d}</span>${ico}<span class="day__rw" title="${rw.label}">${shortLabel(rw)}</span></li>`;
+    const ico=`<span class="day__ico">${ICON[rw.type].replace('<svg','<svg class="day__icon"')}${d>=3?`<span class="day__mb">${ICON.mystery}</span>`:''}<span class="day__rw" title="${rw.label}">${shortLabel(rw)}</span></span>`;
+    const tap=st==='today'?' role="button" tabindex="0"':'';
+    return `<li class="day day--${st}"${tap} aria-label="Day ${d}，${st==='done'?'已签到':st==='today'?'今日可签到，点击签到':'未到'}">
+      ${st==='today'?'<span class="day__tap">TAP</span>':''}<span class="day__label">Day ${d}</span>${ico}</li>`;
   }).join('');
-  $('#streakTxt').innerHTML=`Check-in streak: <b>${S.streak}</b> day${S.streak===1?'':'s'}`;
   scrollToDay(today);
-  const b=$('#btnCheckin');
-  b.disabled=S.checked;
-  b.textContent=S.checked?'Checked in today · Come back tomorrow':`CHECK IN · Day ${S.streak+1}`;
 }
 /* 自动捲动：让「今天」那格出现在可视范围（前面保留 1 格） */
 function scrollToDay(d){
@@ -667,9 +693,12 @@ $('#daysNext').addEventListener('click',()=>$('#days').scrollBy({left:daysStep()
 (()=>{ const b=$('#days'); let down=false,x0=0,s0=0,moved=false;
   b.addEventListener('pointerdown',e=>{ if(e.pointerType!=='mouse') return; down=true; moved=false; x0=e.clientX; s0=b.scrollLeft; b.classList.add('is-drag'); });
   window.addEventListener('pointermove',e=>{ if(!down) return; const dx=e.clientX-x0; if(Math.abs(dx)>3) moved=true; b.scrollLeft=s0-dx; });
-  window.addEventListener('pointerup',()=>{ if(!down) return; down=false; b.classList.remove('is-drag'); });
+  window.addEventListener('pointerup',()=>{ if(!down) return; down=false; b.classList.remove('is-drag'); b.dataset.dragged=moved?'1':''; });
+  /* 点击「今天」那格即完成签到（拖曳滑动后的放开不算点击） */
+  b.addEventListener('click',e=>{ const t=e.target.closest('.day--today'); if(!t) return; if(b.dataset.dragged){ b.dataset.dragged=''; return; } checkIn(); });
+  b.addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&e.target.closest('.day--today')){ e.preventDefault(); checkIn(); } });
 })();
-$('#btnCheckin').addEventListener('click',()=>{
+function checkIn(){
   if(S.checked) return;
   S.streak+=1; S.checked=true;
   const rw=signRewardOf(S.streak);
@@ -679,7 +708,7 @@ $('#btnCheckin').addEventListener('click',()=>{
     const k=weighted(SIGN_BOX_RATE);
     setTimeout(()=>openBox({title:`Day ${S.streak} · Mystery Box ${k+1}`,box:SIGN_BOXES[k],mode:'draw'}),500);
   }
-});
+}
 
 /* ---------- 共用：依中奖率抽 1 项 ---------- */
 function weighted(rates){ const sum=rates.reduce((a,b)=>a+b,0); let r=Math.random()*sum;
@@ -760,13 +789,11 @@ $('#chOk').addEventListener('click',()=>{
 });
 
 /* ---------- Christmas Activities：特别任务＋特别任务宝箱 ---------- */
-const taskKeys=()=>Math.floor(S.xClaimed/CYCLE.goal)*CYCLE.qty;           // 特别任务：已领取的 PAROL（依上次领取时查询的投注）
+const taskKeys=()=>Math.floor(S.xBet/CYCLE.goal)*CYCLE.qty;               // 特别任务：自动发放（实际约 20～30 分钟更新一次，原型即时计入）
 const keysEarned=()=>taskKeys()+S.bombKeys+S.bonusKeys;                   // ＋每日返水赠送（bonusKeys 仅原型模拟用）
 const keysLeft=()=>keysEarned()-S.keysUsed;
 function renderXmas(){
-  const rounds=Math.floor(S.xClaimed/CYCLE.goal), cur=S.xClaimed%CYCLE.goal, keys=keysLeft();
-  $('#keyIco').innerHTML=ICON.parol; $('#keyNum').textContent=int(keys);
-  $('#cycleDesc').innerHTML=`Every <b>${int(CYCLE.goal)}</b> valid bets during the event = <b>${KEY_NAME} ×${CYCLE.qty}</b>. Progress resets after each round · Unlimited rounds.`;
+  const rounds=Math.floor(S.xBet/CYCLE.goal), cur=S.xBet%CYCLE.goal, keys=keysLeft();
   $('#cycleTask').innerHTML=`<div class="task__row"><span>Valid bets (this round)</span><span>${int(cur)} / ${int(CYCLE.goal)}</span></div>
     <div class="bar"><div class="bar__fill" style="width:${cur/CYCLE.goal*100}%"></div></div>`;
   $('#cycleReward').innerHTML=`${ICON.parol}<span>Reward: ${KEY_NAME} ×${CYCLE.qty}<span class="cycle__done">Completed ${int(rounds)} time${rounds===1?'':'s'} · ${int(taskKeys())} PAROL earned</span></span>`;
@@ -841,17 +868,6 @@ function playMulti(C,d,cost,res,top){
 }
 $('#multiOk').addEventListener('click',()=>{ if(MT&&!MT.done){ MT.finish(); return; } $('#multiMask').classList.remove('is-open'); MT=null; });
 $('#btnBetNow').addEventListener('click',()=>toast('导向游戏大厅（原型示意）'));
-/* 特别任务：手动领取 → 查询投注报表（示意 0.9 秒）→ 依自上次领取后完成的轮数配发 PAROL；余数保留 */
-$('#btnTaskClaim').addEventListener('click',()=>{
-  const b=$('#btnTaskClaim'); if(b.disabled) return;          // 查询中不可重复点击
-  b.disabled=true; b.textContent='CHECKING…';
-  setTimeout(()=>{
-    const k0=taskKeys(); S.xClaimed=S.xBet; const g=taskKeys()-k0;
-    b.disabled=false; b.textContent='CLAIM';
-    toast(g?`+${KEY_NAME} ×${g} claimed (${g/CYCLE.qty} round${g/CYCLE.qty>1?'s':''} completed)`:'No completed rounds yet · Keep betting!');
-    renderAll();
-  },900);
-});
 $('#sumOk').addEventListener('click',()=>$('#sumMask').classList.remove('is-open'));
 
 /* ---------- 宝箱开启弹窗 ---------- */
@@ -912,16 +928,25 @@ function bubble(el,n){ el.hidden=n<=0; el.textContent=n>99?'99+':n; el.setAttrib
 function renderReclaim(){
   const nb=bombClaimable().length;
   bubble($('#bubbleBomb'),nb); $('#btnReclaimBomb').disabled=!nb;
+  const canDraw=keysLeft()>=Math.min(...CHESTS.map(C=>C.cost));   // 剩余 PAROL ≥ 最低奖池道具消耗数量（1 抽）
+  $('#dotXmas').hidden=!canDraw; $('#dotXmas').setAttribute('aria-label',canDraw?'PAROL 足够抽奖':'');
   const sum=bombClaimable().reduce((a,t)=>a+t.reward,0);
   $('#bombReclaimInfo').innerHTML=nb?`<b>${nb}</b> reward${nb>1?'s':''} to claim · ${money(sum)}`:'No rewards to claim';
 }
-function renderAll(){ renderSign(); renderBomb(); renderXmas(); renderReclaim(); sim(); }
+/* 今日奖励看板：Bomb Mission Claimed＝今日 BOMB MISSION 已领取彩金合计（含挑战加成，次日归零）；My PAROL＝剩余 PAROL */
+const bombCashToday=()=>Object.values(S.bombClaimed).reduce((a,c)=>a+(c&&c.amt||0),0);
+function renderBoard(){
+  $('#boardCash').innerHTML=`${ICON.cash}<b aria-label="今日已领取彩金">${money(bombCashToday()).replace('₱','')}</b>`;
+  $('#boardParol').innerHTML=`${ICON.parol}<b aria-label="剩余 PAROL">${int(keysLeft())}</b>`;
+}
+function renderAll(){ renderBoard(); renderSign(); renderBomb(); renderXmas(); renderReclaim(); sim(); }
 
 /* ---------- 原型控制（模拟） ---------- */
-function sim(){ $('#simState').textContent=`今日投注 ${int(S.dayBet)}｜今日充值 ${int(S.dayDep)}｜活动累计投注 ${int(S.xBet)}（上次领取查询 ${int(S.xClaimed)}）｜PAROL 获得 ${keysEarned()}（特别任务 ${taskKeys()}＋每日返水 ${S.bombKeys}${S.bonusKeys?'＋模拟 '+S.bonusKeys:''}）／消耗 ${S.keysUsed}／剩余 ${keysLeft()}｜连续签到 ${S.streak} 天｜今日${S.checked?'已':'未'}签到`; }
+function sim(){ $('#simState').textContent=`今日投注 ${int(S.dayBet)}｜今日充值 ${int(S.dayDep)}｜活动累计投注 ${int(S.xBet)}｜PAROL 获得 ${keysEarned()}（特别任务 ${taskKeys()}＋每日返水 ${S.bombKeys}${S.bonusKeys?'＋模拟 '+S.bonusKeys:''}）／消耗 ${S.keysUsed}／剩余 ${keysLeft()}｜连续签到 ${S.streak} 天｜今日${S.checked?'已':'未'}签到`; }
 $$('[data-sim]').forEach(b=>b.addEventListener('click',()=>{
   const k=b.dataset.sim;
-  if(k==='bet'){ S.dayBet+=10000; S.xBet+=10000; toast('模拟投注 +10,000（Special Task 需点击 CLAIM 才查询并配发）'); }
+  if(k==='bet'){ const k0=taskKeys(); S.dayBet+=10000; S.xBet+=10000; const g=taskKeys()-k0;
+    toast(`模拟投注 +10,000${g?` · 特别任务完成 ${g/CYCLE.qty} 轮，自动发放 PAROL ×${g}（实际约 20～30 分钟后更新）`:''}`); }
   if(k==='parol'){ S.bonusKeys+=20; toast('模拟获得 PAROL +20（测试 5 抽／10 抽用）'); }
   if(k==='dep'){ S.dayDep+=5000; toast('模拟充值 +5,000'); }
   if(k==='nextday'){ if(!S.checked) S.streak=0; S.checked=false; S.dayBet=0; S.dayDep=0; S.bombClaimed={}; toast(S.streak?'已进入次日':'昨日未签到 → 断签，连续天数归 0'); }
