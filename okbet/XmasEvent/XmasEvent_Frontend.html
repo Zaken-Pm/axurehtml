@@ -73,6 +73,18 @@ button{font:inherit;cursor:pointer;}
 .board__val svg{width:26px;height:26px;flex:none;}
 .board__val b{margin-left:auto;font-size:1.05rem;font-weight:900;font-style:italic;color:#ffe27a;letter-spacing:.03em;}
 .board + .signin{margin-top:0;}
+/* 活动阶段：兑换期提示条、关闭画面 */
+.phase{margin:0 var(--space-3) var(--space-3);padding:8px 12px;border-radius:12px;font-size:.72rem;line-height:1.35;text-align:center;
+  background:linear-gradient(180deg,#1f6b3a,#124a27);border:1.5px solid #6fe39a;color:#eafff0;}
+.phase b{color:#ffe27a;}
+.phase[hidden]{display:none;}
+.signin.is-ended{filter:grayscale(.6);opacity:.6;pointer-events:none;}
+.phone[data-phase="closed"] > :not(.appbar):not(#closedView){display:none;}
+.closed{padding:64px 24px 80px;text-align:center;}
+.closed[hidden]{display:none;}
+.closed svg{width:120px;height:auto;}
+.closed h2{margin:12px 0 6px;font-size:1rem;font-style:italic;color:var(--gold-1);}
+.closed p{margin:0;font-size:.72rem;color:var(--muted);}
 .signin{margin:-26px var(--space-3) var(--space-3);padding:2px var(--space-2) 0;border-radius:var(--radius);position:relative;
   background:linear-gradient(180deg,#3a1fb0,#24137a);border:3px solid #ff5a6e;box-shadow:0 0 0 3px #ffd2d8 inset,0 8px 20px rgba(0,0,0,.4);}
 .days-wrap{position:relative;margin:0 -4px;}
@@ -403,6 +415,9 @@ button{font:inherit;cursor:pointer;}
       </div>
     </section>
 
+    <!-- 兑换期提示（结束日隔日 00:00 ～ 结束时间 +3 天） -->
+    <p class="phase" id="phaseNote" role="status" hidden>🎄 The event has ended. Check-in &amp; missions have stopped.<br>Redeem your PAROL in the Prize Pools until <b>01/03 23:59</b> (UTC+8).</p>
+
     <!-- 7 日签到（两分页共用；不计入 Tab 气泡与一键领取） -->
     <section class="signin" aria-label="Daily check-in reward">
       <div class="days-wrap">
@@ -438,7 +453,7 @@ button{font:inherit;cursor:pointer;}
           <div class="unc__val"><span id="uncIco"></span><b id="uncAmt">0</b></div>
           <button class="unc__btn" id="btnReclaimBomb"><span>LOCKED</span></button>
         </div>
-        <p class="unc__reset">Daily missions reset in <b id="uncTimer">--:--:--</b></p>
+        <p class="unc__reset" id="uncReset">Daily missions reset in <b id="uncTimer">--:--:--</b></p>
       </section>
       <!-- 特别任务（自动发放 PAROL；位于一键领取下方、LV 列表上方） -->
       <article class="cycle" aria-labelledby="cycleTitle">
@@ -458,6 +473,15 @@ button{font:inherit;cursor:pointer;}
       <p class="sec-note">Tap a pool to view prizes · Draw 1, 5 or 10 times with PAROL</p>
       <ul class="pools" id="poolList" aria-label="奖池"></ul>
     </section>
+    <!-- 活动页面关闭（结束时间 +3 天后） -->
+    <section class="closed" id="closedView" hidden aria-label="活动已关闭">
+      <svg viewBox="0 0 100 110" aria-hidden="true"><circle cx="50" cy="78" r="27" fill="#fff"/><circle cx="50" cy="43" r="20" fill="#fff"/>
+        <path d="M28 36 Q50 2 74 32 L70 36 Z" fill="#e8344b"/><rect x="26" y="32" width="50" height="8" rx="4" fill="#fff"/>
+        <circle cx="43" cy="45" r="2.6" fill="#2a1446"/><circle cx="57" cy="45" r="2.6" fill="#2a1446"/><path d="M50 49 l12 3 -12 3z" fill="#ff8a1f"/>
+        <path d="M43 57 q7 -4 14 0" stroke="#2a1446" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M30 60 h40 v8 h-40z" fill="#ff4fb8"/></svg>
+      <h2>This event has ended</h2>
+      <p>Thank you for joining Christmas Activities 2026!</p>
+    </section>
   </main>
 
   <!-- ======================= 评审面板（非前台画面） ======================= -->
@@ -471,6 +495,12 @@ button{font:inherit;cursor:pointer;}
       <button data-sim="break">模拟断签</button>
       <button data-sim="reset">重置示范资料</button>
     </div>
+    <div class="ctrl" style="align-items:center">
+      <span style="font-size:.67rem;color:#5a6274">活动阶段：</span>
+      <button data-sim="phase-live">活动期间（11/16～12/31）</button>
+      <button data-sim="phase-redeem">兑换期（1/1～1/3）</button>
+      <button data-sim="phase-closed">已关闭（1/3 23:59 后）</button>
+    </div>
     <p class="state" id="simState"></p>
 
     <h3>⓪ TODAY'S REWARD BOARD（今日奖励看板，签到上方）</h3>
@@ -479,6 +509,16 @@ button{font:inherit;cursor:pointer;}
       <li><b>Bomb Mission Claimed</b>：今日 BOMB MISSION 已领取的彩金合计（含挑战任务加成），显示至小数点后 2 位（第 3 位无条件舍去）、整数时不显示「.00」，不显示货币符号；每日 00:00 归零（原型「模拟次日」）。不含签到、宝箱、奖池抽中的彩金。</li>
       <li><b>My PAROL</b>：目前剩余 PAROL 数量（全页唯一的 PAROL 余额显示；Christmas Activities 分页已移除重复的余额条）。</li>
       <li>领取、一键领取、挑战翻牌、抽奖扣除、特别任务发放后即时更新。</li>
+    </ul>
+
+    <h3>⓪-2 活动阶段（活动结束后）</h3>
+    <ul>
+      <li><b>活动期间</b>（示范 11/16 00:00～12/31 23:59，UTC+8）：所有功能正常。</li>
+      <li><b>兑换期</b>＝结束日<b>隔日 00:00</b>～<b>结束时间 +3 天</b>（示范 1/1 00:00～1/3 23:59）：<b>不可签到、不计算投注与充值</b>（每日返水、特别任务停止累计与发放），<b>仅可兑换（开启）特别任务奖池</b>。
+        <br>前台：看板下方显示绿色提示「The event has ended… Redeem your PAROL until 01/03 23:59 (UTC+8)」；签到区变灰、不可点；BOMB MISSION 未领取等级显示「ENDED」，一键领取按钮「ENDED」、金额 0、倒数改为「Daily missions have ended」、不显示数字气泡；Special Task「BET NOW」改为「ENDED」停用；进入页面预设开启 Christmas Activities；奖池可正常 1／5／10 抽。</li>
+      <li>兑换期内<b>前一日未领取</b>的每日任务奖励不可再领取（不计入）。</li>
+      <li><b>已关闭</b>（结束时间 +3 天后）：活动页面关闭，只显示「This event has ended」。剩余 PAROL 作废（不再显示）。</li>
+      <li>原型以「活动阶段」三颗按钮切换示意。</li>
     </ul>
 
     <h3>① DAILY CHECK-IN REWARD（签到区）</h3>
@@ -684,7 +724,7 @@ const TOP_COST=Math.max(...CHESTS.map(C=>C.cost));   // 最高级奖池＝道具
 const topOf=box=>box[box.length-1];   // 主视觉＝宝箱内最高价值奖励（示范资料放在第 9 项）
 
 /* ---------- 用户状态 ---------- */
-const INIT={streak:2,checked:false,dayBet:1250,dayDep:200,bombClaimed:{1:{amt:3}},bombKeys:0,xBet:13650,keysUsed:0,bonusKeys:0,opened:{},pool:0};   // xBet＝活动累计有效投注（示范：已完成 2 轮 → 自动发放 2 个 PAROL）；bombKeys＝每日返水赠送的 PAROL
+const INIT={streak:2,checked:false,dayBet:1250,dayDep:200,bombClaimed:{1:{amt:3}},bombKeys:0,xBet:13650,keysUsed:0,bonusKeys:0,opened:{},pool:0,phase:'live'};   // xBet＝活动累计有效投注（示范：已完成 2 轮 → 自动发放 2 个 PAROL）；bombKeys＝每日返水赠送的 PAROL
 let S=clone(INIT);
 
 /* ---------- 签到区 ---------- */
@@ -697,7 +737,7 @@ function renderSign(){
   const today=S.checked?S.streak:S.streak+1;            // 今天对应的连续天数
   $('#days').innerHTML=Array.from({length:ACTIVITY_DAYS},(_,i)=>{
     const d=i+1, rw=signRewardOf(d);
-    const st=d<=S.streak?'done':(d===S.streak+1&&!S.checked?'today':'future');
+    const st=d<=S.streak?'done':(d===S.streak+1&&!S.checked&&LIVE()?'today':'future');   // 兑换期不可签到
     const ico=`<span class="day__ico">${ICON[rw.type].replace('<svg','<svg class="day__icon"')}${d>=3?`<span class="day__mb">${ICON.mystery}</span>`:''}<span class="day__rw" title="${rw.label}">${shortLabel(rw)}</span></span>`;
     const tap=st==='today'?' role="button" tabindex="0"':'';
     return `<li class="day day--${st}"${tap} aria-label="Day ${d}，${st==='done'?'已签到':st==='today'?'今日可签到，点击签到':'未到'}">
@@ -727,7 +767,7 @@ $('#daysNext').addEventListener('click',()=>$('#days').scrollBy({left:daysStep()
   b.addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&e.target.closest('.day--today')){ e.preventDefault(); checkIn(); } });
 })();
 function checkIn(){
-  if(S.checked) return;
+  if(S.checked||!LIVE()) return;
   S.streak+=1; S.checked=true;
   const rw=signRewardOf(S.streak);
   renderSign(); sim();
@@ -744,6 +784,8 @@ function weighted(rates){ const sum=rates.reduce((a,b)=>a+b,0); let r=Math.rando
 
 /* ---------- BOMB MISSION ---------- */
 const bombDone=t=>(t.cond==='bet'?S.dayBet:S.dayDep)>=t.goal;
+/* 活动阶段：live＝活动期间；redeem＝兑换期（结束日隔日 00:00 ～ 结束时间 +3 天，仅可兑换奖池）；closed＝活动页面关闭 */
+const LIVE=()=>S.phase==='live';
 const bombClaimable=()=>BOMB_TASKS.filter(t=>bombDone(t)&&!S.bombClaimed[t.lv]);
 const HEART=c=>`<svg viewBox="0 0 64 56" aria-hidden="true"><path d="M32 54S4 37 4 18C4 8 12 2 20 2c6 0 10 3 12 7 2-4 6-7 12-7 8 0 16 6 16 16 0 19-28 36-28 36z" fill="${c}" stroke="#fff" stroke-width="2.5"/></svg>`;
 function sortLv(list,claimed){ return [...list].sort((a,b)=>(!!claimed(a)-!!claimed(b))||a.lv-b.lv); }   // 已领取移至最下方
@@ -753,6 +795,7 @@ function renderBomb(){
     const cur=t.cond==='bet'?S.dayBet:S.dayDep, done=cur>=t.goal, got=S.bombClaimed[t.lv];
     const pct=Math.min(100,cur/t.goal*100);
     const act= got?`<div class="locked"><b>✓</b>Claimed</div>`
+             : !LIVE()?`<div class="locked"><b>⏹</b>ENDED</div>`
              : done?`<button class="btn-gold" data-bomb="${t.lv}">CLAIM</button>`
              : `<div class="locked"><b>🔒</b>LOCKED</div>`;
     const kk=n=>n?` + ${ICON.parol.replace('<svg','<svg class="ikey"')}×${n}`:'';
@@ -768,7 +811,7 @@ function renderBomb(){
       </div>${act}</li>`;
   }).join('') || `<li class="empty">The goal has not yet been achieved.</li>`;
   $$('[data-bomb]').forEach(b=>b.addEventListener('click',()=>{
-    const lv=+b.dataset.bomb; if(S.bombClaimed[lv]||CH) return;          // 幂等
+    const lv=+b.dataset.bomb; if(S.bombClaimed[lv]||CH||!LIVE()) return;          // 幂等
     const t=BOMB_TASKS.find(x=>x.lv===lv);
     if(t.trigger){ runChallenges([t],res=>toast(`+${money(res[0].amt)}${keyTxt(t.gift)} claimed (LV${lv})`)); return; }
     S.bombClaimed[lv]={amt:t.reward}; giveKeys(t); toast(`+${money(t.reward)}${keyTxt(t.gift)} claimed (LV${lv})`); renderAll();
@@ -778,7 +821,7 @@ function renderBomb(){
 const giveKeys=t=>{ if(t.gift) S.bombKeys+=t.gift; };
 const keyTxt=n=>n?` + ${KEY_NAME} ×${n}`:'';
 $('#btnReclaimBomb').addEventListener('click',()=>{
-  const list=bombClaimable(); if(!list.length||CH) return;
+  const list=bombClaimable(); if(!list.length||CH||!LIVE()) return;
   const plain=list.filter(t=>!t.trigger), chal=list.filter(t=>t.trigger);
   plain.forEach(t=>{ S.bombClaimed[t.lv]={amt:t.reward}; giveKeys(t); });
   const keys=list.reduce((a,t)=>a+(t.gift||0),0);
@@ -895,7 +938,7 @@ function playMulti(C,d,cost,res,top){
   later(finish,flipStart+res.length*200+700);
 }
 $('#multiOk').addEventListener('click',()=>{ if(MT&&!MT.done){ MT.finish(); return; } $('#multiMask').classList.remove('is-open'); MT=null; });
-$('#btnBetNow').addEventListener('click',()=>toast('导向游戏大厅（原型示意）'));
+$('#btnBetNow').addEventListener('click',()=>{ if(LIVE()) toast('导向游戏大厅（原型示意）'); });
 $('#sumOk').addEventListener('click',()=>$('#sumMask').classList.remove('is-open'));
 
 /* ---------- 宝箱开启弹窗 ---------- */
@@ -954,14 +997,21 @@ $$('.tab').forEach(t=>t.addEventListener('click',()=>setTab(t.dataset.tab)));
 $('.tabs').addEventListener('keydown',e=>{ if(e.key==='ArrowRight'||e.key==='ArrowLeft'){ const n=$('#tabBomb').getAttribute('aria-selected')==='true'?'xmas':'bomb'; setTab(n); $(`[data-tab="${n}"]`).focus(); } });
 function bubble(el,n){ el.hidden=n<=0; el.textContent=n>99?'99+':n; el.setAttribute('aria-label',`${n} 个未领取奖励`); }
 function renderReclaim(){
-  const nb=bombClaimable().length;
+  const nb=LIVE()?bombClaimable().length:0;                      // 兑换期：每日任务停止，不可领取
   bubble($('#bubbleBomb'),nb); $('#btnReclaimBomb').disabled=!nb;
   const canDraw=keysLeft()>=Math.min(...CHESTS.map(C=>C.cost));   // 剩余 PAROL ≥ 最低奖池道具消耗数量（1 抽）
   $('#dotXmas').hidden=!canDraw; $('#dotXmas').setAttribute('aria-label',canDraw?'PAROL 足够抽奖':'');
   /* 今日未领取金额：已达成未领取等级的「基础奖励金额」合计，不含挑战任务加成（翻牌结果未知）；可领为 0 时按钮显示 LOCKED */
-  const sum=bombClaimable().reduce((a,t)=>a+t.reward,0);
+  const sum=LIVE()?bombClaimable().reduce((a,t)=>a+t.reward,0):0;
   $('#uncIco').innerHTML=ICON.cash; $('#uncAmt').textContent=money(sum).replace('₱','');
-  $('#btnReclaimBomb').innerHTML=`<span>${nb?'CLAIM ALL':'LOCKED'}</span>`;
+  $('#btnReclaimBomb').innerHTML=`<span>${!LIVE()?'ENDED':nb?'CLAIM ALL':'LOCKED'}</span>`;
+  /* 阶段 UI：兑换期提示、签到停用、BET NOW 停用、关闭画面 */
+  const ph=S.phase; $('.phone').dataset.phase=ph;
+  $('#phaseNote').hidden=ph!=='redeem'; $('#closedView').hidden=ph!=='closed';
+  $('.signin').classList.toggle('is-ended',!LIVE());
+  const bn=$('#btnBetNow'); bn.disabled=!LIVE(); bn.textContent=LIVE()?'BET NOW ›':'ENDED';
+  if(!LIVE()) $('#uncReset').textContent='Daily missions have ended';
+  else if(!$('#uncTimer')){ $('#uncReset').innerHTML='Daily missions reset in <b id="uncTimer">--:--:--</b>'; tickReset(); }
   $('#btnReclaimBomb').setAttribute('aria-label',nb?`一键领取 ${nb} 笔`:'无可领取奖励');
 }
 /* 今日奖励看板：Bomb Mission Claimed＝今日 BOMB MISSION 已领取彩金合计（含挑战加成，次日归零）；My PAROL＝剩余 PAROL */
@@ -980,9 +1030,10 @@ tickReset(); setInterval(tickReset,1000);
 function renderAll(){ renderBoard(); renderSign(); renderBomb(); renderXmas(); renderReclaim(); sim(); }
 
 /* ---------- 原型控制（模拟） ---------- */
-function sim(){ $('#simState').textContent=`今日投注 ${int(S.dayBet)}｜今日充值 ${int(S.dayDep)}｜活动累计投注 ${int(S.xBet)}｜PAROL 获得 ${keysEarned()}（特别任务 ${taskKeys()}＋每日返水 ${S.bombKeys}${S.bonusKeys?'＋模拟 '+S.bonusKeys:''}）／消耗 ${S.keysUsed}／剩余 ${keysLeft()}｜连续签到 ${S.streak} 天｜今日${S.checked?'已':'未'}签到`; }
+function sim(){ $('#simState').textContent=`今日投注 ${int(S.dayBet)}｜今日充值 ${int(S.dayDep)}｜活动累计投注 ${int(S.xBet)}｜PAROL 获得 ${keysEarned()}（特别任务 ${taskKeys()}＋每日返水 ${S.bombKeys}${S.bonusKeys?'＋模拟 '+S.bonusKeys:''}）／消耗 ${S.keysUsed}／剩余 ${keysLeft()}｜连续签到 ${S.streak} 天｜今日${S.checked?'已':'未'}签到｜阶段 ${({live:'活动期间',redeem:'兑换期',closed:'已关闭'})[S.phase]}`; }
 $$('[data-sim]').forEach(b=>b.addEventListener('click',()=>{
   const k=b.dataset.sim;
+  if((k==='bet'||k==='dep')&&!LIVE()){ toast('兑换期／关闭后不计算投注与充值'); renderAll(); return; }
   if(k==='bet'){ const k0=taskKeys(); S.dayBet+=10000; S.xBet+=10000; const g=taskKeys()-k0;
     toast(`模拟投注 +10,000${g?` · 特别任务完成 ${g/CYCLE.qty} 轮，自动发放 PAROL ×${g}（实际约 20～30 分钟后更新）`:''}`); }
   if(k==='parol'){ S.bonusKeys+=20; toast('模拟获得 PAROL +20（测试 5 抽／10 抽用）'); }
@@ -990,6 +1041,8 @@ $$('[data-sim]').forEach(b=>b.addEventListener('click',()=>{
   if(k==='nextday'){ if(!S.checked) S.streak=0; S.checked=false; S.dayBet=0; S.dayDep=0; S.bombClaimed={}; toast(S.streak?'已进入次日':'昨日未签到 → 断签，连续天数归 0'); }
   if(k==='break'){ S.streak=0; S.checked=false; toast('已模拟断签'); }
   if(k==='reset'){ S=clone(INIT); toast('已重置示范资料'); }
+  if(k.startsWith('phase-')){ S.phase=k.slice(6); closePool(); if(S.phase==='redeem') setTab('xmas');
+    toast({live:'活动期间：可签到、累计投注／充值、领取任务、兑换奖池',redeem:'兑换期：不可签到、不计算投注／充值，仅可兑换奖池',closed:'活动页面已关闭'}[S.phase]); }
   renderAll();
 }));
 

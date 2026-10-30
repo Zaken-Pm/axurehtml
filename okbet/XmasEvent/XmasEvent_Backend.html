@@ -396,7 +396,10 @@ label.chk input{accent-color:var(--primary);}
             <div class="sec-title" style="margin-top:24px">时间设定</div>
             <div class="form-row"><label><span class="req">*</span>活动时间：</label>
               <div class="dp-wrap"><input class="input dp-trigger" id="fActTime" type="text" readonly placeholder="开始时间 ~ 结束时间"><span class="dp-icon">📅</span></div></div>
-            <p class="hint hint--warn">· 活动时间到期：<b>停止计算／产生新奖励</b>；已获得的奖励仍可领取。<br>
+            <div class="form-row"><label>兑换期：</label>
+              <div><div id="fRedeem" style="font-size:13px;color:var(--text);line-height:34px">—</div></div></div>
+            <p class="hint hint--warn">· <b>兑换期（系统自动计算，不可编辑）</b>：活动结束日<b>隔日 00:00</b> 起至<b>结束时间 +3 天</b>。兑换期间<b>不可签到、不计算投注与充值</b>（每日返水、特别任务皆停止累计与发放），<b>仅可兑换（开启）特别任务奖池</b>；兑换期结束即关闭活动页面。<br>
+              · 例：活动时间 2026-11-16 00:00 ~ 2026-12-31 23:59 → 兑换期 2027-01-01 00:00 ~ 2027-01-03 23:59，2027-01-03 23:59 后关闭活动页面。<br>
               · 「签到活动、每日返水、特别任务」统一以本活动时间计算。<br>
               · 「状态」开关为手动强制下架（关闭：<b>仅隐藏入口、停算；不影响用户已获得的奖励，重开各状态维持不变</b>，需二次确认）；同期仅能开启一个节庆特别活动。</p>
           </div>
@@ -1052,7 +1055,7 @@ function resetWizardFields(blank){
   /* ---- 步骤1 活动模板 ---- */
   $('#fType').value=TPL; $('#fName').value=''; $('#fCur').value='PHP';
   $('input[name=status][value="关闭"]').checked=true;
-  $('#fActTime').value='';
+  $('#fActTime').value=''; paintRedeem();
   ['#fName','#fActTime'].forEach(s=>$(s).classList.remove('is-error'));
 
   /* ---- 步骤2 活动图片 ---- */
@@ -1151,6 +1154,7 @@ function openEditRow(tr){
     const sr=$(`input[name=status][value="${d.status}"]`); if(sr) sr.checked=true;
     $('#fActTime').value=d.actTime||'';
   }
+  paintRedeem();
   showWizard(true,'编辑活动');
 }
 
@@ -1808,7 +1812,7 @@ function buildPreview(){
     ['① 活动模板设置',[
       ['活动ID',(typeof editingActId!=='undefined'&&editingActId)?editingActId:'—'],['模板类型',$('#fType').value],
       ['状态',status],['活动币种',$('#fCur').value],
-      ['活动名称',$('#fName').value||'—'],['活动时间',$('#fActTime').value||'—']]],
+      ['活动名称',$('#fName').value||'—'],['活动时间',$('#fActTime').value||'—'],['兑换期',$('#fRedeem').textContent||'—']]],
     ['② 活动图片',[
       ['首页浮窗',floatOn?'开启':'关闭'],['PC 图片','已上传'],
       ['H5 图片','已上传'],['首页浮窗排序',$('#fSort').value||'0'],
@@ -1902,11 +1906,22 @@ $('#dpClear').addEventListener('click',()=>{
   if(dp.target){ dp.target.value=''; dp.target.classList.remove('is-error'); }
   dpClose();
 });
+/* 兑换期：结束日隔日 00:00 ～ 结束时间 +3 天 */
+function paintRedeem(){
+  const el=$('#fRedeem'); if(!el) return;
+  const m=($('#fActTime').value||'').match(/~\s*(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})/);
+  if(!m){ el.textContent='—（设定活动时间后自动计算）'; return; }
+  const p2=n=>String(n).padStart(2,'0'), f=(d,hm)=>`${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())} ${hm}`;
+  const end=new Date(+m[1],+m[2]-1,+m[3]);
+  const st=new Date(end); st.setDate(st.getDate()+1);
+  const cl=new Date(end); cl.setDate(cl.getDate()+3);
+  el.innerHTML=`${f(st,'00:00')} ~ ${f(cl,m[4]+':'+m[5])}　<span style="color:var(--text-3)">（仅可兑换奖池；之后关闭活动页面）</span>`;
+}
 $('#dpOk').addEventListener('click',()=>{
   if(!dp.start||!dp.end){ toast('请选择完整的起止日期',true); return; }
   const st=$('#dpStartTime').value||'00:00', et=$('#dpEndTime').value||'23:59';
   if(dp.target){ dp.target.value=`${dpFmt(dp.start)} ${st} ~ ${dpFmt(dp.end)} ${et}`; dp.target.classList.remove('is-error'); }
-  dpClose();
+  dpClose(); paintRedeem();
 });
 $$('.dp-trigger').forEach(inp=>inp.addEventListener('click',e=>{ e.stopPropagation(); dpOpen(inp); }));
 $('#dpPop').addEventListener('click',e=>e.stopPropagation());
