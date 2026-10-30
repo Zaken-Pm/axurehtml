@@ -133,10 +133,23 @@ button{font:inherit;cursor:pointer;}
 /* === 分页内容 === */
 .panel{padding:var(--space-3) var(--space-3) var(--space-5);}
 .panel[hidden]{display:none;}
-.reclaim{display:flex;align-items:center;justify-content:space-between;gap:var(--space-2);margin-bottom:var(--space-3);
-  padding:var(--space-2) var(--space-3);border-radius:12px;background:rgba(255,255,255,.07);border:1px dashed rgba(255,255,255,.25);}
-.reclaim__info{font-size:.67rem;color:var(--muted);min-width:0;}
-.reclaim__info b{color:var(--gold-1);font-size:.8rem;}
+.unc{position:relative;margin-bottom:var(--space-3);padding:6px var(--space-3) 8px;border-radius:14px;
+  background:radial-gradient(120% 120% at 0% 50%,rgba(255,170,40,.18),transparent 55%),linear-gradient(180deg,#5c1580,#3a0c5c);
+  border:1.5px solid #ff6fd8;box-shadow:0 0 0 2px rgba(255,111,216,.18) inset,0 0 14px rgba(255,111,216,.35);}
+.unc__title{margin:0 0 4px;text-align:center;font-size:.67rem;font-weight:900;font-style:italic;letter-spacing:.06em;
+  background:linear-gradient(180deg,#ffe0f6,#ff8ad8);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.unc__row{display:grid;grid-template-columns:62px minmax(0,1fr) auto;align-items:center;gap:var(--space-2);}
+.unc__coins{margin:-10px 0 -8px;}
+.unc__coins svg{width:100%;height:auto;display:block;}
+.unc__val{display:flex;align-items:center;gap:6px;min-width:0;padding:2px 10px 2px 4px;border-radius:999px;background:rgba(20,4,40,.55);}
+.unc__val svg{width:24px;height:24px;flex:none;}
+.unc__val b{margin-left:auto;font-size:1.05rem;font-weight:900;font-style:italic;color:#ffe27a;white-space:nowrap;}
+.unc__btn{min-width:104px;padding:7px 14px;border:none;border-radius:8px;transform:skewX(-12deg);font-weight:900;font-style:italic;font-size:.8rem;
+  color:var(--gold-ink);background:linear-gradient(180deg,#ffe27a,#ffbe1a 60%,#e08a00);box-shadow:0 3px 0 #9b5a00,0 0 12px rgba(255,190,26,.5);}
+.unc__btn span{display:inline-block;transform:skewX(12deg);}
+.unc__btn:disabled{color:#d9b6e6;background:linear-gradient(180deg,#8a4a9c,#5e2a73);border:1.5px solid #c27ad6;box-shadow:none;cursor:not-allowed;}
+.unc__reset{margin:5px 0 0;text-align:center;font-size:.67rem;color:#f3d9ff;}
+.unc__reset b{color:#ffe27a;font-variant-numeric:tabular-nums;letter-spacing:.04em;}
 .empty{text-align:center;color:var(--muted);font-size:.72rem;padding:var(--space-5) 0;}
 
 /* BOMB MISSION 任务卡 */
@@ -411,10 +424,22 @@ button{font:inherit;cursor:pointer;}
 
     <!-- 分页：BOMB MISSION（每日返水任务） -->
     <section class="panel" id="panelBomb" role="tabpanel" aria-labelledby="tabBomb" hidden>
-      <div class="reclaim">
-        <p class="reclaim__info" id="bombReclaimInfo" style="margin:0"></p>
-        <button class="btn-gold" id="btnReclaimBomb">One-Click Reclaim</button>
-      </div>
+      <!-- 今日未领取奖励（一键领取）：金额不含挑战任务加成 -->
+      <section class="unc" aria-labelledby="uncTitle">
+        <h3 class="unc__title" id="uncTitle">TODAY'S UNCLAIMED REWARDS</h3>
+        <div class="unc__row">
+          <span class="unc__coins" aria-hidden="true"><svg viewBox="0 0 80 60">
+            <ellipse cx="40" cy="54" rx="34" ry="5" fill="rgba(0,0,0,.3)"/>
+            <ellipse cx="22" cy="48" rx="14" ry="5" fill="#b87400"/><rect x="8" y="38" width="28" height="10" fill="#e9a300"/><ellipse cx="22" cy="38" rx="14" ry="5" fill="#ffd34d"/>
+            <ellipse cx="54" cy="46" rx="15" ry="5.5" fill="#b87400"/><rect x="39" y="30" width="30" height="16" fill="#e9a300"/><ellipse cx="54" cy="30" rx="15" ry="5.5" fill="#ffe27a"/>
+            <ellipse cx="38" cy="26" rx="13" ry="4.5" fill="#b87400"/><rect x="25" y="16" width="26" height="10" fill="#f2b400"/><ellipse cx="38" cy="16" rx="13" ry="4.5" fill="#fff0a8"/>
+            <circle cx="66" cy="12" r="7" fill="#ffd34d" stroke="#b87400" stroke-width="1.5"/><text x="66" y="15.5" text-anchor="middle" font-size="9" font-weight="900" fill="#b87400">₱</text>
+            <path d="M14 22 l2 -5 2 5 5 2 -5 2 -2 5 -2 -5 -5 -2z" fill="#fff6c2"/></svg></span>
+          <div class="unc__val"><span id="uncIco"></span><b id="uncAmt">0</b></div>
+          <button class="unc__btn" id="btnReclaimBomb"><span>LOCKED</span></button>
+        </div>
+        <p class="unc__reset">Daily missions reset in <b id="uncTimer">--:--:--</b></p>
+      </section>
       <!-- 特别任务（自动发放 PAROL；位于一键领取下方、LV 列表上方） -->
       <article class="cycle" aria-labelledby="cycleTitle">
         <div class="cycle__head" id="cycleTitle">Special Task <span class="chip">REPEATABLE</span></div>
@@ -451,7 +476,7 @@ button{font:inherit;cursor:pointer;}
     <h3>⓪ TODAY'S REWARD BOARD（今日奖励看板，签到上方）</h3>
     <ul>
       <li>位于 Hero 下方、签到区上方，两分页共用；左侧为原创雪人插图，右侧两栏数值。</li>
-      <li><b>Bomb Mission Claimed</b>：今日 BOMB MISSION 已领取的彩金合计（含挑战任务加成），显示至小数点后 2 位（第 3 位无条件舍去），不显示货币符号；每日 00:00 归零（原型「模拟次日」）。不含签到、宝箱、奖池抽中的彩金。</li>
+      <li><b>Bomb Mission Claimed</b>：今日 BOMB MISSION 已领取的彩金合计（含挑战任务加成），显示至小数点后 2 位（第 3 位无条件舍去）、整数时不显示「.00」，不显示货币符号；每日 00:00 归零（原型「模拟次日」）。不含签到、宝箱、奖池抽中的彩金。</li>
       <li><b>My PAROL</b>：目前剩余 PAROL 数量（全页唯一的 PAROL 余额显示；Christmas Activities 分页已移除重复的余额条）。</li>
       <li>领取、一键领取、挑战翻牌、抽奖扣除、特别任务发放后即时更新。</li>
     </ul>
@@ -473,10 +498,12 @@ button{font:inherit;cursor:pointer;}
       <li>Christmas Activities <b>不显示数字气泡</b>，改为<b>红点</b>：剩余 PAROL ≥ 4 个奖池中最低的「道具消耗数量」（即至少可抽最低奖池 1 次，示范 1 个）时显示红点；不足时隐藏。获得／抽奖扣除后即时更新。</li>
     </ul>
 
-    <h3>③ One-Click Reclaim（一键领取）</h3>
+    <h3>③ TODAY'S UNCLAIMED REWARDS（一键领取）</h3>
     <ul>
-      <li><b>仅 BOMB MISSION 有</b>；Christmas Activities 无一键领取。</li>
-      <li>一次领取全部「已达成未领取」的等级；可领数为 0 时按钮停用，左侧显示「No rewards to claim」。</li>
+      <li><b>仅 BOMB MISSION 有</b>（分页最上方）；Christmas Activities 无一键领取。版面参照 X-BOMB「TODAY'S UNCLAIMED REWARDS」：左侧金币插图、中间未领取金额、右侧按钮、下方「Daily missions reset in HH:MM:SS」倒数：<b>依系统时间 UTC+8</b>，距 UTC+8 每日 00:00 重置，每秒更新（不受用户装置时区影响）。</li>
+      <li><b>未领取金额</b>＝今日已达成未领取等级的<b>基础奖励金额</b>合计，<b>不含挑战任务加成</b>（触发挑战的等级只计基础金额，加成须翻牌后才确定）；不含赠送的 PAROL。显示 2 位小数（整数时不显示「.00」，例 17）、不带货币符号。</li>
+      <li>按钮：有可领时为金色「CLAIM ALL」；可领为 0 时停用并显示「LOCKED」、金额 0.00。</li>
+      <li>一次领取全部「已达成未领取」的等级。</li>
       <li>未勾选触发的等级直接入帐；有勾选「触发」的等级依序逐一弹出挑战翻牌（显示「Challenge 1 / 2」），全部翻完后 toast 显示笔数与总额。</li>
       <li>重复点击幂等，只领一次；领取后卡片转「Claimed」并移至列表最下方。</li>
     </ul>
@@ -499,7 +526,7 @@ button{font:inherit;cursor:pointer;}
       <li>挑战弹窗显示 2 张背面卡牌，用户点选 1 张翻开：依该挑战获奖机率判定，<b>WIN</b>＝领取 基础奖励 ×(1＋奖励提升)；<b>MISS</b>＝领取基础奖励（不会失去基础奖励）。翻开后另一张同步亮出。</li>
       <li>挑战弹窗无关闭钮、Esc 不可关闭，须翻牌后按「Collect」，避免领取中断。</li>
       <li>排序：未领取（含可领、未达成）依 LV 由小到大；Claimed 移至最下方。Claimed 卡显示实得金额（含挑战加成）。</li>
-      <li>金额显示至小数点后 2 位，第 3 位无条件舍去。</li>
+      <li>金额显示至小数点后 2 位，第 3 位无条件舍去；<b>整数金额不显示「.00」</b>（例 ₱5、₱17；有小数时如 ₱14.40）。全页金额统一适用。</li>
     </ul>
 
     <h3>⑥ 特别任务（BOMB MISSION 分页）＋ 特别任务奖池（Christmas Activities 分页）</h3>
@@ -507,7 +534,7 @@ button{font:inherit;cursor:pointer;}
       <li><b>道具名称</b>：前台固定显示「PAROL」（菲律宾圣诞星灯造型图示），前后台道具名称统一（后台报表、说明亦显示 PAROL）；不提供后台配置。</li>
       <li>PAROL 余额显示于上方 TODAY'S REWARD BOARD「My PAROL」（累计获得 − 已消耗）；Christmas Activities 分页不再重复显示。奖池详情弹窗内另显示目前持有数。</li>
       <li>PAROL 来源：① 特别任务；② BOMB MISSION 每日返水有勾选「赠送道具」的等级，领取时即时发放（示范 LV2 ×1、LV3 ×2）。</li>
-      <li><b>位置</b>：特别任务卡位于 <b>BOMB MISSION 分页</b>，「One-Click Reclaim」下方、LV 任务列表上方；不计入 BOMB MISSION 气泡与一键领取。Christmas Activities 分页只保留奖池。</li>
+      <li><b>位置</b>：特别任务卡位于 <b>BOMB MISSION 分页</b>，「TODAY'S UNCLAIMED REWARDS」（一键领取）下方、LV 任务列表上方；不计入 BOMB MISSION 气泡与一键领取。Christmas Activities 分页只保留奖池。</li>
       <li><b>特别任务</b>（后台「特别任务配置」，条件固定投注；标题「Special Task」）：活动期间每累计有效投注达任务目标（示范 5,000）即<b>自动发放</b>奖励数量个 PAROL（示范 1 个），进度归零重新累计、可无限次重复；无 CLAIM 按钮、无气泡、无一键领取。</li>
       <li><b>更新频率</b>：系统约每 20～30 分钟更新一次进度并自动发放 PAROL（同一次更新内完成多轮则一次发放）。卡片不显示说明文字（已移除任务说明与更新频率提示），只保留标题、进度条、奖励与 BET NOW。原型为方便演示，模拟投注后即时计入。</li>
       <li>进度条＝本轮累计／任务目标；下方显示已完成次数与特别任务累计获得 PAROL 数。例：剩 1,350 达标，投注 10,000 → 完成 2 轮、得 PAROL ×2，进度 1,350／5,000。</li>
@@ -588,8 +615,9 @@ button{font:inherit;cursor:pointer;}
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const clone=o=>JSON.parse(JSON.stringify(o));
 function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('is-show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('is-show'),2200); }
-/* 金额：小数点后 2 位，第 3 位无条件舍去 */
-const money=n=>'₱'+(Math.floor(n*100+1e-6)/100).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+/* 金额：小数点后 2 位，第 3 位无条件舍去；整数金额去除「.00」（例 ₱17、₱14.40） */
+const money=n=>{ const v=Math.floor(n*100+1e-6)/100, whole=Number.isInteger(v);
+  return '₱'+v.toLocaleString('en-US',{minimumFractionDigits:whole?0:2,maximumFractionDigits:whole?0:2}); };
 const int=n=>Number(n).toLocaleString('en-US');
 
 /* ---------- 图示（原创 SVG） ---------- */
@@ -930,8 +958,11 @@ function renderReclaim(){
   bubble($('#bubbleBomb'),nb); $('#btnReclaimBomb').disabled=!nb;
   const canDraw=keysLeft()>=Math.min(...CHESTS.map(C=>C.cost));   // 剩余 PAROL ≥ 最低奖池道具消耗数量（1 抽）
   $('#dotXmas').hidden=!canDraw; $('#dotXmas').setAttribute('aria-label',canDraw?'PAROL 足够抽奖':'');
+  /* 今日未领取金额：已达成未领取等级的「基础奖励金额」合计，不含挑战任务加成（翻牌结果未知）；可领为 0 时按钮显示 LOCKED */
   const sum=bombClaimable().reduce((a,t)=>a+t.reward,0);
-  $('#bombReclaimInfo').innerHTML=nb?`<b>${nb}</b> reward${nb>1?'s':''} to claim · ${money(sum)}`:'No rewards to claim';
+  $('#uncIco').innerHTML=ICON.cash; $('#uncAmt').textContent=money(sum).replace('₱','');
+  $('#btnReclaimBomb').innerHTML=`<span>${nb?'CLAIM ALL':'LOCKED'}</span>`;
+  $('#btnReclaimBomb').setAttribute('aria-label',nb?`一键领取 ${nb} 笔`:'无可领取奖励');
 }
 /* 今日奖励看板：Bomb Mission Claimed＝今日 BOMB MISSION 已领取彩金合计（含挑战加成，次日归零）；My PAROL＝剩余 PAROL */
 const bombCashToday=()=>Object.values(S.bombClaimed).reduce((a,c)=>a+(c&&c.amt||0),0);
@@ -939,6 +970,13 @@ function renderBoard(){
   $('#boardCash').innerHTML=`${ICON.cash}<b aria-label="今日已领取彩金">${money(bombCashToday()).replace('₱','')}</b>`;
   $('#boardParol').innerHTML=`${ICON.parol}<b aria-label="剩余 PAROL">${int(keysLeft())}</b>`;
 }
+/* 每日任务重置倒数：依系统时间 UTC+8，距离 UTC+8 下一个 00:00 每秒更新（与用户装置所在时区无关） */
+const TZ_OFFSET=8*3600*1000;
+function tickReset(){ const nowShift=Date.now()+TZ_OFFSET, DAY=86400000;
+  let t=Math.max(0,Math.floor((DAY-(nowShift%DAY))/1000));
+  const h=String(Math.floor(t/3600)).padStart(2,'0'), mi=String(Math.floor(t%3600/60)).padStart(2,'0'), se=String(t%60).padStart(2,'0');
+  const el=$('#uncTimer'); if(el) el.textContent=`${h}:${mi}:${se}`; }
+tickReset(); setInterval(tickReset,1000);
 function renderAll(){ renderBoard(); renderSign(); renderBomb(); renderXmas(); renderReclaim(); sim(); }
 
 /* ---------- 原型控制（模拟） ---------- */
