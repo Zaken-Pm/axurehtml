@@ -169,6 +169,16 @@ button{font:inherit;cursor:pointer;}
 .chest{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding:var(--space-3) var(--space-2);border-radius:16px;min-width:0;
   background:linear-gradient(180deg,#3d2ab2,#2a1b85);border:1px solid var(--line);}
 .chest--ok{border:2px solid var(--gold-2);box-shadow:0 0 14px rgba(255,190,26,.35);}
+/* 最高级宝箱：扫光效果（斜向光带由左至右扫过，约 3 秒一次） */
+.chest--top{overflow:hidden;border:2px solid var(--gold-1);
+  background:radial-gradient(120% 80% at 50% 0%,#7a3fe0,#3d2ab2 55%,#2a1b85);}
+.chest--top::after{content:"";position:absolute;top:-20%;bottom:-20%;left:-60%;width:45%;pointer-events:none;z-index:3;
+  background:linear-gradient(100deg,transparent 0%,rgba(255,255,255,.12) 30%,rgba(255,248,210,.7) 50%,rgba(255,255,255,.12) 70%,transparent 100%);
+  transform:skewX(-20deg);animation:sweep 3s ease-in-out infinite;}
+@keyframes sweep{0%{left:-60%;} 45%,100%{left:130%;}}
+.chest__top{position:absolute;top:30px;right:8px;font-size:.67rem;font-weight:900;font-style:italic;color:var(--gold-ink);
+  padding:1px 6px;border-radius:6px;background:linear-gradient(180deg,#fff3b0,var(--gold-2));}
+@media (prefers-reduced-motion:reduce){ .chest--top::after{animation:none;opacity:0;} }
 .chest__no{position:absolute;top:8px;left:8px;font-weight:900;font-style:italic;font-size:.67rem;padding:1px 8px;border-radius:999px;
   background:linear-gradient(180deg,#ff6a7c,var(--red-d));border:1.5px solid var(--gold-1);}
 .chest__opened{position:absolute;top:9px;right:8px;font-size:.67rem;color:var(--muted);}
@@ -406,6 +416,7 @@ button{font:inherit;cursor:pointer;}
       <li><b>循环任务宝箱</b>（后台「循环任务宝箱配置」）：只显示后台有配置的宝箱（示范 5 个），依编号排序，每箱显示最高价值奖励（Chance to Win …）与道具消耗数量（示范 1／2／3／5／10 把钥匙）。</li>
       <li>钥匙足够：金框＋「OPEN · 🔑×N」可点；不足：按钮停用并提示「Need N more keys」。同一宝箱可重复开启，右上显示已开启次数。</li>
       <li>开启扣除的钥匙记录于后台「活动道具消耗统计」（备注记录开启的宝箱）。</li>
+      <li><b>最高级宝箱</b>（道具消耗数量最高者，示范 Chest 5）：卡片加<b>扫光效果</b>（斜向光带由左至右扫过，约 3 秒循环一次）＋金框与「TOP」标签；钥匙是否足够都持续扫光。若多个宝箱消耗数量并列最高，皆套用。系统设定「减少动态效果」时不播放扫光。</li>
     </ul>
   </aside>
 </div>
@@ -519,6 +530,7 @@ const XBOX=k=>{ const m=k+1, tops=[R('cash','₱100',1,{amt:100}),R('phone','iPh
   return mkBox(m*2,tops[k]); };
 /* 后台 10 个宝箱中示范配置 5 个；未配置的宝箱前台不显示 */
 const CHESTS=[1,2,3,5,10].map((cost,k)=>({no:k+1,cost,box:XBOX(k),art:['chest','phone','cash','gift','chest'][k]}));
+const TOP_COST=Math.max(...CHESTS.map(C=>C.cost));   // 最高级宝箱＝道具消耗数量最高者（加扫光效果）
 const topOf=box=>box[box.length-1];   // 主视觉＝宝箱内最高价值奖励（示范资料放在第 9 项）
 
 /* ---------- 用户状态 ---------- */
@@ -661,9 +673,9 @@ function renderXmas(){
     <div class="bar"><div class="bar__fill" style="width:${cur/CYCLE.goal*100}%"></div></div>`;
   $('#cycleReward').innerHTML=`${ICON.key}<span>Reward: ${KEY_NAME} ×${CYCLE.qty}<span class="cycle__done">Completed ${int(rounds)} time${rounds===1?'':'s'} · ${int(keysEarned())} key${keysEarned()===1?'':'s'} earned</span></span>`;
   $('#chestList').innerHTML=CHESTS.map(C=>{
-    const top=topOf(C.box), ok=keys>=C.cost, n=S.opened[C.no]||0;
-    return `<li class="chest ${ok?'chest--ok':''}">
-      <span class="chest__no">Chest ${C.no}</span>${n?`<span class="chest__opened">Opened ×${n}</span>`:''}
+    const top=topOf(C.box), ok=keys>=C.cost, n=S.opened[C.no]||0, best=C.cost===TOP_COST;
+    return `<li class="chest ${ok?'chest--ok':''} ${best?'chest--top':''}">
+      <span class="chest__no">Chest ${C.no}</span>${n?`<span class="chest__opened">Opened ×${n}</span>`:''}${best?'<span class="chest__top">TOP</span>':''}
       <div class="chest__art">${ART[C.art]}</div>
       <div class="chest__win" title="Chance to Win ${top.label}">${TROPHY}<span>Win</span><b>${top.label}</b></div>
       <button class="btn-gold" data-chest="${C.no}" ${ok?'':'disabled'}>OPEN · ${ICON.key}×${C.cost}</button>
