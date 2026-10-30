@@ -153,6 +153,9 @@ button{font:inherit;cursor:pointer;}
 .cycle__desc{font-size:.67rem;color:var(--muted);margin:4px 0 0;}
 .cycle__desc b{color:var(--gold-1);}
 .cycle .task{margin-top:var(--space-2);}
+.cycle__head .cycle__bet{margin-left:auto;background:none;border:none;color:#d7e4ff;font-size:.67rem;font-weight:700;font-style:normal;text-decoration:underline;padding:0;}
+.cycle__note{margin:4px 0 0;font-size:.67rem;color:var(--muted);}
+.cycle .btn-gold:disabled{cursor:progress;}
 .cycle__foot{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--space-2);align-items:center;margin-top:var(--space-2);}
 .cycle__reward{font-size:.72rem;font-weight:800;color:var(--gold-1);display:flex;align-items:center;gap:6px;min-width:0;}
 .cycle__reward svg{width:26px;height:26px;flex:none;}
@@ -396,12 +399,13 @@ button{font:inherit;cursor:pointer;}
         <span class="keybar__n" id="keyNum" aria-live="polite" aria-label="PAROL 数量">0</span>
       </div>
       <article class="cycle" aria-labelledby="cycleTitle">
-        <div class="cycle__head" id="cycleTitle">Special Task <span class="chip">REPEATABLE</span></div>
+        <div class="cycle__head" id="cycleTitle">Special Task <span class="chip">REPEATABLE</span><button class="cycle__bet" id="btnBetNow">Bet now ›</button></div>
         <p class="cycle__desc" id="cycleDesc"></p>
         <div class="task" id="cycleTask"></div>
+        <p class="cycle__note">Progress updates when you tap CLAIM</p>
         <div class="cycle__foot">
           <div class="cycle__reward" id="cycleReward"></div>
-          <button class="btn-gold" id="btnBetNow">BET NOW ›</button>
+          <button class="btn-gold" id="btnTaskClaim">CLAIM</button>
         </div>
       </article>
       <h3 class="sec-title">Christmas Prize Pools</h3>
@@ -474,10 +478,10 @@ button{font:inherit;cursor:pointer;}
       <li><b>道具名称</b>：前台固定显示「PAROL」（菲律宾圣诞星灯造型图示），前后台道具名称统一（后台报表、说明亦显示 PAROL）；不提供后台配置。</li>
       <li>页首「My PAROL」＝目前持有 PAROL 数（累计获得 − 已消耗）。</li>
       <li>PAROL 来源：① 特别任务；② BOMB MISSION 每日返水有勾选「赠送道具」的等级，领取时即时发放（示范 LV2 ×1、LV3 ×2）。</li>
-      <li><b>特别任务</b>（后台「特别任务配置」，条件固定投注；标题「Special Task」）：活动期间每累计有效投注达任务目标（示范 5,000）即<b>自动发放</b>奖励数量个 PAROL（示范 1 个），进度归零重新累计、可无限次重复；无 CLAIM 按钮、无气泡、无一键领取。</li>
-      <li>进度与 PAROL 发放：原型先以<b>即时</b>示意（投注后立即计入进度、达标立即发放）；20 分钟更新机制前台暂不呈现。</li>
-      <li>进度条＝本轮累计／任务目标；下方显示已完成次数与特别任务累计获得 PAROL 数。单笔投注完成多轮时一次发放（例：剩 1,350 达标，投注 10,000 → 完成 2 轮，进度 1,350／5,000）。</li>
-      <li>「BET NOW ›」导向游戏大厅（原型以 toast 示意）。</li>
+      <li><b>特别任务</b>（后台「特别任务配置」，条件固定投注；标题「Special Task」）：活动期间每累计有效投注达任务目标（示范 5,000）可得奖励数量个 PAROL（示范 1 个），进度归零重新累计、可无限次重复。无气泡、无一键领取。</li>
+      <li><b>手动领取</b>：点击「CLAIM」后才查询投注报表（按钮显示「CHECKING…」、不可重复点击），依<b>自上次领取后新增的有效投注</b>计算完成轮数，一次配发「轮数 × 奖励数量」个 PAROL，余数保留至下次；有配发 toast「+PAROL ×N claimed」，无完成轮数 toast「No completed rounds yet · Keep betting!」。无 20 分钟更新限制，可随时点击。</li>
+      <li>进度条＝上次领取时查询到的本轮累计／任务目标（未点 CLAIM 前不会更新，卡片注明「Progress updates when you tap CLAIM」）；下方显示已完成次数与特别任务累计获得 PAROL 数。例：上次领取时剩 1,350 达标，之后投注 10,000 → 点 CLAIM 完成 2 轮、得 PAROL ×2，进度 1,350／5,000。</li>
+      <li>标题右侧「Bet now ›」导向游戏大厅（原型以 toast 示意）。</li>
       <li><b>特别任务奖池</b>（后台「特别任务奖池配置」，固定 4 个、皆必填）：列表以 2×2 显示 <b>4 个奖池卡</b>（Pool 名称、主视觉、Grand Prize＝该奖池最高价值奖励、「PAROL×N / draw」＝道具消耗数量、VIEW POOL ›）；<b>点击奖池卡后才开启奖池详情</b>。</li>
       <li>奖池详情（弹窗）：Pool 名称、已抽次数（Drawn ×N）与目前持有 PAROL、大奖、9 项奖励一览（大奖排第一并金框），以及「1 Draw／5 Draws／10 Draws」三个按钮，按钮下方显示所需 PAROL（＝道具消耗数量 × 抽数，无折扣）。右上「✕」、点遮罩或 Esc 关闭回到奖池列表。</li>
       <li>PAROL 不足该抽数所需：该按钮停用；连 1 抽都不足时，面板下方提示「Need N more PAROL to draw」。</li>
@@ -622,7 +626,7 @@ const TOP_COST=Math.max(...CHESTS.map(C=>C.cost));   // 最高级奖池＝道具
 const topOf=box=>box[box.length-1];   // 主视觉＝宝箱内最高价值奖励（示范资料放在第 9 项）
 
 /* ---------- 用户状态 ---------- */
-const INIT={streak:2,checked:false,dayBet:1250,dayDep:200,bombClaimed:{1:{amt:3}},bombKeys:0,xBet:13650,keysUsed:0,bonusKeys:0,opened:{},pool:0};   // xBet＝活动累计有效投注（示范：已完成 2 轮 → 2 个 PAROL）；bombKeys＝每日返水赠送的 PAROL
+const INIT={streak:2,checked:false,dayBet:1250,dayDep:200,bombClaimed:{1:{amt:3}},bombKeys:0,xBet:13650,xClaimed:8650,keysUsed:0,bonusKeys:0,opened:{},pool:0};   // xBet＝活动累计有效投注（系统实际）；xClaimed＝上次点击领取时查询到的累计投注（前台进度依此显示）；示范：点 CLAIM 可再领 1 个
 let S=clone(INIT);
 
 /* ---------- 签到区 ---------- */
@@ -756,11 +760,11 @@ $('#chOk').addEventListener('click',()=>{
 });
 
 /* ---------- Christmas Activities：特别任务＋特别任务宝箱 ---------- */
-const taskKeys=()=>Math.floor(S.xBet/CYCLE.goal)*CYCLE.qty;               // 特别任务：每达标 1 轮发放 qty 把钥匙（依已结算投注）
+const taskKeys=()=>Math.floor(S.xClaimed/CYCLE.goal)*CYCLE.qty;           // 特别任务：已领取的 PAROL（依上次领取时查询的投注）
 const keysEarned=()=>taskKeys()+S.bombKeys+S.bonusKeys;                   // ＋每日返水赠送（bonusKeys 仅原型模拟用）
 const keysLeft=()=>keysEarned()-S.keysUsed;
 function renderXmas(){
-  const rounds=Math.floor(S.xBet/CYCLE.goal), cur=S.xBet%CYCLE.goal, keys=keysLeft();
+  const rounds=Math.floor(S.xClaimed/CYCLE.goal), cur=S.xClaimed%CYCLE.goal, keys=keysLeft();
   $('#keyIco').innerHTML=ICON.parol; $('#keyNum').textContent=int(keys);
   $('#cycleDesc').innerHTML=`Every <b>${int(CYCLE.goal)}</b> valid bets during the event = <b>${KEY_NAME} ×${CYCLE.qty}</b>. Progress resets after each round · Unlimited rounds.`;
   $('#cycleTask').innerHTML=`<div class="task__row"><span>Valid bets (this round)</span><span>${int(cur)} / ${int(CYCLE.goal)}</span></div>
@@ -837,6 +841,17 @@ function playMulti(C,d,cost,res,top){
 }
 $('#multiOk').addEventListener('click',()=>{ if(MT&&!MT.done){ MT.finish(); return; } $('#multiMask').classList.remove('is-open'); MT=null; });
 $('#btnBetNow').addEventListener('click',()=>toast('导向游戏大厅（原型示意）'));
+/* 特别任务：手动领取 → 查询投注报表（示意 0.9 秒）→ 依自上次领取后完成的轮数配发 PAROL；余数保留 */
+$('#btnTaskClaim').addEventListener('click',()=>{
+  const b=$('#btnTaskClaim'); if(b.disabled) return;          // 查询中不可重复点击
+  b.disabled=true; b.textContent='CHECKING…';
+  setTimeout(()=>{
+    const k0=taskKeys(); S.xClaimed=S.xBet; const g=taskKeys()-k0;
+    b.disabled=false; b.textContent='CLAIM';
+    toast(g?`+${KEY_NAME} ×${g} claimed (${g/CYCLE.qty} round${g/CYCLE.qty>1?'s':''} completed)`:'No completed rounds yet · Keep betting!');
+    renderAll();
+  },900);
+});
 $('#sumOk').addEventListener('click',()=>$('#sumMask').classList.remove('is-open'));
 
 /* ---------- 宝箱开启弹窗 ---------- */
@@ -903,11 +918,10 @@ function renderReclaim(){
 function renderAll(){ renderSign(); renderBomb(); renderXmas(); renderReclaim(); sim(); }
 
 /* ---------- 原型控制（模拟） ---------- */
-function sim(){ $('#simState').textContent=`今日投注 ${int(S.dayBet)}｜今日充值 ${int(S.dayDep)}｜活动累计投注 ${int(S.xBet)}｜PAROL 获得 ${keysEarned()}（特别任务 ${taskKeys()}＋每日返水 ${S.bombKeys}${S.bonusKeys?'＋模拟 '+S.bonusKeys:''}）／消耗 ${S.keysUsed}／剩余 ${keysLeft()}｜连续签到 ${S.streak} 天｜今日${S.checked?'已':'未'}签到`; }
+function sim(){ $('#simState').textContent=`今日投注 ${int(S.dayBet)}｜今日充值 ${int(S.dayDep)}｜活动累计投注 ${int(S.xBet)}（上次领取查询 ${int(S.xClaimed)}）｜PAROL 获得 ${keysEarned()}（特别任务 ${taskKeys()}＋每日返水 ${S.bombKeys}${S.bonusKeys?'＋模拟 '+S.bonusKeys:''}）／消耗 ${S.keysUsed}／剩余 ${keysLeft()}｜连续签到 ${S.streak} 天｜今日${S.checked?'已':'未'}签到`; }
 $$('[data-sim]').forEach(b=>b.addEventListener('click',()=>{
   const k=b.dataset.sim;
-  if(k==='bet'){ const k0=taskKeys(); S.dayBet+=10000; S.xBet+=10000; const g=taskKeys()-k0;
-    toast(`模拟投注 +10,000${g?` · 特别任务完成 ${g/CYCLE.qty} 轮，获得 PAROL ×${g}`:''}`); }
+  if(k==='bet'){ S.dayBet+=10000; S.xBet+=10000; toast('模拟投注 +10,000（Special Task 需点击 CLAIM 才查询并配发）'); }
   if(k==='parol'){ S.bonusKeys+=20; toast('模拟获得 PAROL +20（测试 5 抽／10 抽用）'); }
   if(k==='dep'){ S.dayDep+=5000; toast('模拟充值 +5,000'); }
   if(k==='nextday'){ if(!S.checked) S.streak=0; S.checked=false; S.dayBet=0; S.dayDep=0; S.bombClaimed={}; toast(S.streak?'已进入次日':'昨日未签到 → 断签，连续天数归 0'); }
