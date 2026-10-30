@@ -216,7 +216,6 @@ label.chk input{accent-color:var(--primary);}
 .report-totals{display:flex;gap:22px;justify-content:flex-end;margin:0 0 12px;font-size:13px;color:var(--text-2);}
 .report-totals b{font-weight:800;}
 .report-totals .m{color:var(--red);} .report-totals .p{color:var(--primary);} .report-totals .c{color:var(--green);}
-#itemBody .p{color:var(--primary);font-weight:700;} #itemBody .m{color:var(--red);font-weight:700;}
 .hl{color:var(--primary);font-weight:600;}
 /* 报表：日期／时间／状态等栏不换行（表格可横向捲动），奖励内容栏允许换行 */
 #awardBody td,#dataBody td{white-space:nowrap;}
@@ -729,9 +728,9 @@ label.chk input{accent-color:var(--primary);}
         </table>
         </div>
         <p class="mini-note">· 仅列出有道具机制的活动；<b>单笔记录，不做当日汇总</b>：会员每获得或消耗一次道具＝1 笔，依时间由近到远排序。<br>
-          · 获得：循环任务<b>每达成 1 次＝1 笔</b>，获得数量＝后台「奖励数量」（单笔投注跨越多轮时，每轮各记 1 笔）；消耗：<b>每开启 1 次宝箱＝1 笔</b>，消耗数量＝该宝箱「道具消耗数量」。不适用的栏位显示「—」。<br>
+          · 获得：宝箱钥匙为系统自动发放，<b>每次发放＝1 笔</b>（依单笔投注结算）；获得数量＝该笔投注完成的循环任务轮数 × 后台「奖励数量」。例：任务目标 1,000、奖励数量 1，单笔投注 10,000 → 记 1 笔，获得数量 10。消耗：<b>每开启 1 次宝箱＝1 笔</b>，消耗数量＝该宝箱「道具消耗数量」。不适用的栏位显示「—」。<br>
           · 时间＝道具发放／扣除当下时间（至秒）；剩余数量＝该笔异动后该会员持有、尚未使用的道具数（累计获得－累计消耗）。日期筛选依时间的日期部分。<br>
-          · 备注：「道具名称｜来源」，获得记「循环任务达成（第 N 次）」，消耗记「开启 宝箱N」。节庆特别活动的道具为「宝箱钥匙」。<br>
+          · 备注：获得只记道具名称「宝箱钥匙」（不注明循环任务达成次数）；消耗记「宝箱钥匙｜开启 宝箱N」。<br>
           · 汇总列：会员数（去重）、总获得、总消耗、查询结果笔数，依筛选结果计算。</p>
       </div>
 
@@ -949,27 +948,27 @@ $$('.rtab').forEach(b=>b.addEventListener('click',()=>{
 }));
 
 /* 活动道具消耗统计（示意资料）：单笔记录，每获得／消耗 1 次＝1 笔，依时间由近到远
-   事件 [时间, 会员账号, 'gain'|'use', 数量, 宝箱编号]；剩余数量依会员时间顺序累计计算
+   事件 [时间, 会员账号, 'gain'|'use', 数量, 宝箱编号]；获得＝系统自动发放，1 笔投注结算 1 笔（数量＝完成轮数×奖励数量）；剩余数量依会员时间顺序累计计算
    宝箱道具消耗数对应后台示范：宝箱1=1、宝箱2=2、宝箱3=3、宝箱4=5、宝箱5=10；循环任务奖励数量=1 */
 const ITEM_ACT=['节庆特别活动','191','Christmas Activities 2026'], ITEM_NAME='宝箱钥匙';
 const ITEM_EVENTS=[
   ['2026-11-16 10:12:05','member01','gain',1],['2026-11-16 10:15:40','member01','use',1,1],['2026-11-16 21:03:11','member01','gain',1],
-  ['2026-11-16 13:22:47','member02','gain',1],['2026-11-16 13:22:47','member02','gain',1],['2026-11-16 18:40:02','member02','gain',1],['2026-11-16 18:41:30','member02','gain',1],
+  ['2026-11-16 13:22:47','member02','gain',2],['2026-11-16 18:40:02','member02','gain',1],['2026-11-16 18:41:30','member02','gain',1],
   ['2026-11-16 18:45:13','member02','use',2,2],['2026-11-16 18:46:02','member02','use',2,2],
   ['2026-11-17 09:20:33','member01','gain',1],['2026-11-17 11:05:19','member01','gain',1],['2026-11-17 11:08:44','member01','use',3,3],
-  ['2026-11-17 15:30:00','vip_king88','gain',1],['2026-11-17 15:30:00','vip_king88','gain',1],['2026-11-17 16:12:21','vip_king88','gain',1],
+  ['2026-11-17 15:30:00','vip_king88','gain',2],['2026-11-17 16:12:21','vip_king88','gain',1],
   ['2026-11-17 16:20:09','vip_king88','use',1,1],['2026-11-17 16:21:55','vip_king88','use',2,2],
   ['2026-11-18 20:14:36','member01','gain',1],
-  ['2026-11-19 08:55:10','member02','gain',1],['2026-11-19 12:31:48','member02','gain',1],['2026-11-19 12:33:05','member02','gain',1],['2026-11-19 19:02:27','member02','gain',1],['2026-11-19 19:02:27','member02','gain',1],
+  ['2026-11-19 08:55:10','member02','gain',1],['2026-11-19 12:31:48','member02','gain',1],['2026-11-19 12:33:05','member02','gain',1],['2026-11-19 19:02:27','member02','gain',2],
   ['2026-11-19 19:06:51','member02','use',3,3],
-  ['2026-11-19 22:10:14','vip_king88','gain',1],['2026-11-19 22:10:14','vip_king88','gain',1],['2026-11-19 22:35:02','vip_king88','gain',1],['2026-11-19 22:47:39','vip_king88','use',3,3],
+  ['2026-11-19 22:10:14','vip_king88','gain',10],['2026-11-19 22:47:39','vip_king88','use',10,5],
   ['2026-11-20 10:01:56','member05','gain',1],['2026-11-20 14:18:22','member05','gain',1],['2026-11-20 14:25:07','member05','use',1,1],
 ];
 /* → [时间, 活动类型, 活动ID, 活动名称, 会员账号, 获得, 消耗, 剩余, 备注] */
-const itemRows=(()=>{ const bal={}, cnt={};
+const itemRows=(()=>{ const bal={};
   const rows=[...ITEM_EVENTS].sort((a,b)=>a[0].localeCompare(b[0])).map(([t,u,k,n,box])=>{
     bal[u]=(bal[u]||0)+(k==='gain'?n:-n);
-    const note=k==='gain'?`${ITEM_NAME}｜循环任务达成（第 ${cnt[u]=(cnt[u]||0)+1} 次）`:`${ITEM_NAME}｜开启 宝箱${box}`;
+    const note=k==='gain'?ITEM_NAME:`${ITEM_NAME}｜开启 宝箱${box}`;
     return [t,...ITEM_ACT,u,k==='gain'?n:0,k==='use'?n:0,bal[u],note]; });
   return rows.reverse(); })();
 function renderItemReport(){
@@ -978,7 +977,7 @@ function renderItemReport(){
   const rows=itemRows.filter(r=>(!aid||r[2]===aid)&&(!uid||r[4].includes(uid))&&(!act||r[1]===act)&&(!tr||(r[0].slice(0,10)>=tr.s&&r[0].slice(0,10)<=tr.e)));
   $('#itemBody').innerHTML=rows.length?rows.map(r=>{
     return `<tr><td style="white-space:nowrap">${r[0]}</td><td class="hl">${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td>
-      <td>${r[5]?'<span class="p">+'+r[5].toLocaleString()+'</span>':'—'}</td><td>${r[6]?'<span class="m">−'+r[6].toLocaleString()+'</span>':'—'}</td><td>${r[7].toLocaleString()}</td><td style="white-space:normal;line-height:1.6">${r[8]}</td></tr>`;
+      <td>${r[5]?r[5].toLocaleString():'—'}</td><td>${r[6]?r[6].toLocaleString():'—'}</td><td>${r[7].toLocaleString()}</td><td style="white-space:normal;line-height:1.6">${r[8]}</td></tr>`;
   }).join(''):'<tr><td colspan="9" style="text-align:center;color:var(--text-3);padding:28px">暂无数据</td></tr>';
   const g=rows.reduce((a,r)=>a+r[5],0), c=rows.reduce((a,r)=>a+r[6],0), users=new Set(rows.map(r=>r[4])).size;
   $('#itTotals').innerHTML=`会员数：<b>${users}</b>　总获得：<b class="p">${g.toLocaleString()}</b>　总消耗：<b class="m">${c.toLocaleString()}</b>　查询结果：<b>${rows.length}</b> 笔`;
