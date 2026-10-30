@@ -38,32 +38,6 @@ button{font:inherit;cursor:pointer;}
   position:sticky;top:0;z-index:30;backdrop-filter:blur(6px);}
 .appbar__back{background:none;border:none;color:var(--snow);font-size:1.1rem;padding:0 var(--space-2);}
 .appbar__title{font-weight:700;font-size:.9rem;margin:0;}
-/* 全部等级页：开启时隐藏活动主页内容 */
-.phone[data-view="all"] > :not(.appbar):not(#viewAll){display:none;}
-#viewAll{padding:var(--space-3) var(--space-3) var(--space-5);}
-#viewAll[hidden]{display:none;}
-.viewall{display:flex;justify-content:center;margin-top:var(--space-1);}
-.btn-green{border:2px solid var(--gold-1);border-radius:999px;padding:11px 22px;font-weight:900;font-size:.8rem;color:#fff;width:100%;
-  background:linear-gradient(180deg,#3fbf5a,#1d7a33 60%,#14592a);box-shadow:0 3px 0 #0c3d1c,0 6px 14px rgba(0,0,0,.35);}
-.btn-green:hover{filter:brightness(1.08);} .btn-green:active{transform:translateY(2px);box-shadow:0 1px 0 #0c3d1c;}
-.all-sum{font-size:.67rem;color:var(--muted);margin:0 0 var(--space-3);text-align:center;}
-.all-sum b{color:var(--gold-1);}
-.lvrow{display:grid;grid-template-columns:50px minmax(0,1fr) 92px;gap:var(--space-2);align-items:center;padding:var(--space-2) var(--space-3);
-  border-radius:14px;margin-bottom:var(--space-2);background:linear-gradient(180deg,#3d2ab2,#2a1b85);border:1px solid var(--line);}
-.lvrow--ms{border:2px solid var(--gold-2);}
-.lvrow--claimed{opacity:.55;background:linear-gradient(180deg,#2e2a5a,#221f45);}
-.lvrow__lv{font-weight:900;font-style:italic;font-size:.67rem;white-space:nowrap;text-align:center;padding:6px 0;border-radius:10px;
-  background:linear-gradient(180deg,#ffe9a8,#e0b24a);color:var(--gold-ink);}
-.lvrow__lv .star{display:block;color:#c25e00;font-style:normal;line-height:1;}
-.lvrow__task{font-size:.67rem;color:var(--muted);display:flex;flex-wrap:wrap;justify-content:space-between;column-gap:6px;}
-.lvrow__task b{color:#fff;font-weight:700;}
-.lvrow .bar{height:7px;margin:2px 0 4px;}
-.lvrow__prize{display:flex;align-items:center;gap:4px;font-size:.67rem;min-width:0;}
-.lvrow__prize b{color:var(--gold-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.lvrow__prize .xcard__pool{margin-left:auto;align-self:center;flex:none;}
-.lvrow .btn-gold{width:100%;padding:8px 4px;font-size:.67rem;white-space:nowrap;}
-.lvrow .won{padding:5px 4px;}
-
 /* === Hero === */
 .hero{position:relative;padding:var(--space-5) var(--space-4) 64px;overflow:hidden;
   background:
@@ -164,29 +138,65 @@ button{font:inherit;cursor:pointer;}
 .locked{font-size:.67rem;color:var(--muted);text-align:center;min-width:78px;}
 .locked b{display:block;font-size:.85rem;}
 
-/* Christmas Activities 等级卡 */
-.xcard{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--space-2);align-items:end;padding:var(--space-3);
-  border-radius:16px;margin-bottom:var(--space-3);overflow:hidden;min-height:150px;
-  background:
-    radial-gradient(1.5px 1.5px at 15% 20%,#fff 50%,transparent 51%),radial-gradient(1.5px 1.5px at 60% 15%,#fff 50%,transparent 51%),
-    radial-gradient(1.5px 1.5px at 85% 35%,#fff 50%,transparent 51%),
-    linear-gradient(180deg,#2c3f9e 0%,#4a2a9e 55%,#7a2f8f 100%);border:2px solid #8fb3ff;box-shadow:0 0 0 2px rgba(143,179,255,.25) inset;}
-.xcard--claimed{filter:grayscale(.65);opacity:.75;}
-.xcard__lv{position:absolute;top:8px;left:8px;z-index:2;font-weight:900;font-style:italic;font-size:.72rem;padding:2px 10px;border-radius:999px;
-  background:linear-gradient(180deg,#ff6a7c,var(--red-d));border:1.5px solid var(--gold-1);}
-.xcard__art{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0;padding-top:18px;}
-.xcard__art svg{width:100%;max-width:150px;height:auto;}
-.xcard__win{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:6px;align-items:center;padding:4px 12px;border-radius:14px;
-  background:linear-gradient(180deg,#7a1020,#4a0612);border:1.5px solid var(--gold-2);font-weight:800;font-size:.67rem;max-width:100%;}
-.xcard__win svg{grid-row:span 2;}
-.xcard__win b{color:var(--gold-1);font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.15;}
-.xcard__side{display:flex;flex-direction:column;gap:var(--space-2);min-width:0;}
+/* Christmas Activities：宝箱钥匙余额 */
+.keybar{display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) var(--space-3);border-radius:14px;margin-bottom:var(--space-3);
+  background:linear-gradient(180deg,#ffe9a8,#e0b24a);color:var(--gold-ink);}
+.keybar svg{width:40px;height:40px;flex:none;display:block;}
+.keybar__lb{font-size:.72rem;font-weight:900;line-height:1.2;}
+.keybar__lb small{display:block;font-weight:600;font-size:.67rem;opacity:.8;}
+.keybar__n{margin-left:auto;font-size:1.4rem;font-weight:900;font-style:italic;line-height:1;}
+/* 循环任务卡 */
+.cycle{padding:var(--space-3);border-radius:16px;margin-bottom:var(--space-4);border:2px solid #8fb3ff;
+  background:radial-gradient(1.5px 1.5px at 85% 25%,#fff 50%,transparent 51%),radial-gradient(1.5px 1.5px at 60% 70%,#fff 50%,transparent 51%),
+    linear-gradient(180deg,#2c3f9e 0%,#4a2a9e 100%);}
+.cycle__head{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:.8rem;font-weight:900;font-style:italic;}
+.cycle__desc{font-size:.67rem;color:var(--muted);margin:4px 0 0;}
+.cycle__desc b{color:var(--gold-1);}
+.cycle .task{margin-top:var(--space-2);}
+.cycle__foot{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--space-2);align-items:center;margin-top:var(--space-2);}
+.cycle__reward{font-size:.72rem;font-weight:800;color:var(--gold-1);display:flex;align-items:center;gap:6px;min-width:0;}
+.cycle__reward svg{width:26px;height:26px;flex:none;}
+.cycle__done{display:block;font-size:.67rem;font-weight:600;color:var(--muted);}
+.cycle .btn-gold{padding:8px 16px;font-size:.72rem;white-space:nowrap;}
 .task{background:linear-gradient(180deg,#eef4ff,#d8e6ff);color:var(--ink);border-radius:12px;padding:6px 10px;}
 .task__row{display:flex;justify-content:space-between;gap:6px;font-size:.67rem;font-weight:800;white-space:nowrap;}
 .task .bar{background:#b9cdf5;height:9px;margin:3px 0 4px;}
-.xcard .btn-gold{width:100%;padding:9px 6px;font-size:.72rem;white-space:nowrap;}
-@media(max-width:420px){ .xcard .btn-gold{font-size:.67rem;} .tab__txt{white-space:normal;line-height:1.1;text-align:left;} }
-.xcard__pool{background:none;border:none;color:#d7e4ff;font-size:.67rem;text-decoration:underline;padding:0;align-self:flex-end;}
+.task .bar__fill{background:linear-gradient(90deg,#4fa8ff,#2f6bff);}
+/* 循环任务宝箱 */
+.sec-title{margin:0 0 2px;font-size:.85rem;font-weight:900;font-style:italic;color:var(--gold-1);text-align:center;}
+.sec-note{margin:0 0 var(--space-3);font-size:.67rem;color:var(--muted);text-align:center;}
+.chests{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-2);}
+.chest{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding:var(--space-3) var(--space-2);border-radius:16px;min-width:0;
+  background:linear-gradient(180deg,#3d2ab2,#2a1b85);border:1px solid var(--line);}
+.chest--ok{border:2px solid var(--gold-2);box-shadow:0 0 14px rgba(255,190,26,.35);}
+.chest__no{position:absolute;top:8px;left:8px;font-weight:900;font-style:italic;font-size:.67rem;padding:1px 8px;border-radius:999px;
+  background:linear-gradient(180deg,#ff6a7c,var(--red-d));border:1.5px solid var(--gold-1);}
+.chest__opened{position:absolute;top:9px;right:8px;font-size:.67rem;color:var(--muted);}
+.chest__art{width:100%;display:flex;justify-content:center;}
+.chest__art svg{width:100%;max-width:120px;height:auto;margin-top:14px;}
+.chest__win{display:flex;align-items:center;gap:4px;font-size:.67rem;font-weight:800;max-width:100%;min-width:0;}
+.chest__win svg{flex:none;}
+.chest__win b{color:var(--gold-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.chest .btn-gold{width:100%;padding:8px 6px;font-size:.72rem;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:4px;}
+.chest .btn-gold svg{width:18px;height:18px;flex:none;}
+.chest__need{font-size:.67rem;color:#ffd38a;min-height:1.4em;text-align:center;margin:0;}
+.xcard__pool{background:none;border:none;color:#d7e4ff;font-size:.67rem;text-decoration:underline;padding:0;}
+/* BOMB MISSION：挑战任务（翻牌） */
+.chip--ch{background:linear-gradient(180deg,#ff8ad0,#d63a8f);color:#fff;}
+.mission__ch{display:block;font-size:.67rem;color:#ffb3dc;font-weight:600;}
+.flip{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-3);margin:var(--space-3) 0 var(--space-2);}
+.flip__card{aspect-ratio:3/4;border-radius:14px;border:2px solid var(--gold-2);display:grid;place-items:center;text-align:center;padding:8px;
+  background:repeating-linear-gradient(45deg,#e81f3a 0 10px,#c3142d 10px 20px);color:#fff;font-weight:900;font-size:1.6rem;transition:transform .3s;}
+.flip__card:hover:not(:disabled){transform:translateY(-3px);}
+.flip__card:disabled{cursor:default;}
+.flip__card--win{background:radial-gradient(circle,#fff6b0 0%,#ffbe1a 55%,#e07b00 100%);color:var(--gold-ink);font-size:.85rem;}
+.flip__card--lose{background:linear-gradient(180deg,#5f588c,#3d3866);color:#e3defa;font-size:.85rem;}
+.flip__card--pick{box-shadow:0 0 0 3px #fff,0 0 22px rgba(255,226,122,.9);}
+.flip__card--other{opacity:.5;}
+.ch-info{text-align:center;font-size:.72rem;color:var(--muted);margin:0;}
+.ch-info b{color:var(--gold-1);}
+.ch-result{text-align:center;font-size:.8rem;min-height:2.6em;margin:var(--space-2) 0 0;}
+.ch-result b{color:var(--gold-1);}
 .won{font-size:.67rem;color:#fff;background:rgba(0,0,0,.35);border-radius:10px;padding:6px 8px;text-align:center;}
 .won b{color:var(--gold-1);}
 .review{display:inline-block;margin-top:2px;font-size:.67rem;color:#ffd38a;}
@@ -227,7 +237,7 @@ button{font:inherit;cursor:pointer;}
 .mbox__result{text-align:center;margin-top:12px;font-size:.8rem;min-height:1.4em;}
 .mbox__result b{color:var(--gold-1);}
 
-/* 一键领取结果弹窗 */
+/* 结果弹窗（BOMB MISSION 一键领取） */
 .rlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;max-height:46vh;overflow:auto;}
 .rlist li{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.08);font-size:.72rem;}
 .rlist svg{width:34px;height:34px;flex:none;}
@@ -235,6 +245,7 @@ button{font:inherit;cursor:pointer;}
 .sheet{width:min(360px,100%);border-radius:22px;padding:20px 16px 18px;background:linear-gradient(180deg,#3a22a8,#1d1066);border:2px solid var(--gold-2);}
 .sheet h2{margin:0 0 12px;text-align:center;font-size:.95rem;font-style:italic;color:var(--gold-1);}
 .sheet .btn-gold{width:100%;margin-top:14px;}
+@media(max-width:420px){ .tab__txt{white-space:normal;line-height:1.1;text-align:left;} }
 
 /* toast */
 .toast{position:fixed;left:50%;top:18px;transform:translateX(-50%) translateY(-10px);background:#fff;color:var(--ink);font-size:.72rem;font-weight:700;
@@ -295,7 +306,7 @@ button{font:inherit;cursor:pointer;}
         <span class="tab__txt">BOMB MISSION</span><span class="bubble" id="bubbleBomb" hidden></span></button>
       <button class="tab" role="tab" id="tabXmas" aria-controls="panelXmas" aria-selected="true" data-tab="xmas">
         <svg class="tab__ico" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12,2 19,14 15,14 20,21 4,21 9,14 5,14" fill="#1f9d55"/><rect x="10.5" y="21" width="3" height="2" fill="#7a4a1f"/><circle cx="12" cy="3" r="1.6" fill="#ffd34d"/></svg>
-        <span class="tab__txt">Christmas Activities</span><span class="bubble" id="bubbleXmas" hidden></span></button>
+        <span class="tab__txt">Christmas Activities</span></button>
     </div>
 
     <!-- 分页：BOMB MISSION（每日返水任务） -->
@@ -307,20 +318,25 @@ button{font:inherit;cursor:pointer;}
       <ul id="bombList" style="list-style:none;margin:0;padding:0"></ul>
     </section>
 
-    <!-- 分页：Christmas Activities（期间返水任务） -->
+    <!-- 分页：Christmas Activities（循环任务＋循环任务宝箱）：无气泡角标、无一键领取 -->
     <section class="panel" id="panelXmas" role="tabpanel" aria-labelledby="tabXmas">
-      <div class="reclaim">
-        <p class="reclaim__info" id="xmasReclaimInfo" style="margin:0"></p>
-        <button class="btn-gold" id="btnReclaimXmas">One-Click Reclaim</button>
+      <div class="keybar">
+        <span id="keyIco"></span>
+        <p class="keybar__lb" style="margin:0">My Chest Keys<small>Use keys to open Christmas Chests</small></p>
+        <span class="keybar__n" id="keyNum" aria-live="polite">0</span>
       </div>
-      <ul id="xmasList" style="list-style:none;margin:0;padding:0"></ul>
-      <div class="viewall"><button class="btn-green" id="btnViewAll">VIEW ALL LEVELS ›</button></div>
-    </section>
-
-    <!-- 全部等级页（Christmas Activities）：已领取排序在最下方 -->
-    <section id="viewAll" aria-label="全部等级" hidden>
-      <p class="all-sum" id="allSum"></p>
-      <ul id="allList" style="list-style:none;margin:0;padding:0"></ul>
+      <article class="cycle" aria-labelledby="cycleTitle">
+        <div class="cycle__head" id="cycleTitle">Bet Task <span class="chip">REPEATABLE</span></div>
+        <p class="cycle__desc" id="cycleDesc"></p>
+        <div class="task" id="cycleTask"></div>
+        <div class="cycle__foot">
+          <div class="cycle__reward" id="cycleReward"></div>
+          <button class="btn-gold" id="btnBetNow">BET NOW ›</button>
+        </div>
+      </article>
+      <h3 class="sec-title">Christmas Chests</h3>
+      <p class="sec-note">Each chest holds 9 prizes · Spend keys to draw 1</p>
+      <ul class="chests" id="chestList"></ul>
     </section>
   </main>
 
@@ -333,12 +349,6 @@ button{font:inherit;cursor:pointer;}
       <button data-sim="nextday">模拟次日</button>
       <button data-sim="break">模拟断签</button>
       <button data-sim="reset">重置示范资料</button>
-    </div>
-    <div class="ctrl" style="align-items:center">
-      <label for="simLv" style="font-size:.67rem">Christmas 模拟进行至 LV</label>
-      <input id="simLv" type="number" min="1" max="50" value="21" style="width:64px;padding:5px 6px;border:1px solid #c9cfdb;border-radius:8px;font-size:.67rem">
-      <button data-sim="jump">套用</button>
-      <span style="font-size:.67rem;color:#5a6274">（LV1～LV(N-1) 视为已领取，LV N 进行中约 60%）</span>
     </div>
     <p class="state" id="simState"></p>
 
@@ -355,15 +365,15 @@ button{font:inherit;cursor:pointer;}
 
     <h3>② Tab 气泡角标</h3>
     <ul>
-      <li>BOMB MISSION＝该分页「已达成未领取」的每日返水任务数；Christmas Activities＝「已达成未领取」的期间返水等级数。<b>两分页各自计算</b>。</li>
-      <li>0 不显示；超过 99 显示「99+」。领取（含一键领取）后即时更新。</li>
+      <li><b>仅 BOMB MISSION 显示</b>：该分页「已达成未领取」的每日返水任务数；0 不显示、超过 99 显示「99+」，领取（含一键领取）后即时更新。</li>
+      <li>Christmas Activities <b>不显示气泡角标</b>（循环任务达标即自动发放宝箱钥匙，无待领取状态）。</li>
     </ul>
 
     <h3>③ One-Click Reclaim（一键领取）</h3>
     <ul>
-      <li>两分页各有一颗，<b>仅领取当前分页</b>全部「已达成未领取」的奖励，不影响另一分页。</li>
-      <li>可领数为 0 时按钮停用，左侧显示「No rewards to claim」。</li>
-      <li>BOMB MISSION：一次领取全部彩金，toast 显示笔数与总额。Christmas Activities：逐级依宝箱中奖率抽出 1 项，以结果清单弹窗显示（不播放逐箱动画）。</li>
+      <li><b>仅 BOMB MISSION 有</b>；Christmas Activities 无一键领取。</li>
+      <li>一次领取全部「已达成未领取」的等级；可领数为 0 时按钮停用，左侧显示「No rewards to claim」。</li>
+      <li>未勾选触发的等级直接入帐；有勾选「触发」的等级依序逐一弹出挑战翻牌（显示「Challenge 1 / 2」），全部翻完后 toast 显示笔数与总额。</li>
       <li>重复点击幂等，只领一次；领取后卡片转「Claimed」并移至列表最下方。</li>
     </ul>
 
@@ -372,21 +382,30 @@ button{font:inherit;cursor:pointer;}
       <li>弹窗展示该宝箱全部 9 项奖励（3×3），点「Draw」后金框沿格子跑动、逐渐减速，停在抽中项；抽中项放大＋金色光芒，其余变暗。</li>
       <li>参考图为「8 格奖励＋中央 Draw」，因后台宝箱固定 9 项，Draw 按钮移至格子下方。</li>
       <li>抽中实体奖品：显示「Under review」，由后台派奖审核人工处理。</li>
-      <li>Christmas Activities 每张卡可点「View pool」预览该等级宝箱 9 项奖励（不抽奖）。</li>
+      <li>签到随机宝箱：按钮为「Draw」，不消耗钥匙。循环任务宝箱：按钮为「Draw · 🔑×N」，<b>按下 Draw 当下才扣除钥匙</b>；开启弹窗后未按 Draw 直接关闭不扣钥匙。</li>
+      <li>每个宝箱可点「View pool」预览 9 项奖励（不抽奖）。</li>
     </ul>
 
-    <h3>⑤ 列表规则</h3>
+    <h3>⑤ BOMB MISSION（每日返水＋挑战任务）</h3>
     <ul>
-      <li>BOMB MISSION：依后台「每日返水配置」（当前 VIP 等级）列出 LV；状态 CLAIM／LOCKED（显示进度）／Claimed。充值任务金框。</li>
-      <li>Christmas Activities：依后台「期间返水任务」，活动期间累计；卡片主视觉为该等级宝箱的最高价值奖励（Chance to Win …）；按钮 CLAIM &amp; OPEN POOL。</li>
-      <li><b>Christmas Activities 列表只显示 3 张</b>：前 2 个「未领取」等级＋下一个重点等级（10 的倍数，标 MILESTONE）。
-        <br>例：初始 LV1、LV2、LV10 → 领完 LV1：LV2、LV3、LV10 → 领完至 LV8：LV9、LV10、LV20。</li>
-      <li>「完成」＝已领取：已达成但未领取的等级仍显示（CLAIM）；已领取的等级不再显示。重点等级若已被领取（如一键领取），改取下一个 10 的倍数。</li>
-      <li>边界：总等级不足 10 级时第三张显示最后一级；后段不足 3 张就少显示（如 LV49、LV50 → 只剩 LV50）；全部领取完显示「All levels completed!」。</li>
-      <li>列表下方「VIEW ALL N LEVELS ›」（N＝后台期间返水总等级数）：进入「All Levels」页面，列出全部等级；<b>未领取（含可领、未达成）依 LV 由小到大，已领取排序在最下方</b>；可直接 CLAIM（开宝箱）或看 Pool；左上「‹」返回活动页。10 的倍数等级金框＋★（重点等级）。</li>
-      <li>Tab 气泡与 One-Click Reclaim 计算<b>全部已达成未领取</b>的等级，含列表上没显示的（例：同时达成 LV2～LV4，列表显示 LV2、LV3、LV10，气泡为 3）。</li>
-      <li>BOMB MISSION 排序：未领取（含可领、未达成）依 LV 由小到大；Claimed 移至最下方。</li>
+      <li>依后台「每日返水配置」（当前 VIP 等级）列出 LV；状态 CLAIM／LOCKED（显示进度）／Claimed。充值任务金框。</li>
+      <li>后台该级勾选「挑战任务 · 触发」→ 卡片标「CHALLENGE」并提示「Claim to unlock a challenge」。</li>
+      <li>领取该级时<b>必定触发 1 个挑战</b>：依「挑战任务配置」的触发机率抽出挑战（示范：挑战1 奖励提升 20%／触发 60%／获奖 60%；挑战2 提升 50%／触发 40%／获奖 50%）。</li>
+      <li>挑战弹窗显示 2 张背面卡牌，用户点选 1 张翻开：依该挑战获奖机率判定，<b>WIN</b>＝领取 基础奖励 ×(1＋奖励提升)；<b>MISS</b>＝领取基础奖励（不会失去基础奖励）。翻开后另一张同步亮出。</li>
+      <li>挑战弹窗无关闭钮、Esc 不可关闭，须翻牌后按「Collect」，避免领取中断。</li>
+      <li>排序：未领取（含可领、未达成）依 LV 由小到大；Claimed 移至最下方。Claimed 卡显示实得金额（含挑战加成）。</li>
       <li>金额显示至小数点后 2 位，第 3 位无条件舍去。</li>
+    </ul>
+
+    <h3>⑥ Christmas Activities（循环任务＋循环任务宝箱）</h3>
+    <ul>
+      <li>页首「My Chest Keys」＝目前持有宝箱钥匙数（累计获得 − 已消耗）。</li>
+      <li><b>循环任务</b>（后台「循环任务配置」，条件固定投注）：活动期间每累计有效投注达任务目标（示范 5,000）即<b>自动发放</b>奖励数量个「宝箱钥匙」（示范 1 个），进度归零重新累计、可无限次重复；无 CLAIM 按钮、无气泡、无一键领取。</li>
+      <li>进度条＝本轮累计／任务目标；下方显示已完成次数与累计获得钥匙数。单笔投注跨越多轮时一次发放多轮钥匙（例：剩 1,350 达标，投注 10,000 → 完成 2 轮，进度 1,350／5,000）。</li>
+      <li>「BET NOW ›」导向游戏大厅（原型以 toast 示意）。</li>
+      <li><b>循环任务宝箱</b>（后台「循环任务宝箱配置」）：只显示后台有配置的宝箱（示范 5 个），依编号排序，每箱显示最高价值奖励（Chance to Win …）与道具消耗数量（示范 1／2／3／5／10 把钥匙）。</li>
+      <li>钥匙足够：金框＋「OPEN · 🔑×N」可点；不足：按钮停用并提示「Need N more keys」。同一宝箱可重复开启，右上显示已开启次数。</li>
+      <li>开启扣除的钥匙记录于后台「活动道具消耗统计」（备注记录开启的宝箱）。</li>
     </ul>
   </aside>
 </div>
@@ -409,7 +428,18 @@ button{font:inherit;cursor:pointer;}
   </div>
 </div>
 
-<!-- ============ 弹窗：一键领取结果（Christmas Activities） ============ -->
+<!-- ============ 弹窗：挑战任务（翻牌；BOMB MISSION 领取有勾选「触发」的等级时） ============ -->
+<div class="mask" id="chMask" role="dialog" aria-modal="true" aria-labelledby="chTitle">
+  <div class="sheet">
+    <h2 id="chTitle">Challenge Unlocked!</h2>
+    <p class="ch-info" id="chInfo"></p>
+    <div class="flip" id="chCards"></div>
+    <p class="ch-result" id="chResult" aria-live="polite"></p>
+    <button class="btn-gold" id="chOk" hidden>Collect</button>
+  </div>
+</div>
+
+<!-- ============ 弹窗：一键领取结果（BOMB MISSION） ============ -->
 <div class="mask" id="sumMask" role="dialog" aria-modal="true" aria-labelledby="sumTitle">
   <div class="sheet">
     <h2 id="sumTitle">Rewards Claimed</h2>
@@ -444,6 +474,8 @@ const ICON={
     <path d="M24 14c-6-10-15-7-11-2 3 3 11 2 11 2zm0 0c6-10 15-7 11-2-3 3-11 2-11 2z" fill="#ffd34d"/></svg>`,
   mystery:`<svg viewBox="0 0 48 48" aria-hidden="true"><g transform="rotate(10 24 24)"><rect x="10" y="10" width="28" height="30" rx="4" fill="#ff6a7c" stroke="#ffd34d" stroke-width="2.5"/>
     <text x="24" y="33" text-anchor="middle" font-size="20" font-weight="900" fill="#fff">?</text></g></svg>`,
+  key:`<svg viewBox="0 0 48 48" aria-hidden="true"><g transform="rotate(-35 24 24)"><circle cx="13" cy="24" r="9" fill="#ffd34d" stroke="#a86400" stroke-width="2.5"/><circle cx="13" cy="24" r="3.5" fill="#a86400"/>
+    <rect x="21" y="21" width="22" height="6" rx="2" fill="#ffd34d" stroke="#a86400" stroke-width="2"/><rect x="34" y="26" width="4" height="7" fill="#ffd34d" stroke="#a86400" stroke-width="1.5"/><rect x="39" y="26" width="4" height="5" fill="#ffd34d" stroke="#a86400" stroke-width="1.5"/></g></svg>`,
   phone:`<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="13" y="4" width="22" height="40" rx="5" fill="#23262f" stroke="#c9ced8" stroke-width="2"/><rect x="16" y="8" width="16" height="31" rx="2" fill="#4c86ff"/><circle cx="24" cy="41" r="1.5" fill="#c9ced8"/></svg>`,
 };
 /* 卡片主视觉（较大） */
@@ -473,33 +505,24 @@ const SIGN_BOXES=[mkBox(1,R('cash','₱100',1,{amt:100})),mkBox(2,R('cash','₱2
   mkBox(4,R('cash','₱500',1,{amt:500})),mkBox(5,R('gift','Xmas Gift Box',1,{physical:true})),mkBox(6,R('phone','iPhone',1,{physical:true}))];
 const SIGN_BOX_RATE=[40,25,15,12,8,0];
 
-/* BOMB MISSION：每日返水（当前 VIP 等级） */
-const BOMB_TASKS=[{lv:1,cond:'bet',goal:200,reward:3},{lv:2,cond:'dep',goal:200,reward:5},{lv:3,cond:'bet',goal:1000,reward:12},
+/* BOMB MISSION：每日返水（当前 VIP 等级）；trigger＝后台「挑战任务 · 触发」 */
+const BOMB_TASKS=[{lv:1,cond:'bet',goal:200,reward:3},{lv:2,cond:'dep',goal:200,reward:5,trigger:true},{lv:3,cond:'bet',goal:1000,reward:12,trigger:true},
   {lv:4,cond:'bet',goal:3000,reward:30},{lv:5,cond:'dep',goal:1000,reward:20},{lv:6,cond:'bet',goal:8000,reward:88}];
-/* Christmas Activities：期间返水任务（每级选 1 款返水任务宝箱） */
+/* 挑战任务配置（全等级共用）：up＝奖励提升 %、appear＝触发机率 %（加总 100）、win＝获奖机率 % */
+const CHALLENGES=[{no:1,up:20,appear:60,win:60},{no:2,up:50,appear:40,win:50}];
+
+/* Christmas Activities：循环任务（条件固定投注；单一目标、可重复）＋循环任务宝箱 */
+const CYCLE={goal:5000,qty:1};        // 每累计有效投注 5,000 → 宝箱钥匙 ×1
+const KEY_NAME='Chest Key';           // 后台道具名称「宝箱钥匙」
 const XBOX=k=>{ const m=k+1, tops=[R('cash','₱100',1,{amt:100}),R('phone','iPhone',1,{physical:true}),R('cash','₱1,000',1,{amt:1000}),
-  R('phone','iPhone',1,{physical:true}),R('cash','₱100,000',1,{amt:100000}),R('gift','Xmas Gift Box',1,{physical:true})];
+  R('gift','Xmas Gift Box',1,{physical:true}),R('cash','₱100,000',1,{amt:100000})];
   return mkBox(m*2,tops[k]); };
-/* 示范 50 级（后台上限 LV50）；LV10／20／30／40／50 为重点等级，宝箱放较高价值奖品 */
-const XMAS_LEVELS=[
-  {lv:1,cond:'bet',bet:1000,art:'cash'},{lv:2,cond:'bet',bet:3000,art:'phone'},{lv:3,cond:'dep',dep:2000,art:'cash'},
-  {lv:4,cond:'both',bet:8000,dep:5000,art:'phone'},{lv:5,cond:'bet',bet:20000,art:'chest'},{lv:6,cond:'bet',bet:50000,art:'gift'}];
-for(let n=7;n<=50;n++){
-  const dep=n%4===3, both=n%10===0;
-  XMAS_LEVELS.push(both?{lv:n,cond:'both',bet:50000+(n-6)*25000,dep:10000+(n-6)*2500}
-                 :dep?{lv:n,cond:'dep',dep:10000+(n-6)*2500}:{lv:n,cond:'bet',bet:50000+(n-6)*25000});
-}
-XMAS_LEVELS.forEach((L,k)=>{ L.box=XBOX(k%6);
-  if(L.lv===10){ L.box[8]=R('phone','iPhone',1,{physical:true}); L.art='phone'; }
-  if(L.lv===20){ L.box[8]=R('cash','₱100,000',1,{amt:100000}); L.art='chest'; }
-  if(L.lv===30){ L.box[8]=R('gift','Xmas Gift Box',1,{physical:true}); L.art='gift'; }
-  if(L.lv===40){ L.box[8]=R('phone','iPhone',1,{physical:true}); L.art='phone'; }
-  if(L.lv===50){ L.box[8]=R('cash','₱500,000',1,{amt:500000}); L.art='chest'; }
-  if(!L.art) L.art=['cash','gift','chest','cash','phone','gift'][k%6]; });
+/* 后台 10 个宝箱中示范配置 5 个；未配置的宝箱前台不显示 */
+const CHESTS=[1,2,3,5,10].map((cost,k)=>({no:k+1,cost,box:XBOX(k),art:['chest','phone','cash','gift','chest'][k]}));
 const topOf=box=>box[box.length-1];   // 主视觉＝宝箱内最高价值奖励（示范资料放在第 9 项）
 
 /* ---------- 用户状态 ---------- */
-const INIT={streak:2,checked:false,dayBet:1250,dayDep:200,bombClaimed:{1:true},xBet:8650,xDep:5200,xClaimed:{}};   // Christmas Activities 初始未领取任何等级（LV1 起显示）
+const INIT={streak:2,checked:false,dayBet:1250,dayDep:200,bombClaimed:{1:{amt:3}},xBet:13650,keysUsed:0,opened:{}};   // xBet＝活动期间累计有效投注（示范：已完成 2 轮 → 2 把钥匙）
 let S=clone(INIT);
 
 /* ---------- 签到区 ---------- */
@@ -566,110 +589,97 @@ function sortLv(list,claimed){ return [...list].sort((a,b)=>(!!claimed(a)-!!clai
 function renderBomb(){
   const list=sortLv(BOMB_TASKS,t=>S.bombClaimed[t.lv]);
   $('#bombList').innerHTML=list.map(t=>{
-    const cur=t.cond==='bet'?S.dayBet:S.dayDep, done=cur>=t.goal, claimed=!!S.bombClaimed[t.lv];
+    const cur=t.cond==='bet'?S.dayBet:S.dayDep, done=cur>=t.goal, got=S.bombClaimed[t.lv];
     const pct=Math.min(100,cur/t.goal*100);
-    const act= claimed?`<div class="locked"><b>✓</b>Claimed</div>`
+    const act= got?`<div class="locked"><b>✓</b>Claimed</div>`
              : done?`<button class="btn-gold" data-bomb="${t.lv}">CLAIM</button>`
              : `<div class="locked"><b>🔒</b>LOCKED</div>`;
-    return `<li class="mission ${t.cond==='dep'?'mission--deposit':''} ${claimed?'mission--claimed':''}">
-      <div class="lv-heart">${HEART(claimed?'#8a86a8':done?'#ff3d8b':'#9c8ad6')}<span>LV${t.lv}</span></div>
+    const rw= got?`Received ${money(got.amt)}${got.ch?` <span class="mission__ch">Challenge ${got.ch} ${got.win?'WIN +'+CHALLENGES[got.ch-1].up+'%':'· base reward'}</span>`:''}`
+            : `Reward ${money(t.reward)}${t.trigger?'<span class="mission__ch">Claim to unlock a challenge (up to +'+Math.max(...CHALLENGES.map(c=>c.up))+'%)</span>':''}`;
+    return `<li class="mission ${t.cond==='dep'?'mission--deposit':''} ${got?'mission--claimed':''}">
+      <div class="lv-heart">${HEART(got?'#8a86a8':done?'#ff3d8b':'#9c8ad6')}<span>LV${t.lv}</span></div>
       <div style="min-width:0">
-        <div class="mission__title">${t.cond==='bet'?'Bet Task':'Top-up Task'}${t.cond==='dep'?'<span class="chip">TOP-UP</span>':''}</div>
+        <div class="mission__title">${t.cond==='bet'?'Bet Task':'Top-up Task'}${t.cond==='dep'?'<span class="chip">TOP-UP</span>':''}${t.trigger?'<span class="chip chip--ch">CHALLENGE</span>':''}</div>
         <div class="bar ${t.cond==='dep'?'bar--blue':''}"><div class="bar__fill" style="width:${pct}%"></div></div>
         <div class="mission__prog"><span>${t.cond==='bet'?'Valid bet':'Top-up'}</span><span>${int(Math.min(cur,t.goal))} / ${int(t.goal)}</span></div>
-        <div class="mission__reward">Reward ${money(t.reward)}</div>
+        <div class="mission__reward">${rw}</div>
       </div>${act}</li>`;
   }).join('') || `<li class="empty">The goal has not yet been achieved.</li>`;
   $$('[data-bomb]').forEach(b=>b.addEventListener('click',()=>{
-    const lv=+b.dataset.bomb; if(S.bombClaimed[lv]) return;          // 幂等
-    S.bombClaimed[lv]=true; const t=BOMB_TASKS.find(x=>x.lv===lv);
-    toast(`+${money(t.reward)} claimed (LV${lv})`); renderAll();
+    const lv=+b.dataset.bomb; if(S.bombClaimed[lv]||CH) return;          // 幂等
+    const t=BOMB_TASKS.find(x=>x.lv===lv);
+    if(t.trigger){ runChallenges([t],res=>toast(`+${money(res[0].amt)} claimed (LV${lv})`)); return; }
+    S.bombClaimed[lv]={amt:t.reward}; toast(`+${money(t.reward)} claimed (LV${lv})`); renderAll();
   }));
 }
 $('#btnReclaimBomb').addEventListener('click',()=>{
-  const list=bombClaimable(); if(!list.length) return;
-  list.forEach(t=>S.bombClaimed[t.lv]=true);
-  const sum=list.reduce((a,t)=>a+t.reward,0);
-  toast(`${list.length} reward${list.length>1?'s':''} claimed · Total ${money(sum)}`); renderAll();
+  const list=bombClaimable(); if(!list.length||CH) return;
+  const plain=list.filter(t=>!t.trigger), chal=list.filter(t=>t.trigger);
+  plain.forEach(t=>S.bombClaimed[t.lv]={amt:t.reward});
+  const done=res=>{ const all=[...plain.map(t=>({amt:t.reward})),...res], sum=all.reduce((a,r)=>a+r.amt,0);
+    toast(`${all.length} reward${all.length>1?'s':''} claimed · Total ${money(sum)}`); renderAll(); };
+  if(chal.length){ renderAll(); runChallenges(chal,done); } else done([]);
 });
 
-/* ---------- Christmas Activities ---------- */
-const xDone=L=>(L.cond!=='dep'?S.xBet>=L.bet:true)&&(L.cond!=='bet'?S.xDep>=L.dep:true);
-const xClaimable=()=>XMAS_LEVELS.filter(L=>xDone(L)&&!S.xClaimed[L.lv]);
-function taskRows(L){
-  const row=(lab,cur,goal)=>`<div class="task__row"><span>${lab}:</span><span>${int(Math.min(cur,goal))} / ${int(goal)}</span></div>
-    <div class="bar"><div class="bar__fill" style="width:${Math.min(100,cur/goal*100)}%;background:linear-gradient(90deg,#4fa8ff,#2f6bff)"></div></div>`;
-  return (L.cond!=='dep'?row(L.cond==='both'?'Bet':'Task',S.xBet,L.bet):'')+(L.cond!=='bet'?row(L.cond==='both'?'Top-up':'Task',S.xDep,L.dep):'');
+/* ---------- 挑战任务（翻牌）：领取有勾选「触发」的等级时必定触发 1 个 ---------- */
+let CH=null;   // {queue, idx, results, done, cur:{t,c,win}}
+function runChallenges(tasks,done){ CH={queue:tasks,idx:0,results:[],done}; showChallenge(); }
+function showChallenge(){
+  const t=CH.queue[CH.idx], c=CHALLENGES[weighted(CHALLENGES.map(x=>x.appear))];
+  CH.cur={t,c,win:Math.random()*100<c.win};
+  $('#chTitle').textContent=CH.queue.length>1?`Challenge Unlocked! (${CH.idx+1} / ${CH.queue.length})`:'Challenge Unlocked!';
+  $('#chInfo').innerHTML=`LV${t.lv} · Challenge ${c.no} · Reward <b>+${c.up}%</b><br>Pick a card — WIN to get <b>${money(t.reward*(1+c.up/100))}</b>, otherwise ${money(t.reward)}.`;
+  $('#chCards').innerHTML=[0,1].map(i=>`<button class="flip__card" data-card="${i}" aria-label="Card ${i+1}">❄</button>`).join('');
+  $('#chResult').textContent=''; $('#chOk').hidden=true;
+  $$('#chCards .flip__card').forEach(b=>b.addEventListener('click',()=>flipCard(+b.dataset.card)));
+  $('#chMask').classList.add('is-open'); $('#chCards .flip__card').focus();
 }
-/* 列表显示规则：前 2 个「未领取」等级＋下一个重点等级（10 的倍数，且大于前 2 张、未领取）。
-   「完成」＝已领取；已领取的等级不再显示。总等级不足 10 级或已无下一个 10 的倍数时，第三张改显示最后一级（未显示过且未领取才显示）；不足就少显示。 */
-function visibleXmasLevels(){
-  const open=XMAS_LEVELS.filter(L=>!S.xClaimed[L.lv]);
-  const firstTwo=open.slice(0,2); if(!firstTwo.length) return [];
-  const maxLv=firstTwo[firstTwo.length-1].lv, total=XMAS_LEVELS.length;
-  let ms=open.find(L=>L.lv>maxLv&&L.lv%10===0);                       // 下一个 10 的倍数
-  if(!ms && total<10){ const last=XMAS_LEVELS[total-1]; if(last.lv>maxLv&&!S.xClaimed[last.lv]) ms=last; }
-  return ms?[...firstTwo,{...ms,_milestone:true}]:firstTwo;
+function flipCard(i){
+  const {t,c,win}=CH.cur; if(CH.cur.flipped) return; CH.cur.flipped=true;
+  const amt=win?Math.floor(t.reward*(1+c.up/100)*100)/100:t.reward;
+  $$('#chCards .flip__card').forEach((b,k)=>{ const mine=k===i, w=mine?win:!win; b.disabled=true;
+    b.className=`flip__card ${w?'flip__card--win':'flip__card--lose'} ${mine?'flip__card--pick':'flip__card--other'}`;
+    b.innerHTML=w?`WIN<br>+${c.up}%`:'MISS'; });
+  $('#chResult').innerHTML=win?`You won! LV${t.lv} reward <b>${money(t.reward)} → ${money(amt)}</b>`:`Not this time. You still get <b>${money(amt)}</b>`;
+  S.bombClaimed[t.lv]={amt,ch:c.no,win}; CH.results.push({amt});
+  const ok=$('#chOk'); ok.hidden=false; ok.textContent=CH.idx<CH.queue.length-1?'Next Challenge ›':'Collect'; ok.focus(); renderAll();
 }
-function renderXmas(){
-  const list=visibleXmasLevels();
-  $('#xmasList').innerHTML=list.map(L=>{
-    const top=topOf(L.box), done=xDone(L), won=S.xClaimed[L.lv];
-    const act= won?`<div class="won">Claimed · Won <b>${won.label}</b>${won.physical?'<br><span class="review">Under review</span>':''}</div>`
-             : `<button class="btn-gold" data-xlv="${L.lv}" ${done?'':'disabled'}>${done?'CLAIM &amp; OPEN POOL ›':'IN PROGRESS'}</button>`;
-    return `<li class="xcard ${won?'xcard--claimed':''}">
-      <span class="xcard__lv">LV${L.lv}${L.lv%10===0?' · MILESTONE':''}</span>
-      <div class="xcard__art">${ART[L.art]}<div class="xcard__win" title="Chance to Win ${top.label}">${TROPHY}<span>Chance to Win</span><b>${top.label}</b></div></div>
-      <div class="xcard__side"><button class="xcard__pool" data-pool="${L.lv}">View pool ›</button>
-        <div class="task">${taskRows(L)}</div>${act}</div></li>`;
-  }).join('') || `<li class="empty">🎉 All levels completed!</li>`;
-  bindXmasActions($('#xmasList'));
-  $('#btnViewAll').textContent=`VIEW ALL ${XMAS_LEVELS.length} LEVELS ›`;
-  if(!$('#viewAll').hidden) renderAllLevels();
-}
-/* 卡片／列：CLAIM & OPEN POOL 与 View pool（限定容器，避免重复绑定） */
-function bindXmasActions(root){
-  $$('[data-xlv]',root).forEach(b=>b.addEventListener('click',()=>{
-    const L=XMAS_LEVELS.find(x=>x.lv===+b.dataset.xlv);
-    if(!xDone(L)||S.xClaimed[L.lv]) return;
-    openBox({title:`LV${L.lv} · Christmas Chest`,box:L.box,mode:'draw',onWin:rw=>{ S.xClaimed[L.lv]=rw; renderAll(); }});
-  }));
-  $$('[data-pool]',root).forEach(b=>b.addEventListener('click',()=>{
-    const L=XMAS_LEVELS.find(x=>x.lv===+b.dataset.pool); openBox({title:`LV${L.lv} · Prize pool`,box:L.box,mode:'preview'});
-  }));
-}
-/* ---------- 全部等级页：未领取依 LV 由小到大，已领取排序在最下方 ---------- */
-function renderAllLevels(){
-  const list=sortLv(XMAS_LEVELS,L=>S.xClaimed[L.lv]);
-  const nClaim=xClaimable().length, nDone=Object.keys(S.xClaimed).length;
-  $('#allSum').innerHTML=`Claimed <b>${nDone}</b> / ${XMAS_LEVELS.length} levels · Ready to claim <b>${nClaim}</b>`;
-  $('#allList').innerHTML=list.map(L=>{
-    const top=topOf(L.box), done=xDone(L), won=S.xClaimed[L.lv];
-    const bar=(lab,cur,goal)=>`<div class="lvrow__task"><span>${lab}</span><b>${int(Math.min(cur,goal))} / ${int(goal)}</b></div>
-      <div class="bar bar--blue"><div class="bar__fill" style="width:${Math.min(100,cur/goal*100)}%"></div></div>`;
-    const task=(L.cond!=='dep'?bar('Valid bets',S.xBet,L.bet):'')+(L.cond!=='bet'?bar('Top-up',S.xDep,L.dep):'');
-    const act= won?`<div class="won">Claimed ✓<br><b>${won.label}</b>${won.physical?'<br><span class="review">Under review</span>':''}</div>`
-             : `<button class="btn-gold" data-xlv="${L.lv}" ${done?'':'disabled'}>${done?'CLAIM ›':'IN PROGRESS'}</button>`;
-    return `<li class="lvrow ${L.lv%10===0?'lvrow--ms':''} ${won?'lvrow--claimed':''}">
-      <div class="lvrow__lv" ${L.lv%10===0?'title="Milestone"':''}>${L.lv%10===0?'<span class="star" aria-label="Milestone">★</span>':''}LV ${L.lv}</div>
-      <div style="min-width:0">${task}<div class="lvrow__prize">${TROPHY}<span>Win</span><b title="${top.label}">${top.label}</b>
-        <button class="xcard__pool" data-pool="${L.lv}">Pool ›</button></div></div>${act}</li>`;
-  }).join('');
-  bindXmasActions($('#allList'));
-}
-function openAllLevels(){
-  $('.phone').dataset.view='all'; $('#viewAll').hidden=false;
-  $('.appbar__title').textContent=`All Levels (${XMAS_LEVELS.length})`; renderAllLevels(); $('.phone').scrollIntoView({block:'start'}); window.scrollTo(0,0);
-}
-function closeAllLevels(){ delete $('.phone').dataset.view; $('#viewAll').hidden=true; $('.appbar__title').textContent='Christmas Activities'; }
-$('#btnViewAll').addEventListener('click',openAllLevels);
-$('.appbar__back').addEventListener('click',()=>{ if(!$('#viewAll').hidden) closeAllLevels(); });
-$('#btnReclaimXmas').addEventListener('click',()=>{
-  const list=xClaimable(); if(!list.length) return;
-  const res=list.map(L=>{ const rw=L.box[weighted(L.box.map(r=>r.rate))]; S.xClaimed[L.lv]=rw; return {L,rw}; });
-  $('#sumList').innerHTML=res.map(({L,rw})=>`<li>${ICON[rw.type]}<span>LV${L.lv} · <b>${rw.label}</b>${rw.physical?' <span class="review">· Under review</span>':''}</span></li>`).join('');
-  $('#sumMask').classList.add('is-open'); $('#sumOk').focus(); renderAll();
+$('#chOk').addEventListener('click',()=>{
+  if(!CH||!CH.cur.flipped) return;
+  if(CH.idx<CH.queue.length-1){ CH.idx++; showChallenge(); return; }
+  $('#chMask').classList.remove('is-open'); const {done,results}=CH; CH=null; done&&done(results); renderAll();
 });
+
+/* ---------- Christmas Activities：循环任务＋循环任务宝箱 ---------- */
+const keysEarned=()=>Math.floor(S.xBet/CYCLE.goal)*CYCLE.qty;            // 每达标 1 轮自动发放 qty 把钥匙
+const keysLeft=()=>keysEarned()-S.keysUsed;
+function renderXmas(){
+  const rounds=Math.floor(S.xBet/CYCLE.goal), cur=S.xBet%CYCLE.goal, keys=keysLeft();
+  $('#keyIco').innerHTML=ICON.key; $('#keyNum').textContent=int(keys);
+  $('#cycleDesc').innerHTML=`Every <b>${int(CYCLE.goal)}</b> valid bets during the event = <b>${KEY_NAME} ×${CYCLE.qty}</b>. Progress resets after each round · Unlimited rounds.`;
+  $('#cycleTask').innerHTML=`<div class="task__row"><span>Valid bets (this round)</span><span>${int(cur)} / ${int(CYCLE.goal)}</span></div>
+    <div class="bar"><div class="bar__fill" style="width:${cur/CYCLE.goal*100}%"></div></div>`;
+  $('#cycleReward').innerHTML=`${ICON.key}<span>Reward: ${KEY_NAME} ×${CYCLE.qty}<span class="cycle__done">Completed ${int(rounds)} time${rounds===1?'':'s'} · ${int(keysEarned())} key${keysEarned()===1?'':'s'} earned</span></span>`;
+  $('#chestList').innerHTML=CHESTS.map(C=>{
+    const top=topOf(C.box), ok=keys>=C.cost, n=S.opened[C.no]||0;
+    return `<li class="chest ${ok?'chest--ok':''}">
+      <span class="chest__no">Chest ${C.no}</span>${n?`<span class="chest__opened">Opened ×${n}</span>`:''}
+      <div class="chest__art">${ART[C.art]}</div>
+      <div class="chest__win" title="Chance to Win ${top.label}">${TROPHY}<span>Win</span><b>${top.label}</b></div>
+      <button class="btn-gold" data-chest="${C.no}" ${ok?'':'disabled'}>OPEN · ${ICON.key}×${C.cost}</button>
+      <p class="chest__need">${ok?'':`Need ${C.cost-keys} more key${C.cost-keys>1?'s':''}`}</p>
+      <button class="xcard__pool" data-pool="${C.no}">View pool ›</button></li>`;
+  }).join('');
+  $$('[data-chest]').forEach(b=>b.addEventListener('click',()=>{
+    const C=CHESTS.find(x=>x.no===+b.dataset.chest); if(keysLeft()<C.cost) return;
+    openBox({title:`Christmas Chest ${C.no} · ${KEY_NAME} ×${C.cost}`,box:C.box,mode:'draw',drawLabel:`Draw · 🔑×${C.cost}`,
+      onDraw:()=>{ if(keysLeft()<C.cost){ toast('Not enough keys'); return false; } S.keysUsed+=C.cost; S.opened[C.no]=(S.opened[C.no]||0)+1; renderAll(); return true; }});
+  }));
+  $$('[data-pool]').forEach(b=>b.addEventListener('click',()=>{
+    const C=CHESTS.find(x=>x.no===+b.dataset.pool); openBox({title:`Christmas Chest ${C.no} · Prize pool`,box:C.box,mode:'preview'});
+  }));
+}
+$('#btnBetNow').addEventListener('click',()=>toast('导向游戏大厅（原型示意）'));
 $('#sumOk').addEventListener('click',()=>$('#sumMask').classList.remove('is-open'));
 
 /* ---------- 宝箱开启弹窗 ---------- */
@@ -679,8 +689,8 @@ function openBox(o){
   $('#boxSub').textContent=o.title;
   $('#grid9').className='grid9';
   $('#grid9').innerHTML=o.box.map((r,i)=>`<div class="tile" data-i="${i}">${ICON[r.type]}<span class="tile__lb" title="${r.label}">${r.label}</span></div>`).join('');
-  $('#boxResult').textContent=o.mode==='preview'?'All 9 prizes in this chest. Complete the task to draw 1.':'';
-  const d=$('#btnDraw'); d.style.display=o.mode==='preview'?'none':''; d.disabled=false; d.textContent='Draw';
+  $('#boxResult').textContent=o.mode==='preview'?'All 9 prizes in this chest. Open the chest to draw 1.':'';
+  const d=$('#btnDraw'); d.style.display=o.mode==='preview'?'none':''; d.disabled=false; d.textContent=o.drawLabel||'Draw';
   $('#boxMask').classList.add('is-open'); (o.mode==='preview'?$('#boxClose'):d).focus();
 }
 /* 跑马灯：依顺时针绕行 3×3 外圈再进中心，逐渐减速后停在抽中项 */
@@ -688,6 +698,7 @@ const RING=[0,1,2,5,8,7,6,3,4];
 $('#btnDraw').addEventListener('click',()=>{
   if(!BX||BX.running) return;
   if(BX.done){ closeBox(); return; }
+  if(BX.onDraw&&BX.onDraw()===false) return;                        // 循环任务宝箱：按下 Draw 当下扣除钥匙
   BX.running=true; $('#btnDraw').disabled=true;
   const win=weighted(BX.box.map(r=>r.rate)), tiles=$$('#grid9 .tile');
   const stopPos=RING.indexOf(win), total=RING.length*2+stopPos;   // 至少跑 2 圈
@@ -709,9 +720,9 @@ function finish(win,tiles){
 }
 function closeBox(){ if(BX&&BX.running) return; $('#boxMask').classList.remove('is-open'); BX=null; }
 $('#boxClose').addEventListener('click',closeBox);
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeBox(); $('#sumMask').classList.remove('is-open'); } });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeBox(); $('#sumMask').classList.remove('is-open'); } });   // 挑战弹窗不可用 Esc 关闭
 
-/* ---------- Tabs ＋ 气泡（两分页各自计算） ---------- */
+/* ---------- Tabs ＋ 气泡（仅 BOMB MISSION） ---------- */
 function setTab(k){
   $$('.tab').forEach(t=>{ const on=t.dataset.tab===k; t.setAttribute('aria-selected',on); t.tabIndex=on?0:-1; });
   $('#panelBomb').hidden=k!=='bomb'; $('#panelXmas').hidden=k!=='xmas';
@@ -720,31 +731,22 @@ $$('.tab').forEach(t=>t.addEventListener('click',()=>setTab(t.dataset.tab)));
 $('.tabs').addEventListener('keydown',e=>{ if(e.key==='ArrowRight'||e.key==='ArrowLeft'){ const n=$('#tabBomb').getAttribute('aria-selected')==='true'?'xmas':'bomb'; setTab(n); $(`[data-tab="${n}"]`).focus(); } });
 function bubble(el,n){ el.hidden=n<=0; el.textContent=n>99?'99+':n; el.setAttribute('aria-label',`${n} 个未领取奖励`); }
 function renderReclaim(){
-  const nb=bombClaimable().length, nx=xClaimable().length;
-  bubble($('#bubbleBomb'),nb); bubble($('#bubbleXmas'),nx);
-  $('#btnReclaimBomb').disabled=!nb; $('#btnReclaimXmas').disabled=!nx;
+  const nb=bombClaimable().length;
+  bubble($('#bubbleBomb'),nb); $('#btnReclaimBomb').disabled=!nb;
   const sum=bombClaimable().reduce((a,t)=>a+t.reward,0);
   $('#bombReclaimInfo').innerHTML=nb?`<b>${nb}</b> reward${nb>1?'s':''} to claim · ${money(sum)}`:'No rewards to claim';
-  $('#xmasReclaimInfo').innerHTML=nx?`<b>${nx}</b> chest${nx>1?'s':''} to open`:'No rewards to claim';
 }
 function renderAll(){ renderSign(); renderBomb(); renderXmas(); renderReclaim(); sim(); }
 
 /* ---------- 原型控制（模拟） ---------- */
-function sim(){ $('#simState').textContent=`今日投注 ${int(S.dayBet)}｜今日充值 ${int(S.dayDep)}｜活动累计投注 ${int(S.xBet)}｜活动累计充值 ${int(S.xDep)}｜连续签到 ${S.streak} 天｜今日${S.checked?'已':'未'}签到`; }
+function sim(){ $('#simState').textContent=`今日投注 ${int(S.dayBet)}｜今日充值 ${int(S.dayDep)}｜活动累计投注 ${int(S.xBet)}｜宝箱钥匙 获得 ${keysEarned()}／消耗 ${S.keysUsed}／剩余 ${keysLeft()}｜连续签到 ${S.streak} 天｜今日${S.checked?'已':'未'}签到`; }
 $$('[data-sim]').forEach(b=>b.addEventListener('click',()=>{
   const k=b.dataset.sim;
-  if(k==='bet'){ S.dayBet+=10000; S.xBet+=10000; toast('模拟投注 +10,000'); }
-  if(k==='dep'){ S.dayDep+=5000; S.xDep+=5000; toast('模拟充值 +5,000'); }
+  if(k==='bet'){ const k0=keysEarned(); S.dayBet+=10000; S.xBet+=10000; const g=keysEarned()-k0; toast(`模拟投注 +10,000${g?` · 循环任务完成 ${g/CYCLE.qty} 轮，获得宝箱钥匙 ×${g}`:''}`); }
+  if(k==='dep'){ S.dayDep+=5000; toast('模拟充值 +5,000'); }
   if(k==='nextday'){ if(!S.checked) S.streak=0; S.checked=false; S.dayBet=0; S.dayDep=0; S.bombClaimed={}; toast(S.streak?'已进入次日':'昨日未签到 → 断签，连续天数归 0'); }
   if(k==='break'){ S.streak=0; S.checked=false; toast('已模拟断签'); }
   if(k==='reset'){ S=clone(INIT); toast('已重置示范资料'); }
-  if(k==='jump'){
-    const N=Math.min(50,Math.max(1,parseInt($('#simLv').value,10)||1)); $('#simLv').value=N;
-    const before=XMAS_LEVELS.filter(L=>L.lv<N), after=XMAS_LEVELS.filter(L=>L.lv>=N);
-    S.xClaimed={}; before.forEach(L=>S.xClaimed[L.lv]={label:'—',type:'cash'});
-    const mid=(key)=>{ const p=Math.max(0,...before.map(L=>L[key]||0)); const nx=after.find(L=>L[key]); return nx?Math.floor(p+(nx[key]-p)*0.6):p; };
-    S.xBet=mid('bet'); S.xDep=mid('dep'); setTab('xmas'); toast(`已模拟：LV1～LV${N-1} 已领取，LV${N} 进行中`);
-  }
   renderAll();
 }));
 
