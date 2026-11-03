@@ -1079,7 +1079,9 @@ const XBOX=k=>{ const m=k+1, tops=[R('cash','₱100',1,{amt:100}),R('phone','iPh
 const CHESTS=[1,2,3,5].map((cost,k)=>({no:k+1,cost,box:XBOX(k),art:['cash','phone','gift','chest'][k]}));   // cost＝道具消耗数量（个／抽）
 const DRAWS=[1,5,10];                 // 前台抽数选项
 const TOP_COST=Math.max(...CHESTS.map(C=>C.cost));   // 最高级奖池＝道具消耗数量最高者（加扫光效果）
-const topOf=box=>box[box.length-1];   // 主视觉＝宝箱内最高价值奖励（示范资料放在第 9 项）
+/* Grand Prize＝中奖率最小的奖励；中奖率相同时取奖励编号最小者（奖励 1 → 9） */
+const topIdx=box=>box.reduce((b,r,i)=>r.rate<box[b].rate?i:b,0);
+const topOf=box=>box[topIdx(box)];
 
 /* ---------- 用户状态 ---------- */
 const INIT={streak:2,checked:false,dayBet:3200,dayDep:200,bombClaimed:{1:{amt:3}},bombKeys:0,xBet:13650,keysUsed:0,bonusKeys:0,dayNo:0,opened:{},pool:0,phase:'live',makeup:[],makeupDay:'',makeupCash:0,chAssign:{},hist:[]};   // xBet＝活动累计有效投注（示范：已完成 2 轮 → 自动发放 2 个 PAROL）；bombKeys＝每日返水赠送的 PAROL
@@ -1167,7 +1169,7 @@ function renderBomb(){
              : `<button class="mbtn mbtn--bet" data-go="bet"><span>BET</span></button>`;
     /* 挑战标签：显示该等级当日挑战加成；领取后不因胜负改变（金额栏仍显示基础金额） */
     /* 充值任务即使勾选挑战（领取时仍会触发翻牌），前台也不显示 CHALLENGE 标签 */
-    const ch=(!t.trigger||dep)?'':`<span class="mc__tag mc__tag--ch">CHALLENGE <b>+${(got&&got.ch?CHALLENGES[got.ch-1]:chOf(t)).up}%</b></span>`;   // 领取后标签不变（不因胜负改变）
+    const ch=(!t.trigger||dep)?'':`<span class="mc__tag mc__tag--ch">BONUS <b>+${(got&&got.ch?CHALLENGES[got.ch-1]:chOf(t)).up}%</b></span>`;   // 领取后标签不变（不因胜负改变）
     return `<li class="mc ${dep?'mc--dep':''} ${got?'mc--claimed':''}">
       <div class="mc__top"><span class="mc__tags"><span class="mc__lv">LV ${t.lv}</span>${dep?'<span class="mc__tag mc__tag--dep">TOP-UP MISSION</span>':''}${ch}</span>
         <span class="mc__prog">${int(Math.min(cur,t.goal))}<small>/${int(t.goal)}</small></span></div>
@@ -1312,7 +1314,7 @@ function renderPoolPanel(keys){
   p.innerHTML=`<div class="pool__head"><span class="pool__name">Pool ${C.no}</span><span class="pool__drawn">${n?`Drawn ×${n}`:'9 prizes'} · ${ICON.parol.replace('<svg','<svg class="ikey"')} ${int(keys)}</span>
       <button class="pool__close" id="poolClose" aria-label="关闭">✕</button></div>
     <div class="pool__hero">${ART[C.art]}<p class="pool__gp" style="margin:0">Grand Prize<b>${top.label}</b></p></div>
-    <div class="pool__prizes">${[...C.box].reverse().map((r,i)=>`<div class="pz ${i===0?'pz--gp':''}" title="${r.label}">${ICON[r.type]}<span>${r.label}</span></div>`).join('')}</div>
+    <div class="pool__prizes">${(()=>{ const g=topIdx(C.box); return [C.box[g],...C.box.filter((_,i)=>i!==g)]; })().map((r,i)=>`<div class="pz ${i===0?'pz--gp':''}" title="${r.label}">${ICON[r.type]}<span>${r.label}</span></div>`).join('')}</div>
     <div class="pool__btns">${DRAWS.map(d=>{ const cost=C.cost*d, ok=keys>=cost;
       return `<button class="btn-gold ${d===10?'btn-gold--x10':''}" data-draw="${d}" ${ok?'':'disabled'} aria-label="${d} 抽，消耗 PAROL ${cost}">${d} Draw${d>1?'s':''}<small>${ICON.parol}×${cost}</small></button>`; }).join('')}</div>
     <p class="pool__need">${minNeed>0?`Need ${minNeed} more PAROL to draw`:''}</p>`;
