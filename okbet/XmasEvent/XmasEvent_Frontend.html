@@ -298,13 +298,23 @@ button{font:inherit;cursor:pointer;}
 .hist__x{position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.5);background:rgba(0,0,0,.35);color:#fff;font-size:.8rem;cursor:pointer;}
 .hist__x:focus-visible{outline:2px solid #fff;outline-offset:2px;}
 .hist__list{list-style:none;margin:0;padding:0 2px 0 0;max-height:min(56vh,420px);overflow:auto;display:flex;flex-direction:column;gap:8px;}
-.hist__item{padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);font-size:.67rem;line-height:1.45;}
-.hist__top{display:flex;justify-content:space-between;gap:8px;}
-.hist__top b{color:#fff;font-size:.72rem;}
 .hist__time{color:var(--muted);white-space:nowrap;}
 .hist__prize{color:#ffe9a8;overflow-wrap:anywhere;}
 .hist__cost{color:var(--muted);}
-.hist__empty{padding:28px 0;text-align:center;color:var(--muted);font-size:.72rem;}
+.hist__empty{margin:0;padding:28px 0;text-align:center;color:var(--muted);font-size:.72rem;}
+/* History 表格：时间／PAROL Used／PAROL Left／Rewards */
+.hist__list{display:block;overflow:auto;}
+/* History 弹窗加宽；表格文字一律一行显示，奖励过长时表格可左右滑动 */
+.sheet.hist{width:min(560px,100%);padding:20px 12px 16px;}
+.hist__tbl th,.hist__tbl td{white-space:nowrap;}
+.hist__tbl th{vertical-align:middle;}
+.hist__tbl{width:100%;border-collapse:collapse;font-size:.67rem;line-height:1.35;}
+.hist__tbl th{position:sticky;top:0;z-index:1;padding:6px 4px;text-align:left;font-weight:800;color:var(--gold-1);background:#6e0b16;border-bottom:1px solid rgba(232,181,74,.55);vertical-align:bottom;}
+.hist__tbl td{padding:7px 4px;border-bottom:1px solid rgba(232,181,74,.22);vertical-align:top;}
+.hist__tbl th:nth-child(2),.hist__tbl th:nth-child(3),.hist__num{text-align:right;white-space:nowrap;}
+.hist__tbl .hist__time{white-space:nowrap;color:var(--muted);}
+.hist__tbl .hist__num{font-weight:800;color:#fff;font-variant-numeric:tabular-nums;}
+.hist__tbl .hist__prize{color:#ffe9a8;}
 .sec-note{margin:0 0 var(--space-3);font-size:.67rem;color:var(--muted);text-align:center;}
 .pools{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-2);}
 .pcard{position:relative;overflow:hidden;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;gap:4px;padding:var(--space-3) var(--space-2);
@@ -484,7 +494,11 @@ button{font:inherit;cursor:pointer;}
   --card:#7a121c; --card-2:#5a0a12; --line:rgba(232,181,74,.45);
   --velvet-red:radial-gradient(120% 80% at 20% 0%,rgba(255,120,120,.16),transparent 55%),radial-gradient(90% 70% at 90% 100%,rgba(0,0,0,.35),transparent 60%),linear-gradient(180deg,#a3182a 0%,#6e0b16 100%);
   --velvet-green:radial-gradient(120% 80% at 20% 0%,rgba(140,255,170,.14),transparent 55%),radial-gradient(90% 70% at 90% 100%,rgba(0,0,0,.35),transparent 60%),linear-gradient(180deg,#17703a 0%,#0a3d1f 100%);
-  --candy:repeating-linear-gradient(-45deg,#e8343f 0 7px,#fff4f4 7px 9px,#2fa556 9px 16px,#fff4f4 16px 18px);
+  /* 糖果斜纹：36px 方形拼贴（45° 斜纹周期 25.46px＝36/√2，拼贴可无缝衔接），用于条纹流动动画 */
+  /* 拐杖糖：绿底＋红斜纹（两侧白色细边） */
+  --candy:repeating-linear-gradient(-45deg,#1f9a46 0 11px,#fffaf2 11px 12.6px,#e3262f 12.6px 20.4px,#fffaf2 20.4px 22px,#1f9a46 22px 25.456px);
+  /* 圆柱光泽：上缘亮、下缘暗（不随条纹移动） */
+  --cane-gloss:linear-gradient(180deg,rgba(255,255,255,.55) 0%,rgba(255,255,255,.18) 35%,rgba(255,255,255,0) 50%,rgba(0,0,0,.12) 70%,rgba(0,0,0,.35) 100%);
 }
 body{background:#1a0204;}
 .phone{background:radial-gradient(120% 40% at 50% 0%,#5a0a12,transparent 70%),linear-gradient(180deg,#3d0609 0%,#2a0306 45%,#4a0810 100%);border-color:rgba(232,181,74,.18);}
@@ -501,6 +515,10 @@ body{background:#1a0204;}
     radial-gradient(90% 90% at 65% 30%,#1f5a2e 0%,#123a1d 55%,#0b2413 100%);}
 .hero__title{text-shadow:0 3px 0 #7a0a14,0 6px 14px rgba(0,0,0,.6);}
 .hero__title .pink{color:#fff;}
+/* 主视觉文案层级：奖励数字最大，其余文字皆小于数字 */
+.hero__title .pink{font-size:clamp(1.1rem,5.4vw,1.45rem);letter-spacing:.06em;}
+.hero__upto{display:block;margin-top:2px;font-size:clamp(.85rem,4vw,1.05rem);color:#ffe9b0;letter-spacing:.08em;}
+.hero__title .hero__amt{font-size:clamp(2.3rem,12.5vw,3.1rem);line-height:1;letter-spacing:0;}
 .hero__title .gold{filter:drop-shadow(0 3px 0 #7a0a14);}
 
 /* 今日奖励看板：红丝绒＋金框＋缎带标题 */
@@ -516,6 +534,21 @@ body{background:#1a0204;}
 .board__rows > div:nth-child(2) .board__val b{color:#ffb347;}
 .board__val{background:rgba(40,0,6,.6);border:1px solid rgba(232,181,74,.55);}
 .board__val b{color:#5fe08a;}
+/* 看板缩减高度：标题缎带较薄、吉祥物缩小、标签与数值间距收紧 */
+.board{margin-top:-22px;padding:18px var(--space-3) 10px;grid-template-columns:66px minmax(0,1fr);gap:var(--space-2);}
+.board__title{top:-12px;padding:2px 18px;font-size:.75rem;}
+.board__mascot{margin:-6px 0 -4px;}
+.board__rows{gap:4px;}
+.board__lb{margin:0 0 1px;font-size:.67rem;line-height:1.2;}
+.board__val{padding:1px 12px 1px 4px;}
+.board__val svg{width:20px;height:20px;}
+.board__val b{font-size:.95rem;line-height:1.35;}
+/* 主视觉加高 */
+.hero{padding:40px var(--space-4) 92px;}
+.hero__deco{right:2px;bottom:16px;width:auto;height:calc(100% - 24px);max-width:44%;}
+.hero__gifts{position:absolute;left:12px;bottom:30px;width:44%;max-width:180px;height:auto;}
+.hero__title{position:relative;z-index:2;}
+.hero__rules{bottom:58px;}
 
 /* 签到日历 */
 .signin{background:var(--velvet-red);border:2px solid var(--gold-2);box-shadow:0 0 0 2px rgba(255,224,138,.2) inset,0 8px 20px rgba(0,0,0,.45);}
@@ -526,14 +559,23 @@ body{background:#1a0204;}
 /* 分页：红（BOMB MISSION）／绿（Christmas Activities）卡片式＋积雪 */
 .tabs{background:none;border:none;padding:6px 0 0;gap:var(--space-2);}
 .tab{border-radius:12px;padding:14px 6px 10px;font-family:Georgia,'Times New Roman',serif;font-weight:700;letter-spacing:.03em;color:#fff;
-  border:2px solid rgba(232,181,74,.55);opacity:.72;text-shadow:0 2px 0 rgba(0,0,0,.4);overflow:visible;}
-#tabBomb{background:linear-gradient(180deg,#e0303e,#8e0f1b);}
-#tabXmas{background:linear-gradient(180deg,#25934a,#0d4a24);}
+  border:2px solid rgba(232,181,74,.45);color:rgba(255,255,255,.78);text-shadow:0 2px 0 rgba(0,0,0,.4);overflow:visible;}
+/* 未选中：较暗底色（不用 opacity，避免气泡／红点一起变淡） */
+#tabBomb{background:linear-gradient(180deg,#a8202c,#650a14);}
+#tabXmas{background:linear-gradient(180deg,#1b6b38,#0a3a1c);}
 .tab::before{content:"";position:absolute;left:4px;right:4px;top:-5px;height:11px;border-radius:10px 10px 4px 4px;pointer-events:none;
   background:radial-gradient(12px 7px at 15% 100%,#fff 96%,transparent),radial-gradient(16px 8px at 45% 100%,#fff 96%,transparent),radial-gradient(14px 7px at 80% 100%,#fff 96%,transparent);}
 .tab[aria-selected="true"]{opacity:1;color:#fff;border-color:var(--gold-1);box-shadow:0 0 0 2px rgba(255,224,138,.35),0 0 16px rgba(255,214,110,.55);}
 #tabBomb[aria-selected="true"]{background:linear-gradient(180deg,#ff4452,#a8121f);}
 #tabXmas[aria-selected="true"]{background:linear-gradient(180deg,#2fb35a,#0f5a2c);}
+/* 气泡／红点：不继承分页的衬线字与字距、阴影；置于积雪之上；边框 2px 时行高 16px 才垂直置中 */
+.tab .bubble{z-index:2;display:flex;align-items:center;justify-content:center;line-height:1;font-family:"PingFang SC","Microsoft YaHei",system-ui,-apple-system,"Segoe UI",sans-serif;
+  letter-spacing:0;text-shadow:none;font-weight:800;}
+.tab .dot{z-index:2;}
+/* 分页名称全大写：字距收紧，避免 CHRISTMAS ACTIVITIES 被截断；窄屏改两行 */
+.tab{gap:4px;padding-left:4px;padding-right:4px;}
+.tab__txt{font-size:.68rem;letter-spacing:0;text-overflow:clip;}
+.tab__ico{width:16px;height:16px;}
 
 /* 今日未领取奖励：金色横幅＋红色 CLAIM ALL */
 .unc{background:linear-gradient(180deg,#fbe9b0 0%,#e9be5c 55%,#c98f2a 100%);border:2px solid #fff1c2;
@@ -570,6 +612,12 @@ body{background:#1a0204;}
 /* 糖果条纹进度条（取代频谱长条）：已完成段红白绿斜纹，未完成段暗色轨道，尾端发光小点 */
 .mc__bar{display:block;height:10px;margin:7px 0 8px;padding:0;border-radius:999px;background:rgba(0,0,0,.45);border:1px solid rgba(232,181,74,.4);}
 .mc__fill{position:absolute;left:0;top:0;bottom:0;border-radius:999px;background:var(--candy);box-shadow:0 0 6px rgba(255,214,110,.45);}
+/* 进度条动态：糖果斜纹持续向右流动（1 秒移动一个拼贴，无缝循环）；已领取停止；减少动态效果时停止 */
+.mc__fill,.task .bar__fill{background:var(--cane-gloss),var(--candy);background-size:100% 100%,36px 36px;background-repeat:no-repeat,repeat;
+  box-shadow:inset 0 0 0 1px rgba(10,60,25,.55),0 0 5px rgba(255,214,110,.35);animation:candyFlow 1s linear infinite;}
+@keyframes candyFlow{from{background-position:0 0,0 0;} to{background-position:0 0,36px 0;}}
+.mc--claimed .mc__fill{animation:none;}
+@media (prefers-reduced-motion:reduce){ .mc__fill,.task .bar__fill{animation:none;} }
 .mc__dot{width:7px;height:7px;}
 .mc__amt{background:rgba(40,0,6,.65);border:1px solid rgba(232,181,74,.55);color:var(--gold-1);}
 .mc--dep .mc__amt{background:rgba(0,30,12,.6);}
@@ -602,7 +650,6 @@ body{background:#1a0204;}
 .sheet{background:var(--velvet-red);border:2px solid var(--gold-2);}
 .sheet h2{font-family:Georgia,'Times New Roman',serif;font-style:normal;letter-spacing:.04em;}
 .rules__body{color:#fff3ee;}
-.hist__item{background:rgba(40,0,6,.45);border-color:rgba(232,181,74,.3);}
 .mbox{background:radial-gradient(120% 90% at 50% 0%,#b0202e,#7a0c16 60%,#4a060c);}
 .tile{background:linear-gradient(180deg,#9c1a26,#5e0a12);border-color:rgba(232,181,74,.4);}
 .chx__entry{background:radial-gradient(circle at 50% 35%,#b0202e,#4a060c 70%);}
@@ -610,6 +657,62 @@ body{background:#1a0204;}
 .btn-gold:disabled{background:linear-gradient(180deg,#8a6a6a,#5e4545);color:#f0e0e0;}
 .closed h2{color:var(--gold-1);}
 .home__banner{background:linear-gradient(120deg,#c81e33,#0f5a2c);}
+
+/* === 玻璃许愿树 ×4（11/03）：每个奖池一座玻璃许愿树（覆盖前一版单一玻璃罩／许愿牌样式） === */
+.gpools{gap:16px 12px;margin-top:4px;}
+/* 每个奖池一张独立卡片（红丝绒＋金框），卡内为玻璃许愿树 */
+.gpools .pcard{background:var(--velvet-red);border:1.5px solid var(--gold-2);border-radius:16px;padding:12px 10px 12px;gap:6px;color:#fff;overflow:hidden;
+  box-shadow:inset 0 0 0 1px rgba(255,224,138,.15),0 6px 14px rgba(0,0,0,.45);}
+.gpools .pcard--top{border:2px solid var(--gold-1);box-shadow:inset 0 0 0 1px rgba(255,224,138,.25),0 0 16px rgba(255,214,110,.45),0 6px 14px rgba(0,0,0,.45);}
+.gpools .pcard:hover{filter:brightness(1.06);}
+.gpools .pcard::after{display:none;}
+/* 玻璃罩：圆顶、透明、反光、暖光 */
+.gdome{position:relative;width:100%;aspect-ratio:1/1.08;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;padding:0 6px 10px;overflow:hidden;
+  border-radius:50% 50% 10px 10px / 46% 46% 10px 10px;border:2px solid rgba(255,255,255,.42);
+  background:radial-gradient(70% 50% at 50% 78%,rgba(255,196,110,.28),transparent 70%),radial-gradient(120% 70% at 50% 0%,rgba(255,255,255,.12),transparent 60%),rgba(255,255,255,.04);
+  box-shadow:inset 8px 0 14px -8px rgba(255,255,255,.5),inset -6px 0 12px -8px rgba(255,255,255,.3),inset 0 -14px 20px -14px rgba(255,200,120,.4),0 0 16px rgba(255,190,110,.15);}
+.gdome::before{content:"";position:absolute;left:10%;top:16%;width:9%;height:60%;border-radius:50%;pointer-events:none;z-index:3;
+  background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.22),rgba(255,255,255,0));transform:rotate(8deg);}
+.gdome::after{content:"";position:absolute;right:18%;top:9%;width:26px;height:9px;border-radius:50%;pointer-events:none;z-index:3;
+  background:radial-gradient(closest-side,rgba(255,255,255,.6),transparent);transform:rotate(-28deg);}
+.gdome__tree{position:absolute;left:50%;top:9%;width:62%;transform:translateX(-50%);opacity:.9;z-index:0;}
+.gpools .pcard__art{position:relative;z-index:1;width:62%;max-width:96px;margin:0;filter:drop-shadow(0 4px 6px rgba(0,0,0,.45));}
+.gpools .pcard__gp{position:relative;z-index:1;color:#ffe9c4;text-shadow:0 1px 2px rgba(0,0,0,.7);}
+.gpools .pcard__gp b{color:var(--gold-1);font-size:.85rem;text-shadow:0 1px 2px rgba(0,0,0,.8);}
+/* 木底座＋Pool N 铭牌 */
+.gbase{position:relative;width:104%;margin-top:-10px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:50% 50% 8px 8px / 10px 10px 8px 8px;
+  background:linear-gradient(180deg,#e8b77a 0%,#c98a4a 35%,#9a5f2a 75%,#6e3f18 100%);
+  box-shadow:inset 0 2px 0 rgba(255,236,200,.7),0 6px 10px rgba(0,0,0,.45),0 -4px 12px rgba(255,190,110,.3);}
+.gpools .pcard__no{position:static;align-self:auto;margin:0;font-size:.67rem;padding:0 10px;border-radius:4px;color:#4a1606;
+  background:linear-gradient(180deg,#fff0b8,#e8b54a);border:1px solid #fff1c2;font-style:normal;font-family:Georgia,'Times New Roman',serif;font-weight:700;}
+.gpools .pcard__cost{background:rgba(40,0,6,.6);color:#fff;white-space:nowrap;margin-top:2px;}
+.gpools .pcard__go{color:#fff;background:linear-gradient(180deg,#ff5a62,#d4202e 55%,#9c0d18);border:2px solid #fff1c2;box-shadow:0 0 0 1px #9a6416,0 2px 0 #6a0610;
+  font-style:normal;font-family:Georgia,'Times New Roman',serif;white-space:nowrap;padding:5px 12px;}
+/* 最高级奖池：金色光罩＋扫光 */
+.gpools .pcard--top .gdome{border-color:var(--gold-1);background:radial-gradient(70% 50% at 50% 78%,rgba(255,214,110,.45),transparent 70%),radial-gradient(120% 70% at 50% 0%,rgba(255,240,180,.2),transparent 60%),rgba(255,214,110,.08);
+  box-shadow:inset 8px 0 14px -8px rgba(255,255,255,.55),0 0 20px rgba(255,214,110,.65);}
+.gdome__sweep{position:absolute;top:-20%;bottom:-20%;left:-60%;width:45%;pointer-events:none;z-index:2;
+  background:linear-gradient(100deg,transparent 0%,rgba(255,255,255,.12) 30%,rgba(255,248,210,.6) 50%,rgba(255,255,255,.12) 70%,transparent 100%);
+  transform:skewX(-20deg);animation:sweep 3s ease-in-out infinite;}
+@media (prefers-reduced-motion:reduce){ .gdome__sweep{animation:none;opacity:0;} }
+.gpools .pcard--top .gbase{box-shadow:inset 0 2px 0 rgba(255,236,200,.8),0 6px 10px rgba(0,0,0,.45),0 -4px 16px rgba(255,214,110,.6);}
+
+/* 玻璃罩内飘雪（点缀）：两层稀疏雪点缓慢落下，四张卡错开节奏；减少动态效果时不显示 */
+.gdome__snow{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.75;
+  background-image:
+    radial-gradient(1.6px 1.6px at 18% 12%,#fff 60%,transparent 62%),radial-gradient(1.2px 1.2px at 46% 34%,#fff 60%,transparent 62%),
+    radial-gradient(1.8px 1.8px at 74% 8%,#fff 60%,transparent 62%),radial-gradient(1.2px 1.2px at 86% 52%,#fff 60%,transparent 62%),
+    radial-gradient(1.4px 1.4px at 30% 70%,#fff 60%,transparent 62%),
+    radial-gradient(1px 1px at 60% 82%,rgba(255,255,255,.85) 60%,transparent 62%),radial-gradient(1px 1px at 10% 44%,rgba(255,255,255,.85) 60%,transparent 62%),
+    radial-gradient(1.1px 1.1px at 92% 26%,rgba(255,255,255,.85) 60%,transparent 62%);
+  background-size:100% 140px,100% 140px,100% 140px,100% 140px,100% 140px,100% 90px,100% 90px,100% 90px;
+  animation:domeSnow 9s linear infinite;}
+@keyframes domeSnow{from{background-position:0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0;}
+  to{background-position:6px 140px,-4px 140px,5px 140px,-6px 140px,4px 140px,-3px 180px,3px 180px,-2px 180px;}}
+.gpools > li:nth-child(2) .gdome__snow{animation-delay:-3s;}
+.gpools > li:nth-child(3) .gdome__snow{animation-delay:-6s;}
+.gpools > li:nth-child(4) .gdome__snow{animation-delay:-4.5s;}
+@media (prefers-reduced-motion:reduce){ .gdome__snow{display:none;} }
 
 </style>
 </head>
@@ -625,13 +728,32 @@ body{background:#1a0204;}
 
     <!-- Hero -->
     <section class="hero" aria-label="活动横幅">
-      <h2 class="hero__title"><span class="pink">DAILY BONUS</span><span class="gold">UP TO ₱39,142</span></h2>
-      <svg class="hero__deco" viewBox="0 0 200 150" aria-hidden="true">
-        <polygon points="150,10 185,70 170,70 195,115 105,115 130,70 115,70" fill="#1f8f4e"/><rect x="143" y="115" width="14" height="18" fill="#7a4a1f"/>
-        <circle cx="140" cy="60" r="5" fill="#ff4d5e"/><circle cx="165" cy="88" r="5" fill="#ffd34d"/><circle cx="130" cy="100" r="5" fill="#5ab0ff"/>
-        <polygon points="150,2 154,12 165,12 156,18 160,28 150,22 140,28 144,18 135,12 146,12" fill="#ffe27a"/>
-        <rect x="40" y="95" width="56" height="44" rx="4" fill="#e8344b"/><rect x="34" y="84" width="68" height="16" rx="3" fill="#ff5a6e"/>
-        <rect x="63" y="84" width="10" height="55" fill="#ffd34d"/><path d="M68 84c-12-20-30-14-22-4 6 6 22 4 22 4zm0 0c12-20 30-14 22-4-6 6-22 4-22 4z" fill="#ffd34d"/>
+      <h2 class="hero__title"><span class="pink">XMAS BONUS</span><span class="hero__upto">UP TO</span><span class="gold hero__amt">₱39,142</span></h2>
+      <!-- 主视觉装饰：右侧大圣诞树（由上到下填满右侧）＋左下礼物与拐杖糖 -->
+      <svg class="hero__deco" viewBox="0 0 160 220" aria-hidden="true">
+        <rect x="72" y="188" width="16" height="22" rx="2" fill="#6b3f1a"/>
+        <polygon points="80,22 128,92 32,92" fill="#1e7a3e"/><polygon points="80,22 128,92 80,92" fill="#16602f"/>
+        <polygon points="80,58 140,138 20,138" fill="#1e7a3e"/><polygon points="80,58 140,138 80,138" fill="#16602f"/>
+        <polygon points="80,100 154,192 6,192" fill="#1e7a3e"/><polygon points="80,100 154,192 80,192" fill="#16602f"/>
+        <path d="M44 84 Q80 102 118 80" fill="none" stroke="#ffd36b" stroke-width="2.2" stroke-dasharray="1 5" stroke-linecap="round"/>
+        <path d="M30 128 Q80 150 130 124" fill="none" stroke="#ffd36b" stroke-width="2.2" stroke-dasharray="1 5" stroke-linecap="round"/>
+        <path d="M16 182 Q80 206 146 178" fill="none" stroke="#ffd36b" stroke-width="2.2" stroke-dasharray="1 5" stroke-linecap="round"/>
+        <circle cx="64" cy="72" r="5" fill="#e3262f"/><circle cx="100" cy="66" r="4.5" fill="#ffd34d"/>
+        <circle cx="52" cy="118" r="5.5" fill="#ffd34d"/><circle cx="96" cy="114" r="5.5" fill="#e3262f"/><circle cx="118" cy="130" r="4.5" fill="#ffffff"/>
+        <circle cx="36" cy="170" r="6" fill="#e3262f"/><circle cx="78" cy="164" r="5.5" fill="#ffffff"/><circle cx="118" cy="168" r="6" fill="#ffd34d"/>
+        <g fill="#c8102e"><path d="M80 40 l-9 -6 v12z"/><path d="M80 40 l9 -6 v12z"/><circle cx="80" cy="40" r="2.6"/></g>
+        <polygon points="80,2 85,15 99,15 88,23 92,37 80,29 68,37 72,23 61,15 75,15" fill="#ffe27a" stroke="#c98f2a" stroke-width="1"/>
+      </svg>
+      <svg class="hero__gifts" viewBox="0 0 200 64" aria-hidden="true">
+        <ellipse cx="100" cy="60" rx="98" ry="5" fill="rgba(0,0,0,.25)"/>
+        <rect x="6" y="22" width="44" height="36" rx="3" fill="#e3262f"/><rect x="24" y="22" width="8" height="36" fill="#ffd34d"/><rect x="2" y="16" width="52" height="10" rx="2" fill="#ff4d5a"/><rect x="24" y="16" width="8" height="10" fill="#ffd34d"/>
+        <path d="M28 16c-8-12-20-8-14-2 4 4 14 2 14 2zm0 0c8-12 20-8 14-2-4 4-14 2-14 2z" fill="#ffd34d"/>
+        <rect x="58" y="32" width="34" height="26" rx="3" fill="#1e8a44"/><rect x="72" y="32" width="6" height="26" fill="#e3262f"/><rect x="55" y="27" width="40" height="8" rx="2" fill="#27a453"/><rect x="72" y="27" width="6" height="8" fill="#e3262f"/>
+        <rect x="100" y="38" width="28" height="20" rx="3" fill="#e8b54a"/><rect x="111" y="38" width="6" height="20" fill="#c8102e"/><rect x="98" y="34" width="32" height="7" rx="2" fill="#ffd36b"/>
+        <g fill="none" stroke-linecap="round" stroke-width="5">
+          <path d="M146 58 V22 a8 8 0 0 1 16 0" stroke="#fff"/><path d="M146 58 V22 a8 8 0 0 1 16 0" stroke="#e3262f" stroke-dasharray="4 4"/>
+          <path d="M176 58 V28 a7 7 0 0 1 14 0" stroke="#fff"/><path d="M176 58 V28 a7 7 0 0 1 14 0" stroke="#1f9a46" stroke-dasharray="4 4"/>
+        </g>
       </svg>
       <button class="hero__rules" id="btnRules" aria-haspopup="dialog">RULES</button>
       <div class="hero__snow"></div>
@@ -677,7 +799,7 @@ body{background:#1a0204;}
         <span class="tab__txt">BOMB MISSION</span><span class="bubble" id="bubbleBomb" hidden></span></button>
       <button class="tab" role="tab" id="tabXmas" aria-controls="panelXmas" aria-selected="false" data-tab="xmas">
         <svg class="tab__ico" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12,2 19,14 15,14 20,21 4,21 9,14 5,14" fill="#1f9d55"/><rect x="10.5" y="21" width="3" height="2" fill="#7a4a1f"/><circle cx="12" cy="3" r="1.6" fill="#ffd34d"/></svg>
-        <span class="tab__txt">Christmas Activities</span><span class="dot" id="dotXmas" hidden></span></button>
+        <span class="tab__txt">CHRISTMAS ACTIVITIES</span><span class="dot" id="dotXmas" hidden></span></button>
     </div>
 
     <!-- 分页：BOMB MISSION（每日返水任务） -->
@@ -718,7 +840,8 @@ body{background:#1a0204;}
         <button class="hist-btn" id="btnHist" aria-haspopup="dialog"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 4.5V8l2.5 1.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>History</button>
       </div>
       <p class="sec-note">Tap a pool to view prizes · Draw 1, 5 or 10 times with PAROL</p>
-      <ul class="pools" id="poolList" aria-label="奖池"></ul>
+      <!-- 玻璃许愿树 ×4：每个奖池为一座独立的玻璃许愿树（玻璃罩＋罩内圣诞树＋木底座） -->
+      <ul class="pools gpools" id="poolList" aria-label="奖池"></ul>
     </section>
     <!-- 平台首页（示意）：用户登录后若有昨日未领取的每日任务基础奖励，跳出次日补领弹窗 -->
     <section class="home" id="homeView" hidden aria-label="平台首页（示意）">
@@ -831,7 +954,7 @@ body{background:#1a0204;}
   <div class="sheet hist">
     <button class="hist__x" id="histClose" aria-label="关闭">✕</button>
     <h2 id="histTitle">History</h2>
-    <ul class="hist__list" id="histList"></ul>
+    <div class="hist__list" id="histList"></div>
   </div>
 </div>
 
@@ -845,8 +968,6 @@ body{background:#1a0204;}
       <h3>You may receive</h3>
       <ol>
         <li><b>Instant Cash:</b><br>Cash rewards will be credited directly to your OKGAMES wallet.</li>
-        <li><b>Lucky Scratch Ticket:</b>
-          <ul><li>The Scratch Ticket will be released at 12:00 PM the next day.</li><li>Once released, it is valid for 72 hours (3 days).</li><li>Scratch the ticket to reveal your cash reward.</li></ul></li>
         <li><b>Pili Card Challenge Chance:</b><br>Choose <b>one card from two cards.</b> If your card is higher, your Instant Cash reward will be increased.<br><b>Card Ranking:</b><br><b>A &gt; K &gt; Q &gt; J &gt; 10 &gt; 9 &gt; 8 &gt; ... &gt; 2</b></li>
       </ol>
       <h3><i>Reward &amp; VIP Rules</i></h3>
@@ -1129,12 +1250,20 @@ function renderXmas(){
   renderPools(keys);
 }
 /* 奖池：列表显示 4 个奖池卡；点击奖池卡才开启详情（奖励一览＋1／5／10 抽） */
+/* 罩内小圣诞树（装饰背景） */
+const GTREE=`<svg class="gdome__tree" viewBox="0 0 100 110" aria-hidden="true"><rect x="45" y="94" width="10" height="12" fill="#6b3f1a"/>
+  <polygon points="50,10 74,44 26,44" fill="#1e7a3e"/><polygon points="50,30 82,70 18,70" fill="#1e7a3e"/><polygon points="50,52 90,96 10,96" fill="#1e7a3e"/>
+  <polygon points="50,10 74,44 50,44" fill="#16602f"/><polygon points="50,30 82,70 50,70" fill="#16602f"/><polygon points="50,52 90,96 50,96" fill="#16602f"/>
+  <g fill="#ffd36b"><circle cx="36" cy="40" r="2"/><circle cx="62" cy="38" r="2"/><circle cx="30" cy="64" r="2"/><circle cx="70" cy="62" r="2"/><circle cx="24" cy="90" r="2"/><circle cx="50" cy="86" r="2"/><circle cx="76" cy="90" r="2"/></g>
+  <polygon points="50,0 53,7 61,7 55,12 57,19 50,15 43,19 45,12 39,7 47,7" fill="#ffe27a"/></svg>`;
 function renderPools(keys){
   $('#poolList').innerHTML=CHESTS.map(C=>{ const top=topOf(C.box), best=C.cost===TOP_COST;
+    /* 玻璃许愿树：玻璃罩（罩内小圣诞树＋奖池主视觉＋大奖）→ 木底座（Pool N 铭牌）→ 每抽消耗 → VIEW POOL */
     return `<li><button class="pcard ${best?'pcard--top':''}" data-poolcard="${C.no}" aria-label="Pool ${C.no}，大奖 ${top.label}，每抽 PAROL ${C.cost}">
-      <span class="pcard__no">Pool ${C.no}</span>${best?'<span class="pcard__top">TOP</span>':''}
-      <span class="pcard__art">${ART[C.art]}</span>
-      <span class="pcard__gp">Grand Prize<b>${top.label}</b></span>
+      <span class="gdome">${GTREE}<span class="gdome__snow" aria-hidden="true"></span>${best?'<span class="gdome__sweep" aria-hidden="true"></span>':''}
+        <span class="pcard__art">${ART[C.art]}</span>
+        <span class="pcard__gp">Grand Prize<b>${top.label}</b></span></span>
+      <span class="gbase"><span class="pcard__no">Pool ${C.no}</span></span>
       <span class="pcard__cost">${ICON.parol}×${C.cost} / draw</span>
       <span class="pcard__go">VIEW POOL ›</span></button></li>`; }).join('');
   $$('[data-poolcard]').forEach(b=>b.addEventListener('click',()=>openPool(+b.dataset.poolcard)));
@@ -1164,7 +1293,7 @@ function drawPool(C,d){
   const cost=C.cost*d; if(keysLeft()<cost||BX) return;
   S.keysUsed+=cost; S.opened[C.no]=(S.opened[C.no]||0)+d; renderAll();
   const wins=Array.from({length:d},()=>weighted(C.box.map(r=>r.rate)));   // 实际由后端抽出，前端依结果演出
-  S.hist.unshift({at:Date.now(),pool:C.no,d,cost,labels:wins.map(w=>C.box[w].label)});   // History：抽奖成功即写入（每次操作 1 笔）
+  S.hist.unshift({at:Date.now(),pool:C.no,d,cost,left:keysLeft(),labels:wins.map(w=>C.box[w].label)});   // left＝本次扣除后剩余 PAROL   // History：抽奖成功即写入（每次操作 1 笔）
   openBox({title:`Pool ${C.no} · ${d} Draw${d>1?'s':''} · ${KEY_NAME} ×${cost}`,box:C.box,mode:'draw',auto:true,ribbon:'❄ Prize Pool ❄',wins,cost});
 }
 $('#btnBetNow').addEventListener('click',()=>{ if(LIVE()) toast('导向游戏大厅（原型示意）'); });
@@ -1177,12 +1306,15 @@ $('#rulesOk').addEventListener('click',closeRules);
 const fmtTime=ms=>{ const d=new Date(ms+8*3600e3), z=n=>String(n).padStart(2,'0');
   return `${d.getUTCFullYear()}-${z(d.getUTCMonth()+1)}-${z(d.getUTCDate())} ${z(d.getUTCHours())}:${z(d.getUTCMinutes())}:${z(d.getUTCSeconds())}`; };
 function renderHist(){
-  $('#histList').innerHTML=S.hist.length?S.hist.map(h=>{
+  /* 栏位：时间／PAROL 消耗数／PAROL 剩余数（本次扣除后）／奖励（相同奖励合并 ×N） */
+  const rows=S.hist.map(h=>{
     const cnt={}; h.labels.forEach(l=>{ cnt[l]=(cnt[l]||0)+1; });
     const prizes=Object.keys(cnt).map(l=>cnt[l]>1?`${l} ×${cnt[l]}`:l).join(', ');
-    return `<li class="hist__item"><div class="hist__top"><b>Pool ${h.pool} · ${h.d} Draw${h.d>1?'s':''}</b><span class="hist__time">${fmtTime(h.at)}</span></div>
-      <div class="hist__prize">${prizes}</div><div class="hist__cost">Spent ${KEY_NAME} ×${h.cost}</div></li>`; }).join('')
-    :`<li class="hist__empty">No records yet.</li>`;
+    const [d,t]=fmtTime(h.at).split(' ');
+    return `<tr><td class="hist__time">${d} ${t}</td><td class="hist__num">${int(h.cost)}</td><td class="hist__num">${int(h.left)}</td><td class="hist__prize">${prizes}</td></tr>`; }).join('');
+  $('#histList').innerHTML=S.hist.length
+    ?`<table class="hist__tbl"><thead><tr><th scope="col">Time</th><th scope="col">PAROL Used</th><th scope="col">PAROL Left</th><th scope="col">Rewards</th></tr></thead><tbody>${rows}</tbody></table>`
+    :`<p class="hist__empty">No records yet.</p>`;
 }
 $('#btnHist').addEventListener('click',()=>{ renderHist(); $('#histMask').classList.add('is-open'); $('#histList').scrollTop=0; $('#histClose').focus(); });
 const closeHist=()=>{ $('#histMask').classList.remove('is-open'); $('#btnHist').focus(); };
