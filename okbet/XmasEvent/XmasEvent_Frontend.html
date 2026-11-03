@@ -398,7 +398,23 @@ button{font:inherit;cursor:pointer;}
 .pcard-x.is-other{opacity:.7;}
 .pcard-x__rk{position:absolute;top:6px;left:9px;font-size:1rem;line-height:1.05;text-align:center;}
 .pcard-x__su{font-size:2.6rem;margin-bottom:38%;}
-.pcard-x__tag{position:absolute;bottom:6px;left:0;right:0;font-size:.67rem;font-weight:800;color:#5a6274;}
+.pcard-x__tag{position:absolute;bottom:6px;left:0;right:0;font-size:.67rem;font-weight:800;color:#5a6274;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;}
+/* 实际扑克牌样式 */
+.pcard-x.is-face{font-family:Georgia,'Times New Roman',serif;font-size:1rem;display:block;overflow:visible;}
+.pc__corner{position:absolute;display:flex;flex-direction:column;align-items:center;line-height:1;z-index:1;}
+.pc__corner b{font-size:1rem;font-weight:700;letter-spacing:-.04em;}
+.pc__corner i{font-style:normal;font-size:.85rem;margin-top:1px;}
+.pc__corner--tl{top:6px;left:6px;}
+.pc__corner--br{bottom:6px;right:6px;transform:rotate(180deg);}
+.pc__pips{position:absolute;inset:14% 20%;}
+.pc__pips i{position:absolute;transform:translate(-50%,-50%);font-style:normal;font-size:1.25rem;line-height:1;}
+.pc__pips i.is-flip{transform:translate(-50%,-50%) rotate(180deg);}
+.pc__pips--ace i{font-size:3rem;}
+.pc__face{position:absolute;inset:16% 18%;border:1.5px solid currentColor;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:repeating-linear-gradient(45deg,rgba(0,0,0,.03) 0 4px,transparent 4px 8px);}
+.pc__face b{font-size:2.4rem;line-height:1;font-weight:700;}
+.pc__face i{font-style:normal;font-size:1.4rem;line-height:1;}
+.pc__crown{position:absolute;top:4px;font-size:.9rem;opacity:.75;}
 .chx__msg{position:absolute;left:50%;top:70%;transform:translate(-50%,-50%);z-index:2;width:92%;text-align:center;font-size:.85rem;font-weight:900;font-style:italic;
   padding:8px 10px;border-radius:12px;background:rgba(13,6,48,.82);color:var(--gold-1);}
 .chx__msg[hidden]{display:none;}
@@ -409,6 +425,10 @@ button{font:inherit;cursor:pointer;}
 .ch-info b{color:var(--gold-1);}
 .ch-result{text-align:center;font-size:.8rem;min-height:2.6em;margin:var(--space-2) 0 0;}
 .ch-result b{color:var(--gold-1);}
+/* 翻牌结果：只显示最终金额（大字） */
+#chResult{min-height:0;margin:var(--space-2) 0 0;}
+#chResult b{display:block;font-size:1.6rem;font-weight:900;font-style:italic;line-height:1.2;text-shadow:0 2px 0 rgba(0,0,0,.4);}
+.chx__status[hidden]{display:none;}
 .won{font-size:.67rem;color:#fff;background:rgba(0,0,0,.35);border-radius:10px;padding:6px 8px;text-align:center;}
 .won b{color:var(--gold-1);}
 .review{display:inline-block;margin-top:2px;font-size:.67rem;color:#ffd38a;}
@@ -1197,7 +1217,7 @@ function showChallenge(){
   $('#chEntry').hidden=false;
   $('#chBase').textContent=money(t.reward); $('#chBoost').textContent=`+${c.up}%`;
   $('#chCards').innerHTML=`<div class="chx__cd" id="chCd" hidden>Ready</div>`+[0,1].map(i=>`<button class="pcard-x" data-card="${i}" aria-label="Card ${i+1}" disabled>❄</button>`).join('')+`<div class="chx__msg" id="chMsg" hidden></div>`;
-  $('#chStatus').textContent='Choose a card'; $('#chStatus').className='chx__status';
+  $('#chStatus').textContent='Choose a card'; $('#chStatus').className='chx__status'; $('#chStatus').hidden=false;
   $('#chResult').textContent=''; const ok=$('#chOk'); ok.textContent='Confirm'; ok.disabled=true;
   $$('#chCards .pcard-x').forEach(b=>b.addEventListener('click',()=>pickCard(+b.dataset.card)));
   $('#chMask').classList.add('is-open'); $('#chGo').focus();
@@ -1215,6 +1235,19 @@ function pickCard(i){
   CH.cur.picked=i; $$('#chCards .pcard-x').forEach((b,k)=>b.classList.toggle('is-selected',k===i)); $('#chOk').disabled=false;
 }
 /* Confirm：两张同时翻开比大小（用户牌大＝WIN）；再按 Confirm 入帐／进入下一个挑战 */
+/* 实际扑克牌牌面：左上／右下角标（右下倒置）＋依点数排列的花色（下半部倒置）；J／Q／K 为人头牌框＋大字母 */
+const PIPS={A:[[50,50]],'2':[[50,18],[50,82]],'3':[[50,18],[50,50],[50,82]],'4':[[30,18],[70,18],[30,82],[70,82]],
+  '5':[[30,18],[70,18],[50,50],[30,82],[70,82]],'6':[[30,18],[70,18],[30,50],[70,50],[30,82],[70,82]],
+  '7':[[30,18],[70,18],[50,34],[30,50],[70,50],[30,82],[70,82]],'8':[[30,18],[70,18],[50,34],[30,50],[70,50],[50,66],[30,82],[70,82]],
+  '9':[[30,18],[70,18],[30,39],[70,39],[50,50],[30,61],[70,61],[30,82],[70,82]],
+  '10':[[30,18],[70,18],[50,29],[30,39],[70,39],[30,61],[70,61],[50,71],[30,82],[70,82]]};
+function cardFace(rk,su){
+  const corner=c=>`<span class="pc__corner pc__corner--${c}"><b>${rk}</b><i>${su}</i></span>`;
+  let mid;
+  if(PIPS[rk]) mid=`<span class="pc__pips${rk==='A'?' pc__pips--ace':''}">`+PIPS[rk].map(([x,y])=>`<i style="left:${x}%;top:${y}%"${y>50?' class="is-flip"':''}>${su}</i>`).join('')+`</span>`;
+  else mid=`<span class="pc__face"><b>${rk}</b><i>${su}</i><span class="pc__crown" aria-hidden="true">${rk==='K'?'♔':rk==='Q'?'♕':'⚜'}</span></span>`;
+  return corner('tl')+mid+corner('br');
+}
 function revealCard(){
   const {t,c,win,picked}=CH.cur; CH.cur.step='done';
   const a=Math.floor(Math.random()*12), b=a+1+Math.floor(Math.random()*(12-a));   // a 牌较大（索引小）
@@ -1222,10 +1255,10 @@ function revealCard(){
   const amt=win?Math.floor(t.reward*(100+c.up)+1e-6)/100:t.reward;   // 加 1e-6 避免浮点误差（如 12×1.2）
   $$('#chCards .pcard-x').forEach((el,k)=>{ const mine=k===picked, rk=mine?mineRk:otherRk, su=SUITS[Math.floor(Math.random()*4)];
     el.disabled=true; el.className=`pcard-x is-face ${su==='♥'||su==='♦'?'is-red':''} ${mine?'is-mine':'is-other'}`;
-    el.innerHTML=`<span class="pcard-x__rk">${rk}<br>${su}</span><span class="pcard-x__su">${su}</span><span class="pcard-x__tag">${mine?'YOUR CARD':''}</span>`; });
-  const msg=$('#chMsg'); msg.hidden=false; msg.textContent=win?'Congratulations!':'SO CLOSE—BETTER LUCK NEXT TIME!';
-  const st=$('#chStatus'); st.textContent=win?'You Win':'You Lose'; st.className='chx__status '+(win?'chx__status--win':'chx__status--lose');
-  $('#chResult').innerHTML=`LV${t.lv} reward <b>${money(amt)}</b>`;   // 只显示最终获得彩金（胜＝加成后、负＝基础），不显示加成过程与 PAROL
+    el.innerHTML=cardFace(rk,su)+`<span class="pcard-x__tag">${mine?'YOUR CARD':''}</span>`; });
+  const msg=$('#chMsg'); msg.hidden=!win; msg.textContent=win?'Congratulations!':'';   // 只有胜利显示 Congratulations!；输不显示提示
+  $('#chStatus').hidden=true;   // 结果不显示 You Win／You Lose，只显示金额
+  $('#chResult').innerHTML=`<b>${money(amt)}</b>`;   // 只显示最终获得彩金（胜＝加成后、负＝基础）；不显示 LVn reward、加成过程与 PAROL
   S.bombClaimed[t.lv]={amt,ch:c.no,win}; giveKeys(t); CH.results.push({amt}); renderAll(); $('#chOk').focus();
 }
 $('#chOk').addEventListener('click',()=>{
