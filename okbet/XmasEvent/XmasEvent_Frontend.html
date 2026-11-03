@@ -315,6 +315,16 @@ button{font:inherit;cursor:pointer;}
 .hist__tbl .hist__time{white-space:nowrap;color:var(--muted);}
 .hist__tbl .hist__num{font-weight:800;color:#fff;font-variant-numeric:tabular-nums;}
 .hist__tbl .hist__prize{color:#ffe9a8;}
+/* History 表格：表头与内容一律置中 */
+.hist__tbl th,.hist__tbl td,.hist__tbl th:nth-child(2),.hist__tbl th:nth-child(3),.hist__tbl .hist__num{text-align:center;}
+/* 允许换行：表格不超出弹窗宽度、不需左右滑动；奖励内容一行放不下时自动断行；内容垂直置中 */
+.hist__tbl{table-layout:fixed;}
+.hist__tbl th,.hist__tbl td{white-space:normal;vertical-align:middle;}
+.hist__tbl th:nth-child(1){width:25%;} .hist__tbl th:nth-child(2),.hist__tbl th:nth-child(3){width:18%;}
+.hist__tbl th,.hist__tbl td{padding-left:3px;padding-right:3px;}
+.hist__tbl .hist__time,.hist__tbl .hist__num{white-space:normal;}
+.hist__tbl .hist__prize{overflow-wrap:anywhere;}
+.hist__tbl th:nth-child(2),.hist__tbl th:nth-child(3){white-space:normal;}
 .sec-note{margin:0 0 var(--space-3);font-size:.67rem;color:var(--muted);text-align:center;}
 .pools{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-2);}
 .pcard{position:relative;overflow:hidden;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;gap:4px;padding:var(--space-3) var(--space-2);
@@ -1311,7 +1321,7 @@ function renderPoolPanel(keys){
   const p=$('#poolPanel'); p.classList.toggle('pool--top',C.cost===TOP_COST);
   p.setAttribute('aria-label',`Pool ${C.no}`);
   const minNeed=C.cost-keys;
-  p.innerHTML=`<div class="pool__head"><span class="pool__name">Pool ${C.no}</span><span class="pool__drawn">${n?`Drawn ×${n}`:'9 prizes'} · ${ICON.parol.replace('<svg','<svg class="ikey"')} ${int(keys)}</span>
+  p.innerHTML=`<div class="pool__head"><span class="pool__name">Pool ${C.no}</span><span class="pool__drawn">9 prizes · ${ICON.parol.replace('<svg','<svg class="ikey"')} ${int(keys)}</span>
       <button class="pool__close" id="poolClose" aria-label="关闭">✕</button></div>
     <div class="pool__hero">${ART[C.art]}<p class="pool__gp" style="margin:0">Grand Prize<b>${top.label}</b></p></div>
     <div class="pool__prizes">${(()=>{ const g=topIdx(C.box); return [C.box[g],...C.box.filter((_,i)=>i!==g)]; })().map((r,i)=>`<div class="pz ${i===0?'pz--gp':''}" title="${r.label}">${ICON[r.type]}<span>${r.label}</span></div>`).join('')}</div>
