@@ -1095,7 +1095,7 @@ const SIGN_BOX_RATE=[40,25,15,12,8,0];
 /* BOMB MISSION：每日返水（当前 VIP 等级）；gift＝后台「赠送道具」奖励数量；trigger＝后台「挑战任务 · 触发」 */
 const BOMB_TASKS=[{lv:1,cond:'bet',goal:200,reward:3},{lv:2,cond:'dep',goal:200,reward:5,gift:1,trigger:true},{lv:3,cond:'bet',goal:1000,reward:12,gift:2,trigger:true},
   {lv:4,cond:'bet',goal:3000,reward:30},{lv:5,cond:'dep',goal:1000,reward:20},{lv:6,cond:'bet',goal:8000,reward:88}];
-/* 挑战任务配置（全等级共用）：up＝奖励提升 %、appear＝触发机率 %（加总 100）、win＝获奖机率 % */
+/* 挑战任务配置（全等级共用）：up＝奖励提升 %、appear＝触发机率 %（加总 ≤100；未匹配时由触发机率最大者承接）、win＝获奖机率 % */
 const CHALLENGES=[{no:1,up:20,appear:60,win:60},{no:2,up:50,appear:40,win:50}];
 
 /* Christmas Activities：特别任务（条件固定投注；单一目标、可重复）＋特别任务宝箱 */

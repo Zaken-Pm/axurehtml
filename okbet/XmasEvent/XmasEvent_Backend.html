@@ -62,6 +62,7 @@ body{margin:0;font-family:"PingFang SC","Microsoft YaHei",system-ui,-apple-syste
 .btn--text{border:none;background:none;padding:2px 6px;}
 .btn--link{border:none;background:none;color:var(--primary);cursor:pointer;padding:2px 4px;font-size:13px;}
 .btn--link.red{color:var(--red);}
+.btn--link:disabled{color:#c0c4cc;cursor:not-allowed;}
 .op-sep{color:var(--border);margin:0 3px;font-size:12px;}
 .input,.select{height:34px;border:1px solid var(--border);border-radius:var(--radius);padding:0 10px;font-size:13.5px;
   color:var(--text);background:#fff;width:100%;}
@@ -104,6 +105,9 @@ select.select{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg
 .tbl .hint--err{position:absolute;left:8px;right:6px;bottom:3px;margin:0;padding:0;
   font-size:11px;line-height:1.2;white-space:nowrap;text-align:left;
   overflow:hidden;text-overflow:ellipsis;z-index:5;pointer-events:none;}
+/* 挑战任务表：不预留错误提示空间，有错误时才撑开 */
+.tbl--compact tbody td{padding-bottom:7px;}
+.tbl--compact .hint--err{position:static;margin-top:2px;text-align:left;}
 .prefix-wrap{display:flex;align-items:center;}
 .prefix-wrap .prefix{height:30px;line-height:30px;padding:0 8px;background:#f5f7fa;border:1px solid var(--border);border-right:none;border-radius:4px 0 0 4px;color:var(--text-3);font-size:12.5px;}
 .prefix-wrap .input{border-radius:0 4px 4px 0;}
@@ -392,7 +396,7 @@ label.chk input{accent-color:var(--primary);}
             <div class="form-row"><label><span class="req">*</span>活动名称：</label>
               <input class="input" id="fName" placeholder="请输入"></div>
             <div class="form-row"><label><span class="req">*</span>币种：</label>
-              <select class="select" id="fCur"><option>PHP</option><option>USD</option></select></div>
+              <select class="select" id="fCur"><option selected>PHP</option></select></div>
             <div class="form-row"><label>状态：</label>
               <div><label class="radio"><input type="radio" name="status" value="关闭" checked>关闭</label>
                    <label class="radio"><input type="radio" name="status" value="开启">开启</label>
@@ -495,14 +499,14 @@ label.chk input{accent-color:var(--primary);}
               <div class="block__body">
                 <div class="vip-tabs" id="vipTabs"></div>
                 <label class="applyall"><input type="checkbox" id="applyAll">套用至其他等级（勾选后其余 VIP 等级套用 VIP0 配置、不可再编辑）</label>
-                <table class="tbl" style="margin-top:10px;min-width:900px;table-layout:fixed">
+                <table class="tbl tbl--compact" style="margin-top:10px;min-width:900px;table-layout:fixed">
                   <thead><tr>
                     <th style="width:6%">等级</th><th style="width:12%">任务条件</th><th style="width:17%">任务目标</th>
                     <th style="width:7%">奖励物</th><th style="width:16%">奖励金额</th><th style="width:10%">挑战任务</th><th style="width:10%">赠送道具</th><th style="width:15%">奖励数量</th><th style="width:7%">操作</th>
                   </tr></thead>
                   <tbody id="rebateBody"></tbody>
                 </table>
-                <p class="hint">· 任务目标需逐级递增；最多 LV20。</p>
+                <p class="hint">任务目标／固定金额：不可为空、0 或小数点；任务目标需依同「任务条件」逐级递增（不可小于或等于同任务条件）。奖励金额一律为固定金额。等级最低 LV1，最多 LV20。</p>
               </div>
             </section>
 
@@ -511,11 +515,11 @@ label.chk input{accent-color:var(--primary);}
               <div class="block__head"><h4>挑战任务配置 <span class="sub">（全等级共用）</span></h4>
                 <button class="btn btn--primary btn--sm" id="btnAddChallenge">＋ 新增挑战</button></div>
               <div class="block__body">
-                <table class="tbl" style="min-width:560px">
+                <table class="tbl tbl--compact" style="min-width:560px">
                   <thead><tr><th style="width:70px">挑战</th><th>奖励提升</th><th>触发机率</th><th>获奖机率</th><th style="width:60px">操作</th></tr></thead>
                   <tbody id="challengeBody"></tbody>
                 </table>
-                <p class="hint">· 触发机率加总须等于 100%；最多 5 个挑战。</p>
+                <p class="hint">非必填；可全部删除不设置挑战。如有设置：奖励提升／触发机率／获奖机率不可为空或 0（单位 %）；触发机率为 挑战1～挑战5 加总不得超过100%；获奖机率为各挑战各自不得超过100%；奖励提升无上限。最多 挑战5。</p>
               </div>
             </section>
 
@@ -1540,40 +1544,22 @@ const newRebate=()=>({cond:'有效投注',goal:'',amt:'',gift:false,qty:'',trigg
 let rebateRows=[newRebate()];
 const SAMPLE_REBATE=[{cond:'有效投注',goal:'200',amt:'3',gift:false,qty:'',trigger:false},{cond:'充值',goal:'200',amt:'5',gift:true,qty:'1',trigger:true},{cond:'有效投注',goal:'1000',amt:'12',gift:true,qty:'2',trigger:true}];
 const BLANK_REBATE=[newRebate()];
-function validateGoalOrder(strict){
-  let orderBad=false, anyBad=false;
-  const prevGoalByCond={};
-  $$('#rebateBody tr').forEach(tr=>{
-    const goal=$('.js-goal',tr); if(!goal) return;
-    const cond=$('.js-cond',tr).value; const hint=$('.js-goal-hint',tr);
-    const hasValue=goal.value!==''; const val=Number(goal.value);
-    let invalid=false, orderInvalid=false, msg='';
-    if(hasValue){
-      if(val<=0){ invalid=true; msg='不可为 0'; }
-      const prev=Object.prototype.hasOwnProperty.call(prevGoalByCond,cond)?prevGoalByCond[cond]:null;
-      if(!invalid && prev!==null && val<=prev){ invalid=true; orderInvalid=true; orderBad=true; msg='任务目标不可小于或等于同任务条件'; }
-    } else if(strict){ invalid=true; msg='请输入任务目标'; }
-    if(invalid) anyBad=true;
-    goal.classList.toggle('is-error',invalid);
-    if(hint){ hint.textContent=msg; hint.style.visibility=invalid?'visible':'hidden'; }
-    if(hasValue && !isNaN(val)) prevGoalByCond[cond]=val;
-  });
-  return {orderBad,anyBad};
+function validateGoalOrder(){}   // 每日返水不即时标红；点「下一步」时以 toast 提示第一个错误（rebateMsg）
+/* 点「下一步」时依 LV1 → LVN、每级依「任务目标 → 奖励金额 → 奖励数量」回报第一个错误 */
+function rebateMsg(){
+  const vip='VIP'+curVip, prev={};
+  for(let i=0;i<rebateRows.length;i++){ const r=rebateRows[i], lv=`${vip} LV${i+1}`;
+    if(!(Number(r.goal)>0)) return `${lv} 的「任务目标」不可为空或 0`;
+    if(prev[r.cond]!==undefined && Number(r.goal)<=prev[r.cond]) return `${vip} 同类型任务的目标金额必须随任务等级递增`;
+    prev[r.cond]=Number(r.goal);
+    if(!(Number(r.amt)>0)) return `${lv} 的「奖励金额」不可为空或 0`;
+    if(r.gift&&!(Number(r.qty)>0)) return `${lv} 已勾选赠送道具，「奖励数量」不可为空或 0`;
+  }
+  return '';
 }
-function rebateOk(){
-  const prev={};
-  return rebateRows.every(r=>{ if(!(Number(r.goal)>0)||!(Number(r.amt)>0)||giftErr(r,true)) return false;
-    if(prev[r.cond]!==undefined && Number(r.goal)<=prev[r.cond]) return false; prev[r.cond]=Number(r.goal); return true; });
-}
-/* 赠送道具：勾选时奖励数量必填、>0 整数 */
-function giftErr(r,strict){ if(!r.gift) return ''; if(r.qty==='') return strict?'请输入奖励数量':''; return Number(r.qty)>0?'':'须为大于 0 的整数'; }
-function paintGift(tr,r){ const q=$('.js-qty',tr), h=$('.js-qty-hint',tr), m=giftErr(r,s4Strict);
-  q.disabled=!r.gift; if(!r.gift) q.value=''; q.classList.toggle('is-error',!!m); h.textContent=m; h.style.visibility=m?'visible':'hidden'; }
-function paintRebateAmt(tr,r){
-  const amt=$('.js-amt',tr), h=$('.js-amt-hint',tr);
-  const msg = r.amt==='' ? (s4Strict?'请输入奖励金额':'') : (Number(r.amt)>0?'':'不可为 0');
-  amt.classList.toggle('is-error',!!msg); h.textContent=msg; h.style.visibility=msg?'visible':'hidden';
-}
+function rebateOk(){ return !rebateMsg(); }
+function paintGift(tr,r){ const q=$('.js-qty',tr); q.disabled=!r.gift; if(!r.gift) q.value=''; }
+function paintRebateAmt(){}
 function renderRebate(){
   const tb=$('#rebateBody'); tb.innerHTML='';
   rebateRows.forEach((r,i)=>{
@@ -1581,15 +1567,12 @@ function renderRebate(){
     tr.innerHTML=`
       <td>LV${i+1}</td>
       <td><select class="select js-cond"><option ${r.cond==='有效投注'?'selected':''}>有效投注</option><option ${r.cond==='充值'?'selected':''}>充值</option></select></td>
-      <td><div class="prefix-wrap"><span class="prefix">≥</span><input class="input js-goal" value="${r.goal}"></div>
-        <p class="hint hint--err js-goal-hint" style="visibility:hidden"></p></td>
+      <td><div class="prefix-wrap"><span class="prefix">≥</span><input class="input js-goal" value="${r.goal}"></div></td>
       <td>彩金</td>
-      <td><div class="suffix-wrap"><input class="input js-amt" value="${r.amt}" placeholder="固定金额"><span class="suffix">${curCode()}</span></div>
-        <p class="hint hint--err js-amt-hint" style="visibility:hidden"></p></td>
+      <td><div class="suffix-wrap"><input class="input js-amt" value="${r.amt}" placeholder="固定金额"><span class="suffix">${curCode()}</span></div></td>
       <td><label class="chk"><input type="checkbox" class="js-trigger" ${r.trigger?'checked':''}>触发</label></td>
       <td><label class="chk"><input type="checkbox" class="js-gift" ${r.gift?'checked':''}>赠送</label></td>
-      <td><div class="suffix-wrap"><input class="input js-qty" value="${r.qty}" placeholder="正整数"><span class="suffix">个道具</span></div>
-        <p class="hint hint--err js-qty-hint" style="visibility:hidden"></p></td>
+      <td><div class="suffix-wrap"><input class="input js-qty" value="${r.qty}" placeholder="正整数"><span class="suffix">个道具</span></div></td>
       <td><button class="btn--link red js-del">删除</button></td>`;
     $('.js-trigger',tr).addEventListener('change',e=>{ r.trigger=e.target.checked; paintChallengeNeed(); });
     $('.js-gift',tr).addEventListener('change',e=>{ r.gift=e.target.checked; if(!r.gift) r.qty=''; paintGift(tr,r); });
@@ -1597,16 +1580,14 @@ function renderRebate(){
     $('.js-cond',tr).addEventListener('change',e=>{ r.cond=e.target.value; validateGoalOrder(s4Strict); });
     $('.js-goal',tr).addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r.goal=e.target.value; validateGoalOrder(s4Strict); });
     $('.js-amt',tr).addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r.amt=e.target.value; paintRebateAmt(tr,r); });
-    $('.js-del',tr).addEventListener('click',()=>{ if(rebateRows.length<=1){toast('至少保留 LV1',true);return;}
-      rebateRows.splice(i,1); renderRebate(); });
+    $('.js-del',tr).disabled=rebateRows.length<=1;   // 只剩 LV1 → 删除不可点
+    $('.js-del',tr).addEventListener('click',()=>{ rebateRows.splice(i,1); renderRebate(); });
     tb.appendChild(tr); paintRebateAmt(tr,r); paintGift(tr,r);
   });
+  $('#btnAddLevel').disabled=rebateRows.length>=20;   // 已达 LV20 → 新增等级不可点
   validateGoalOrder(s4Strict);
 }
-$('#btnAddLevel').addEventListener('click',()=>{
-  if(rebateRows.length>=20){toast('等级最多 LV20',true);return;}
-  rebateRows.push(newRebate()); renderRebate();
-});
+$('#btnAddLevel').addEventListener('click',()=>{ rebateRows.push(newRebate()); renderRebate(); });
 
 /* ---------- 4-4 挑战任务配置（沿用 X-BOMB；最多 5 个，非必填） ---------- */
 let challengeRows=[];
@@ -1614,22 +1595,20 @@ const SAMPLE_CHALLENGE=[{up:'20',appear:'60',win:'60'},{up:'50',appear:'40',win:
 const BLANK_CHALLENGE=[];
 const challengeAppearSum=()=>challengeRows.reduce((a,r)=>a+(Number(r.appear)||0),0);
 const anyTrigger=()=>rebateRows.some(r=>r.trigger);
-function challengeErr(r,k,strict){ const v=r[k];
-  if(v==='') return strict?'请输入':''; if(!(Number(v)>0)) return '不可为 0';
-  if(k==='win'&&Number(v)>100) return '比例配置不得超过100%'; return ''; }
-function challengeOk(){
-  if(anyTrigger()&&!challengeRows.length) return false;
-  if(!challengeRows.length) return true;
-  return challengeRows.every(r=>['up','appear','win'].every(k=>!challengeErr(r,k,true))) && challengeAppearSum()===100;
+function challengeOk(){ return !challengeMsg(); }
+/* 点「下一步」时依挑战顺序（奖励提升 → 触发机率 → 获奖机率）回报第一个错误 */
+const CH_LABEL={up:'奖励提升',appear:'触发机率',win:'获奖机率'};
+function challengeMsg(){
+  if(anyTrigger()&&!challengeRows.length) return '「每日返水配置」已有等级勾选触发，挑战任务配置至少需 1 个';
+  for(let i=0;i<challengeRows.length;i++){ const r=challengeRows[i];
+    for(const k of ['up','appear','win']){ const n=Number(r[k]);
+      if(k==='up'){ if(!(r[k]!==''&&n>0)) return `挑战 ${i+1} 的「${CH_LABEL[k]}」必须大于 0`; }
+      else if(!(r[k]!==''&&n>=1&&n<=100)) return `挑战 ${i+1} 的「${CH_LABEL[k]}」必须在 1～100 之间`; } }
+  const sum=challengeAppearSum();
+  if(sum>100) return `所有挑战的触发机率合计不得超过 100%，当前为 ${sum}%`;
+  return '';
 }
-function paintChallenge(){
-  const rows=[...$('#challengeBody').children], sum=challengeAppearSum();
-  const sumBad=challengeRows.length&&(s4Strict||challengeRows.some(r=>r.appear!==''))&&sum!==100;
-  rows.forEach((tr,i)=>{ const r=challengeRows[i]; if(!r) return;
-    ['up','appear','win'].forEach(k=>{ const inp=$('.js-'+k,tr), h=$('.js-'+k+'-hint',tr);
-      let m=challengeErr(r,k,s4Strict); if(!m&&k==='appear'&&sumBad&&i===rows.length-1) m='触发机率总计须等于100%（目前 '+sum+'%）';
-      inp.classList.toggle('is-error',!!m||(k==='appear'&&sumBad)); h.textContent=m; h.style.visibility=m?'visible':'hidden'; });
-  });
+function paintChallenge(){   // 挑战任务不即时标红，点「下一步」时以 toast 提示第一个错误
   paintChallengeNeed();
 }
 /* 每日返水有勾选「触发」却未设置挑战 → 提示 */
@@ -1643,14 +1622,13 @@ function renderChallenge(){
   const tb=$('#challengeBody'); tb.innerHTML='';
   challengeRows.forEach((r,i)=>{
     const tr=document.createElement('tr');
-    const cell=(k)=>`<td><div class="suffix-wrap"><input class="input js-${k}" value="${r[k]}" placeholder="整数"><span class="suffix">%</span></div>
-      <p class="hint hint--err js-${k}-hint" style="visibility:hidden"></p></td>`;
+    const cell=(k)=>`<td><div class="suffix-wrap"><input class="input js-${k}" value="${r[k]}" placeholder="请输入"><span class="suffix">%</span></div></td>`;
     tr.innerHTML=`<td>挑战${i+1}</td>${cell('up')}${cell('appear')}${cell('win')}<td><button class="btn--link red js-del">删除</button></td>`;
     ['up','appear','win'].forEach(k=>$('.js-'+k,tr).addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r[k]=e.target.value; paintChallenge(); }));
     $('.js-del',tr).addEventListener('click',()=>{ challengeRows.splice(i,1); renderChallenge(); });
     tb.appendChild(tr);
   });
-  if(!challengeRows.length) tb.innerHTML='<tr><td colspan="5" style="color:var(--text-3);padding:16px">未设置挑战（非必填）</td></tr>';
+  if(!challengeRows.length) tb.innerHTML='<tr><td colspan="5" style="color:var(--text-3);padding:16px">No Data</td></tr>';
   $('#btnAddChallenge').disabled=challengeRows.length>=5;   // 达上限（5 个）按钮停用；删除后恢复
   paintChallenge();
 }
@@ -1761,8 +1739,8 @@ function wagerOk(){ const wv=$('#fWager').value.trim(), wn=Number(wv); return wv
 const SECTIONS=[
   ['box','secBox',boxesOk,()=>boxNoneErr()?'开启「额外随机宝箱」时，至少需配置 1 款签到宝箱':'签到宝箱配置未完成：宝箱一旦配置任 1 项奖励，其余 8 项皆须配置，且中奖率合计需等于100%'],
   ['sign','secSign',signOk,'签到活动配置未完成：请检查奖励类型／奖励数量，及已配置宝箱的中奖率合计需等于100%'],
-  ['rebate','secRebate',rebateOk,'每日返水配置有必填/格式错误（含勾选赠送道具未填奖励数量），或任务目标未依同任务条件逐级递增'],
-  ['challenge','secChallenge',challengeOk,()=>anyTrigger()&&!challengeRows.length?'「每日返水配置」已有等级勾选触发，挑战任务配置至少需 1 个':'挑战任务配置有误：各栏皆为整数、不可为空或 0，触发机率总计须等于100%，获奖机率不得超过100%'],
+  ['rebate','secRebate',rebateOk,rebateMsg],
+  ['challenge','secChallenge',challengeOk,challengeMsg],
   ['pbox','secPBox',()=>PBOX.ok(),'特别任务奖池配置未完成：4 个奖池皆须填写道具消耗数量、配置完成 9 项奖励，且中奖率合计需等于100%'],
   ['period','secPeriod',cycleOk,'特别任务配置未完成：任务目标、奖励数量皆须为大于 0 的整数'],
   ['ratio','secRatio',ratioOk,'投注量计算比例有误：Slot／Live／Mini 已填比例须至少勾选 1 家游戏商；比例 0～100'],
