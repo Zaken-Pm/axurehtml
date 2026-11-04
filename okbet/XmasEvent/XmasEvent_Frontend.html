@@ -663,35 +663,6 @@ body{background:#1a0204;}
   background:repeating-linear-gradient(-45deg,#fff 0 6px,#ffd9de 6px 12px);border:1.5px solid #e8344b;box-shadow:0 2px 0 rgba(0,0,0,.25);}
 .gpool__cost svg{width:15px;height:15px;}
 
-/* 拆礼物动画弹窗（约 2 秒）：礼物摇晃 → 盒盖弹开 → 光芒与星光迸发 */
-#giftMask{z-index:110;}
-.gift{position:relative;width:min(360px,100%);height:440px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:10px;}
-.gift__box{position:relative;width:300px;height:300px;margin-bottom:30px;}
-.gift__body{position:absolute;left:30px;bottom:0;width:240px;height:180px;filter:drop-shadow(0 8px 10px rgba(0,0,0,.5));}
-.gift__lid{position:absolute;left:10px;bottom:152px;width:280px;height:120px;transform-origin:20% 100%;filter:drop-shadow(0 4px 6px rgba(0,0,0,.4));}
-.gift__rays{position:absolute;left:50%;top:48%;width:560px;height:560px;margin:-280px 0 0 -280px;border-radius:50%;opacity:0;pointer-events:none;
-  background:repeating-conic-gradient(from 0deg,rgba(255,226,122,.55) 0 8deg,transparent 8deg 22deg);
-  -webkit-mask:radial-gradient(circle,#000 30%,transparent 68%);mask:radial-gradient(circle,#000 30%,transparent 68%);}
-.gift__glow{position:absolute;left:50%;top:52%;width:300px;height:300px;margin:-150px 0 0 -150px;border-radius:50%;opacity:0;pointer-events:none;
-  background:radial-gradient(circle,rgba(255,248,210,.95),rgba(255,214,110,.5) 40%,transparent 70%);}
-.gift__spark{position:absolute;left:50%;top:50%;width:0;height:0;pointer-events:none;}
-.gift__spark i{position:absolute;left:-10px;top:-12px;font-style:normal;font-size:1.6rem;color:var(--gold-1);opacity:0;text-shadow:0 0 8px rgba(255,226,122,.9);}
-.gift__txt{position:absolute;left:30px;right:30px;bottom:66px;z-index:2;margin:0;text-align:center;white-space:nowrap;
-  font-family:Georgia,'Times New Roman',serif;font-style:italic;font-weight:700;font-size:.85rem;color:#fff6dc;letter-spacing:.02em;
-  text-shadow:0 0 2px #5a0912,0 1px 2px #5a0912,0 2px 6px rgba(0,0,0,.7);}
-.gift.is-play .gift__box{animation:giftShake .9s ease-in-out both;}
-.gift.is-play .gift__lid{animation:giftLid .7s cubic-bezier(.3,1.4,.6,1) .9s both;}
-.gift.is-play .gift__rays{animation:giftRays 1.1s ease-out .95s both;}
-.gift.is-play .gift__glow{animation:giftGlow 1.1s ease-out .95s both;}
-.gift.is-play .gift__spark i{animation:giftSpark .9s ease-out 1s both;}
-.gift__spark i:nth-child(1){--x:-150px;--y:-140px;} .gift__spark i:nth-child(2){--x:150px;--y:-150px;} .gift__spark i:nth-child(3){--x:-170px;--y:10px;}
-.gift__spark i:nth-child(4){--x:170px;--y:0px;} .gift__spark i:nth-child(5){--x:-60px;--y:-200px;} .gift__spark i:nth-child(6){--x:70px;--y:-206px;}
-@keyframes giftShake{0%,100%{transform:rotate(0) scale(1);}10%{transform:rotate(-7deg) scale(1.03);}25%{transform:rotate(7deg) scale(1.05);}40%{transform:rotate(-8deg) scale(1.07);}
-  55%{transform:rotate(8deg) scale(1.08);}70%{transform:rotate(-5deg) scale(1.08);}85%{transform:rotate(3deg) scale(1.06);}}
-@keyframes giftLid{0%{transform:translate(0,0) rotate(0);}100%{transform:translate(-24px,-110px) rotate(-28deg);opacity:.95;}}
-@keyframes giftRays{0%{opacity:0;transform:scale(.4) rotate(0);}40%{opacity:1;}100%{opacity:.85;transform:scale(1.05) rotate(40deg);}}
-@keyframes giftGlow{0%{opacity:0;transform:scale(.3);}35%{opacity:1;transform:scale(1.1);}100%{opacity:.8;transform:scale(1);}}
-@keyframes giftSpark{0%{opacity:0;transform:translate(0,0) scale(.4);}30%{opacity:1;}100%{opacity:0;transform:translate(var(--x),var(--y)) scale(1.2);}}
 
 /* === 奖池：9 宫格＋圣诞树底图 === */
 .gtree{position:relative;display:flex;flex-direction:column;align-items:center;padding:12px 12px 12px;border-radius:20px;color:#fff;overflow:hidden;
@@ -723,8 +694,8 @@ body{background:#1a0204;}
 .gtree--top{border-color:var(--gold-1);box-shadow:0 0 18px rgba(255,214,110,.5),0 8px 18px rgba(0,0,0,.5);}
 @media (prefers-reduced-motion:reduce){ .gtree__snow{animation:none;} }
 
-/* 获奖弹窗：拆礼物动画结束后跳出 */
-/* 获奖弹窗（拆礼物动画结束后跳出）：Q 版雪人吉祥物、漫画星星、拐杖糖条纹、缎带标题、贴纸奖励卡；配色与页面一致（红丝绒＋金） */
+/* 获奖弹窗：奖池跑马灯结束后跳出 */
+/* 获奖弹窗（奖池跑马灯结束后跳出）：Q 版雪人吉祥物、漫画星星、拐杖糖条纹、缎带标题、贴纸奖励卡；配色与页面一致（红丝绒＋金） */
 .win{position:relative;overflow:visible;padding-top:52px;border:2px solid var(--gold-2);border-radius:24px;color:#fff;
   background:radial-gradient(1.6px 1.6px at 10% 30%,rgba(255,255,255,.7) 60%,transparent 62%),radial-gradient(1.2px 1.2px at 88% 22%,rgba(255,255,255,.6) 60%,transparent 62%),
     radial-gradient(1.4px 1.4px at 20% 70%,rgba(255,255,255,.5) 60%,transparent 62%),radial-gradient(1.2px 1.2px at 80% 62%,rgba(255,255,255,.55) 60%,transparent 62%),
@@ -764,6 +735,8 @@ body{background:#1a0204;}
 .win__note{margin:10px 0 0;text-align:center;font-size:.72rem;color:#ffd38a;}
 .win__note:empty{display:none;}
 @media (prefers-reduced-motion:reduce){ .win__chibi,.win__pop{animation:none;} }
+/* 奖池跑马灯（页面 9 宫格）：目前所在格金框发光 */
+.gtree__grid .tile.tile--hit{border-color:var(--gold-1);background:rgba(170,24,38,.9);box-shadow:0 0 0 3px rgba(255,226,122,.75),0 0 22px rgba(255,226,122,.95);transform:scale(1.05);z-index:3;}
 </style>
 </head>
 <body>
@@ -996,26 +969,7 @@ body{background:#1a0204;}
   </div>
 </div>
 
-<!-- ============ 弹窗：拆礼物动画（按下 1／5／10 抽后跳出，约 2 秒后自动切换为获奖弹窗） ============ -->
-<div class="mask" id="giftMask" role="dialog" aria-modal="true" aria-label="Opening gift">
-  <div class="gift">
-    <span class="gift__rays" aria-hidden="true"></span>
-    <span class="gift__glow" aria-hidden="true"></span>
-    <div class="gift__box">
-      <svg class="gift__lid" viewBox="0 0 140 60"><rect x="4" y="22" width="132" height="34" rx="6" fill="#e8344b" stroke="#8e0f1b" stroke-width="2"/>
-        <rect x="60" y="22" width="20" height="34" fill="#ffd36b"/><rect x="4" y="22" width="132" height="8" rx="4" fill="#ff6a7c" opacity=".55"/>
-        <path d="M70 24 C52 2 30 6 36 20 C40 30 60 26 70 24Z" fill="#ffd36b" stroke="#c98d22" stroke-width="2"/>
-        <path d="M70 24 C88 2 110 6 104 20 C100 30 80 26 70 24Z" fill="#ffd36b" stroke="#c98d22" stroke-width="2"/><circle cx="70" cy="22" r="7" fill="#ffe9a6" stroke="#c98d22" stroke-width="2"/></svg>
-      <svg class="gift__body" viewBox="0 0 120 90"><rect x="2" y="2" width="116" height="86" rx="6" fill="#c81e33" stroke="#8e0f1b" stroke-width="2"/>
-        <rect x="50" y="2" width="20" height="86" fill="#ffd36b"/><rect x="2" y="2" width="116" height="10" fill="#8e0f1b" opacity=".35"/>
-        <g fill="#fff" opacity=".5"><circle cx="22" cy="30" r="2"/><circle cx="34" cy="62" r="2"/><circle cx="92" cy="40" r="2"/><circle cx="100" cy="72" r="2"/></g></svg>
-      <p class="gift__txt">Unwrapping your gift…</p>
-    </div>
-    <span class="gift__spark" aria-hidden="true"><i>✦</i><i>✦</i><i>✦</i><i>✦</i><i>✦</i><i>✦</i></span>
-  </div>
-</div>
-
-<!-- ============ 弹窗：获奖（拆礼物动画结束后跳出） ============ -->
+<!-- ============ 弹窗：获奖（奖池 9 宫格跑马灯结束后跳出） ============ -->
 <div class="mask" id="winMask" role="dialog" aria-modal="true" aria-labelledby="winTitle">
   <div class="sheet win">
     <svg class="win__chibi" viewBox="0 0 120 120" aria-hidden="true">
@@ -1361,7 +1315,7 @@ function renderXmas(){
   renderPools(keys);
 }
 /* 奖池：4 个奖池上下排列；每个奖池 9 宫格外放（Grand Prize 置中、其余依奖励编号）＋ 1／5／10 抽按钮，于同页抽奖 */
-let PD=null;   // 进行中的奖池抽奖演出 {no, t, skip}
+let PD=null;   // 进行中的奖池跑马灯演出 {no, t}
 function renderPools(keys){
   if(PD) return;   // 演出中不重画，结束后统一更新
   renderTreePools(keys);
@@ -1378,11 +1332,10 @@ const TREE_SVG=`<svg class="gtree__tree" viewBox="0 0 300 330" preserveAspectRat
   <polygon points="150,160 290,300 10,300" fill="#1e7a3e"/><polygon points="150,160 290,300 150,300" fill="#16602f"/>
   <path d="M100 104 Q150 124 202 98 M70 192 Q150 218 232 186 M36 284 Q150 314 266 278" fill="none" stroke="#ffd36b" stroke-width="2.5" stroke-dasharray="1 7" stroke-linecap="round" opacity=".9"/></svg>`;
 function renderTreePools(keys){
-  $('#poolList').innerHTML=CHESTS.map(C=>{ const best=C.cost===TOP_COST, g=topIdx(C.box), o=C.box.map((_,i)=>i).filter(i=>i!==g);
-    const ord=[...o.slice(0,4),g,...o.slice(4)];   // 格位 → 奖励索引（GP 置中）
+  $('#poolList').innerHTML=CHESTS.map(C=>{ const best=C.cost===TOP_COST, g=topIdx(C.box), ord=poolOrd(C);
     const tiles=ord.map(bi=>{ const r=C.box[bi], gp=bi===g;
       return `<div class="tile ${gp?'tile--gp':''}">${gp?'<span class="tile__gp">GRAND PRIZE</span>':''}${ICON[r.type]}<span class="tile__lb" title="${r.label}">${r.label}</span></div>`; }).join('');
-    return `<li class="gtree ${best?'gtree--top':''}" aria-label="Pool ${C.no}">
+    return `<li class="gtree ${best?'gtree--top':''}" data-pool="${C.no}" aria-label="Pool ${C.no}">
       <div class="gtree__head"><span class="gtree__plate">POOL ${C.no}</span><span class="gpool__cost">${ICON.parol}×${C.cost} / draw</span></div>
       <div class="gtree__stage">${TREE_SVG}<span class="gtree__snow" aria-hidden="true"></span>
         <div class="grid9 gtree__grid">${tiles}</div>
@@ -1391,7 +1344,7 @@ function renderTreePools(keys){
         return `<button class="btn-gold ${d===10?'btn-gold--x10':''}" data-pdraw="${C.no}" data-d="${d}" ${ok?'':'disabled'} aria-label="Pool ${C.no} ${d} 抽，消耗 PAROL ${cost}">${d} Draw${d>1?'s':''}<small>${ICON.parol}×${cost}</small></button>`; }).join('')}</div></li>`; }).join('');
   $$('[data-pdraw]').forEach(b=>b.addEventListener('click',()=>drawPool(CHESTS.find(x=>x.no===+b.dataset.pdraw),+b.dataset.d)));
 }
-/* 获奖弹窗：拆礼物动画结束后跳出，列出本次抽中的奖励（相同奖励合并 ×N，依首次抽中顺序）；按 COLLECT／Esc 关闭 */
+/* 获奖弹窗：奖池跑马灯结束后跳出，列出本次抽中的奖励（相同奖励合并 ×N，依首次抽中顺序）；按 COLLECT／Esc 关闭 */
 function openWin(C,res){
   const items=res.wins.map(w=>C.box[w]), phys=items.filter(r=>r.physical).length, multi=res.wins.length>1;
   const cnt={}; res.wins.forEach(w=>{ cnt[w]=(cnt[w]||0)+1; });
@@ -1407,8 +1360,10 @@ function closeWin(){ if(!WIN) return; const no=WIN; WIN=0; $('#winMask').classLi
   $(`[data-pdraw="${no}"]`)?.focus(); }
 $('#winOk').addEventListener('click',closeWin);
 /* 抽奖：按下 1／5／10 抽当下扣除 PAROL（道具消耗数量×抽数）；每抽依中奖率独立抽出 1 项
-   演出：跳出「拆礼物」动画弹窗（约 2 秒，不可关闭、不可跳过）→ 自动切换为获奖弹窗；演出中所有奖池按钮停用 */
-const GIFT_MS=2000;
+   演出：当前奖池的 9 宫格直接跑马灯（顺时针绕外圈再进中心，固定绕 3 圈、约 2 秒；1／5／10 抽演出一致，不停在抽中项、不标示结果）
+   → 跑马灯结束立即跳出获奖弹窗；演出中所有奖池按钮停用、不可跳过 */
+const POOL_RING=[0,1,2,5,8,7,6,3,4], POOL_LAPS=3, POOL_STEP_MS=75;   // 3 圈 × 9 格 × 75ms ≈ 2 秒
+const poolOrd=C=>{ const g=topIdx(C.box), o=C.box.map((_,i)=>i).filter(i=>i!==g); return [...o.slice(0,4),g,...o.slice(4)]; };   // 格位 → 奖励索引（GP 置中）
 function drawPool(C,d){
   const cost=C.cost*d; if(PD||keysLeft()<cost||!LIVE_OR_REDEEM()) return;
   S.keysUsed+=cost; S.opened[C.no]=(S.opened[C.no]||0)+d;
@@ -1417,12 +1372,16 @@ function drawPool(C,d){
   renderAll();
   $$('[data-pdraw]').forEach(b=>b.disabled=true);
   PD={no:C.no};
-  const finish=()=>{ $('#giftMask').classList.remove('is-open'); PD=null; renderAll(); openWin(C,{wins,cost}); };
-  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return finish();   // 减少动态效果：不播动画，直接跳获奖弹窗
-  const g=$('#giftMask'), box=$('.gift',g);
-  box.classList.remove('is-play'); void box.offsetWidth; box.classList.add('is-play');   // 重播动画
-  g.classList.add('is-open');
-  PD.t=setTimeout(finish,GIFT_MS);
+  const finish=()=>{ clearTimeout(PD&&PD.t); PD=null; renderAll(); openWin(C,{wins,cost}); };
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return finish();   // 减少动态效果：不跑马灯，直接跳获奖弹窗
+  const grid=$(`#poolList [data-pool="${C.no}"] .gtree__grid`), tiles=$$('.tile',grid);
+  grid.closest('.gtree').scrollIntoView({block:'nearest',behavior:'smooth'});
+  const total=POOL_RING.length*POOL_LAPS; let st=0;
+  const tick=()=>{ tiles.forEach(t=>t.classList.remove('tile--hit'));
+    if(st>=total) return finish();
+    tiles[POOL_RING[st%POOL_RING.length]].classList.add('tile--hit'); st++;
+    PD.t=setTimeout(tick,POOL_STEP_MS); };
+  tick();
 }
 $('#btnBetNow').addEventListener('click',()=>{ if(LIVE()) toast('导向游戏大厅（原型示意）'); });
 $('#sumOk').addEventListener('click',()=>$('#sumMask').classList.remove('is-open'));
