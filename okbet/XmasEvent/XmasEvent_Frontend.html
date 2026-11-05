@@ -1034,7 +1034,7 @@ body{background:#1a0204;}
     <h2 id="rulesTitle">GENERAL MECHANICS</h2>
     <!-- 规则文案：依运营提供「20261105OKGAMES 聖誕活動」·「聖誕活動英文規則」（原文照录） -->
     <div class="rules__body" tabindex="0">
-      <p class="rules__lead"><b>X-BOMB PAROL FIESTA -- Light Up Your Christmas Luck!<br>November 16, 00:00 – December 31, 23:59</b></p>
+      <p class="rules__lead"><b>X-BOMB PAROL FIESTA<br>Light Up Your Christmas Luck!<br><span id="rulesPeriod"></span></b></p>
 
       <h3>1. Santa's Daily Gift</h3>
       <p>During the promotion, each user may check in once per day. Check-in eligibility resets daily at 00:00 (UTC+8, Philippine Time).</p>
@@ -1174,6 +1174,10 @@ let S=clone(INIT);
 function signRewardOf(d){ return SIGN_REWARD[Math.min(d,3)]; }
 /* 签到格只显示数量：彩金 ₱10、积分 100、抽奖券 ×1（完整名称见 title） */
 const shortLabel=rw=>rw.type==='cash'?rw.label:rw.type==='points'?rw.label.replace(' PTS',''):(rw.label.match(/×\d+/)||[rw.label])[0];
+/* 活动时间：套用后台「时间设定 · 活动时间」（UTC+8）；RULES 弹窗显示为「Month D, HH:mm – Month D, HH:mm」（英文月份全名、24 小时制、不显示年份） */
+const ACT_PERIOD={start:'2026-11-16 00:00', end:'2026-12-31 23:59'};   // 原型示意：后台配置值
+const fmtPeriod=t=>{ const [d,hm]=t.split(' '), [y,mo,da]=d.split('-').map(Number);
+  return `${['January','February','March','April','May','June','July','August','September','October','November','December'][mo-1]} ${da}, ${hm}`; };
 /* 签到天数上限＝活动天数（11/16～12/31 共 46 天）；日历可左右滑动 */
 const ACTIVITY_DAYS=46;
 function renderSign(){
@@ -1439,6 +1443,7 @@ function drawPool(C,d){
 $('#btnBetNow').addEventListener('click',()=>{ if(LIVE()) toast('导向游戏大厅（原型示意）'); });
 $('#sumOk').addEventListener('click',()=>$('#sumMask').classList.remove('is-open'));
 /* 活动规则：RULES 开启；CONFIRM／Esc 关闭，焦点回到 RULES */
+$('#rulesPeriod').textContent=`${fmtPeriod(ACT_PERIOD.start)} – ${fmtPeriod(ACT_PERIOD.end)}`;
 $('#btnRules').addEventListener('click',()=>{ $('#rulesMask').classList.add('is-open'); $('#rulesMask .rules__body').scrollTop=0; $('#rulesOk').focus(); });
 const closeRules=()=>{ $('#rulesMask').classList.remove('is-open'); $('#btnRules').focus(); };
 $('#rulesOk').addEventListener('click',closeRules);

@@ -141,7 +141,7 @@
    - 点底部 `CONFIRM` 关闭（桌机可按 Esc）
    - 点遮罩不关闭
 4. **规则内容：**依运营提供文案「20261105 OKGAMES 圣诞活动 · 圣诞活动英文规则」（前台英文，原文照录），完整文案见原型「活动规则」弹窗：
-   - 开头：活动名称 `X-BOMB PAROL FIESTA -- Light Up Your Christmas Luck!`、活动时间 `November 16, 00:00 – December 31, 23:59`（不显示时区）（两行皆粗体；不显示「Promotion Name／Promotion Period」字样）
+   - 开头三行：第 1 行 `X-BOMB PAROL FIESTA`、第 2 行 `Light Up Your Christmas Luck!`（活动名称拆两行，不显示「--」）、第 3 行活动时间**套用后台 B2「时间设定 · 活动时间」**（起～迄），显示格式 `Month D, HH:mm – Month D, HH:mm`（英文月份全名、24 小时制、不显示年份与时区；例：后台 2026-11-16 00:00 ～ 2026-12-31 23:59 → `November 16, 00:00 – December 31, 23:59`）（两行皆粗体；不显示「Promotion Name／Promotion Period」字样）
    - `1. Santa's Daily Gift`：每日签到与连续签到奖励（Day 1～Day 4 onwards）、断签规则
    - `2. Parol Quest`：2.1 Christmas Mission／2.2 Daily Mission／2.3 PILI CARD Challenge（含 Card Ranking）／2.4 Reward & VIP Rules
    - `3. Parol Wish Draw`：4 个奖池、PAROL 消耗不退还、活动结束未用作废、奖励发放（线上／实体）、28 天内未回复视同放弃实体奖品
