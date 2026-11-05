@@ -4,7 +4,7 @@
 
 活动正式名称「Christmas Activities 2026」：
 · 每日签到：培养登录习惯
-· BOMB MISSION 每日返水＋翻牌挑战：带动投注与充值
+· PAROL QUEST 每日返水＋翻牌挑战：带动投注与充值
 · 特别任务与返水赠送的 PAROL：兑换奖池大奖
 · 形成「签到 → 投注／充值 → 领奖／得 PAROL → 奖池抽奖 → 再投注」闭环
 · 活动结束后保留 3 天兑换期，让用户消化 PAROL
@@ -20,7 +20,7 @@
 ### 需求目的 【新增】
 
 1. **提升登录：**每日签到（Day 1～活动最后一天），连续签到第 3 天起加发随机签到宝箱，断签归零，鼓励每日回访。
-2. **带动投注与充值：**BOMB MISSION 依 VIP 分级配置「有效投注／充值」阶梯任务，领奖可触发翻牌挑战加成，并可赠送 PAROL。
+2. **带动投注与充值：**PAROL QUEST 依 VIP 分级配置「有效投注／充值」阶梯任务，领奖可触发翻牌挑战加成，并可赠送 PAROL。
 3. **延长活动黏着：**特别任务以活动期间累计有效投注、可重复达成发放 PAROL；PAROL 于 4 个奖池抽奖（1／5／10 抽），以大奖（含实体奖品）制造话题。
 4. **减少奖励流失客诉：**前一日未领的每日任务彩金与 PAROL，次日登录平台首页弹窗补领；活动结束后 3 天兑换期，让用户用完剩余 PAROL。
 
@@ -32,9 +32,9 @@
 - **兑换期**：活动结束日**隔日 00:00 ～ 结束时间 +3 天**，系统自动计算、不可编辑。期间**只能兑换（开启）奖池**。
 - **每日签到**：每日 1 次，点「今天」那格奖励图示即签到并领取；**第 3 天起**另随机发放 1 款「签到宝箱」（Mystery Box）。
 - **签到宝箱**：后台最多 6 款、每款固定 9 项奖励；开启时依各项中奖率抽出 1 项（不消耗 PAROL）。
-- **BOMB MISSION**：前台分页名称＝后台「**每日返水配置**」（VIP 分级、LV1～LV20、条件为有效投注或充值）。**用户手动领取**；进度依报表数据更新（**注单报表约每 30 分钟更新一次**）。每日 00:00（UTC+8）重置。
+- **PAROL QUEST**：前台分页名称＝后台「**每日返水配置**」（VIP 分级、LV1～LV20、条件为有效投注或充值）。**用户手动领取**；进度依报表数据更新（**注单报表约每 30 分钟更新一次**）。每日 00:00（UTC+8）重置。
 - **挑战任务**：返水等级勾选「触发」时，**领取该级奖励必定触发 1 个挑战（Pili Card Challenge 翻牌）**：二选一扑克牌比大小，胜＝基础奖励 ×(1＋奖励提升%)，负＝基础奖励。与 VIP 等级无关。
-- **一键领取**：BOMB MISSION 分页「TODAY'S UNCLAIMED REWARDS」：一次领取**当日**已达成未领取的全部等级。
+- **一键领取**：PAROL QUEST 分页「Unclaimed Mission Rewards」：一次领取**当日**已达成未领取的全部等级。
 - **次日补领**：用户登录后于**平台首页弹窗**补领**前一日**已达成未领取的每日任务**基础彩金及赠送的 PAROL**。与「一键领取」为两个独立功能。
 - **特别任务**：前台名称 `Christmas Sparks`。活动期间累计有效投注每达「任务目标」即获得「奖励数量」个 PAROL，可无限重复；**自动发放**（系统跑 Job，**每 20 分钟更新一次**）。
 - **PAROL**：活动道具（菲律宾圣诞星灯），前后台名称固定「PAROL」、不提供配置。来源：特别任务、每日返水「赠送道具」。用途：特别任务奖池抽奖。
@@ -87,7 +87,7 @@
 | 关闭期间新产生的投注、充值 | **不计入** | 不补计 |
 | 计入判定（报表／Job 延迟） | 一律以**投注／充值的发生时间**判定：关闭前发生的照常计入（即使注单报表约 30 分钟、特别任务 Job 每 20 分钟的更新落在关闭后）；关闭期间发生的一律不计入 |  |
 | 签到 | 不可签到 | 关闭期间有**任一整天**（00:00～23:59）全程关闭、无法签到 → **断签**（从 Day 1 重新计算）；重开当天仍可签到则**不算断签** |
-| 每日任务（BOMB MISSION） | 不计算 | 同一天重开：延续当天进度，关闭前已达成未领的等级仍可 CLAIM。<br>跨日重开：依当日**重置**；若重开当天的「前一日」有已达成未领的奖励（例：11/20 关闭、11/21 重开），重开后**跳次日补领弹窗**（规则同一般补领，更早作废） |
+| 每日任务（PAROL QUEST） | 不计算 | 同一天重开：延续当天进度，关闭前已达成未领的等级仍可 CLAIM。<br>跨日重开：依当日**重置**；若重开当天的「前一日」有已达成未领的奖励（例：11/20 关闭、11/21 重开），重开后**跳次日补领弹窗**（规则同一般补领，更早作废） |
 | 特别任务 | 不累计、不发放 | 延续关闭前进度 |
 | 已获得的奖励、PAROL | 保留 | 维持不变 |
 
@@ -96,7 +96,7 @@
 1. 参与对象依后台「步骤3 参与对象与名单」（充值层级、指定代理、新会员限制、会员等级、用户标签、黑名单）；不符资格者看不到入口。
 2. 每日返水「有效投注」与特别任务投注量，皆依后台「**投注量计算比例**」折算（Slot／Live／Sport／Mini；未勾选或留空按 100%）；前台进度**只显示「目前值 / 目标值」**。
 3. 每日返水依用户**当前 VIP 等级**的配置显示与计算；挑战任务、特别任务、奖池与 VIP 无关（全等级共用）。
-4. 每日 **00:00（UTC+8）**重置：每日任务进度、今日看板「Bomb Mission Claimed」、一键领取；签到依连续天数推进。
+4. 每日 **00:00（UTC+8）**重置：每日任务进度、今日看板「Cash Bonus Claimed Today」、一键领取；签到依连续天数推进。
 5. 
      - 彩金发放后，提现前需完成后台「**彩金所需流水倍数**」（沿用既有规则）
      - 所有奖励（**含实体奖品**）皆**自动审核**、即时入帐
@@ -104,7 +104,7 @@
 6. **金额显示（前台全页）：**
    - 显示至小数点后 2 位，**第 3 位无条件舍去**
    - **整数不显示「.00」**（例 ₱5、₱17；有小数时 ₱14.40）
-   - **例外：**看板「Bomb Mission Claimed」固定显示 2 位小数（0 显示 0.00，见 F1）
+   - **例外：**看板「Cash Bonus Claimed Today」固定显示 2 位小数（0 显示 0.00，见 F1）
 
 ### 本次未涉及之既有规则 【不异动】
 
@@ -126,13 +126,13 @@
 
 ### 页面结构（由上而下）
 
-1. 顶栏（‹ 返回＋标题 `Christmas Activities`）→ Hero 主视觉（右下 `RULES`）→ `TODAY'S REWARD BOARD` → 签到日历（F2）→ Tab → 分页内容。
+1. 顶栏（‹ 返回＋标题 `Christmas Activities`）→ Hero 主视觉（主标 `X-BOMB PAROL FIESTA`、副标 `Light Up Your Christmas Luck!`，各一行显示不断行、直接压在主视觉图上，不显示金额；右下 `RULES`）→ `X'mas Reward Board` → 签到日历（F2）→ Tab → 分页内容。
 2. 看板、签到区**两分页共用**，切换 Tab 不重新载入。
 
 ### 活动规则（RULES）
 
 1. **入口：**
-   - Hero 主视觉右下、`TODAY'S REWARD BOARD` 上方的按钮 `RULES`
+   - Hero 主视觉右下、`X'mas Reward Board` 上方的按钮 `RULES`
    - **固定显示**：活动期间、兑换期皆显示
 2. **点击：**
    - 弹出「活动规则」弹窗（居中、半透明遮罩），标题 `GENERAL MECHANICS`
@@ -140,33 +140,34 @@
 3. **关闭：**
    - 点底部 `CONFIRM` 关闭（桌机可按 Esc）
    - 点遮罩不关闭
-4. **规则内容：**依运营提供文案（前台英文），完整文案见原型「活动规则」弹窗：
-   - `BOMB MISSION REWARDS`＋活动日期
-   - `You may receive`：Instant Cash／Pili Card Challenge Chance（本次无 Lucky Scratch Ticket，已移除）（含 Card Ranking）
-   - `Reward & VIP Rules`（3 条）
-   - 结尾免责声明 `OKGAMES reserves the final interpretation rights for all events and rewards.`
+4. **规则内容：**依运营提供文案「20261105 OKGAMES 圣诞活动 · 圣诞活动英文规则」（前台英文，原文照录），完整文案见原型「活动规则」弹窗：
+   - 开头：活动名称 `X-BOMB PAROL FIESTA -- Light Up Your Christmas Luck!`、活动时间 `November 16, 00:00 – December 31, 23:59`（不显示时区）（两行皆粗体；不显示「Promotion Name／Promotion Period」字样）
+   - `1. Santa's Daily Gift`：每日签到与连续签到奖励（Day 1～Day 4 onwards）、断签规则
+   - `2. Parol Quest`：2.1 Christmas Mission／2.2 Daily Mission／2.3 PILI CARD Challenge（含 Card Ranking）／2.4 Reward & VIP Rules
+   - `3. Parol Wish Draw`：4 个奖池、PAROL 消耗不退还、活动结束未用作废、奖励发放（线上／实体）、28 天内未回复视同放弃实体奖品
+   - `4. Miscellaneous`：`OKGAMES reserves the right to final interpretation of this promotion.`
 
-### TODAY'S REWARD BOARD
+### X'mas Reward Board
 
-- **Bomb Mission Claimed**：
-  - **今日**在 BOMB MISSION 已领取的彩金合计（**含挑战加成**）
+- **Cash Bonus Claimed Today**：
+  - **今日**在 PAROL QUEST 已领取的彩金合计（**含挑战加成**）
   - **不含**：次日补领、签到、签到宝箱、奖池抽中的彩金
   - 每日 00:00 归零
   - **固定显示至小数点后 2 位**（第 3 位无条件舍去，整数也显示 .00，例 3.00、14.40）
   - **奖励为 0 时显示 0.00**
-- **My PAROL**：目前剩余 PAROL（累计获得 − 已消耗），为全页唯一的余额显示。
+- **My Parols**：目前剩余 PAROL（累计获得 − 已消耗），为全页唯一的余额显示。
 - **更新时机**：领取、一键领取、挑战 Confirm 入帐、抽奖扣除、特别任务发放后**即时更新**。
 
 ### 分页 Tab 与提示
 
-分页名称一律全大写：`BOMB MISSION`／`CHRISTMAS ACTIVITIES`。
+分页名称一律全大写：`PAROL QUEST`／`PAROL WISH DRAW`。
 
 | Tab | 提示样式 | 显示条件 |
 |---|---|---|
-| `BOMB MISSION` | 数字气泡 | 已达成未领取的每日任务等级数；`0` 不显示；>99 显示 `99+`；不含签到、特别任务。领取后即时更新；兑换期不显示。 |
-| `CHRISTMAS ACTIVITIES` | 红点（无数字） | 剩余 PAROL ≥ 4 个奖池中**最低的「道具消耗数量」**（至少可抽 1 次）时显示；不足隐藏。获得／扣除后即时更新。 |
+| `PAROL QUEST` | 数字气泡 | 已达成未领取的每日任务等级数；`0` 不显示；>99 显示 `99+`；不含签到、特别任务。领取后即时更新；兑换期不显示。 |
+| `PAROL WISH DRAW` | 红点（无数字） | 剩余 PAROL ≥ 4 个奖池中**最低的「道具消耗数量」**（至少可抽 1 次）时显示；不足隐藏。获得／扣除后即时更新。 |
 
-> 📍 **预设分页：**活动期间进入页面预设 `BOMB MISSION`；**兑换期**进入页面预设 `CHRISTMAS ACTIVITIES`（只剩奖池可操作）。
+> 📍 **预设分页：**活动期间进入页面预设 `PAROL QUEST`；**兑换期**进入页面预设 `PAROL WISH DRAW`（只剩奖池可操作）。
 
 ### F2 每日签到（签到日历 · 签到宝箱）【新增】
 
@@ -191,7 +192,7 @@
 | 状态 | 显示 | 可点击 |
 |---|---|---|
 | 已签到 | ✓ | 否 |
-| 今日可签 | 上方 `TAP` 标签 | 是（点击即签到） |
+| 今日可签 | 外框流动光圈（持续绕行），提醒点击；不显示文字标签 | 是（点击即签到） |
 | 未到（之后的天数） | 一般 | 否（点击无反应） |
 | 兑换期 | 整区停用 | 否 |
 
@@ -216,11 +217,11 @@
      - 中奖率可至小数点后 4 位；签到宝箱、奖池每款 9 项合计皆须等于 100%
      - **签到宝箱**：奖励于签到成功当下由后端抽出并入帐，Draw 只是演出、不会失败
 
-### F4 BOMB MISSION · 一键领取（TODAY'S UNCLAIMED REWARDS）【新增】
+### F4 PAROL QUEST · 一键领取（Unclaimed Mission Rewards）【新增】
 
 > 📷 截图：前台截图 · 一键领取＋特别任务
 
-- **位置**：BOMB MISSION 分页最上方（CHRISTMAS ACTIVITIES 分页**无**一键领取）。
+- **位置**：PAROL QUEST 分页最上方（PAROL WISH DRAW 分页**无**一键领取）。
 - **未领取金额**：今日已达成未领取等级的**奖励金额合计**；**不包含会触发挑战的任务**（后台勾选「触发」的等级整笔不计入；投注、充值任务皆同）；此金额只计彩金，**赠送的 PAROL 不计入金额，但领取时会一并发放**。
 - **按钮**：
   - 有可领等级（含挑战等级）：`CLAIM ALL`
@@ -235,16 +236,16 @@
   - 全部完成后显示 toast
 - **成功**：
   - toast `N rewards claimed · Total X + PAROL ×N`（N＝本次一并发放的 PAROL 数；无赠送 PAROL 时省略「+ PAROL ×N」）
-  - My PAROL、CHRISTMAS ACTIVITIES 分页红点同步更新
+  - My Parols、PAROL WISH DRAW 分页红点同步更新
   - 各卡转 CLAIMED 并移至列表最下方
   - 看板、气泡即时更新
 - 〔暂隐藏〕**失败**：见「失败情境」页签；部分成功时成功等级照常入帐，toast `Some rewards could not be claimed.`。重复点击幂等，只领一次。
 
 > 🔀 **一键领取 ≠ 次日补领：**一键领取只处理**当日**；前一日未领的奖励改由平台首页弹窗补领（F11）。
 
-### F5 BOMB MISSION · 每日任务列表（每日返水）【新增】
+### F5 PAROL QUEST · 每日任务列表（每日返水）【新增】
 
-> 📷 截图：前台截图 · BOMB MISSION
+> 📷 截图：前台截图 · PAROL QUEST
 
 1. 依后台「每日返水配置」**当前 VIP 等级**列出 LV：
    - 列表上方：区块标题 `DAILY MISSIONS`（活动期间、兑换期皆显示）
@@ -267,7 +268,7 @@
    - 未领取（可领、未达成）依 LV 由小到大
    - **CLAIMED 移至最下方**，卡片变暗
    - 金额栏**维持显示基础金额**：触发挑战且获胜也不改为加成后金额（例基础 `₱12`、实得 `₱14.40` → 卡片仍显示 `₱12`）
-   - 实得金额计入看板 `Bomb Mission Claimed`
+   - 实得金额计入看板 `Cash Bonus Claimed Today`
 5. **数值显示：**金额依金额显示规则（整数不显示 .00）、进度数值加千分位，皆不截断。
 
 ### 按钮状态
@@ -332,27 +333,27 @@
 
 > 📷 截图：前台截图 · Christmas Sparks
 
-- **位置**：BOMB MISSION 分页，一键领取**下方**、`DAILY MISSIONS`（LV 列表）上方。不计入气泡与一键领取。
+- **位置**：PAROL QUEST 分页，一键领取**下方**、`DAILY MISSIONS`（LV 列表）上方。不计入气泡与一键领取。
 - **卡片内容**：
   - 卡片顶部：标题 `✦ CHRISTMAS MISSION ✦`（固定文案）
   - 第 1 行左：任务名称 `✦ Christmas Sparks`（固定文案）
   - 第 1 行右：奖励 `✦ N PAROL`（N＝后台「奖励数量」，即每完成 1 轮获得的 PAROL 数）
   - 第 2 行左：进度框
-    - 进度框上方左侧：`Completed X times`（X＝累计完成轮数；1 次时为 `Completed 1 time`；不显示累计获得的 PAROL 数）
+    - 进度框上方左侧：`Times Completed: X`（X＝累计完成轮数；1 次时为 `Completed 1 time`；不显示累计获得的 PAROL 数）
     - 进度框上方右侧：`本轮累计 / 任务目标`
     - 下方为进度条（依目前值显示对应进度）
-    - 宽度不足时，`Completed X times` 与进度数值分两行显示，不截断
-  - 第 2 行右：按钮 `BET NOW ›`（导向游戏大厅；兑换期显示 `ENDED` 并停用）
+    - 宽度不足时，`Times Completed: X` 与进度数值分两行显示，不截断
+  - 第 2 行右：按钮 `Bet`（导向游戏大厅；兑换期显示 `ENDED` 并停用）
   - 不显示 `REPEATABLE` 标签
   - **不显示任务说明与更新频率文字**
 - **计算**：活动期间累计有效投注（折算）每达任务目标，获得奖励数量个 PAROL，进度归零重新累计，**可无限次重复**。
 - **发放**：**自动发放**，系统跑 Job **每 20 分钟更新一次**；同一次更新完成多轮则一次发放（完成轮数 × 奖励数量）。**无 CLAIM、无补领**。
 - **范例**：目标 5,000、奖励 1：本轮已 3,650，再投注 10,000 → 下次更新完成 2 轮、得 PAROL ×2，进度 3,650 / 5,000。
-- **兑换期**：停止累计；`BET NOW` 改 `ENDED` 停用；进度停留最后数值。
+- **兑换期**：停止累计；`Bet` 改 `ENDED` 停用；进度停留最后数值。
 
 > ⏳ 进度与 PAROL 于 Job 更新（每 20 分钟）后才同步显示，前台不显示「下次更新时间」。
 
-### F8 CHRISTMAS ACTIVITIES 分页 · 特别任务奖池（9 宫格＋圣诞树底图） 【新增】
+### F8 PAROL WISH DRAW 分页 · 特别任务奖池（9 宫格＋圣诞树底图） 【新增】
 
 > 📷 截图：前台截图 · 奖池（9 宫格＋圣诞树底图）
 > 📷 截图：前台截图 · History 弹窗
@@ -360,7 +361,6 @@
 1. **标题列：**
    - 左：标题 `Christmas Prize Pools`
    - 右：`History` 标签（见下方「History 抽奖纪录」）
-   - 下方副标 `Draw 1, 5 or 10 times with PAROL`
    - 宽度不足时标题换行，不截断
 2. **排列：**
    - 后台固定 4 个奖池，**由上而下排列**（Pool 1 → Pool 4），页面上下滑动浏览
@@ -450,7 +450,7 @@
 > 〔暂隐藏〕网络／服务器失败：不进入演出、整笔回滚退回 PAROL，toast `Draw failed. Please try again.`
 > 〔暂隐藏〕PAROL 不足：toast `Not enough PAROL.`
 > · **减少动态效果**时不跑马灯，直接跳出获奖弹窗
-> · 抽奖后 My PAROL、各奖池按钮状态、CHRISTMAS ACTIVITIES 分页红点即时更新
+> · 抽奖后 My Parols、各奖池按钮状态、PAROL WISH DRAW 分页红点即时更新
 
 ### F10 兑换期 · 活动关闭 【新增】
 
@@ -464,11 +464,11 @@
 | 区块 | 兑换期呈现 |
 |---|---|
 | 签到 | 整区停用、不可点 |
-| 看板 | Bomb Mission Claimed 显示 0；My PAROL 正常 |
+| 看板 | Cash Bonus Claimed Today 显示 0；My Parols 正常 |
 | 一键领取 | 金额 0、按钮 `ENDED`、倒数改 `Daily missions have ended` |
 | 每日任务 | 未领取等级按钮 `ENDED`；已领取维持 `CLAIMED`；Tab 不显示气泡 |
-| 特别任务 | `BET NOW` → `ENDED` 停用 |
-| 奖池 | **正常 1／5／10 抽**；预设开启 CHRISTMAS ACTIVITIES 分页 |
+| 特别任务 | `Bet` → `ENDED` 停用 |
+| 奖池 | **正常 1／5／10 抽**；预设开启 PAROL WISH DRAW 分页 |
 | 次日补领 | 兑换期第 1 天：活动最后一天未领的每日返水基础彩金及 PAROL 仍跳弹窗可补领；第 2 天起不跳（兑换期内没有新的每日任务奖励） |
 
 ### 已关闭（结束时间 +3 天后 / 状态关闭）
@@ -507,10 +507,10 @@
   - 不逐级列明细
   - 弹窗图下方为 `CLAIM` 按钮（与弹窗图保留间距；呼吸灯效果：持续放大缩小），**点 `CLAIM` 即补领**
   - 弹窗图右上方 ✕ 关闭（不领取）
-- **成功**：点 `CLAIM` 一键补领全部等级，弹窗关闭，彩金与 PAROL 一并发放，toast `Yesterday's rewards claimed · ₱X + PAROL ×N`（没有 PAROL 时省略「+ PAROL ×N」）；My PAROL 同步增加。
+- **成功**：点 `CLAIM` 一键补领全部等级，弹窗关闭，彩金与 PAROL 一并发放，toast `Yesterday's rewards claimed · ₱X + PAROL ×N`（没有 PAROL 时省略「+ PAROL ×N」）；My Parols 同步增加。
 - 〔暂隐藏〕**失败**：见「失败情境」页签；网络／服务器：弹窗保留可再点，toast `Claim failed. Please try again.`；活动关闭、跨日、已补领：关闭弹窗；进入兑换期第 1 天不影响补领。重复点击幂等。
 - **不跳出**：无可补领、已补领、兑换期第 2 天起、活动详情页及入口已关闭（状态关闭／+3 天后）。
-- **计入**：补领彩金**不计入**当日看板 Bomb Mission Claimed（补领的 PAROL 计入 My PAROL）；补领不影响当天新一轮每日任务。
+- **计入**：补领彩金**不计入**当日看板 Cash Bonus Claimed Today（补领的 PAROL 计入 My Parols）；补领不影响当天新一轮每日任务。
 
 ### 金额显示规则（彩金＋PAROL）
 
@@ -614,7 +614,7 @@
   - **合计须等于 100%**，否则红字 `宝箱中奖率合计需等于100%` 并挡下一步
   - 尚未配置任何宝箱时提示「尚未配置签到宝箱…」
 
-### B5 配置向导 · 步骤4 每日返水配置（BOMB MISSION）【新增】
+### B5 配置向导 · 步骤4 每日返水配置（PAROL QUEST）【新增】
 
 > 📷 截图：后台截图 · 每日返水配置
 
@@ -796,7 +796,7 @@
 
 ↓
 
-CLAIMED 移至列表底部；看板 Bomb Mission Claimed＋实得金额；My PAROL＋赠送数
+CLAIMED 移至列表底部；看板 Cash Bonus Claimed Today＋实得金额；My Parols＋赠送数
 
 ↓ 当日 23:59:59 仍未领取
 
@@ -947,7 +947,7 @@ CLAIMED 移至列表底部；看板 Bomb Mission Claimed＋实得金额；My PAR
 | E4 | 已进入兑换期 | 停留页面跨过结束日隔日 00:00 后才点签到／领取 | 刷新为兑换期样式（F10：签到灰、按钮 ENDED） | `Check-in & missions have ended.` |
 | E5 | 跨日（00:00 已重置） | 停留页面跨过 UTC+8 00:00 后才点昨天的签到格／CLAIM | 刷新签到日历、每日任务、看板、一键领取为新一天状态 | `A new day has started. Rewards have been refreshed.` |
 | E6 | 已在其他装置操作过 | 同账号在另一装置已签到／已领取／已补领 | 刷新为最新状态（已签到 ✓／CLAIMED／弹窗关闭） | 签到：`Already checked in today.`；领取／补领：`Already claimed.` |
-| E7 | PAROL 不足 | 另一装置先抽奖用掉 PAROL，本装置余额未更新 | 不进入演出；刷新 My PAROL、红点与抽奖按钮状态 | `Not enough PAROL.` |
+| E7 | PAROL 不足 | 另一装置先抽奖用掉 PAROL，本装置余额未更新 | 不进入演出；刷新 My Parols、红点与抽奖按钮状态 | `Not enough PAROL.` |
 | E8 | 不符参与资格 | 停留期间被风控冻结、加入黑名单或用户标签排除 | 关闭弹窗、离开活动详情页回到首页，入口隐藏 | `You are not eligible for this event.` |
 | E9 | 任务未达成 | 页面显示可领，但后端重算未达标（例：投注取消／退款后折算不足） | 刷新该等级为 BET／TOP-UP 与最新进度 | `Mission not completed yet.` |
 
@@ -968,7 +968,7 @@ CLAIMED 移至列表底部；看板 Bomb Mission Claimed＋实得金额；My PAR
 
 | 功能 | 情境 | 处理 |
 |---|---|---|
-| 签到（F2） | E1／E2 | 今日格维持「今日可签」（TAP），不弹 Mystery Box；可再点 |
+| 签到（F2） | E1／E2 | 今日格维持「今日可签」（流动光圈），不弹 Mystery Box；可再点 |
 | 签到（F2） | E5 跨日 | 日历刷新：昨日格依后端结果显示（未签成功＝未签），「今日可签」移到新的一天；连续天数依后端 |
 | CLAIM ALL（F4） | 部分成功（E6／E9 只影响部分等级） | **成功的等级照常入帐**（含挑战翻牌）、转 CLAIMED；未成功的等级刷新为最新状态；toast `Some rewards could not be claimed.` |
 | CLAIM ALL（F4） | E1／E2 全部失败 | 全部等级维持 CLAIM、金额不变；toast `Claim failed. Please try again.` |

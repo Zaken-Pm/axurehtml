@@ -70,7 +70,10 @@ button{font:inherit;cursor:pointer;}
 .rules__body ol > li{margin-bottom:8px;}
 .rules__body ul{margin:4px 0 0;padding-left:1.2em;list-style:disc;}
 .rules__body h3 i{font-style:italic;}
-.rules__vip li{margin-bottom:6px;}
+.rules__body h4{margin:8px 0 3px;font-size:.72rem;color:#ffe9b0;}
+.rules__body ul{margin:0 0 10px;}
+.rules__body ul > li{margin-bottom:4px;}
+.rules__lead{padding-bottom:8px;border-bottom:1px solid rgba(255,214,110,.3);}
 .hero__snow{position:absolute;left:0;right:0;bottom:-1px;height:28px;background:
   radial-gradient(30px 18px at 10% 100%,#fff 98%,transparent),radial-gradient(40px 22px at 35% 100%,#fff 98%,transparent),
   radial-gradient(36px 20px at 62% 100%,#fff 98%,transparent),radial-gradient(44px 24px at 90% 100%,#fff 98%,transparent);opacity:.95;}
@@ -167,8 +170,16 @@ button{font:inherit;cursor:pointer;}
 .day--future{filter:saturate(.7);}
 .day--today{cursor:pointer;}
 .day--today:focus-visible{outline:3px solid #fff;outline-offset:1px;}
-.day__tap{position:absolute;top:-7px;left:50%;transform:translateX(-50%);font-size:.67rem;font-weight:900;font-style:italic;line-height:1.2;
-  padding:0 6px;border-radius:999px;color:var(--gold-ink);background:linear-gradient(180deg,#fff3b0,var(--gold-2));box-shadow:0 1px 3px rgba(0,0,0,.4);white-space:nowrap;}
+/* 今日可签：流动光圈（一道金白光沿外框持续绕行）提醒点击，不另加文字标签 */
+@property --ring{syntax:'<angle>';initial-value:0deg;inherits:false;}
+.day--today::before{content:"";position:absolute;inset:-3px;border-radius:12px;padding:3px;pointer-events:none;z-index:2;
+  background:conic-gradient(from var(--ring),transparent 0 45%,rgba(255,214,110,.5) 62%,#ffd84a 78%,#ffffff 90%,#ffe27a 95%,transparent 100%);
+  filter:drop-shadow(0 0 3px #fff3b0) drop-shadow(0 0 6px rgba(255,214,110,.9));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;
+  animation:ringFlow 1.6s linear infinite;}
+@keyframes ringFlow{to{--ring:360deg;}}
+.days .day.day--today{border-color:rgba(255,226,122,.35);box-shadow:0 0 10px rgba(255,226,122,.45);animation:none;}   /* 底框收暗，让流动光更明显 */
+@media (prefers-reduced-motion:reduce){ .day--today::before{animation:none;background:var(--gold-1);} }
 @keyframes pulse{50%{box-shadow:0 0 0 2px rgba(255,226,122,.2),0 0 22px rgba(255,226,122,.95);}}
 
 /* === 按钮 === */
@@ -302,7 +313,7 @@ button{font:inherit;cursor:pointer;}
 /* 特别任务奖池（4 个奖池卡＋点击开启奖池详情弹窗＋1／5／10 抽） */
 .sec-title{margin:0 0 2px;font-size:.85rem;font-weight:900;font-style:italic;color:var(--gold-1);text-align:center;}
 /* Christmas Prize Pools 标题列：标题加大（左）、History 标签（右） */
-.pools-head{display:flex;justify-content:space-between;align-items:center;gap:var(--space-2);margin-bottom:4px;}
+.pools-head{display:flex;justify-content:space-between;align-items:center;gap:var(--space-2);margin-bottom:12px;}
 .pools-head .sec-title{margin:0;min-width:0;font-size:1.2rem;line-height:1.2;text-align:left;}
 .pools-head + .sec-note{text-align:left;}
 .hist-btn{flex:none;display:flex;align-items:center;gap:4px;padding:5px 11px;border-radius:999px;
@@ -506,6 +517,14 @@ button{font:inherit;cursor:pointer;}
 body{background:#1a0204;}
 .phone{background:radial-gradient(120% 40% at 50% 0%,#5a0a12,transparent 70%),linear-gradient(180deg,#3d0609 0%,#2a0306 45%,#4a0810 100%);border-color:rgba(232,181,74,.18);}
 .appbar{background:rgba(16,28,44,.95);}
+/* 页面名称栏不切圆角：手机画面直角；overflow 改 clip 让顶栏 sticky 正常 */
+.phone{border-radius:0;overflow:clip;}
+/* 单栏（≤900px）：手机画面贴齐视窗左右与上缘，页面名称栏直接填满，不留外框与间距；原型控制面板保留左右间距 */
+@media(max-width:900px){
+  .stage{grid-template-columns:minmax(0,1fr);padding:0 0 var(--space-5);gap:var(--space-5);}
+  .phone{border:0;box-shadow:none;width:100%;max-width:480px;margin:0 auto;}
+  .notes{margin:0 var(--space-4);}
+}
 .appbar__title{color:#fff;}
 
 /* Hero：圣诞树＋灯串＋红色缎带 */
@@ -520,8 +539,13 @@ body{background:#1a0204;}
 .hero__title .pink{color:#fff;}
 /* 主视觉文案层级：奖励数字最大，其余文字皆小于数字 */
 .hero__title .pink{font-size:clamp(1.1rem,5.4vw,1.45rem);letter-spacing:.06em;}
-.hero__upto{display:block;margin-top:2px;font-size:clamp(.85rem,4vw,1.05rem);color:#ffe9b0;letter-spacing:.08em;}
-.hero__title .hero__amt{font-size:clamp(2.3rem,12.5vw,3.1rem);line-height:1;letter-spacing:0;}
+/* 主视觉：主标 X-BOMB PAROL FIESTA（金色大字）＋副标 Light Up Your Christmas Luck! */
+/* 主标、副标各一行不断行，直接压在主视觉图上（圣诞树在下层）；字级依宽度缩放 */
+.hero__title{transform:rotate(-4deg);text-align:center;}
+.hero{container-type:inline-size;}   /* 字级依主视觉实际宽度（cqi）缩放，不受视窗宽度影响 */
+.hero__title .hero__main{white-space:nowrap;font-size:clamp(1.1rem,calc(7cqi + 4px),2.1rem);line-height:1.1;letter-spacing:0;filter:drop-shadow(0 3px 0 #7a0a14) drop-shadow(0 4px 10px rgba(0,0,0,.65));}
+.hero__sub{display:block;margin-top:6px;white-space:nowrap;font-size:clamp(.7rem,4.5cqi,1.1rem);line-height:1.2;color:#fff3c8;letter-spacing:.02em;
+  text-shadow:0 2px 0 #7a0a14,0 0 10px rgba(0,0,0,.75);}
 .hero__title .gold{filter:drop-shadow(0 3px 0 #7a0a14);}
 
 /* 今日奖励看板：红丝绒＋金框＋缎带标题 */
@@ -538,9 +562,9 @@ body{background:#1a0204;}
 .board__val{background:rgba(40,0,6,.6);border:1px solid rgba(232,181,74,.55);}
 .board__val b{color:#5fe08a;}
 /* 看板缩减高度：标题缎带较薄、吉祥物缩小、标签与数值间距收紧 */
-.board{margin-top:-22px;padding:18px var(--space-3) 10px;grid-template-columns:66px minmax(0,1fr);gap:var(--space-2);}
+.board{margin-top:-22px;padding:18px var(--space-3) 10px;grid-template-columns:clamp(84px,27%,108px) minmax(0,1fr);gap:var(--space-3);}   /* 雪人加大（窄屏略缩），右侧纪录栏相对缩窄 */
 .board__title{top:-12px;padding:2px 18px;font-size:.75rem;}
-.board__mascot{margin:-6px 0 -4px;}
+.board__mascot{margin:-16px 0 -6px;}
 .board__rows{gap:4px;}
 .board__lb{margin:0 0 1px;font-size:.67rem;line-height:1.2;}
 .board__val{padding:1px 12px 1px 4px;}
@@ -749,7 +773,7 @@ body{background:#1a0204;}
 
     <!-- Hero -->
     <section class="hero" aria-label="活动横幅">
-      <h2 class="hero__title"><span class="pink">XMAS BONUS</span><span class="hero__upto">UP TO</span><span class="gold hero__amt">₱39,142</span></h2>
+      <h2 class="hero__title"><span class="gold hero__main">X-BOMB PAROL FIESTA</span><span class="hero__sub">Light Up Your Christmas Luck!</span></h2>
       <!-- 主视觉装饰：右侧大圣诞树（由上到下填满右侧）＋左下礼物与拐杖糖 -->
       <svg class="hero__deco" viewBox="0 0 160 220" aria-hidden="true">
         <rect x="72" y="188" width="16" height="22" rx="2" fill="#6b3f1a"/>
@@ -782,7 +806,7 @@ body{background:#1a0204;}
 
     <!-- 今日奖励看板（签到上方；两分页共用） -->
     <section class="board" aria-labelledby="boardTitle">
-      <h2 class="board__title" id="boardTitle">TODAY'S REWARD BOARD</h2>
+      <h2 class="board__title" id="boardTitle">X'mas Reward Board</h2>
       <div class="board__mascot" aria-hidden="true"><svg viewBox="0 0 100 110">
         <ellipse cx="50" cy="104" rx="34" ry="5" fill="rgba(0,0,0,.25)"/>
         <circle cx="50" cy="78" r="27" fill="#fff"/><circle cx="50" cy="43" r="20" fill="#fff"/>
@@ -798,8 +822,8 @@ body{background:#1a0204;}
         <g transform="translate(84 40) scale(.42)"><path d="M24 2 L29.6 16.3 L45 17 L33 26.7 L37.2 41.6 L24 33.2 L10.8 41.6 L15 26.7 L3 17 L18.4 16.3 Z" fill="#ffd34d" stroke="#fff" stroke-width="2"/></g>
       </svg></div>
       <div class="board__rows">
-        <div><p class="board__lb">Bomb Mission Claimed</p><div class="board__val" id="boardCash"></div></div>
-        <div><p class="board__lb">My PAROL</p><div class="board__val" id="boardParol"></div></div>
+        <div><p class="board__lb">Cash Bonus Claimed Today</p><div class="board__val" id="boardCash"></div></div>
+        <div><p class="board__lb">My Parols</p><div class="board__val" id="boardParol"></div></div>
       </div>
     </section>
 
@@ -817,17 +841,17 @@ body{background:#1a0204;}
     <div class="tabs" role="tablist" aria-label="活动分页">
       <button class="tab" role="tab" id="tabBomb" aria-controls="panelBomb" aria-selected="true" data-tab="bomb">
         <svg class="tab__ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.4-9.3-9C1 8.4 3.3 4.5 7 4.5c2 0 3.6 1.1 5 2.8 1.4-1.7 3-2.8 5-2.8 3.7 0 6 3.9 4.3 7.5C19 16.6 12 21 12 21z" fill="#ff7ad9" stroke="#fff" stroke-width="1.2"/></svg>
-        <span class="tab__txt">BOMB MISSION</span><span class="bubble" id="bubbleBomb" hidden></span></button>
+        <span class="tab__txt">PAROL QUEST</span><span class="bubble" id="bubbleBomb" hidden></span></button>
       <button class="tab" role="tab" id="tabXmas" aria-controls="panelXmas" aria-selected="false" data-tab="xmas">
         <svg class="tab__ico" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12,2 19,14 15,14 20,21 4,21 9,14 5,14" fill="#1f9d55"/><rect x="10.5" y="21" width="3" height="2" fill="#7a4a1f"/><circle cx="12" cy="3" r="1.6" fill="#ffd34d"/></svg>
-        <span class="tab__txt">CHRISTMAS ACTIVITIES</span><span class="dot" id="dotXmas" hidden></span></button>
+        <span class="tab__txt">PAROL WISH DRAW</span><span class="dot" id="dotXmas" hidden></span></button>
     </div>
 
     <!-- 分页：BOMB MISSION（每日返水任务） -->
     <section class="panel" id="panelBomb" role="tabpanel" aria-labelledby="tabBomb">
       <!-- 今日未领取奖励（一键领取）：金额不含挑战任务加成 -->
       <section class="unc" aria-labelledby="uncTitle">
-        <h3 class="unc__title" id="uncTitle">TODAY'S UNCLAIMED REWARDS</h3>
+        <h3 class="unc__title" id="uncTitle">Unclaimed Mission Rewards</h3>
         <div class="unc__row">
           <span class="unc__coins" aria-hidden="true"><svg viewBox="0 0 80 60">
             <ellipse cx="40" cy="54" rx="34" ry="5" fill="rgba(0,0,0,.3)"/>
@@ -847,7 +871,7 @@ body{background:#1a0204;}
         <div class="cycle__head"><h4 class="cycle__name" id="cycleTitle"><span class="cycle__star" aria-hidden="true">✦</span>Christmas Sparks</h4><b class="cycle__prize" id="cyclePrize"></b></div>
         <div class="cycle__body">
           <div class="task" id="cycleTask"></div>
-          <button class="btn-gold" id="btnBetNow">BET NOW ›</button>
+          <button class="btn-gold" id="btnBetNow">Bet</button>
         </div>
       </article>
       <h3 class="dm-title" id="dmTitle">DAILY MISSIONS</h3>
@@ -860,7 +884,6 @@ body{background:#1a0204;}
         <h3 class="sec-title">Christmas Prize Pools</h3>
         <button class="hist-btn" id="btnHist" aria-haspopup="dialog"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 4.5V8l2.5 1.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>History</button>
       </div>
-      <p class="sec-note">Draw 1, 5 or 10 times with PAROL</p>
       <!-- 玻璃许愿树 ×4：每个奖池为一座独立的玻璃许愿树（玻璃罩＋罩内圣诞树＋木底座） -->
       <ul class="pools gpools" id="poolList" aria-label="奖池"></ul>
     </section>
@@ -1009,21 +1032,54 @@ body{background:#1a0204;}
 <div class="mask" id="rulesMask" role="dialog" aria-modal="true" aria-labelledby="rulesTitle">
   <div class="sheet">
     <h2 id="rulesTitle">GENERAL MECHANICS</h2>
+    <!-- 规则文案：依运营提供「20261105OKGAMES 聖誕活動」·「聖誕活動英文規則」（原文照录） -->
     <div class="rules__body" tabindex="0">
-      <p class="rules__lead"><b>BOMB MISSION REWARDS<br>29 September 2026 – 30 November 2026</b></p>
-      <p>Complete daily missions to unlock rewards.</p>
-      <h3>You may receive</h3>
-      <ol>
-        <li><b>Instant Cash:</b><br>Cash rewards will be credited directly to your OKGAMES wallet.</li>
-        <li><b>Pili Card Challenge Chance:</b><br>Choose <b>one card from two cards.</b> If your card is higher, your Instant Cash reward will be increased.<br><b>Card Ranking:</b><br><b>A &gt; K &gt; Q &gt; J &gt; 10 &gt; 9 &gt; 8 &gt; ... &gt; 2</b></li>
-      </ol>
-      <h3><i>Reward &amp; VIP Rules</i></h3>
-      <ul class="rules__vip">
-        <li><i>Not every mission level offers all reward types. Please check the promotion page for the specific rewards available at each level.</i></li>
-        <li><i>If your VIP level is upgraded, rewards that have already been claimed will remain unchanged.</i></li>
-        <li><b><i>Unclaimed rewards will be updated based on your current VIP level.</i></b></li>
+      <p class="rules__lead"><b>X-BOMB PAROL FIESTA -- Light Up Your Christmas Luck!<br>November 16, 00:00 – December 31, 23:59</b></p>
+
+      <h3>1. Santa's Daily Gift</h3>
+      <p>During the promotion, each user may check in once per day. Check-in eligibility resets daily at 00:00 (UTC+8, Philippine Time).</p>
+      <p>Check-in rewards follow a consecutive-day progression:</p>
+      <ul>
+        <li>Day 1: Claim the Day 1 check-in reward;</li>
+        <li>Day 2: Claim the Day 2 check-in reward;</li>
+        <li>Day 3: Claim the Day 3 check-in reward plus 1 random Check-in Treasure Chest;</li>
+        <li>Day 4 onwards: Claim the Day 3 check-in reward plus 1 random Check-in Treasure Chest each day until the promotion ends.</li>
       </ul>
-      <p>OKGAMES reserves the final interpretation rights for all events and rewards.</p>
+      <p>If a user misses check-in on any day, the consecutive-day streak resets to zero, and the next check-in restarts from Day 1.</p>
+
+      <h3>2. Parol Quest</h3>
+      <p>This section consists of two mission categories: Christmas Mission and Daily Mission.</p>
+      <h4>2.1 Christmas Mission</h4>
+      <p>Complete the corresponding betting missions to earn the corresponding number of Parols during the promotional period.<br>Parols can be used in the X'mas Parol Draw to draw rewards.</p>
+      <h4>2.2 Daily Mission</h4>
+      <p>Complete the corresponding daily betting missions or deposit missions to receive:</p>
+      <ul>
+        <li>Bonus: Credited directly to the user's wallet; a 1x turnover requirement applies before withdrawal;</li>
+        <li>The corresponding number of Parols: Usable in the Parol Wish Draw.</li>
+      </ul>
+      <h4>2.3 PILI CARD Challenge</h4>
+      <p>At certain mission levels, completing a mission triggers the PILI CARD challenge: two cards are displayed, and the user chooses one.</p>
+      <p>Choose one card from two. If your card is higher, your Instant Cash reward will be increased. If both cards are of equal rank, the challenge is considered a miss and the reward remains unchanged.</p>
+      <p><b>Card Ranking: A &gt; K &gt; Q &gt; J &gt; 10 &gt; 9 &gt; 8 &gt; … &gt; 2</b></p>
+      <h4>2.4 Reward &amp; VIP Rules</h4>
+      <ul>
+        <li>Not every mission level offers all reward types. Please refer to the promotion page for the specific rewards available at each level.</li>
+        <li>If your VIP level is upgraded: rewards already claimed will remain unchanged; unclaimed rewards will be updated based on your current VIP level.</li>
+      </ul>
+
+      <h3>3. Parol Wish Draw</h3>
+      <p>After earning Parols in XBomb Mission, users may enter the Parol Wish Draw to redeem draws.</p>
+      <p>There are 4 prize pools, and users may choose freely among them. Each pool consumes a different number of Parols per draw, as displayed on the promotion page.</p>
+      <p>Parols once consumed will not be refunded. Any unused Parols will be automatically forfeited after the promotion ends.</p>
+      <p>Reward distribution:</p>
+      <ul>
+        <li>Online rewards (Free Spins, Bonuses, Vouchers, etc.): Credited directly to the user's account;</li>
+        <li>Physical prizes: Shipped within 1 month after customer service contacts the winner to confirm delivery details. Please verify the actual shipping time and delivery address with customer service.</li>
+      </ul>
+      <p>Winners who fail to respond to customer service to confirm delivery details within 28 days after the promotion ends will be deemed to have forfeited their physical prizes.</p>
+
+      <h3>4. Miscellaneous</h3>
+      <p>OKGAMES reserves the right to final interpretation of this promotion.</p>
     </div>
     <button class="btn-gold" id="rulesOk">CONFIRM</button>
   </div>
@@ -1128,7 +1184,7 @@ function renderSign(){
     const ico=`<span class="day__ico">${ICON[rw.type].replace('<svg','<svg class="day__icon"')}${d>=3?`<span class="day__mb">${ICON.mystery}</span>`:''}<span class="day__rw" title="${rw.label}">${shortLabel(rw)}</span></span>`;
     const tap=st==='today'?' role="button" tabindex="0"':'';
     return `<li class="day day--${st}"${tap} aria-label="Day ${d}，${st==='done'?'已签到':st==='today'?'今日可签到，点击签到':'未到'}">
-      ${st==='today'?'<span class="day__tap">TAP</span>':''}<span class="day__label">Day ${d}</span>${ico}</li>`;
+      <span class="day__label">Day ${d}</span>${ico}</li>`;
   }).join('');
   scrollToDay(today);
 }
@@ -1305,7 +1361,7 @@ const keysLeft=()=>keysEarned()-S.keysUsed;
 function renderXmas(){
   const rounds=Math.floor(S.xBet/CYCLE.goal), cur=S.xBet%CYCLE.goal, keys=keysLeft();
   /* 进度框：左＝累计完成次数、右＝本轮进度；BET NOW 在进度框右侧 */
-  $('#cycleTask').innerHTML=`<div class="task__row"><span class="cycle__done">Completed ${int(rounds)} time${rounds===1?'':'s'}</span><span>${int(cur)} / ${int(CYCLE.goal)}</span></div>
+  $('#cycleTask').innerHTML=`<div class="task__row"><span class="cycle__done">Times Completed: ${int(rounds)}</span><span>${int(cur)} / ${int(CYCLE.goal)}</span></div>
     <div class="bar"><div class="bar__fill" style="width:${cur/CYCLE.goal*100}%"></div></div>`;
   /* 奖励（右上）：每完成 1 轮获得的 PAROL 数（不显示累计获得 PAROL） */
   $('#cyclePrize').innerHTML=`<span class="cycle__star" aria-hidden="true">✦</span>${int(CYCLE.qty)} ${KEY_NAME}`;
@@ -1497,7 +1553,7 @@ function renderReclaim(){
   const ph=S.phase; $('.phone').dataset.phase=ph;
   $('#closedView').hidden=ph!=='closed';
   $('.signin').classList.toggle('is-ended',!LIVE());
-  const bn=$('#btnBetNow'); bn.disabled=!LIVE(); bn.textContent=LIVE()?'BET NOW ›':'ENDED';
+  const bn=$('#btnBetNow'); bn.disabled=!LIVE(); bn.textContent=LIVE()?'Bet':'ENDED';
   if(!LIVE()) $('#uncReset').textContent='Daily missions have ended';
   else if(!$('#uncTimer')){ $('#uncReset').innerHTML='Daily missions reset in <b id="uncTimer">--:--:--</b>'; tickReset(); }
   $('#btnReclaimBomb').setAttribute('aria-label',nb?`一键领取 ${nb} 笔`:'无可领取奖励');
