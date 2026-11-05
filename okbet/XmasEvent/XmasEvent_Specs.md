@@ -206,8 +206,7 @@
 
 1. 
      - 弹窗显示该宝箱**全部 9 项奖励（3×3）**
-     - 标题文字 `❄ Mystery Box ❄`
-     - 副标题 `Day N · Mystery Box X`
+     - 标题 `❄ Mystery Box ❄`（置于 9 宫格上方）
 2. 点「`Draw`」才开始跑马灯（不消耗 PAROL）。
 3. 跑马灯：依序绕格后停在抽中项，抽中项标示、其余变暗；按钮转「`Collect`」。
 4. 结果文案：`You won <奖励>`；实体奖品另显示 `Please contact Customer Service to claim your prize.`（实体奖品同样自动审核，由客服线下安排寄送／领取）。
