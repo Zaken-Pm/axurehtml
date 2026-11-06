@@ -739,16 +739,14 @@ body{background:#1a0204;}
 .win__lead{margin:0 0 14px;text-align:center;font-size:1.15rem;font-weight:800;line-height:1.3;}
 .win__lead b{color:var(--gold-1);}
 .win__grid{list-style:none;margin:0;padding:4px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;max-height:46vh;overflow:auto;}
-.win__grid--one{grid-template-columns:minmax(0,150px);justify-content:center;}
+.win__grid--one{grid-template-columns:minmax(0,130px);justify-content:center;}   /* 单张卡 130px：奖池 1 抽与签到奖励弹窗统一 */
 /* 奖励卡：深红贴纸＋金框，图示后方金色爆炸框 */
 .win__grid .tile{background:linear-gradient(180deg,#9c1a26,#5e0a12);border:2px solid var(--gold-1);border-radius:16px;box-shadow:0 0 10px rgba(255,214,110,.4),0 4px 0 #3a0610;overflow:visible;}
 .win__grid .tile::before{content:"";position:absolute;left:50%;top:44%;width:72%;aspect-ratio:1;transform:translate(-50%,-50%);z-index:0;opacity:.55;
   background:radial-gradient(circle,#ffe27a,#ffbe1a 70%);clip-path:polygon(50% 0,61% 18%,82% 8%,80% 30%,100% 36%,86% 52%,100% 68%,79% 72%,82% 94%,61% 84%,50% 100%,39% 84%,18% 94%,21% 72%,0 68%,14% 52%,0 36%,20% 30%,18% 8%,39% 18%);}
 .win__grid .tile svg{position:relative;z-index:1;width:64%;}
 /* 单抽：单格放大，图示＋奖励名称 */
-.win__grid--one .tile svg{width:66%;}
-.win__grid--one .tile::before{top:44%;width:80%;}
-.win__grid--one .tile__lb{font-size:.85rem;}
+.win__grid--one .tile svg{width:58%;}
 .win__grid .tile__lb{position:relative;z-index:1;}
 .win__note{margin:10px 0 0;text-align:center;font-size:.72rem;color:#ffd38a;}
 .win__note:empty{display:none;}
@@ -758,11 +756,6 @@ body{background:#1a0204;}
 /* 签到奖励弹窗：2 项（签到奖励＋宝箱奖励）置中并排；卡片上缘来源标签 */
 .win__grid--two{grid-template-columns:repeat(2,minmax(0,130px));justify-content:center;}
 .win__grid--two .tile svg{width:58%;}
-/* 签到奖励弹窗：Day 1～2（1 项）与 Day 3 起（2 项）卡片同尺寸（130px）、图示与字级一致，两种弹窗宽高相同 */
-.win__grid--sign.win__grid--one{grid-template-columns:minmax(0,130px);}
-.win__grid--sign.win__grid--one .tile svg{width:58%;}
-.win__grid--sign.win__grid--one .tile::before{top:44%;width:72%;}
-.win__grid--sign.win__grid--one .tile__lb{font-size:.67rem;}
 .tile__src{position:absolute;top:-9px;left:50%;transform:translateX(-50%);z-index:3;white-space:nowrap;padding:1px 8px;border-radius:999px;font-size:.67rem;font-weight:900;font-style:italic;line-height:1.3;
   color:var(--gold-ink);background:linear-gradient(180deg,#fff3b0,var(--gold-2));box-shadow:0 1px 3px rgba(0,0,0,.4);}
 /* 获奖／签到奖励弹窗：CLAIM 按钮宽度依文案适中、置中（不撑满） */
@@ -1447,7 +1440,7 @@ function openWin(C,res){
 function openSignWin(day,rw,boxRw){
   const items=[[rw,'Check-In'],...(boxRw?[[boxRw,'Mystery Box']]:[])];
   $('#winLead').innerHTML=`Day ${day} <b>Check-In Reward${boxRw?'s':''}</b>`;
-  const list=$('#winList'); list.className='win__grid win__grid--sign '+(boxRw?'win__grid--two':'win__grid--one');   // 签到 1 项／2 项卡片尺寸一致，弹窗高度相同
+  const list=$('#winList'); list.className='win__grid '+(boxRw?'win__grid--two':'win__grid--one');   // 单张／两张卡皆 130px，弹窗宽高一致
   list.innerHTML=items.map(([r,src])=>`<li class="tile"><span class="tile__src">${src}</span>${ICON[r.type]}<span class="tile__lb" title="${r.label}">${r.label}</span></li>`).join('');
   $('#winNote').textContent=boxRw&&boxRw.physical?'Please contact Customer Service to claim your prize.':'';
   WIN={sign:day}; $('#winMask').classList.add('is-open'); $('#winOk').focus();
