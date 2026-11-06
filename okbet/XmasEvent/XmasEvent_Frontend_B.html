@@ -758,8 +758,15 @@ body{background:#1a0204;}
 /* 签到奖励弹窗：2 项（签到奖励＋宝箱奖励）置中并排；卡片上缘来源标签 */
 .win__grid--two{grid-template-columns:repeat(2,minmax(0,130px));justify-content:center;}
 .win__grid--two .tile svg{width:58%;}
+/* 签到奖励弹窗：Day 1～2（1 项）与 Day 3 起（2 项）卡片同尺寸（130px）、图示与字级一致，两种弹窗宽高相同 */
+.win__grid--sign.win__grid--one{grid-template-columns:minmax(0,130px);}
+.win__grid--sign.win__grid--one .tile svg{width:58%;}
+.win__grid--sign.win__grid--one .tile::before{top:44%;width:72%;}
+.win__grid--sign.win__grid--one .tile__lb{font-size:.67rem;}
 .tile__src{position:absolute;top:-9px;left:50%;transform:translateX(-50%);z-index:3;white-space:nowrap;padding:1px 8px;border-radius:999px;font-size:.67rem;font-weight:900;font-style:italic;line-height:1.3;
   color:var(--gold-ink);background:linear-gradient(180deg,#fff3b0,var(--gold-2));box-shadow:0 1px 3px rgba(0,0,0,.4);}
+/* 获奖／签到奖励弹窗：CLAIM 按钮宽度依文案适中、置中（不撑满） */
+#winMask .win #winOk{display:block;width:auto;min-width:160px;margin:16px auto 0;padding:12px 40px;}
 
 /* === B 版：奖池 Tab === */
 .ptabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:0 0 12px;}
@@ -1031,7 +1038,7 @@ body{background:#1a0204;}
     <p class="win__lead" id="winLead" aria-live="polite"></p>
     <ul class="win__grid" id="winList"></ul>
     <p class="win__note" id="winNote"></p>
-    <button class="btn-gold" id="winOk">COLLECT</button>
+    <button class="btn-gold" id="winOk">CLAIM</button>
   </div>
 </div>
 
@@ -1228,16 +1235,18 @@ $('#daysNext').addEventListener('click',()=>$('#days').scrollBy({left:daysStep()
   b.addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&e.target.closest('.day--today')){ e.preventDefault(); checkIn(); } });
 })();
 function checkIn(){
-  if(S.checked||!LIVE()) return;
-  S.streak+=1; S.checked=true;
-  const rw=signRewardOf(S.streak);
-  renderSign(); sim();
-  // 签到成功（不用 toast）：Day 1～2 直接弹签到奖励弹窗；第三天起先开随机签到宝箱抽奖，结束后与签到奖励合并于同一弹窗
-  const day=S.streak;
+  if(S.checked||!LIVE()||BX) return;
+  const day=S.streak+1, rw=signRewardOf(day);
+  const commit=()=>{ S.streak=day; S.checked=true; renderSign(); sim(); };   // 完成签到：连续天数＋1、该格转已签到、发放奖励
+  // Day 1～2：点今日格即完成签到，弹签到奖励弹窗（不用 toast）
+  // Day 3 起：点今日格先弹签到宝箱（尚未签到）；按 Draw 才完成签到（后端同时抽出宝箱奖励），跑马灯结束后签到奖励＋宝箱奖励合并于同一弹窗
+  //           未按 Draw 就按 ✕／Esc 关闭＝该日未完成签到（不发奖、今日格维持可签，可再点）
   if(day>=3){
-    const box=SIGN_BOXES[weighted(SIGN_BOX_RATE)], res=weighted(box.map(r=>r.rate));   // 宝箱奖励于签到当下由后端抽出，Draw 只是演出
-    setTimeout(()=>openBox({box,mode:'draw',res,onDone:w=>openSignWin(day,rw,box[w])}),300);
-  } else openSignWin(day,rw);
+    const box=SIGN_BOXES[weighted(SIGN_BOX_RATE)], res=weighted(box.map(r=>r.rate));
+    openBox({box,mode:'draw',res,onStart:commit,onDone:w=>openSignWin(day,rw,box[w])});
+    return;
+  }
+  commit(); openSignWin(day,rw);
 }
 
 /* ---------- 共用：依中奖率抽 1 项 ---------- */
@@ -1421,7 +1430,7 @@ function renderTreePools(keys){
   $$('#poolTabs [data-open]').forEach(b=>b.addEventListener('click',()=>{ if(PD||+b.dataset.open===OPEN_POOL) return; OPEN_POOL=+b.dataset.open; renderAll();
     $(`#poolTabs [data-open="${OPEN_POOL}"]`).focus({preventScroll:true}); }));
 }
-/* 获奖弹窗：奖池跑马灯结束后跳出，列出本次抽中的奖励（相同奖励合并 ×N，依首次抽中顺序）；按 COLLECT／Esc 关闭 */
+/* 获奖弹窗：奖池跑马灯结束后跳出，列出本次抽中的奖励（相同奖励合并 ×N，依首次抽中顺序）；按 CLAIM／Esc 关闭 */
 function openWin(C,res){
   const items=res.wins.map(w=>C.box[w]), phys=items.filter(r=>r.physical).length, multi=res.wins.length>1;
   const cnt={}; res.wins.forEach(w=>{ cnt[w]=(cnt[w]||0)+1; });
@@ -1434,11 +1443,11 @@ function openWin(C,res){
 }
 /* 签到奖励弹窗：沿用获奖弹窗版面（雪人、星星、缎带标题）；签到成功后弹出
    Day 1～2：只显示签到奖励；Day 3 起（有签到宝箱）：先开 Mystery Box 抽奖，跑马灯结束后「签到奖励＋宝箱抽中奖励」合并在此弹窗呈现
-   每项上缘标示来源（Check-in／Mystery Box）；按 COLLECT／Esc 关闭 */
+   每项上缘标示来源（Check-In／Mystery Box）；按 CLAIM／Esc 关闭 */
 function openSignWin(day,rw,boxRw){
-  const items=[[rw,'Check-in'],...(boxRw?[[boxRw,'Mystery Box']]:[])];
-  $('#winLead').innerHTML=`Day ${day} <b>Check-in Reward${boxRw?'s':''}</b>`;
-  const list=$('#winList'); list.className='win__grid '+(boxRw?'win__grid--two':'win__grid--one');
+  const items=[[rw,'Check-In'],...(boxRw?[[boxRw,'Mystery Box']]:[])];
+  $('#winLead').innerHTML=`Day ${day} <b>Check-In Reward${boxRw?'s':''}</b>`;
+  const list=$('#winList'); list.className='win__grid win__grid--sign '+(boxRw?'win__grid--two':'win__grid--one');   // 签到 1 项／2 项卡片尺寸一致，弹窗高度相同
   list.innerHTML=items.map(([r,src])=>`<li class="tile"><span class="tile__src">${src}</span>${ICON[r.type]}<span class="tile__lb" title="${r.label}">${r.label}</span></li>`).join('');
   $('#winNote').textContent=boxRw&&boxRw.physical?'Please contact Customer Service to claim your prize.':'';
   WIN={sign:day}; $('#winMask').classList.add('is-open'); $('#winOk').focus();
@@ -1523,6 +1532,7 @@ function runMarquee(){
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const counts={}; let pos=RING.length-1, k=0;
   BX.running=true;
+  if(BX.onStart){ BX.onStart(); BX.onStart=null; }   // 签到宝箱：按 Draw 当下才完成签到
   if(BX.wins){ btn.disabled=false; btn.textContent='Skip'; } else btn.disabled=true;
   const hit=i=>{ tiles.forEach(t=>t.classList.remove('tile--hit')); tiles[i].classList.add('tile--hit'); };
   const mark=i=>{ counts[i]=(counts[i]||0)+1; const t=tiles[i]; t.classList.add('tile--got');
@@ -1550,18 +1560,18 @@ function runMarquee(){
         +`<span class="rw-list">${order.map(w=>`<span class="rw-chip">${BX.box[w].label} <b>×${counts[w]}</b></span>`).join('')}</span>`
         +(phys?`<span class="review">You won ${phys} physical prize${phys>1?'s':''} — please contact Customer Service to claim.</span>`:'');
     }
-    BX.running=false; BX.done=true; btn.disabled=false; btn.textContent='Collect'; btn.focus();
+    BX.running=false; BX.done=true; btn.disabled=false; btn.textContent='CLAIM'; btn.focus();
     BX.onWin&&BX.onWin(items[0]);
-    if(BX.onDone){   // 签到宝箱：停在抽中项约 0.8 秒后自动关闭，改由签到奖励弹窗合并呈现（宝箱内不显示结果文案与 Collect）
+    if(BX.onDone){   // 签到宝箱：停在抽中项约 0.8 秒后自动关闭，改由签到奖励弹窗合并呈现（宝箱内不显示结果文案与 CLAIM）
       const cb=BX.onDone, w=wins[0]; BX.onDone=null; $('#boxResult').textContent=''; btn.disabled=true; btn.textContent='Draw';
       BX.t=setTimeout(()=>{ closeBox(); cb(w); },800); } };
   if(BX.wins) BX.skip=end;
   if(reduce){ end(); return; }
   next();
 }
-function closeBox(){ if(BX&&BX.running) return; const cb=BX&&!BX.done&&BX.onDone, r=BX&&BX.res;
+function closeBox(){ if(BX&&BX.running) return; const unsigned=BX&&!BX.done&&BX.onStart;
   $('#boxMask').classList.remove('is-open'); BX=null;
-  if(cb) cb(r);   // 签到宝箱未抽就关闭（✕／Esc）：奖励已于签到入帐，仍弹出合并的签到奖励弹窗
+  if(unsigned) $('.day--today')?.focus();   // 签到宝箱未按 Draw 就关闭（✕／Esc）＝该日未完成签到，焦点回到今日格
 }
 $('#boxClose').addEventListener('click',closeBox);
 /* Esc：由最上层弹窗开始关闭（挑战弹窗不可用 Esc 关闭；签到宝箱跑马灯进行中不关闭） */
