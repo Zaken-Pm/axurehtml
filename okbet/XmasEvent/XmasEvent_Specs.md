@@ -196,7 +196,7 @@
    - 1 项（Day 1～2）与 2 项（Day 3 起）卡片同尺寸，**两种弹窗宽度、高度一致**（仅实体奖品提示多一行）
    - 宝箱抽中实体奖品时，下方另显示 `Please contact Customer Service to claim your prize.`
    - 奖励名称最多两行，超过以「…」截断
-   - 点 `CLAIM`（按钮宽度依文案适中、置中）（或 Esc）关闭；点遮罩不关闭；奖励于签到当下已入帐
+   - 点 `CLAIM`（或 Esc）关闭；点遮罩不关闭；奖励于签到当下已入帐
 6. **签到宝箱：**Day 3 起点今日格立即弹出「Mystery Box」弹窗（F3），按 Draw 才完成签到；后台关闭「额外随机宝箱」时只发签到奖励、直接弹签到奖励弹窗。宝箱款式依后台「随机宝箱中奖率」抽出 1 款。
 
 ### 日历格状态
@@ -460,7 +460,7 @@
 3. **抽中实体奖品：**列表下方另显示提示
    - 1 抽：`Please contact Customer Service to claim your prize.`
    - 5／10 抽：`You won N physical prize(s) — please contact Customer Service to claim.`
-4. **关闭：**点 `CLAIM`（按钮宽度依文案适中、置中）（或 Esc）关闭，点遮罩不关闭；关闭后回到奖池页面，按钮恢复可继续抽。奖励于抽奖当下已入帐，关闭弹窗不影响发放。
+4. **关闭：**点 `CLAIM`（或 Esc）关闭，点遮罩不关闭；关闭后回到奖池页面，按钮恢复可继续抽。奖励于抽奖当下已入帐，关闭弹窗不影响发放。
 
 > ⚠️ 〔暂隐藏〕**失败处理（详见「失败情境」页签）：**
 > 〔暂隐藏〕网络／服务器失败：不进入演出、整笔回滚退回 PAROL，toast `Draw failed. Please try again.`
