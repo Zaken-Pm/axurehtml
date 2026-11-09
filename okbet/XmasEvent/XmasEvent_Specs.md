@@ -126,13 +126,13 @@
 
 ### 页面结构（由上而下）
 
-1. 顶栏（‹ 返回＋标题 `Christmas Activities`）→ Hero 主视觉（主标 `X-BOMB PAROL FIESTA`、副标 `Light Up Your Christmas Luck!`，各一行显示不断行、直接压在主视觉图上，不显示金额；右下 `RULES`）→ `X'mas Reward Board` → 签到日历（F2）→ Tab → 分页内容。
+1. 顶栏（‹ 返回＋标题 `Christmas Activities`）→ Hero 主视觉（使用运营提供的主视觉图，图上已含主标 `X-BOMB PAROL FIESTA`、副标 `Light Up Your Christmas Luck!`，不另叠文字、不显示金额；下方看板压在主视觉下半部；`RULES` 位于右侧、看板上方）→ `X'mas Reward Board` → 签到日历（F2）→ Tab → 分页内容。
 2. 看板、签到区**两分页共用**，切换 Tab 不重新载入。
 
 ### 活动规则（RULES）
 
 1. **入口：**
-   - Hero 主视觉右下、`X'mas Reward Board` 上方的按钮 `RULES`
+   - Hero 主视觉右侧、`X'mas Reward Board` 上方的按钮 `RULES`
    - **固定显示**：活动期间、兑换期皆显示
 2. **点击：**
    - 弹出「活动规则」弹窗（居中、半透明遮罩），标题 `GENERAL MECHANICS`
@@ -196,7 +196,7 @@
 5. **签到奖励弹窗（不使用 toast）：**
    - 版面同奖池获奖弹窗（依圣诞风格设计），标题 `Congratulations!`
    - **Day 1～2**：签到成功后立即弹出，文案 `Day N Check-In Reward`，显示签到奖励（图示＋名称）
-   - **Day 3 起（有签到宝箱）**：点今日格先弹出 Mystery Chest（F3），按 Draw 完成签到；宝箱跑马灯结束后，**签到奖励与宝箱抽中奖励合并在同一个弹窗**呈现，文案 `Day N Check-In Rewards`，两项并排，卡片上缘分别标示 `Check-In`／`Mystery Chest`
+   - **Day 3 起（有签到宝箱）**：点今日格先弹出 Mystery Chest（F3），按 Draw 完成签到；宝箱跑马灯结束后，**签到奖励与宝箱抽中奖励合并在同一个弹窗**呈现，文案 `Day N Check-In Rewards`，两项并排，上方分别标示 `Check-In`／`Mystery Chest`
    - 1 项（Day 1～2）与 2 项（Day 3 起）卡片同尺寸，**两种弹窗宽度、高度一致**（仅实体奖品提示多一行）
    - 宝箱抽中实体奖品时，下方另显示 `Please contact Customer Service to claim your prize.`
    - 奖励名称最多两行，超过以「…」截断
@@ -458,7 +458,7 @@
    - 奖励列表
        - 每项＝奖励图示＋奖励名称；1 抽单项置中，5／10 抽 3 项一列
        - 1 抽单张卡与签到奖励弹窗同尺寸，**1 抽获奖弹窗与签到奖励弹窗宽度、高度一致**
-       - 5／10 抽：相同奖励合并，右上标示 `×N`，依首次抽中顺序排列
+       - 5／10 抽：相同奖励合并，依首次抽中顺序排列；同一奖励抽中 ≥2 次才于右上标示 `×N`，只抽中 1 次不标示
        - 内容超过弹窗高度时，列表可上下滚动
        - 奖励名称最多两行，超过以「…」截断
 3. **抽中实体奖品：**列表下方另显示提示
