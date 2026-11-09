@@ -74,6 +74,15 @@ button{font:inherit;cursor:pointer;}
 .rules__body ul{margin:0 0 10px;}
 .rules__body ul > li{margin-bottom:4px;}
 .rules__lead{padding-bottom:8px;border-bottom:1px solid rgba(255,214,110,.3);}
+/* 规则：大段标题（How to Play／Terms & Conditions）→ 编号章节 h4 → 小节 h5；标语粗体；表格 */
+.rules__body .rules__sec{margin:14px 0 6px;padding-top:8px;border-top:1px solid rgba(255,214,110,.3);font-size:.85rem;letter-spacing:.04em;text-transform:uppercase;}
+.rules__lead + .rules__sec{border-top:0;padding-top:0;margin-top:4px;}
+.rules__body h4{margin:12px 0 4px;font-size:.78rem;color:var(--gold-1);}
+.rules__body h5{margin:10px 0 3px;font-size:.72rem;color:#ffe9b0;}
+.rules__tag{font-weight:800;font-style:italic;color:#ffe9b0;margin-bottom:4px!important;}
+.rules__tbl{width:100%;margin:0 0 10px;border-collapse:collapse;font-size:.67rem;line-height:1.4;}
+.rules__tbl th,.rules__tbl td{padding:5px 8px;border:1px solid rgba(255,214,110,.35);text-align:left;vertical-align:middle;}
+.rules__tbl th{background:rgba(255,214,110,.14);color:var(--gold-1);font-weight:800;}
 .hero__snow{position:absolute;left:0;right:0;bottom:-1px;height:28px;background:
   radial-gradient(30px 18px at 10% 100%,#fff 98%,transparent),radial-gradient(40px 22px at 35% 100%,#fff 98%,transparent),
   radial-gradient(36px 20px at 62% 100%,#fff 98%,transparent),radial-gradient(44px 24px at 90% 100%,#fff 98%,transparent);opacity:.95;}
@@ -455,7 +464,7 @@ button{font:inherit;cursor:pointer;}
 @keyframes rays{to{transform:rotate(360deg);}}
 .mbox__draw{display:flex;justify-content:center;margin-top:14px;}
 .mbox__draw .btn-gold{min-width:150px;font-size:.9rem;padding:12px 24px;border-radius:999px;}
-/* 标题：❄ Mystery Box ❄（纯文字标题，同页面区块标题：金色粗斜体；置于皇冠下方、9 宫格上方） */
+/* 标题：❄ Mystery Chest ❄（纯文字标题，同页面区块标题：金色粗斜体；置于皇冠下方、9 宫格上方） */
 .mbox__ribbon{margin:-18px 0 12px;text-align:center;font-size:1.2rem;line-height:1.2;font-weight:900;font-style:italic;color:var(--gold-1);
   text-shadow:0 2px 0 rgba(0,0,0,.45),0 0 12px rgba(255,214,110,.35);}
 .mbox__result{text-align:center;margin:10px 0 0;font-size:.8rem;}
@@ -941,7 +950,7 @@ body{background:#1a0204;}
       <circle cx="30" cy="23" r="1.8" fill="#222"/><circle cx="40" cy="23" r="1.8" fill="#222"/><path d="M35 27 l9 2 -9 2z" fill="#ff8a1f"/>
       <path d="M22 36 h26 v5 h-26z" fill="#e8344b"/></svg>
     <button class="mbox__close" id="boxClose" aria-label="关闭">✕</button>
-    <h2 class="mbox__ribbon" id="boxRibbon">❄ Mystery Box ❄</h2>
+    <h2 class="mbox__ribbon" id="boxRibbon">❄ Mystery Chest ❄</h2>
     <div class="grid9" id="grid9"></div>
     <div class="mbox__draw"><button class="btn-gold" id="btnDraw">Draw</button></div>
     <p class="mbox__result" id="boxResult" aria-live="polite"></p>
@@ -1035,54 +1044,116 @@ body{background:#1a0204;}
 <div class="mask" id="rulesMask" role="dialog" aria-modal="true" aria-labelledby="rulesTitle">
   <div class="sheet">
     <h2 id="rulesTitle">GENERAL MECHANICS</h2>
-    <!-- 规则文案：依运营提供「20261105OKGAMES 聖誕活動」·「聖誕活動英文規則」（原文照录） -->
+    <!-- 规则文案：依运营提供「20261105OKGAMES 聖誕活動.docx」·「聖誕活動英文規則」（原文照录；活动时间套用后台配置） -->
     <div class="rules__body" tabindex="0">
       <p class="rules__lead"><b>X-BOMB PAROL FIESTA<br>Light Up Your Christmas Luck!<br><span id="rulesPeriod"></span></b></p>
 
-      <h3>1. Santa's Daily Gift</h3>
-      <p>During the promotion, each user may check in once per day. Check-in eligibility resets daily at 00:00 (UTC+8, Philippine Time).</p>
-      <p>Check-in rewards follow a consecutive-day progression:</p>
-      <ul>
-        <li>Day 1: Claim the Day 1 check-in reward;</li>
-        <li>Day 2: Claim the Day 2 check-in reward;</li>
-        <li>Day 3: Claim the Day 3 check-in reward plus 1 random Check-in Treasure Chest;</li>
-        <li>Day 4 onwards: Claim the Day 3 check-in reward plus 1 random Check-in Treasure Chest each day until the promotion ends.</li>
-      </ul>
-      <p>If a user misses check-in on any day, the consecutive-day streak resets to zero, and the next check-in restarts from Day 1.</p>
+      <h3 class="rules__sec">How to Play</h3>
+      <h4>1. Santa's Daily Gift</h4>
+      <p class="rules__tag">Check In Daily, Unwrap More Surprises!</p>
+      <p>Check in every day to collect 50 Points! Keep your streak going to unlock a Mystery Chest every day from Day 3 onwards.</p>
+      <p>Mystery Chests may contain Points, Cash, Free Spins, or Golden Draw Tickets!</p>
+      <h4>2. Parol Quest</h4>
+      <p class="rules__tag">Complete Missions, Collect Parols!</p>
+      <p>Place bets or make deposits to earn Sparks and complete festive missions.</p>
+      <p>Unlock Cash Bonuses and collect Parols to light up your Christmas rewards!</p>
+      <h4>3. Parol Wish Draw</h4>
+      <p class="rules__tag">Collect Parols, Draw Your Christmas Wishes!</p>
+      <p>Use your Parols to enter any of four festive prize pools for a chance to win exciting rewards, including Cash Bonuses, Free Spins, Vouchers, and physical prizes!</p>
+      <p><b>The more Parols you collect, the more chances you have to win!</b></p>
 
-      <h3>2. Parol Quest</h3>
-      <p>This section consists of two mission categories: Christmas Mission and Daily Mission.</p>
-      <h4>2.1 Christmas Mission</h4>
-      <p>Complete the corresponding betting missions to earn the corresponding number of Parols during the promotional period.<br>Parols can be used in the X'mas Parol Draw to draw rewards.</p>
-      <h4>2.2 Daily Mission</h4>
-      <p>Complete the corresponding daily betting missions or deposit missions to receive:</p>
+      <h3 class="rules__sec">Terms &amp; Conditions</h3>
+      <h4>1. Santa's Daily Gift</h4>
+      <h5>1.1 Daily Check-In</h5>
+      <p>Each user may check in once per day during the promotion period. Check-in eligibility resets daily at 00:00 (UTC+8, Philippine Time).</p>
+      <p>Check-in rewards are based on consecutive check-in days:</p>
+      <table class="rules__tbl">
+        <thead><tr><th scope="col">Consecutive Days</th><th scope="col">Daily Rewards</th></tr></thead>
+        <tbody>
+          <tr><td>Day 1</td><td>50 Points</td></tr>
+          <tr><td>Day 2</td><td>50 Points</td></tr>
+          <tr><td>Day 3 onwards</td><td>50 Points + 1 Mystery Chest</td></tr>
+        </tbody>
+      </table>
+      <p>From Day 3 onwards, users may continue receiving 50 Points and 1 Mystery Chest each day, provided they maintain their consecutive check-in streak.</p>
+      <p>Missing a daily check-in will reset the streak. The next successful check-in will start again from Day 1.</p>
+      <h5>1.2 Mystery Chest Rewards</h5>
+      <p>Each Mystery Chest may contain one or more of the following rewards:</p>
       <ul>
-        <li>Bonus: Credited directly to the user's wallet; a 1x turnover requirement applies before withdrawal;</li>
-        <li>The corresponding number of Parols: Usable in the Parol Wish Draw.</li>
+        <li>Points</li>
+        <li>Instant Cash</li>
+        <li>Free Spins</li>
+        <li>Golden Draw Tickets</li>
       </ul>
-      <h4>2.3 PILI CARD Challenge</h4>
-      <p>At certain mission levels, completing a mission triggers the PILI CARD challenge: two cards are displayed, and the user chooses one.</p>
-      <p>Choose one card from two. If your card is higher, your Instant Cash reward will be increased. If both cards are of equal rank, the challenge is considered a miss and the reward remains unchanged.</p>
-      <p><b>Card Ranking: A &gt; K &gt; Q &gt; J &gt; 10 &gt; 9 &gt; 8 &gt; … &gt; 2</b></p>
-      <h4>2.4 Reward &amp; VIP Rules</h4>
-      <ul>
-        <li>Not every mission level offers all reward types. Please refer to the promotion page for the specific rewards available at each level.</li>
-        <li>If your VIP level is upgraded: rewards already claimed will remain unchanged; unclaimed rewards will be updated based on your current VIP level.</li>
-      </ul>
+      <p>Rewards are randomly determined. Actual rewards will be displayed on the promotion page.</p>
 
-      <h3>3. Parol Wish Draw</h3>
-      <p>After earning Parols in XBomb Mission, users may enter the Parol Wish Draw to redeem draws.</p>
-      <p>There are 4 prize pools, and users may choose freely among them. Each pool consumes a different number of Parols per draw, as displayed on the promotion page.</p>
-      <p>Parols once consumed will not be refunded. Any unused Parols will be automatically forfeited after the promotion ends.</p>
-      <p>Reward distribution:</p>
+      <h4>2. Parol Quest</h4>
+      <p>Parol Quest features two mission categories: <b>Christmas Mission</b> and <b>Daily Mission</b>.</p>
+      <p>Users can earn Sparks through eligible bets or successful deposits to complete missions and unlock rewards.</p>
+      <h5>2.1 Sparks Conversion Rates</h5>
+      <p>Sparks are calculated according to the following rates:</p>
+      <table class="rules__tbl">
+        <thead><tr><th scope="col">Category</th><th scope="col">Sparks Earned</th></tr></thead>
+        <tbody>
+          <tr><td>Slots Bets</td><td>₱1 eligible bet = 1 Spark</td></tr>
+          <tr><td>Live Casino Bets</td><td>₱1 eligible bet = 0.5 Sparks</td></tr>
+          <tr><td>Perya Bets</td><td>₱1 eligible bet = 1 Spark</td></tr>
+          <tr><td>Sports Bets</td><td>₱1 eligible bet = 2 Sparks</td></tr>
+          <tr><td>Deposit</td><td>₱1 successful deposit = 1 Spark</td></tr>
+        </tbody>
+      </table>
+      <p>Only qualifying bets and successful deposits will count towards Sparks accumulation. Mission progress is subject to system verification.</p>
+      <h5>2.2 Christmas Mission</h5>
+      <p>Accumulate Sparks through eligible bets during the promotion period.</p>
+      <p>For every 1,000 Sparks earned, users can receive the corresponding number of Parols based on the applicable mission requirements.</p>
+      <p>Collected Parols can be used to participate in Parol Wish Draw.</p>
+      <p>Specific mission milestones, reward quantities, and claiming requirements are displayed on the promotion page.</p>
+      <h5>2.3 Daily Mission</h5>
+      <p>Complete designated daily betting or deposit missions to unlock rewards.</p>
+      <p>Depending on the mission level, rewards may include:</p>
       <ul>
-        <li>Online rewards (Free Spins, Bonuses, Vouchers, etc.): Credited directly to the user's account;</li>
-        <li>Physical prizes: Shipped within 1 month after customer service contacts the winner to confirm delivery details. Please verify the actual shipping time and delivery address with customer service.</li>
+        <li><b>Cash Bonus:</b> Credited directly to the user's wallet. A 1× wagering requirement on the bonus amount must be fulfilled before withdrawal.</li>
+        <li><b>Parols:</b> Used to participate in Parol Wish Draw.</li>
       </ul>
-      <p>Winners who fail to respond to customer service to confirm delivery details within 28 days after the promotion ends will be deemed to have forfeited their physical prizes.</p>
+      <p>Daily Mission progress resets at 00:00 (UTC+8, Philippine Time).</p>
+      <p>Mission requirements and available rewards may vary by level. Please refer to the promotion page for details.</p>
+      <h5>2.4 PILI CARD Challenge</h5>
+      <p>Certain mission levels include a PILI CARD Challenge.</p>
+      <p>When triggered, two cards will be presented. Users must select one card to reveal the result.</p>
+      <p>If the selected card is higher than the other card, the user's Instant Cash reward will increase according to the applicable reward multiplier.</p>
+      <p>If the selected card is lower than or equal to the other card, the original Instant Cash reward remains unchanged.</p>
+      <p>Card rankings, from highest to lowest, are:</p>
+      <p><b>A &gt; K &gt; Q &gt; J &gt; 10 &gt; 9 &gt; 8 &gt; 7 &gt; 6 &gt; 5 &gt; 4 &gt; 3 &gt; 2</b></p>
+      <h5>2.5 Reward &amp; VIP Rules</h5>
+      <p>Not all mission levels offer every reward type. Available rewards depend on the corresponding mission requirements.</p>
+      <p>If a user's VIP level increases during the promotion:</p>
+      <ul>
+        <li><b>Claimed rewards:</b> Remain unchanged.</li>
+        <li><b>Unclaimed rewards:</b> Will be updated according to the user's current VIP level.</li>
+      </ul>
+      <p>Actual reward amounts and eligibility requirements are displayed on the promotion page.</p>
 
-      <h3>4. Miscellaneous</h3>
-      <p>OKGAMES reserves the right to final interpretation of this promotion.</p>
+      <h4>3. Parol Wish Draw</h4>
+      <h5>3.1 How to Participate</h5>
+      <p>Collect Parols by completing eligible Parol Quest missions.</p>
+      <p>Choose from four prize pools, each with its own Parol entry cost and available rewards.</p>
+      <p>The number of Parols required per draw will be displayed on the promotion page.</p>
+      <p>Parols used for a draw are non-refundable.</p>
+      <p>All unused Parols will automatically expire at the end of the promotion and cannot be carried forward or exchanged for cash.</p>
+      <h5>3.2 Prize Distribution</h5>
+      <p><b>Digital Rewards</b></p>
+      <p>Digital rewards, including Free Spins, Cash Bonuses, and Vouchers, will be credited directly to the user's account.</p>
+      <p>Specific usage requirements and validity periods are subject to the applicable reward terms.</p>
+      <p><b>Physical Prizes</b></p>
+      <p>Winners of physical prizes will be contacted by OKGAMES Customer Support to confirm their delivery details.</p>
+      <p>Physical prizes will be dispatched within one month after the required delivery information has been successfully confirmed.</p>
+      <p>Delivery arrangements and shipping details may be confirmed with Customer Support.</p>
+      <h5>3.3 Physical Prize Claiming Deadline</h5>
+      <p>Winners must respond to Customer Support and provide the required delivery information within 28 days after the promotion ends.</p>
+      <p>Failure to confirm the necessary information within this period will be considered a voluntary forfeiture of the physical prize.</p>
+
+      <h4>4. General Terms</h4>
+      <p>OKGAMES reserves the right to interpret these promotion terms, subject to applicable laws and regulatory requirements.</p>
     </div>
     <button class="btn-gold" id="rulesOk">CONFIRM</button>
   </div>
@@ -1417,10 +1488,10 @@ function openWin(C,res){
   WIN={pool:C.no}; $('#winMask').classList.add('is-open'); $('#winOk').focus();
 }
 /* 签到奖励弹窗：沿用获奖弹窗版面（雪人、星星、缎带标题）；签到成功后弹出
-   Day 1～2：只显示签到奖励；Day 3 起（有签到宝箱）：先开 Mystery Box 抽奖，跑马灯结束后「签到奖励＋宝箱抽中奖励」合并在此弹窗呈现
-   每项上缘标示来源（Check-In／Mystery Box）；按 CLAIM／Esc 关闭 */
+   Day 1～2：只显示签到奖励；Day 3 起（有签到宝箱）：先开 Mystery Chest 抽奖，跑马灯结束后「签到奖励＋宝箱抽中奖励」合并在此弹窗呈现
+   每项上缘标示来源（Check-In／Mystery Chest）；按 CLAIM／Esc 关闭 */
 function openSignWin(day,rw,boxRw){
-  const items=[[rw,'Check-In'],...(boxRw?[[boxRw,'Mystery Box']]:[])];
+  const items=[[rw,'Check-In'],...(boxRw?[[boxRw,'Mystery Chest']]:[])];
   $('#winLead').innerHTML=`Day ${day} <b>Check-In Reward${boxRw?'s':''}</b>`;
   const list=$('#winList'); list.className='win__grid '+(boxRw?'win__grid--two':'win__grid--one');   // 单张／两张卡皆 130px，弹窗宽高一致
   list.innerHTML=items.map(([r,src])=>`<li class="tile"><span class="tile__src">${src}</span>${ICON[r.type]}<span class="tile__lb" title="${r.label}">${r.label}</span></li>`).join('');
@@ -1489,7 +1560,7 @@ function openBox(o){
   $('#grid9').innerHTML=o.box.map((r,i)=>`<div class="tile" data-i="${i}">${ICON[r.type]}<span class="tile__lb" title="${r.label}">${r.label}</span></div>`).join('');
   $('#boxResult').textContent=o.mode==='preview'?'All 9 prizes in this chest. Open the chest to draw 1.':'';
   const d=$('#btnDraw'); d.style.display=o.mode==='preview'?'none':''; d.disabled=false; d.textContent=o.drawLabel||'Draw';
-  $('#boxRibbon').textContent=o.ribbon||'❄ Mystery Box ❄';
+  $('#boxRibbon').textContent=o.ribbon||'❄ Mystery Chest ❄';
   $('#boxMask').classList.add('is-open'); (o.mode==='preview'?$('#boxClose'):d).focus();
   if(o.auto) setTimeout(()=>{ if(BX&&!BX.running&&!BX.done) runMarquee(); },350);   // 奖池 1／5／10 抽：已于奖池按钮扣除 PAROL，开窗后自动开始跑马灯
 }
