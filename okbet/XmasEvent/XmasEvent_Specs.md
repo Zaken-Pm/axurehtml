@@ -265,6 +265,8 @@
 ### F5 PAROL QUEST · 每日任务列表（每日返水）【新增】
 
 > 📷 截图：前台截图 · PAROL QUEST
+> 📷 截图：前台截图 · PAROL 提示弹窗（不足）
+> 📷 截图：前台截图 · PAROL 提示弹窗（满足）
 
 1. 依后台「每日返水配置」**当前 VIP 等级**列出 LV：
    - 列表上方：区块标题 `DAILY MISSIONS`（活动期间、兑换期皆显示）
@@ -294,11 +296,29 @@
 
 | 状态 | 按钮 | 点击行为 |
 |---|---|---|
-| 已达成未领取 | `CLAIM` | 领取；勾选挑战则先弹翻牌（F6）。成功 toast `+₱X + PAROL ×N claimed (LVn)` |
+| 已达成未领取 | `CLAIM` | 领取；勾选挑战则先弹翻牌（F6）。成功 toast `+₱X + PAROL ×N claimed (LVn)`；该等级有赠送 PAROL 时，另弹出 PAROL 提示弹窗（见下方） |
 | 充值任务未达成 | `TOP-UP` | 导向**充值页面** |
 | 投注任务未达成 | `BET` | 导向**首页** |
 | 已领取 | `CLAIMED` | 无 |
 | 兑换期（未领取等级） | `ENDED` | 无 |
+
+### PAROL 提示弹窗（领取赠送 PAROL 后）
+
+1. **跳出时机：**每日任务**单笔 `CLAIM`** 领取成功、且该等级有赠送 PAROL 时跳出（有挑战者于翻牌结束、奖励入帐后跳出）
+   - 未赠送 PAROL 的等级不跳
+   - 一键领取（F4）、次日补领（F11）不跳
+2. **判断门槛：**领取后的 My Parols ≥ **最低级奖池 1 抽所需 PAROL**（4 个奖池「道具消耗数量」的最小值）即为满足。
+3. **不足：**
+   - 标题 `Keep Challenging!`
+   - `Parols to Draw: X / Y`（X＝目前 PAROL，Y＝最低抽奖数）
+   - 文案 `Complete missions to earn more Parols!`
+   - 点 `CONFIRM`（或 Esc）关闭，停留原页面
+4. **满足：**
+   - 标题 `Ready to Draw!`
+   - `My Parols: X`
+   - 文案 `Enough Parols to draw! Try Parol Wish Draw now!`
+   - 点 `CONFIRM`（或 Esc）关闭并**跳转 PAROL WISH DRAW 分页**（奖池）
+5. 点遮罩不关闭。
 
 > 🧮 · **领取方式：**用户**手动领取**（CLAIM／一键领取）
 > · **进度更新：**依报表数据更新（**注单报表约每 30 分钟更新一次**），投注后进度不会即时变动，前台不显示下次更新时间
@@ -892,7 +912,7 @@ CLAIMED 移至列表底部；看板 Cash Bonus Claimed Today＋实得金额；My
 
 | 情境 | 结果 |
 |---|---|
-| 11/18 达成 LV2（₱5，触发＋赠 PAROL×1）、LV3（₱12，触发＋赠×2）未领，11/19 登录 | 首页弹窗 ₱17＋PAROL 3；点 CLAIM → 派奖审核 2 笔（₱5、₱12）、道具消耗统计 2 笔（PAROL 1、2），不翻牌；彩金不计入 11/19 看板 |
+| 11/18 达成 LV2（₱5，触发＋赠 PAROL×1）、LV4（₱30，赠×2）未领，11/19 登录 | 首页弹窗 ₱35＋PAROL 3；点 CLAIM → 派奖审核 2 笔（₱5、₱30）、道具消耗统计 2 笔（PAROL 1、2），不翻牌；彩金不计入 11/19 看板 |
 | 11/18 未领，11/19 登录关闭弹窗不领，之后返回首页或再次登录 | 再次跳出（11/19 当天皆可补领） |
 | 11/18 未领，11/20 才登录 | 不跳（11/18 作废）；若 11/19 也有未领 → 跳 11/19 的金额 |
 | 11/18 全部已领或无达成 | 不跳 |
@@ -917,6 +937,8 @@ CLAIMED 移至列表底部；看板 Cash Bonus Claimed Today＋实得金额；My
 | PAROL 为 0 | 3 个按钮皆停用（不显示提示文字） |
 | 多个奖池消耗数量并列最高 | 皆套用最高级奖池的视觉区隔 |
 | 抽中实体奖品 | · 前台结果区提示：<br>- 1 抽：`Please contact Customer Service to claim your prize.`<br>- 5／10 抽：`You won N physical prize(s) — please contact Customer Service to claim.`<br>· 派奖审核、数据统计皆为自动审核「审核通过／已通过」<br>· 奖励统计即时计入笔数 |
+| 每日任务 CLAIM 领到 PAROL 后，PAROL 仍少于最低级奖池 1 抽所需 | 弹出 PAROL 提示弹窗（不足）：`Parols to Draw: X / Y`，CONFIRM 后停留原页 |
+| 每日任务 CLAIM 领到 PAROL 后，PAROL ≥ 最低级奖池 1 抽所需 | 弹出 PAROL 提示弹窗（满足），CONFIRM 后跳转 PAROL WISH DRAW 分页 |
 | 额外随机宝箱关闭 | Day 3 起只发签到奖励、不弹 Mystery Chest（点今日格即完成签到） |
 | Day 3 起签到宝箱弹窗未按 Draw 就关闭（✕／Esc） | 该日未完成签到：不发奖、连续天数不变，今日格维持可签可再点；当日结束前未完成即断签 |
 | 随机宝箱中奖率某款填 0 | 该款永不发放 |

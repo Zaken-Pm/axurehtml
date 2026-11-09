@@ -781,6 +781,15 @@ body{background:#1a0204;}
 .hero__rules{top:auto;bottom:calc(41% + 8px);right:8px;transform:rotate(-8deg);padding:4px 10px 4px 8px;font-size:.67rem;}
 /* 获奖／签到奖励弹窗：奖励卡不显示外框与底色，只留爆炸光芒＋图示＋名称（11/09） */
 #winMask .win__grid .tile{background:none;border:0;box-shadow:none;}
+/* PAROL 状态提示弹窗 */
+.ktip{text-align:center;}
+.ktip__ic{display:block;width:64px;height:64px;margin:0 auto 6px;filter:drop-shadow(0 0 10px rgba(255,214,110,.6));}
+.ktip__ic svg{width:100%;height:100%;}
+.ktip h2{margin:0 0 6px;}
+.ktip__num{margin:0 0 8px;font-size:.9rem;font-weight:800;}
+.ktip__num b{color:var(--gold-1);font-size:1.15rem;}
+.ktip__msg{margin:0;font-size:.78rem;line-height:1.5;color:#ffe9d0;}
+#keyMask .ktip #keyOk{display:block;width:auto;min-width:160px;margin:16px auto 0;padding:12px 40px;}
 </style>
 </head>
 <body>
@@ -1011,6 +1020,17 @@ body{background:#1a0204;}
   </div>
 </div>
 
+<!-- ============ 弹窗：PAROL 状态提示（每日任务单笔 CLAIM 领到赠送 PAROL 后跳出） ============ -->
+<div class="mask" id="keyMask" role="dialog" aria-modal="true" aria-labelledby="keyTitle">
+  <div class="sheet ktip">
+    <span class="ktip__ic" aria-hidden="true" id="keyIc"></span>
+    <h2 id="keyTitle"></h2>
+    <p class="ktip__num"><span id="keyNum"></span></p>
+    <p class="ktip__msg" id="keyMsg"></p>
+    <button class="btn-gold" id="keyOk">CONFIRM</button>
+  </div>
+</div>
+
 <!-- ============ 弹窗：获奖（奖池 9 宫格跑马灯结束后跳出） ============ -->
 <div class="mask" id="winMask" role="dialog" aria-modal="true" aria-labelledby="winTitle">
   <div class="sheet win">
@@ -1231,8 +1251,8 @@ const SIGN_BOXES=[mkBox(1,R('cash','₱100',1,{amt:100})),mkBox(2,R('cash','₱2
 const SIGN_BOX_RATE=[40,25,15,12,8,0];
 
 /* BOMB MISSION：每日返水（当前 VIP 等级）；gift＝后台「赠送道具」奖励数量；trigger＝后台「挑战任务 · 触发」 */
-const BOMB_TASKS=[{lv:1,cond:'bet',goal:200,reward:3},{lv:2,cond:'dep',goal:200,reward:5,gift:1,trigger:true},{lv:3,cond:'bet',goal:1000,reward:12,gift:2,trigger:true},
-  {lv:4,cond:'bet',goal:3000,reward:30},{lv:5,cond:'dep',goal:1000,reward:20},{lv:6,cond:'bet',goal:8000,reward:88}];
+const BOMB_TASKS=[{lv:1,cond:'bet',goal:200,reward:3},{lv:2,cond:'dep',goal:200,reward:5,gift:1,trigger:true},{lv:3,cond:'bet',goal:1000,reward:12,trigger:true},
+  {lv:4,cond:'bet',goal:3000,reward:30,gift:2},{lv:5,cond:'dep',goal:1000,reward:20},{lv:6,cond:'bet',goal:8000,reward:88}];
 /* 挑战任务配置（全等级共用）：up＝奖励提升 %、appear＝触发机率 %（加总 ≤100；未匹配时由触发机率最大者承接）、win＝获奖机率 % */
 const CHALLENGES=[{no:1,up:20,appear:60,win:60},{no:2,up:50,appear:40,win:50}];
 
@@ -1243,7 +1263,7 @@ const XBOX=k=>{ const m=k+1, tops=[R('cash','₱100',1,{amt:100}),R('phone','iPh
   R('gift','Xmas Gift Box',1,{physical:true}),R('cash','₱100,000',1,{amt:100000})].filter((_,i)=>i!==3);
   return mkBox(m*2,tops[k]); };
 /* 后台固定 4 个宝箱（皆必填） */
-const CHESTS=[1,2,3,5].map((cost,k)=>({no:k+1,cost,box:XBOX(k),art:['cash','phone','gift','chest'][k]}));   // cost＝道具消耗数量（个／抽）
+const CHESTS=[5,8,10,15].map((cost,k)=>({no:k+1,cost,box:XBOX(k),art:['cash','phone','gift','chest'][k]}));   // cost＝道具消耗数量（个／抽）
 const DRAWS=[1,5,10];                 // 前台抽数选项
 const TOP_COST=Math.max(...CHESTS.map(C=>C.cost));   // 最高级奖池＝道具消耗数量最高者（加扫光效果）
 /* Grand Prize＝中奖率最小的奖励；中奖率相同时取奖励编号最小者（奖励 1 → 9） */
@@ -1356,8 +1376,8 @@ function renderBomb(){
   $$('[data-bomb]').forEach(b=>b.addEventListener('click',()=>{
     const lv=+b.dataset.bomb; if(S.bombClaimed[lv]||CH||!LIVE()) return;          // 幂等
     const t=BOMB_TASKS.find(x=>x.lv===lv);
-    if(t.trigger){ runChallenges([t],res=>toast(`+${money(res[0].amt)}${keyTxt(t.gift)} claimed (LV${lv})`)); return; }
-    S.bombClaimed[lv]={amt:t.reward}; giveKeys(t); toast(`+${money(t.reward)}${keyTxt(t.gift)} claimed (LV${lv})`); renderAll();
+    if(t.trigger){ runChallenges([t],res=>{ toast(`+${money(res[0].amt)}${keyTxt(t.gift)} claimed (LV${lv})`); openKeyTip(t.gift); }); return; }
+    S.bombClaimed[lv]={amt:t.reward}; giveKeys(t); toast(`+${money(t.reward)}${keyTxt(t.gift)} claimed (LV${lv})`); renderAll(); openKeyTip(t.gift);
   }));
 }
 /* 每日返水赠送道具：领取当下发放（挑战加成只作用于彩金） */
@@ -1383,6 +1403,25 @@ function pickChallenge(){
   for(const c of asc){ acc+=c.appear; if(r<acc) return c; }
   return asc[asc.length-1];
 }
+/* PAROL 状态提示弹窗：每日任务单笔 CLAIM（含翻牌后）领到赠送 PAROL 才跳出；一键领取、次日补领不跳
+   门槛＝最低级奖池 1 抽所需 PAROL（道具消耗数量最小值）
+   · 不足：Keep Challenging!＋Parols to Draw: 目前／门槛（例 3 / 5），提示完成任务可获得更多 PAROL；CONFIRM 关闭
+   · 满足：Ready to Draw!＋目前数量，提示可抽奖；CONFIRM 关闭并跳转 PAROL WISH DRAW 分页（奖池） */
+let KEYTIP=null;   // 'go'＝满足（确认后跳转）；'stay'＝不足
+const drawNeed=()=>Math.min(...CHESTS.map(C=>C.cost));
+function openKeyTip(gift){
+  if(!gift) return;
+  const have=keysLeft(), need=drawNeed(), ok=have>=need;
+  $('#keyIc').innerHTML=ICON.parol;
+  $('#keyTitle').textContent=ok?'Ready to Draw!':'Keep Challenging!';
+  $('#keyNum').innerHTML=ok?`My Parols: <b>${int(have)}</b>`:`Parols to Draw: <b>${int(have)}</b> / ${int(need)}`;
+  $('#keyMsg').textContent=ok?'Enough Parols to draw! Try Parol Wish Draw now!'
+    :'Complete missions to earn more Parols!';
+  KEYTIP=ok?'go':'stay'; $('#keyMask').classList.add('is-open'); $('#keyOk').focus();
+}
+function closeKeyTip(){ if(!KEYTIP) return; const go=KEYTIP==='go'; KEYTIP=null; $('#keyMask').classList.remove('is-open');
+  if(go){ setTab('xmas'); $('#panelXmas').scrollIntoView({block:'start',behavior:'smooth'}); $('#tabXmas').focus({preventScroll:true}); } }
+$('#keyOk').addEventListener('click',closeKeyTip);
 function runChallenges(tasks,done){ CH={queue:tasks,idx:0,results:[],done}; showChallenge(); }
 function showChallenge(){
   const t=CH.queue[CH.idx], c=CHALLENGES.find(x=>x.no===S.chAssign[t.lv])||pickChallenge();   // 使用进入页面时已决定的挑战
@@ -1634,6 +1673,7 @@ $('#boxClose').addEventListener('click',closeBox);
 document.addEventListener('keydown',e=>{ if(e.key!=='Escape'||CH) return;
   if(BX){ if(BX.running&&BX.skip){ BX.skip(); return; } closeBox(); return; }
   if($('#mkMask').classList.contains('is-open')){ $('#mkMask').classList.remove('is-open'); return; }
+  if(KEYTIP){ closeKeyTip(); return; }
   if(WIN){ closeWin(); return; }
   if($('#sumMask').classList.contains('is-open')){ $('#sumMask').classList.remove('is-open'); return; }
   if($('#rulesMask').classList.contains('is-open')){ closeRules(); return; }
