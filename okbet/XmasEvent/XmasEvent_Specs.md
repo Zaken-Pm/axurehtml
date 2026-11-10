@@ -30,7 +30,7 @@
 - **活动详情页及入口**：前台活动页面（本文件「前台规则」）及进入该页面的所有入口（首页浮窗、Rewards → Promotion 列表等）。两者**同时开启、同时关闭**。
 - **活动时间**：后台步骤1「活动时间」（起～迄）。签到、每日返水、特别任务**统一以活动时间计算**。
 - **兑换期**：活动结束日**隔日 00:00 ～ 结束时间 +3 天**，系统自动计算、不可编辑。期间**只能兑换（开启）奖池**。
-- **每日签到**：每日 1 次，点「今天」那格奖励图示即签到并领取；**第 3 天起**另随机发放 1 款「签到宝箱」（Mystery Chest）。
+- **每日签到**：每日 1 次，点「今天」那格奖励图示即签到并领取；**第 3 天起**另随机发放 1 款「签到宝箱」（Christmas Surprise Chest）。
 - **签到宝箱**：后台最多 6 款、每款固定 9 项奖励；开启时依各项中奖率抽出 1 项（不消耗 PAROL）。
 - **PAROL QUEST**：前台分页名称＝后台「**每日返水配置**」（VIP 分级、LV1～LV20、条件为有效投注或充值）。**用户手动领取**；进度依报表数据更新（**注单报表约每 30 分钟更新一次**）。每日 00:00（UTC+8）重置。
 - **挑战任务**：返水等级勾选「触发」时，**领取该级奖励必定触发 1 个挑战（Pili Card Challenge 翻牌）**：二选一扑克牌比大小，胜＝基础奖励 ×(1＋奖励提升%)，负＝基础奖励。与 VIP 等级无关。
@@ -140,16 +140,12 @@
 3. **关闭：**
    - 点底部 `CONFIRM` 关闭（桌机可按 Esc）
    - 点遮罩不关闭
-4. **规则内容：**依运营提供文案「20261105 OKGAMES 圣诞活动（docx）· 圣诞活动英文规则」（前台英文，原文照录），完整文案见原型「活动规则」弹窗：
-   - 开头三行：第 1 行 `X-BOMB PAROL FIESTA`、第 2 行 `Light Up Your Christmas Luck!`（不显示「Promotion Name」「--」）、第 3 行活动时间**套用后台 B2「时间设定 · 活动时间」**，格式 `Month D, HH:mm – Month D, HH:mm`（英文月份全名、24 小时制、不显示年份、时区与「Promotion Period」）
-   - `How to Play`：1. Santa's Daily Gift／2. Parol Quest／3. Parol Wish Draw（各含粗体标语＋说明）
-   - `Terms & Conditions`：
-       - 1. Santa's Daily Gift：1.1 Daily Check-In（含「Consecutive Days／Daily Rewards」表格）、1.2 Mystery Chest Rewards
-       - 2. Parol Quest：2.1 Sparks Conversion Rates（含「Category／Sparks Earned」表格）、2.2 Christmas Mission、2.3 Daily Mission、2.4 PILI CARD Challenge、2.5 Reward & VIP Rules
-       - 3. Parol Wish Draw：3.1 How to Participate、3.2 Prize Distribution（Digital Rewards／Physical Prizes）、3.3 Physical Prize Claiming Deadline
-       - 4. General Terms
+4. **规则内容：**依运营提供文案「20261105 OKGAMES 圣诞活动 1（docx）· 圣诞活动英文规则」（前台英文，原文照录），完整文案见原型「活动规则」弹窗：
+   - 开头三行：第 1 行 `X-BOMB PAROL FIESTA`、第 2 行 `Light Up Your Christmas Luck!`、第 3 行活动时间**套用后台 B2「时间设定 · 活动时间」**，格式 `Month D, HH:mm – Month D, HH:mm`（英文月份全名、24 小时制、不显示年份与时区）
+   - 文件开头的「Promotion Name」「Promotion Period」「English ｜ … Promotion Rules」及第二行活动时间说明不显示（活动时间以后台配置为准）
+   - 章节：`1. Santa’s Daily Gift`／`2. Parol Quest`（含 Sparks 换算表「Category／Qualifying amount／Sparks earned」、Christmas Mission、Daily Mission）／`3. VIP Upgrades and Mission Rewards`／`4. Parol Wish Draw`／`5. Receiving Your Prizes`（Digital rewards／Physical prizes）／`6. General Terms`
    - 原文「Click the image to view the sheet.」为文件操作提示，前台不显示；文件内嵌表格以文字表格呈现
-   - **规则文案为固定文案，依运营文件撰写，不随后台配置变动**（例：签到奖励实际依后台设置发放，规则文字不同步）；**唯活动时间套用后台配置**
+   - **规则文案为固定文案，依运营文件撰写，不随后台配置变动**；**唯活动时间套用后台配置**
 
 ### X'mas Reward Board
 
@@ -191,17 +187,17 @@
    - Day 1、Day 2 各 1 项
    - **Day 3 起**每日＝「第三天以上(含)」签到奖励＋1 款随机签到宝箱（后台「额外随机宝箱」开启时）
    - 签到格只显示奖励图示，**不显示奖励数量**（完整奖励名称于签到奖励弹窗呈现）
-   - Day 3 起图示右上加 Mystery Chest 小图示
+   - Day 3 起图示右上加 Christmas Surprise Chest 小图示
 4. **断签：**任一天未签到，连续天数归 0，次日从 **Day 1** 重新计算（状态关闭跨日同样视为断签）。
 5. **签到奖励弹窗（不使用 toast）：**
    - 版面同奖池获奖弹窗（依圣诞风格设计），标题 `Congratulations!`
    - **Day 1～2**：签到成功后立即弹出，文案 `Day N Check-In Reward`，显示签到奖励（图示＋名称）
-   - **Day 3 起（有签到宝箱）**：点今日格先弹出 Mystery Chest（F3），按 Draw 完成签到；宝箱跑马灯结束后，**签到奖励与宝箱抽中奖励合并在同一个弹窗**呈现，文案 `Day N Check-In Rewards`，两项并排，上方分别标示 `Check-In`／`Mystery Chest`
+   - **Day 3 起（有签到宝箱）**：点今日格先弹出 Christmas Surprise Chest（F3），按 Draw 完成签到；宝箱跑马灯结束后，**签到奖励与宝箱抽中奖励合并在同一个弹窗**呈现，文案 `Day N Check-In Rewards`，两项并排（不标示奖励来源）
    - 1 项（Day 1～2）与 2 项（Day 3 起）卡片同尺寸，**两种弹窗宽度、高度一致**（仅实体奖品提示多一行）
    - 宝箱抽中实体奖品时，下方另显示 `Please contact Customer Service to claim your prize.`
    - 奖励名称最多两行，超过以「…」截断
    - 点 `CLAIM`（或 Esc）关闭；点遮罩不关闭；奖励于签到当下已入帐
-6. **签到宝箱：**Day 3 起点今日格立即弹出「Mystery Chest」弹窗（F3），按 Draw 才完成签到；后台关闭「额外随机宝箱」时只发签到奖励、直接弹签到奖励弹窗。宝箱款式依后台「随机宝箱中奖率」抽出 1 款。
+6. **签到宝箱：**Day 3 起点今日格立即弹出「Christmas Surprise Chest」弹窗（F3），按 Draw 才完成签到；后台关闭「额外随机宝箱」时只发签到奖励、直接弹签到奖励弹窗。宝箱款式依后台「随机宝箱中奖率」抽出 1 款。
 
 ### 日历格状态
 
@@ -217,13 +213,13 @@
 > 〔暂隐藏〕网络／服务器：toast `Check-in failed. Please try again.`，该格维持原状态
 > 〔暂隐藏〕跨日、已签、活动结束等：刷新状态
 
-### F3 签到宝箱开启弹窗（Mystery Chest）【新增】
+### F3 签到宝箱开启弹窗（Christmas Surprise Chest）【新增】
 
 > 📷 截图：前台截图 · 跑马灯停在抽中项（约 0.8 秒后自动关闭）
 
 1. 
      - 弹窗显示该宝箱**全部 9 项奖励（3×3）**
-     - 标题 `❄ Mystery Chest ❄`（置于 9 宫格上方）
+     - 标题 `❄ Christmas Surprise Chest ❄`（置于 9 宫格上方，一行显示不换行）
 2. 点「`Draw`」＝**完成当日签到**（不消耗 PAROL）：后端完成签到并依中奖率抽出宝箱奖励，签到奖励与宝箱奖励一并入帐，同时开始跑马灯；今日格转「已签到」。
 3. 跑马灯：依序绕格后停在抽中项，抽中项标示、其余变暗；停留约 0.8 秒后**自动关闭宝箱弹窗**，接着弹出合并的签到奖励弹窗（见 F2 第 5 条）。
 4. 宝箱弹窗内**不显示结果文案、无 CLAIM 按钮**；抽中奖励统一在签到奖励弹窗呈现（实体奖品提示亦在该弹窗）。实体奖品同样自动审核，由客服线下安排寄送／领取。
@@ -241,13 +237,14 @@
 > 📷 截图：前台截图 · 一键领取＋特别任务
 
 - **位置**：PAROL QUEST 分页最上方（PAROL WISH DRAW 分页**无**一键领取）。
+- **版面**：依设计稿：标题缎带 `Unclaimed Mission Rewards`、宝箱金币插图、金额栏、按钮、倒数；金额、按钮、倒数依状态动态显示。
 - **未领取金额**：今日已达成未领取等级的**奖励金额合计**；**不包含会触发挑战的任务**（后台勾选「触发」的等级整笔不计入；投注、充值任务皆同）；此金额只计彩金，**赠送的 PAROL 不计入金额，但领取时会一并发放**。
 - **按钮**：
-  - 有可领等级（含挑战等级）：`CLAIM ALL`
-  - 没有任何可领等级：停用 `LOCKED`、金额 `0`
-  - 兑换期：`ENDED`
-  - 只剩挑战等级可领：金额显示 `0`（挑战等级不计入金额），按钮仍为 `CLAIM ALL`，按下后照常领取并依序翻牌
-- **倒数**：`Daily missions reset in HH:MM:SS`，距 UTC+8 每日 00:00，每秒更新；兑换期改为 `Daily missions have ended`。
+  - 有可领等级（含挑战等级）：`Claim All`
+  - 没有任何可领等级：停用 `Locked`、金额 `0`
+  - 兑换期：`Ended`
+  - 只剩挑战等级可领：金额显示 `0`（挑战等级不计入金额），按钮仍为 `Claim All`，按下后照常领取并依序翻牌
+- **倒数**：`Daily Missions reset in: HH:MM:SS`（前方闹钟图示），距 UTC+8 每日 00:00，每秒更新；兑换期改为 `Daily missions have ended`。
 - **领取流程**：一次领取全部可领等级：
   - **包含每日返水任务赠送的 PAROL**（有勾选「赠送道具」的等级，彩金与 PAROL 一并发放）
   - 未勾选触发的等级：直接入帐
@@ -345,7 +342,7 @@
 > 📷 截图：前台截图 · 胜负结果
 
 1. **触发时机（挑战绑定每日返水任务）：**
-   - 该等级**勾选「触发」**且用户**点击「领取」（CLAIM／CLAIM ALL）**后，**必定触发**一个挑战（翻牌）
+   - 该等级**勾选「触发」**且用户**点击「领取」（CLAIM／Claim All）**后，**必定触发**一个挑战（翻牌）
    - 未勾选「触发」的等级：领取时不触发
    - **充值任务**勾选「触发」：前台卡片不显示挑战标签，领取时同样必定触发
    - 挑战任务、触发机率与 VIP 等级无关
@@ -517,7 +514,7 @@
 |---|---|
 | 签到 | 整区停用、不可点 |
 | 看板 | Cash Bonus Claimed Today 显示 0；My Parols 正常 |
-| 一键领取 | 金额 0、按钮 `ENDED`、倒数改 `Daily missions have ended` |
+| 一键领取 | 金额 0、按钮 `Ended`、倒数改 `Daily missions have ended` |
 | 每日任务 | 未领取等级按钮 `ENDED`；已领取维持 `CLAIMED`；Tab 不显示气泡 |
 | 特别任务 | `Bet` → `ENDED` 停用 |
 | 奖池 | **正常 1／5／10 抽**；预设开启 PAROL WISH DRAW 分页 |
@@ -659,7 +656,7 @@
 
 - **连续签到天数**：固定 3 列：第一天／第二天／第三天以上(含)。
 - **签到奖励**：每列 1 项（必填）：彩金／积分／抽奖券（Golden Draw Ticket）／免费投注／优惠券（无实体奖品）；数量规则同 B3。
-- **额外随机宝箱**：仅「第三天以上(含)」有开关。**开启**：Day 3 起每次签到依「随机宝箱中奖率」发 1 款签到宝箱、前台弹 Mystery Chest；**关闭**：只发签到奖励、前台不弹窗，中奖率区块停用。
+- **额外随机宝箱**：仅「第三天以上(含)」有开关。**开启**：Day 3 起每次签到依「随机宝箱中奖率」发 1 款签到宝箱、前台弹 Christmas Surprise Chest；**关闭**：只发签到奖励、前台不弹窗，中奖率区块停用。
 - **随机宝箱中奖率**：
   - 宝箱1～6 各一栏，**仅已配置的宝箱可填写**（未配置显示「未配置」停用）
   - 可填 0（不发放该款）；可至小数点后 4 位
@@ -951,7 +948,7 @@ CLAIMED 移至列表底部；看板 Cash Bonus Claimed Today＋实得金额；My
 | 抽中实体奖品 | · 前台结果区提示：<br>- 1 抽：`Please contact Customer Service to claim your prize.`<br>- 5／10 抽：`You won N physical prize(s) — please contact Customer Service to claim.`<br>· 派奖审核、数据统计皆为自动审核「审核通过／已通过」<br>· 奖励统计即时计入笔数 |
 | 每日任务 CLAIM 领到 PAROL 后，PAROL 仍少于最低级奖池 1 抽所需 | 弹出 PAROL 提示弹窗（不足）：`Parols to Draw: X / Y`，CONFIRM 后停留原页 |
 | 每日任务 CLAIM 领到 PAROL 后，PAROL ≥ 最低级奖池 1 抽所需 | 弹出 PAROL 提示弹窗（满足），CONFIRM 后跳转 PAROL WISH DRAW 分页 |
-| 额外随机宝箱关闭 | Day 3 起只发签到奖励、不弹 Mystery Chest（点今日格即完成签到） |
+| 额外随机宝箱关闭 | Day 3 起只发签到奖励、不弹 Christmas Surprise Chest（点今日格即完成签到） |
 | Day 3 起签到宝箱弹窗未按 Draw 就关闭（✕／Esc） | 该日未完成签到：不发奖、连续天数不变，今日格维持可签可再点；当日结束前未完成即断签 |
 | 随机宝箱中奖率某款填 0 | 该款永不发放 |
 | 挑战任务全部删除 | 每日返水「触发」不可勾选；前台无 BONUS 标签 |
@@ -1023,7 +1020,7 @@ CLAIMED 移至列表底部；看板 Cash Bonus Claimed Today＋实得金额；My
 
 | 功能 | 情境 | 处理 |
 |---|---|---|
-| 签到（F2） | E1／E2 | 今日格维持「今日可签」（流动光圈），不弹 Mystery Chest；可再点 |
+| 签到（F2） | E1／E2 | 今日格维持「今日可签」（流动光圈），不弹 Christmas Surprise Chest；可再点 |
 | 签到（F2） | E5 跨日 | 日历刷新：昨日格依后端结果显示（未签成功＝未签），「今日可签」移到新的一天；连续天数依后端 |
 | CLAIM ALL（F4） | 部分成功（E6／E9 只影响部分等级） | **成功的等级照常入帐**（含挑战翻牌）、转 CLAIMED；未成功的等级刷新为最新状态；toast `Some rewards could not be claimed.` |
 | CLAIM ALL（F4） | E1／E2 全部失败 | 全部等级维持 CLAIM、金额不变；toast `Claim failed. Please try again.` |
