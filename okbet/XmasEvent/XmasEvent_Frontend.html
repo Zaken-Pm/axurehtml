@@ -357,7 +357,7 @@ button{font:inherit;cursor:pointer;}
 /* 允许换行：表格不超出弹窗宽度、不需左右滑动；奖励内容一行放不下时自动断行；内容垂直置中 */
 .hist__tbl{table-layout:fixed;}
 .hist__tbl th,.hist__tbl td{white-space:normal;vertical-align:middle;}
-.hist__tbl th:nth-child(1){width:25%;} .hist__tbl th:nth-child(2),.hist__tbl th:nth-child(3){width:18%;}
+.hist__tbl th:nth-child(1){width:24%;} .hist__tbl th:nth-child(2),.hist__tbl th:nth-child(3){width:15%;} .hist__tbl th:nth-child(4){width:15%;}
 .hist__tbl th,.hist__tbl td{padding-left:3px;padding-right:3px;}
 .hist__tbl .hist__time,.hist__tbl .hist__num{white-space:normal;}
 .hist__tbl .hist__prize{overflow-wrap:anywhere;}
@@ -1731,7 +1731,8 @@ function drawPool(C,d){
   S.keysUsed+=cost; S.opened[C.no]=(S.opened[C.no]||0)+d; S.poolHit=null;
   const wins=Array.from({length:d},()=>weighted(C.box.map(r=>r.rate)));   // 实际由后端抽出，前端依结果演出
   if(FORCE.gp&&(FORCE.gp==='single')===(d===1)){ const g=topIdx(C.box); if(d===1) wins[0]=g; else wins[Math.floor(Math.random()*d)]=g; FORCE.gp=null; }   // 原型：抽奖模拟
-  S.hist.unshift({at:Date.now(),pool:C.no,d,cost,left:keysLeft(),labels:wins.map(w=>C.box[w].label)});   // History：抽奖成功即写入（每次操作 1 笔；left＝扣除后剩余）
+  { const at=Date.now(), left0=keysLeft()+cost;   // History：抽奖成功即写入；一个奖励一笔（5／10 抽拆成 5／10 笔，依抽出顺序，最新在上）；left＝该抽扣除后剩余
+    wins.forEach((w,i)=>S.hist.unshift({at,pool:C.no,cost:C.cost,left:left0-C.cost*(i+1),label:C.box[w].label})); }
   renderAll();
   $$('[data-pdraw]').forEach(b=>b.disabled=true);
   PD={no:C.no};
@@ -1759,18 +1760,14 @@ $('#rulesPeriod').textContent=`${fmtPeriod(ACT_PERIOD.start)} – ${fmtPeriod(AC
 $('#btnRules').addEventListener('click',()=>{ $('#rulesMask').classList.add('is-open'); $('#rulesMask .rules__body').scrollTop=0; $('#rulesOk').focus(); });
 const closeRules=()=>{ $('#rulesMask').classList.remove('is-open'); $('#btnRules').focus(); };
 $('#rulesOk').addEventListener('click',closeRules);
-/* History：奖池抽奖纪录（新到旧；每次操作 1 笔；时间 UTC+8） */
+/* History：奖池抽奖纪录（新到旧；一个奖励一笔；时间 UTC+8） */
 const fmtTime=ms=>{ const d=new Date(ms+8*3600e3), z=n=>String(n).padStart(2,'0');
   return `${d.getUTCFullYear()}-${z(d.getUTCMonth()+1)}-${z(d.getUTCDate())} ${z(d.getUTCHours())}:${z(d.getUTCMinutes())}:${z(d.getUTCSeconds())}`; };
 function renderHist(){
-  /* 栏位：时间／PAROL 消耗数／PAROL 剩余数（本次扣除后）／奖励（相同奖励合并 ×N） */
-  const rows=S.hist.map(h=>{
-    const cnt={}; h.labels.forEach(l=>{ cnt[l]=(cnt[l]||0)+1; });
-    const prizes=Object.keys(cnt).map(l=>cnt[l]>1?`${l} ×${cnt[l]}`:l).join(', ');
-    const [d,t]=fmtTime(h.at).split(' ');
-    return `<tr><td class="hist__time">${d} ${t}</td><td class="hist__num">${int(h.cost)}</td><td class="hist__num">${int(h.left)}</td><td class="hist__prize">${prizes}</td></tr>`; }).join('');
+  /* 栏位：时间／PAROL 消耗数（单抽）／PAROL 剩余数（该抽扣除后）／奖池名称／奖励（一个奖励一笔） */
+  const rows=S.hist.map(h=>`<tr><td class="hist__time">${fmtTime(h.at)}</td><td class="hist__num">${int(h.cost)}</td><td class="hist__num">${int(h.left)}</td><td class="hist__pool">Pool ${h.pool}</td><td class="hist__prize">${h.label}</td></tr>`).join('');
   $('#histList').innerHTML=S.hist.length
-    ?`<table class="hist__tbl"><thead><tr><th scope="col">Time</th><th scope="col">PAROL Used</th><th scope="col">PAROL Left</th><th scope="col">Rewards</th></tr></thead><tbody>${rows}</tbody></table>`
+    ?`<table class="hist__tbl"><thead><tr><th scope="col">Time</th><th scope="col">PAROL Used</th><th scope="col">PAROL Left</th><th scope="col">Prize Pool</th><th scope="col">Rewards</th></tr></thead><tbody>${rows}</tbody></table>`
     :`<p class="hist__empty">No records yet.</p>`;
 }
 $('#btnHist').addEventListener('click',()=>{ renderHist(); $('#histMask').classList.add('is-open'); $('#histList').scrollTop=0; $('#histClose').focus(); });
