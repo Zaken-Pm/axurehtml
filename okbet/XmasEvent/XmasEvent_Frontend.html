@@ -1478,9 +1478,9 @@ function renderBomb(){
   $$('[data-bomb]').forEach(b=>b.addEventListener('click',()=>{
     const lv=+b.dataset.bomb; if(S.bombClaimed[lv]||CH||!LIVE()) return;          // 幂等
     const t=BOMB_TASKS.find(x=>x.lv===lv);
-    // 有赠送 PAROL 的等级：领取后先播礼物盒动画（金币＋PAROL 飞入看板），再 toast 与 PAROL 提示弹窗；无赠送者维持 toast
+    // 有赠送 PAROL 的等级：领取后先播礼物盒动画（金币＋PAROL 飞入看板），再弹 PAROL 提示弹窗；单项 CLAIM 不显示 toast（11/10）
     const snap=[$('#boardCash').innerHTML,$('#boardParol').innerHTML];   // 动画结束前看板维持领取前数值，奖励飞入后才更新
-    const after=amt=>{ toast(`+${money(amt)}${keyTxt(t.gift)} claimed (LV${lv})`); openKeyTip(t.gift); };
+    const after=()=>openKeyTip(t.gift);
     if(t.trigger){ runChallenges([t],res=>t.gift?playGift(res[0].amt,t.gift,()=>after(res[0].amt),snap):after(res[0].amt)); return; }
     S.bombClaimed[lv]={amt:t.reward}; giveKeys(t); renderAll();
     if(t.gift) playGift(t.reward,t.gift,()=>after(t.reward),snap); else after(t.reward);
