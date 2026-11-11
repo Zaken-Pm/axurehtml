@@ -286,6 +286,16 @@ label.chk input{accent-color:var(--primary);}
 .modal__toolbar{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;}
 @media(max-width:1100px){ .boxrate{grid-template-columns:repeat(3,minmax(0,1fr));} .prov-group__grid{grid-template-columns:repeat(2,minmax(0,1fr));} }
 @media(max-width:1100px){ .wizard{grid-template-columns:minmax(0,1fr);} .side{display:none;} }
+
+/* === 彩金流水倍数（11/11：拆为签到／每日返水／特别奖池三项，各自显示在对应区块下方） === */
+.wager-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line,#e5e7eb);}
+.wager-row label{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;}
+.wager-row{align-items:flex-start;}
+.wager-row label,.wager-row > .hint{line-height:34px;}
+.wager-field{display:flex;flex-direction:column;gap:4px;width:240px;max-width:100%;}
+.wager-field .input{width:100%;}
+.wager-err{margin:0;font-size:12px;white-space:nowrap;width:max-content;}   /* 红字一行显示，可延伸至右侧说明文字下方 */
+.wager-err:empty{display:none;}
 </style>
 </head>
 <body>
@@ -344,7 +354,7 @@ label.chk input{accent-color:var(--primary);}
         <tbody>
           <tr><td>191</td><td>0</td><td class="tag-on">开启</td><td>26/11/16<br>26/12/31</td><td>PHP</td><td>预设</td>
             <td><b>节庆特别活动</b></td><td>Christmas Activities 2026</td><td><button class="btn btn--primary btn--sm">上传</button></td><td>—</td><td>—</td>
-            <td>0 / 0</td><td>1</td>
+            <td>0 / 0</td><td>签到 1<br>每日返水 1<br>特别奖池 1</td>
             <td><button class="btn--link" data-edit>编辑</button><span class="op-sep">|</span><button class="btn--link red" data-del>删除</button><br><button class="btn--link red" data-close>关闭</button></td></tr>
           <tr><td>190</td><td>0</td><td class="tag-on">开启</td><td>26/08/21<br>26/10/31</td><td>PHP</td><td>预设</td>
             <td>联名挑战活动</td><td>X-Bomb Lucky Blast</td><td><button class="btn btn--primary btn--sm">上传</button></td><td>—</td><td>—</td>
@@ -489,6 +499,11 @@ label.chk input{accent-color:var(--primary);}
                   <tbody id="signBody"></tbody>
                 </table>
                 <p class="hint">· 每天签到奖励固定 1 项；连续签到第 3 天起每日发放「第三天以上(含)」奖励。</p>
+                <div class="wager-row">
+                  <label for="fWagerSign">签到彩金流水倍数：</label>
+                  <div class="wager-field"><input class="input" id="fWagerSign" data-wager placeholder="0.01～999999.99（可空；不可为 0）" aria-describedby="fWagerSignErr"><p class="hint hint--err wager-err" id="fWagerSignErr"></p></div>
+                  <span class="hint" style="margin:0">适用：签到奖励与签到宝箱抽中的彩金，提现前需完成的流水倍数</span>
+                </div>
               </div>
             </section>
 
@@ -520,6 +535,11 @@ label.chk input{accent-color:var(--primary);}
                   <tbody id="challengeBody"></tbody>
                 </table>
                 <p class="hint">非必填；可全部删除不设置挑战。如有设置：奖励提升／触发机率／获奖机率不可为空或 0（单位 %）；触发机率为 挑战1～挑战5 加总不得超过100%；获奖机率为各挑战各自不得超过100%；奖励提升无上限。最多 挑战5。</p>
+                <div class="wager-row">
+                  <label for="fWagerRebate">每日返水彩金流水倍数：</label>
+                  <div class="wager-field"><input class="input" id="fWagerRebate" data-wager placeholder="0.01～999999.99（可空；不可为 0）" aria-describedby="fWagerRebateErr"><p class="hint hint--err wager-err" id="fWagerRebateErr"></p></div>
+                  <span class="hint" style="margin:0">适用：每日返水（含挑战任务提升后）发放的彩金，提现前需完成的流水倍数</span>
+                </div>
               </div>
             </section>
 
@@ -553,6 +573,11 @@ label.chk input{accent-color:var(--primary);}
                   <tbody id="cycleBody"></tbody>
                 </table>
                 <p class="hint">· 系统每 20 分钟自动结算发放，可重复达成。</p>
+                <div class="wager-row">
+                  <label for="fWagerPool">特别奖池彩金流水倍数：</label>
+                  <div class="wager-field"><input class="input" id="fWagerPool" data-wager placeholder="0.01～999999.99（可空；不可为 0）" aria-describedby="fWagerPoolErr"><p class="hint hint--err wager-err" id="fWagerPoolErr"></p></div>
+                  <span class="hint" style="margin:0">适用：特别任务奖池抽中的彩金，提现前需完成的流水倍数</span>
+                </div>
               </div>
             </section>
 
@@ -571,11 +596,6 @@ label.chk input{accent-color:var(--primary);}
               </div>
             </section>
 
-            <!-- 4-8 彩金所需流水倍数（沿用） -->
-            <section id="secOther">
-              <div class="form-row"><label>彩金所需流水倍数：</label>
-                <input class="input" id="fWager" placeholder="0.01～999999.99（可空；不可为 0）" style="max-width:220px"></div>
-            </section>
           </div>
 
           <!-- 步骤5 风控条件 -->
@@ -1060,7 +1080,7 @@ function resetWizardFields(blank){
   cycle      = clone(blank?BLANK_CYCLE:SAMPLE_CYCLE);
   ratio      = blank?BLANK_RATIO():SAMPLE_RATIO();
   curVip = 0; if($('#applyAll')) $('#applyAll').checked=false;
-  if($('#fWager')){ $('#fWager').value=blank?'':'1'; $('#fWager').classList.remove('is-error'); }
+  $$('[data-wager]').forEach(i=>{ i.value=blank?'':'1'; paintWager(i); });
   renderStep4();
 
   /* ---- 步骤5 风控条件：还原默认开关（同手机号/同email 预设开） ---- */
@@ -1103,7 +1123,7 @@ function fillRow(tr,a){
   const black    = tr.children[9] ? tr.children[9].textContent.trim() : '—';
   const agent    = tr.children[10]? tr.children[10].textContent.trim(): '—';
   const prevJoin = tr.children[11]? tr.children[11].textContent.trim(): '0 / 0';
-  const wager    = (a.wager!==undefined) ? a.wager : (tr.children[12]?tr.children[12].textContent.trim():'—');
+  const wager    = (a.wager!==undefined) ? a.wager : (tr.children[12]?tr.children[12].innerHTML.trim():'—');
   const timeCell = (a.actTime!==undefined) ? actTimeToCell(a.actTime)
                  : (tr.children[3] ? tr.children[3].innerHTML : '—');
   const actionBtn = a.status==='开启'
@@ -1211,7 +1231,7 @@ $('#btnSubmit').addEventListener('click',()=>{
     type:$('#fType').value, name:$('#fName').value.trim(), cur:$('#fCur').value,
     status:$('input[name=status]:checked').value,
     actTime:$('#fActTime').value,
-    wager:($('#fWager').value.trim()||'—')
+    wager:wagerCell()
   };
 
   /* 规则：同一时间只能有一个「节庆特别活动」处于开启 */
@@ -1253,13 +1273,16 @@ function validateStep(n){
   if(n===4){
     /* 按下一步／提交：切换为严格模式（空值也标红）→ 重画 → 依区块顺序挡下第一个错误并捲动定位 */
     s4Strict=true; renderStep4();
-    if(!wagerOk()) $('#fWager').classList.add('is-error'); else $('#fWager').classList.remove('is-error');
+    $$('[data-wager]').forEach(paintWager);
     const bad=SECTIONS.find(([,,fn])=>!fn());
     if(bad){
       const set=bad[0]==='box'?SBOX:bad[0]==='pbox'?PBOX:null;   // 宝箱类：切到第一款有问题的宝箱
       if(set){ const k=set.firstBad(); if(k>=0&&k!==set.cur){ set.cur=k; set.render(); } }
-      document.getElementById(bad[1]).scrollIntoView({behavior:'smooth',block:'start'});
-      toast(typeof bad[3]==='function'?bad[3]():bad[3],true); return false;
+      const wIn={wSign:'fWagerSign',wRebate:'fWagerRebate',wPool:'fWagerPool'}[bad[0]];   // 彩金流水倍数：捲动到该输入框并聚焦
+      if(wIn){ $('#'+wIn).scrollIntoView({behavior:'smooth',block:'center'}); $('#'+wIn).focus({preventScroll:true}); }
+      else document.getElementById(bad[1]).scrollIntoView({behavior:'smooth',block:'start'});
+      if(bad[3]) toast(typeof bad[3]==='function'?bad[3]():bad[3],true);   // 彩金流水倍数无 toast（已即时红框＋红字）
+      return false;
     }
   }
   return true;
@@ -1732,19 +1755,27 @@ $('#provConfirm').addEventListener('click',()=>{
   $('#provMask').classList.remove('is-open'); renderRatio(); toast(provCat.key+' 套用游戏商已更新');
 });
 
-/* ---------- 4-7 彩金所需流水倍数 ---------- */
-function wagerOk(){ const wv=$('#fWager').value.trim(), wn=Number(wv); return wv===''||(wn>=0.01&&wn<=999999.99&&/^\d{1,8}(\.\d{1,2})?$/.test(wv)); }
+/* ---------- 彩金流水倍数（签到／每日返水／特别奖池，各自独立；可空、不可为 0） ---------- */
+function wagerOk(id){ const wv=$('#'+id).value.trim(), wn=Number(wv); return wv===''||(wn>=0.01&&wn<=999999.99&&/^\d{1,8}(\.\d{1,2})?$/.test(wv)); }
+const wv=id=>$('#'+id).value.trim()||'—';
+/* 活动列表「彩金所需流水倍数」栏：三项分行显示 */
+const WAGER_ERR='彩金所需流水倍数必须为 0.01～999999.99，且最多 2 位小数';
+/* 即时检核：输入 0 或超出范围 → 红框＋输入框下方红字（不使用 toast）；留空或有效值即清除 */
+function paintWager(i){ const bad=!wagerOk(i.id); i.classList.toggle('is-error',bad); $('#'+i.id+'Err').textContent=bad?WAGER_ERR:''; return !bad; }
+const wagerCell=()=>`签到 ${wv('fWagerSign')}<br>每日返水 ${wv('fWagerRebate')}<br>特别奖池 ${wv('fWagerPool')}`;
 
 /* ---------- 步骤4 各区块校验（下一步／提交时依序检查） ---------- */
 const SECTIONS=[
   ['box','secBox',boxesOk,()=>boxNoneErr()?'开启「额外随机宝箱」时，至少需配置 1 款签到宝箱':'签到宝箱配置未完成：宝箱一旦配置任 1 项奖励，其余 8 项皆须配置，且中奖率合计需等于100%'],
   ['sign','secSign',signOk,'签到活动配置未完成：请检查奖励类型／奖励数量，及已配置宝箱的中奖率合计需等于100%'],
+  ['wSign','secSign',()=>wagerOk('fWagerSign'),null],   // 错误以红框＋红字呈现，不 toast
   ['rebate','secRebate',rebateOk,rebateMsg],
   ['challenge','secChallenge',challengeOk,challengeMsg],
+  ['wRebate','secChallenge',()=>wagerOk('fWagerRebate'),null],   // 错误以红框＋红字呈现，不 toast
   ['pbox','secPBox',()=>PBOX.ok(),'特别任务奖池配置未完成：4 个奖池皆须填写道具消耗数量、配置完成 9 项奖励，且中奖率合计需等于100%'],
   ['period','secPeriod',cycleOk,'特别任务配置未完成：任务目标、奖励数量皆须为大于 0 的整数'],
+  ['wPool','secPeriod',()=>wagerOk('fWagerPool'),null],   // 错误以红框＋红字呈现，不 toast
   ['ratio','secRatio',ratioOk,'投注量计算比例有误：Slot／Live／Mini 已填比例须至少勾选 1 家游戏商；比例 0～300'],
-  ['other','secOther',wagerOk,'彩金所需流水倍数须为 0.01～999999.99（最多 8 位整数＋2 位小数、不可为 0）'],
 ];
 
 function renderStep4(){ renderSign(); renderBoxes(); renderVipTabs(); renderRebate(); renderChallenge(); PBOX.render(); renderCycle(); renderRatio(); }
@@ -1760,7 +1791,7 @@ $$('[data-close-modal]').forEach(b=>b.addEventListener('click',e=>{
 $('#autoReject').addEventListener('change',e=>$('#rejectN').disabled=!e.target.checked);
 
 /* ---------- 流水倍数：可留空、不可填0；填入有效值即清除红框 ---------- */
-$('#fWager').addEventListener('input',e=>{ e.target.value=sanWager(e.target.value); const v=e.target.value, n=Number(v); if(v===''||(n>=0.01&&n<=999999.99)) e.target.classList.remove('is-error'); });
+$$('[data-wager]').forEach(w=>w.addEventListener('input',e=>{ e.target.value=sanWager(e.target.value); paintWager(e.target); }));
 
 /* ---------- 提交预览 ---------- */
 function buildPreview(){
@@ -1794,13 +1825,14 @@ function buildPreview(){
     ['④ 活动条件',[
       ['签到宝箱配置','已配置 '+configuredBoxes().length+' 款（'+(configuredBoxes().map(k=>'宝箱'+(k+1)).join('、')||'—')+'）'+(configuredBoxes().length?' × 9 项奖励':'')+(sign.boxOn?'':'；随机宝箱关闭，不发放')],
       ['签到奖励·第一天',rwTxt(sign.days[0])],['签到奖励·第二天',rwTxt(sign.days[1])],
-      ['签到奖励·第三天以上(含)',rwTxt(sign.days[2])],['额外随机宝箱',sign.boxOn?('开启（'+(configuredBoxes().map(k=>'宝箱'+(k+1)+' '+(sign.boxRates[k]||'—')+'%').join('、')||'—')+'）'):'关闭'],
+      ['签到奖励·第三天以上(含)',rwTxt(sign.days[2])],['签到彩金流水倍数',wv('fWagerSign')],['额外随机宝箱',sign.boxOn?('开启（'+(configuredBoxes().map(k=>'宝箱'+(k+1)+' '+(sign.boxRates[k]||'—')+'%').join('、')||'—')+'）'):'关闭'],
       ['每日返水·VIP 配置数',applyAll?'1 个（套用至其他等级）':'11 个'],
       ['每日返水配置',rebateRows.length+' 个等级（赠送道具 '+rebateRows.filter(r=>r.gift).length+' 个；触发挑战 '+rebateRows.filter(r=>r.trigger).length+' 个）'],
       ['挑战任务配置',challengeRows.length?challengeRows.length+' 个（'+challengeRows.map((r,i)=>'挑战'+(i+1)+' +'+(r.up||'—')+'%／触发'+(r.appear||'—')+'%／获奖'+(r.win||'—')+'%').join('；')+'）':'未设置'],
+      ['每日返水彩金流水倍数',wv('fWagerRebate')],
       ['特别任务奖池配置','4 个奖池（'+[0,1,2,3].map(k=>'奖池'+(k+1)+' 消耗'+(PBOX.cost[k]||'—')+'个／抽').join('、')+'）× 9 项奖励'],
-      ['特别任务配置',cycle.goal&&cycle.qty?('投注 ≥ '+cycle.goal+' → '+cycle.qty+' 个道具（可重复达成）'):'—'],
-      ['投注量计算比例',ratioTxt],['彩金所需流水倍数',$('#fWager').value||'—'],
+      ['特别任务配置',cycle.goal&&cycle.qty?('投注 ≥ '+cycle.goal+' → '+cycle.qty+' 个道具（可重复达成）'):'—'],['特别奖池彩金流水倍数',wv('fWagerPool')],
+      ['投注量计算比例',ratioTxt],
       ['审核方式','自动审核']]],
     ['⑤ 风控条件',[
       ['同 IP 检测',yn(sw[0])],['同姓名检测',yn(sw[2])],
