@@ -567,7 +567,7 @@ label.chk input{accent-color:var(--primary);}
                   </tr></thead>
                   <tbody id="ratioBody"></tbody>
                 </table>
-                <p class="hint">· 比例 0～100；留空或未勾选的游戏商按 100% 计算。</p>
+                <p class="hint">· 比例 0～300；留空或未勾选的游戏商按 100% 计算。</p>
               </div>
             </section>
 
@@ -825,10 +825,10 @@ const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 function toast(msg,err){const t=$('#toast');t.textContent=msg;t.className='toast'+(err?' err':'')+' is-show';
   clearTimeout(t._t);t._t=setTimeout(()=>t.className='toast'+(err?' err':''),2200);}
 
-/* ---------- 比例（%）输入超过 100 即时提示 ---------- */
-function pctHintHtml(cls){ return `<p class="hint hint--err ${cls}" style="visibility:hidden">比例配置不得超过100%</p>`; }
+/* ---------- 比例（%）输入超过 300 即时提示 ---------- */
+function pctHintHtml(cls){ return `<p class="hint hint--err ${cls}" style="visibility:hidden">比例配置不得超过300%</p>`; }
 function attachPctGuard(input,hintEl){
-  const check=()=>{ const over=input.value!==''&&Number(input.value)>100; input.classList.toggle('is-error',over); if(hintEl) hintEl.style.visibility=over?'visible':'hidden'; };
+  const check=()=>{ const over=input.value!==''&&Number(input.value)>300; input.classList.toggle('is-error',over); if(hintEl) hintEl.style.visibility=over?'visible':'hidden'; };
   input.addEventListener('input',check); check();
 }
 
@@ -1678,7 +1678,7 @@ let ratio=BLANK_RATIO();
 const SAMPLE_RATIO=()=>{ const r=BLANK_RATIO(); r.Slot.pct='100'; r.Live.pct='50'; r.Sport.pct='30'; return r; };
 function ratioErr(c){
   const r=ratio[c.key];
-  if(r.pct!==''&&Number(r.pct)>100) return {pct:'比例配置不得超过100%'};
+  if(r.pct!==''&&Number(r.pct)>300) return {pct:'比例配置不得超过300%'};   // 上限 300%（11/11）
   if(c.fixed) return {};   // Sport：留空＝100%
   if(r.pct!==''&&!r.sel.length) return {sel:'请选择游戏商'};
   return {};
@@ -1689,7 +1689,7 @@ function renderRatio(){
   GAME_CATS.forEach(c=>{
     const r=ratio[c.key], tr=document.createElement('tr');
     tr.innerHTML=`<td><b>${c.key}</b></td>
-      <td><div class="suffix-wrap"><input class="input js-pct" value="${r.pct}" placeholder="0～100"><span class="suffix">%</span></div>
+      <td><div class="suffix-wrap"><input class="input js-pct" value="${r.pct}" placeholder="0～300"><span class="suffix">%</span></div>
         <p class="hint hint--err js-pct-hint" style="visibility:hidden"></p></td>
       <td style="text-align:left">${c.fixed
         ? `<span style="font-size:12.5px;color:var(--text-2)">套用全部体育游戏商；留空按 100% 计算</span>`
@@ -1743,7 +1743,7 @@ const SECTIONS=[
   ['challenge','secChallenge',challengeOk,challengeMsg],
   ['pbox','secPBox',()=>PBOX.ok(),'特别任务奖池配置未完成：4 个奖池皆须填写道具消耗数量、配置完成 9 项奖励，且中奖率合计需等于100%'],
   ['period','secPeriod',cycleOk,'特别任务配置未完成：任务目标、奖励数量皆须为大于 0 的整数'],
-  ['ratio','secRatio',ratioOk,'投注量计算比例有误：Slot／Live／Mini 已填比例须至少勾选 1 家游戏商；比例 0～100'],
+  ['ratio','secRatio',ratioOk,'投注量计算比例有误：Slot／Live／Mini 已填比例须至少勾选 1 家游戏商；比例 0～300'],
   ['other','secOther',wagerOk,'彩金所需流水倍数须为 0.01～999999.99（最多 8 位整数＋2 位小数、不可为 0）'],
 ];
 
