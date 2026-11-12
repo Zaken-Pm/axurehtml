@@ -135,17 +135,16 @@
    - Hero 主视觉右侧、`X'mas Reward Board` 上方的按钮 `RULES`
    - **固定显示**：活动期间、兑换期皆显示
 2. **点击：**
-   - 弹出「活动规则」弹窗，标题 `GENERAL MECHANICS`
+   - 弹出「活动规则」弹窗，标题 `HOW TO PLAY`
    - 内容超过弹窗高度时，内容区可上下滚动，每次开启回到最上方
 3. **关闭：**
    - 点底部 `CONFIRM` 关闭（桌机可按 Esc）
    - 点遮罩不关闭
-4. **规则内容：**依运营提供文案「20261105 OKGAMES 圣诞活动 1（docx）· 圣诞活动英文规则」（前台英文，原文照录），完整文案见原型「活动规则」弹窗：
+4. **规则内容：**依运营提供文案「XBomb Parol Fiesta - Simplified Instructions」（11/12，前台英文，原文照录），完整文案见原型「活动规则」弹窗：
    - 开头三行：第 1 行 `X-BOMB PAROL FIESTA`、第 2 行 `Light Up Your Christmas Luck!`、第 3 行活动时间**套用后台 B2「时间设定 · 活动时间」**，格式 `Month D, HH:mm – Month D, HH:mm`（英文月份全名、24 小时制、不显示年份与时区）
-   - 文件开头的「Promotion Name」「Promotion Period」「English ｜ … Promotion Rules」及第二行活动时间说明不显示（活动时间以后台配置为准）
-   - 章节：`1. Santa’s Daily Gift`／`2. Parol Quest`（含 Sparks 换算表「Category／Qualifying amount／Sparks earned」、Christmas Mission、Daily Mission）／`3. VIP Upgrades and Mission Rewards`／`4. Parol Wish Draw`／`5. Receiving Your Prizes`（Digital rewards／Physical prizes）／`6. General Terms`
-   - 原文「Click the image to view the sheet.」为文件操作提示，前台不显示；文件内嵌表格以文字表格呈现
-   - **规则文案为固定文案，依运营文件撰写，不随后台配置变动**；**唯活动时间套用后台配置**
+   - 章节：`1. Santa’s Daily Gift — Check In & Win!`／`2. Parol Quest — Earn Sparks & Get Rewards!`（Christmas Mission、Daily Mission、How to Earn Sparks 换算表「Activity／Sparks Earned」）／`3. Parol Wish Draw — Use Your Parols!`／`Important Dates`
+   - `Important Dates` 三个日期**依后台活动时间推算**：活动结束时间（英文日期＋12 小时制，如 `December 31, 2026, 11:59 PM`）、兑换期（结束日隔日起 3 天，如 `January 1–3, 2027`）、兑换期最后一天 `11:59 PM`
+   - **规则文案为固定文案，依运营文件撰写，不随后台配置变动**；**唯活动时间与 Important Dates 日期套用后台配置**
 
 ### X'mas Reward Board
 

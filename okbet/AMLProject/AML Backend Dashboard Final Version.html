@@ -1,0 +1,2336 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  AML MONITORING DASHBOARD — MOCKUP / PROTOTYPE
+  ============================================================================
+  This is a single self-contained HTML file: all CSS lives in the <style>
+  block below, all markup is in <body>, and all behavior is in the <script>
+  blocks near the bottom. No build step — just edit and reopen in a browser.
+
+  FILE MAP (search for these comment headers to jump around):
+    1. <style>                — all visual styling, organized by component
+    2. <body> → <aside class="sidebar">   — left-hand navigation menu
+    3. <body> → <div class="topbar">      — server time / bell / user menu
+    4. <body> → <div class="content">     — one <div class="panel"> per tab
+    5. <div class="modal-overlay">        — popup dialogs (detail + tag picker)
+    6. <script src=cdnjs...xlsx>          — Excel export library (needs internet)
+    7. <script> (main)                    — all interactivity, organized by feature
+
+  HOW THE TABS WORK
+    Each sidebar item (<li class="sub-item" data-target="players">...) shows
+    one <div class="panel" id="players">...</div>. The data-target value MUST
+    match the panel's id. Clicking a sidebar item just toggles which .panel
+    has the "active" class — see "SIDEBAR TAB SWITCHING" in the script.
+
+  HOW TO ADD A NEW TAB
+    a) Copy an existing <li class="sub-item" data-target="...">  in the
+       sidebar <ul id="railNav"> and give it a new data-target value + label.
+    b) Copy an existing <div class="panel" id="...">...</div> block, paste
+       it before </div> that closes <div class="content">, rename its id to
+       match the new data-target.
+    c) Everything inside (filters, tables, pagination, pie charts) is wired
+       up generically by CSS class / data-attribute, so as long as you keep
+       the same class names (fctrl, search-btn, table-scroll, pager, etc.)
+       it will "just work" — see the per-component notes throughout.
+
+  HOW TO EDIT SAMPLE DATA
+    All table rows are plain <tr> markup — edit the text directly. Numbers
+    used in the pie charts and stat cards are hand-typed in the HTML (stat
+    cards) and in the renderPie(...) calls at the bottom of the script
+    (pie charts) — they are NOT calculated from the table rows, so if you
+    change a stat you may want to update its matching pie/legend too.
+
+  THINGS THAT NEED INTERNET TO WORK
+    - "Export to Excel" buttons (loads the SheetJS library from cdnjs.com)
+    - Pie charts do NOT need internet — they're hand-drawn SVG, no library.
+  ============================================================================
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AML</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  /* ==========================================================================
+     COLOR / SPACING VARIABLES
+     Change a value here and it updates everywhere that variable is used.
+     This is the fastest way to reskin the whole dashboard.
+  ========================================================================== */
+  :root{
+    --sidebar-bg:#eef1f9;        /* left menu background color */
+    --sidebar-active-bg:#dfe6fb; /* left menu highlight behind the active section */
+    --blue:#4098fc;               /* primary action color: buttons, selected tab pill, links */
+    --blue-dark:#2f86f0;          /* darker blue: hover states, active nav text */
+    --text-dark:#303133;          /* main body text / headings */
+    --text-mid:#606266;           /* secondary text: labels, table cells */
+    --text-light:#909399;         /* muted text: placeholders, helper captions */
+    --placeholder:#c0c4cc;        /* input placeholder text color */
+    --border:#e4e7ed;             /* default border color (inputs, dividers) */
+    --border-light:#ebeef5;       /* lighter border color (table row lines) */
+    --page-bg:#f0f2f8;            /* (currently unused, reserved for a page-level bg) */
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:"Helvetica Neue",Helvetica,Arial,"PingFang SC","Microsoft YaHei",sans-serif; /* EDIT: swap the font family here */
+    color:var(--text-dark);
+    background:#fff;
+    font-size:14px; /* EDIT: base font size for the whole page */
+  }
+  ul{list-style:none;margin:0;padding:0;}
+
+
+  /* ==========================================================================
+     PAGE LAYOUT — 2-column grid: sidebar (200px) + everything else
+  ========================================================================== */
+  .shell{display:grid; grid-template-columns:200px 1fr; min-height:100vh;} /* EDIT: change 200px to resize the sidebar */
+
+  /* ==========================================================================
+     SIDEBAR — left navigation menu
+     .side-item      = a top-level row (Menu, Personal center, AML Monitoring…)
+     .side-item.top-active = the currently open top-level section (blue highlight)
+     .sub-list       = the <ul> of tab links shown under "AML Monitoring"
+     .sub-item       = one tab link (Total Number of Players, Risk Profiling…)
+     .sub-item.active = the currently selected tab (blue text + left border)
+     To add a new tab: copy a <li class="sub-item"> in the HTML sidebar list.
+  ========================================================================== */
+  .sidebar{background:var(--sidebar-bg); padding:18px 0; border-right:1px solid var(--border);}
+  .side-item{display:flex; align-items:center; gap:10px; padding:11px 20px; font-size:14px; font-weight:700; color:var(--text-dark); cursor:pointer;}
+  .side-item svg{width:15px; height:15px; flex-shrink:0;}
+  .side-item.top-active{background:var(--sidebar-active-bg); color:var(--blue-dark);}
+  .side-item.top-active svg{stroke:var(--blue-dark);}
+  .side-item .chev{margin-left:auto; font-size:11px; color:var(--text-light);}
+
+  .sub-list{padding:2px 0 8px;}
+  .sub-item{display:flex; align-items:center; gap:8px; padding:9px 20px 9px 30px; font-size:13px; color:var(--text-mid); cursor:pointer; border-left:3px solid transparent;}
+  .sub-item .tri{font-size:9px; color:var(--text-light);} /* the small ▸ marker before each tab label */
+  .sub-item:hover{color:var(--blue-dark); background:#f7f9fe;}
+  .sub-item.active{color:var(--blue-dark); background:#e4ecfd; font-weight:600; border-left-color:var(--blue-dark);}
+
+  /* ==========================================================================
+     TOP BAR — server time (left) + notification bell / flag / user menu (right)
+  ========================================================================== */
+  .topbar{display:flex; justify-content:flex-end; align-items:center; gap:16px; padding:14px 24px; border-bottom:1px solid var(--border-light); font-size:13px; color:var(--text-mid);}
+  .topbar .servertime{margin-right:auto; color:var(--text-mid);} /* margin-right:auto pushes everything else to the right */
+  .icon-btn{width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#f2f3f7; color:var(--text-mid); position:relative;}
+  .badge-count{ /* the small red "unread" number on the bell icon */
+    position:absolute; top:-4px; right:-4px; background:#e0463f; color:#fff; font-size:9.5px; font-weight:700;
+    min-width:15px; height:15px; border-radius:8px; display:flex; align-items:center; justify-content:center; padding:0 3px;
+  }
+  .flag{width:22px; height:16px; border-radius:2px; overflow:hidden; display:inline-block;}
+  .user-chip{display:flex; align-items:center; gap:8px; font-weight:700; font-size:14px;}
+  .avatar{width:26px; height:26px; border-radius:50%; background:#dfe2ea;} /* EDIT: swap to background-image:url(...) for a real photo */
+
+  /* ==========================================================================
+     MAIN CONTENT AREA — breadcrumb, the blue "current tab" pill, and panels
+     .panel        = one tab's entire content; only .panel.active is visible
+     .tab-tag      = the blue pill under the breadcrumb showing the open tab
+  ========================================================================== */
+  .content{padding:16px 22px 40px;}
+  .breadcrumb{font-size:13px; color:var(--text-mid); margin-bottom:12px;}
+  .breadcrumb .sep{margin:0 6px; color:var(--text-light);}
+  .breadcrumb .current{color:var(--text-dark);}
+
+  .tag-row{margin-bottom:0;}
+  .tab-tag{display:inline-flex; align-items:center; gap:8px; background:var(--blue); color:#fff; font-size:12.5px; font-weight:600; padding:6px 10px 6px 12px; border-radius:2px;}
+  .tab-tag .x{opacity:.85; font-size:12px; cursor:pointer;}
+
+  .panel{display:none;}          /* every tab's content is hidden by default… */
+  .panel.active{display:block;}  /* …and only the active one is shown */
+
+  /* ==========================================================================
+     FILTER BAR — the row of dropdowns / text fields / date pickers + Search
+     .fctrl        = one filter control (dropdown OR text field OR date range,
+                     depending on its data-* attributes — see the JS section
+                     "GENERIC FILTER DROPDOWNS" and "GENERIC ROW FILTERING")
+     .fctrl.wide   = a wider variant for longer labels (date ranges, search)
+     .fctrl.placeholder = shows greyed-out placeholder-style text until clicked
+  ========================================================================== */
+  .filter-panel{background:#fff; padding:14px 0 0; margin-bottom:0;}
+  .filter-row{display:flex; flex-wrap:wrap; gap:10px; margin-bottom:10px;}
+  .fctrl{
+    border:1px solid var(--border); border-radius:4px; padding:0 10px; height:32px;
+    display:flex; align-items:center; font-size:12.5px; color:var(--text-mid);
+    background:#fff; min-width:118px; white-space:nowrap; position:relative; cursor:pointer; user-select:none;
+  }
+  .fctrl.wide{min-width:170px;}
+  .fctrl.narrow{min-width:96px;}
+  .fctrl.placeholder{color:var(--placeholder);}
+  .fctrl .caret{margin-left:auto; color:var(--text-light); font-size:9px; padding-left:8px;}
+  .fctrl .range-sep{margin:0 6px; color:var(--text-light);}
+  .fctrl .ic{margin-right:6px; color:var(--text-light); font-size:12px;}
+  .fctrl input{border:none; outline:none; background:transparent; font-size:12.5px; color:var(--text-dark); width:100%; font-family:inherit;}
+  .fctrl.editing{cursor:text;}
+
+  .checkline{display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text-mid); margin:2px 0 14px;}
+  .checkline input{accent-color:var(--blue); width:14px; height:14px;}
+  /* Buttons: .search-btn = solid blue action button, .btn-outline = grey secondary button (Export etc.) */
+  .search-btn{background:var(--blue); color:#fff; border:none; border-radius:4px; padding:0 22px; height:32px; font-size:13px; font-weight:600; cursor:pointer;}
+  .btn-outline{background:#fff; color:var(--text-mid); border:1px solid var(--border); border-radius:4px; padding:0 16px; height:32px; font-size:13px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;}
+  .btn-outline:hover{border-color:var(--blue); color:var(--blue-dark);}
+  .filter-actions{display:flex; align-items:center; gap:12px; margin-bottom:14px; flex-wrap:wrap;}
+
+  /* ==========================================================================
+     DATA TABLES — every tab's main list uses this same table markup
+     .table-scroll = wraps <table> so wide tables scroll horizontally
+     .member-cell  = the stacked "Member ID / User Name / Real Name…" cell
+     .badge        = small colored pill for statuses (see color variants below)
+     .op-link      = blue clickable text in the "Operation" column
+  ========================================================================== */
+  .table-scroll{overflow-x:auto; border:1px solid var(--border-light); border-radius:2px;}
+  table{width:100%; border-collapse:collapse; font-size:12.5px;}
+  thead th{background:#fff; text-align:left; font-weight:700; color:var(--text-dark); padding:13px 14px; border-bottom:1px solid var(--border); white-space:nowrap;}
+  tbody td{padding:13px 14px; border-bottom:1px solid var(--border-light); color:var(--text-mid); vertical-align:top;}
+  tbody tr:hover td{background:#f7f9fc;}
+  .nodata{text-align:center; color:var(--text-light); padding:34px 0;} /* shown by JS when a filter matches nothing */
+
+  .member-cell{white-space:nowrap; font-size:12px; line-height:1.85; color:var(--text-mid);}
+  .member-cell b{color:var(--text-dark); font-weight:600;}
+  .member-cell .red{color:#e0463f;}
+  .photo-ph{width:44px; height:44px; border-radius:4px; background:#eceef3; display:flex; align-items:center; justify-content:center; color:#c0c4cc; font-size:18px;} /* placeholder avatar box */
+
+  /* Badge color variants — apply as class="badge low|med|high|neutral|on|off".
+     EDIT the hex codes here to change ALL badges of that color across every tab. */
+  .badge{display:inline-block; padding:2px 9px; border-radius:10px; font-size:11.5px; font-weight:600;}
+  .badge.low{background:#e7f7ec; color:#2ba24c;}      /* green  — good / low-risk / normal */
+  .badge.med{background:#fdf3e2; color:#c8890b;}      /* amber  — needs attention / medium */
+  .badge.high{background:#fdeaea; color:#e0463f;}     /* red    — bad / high-risk / urgent */
+  .badge.neutral{background:#eef1f9; color:#5b6cad;}  /* blue-grey — informational */
+  .badge.on{background:#e7f7ec; color:#2ba24c;}       /* "Online" status */
+  .badge.off{background:#f2f3f7; color:#909399;}      /* "Offline" / disabled status */
+
+  .taglist{display:flex; flex-wrap:wrap; gap:5px; max-width:190px;} /* wraps multiple .chip tags in a table cell */
+  .taglist .chip{background:#eef1f9; color:#4f5b8f; font-size:10.5px; padding:2px 8px; border-radius:9px; white-space:nowrap;}
+
+  .op-link{color:var(--blue-dark); cursor:pointer; margin-right:10px; font-size:12.5px; position:relative;}
+  .op-link:hover{text-decoration:underline;}
+
+  /* ==========================================================================
+     PAGINATION FOOTER — "Total X · 10/page · ‹ 1 2 3 › · Go to [_]"
+     Clicking a .num swaps in a different set of sample rows (see JS:
+     "PAGINATION: SWAP IN SAMPLE ROWS PER PAGE"). Only pages with data
+     prepared in PAGE_DATA_EXTRA will actually change — extra page buttons
+     beyond that are decorative in this mockup.
+  ========================================================================== */
+  .pager{display:flex; align-items:center; justify-content:flex-end; gap:14px; padding:14px; font-size:12.5px; color:var(--text-mid);}
+  .pager .pagesize{border:1px solid var(--border); border-radius:4px; padding:4px 8px; display:flex; align-items:center; gap:4px; position:relative; cursor:pointer;}
+  .pager .pages{display:flex; align-items:center; gap:8px;}
+  .pager .pages .num{width:24px; height:24px; display:flex; align-items:center; justify-content:center; border-radius:3px; background:#fff; border:1px solid var(--border); color:var(--text-mid); font-weight:600; cursor:pointer;}
+  .pager .pages .num.active{background:var(--blue); color:#fff; border-color:var(--blue);}
+  .pager .pages .num:hover{border-color:var(--blue); color:var(--blue-dark);}
+  .pager .arrow{color:var(--text-light); cursor:pointer;}
+  .pager .goto input{width:38px; border:1px solid var(--border); border-radius:4px; padding:4px 6px; text-align:center;}
+
+  /* ==========================================================================
+     STAT CARDS — the row of small number boxes above each table
+     (e.g. "Total Registered Players  500,000"). Plain static HTML — edit
+     the numbers directly where the .stat-box divs appear in the body.
+  ========================================================================== */
+  .stat-strip{display:flex; gap:12px; margin:2px 0 16px; flex-wrap:wrap;}
+  .stat-box{border:1px solid var(--border-light); border-radius:2px; padding:12px 16px; min-width:150px; background:#fafbfd;}
+  .stat-box .slabel{font-size:11.5px; color:var(--text-light);}
+  .stat-box .sval{font-size:19px; font-weight:700; color:var(--text-dark); margin-top:4px;}
+  .stat-box .sdelta{font-size:11px; margin-top:3px; color:#2ba24c;}
+  .stat-box .sdelta.down{color:#e0463f;}
+
+  .section-title{font-size:13.5px; font-weight:700; color:var(--text-dark); margin:20px 0 10px; display:flex; align-items:center; justify-content:space-between;}
+
+  /* ==========================================================================
+     DROPDOWN MENUS — the popup list under a single-select .fctrl filter
+     Built dynamically by JS from each element's data-options="A|B|C" attribute
+     (see "GENERIC FILTER DROPDOWNS" in the script). Don't hand-edit .dd-menu
+     markup — edit the data-options string on the .fctrl div in the HTML instead.
+  ========================================================================== */
+  .dd-menu{position:absolute; top:calc(100% + 4px); left:0; min-width:100%; background:#fff; border:1px solid var(--border); border-radius:4px; box-shadow:0 4px 14px rgba(0,0,0,0.09); z-index:50; overflow:hidden; display:none;}
+  .dd-menu.show{display:block;}
+  .dd-menu.scroll{max-height:260px; overflow-y:auto; min-width:260px;}
+  .dd-menu li{list-style:none; padding:8px 12px; font-size:12.5px; color:var(--text-mid); white-space:nowrap; cursor:pointer;}
+  .dd-menu li:hover{background:#f0f6ff; color:var(--blue-dark);}
+  .dd-menu li.selected{background:#eaf2ff; color:var(--blue-dark); font-weight:600;}
+  .dd-menu.checklist li{display:flex; align-items:center; gap:8px;}
+  .dd-menu.checklist li input{accent-color:var(--blue);}
+  .dd-menu .dd-apply{position:sticky; bottom:0; background:#fff; border-top:1px solid var(--border-light); padding:8px 12px; text-align:right;}
+  .dd-menu .dd-apply button{background:var(--blue); color:#fff; border:none; border-radius:4px; padding:5px 14px; font-size:12px; cursor:pointer;}
+  .chip-row{display:flex; flex-wrap:wrap; gap:6px; margin:-4px 0 14px;} /* holds the removable chips for a multi-select tag filter */
+  .chip-row .chip{background:#eef1f9; color:#4f5b8f; font-size:11px; padding:4px 8px 4px 10px; border-radius:12px; display:flex; align-items:center; gap:6px;}
+  .chip-row .chip .rm{cursor:pointer; color:#8f9ac2; font-size:11px;}
+
+  /* ==========================================================================
+     MODAL DIALOG — the popup that shows row details when you click a blue
+     "Operation" link (e.g. "View", "Risk Profile"). Content is generated
+     automatically from the table row's cells — see openModal() in the JS.
+  ========================================================================== */
+  .modal-overlay{position:fixed; inset:0; background:rgba(30,34,44,0.45); display:none; align-items:center; justify-content:center; z-index:200;}
+  .modal-overlay.show{display:flex;}
+  .modal-box{background:#fff; border-radius:6px; width:440px; max-width:90vw; max-height:80vh; overflow:auto; box-shadow:0 12px 32px rgba(0,0,0,0.2);}
+  .modal-head{display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--border-light);}
+  .modal-head h3{margin:0; font-size:14.5px; color:var(--text-dark);}
+  .modal-close{cursor:pointer; color:var(--text-light); font-size:16px; line-height:1;}
+  .modal-close:hover{color:var(--text-dark);}
+  .modal-body{padding:16px 18px;}
+  .modal-row{display:flex; justify-content:space-between; gap:16px; padding:8px 0; border-bottom:1px solid var(--border-light); font-size:12.5px;}
+  .modal-row:last-child{border-bottom:none;}
+  .modal-row .mk{color:var(--text-light);} /* field label, e.g. "Risk Score" */
+  .modal-row .mv{color:var(--text-dark); font-weight:600; text-align:right;} /* field value */
+
+  /* Toast — the small dark pop-up message at the bottom of the screen
+     (e.g. "Search applied — 3 matching results"). Triggered by showToast(). */
+  .toast{position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(10px); background:#2b2f38; color:#fff; padding:10px 18px; border-radius:4px; font-size:12.5px; opacity:0; pointer-events:none; transition:opacity .2s ease, transform .2s ease; z-index:300;}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  /* Top-bar dropdowns (bell / flag / user avatar) reuse the .dd-menu styles above,
+     just anchored to the right instead of the left. */
+  .topbar-dd{position:relative;}
+  .topbar .dd-menu{left:auto; right:0; top:calc(100% + 8px);}
+  .topbar .dd-menu li{color:var(--text-mid);}
+  .notif-item .nt{font-weight:600; color:var(--text-dark); display:block;}
+  .notif-item .nd{color:var(--text-light); font-size:11px;}
+
+  /* Shown instead of the AML panels when you click Menu / Personal center /
+     User Management in the sidebar — those sections aren't built out. */
+  .placeholder-view{padding:60px 24px; text-align:center; color:var(--text-light); font-size:13px;}
+  .placeholder-view b{display:block; color:var(--text-dark); font-size:15px; margin-bottom:8px;}
+
+  /* ==========================================================================
+     RED-FLAG RULE CARDS — the "Active Rules" list at the top of the Red Flag
+     Alerts tab, each with a toggle .switch on the right (click to enable/disable —
+     purely visual, see the "RULE TOGGLE SWITCHES" JS block).
+  ========================================================================== */
+  .rule-card{border:1px solid var(--border-light); border-radius:2px; padding:14px 16px; margin-bottom:10px; display:flex; align-items:center; gap:16px;}
+  .rule-card .ricon{width:34px; height:34px; border-radius:50%; background:#fdeaea; color:#e0463f; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0;}
+  .rule-card .rname{font-weight:700; font-size:13px; color:var(--text-dark);}
+  .rule-card .rdesc{font-size:12px; color:var(--text-mid); margin-top:2px;}
+  .rule-card .rmeta{margin-left:auto; text-align:right; font-size:11.5px; color:var(--text-light); white-space:nowrap;}
+  .switch{width:34px; height:19px; background:#2ba24c; border-radius:20px; position:relative; flex-shrink:0; cursor:pointer;} /* green = on */
+  .switch::after{content:''; position:absolute; width:15px; height:15px; background:#fff; border-radius:50%; top:2px; right:2px;}
+  .switch.off{background:#dcdfe6;} /* grey = off */
+  .switch.off::after{right:auto; left:2px;}
+
+  /* ==========================================================================
+     TABLE TOOLBAR EXTRAS — refresh button, bulk-select action bar,
+     sortable column headers, and the small risk-score bar in Risk Profiling
+  ========================================================================== */
+  .refresh-line{display:flex; align-items:center; gap:10px; font-size:11.5px; color:var(--text-light); margin:-2px 0 14px;}
+  .refresh-btn{
+    display:inline-flex; align-items:center; gap:5px; border:1px solid var(--border); border-radius:4px;
+    padding:5px 12px; font-size:12px; color:var(--text-mid); background:#fff; cursor:pointer;
+  }
+  .refresh-btn:hover{border-color:var(--blue); color:var(--blue-dark);}
+  .refresh-btn .spin{display:inline-block; transition:transform .5s ease;}
+  .refresh-btn.spinning .spin{transform:rotate(360deg);}
+
+  /* Sortable column headers (click a th with class="sortable" to sort that
+     column — see the "SORTABLE TABLE HEADERS" JS block for the logic). */
+  thead th.sortable{cursor:pointer; user-select:none;}
+  thead th.sortable:hover{color:var(--blue-dark);}
+  thead th.sortable .sort-ic{margin-left:4px; font-size:9px; color:var(--text-light);}
+  thead th.sortable.sorted-asc .sort-ic, thead th.sortable.sorted-desc .sort-ic{color:var(--blue-dark);}
+
+  /* Bulk-select action bar — appears above a table once one or more row
+     checkboxes are ticked. Buttons are just data-bulk="Label" — add a new
+     one in the HTML and it will automatically show a toast when clicked. */
+  .bulk-bar{
+    display:none; align-items:center; gap:14px;
+    background:#eaf2ff; border:1px solid #cfe1ff; border-radius:4px;
+    padding:9px 14px; margin-bottom:10px; font-size:12.5px; color:var(--blue-dark);
+  }
+  .bulk-bar.show{display:flex;}
+  .bulk-bar .bcount{font-weight:700;}
+  .bulk-bar .bactions{margin-left:auto; display:flex; gap:8px;}
+  .bulk-bar button{
+    border:1px solid #b7d3ff; background:#fff; color:var(--blue-dark); border-radius:4px;
+    padding:5px 12px; font-size:12px; cursor:pointer;
+  }
+  .bulk-bar button:hover{background:#dcebff;}
+  .bulk-bar .bclear{border:none; background:none; color:var(--text-light); cursor:pointer; text-decoration:underline;}
+
+  .rowchk, .headchk{accent-color:var(--blue); width:14px; height:14px; cursor:pointer;} /* row / select-all checkboxes */
+
+  /* small mini progress bar used next to the Risk Score badge in Risk Profiling */
+  .risk-bar-track{width:70px; height:5px; background:#f0f1f5; border-radius:3px; overflow:hidden; margin-top:5px;}
+  .risk-bar-fill{height:100%; border-radius:3px;}
+  .risk-bar-fill.low{background:#2ba24c;}
+  .risk-bar-fill.med{background:#c8890b;}
+  .risk-bar-fill.high{background:#e0463f;}
+  .risk-score-txt{font-size:11px; color:var(--text-light); margin-top:3px;}
+
+  /* (currently unused leftover from an earlier layout — safe to delete if unneeded) */
+  .compare-strip{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:2px 0 18px;}
+  .compare-card{border:1px solid var(--border-light); border-radius:2px; padding:12px 16px; background:#fafbfd;}
+  .compare-card .clabel{font-size:11px; color:var(--text-light); text-transform:uppercase; letter-spacing:.04em;}
+  .compare-card .cval{font-size:19px; font-weight:700; margin-top:4px; color:var(--text-dark);}
+  .compare-card .cbar{height:5px; background:#eef1f9; border-radius:3px; margin-top:9px; overflow:hidden;}
+  .compare-card .cbar i{display:block; height:100%; background:#e0463f;}
+
+  /* Invisible full-page click-catcher shown behind any open dropdown/tag-picker
+     so clicking anywhere outside reliably closes it (fixes dropdowns that would
+     otherwise silently block clicks on buttons underneath them). */
+  .dd-backdrop{position:fixed; inset:0; z-index:40; display:none;}
+  .dd-backdrop.show{display:block;}
+
+  /* "Select Tags" popup dialog used by the Risk Profiling "All Tags" filter
+     (a full modal instead of an inline dropdown, since the tag list is long) */
+  .tagpicker-list li{
+    list-style:none; display:flex; align-items:center; gap:9px;
+    padding:8px 10px; font-size:12.5px; color:var(--text-mid); cursor:pointer; border-radius:3px;
+  }
+  .tagpicker-list li:hover{background:#f0f6ff;}
+  .tagpicker-list li input{accent-color:var(--blue);}
+  .tagpicker-footer{padding:10px 18px; border-top:1px solid var(--border-light); text-align:right;}
+  .tagpicker-footer button{
+    background:var(--blue); color:#fff; border:none; border-radius:4px; padding:7px 18px; font-size:12.5px; cursor:pointer; font-weight:600;
+  }
+
+  /* ==========================================================================
+     PIE CHART / OVERVIEW CARDS — the "Overview — …" boxes with a pie + legend
+     on every tab. The pies are hand-drawn inline SVG (no chart library, no
+     internet needed) — see renderPie(...) near the bottom of the script.
+     .overview-row  = lays 2–3 .overview-card side by side (wraps on narrow screens)
+     EDIT the actual numbers where renderPie(...) is called at the bottom of
+     the <script>, NOT here — this only controls how the cards look.
+  ========================================================================== */
+  .overview-card{
+    display:flex; align-items:center; gap:22px;
+    border:1px solid var(--border-light); border-radius:2px; padding:16px 20px; margin-bottom:18px; background:#fafbfd;
+  }
+  .overview-card .pie-wrap{flex-shrink:0; width:150px; height:150px;} /* EDIT: change size (must match renderPie's r=70,cx=75,cy=75 → 150x150) */
+  .overview-card .pie-wrap svg{display:block;}
+  .overview-legend{display:flex; flex-direction:column; gap:7px; font-size:12.5px;}
+  .overview-legend .oi{display:flex; align-items:center; gap:8px;} /* one legend row: swatch + label + value */
+  .overview-legend .sw{width:10px; height:10px; border-radius:2px; flex-shrink:0;} /* color swatch */
+  .overview-legend .ov{margin-left:auto; font-weight:700; color:var(--text-dark); padding-left:14px;} /* the "1,234 (56%)" value */
+  .overview-legend .legend-title{font-size:11.5px; font-weight:700; color:var(--text-dark); margin-bottom:2px;}
+  .overview-title{font-size:11px; text-transform:uppercase; letter-spacing:.07em; color:var(--text-light); margin-bottom:8px;}
+  .overview-row{display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:14px; margin-bottom:4px;} /* holds 2+ cards side by side */
+  .overview-row .overview-card{margin-bottom:0;}
+
+  /* ==========================================================================
+     INNER SUB-TABS — used inside "Larget Amount Report" for the
+     Deposit statistics / Withdrawal statistics toggle (a tab bar nested
+     inside one sidebar tab). See "INNER TABS" in the JS for the switch logic.
+  ========================================================================== */
+  .inner-tabs{display:flex; border-bottom:1px solid var(--border); margin-bottom:18px;}
+  .inner-tab{
+    padding:11px 20px; font-size:13px; color:var(--text-mid); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px;
+  }
+  .inner-tab.active{color:var(--blue-dark); border-bottom-color:var(--blue-dark); font-weight:600;}
+  .inner-panel{display:none;}
+  .inner-panel.active{display:block;}
+  .threshold-note{ /* the red "Showing alerts > ₱500,000" pill */
+    display:inline-flex; align-items:center; gap:6px; background:var(--clay-100, #fdeaea); color:#e0463f;
+    font-size:11.5px; font-weight:600; padding:5px 12px; border-radius:20px; margin-bottom:14px;
+  }
+  tfoot td{font-weight:700; color:var(--text-dark); background:#fafbfd; border-top:1px solid var(--border);} /* the "Total" row */
+
+  /* ==========================================================================
+     KYC PROGRESS TRACKER — the 3-dot bar in "Periodic Updating of Users"
+     3 dots = 3 required consecutive daily updates.
+     .progress-dot        = not done yet (grey)
+     .progress-dot.done   = confirmed for that day (green)
+     .progress-dot.today  = due today (amber) — put this on the CURRENT day's dot
+  ========================================================================== */
+  .progress-track{display:flex; gap:4px; margin-top:4px;}
+  .progress-dot{width:16px; height:6px; border-radius:3px; background:#eceef3;}
+  .progress-dot.done{background:#2ba24c;}
+  .progress-dot.today{background:#c8890b;}
+  .progress-txt{font-size:11px; color:var(--text-light); margin-top:4px;} /* e.g. "Day 1 of 3 updated" */
+  .missing-list{display:flex; flex-wrap:wrap; gap:5px; max-width:210px;} /* red chips: "Valid ID", "Proof of Address"… */
+  .missing-list .chip{background:#fdeaea; color:#e0463f; font-size:10.5px; padding:2px 8px; border-radius:9px; white-space:nowrap;}
+</style>
+</head>
+<body>
+<!-- ============================================================================
+     BODY STRUCTURE
+     <div class="shell">                    2-column grid: sidebar + everything
+       <aside class="sidebar">              left nav — see markup below
+       <div> (right column)
+         <div class="topbar">               server time / bell / flag / user
+         <div class="content">              breadcrumb + one <div class="panel">
+                                             per tab (only one visible at a time)
+     Modals (.modal-overlay) and the toast live OUTSIDE .shell, as direct
+     children of <body>, so they can float above everything with z-index.
+============================================================================ -->
+<div class="shell">
+
+  <!-- ============================================================
+       SIDEBAR NAVIGATION
+       Top-level rows (Menu / Personal center / User Management / AML
+       Monitoring) — clicking one that isn't "AML Monitoring" shows the
+       .placeholder-view instead (see "TOP-LEVEL SIDEBAR NAV" in the script).
+       #railNav below is the list of AML Monitoring's tabs.
+  ============================================================ -->
+  <aside class="sidebar">
+    <div class="side-item" id="navMenu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#4098fc" stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+      Menu
+    </div>
+    <div class="side-item" id="navPersonal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#606266" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+      Personal center
+    </div>
+    <div class="side-item" id="navUserMgmt">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#606266" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><circle cx="17.5" cy="9" r="2.6"/><path d="M15 14.3c2.6.3 5 2 5 5.2"/></svg>
+      User Management
+      <span class="chev">›</span>
+    </div>
+    <div class="side-item top-active" id="navAml">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#2f86f0" stroke-width="2"><path d="M4 20V10"/><path d="M11 20V4"/><path d="M18 20v-7"/></svg>
+      AML Monitoring
+      <span class="chev">⌄</span>
+    </div>
+    <!-- TAB LIST — each data-target must exactly match a <div class="panel" id="..."> below.
+         Order here = order in the sidebar. To add a tab, add a new <li> AND a new panel. -->
+    <ul class="sub-list" id="railNav">
+      <li class="sub-item active" data-target="players"><span class="tri">▸</span>Total Number of Players</li>
+      <li class="sub-item" data-target="risk"><span class="tri">▸</span>Risk Profiling Tab</li>
+      <li class="sub-item" data-target="acctstatus"><span class="tri">▸</span>Account Status Tab</li>
+      <li class="sub-item" data-target="txn"><span class="tri">▸</span>Daily Transaction Monitoring</li>
+      <li class="sub-item" data-target="redflag"><span class="tri">▸</span>Red Flag Alerts</li>
+      <li class="sub-item" data-target="bigamount"><span class="tri">▸</span>Larget Amount Report</li>
+      <li class="sub-item" data-target="kycupdate"><span class="tri">▸</span>Periodic Updating of Users</li>
+    </ul>
+  </aside>
+
+  <!-- ============================================================
+       RIGHT COLUMN: top bar + all tab content
+  ============================================================ -->
+  <div>
+    <!-- TOP BAR: server clock (static text, not a real clock) + 3 dropdown menus -->
+    <div class="topbar">
+      <div class="servertime">Server Time： <span id="clock">2026/08/12 17:16:29 +08:00</span></div>
+      <div class="topbar-dd" id="ddBell">
+        <div class="icon-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#606266" stroke-width="2"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>
+          <span class="badge-count" id="bellCount">4</span>
+        </div>
+        <ul class="dd-menu" style="min-width:240px;">
+          <li class="notif-item"><span class="nt">High-risk threshold hit</span><span class="nd">okbet3119j7kbs crossed ₱400,000 — 12 min ago</span></li>
+          <li class="notif-item"><span class="nt">New EDD tag applied</span><span class="nd">Player tagged PENDING EDD — 1 hr ago</span></li>
+          <li class="notif-item"><span class="nt">Account frozen</span><span class="nd">Repeat account attempt detected — 3 hrs ago</span></li>
+          <li class="notif-item"><span class="nt">Structuring pattern flagged</span><span class="nd">4 deposits under threshold — 5 hrs ago</span></li>
+        </ul>
+      </div>
+      <div class="topbar-dd" id="ddFlag">
+        <span class="flag" style="cursor:pointer;">🇺🇸</span>
+        <ul class="dd-menu"><li>🇺🇸 English</li><li>🇵🇭 Filipino</li><li>🇨🇳 中文</li></ul>
+      </div>
+      <div class="topbar-dd" id="ddUser">
+        <div class="user-chip" style="cursor:pointer;"><span class="avatar"></span>TOJOSHUA <span style="font-size:10px;">▾</span></div>
+        <ul class="dd-menu"><li>My Profile</li><li>Account Settings</li><li>Log Out</li></ul>
+      </div>
+    </div>
+
+    <!-- CONTENT AREA — breadcrumb + blue tab pill are both rewritten by JS on
+         every tab click (see "SIDEBAR TAB SWITCHING"); the text below is just
+         the default shown before any click happens. -->
+    <div class="content" id="amlContent">
+      <div class="breadcrumb"><span>Location</span><span class="sep">›</span><span class="current" id="crumbTxt">AML Monitoring / Total Number of Players</span></div>
+      <div class="tag-row" style="margin:14px 0;">
+        <span class="tab-tag" id="tabTag">Total Number of Players <span class="x">✕</span></span>
+      </div>
+
+      <!-- ================================================================
+           TAB 1 / 7 — TOTAL NUMBER OF PLAYERS
+           Filters: Status, Nation, Register date range, Username search
+           Extras: population stat cards, 2 pie charts, full player table
+      ================================================================ -->
+      <div class="panel active" id="players">
+        <div class="filter-panel">
+          <!-- Each .fctrl below is a filter control. Ones with data-options="A|B|C"
+               become a dropdown; ones with a .range-sep child become a date range;
+               plain ones become a text search box. data-fcol says WHICH table
+               column (counting from 0, checkbox column included) it filters
+               against, and data-fmatch says HOW (contains / nation / daterange / tags / txntype).
+               See "GENERIC ROW FILTERING" in the script for the full logic. -->
+          <div class="filter-row">
+            <div class="fctrl" data-options="All Status|Under Review|Normal|Freeze|Deactivate|Deleted|banBet|Temporarily frozen|ndrp frozen" data-fcol="6" data-fmatch="contains">All Status<span class="caret">⌄</span></div>
+            <div class="fctrl" data-options="All Nation|Local (Philippines)|Foreign" data-fcol="5" data-fmatch="nation">All Nation<span class="caret">⌄</span></div>
+            <div class="fctrl wide" data-fcol="7" data-fmatch="daterange"><span class="ic">📅</span>Register Start Time<span class="range-sep">~</span>Register End Time</div>
+            <div class="fctrl wide placeholder" data-fcol="3" data-fmatch="contains">Username / Member ID<span class="caret"></span></div>
+          </div>
+          <div class="filter-actions">
+            <label class="checkline"><input type="checkbox" checked>Filter Test Users</label>
+            <button class="search-btn" data-filter-panel="players">Search</button>
+            <button class="btn-outline" id="exportPlayers">⬇ Export to Excel</button>
+          </div>
+        </div>
+
+        <div class="section-title">Population Summary</div>
+        <div class="stat-strip">
+          <div class="stat-box"><div class="slabel">Total Registered Players</div><div class="sval">500,000</div></div>
+          <div class="stat-box"><div class="slabel">Foreign</div><div class="sval">64,500</div><div class="sdelta">13% of registered</div></div>
+          <div class="stat-box"><div class="slabel">Local</div><div class="sval">435,500</div><div class="sdelta">87% of registered</div></div>
+          <div class="stat-box"><div class="slabel">Total Active</div><div class="sval">150,000</div><div class="sdelta">30% of registered</div></div>
+          <div class="stat-box"><div class="slabel">Newly Registered (3 mo)</div><div class="sval">18,240</div><div class="sdelta">▲ last 90 days</div></div>
+        </div>
+
+        <div class="overview-title">Overview — Population Statistics</div>
+        <div class="overview-row">
+          <div class="overview-card">
+            <div id="piePlayers" class="pie-wrap"></div>
+            <div class="overview-legend" id="legendPlayers"></div>
+          </div>
+          <div class="overview-card">
+            <div id="piePlayersActive" class="pie-wrap"></div>
+            <div class="overview-legend" id="legendPlayersActive"></div>
+          </div>
+        </div>
+
+        <div class="section-title">Player List</div>
+        <div class="refresh-line">
+          <button class="refresh-btn" data-refresh><span class="spin">⟳</span> Refresh</button>
+          <span>Last updated: <span class="lastupdate">2026-08-12 17:16:29</span></span>
+        </div>
+        <div class="bulk-bar" id="bulkPlayers">
+          <span><span class="bcount">0</span> selected</span>
+          <div class="bactions">
+            <button data-bulk="Tag">Add Tag</button>
+            <button data-bulk="Freeze">Freeze Accounts</button>
+            <button data-bulk="Export Selected">Export Selected</button>
+          </div>
+          <span class="bclear">Clear</span>
+        </div>
+        <div class="table-scroll">
+          <table id="tablePlayers">
+            <thead><tr>
+              <th style="width:32px;"><input type="checkbox" class="headchk" data-group="players"></th>
+              <th>Online</th><th>Photo</th>
+              <th class="sortable" data-sort="text">Member Information <span class="sort-ic">⇅</span></th>
+              <th>Category</th><th class="sortable" data-sort="text">Nation <span class="sort-ic">⇅</span></th>
+              <th>Account Status</th>
+              <th class="sortable" data-sort="date">Register Time <span class="sort-ic">⇅</span></th>
+              <th>KYC Status</th><th>User Tags</th><th>Operation</th>
+            </tr></thead>
+            <tbody>
+              <tr>
+                <td><input type="checkbox" class="rowchk" data-group="players"></td>
+                <td><span class="badge on">Online</span></td>
+                <td><div class="photo-ph">👤</div></td>
+                <td class="member-cell">
+                  Member ID：<b>28993380</b><br>
+                  User Name：<b>okbet3119j7kbs</b><br>
+                  Real Name：ANALYN DOMINGO MANLINO<br>
+                  Nickname：ok***bs<br>
+                  device：Android<br>
+                  Betting station code：Pasay001
+                </td>
+                <td>Default<br>VIP2</td>
+                <td>Philippines <span class="red">●</span></td>
+                <td><span class="badge low">Normal</span></td>
+                <td>2026-07-18 11:51</td>
+                <td><span class="badge low">Fully Verify</span></td>
+                <td><div class="taglist"><span class="chip">KYC Passed</span><span class="chip">EDD COMPLETED</span></div></td>
+                <td><span class="op-link">Funding Details</span><span class="op-link">Bet Details</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="rowchk" data-group="players"></td>
+                <td><span class="badge off">Offline</span></td>
+                <td><div class="photo-ph">👤</div></td>
+                <td class="member-cell">
+                  Member ID：<b>29104512</b><br>
+                  User Name：<b>ph_lchen21</b><br>
+                  Real Name：LI CHEN<br>
+                  Nickname：li***21<br>
+                  device：iOS<br>
+                  Betting station code：Makati004
+                </td>
+                <td>Default<br>Standard</td>
+                <td>China <span class="red">●</span></td>
+                <td><span class="badge low">Normal</span></td>
+                <td>2026-05-02 09:14</td>
+                <td><span class="badge med">Pending Review</span></td>
+                <td><div class="taglist"><span class="chip">PENDING VCKYC</span></div></td>
+                <td><span class="op-link">Funding Details</span><span class="op-link">Bet Details</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="rowchk" data-group="players"></td>
+                <td><span class="badge off">Offline</span></td>
+                <td><div class="photo-ph">👤</div></td>
+                <td class="member-cell">
+                  Member ID：<b>27788013</b><br>
+                  User Name：<b>r.torres01</b><br>
+                  Real Name：RICARDO TORRES<br>
+                  Nickname：r***01<br>
+                  device：Android<br>
+                  Betting station code：QC012
+                </td>
+                <td>Default<br>Standard</td>
+                <td>Philippines <span class="red">●</span></td>
+                <td><span class="badge off">Deactivate</span></td>
+                <td>2024-06-30 08:20</td>
+                <td><span class="badge high">Not certified</span></td>
+                <td><div class="taglist"><span class="chip">INTERNAL TEST ACCOUNT</span></div></td>
+                <td><span class="op-link">Funding Details</span><span class="op-link">Bet Details</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="rowchk" data-group="players"></td>
+                <td><span class="badge on">Online</span></td>
+                <td><div class="photo-ph">👤</div></td>
+                <td class="member-cell">
+                  Member ID：<b>30021144</b><br>
+                  User Name：<b>michael.uy</b><br>
+                  Real Name：MICHAEL UY<br>
+                  Nickname：mi***uy<br>
+                  device：Android<br>
+                  Betting station code：Cebu009
+                </td>
+                <td>Default<br>VIP1</td>
+                <td>Philippines <span class="red">●</span></td>
+                <td><span class="badge low">Normal</span></td>
+                <td>2026-06-11 14:02</td>
+                <td><span class="badge med">Pending Review</span></td>
+                <td><div class="taglist"><span class="chip">PENDING EDD</span></div></td>
+                <td><span class="op-link">Funding Details</span><span class="op-link">Bet Details</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="rowchk" data-group="players"></td>
+                <td><span class="badge off">Offline</span></td>
+                <td><div class="photo-ph">👤</div></td>
+                <td class="member-cell">
+                  Member ID：<b>31207765</b><br>
+                  User Name：<b>k.torres</b><br>
+                  Real Name：KAREN TORRES<br>
+                  Nickname：k***rs<br>
+                  device：iOS<br>
+                  Betting station code：Pasig002
+                </td>
+                <td>Default<br>Standard</td>
+                <td>Philippines <span class="red">●</span></td>
+                <td><span class="badge low">Normal</span></td>
+                <td>2026-04-27 17:38</td>
+                <td><span class="badge low">Verified</span></td>
+                <td><div class="taglist"><span class="chip">No Label</span></div></td>
+                <td><span class="op-link">Funding Details</span><span class="op-link">Bet Details</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="rowchk" data-group="players"></td>
+                <td><span class="badge off">Offline</span></td>
+                <td><div class="photo-ph">👤</div></td>
+                <td class="member-cell">
+                  Member ID：<b>26610234</b><br>
+                  User Name：<b>d.fernandez</b><br>
+                  Real Name：DIEGO FERNANDEZ<br>
+                  Nickname：di***ez<br>
+                  device：Android<br>
+                  Betting station code：Taguig007
+                </td>
+                <td>Default<br>Standard</td>
+                <td>Philippines <span class="red">●</span></td>
+                <td><span class="badge high">Freeze</span></td>
+                <td>2025-11-03 08:55</td>
+                <td><span class="badge high">Authentication Failed</span></td>
+                <td><div class="taglist"><span class="chip">RESTRICTED PLAYER (FRAUDULENT DOCUMENTS)</span></div></td>
+                <td><span class="op-link">Funding Details</span><span class="op-link">Bet Details</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="pager">
+            <span class="total-txt">Total 500,000</span>
+            <div class="pagesize" data-options="10/page|20/page|50/page|100/page">10/page <span class="caret">⌄</span></div>
+            <div class="pages" data-group="players"><span class="arrow">‹</span><span class="num active">1</span><span class="num">2</span><span class="num">3</span><span class="arrow">›</span></div>
+            <div class="goto">Go to <input value="1"></div>
+          </div>
+        </div>
+      </div>
+
+            <!-- ================================================================
+           TAB 2 / 7 — RISK PROFILING TAB (Risk Assessment + EDD combined)
+           Filters: KYC Status, All Tags (multi-select popup), Risk Level, Username
+           Extras: risk distribution stat cards, 2 pie charts, risk-score bar per row
+      ================================================================ -->
+      <div class="panel" id="risk">
+        <p style="font-size:12.5px; color:var(--text-mid); margin:0 0 14px;">Combines Risk Assessment and EDD Monitoring — filter by KYC Status and Tags to see how a player's risk profile was built.</p>
+        <div class="filter-panel">
+          <div class="filter-row">
+            <div class="fctrl" data-options="kyc Status|Not certified|Verified|Pending|Additional Info|Pending Review|Incomplete Info|Authentication Failed|Fully Verify" data-fcol="4" data-fmatch="contains">kyc Status<span class="caret">⌄</span></div>
+            <div class="fctrl" id="tagFilterRisk" data-fcol="5" data-fmatch="tags">All Tags<span class="caret">⌄</span></div>
+            <div class="fctrl" data-options="Risk Level|Low Risk|Medium Risk|High Risk" data-fcol="3" data-fmatch="contains">Risk Level<span class="caret">⌄</span></div>
+            <div class="fctrl wide placeholder" data-fcol="2" data-fmatch="contains">Username / Member ID<span class="caret"></span></div>
+          </div>
+          <div class="chip-row" id="tagChipsRisk"></div>
+          <div class="filter-actions">
+            <label class="checkline"><input type="checkbox" checked>Filter Test Users</label>
+            <button class="search-btn" data-filter-panel="risk">Search</button>
+            <button class="btn-outline" id="exportRisk">⬇ Export to Excel</button>
+          </div>
+        </div>
+
+        <div class="section-title">Risk Distribution</div>
+        <div class="stat-strip">
+          <div class="stat-box"><div class="slabel">Low Risk</div><div class="sval">120,000</div><div class="sdelta">80%</div></div>
+          <div class="stat-box"><div class="slabel">Medium Risk</div><div class="sval">25,000</div><div class="sdelta">17%</div></div>
+          <div class="stat-box"><div class="slabel">High Risk</div><div class="sval">5,000</div><div class="sdelta down">3%</div></div>
+          <div class="stat-box"><div class="slabel">Under EDD</div><div class="sval">1,240</div></div>
+        </div>
+
+        <div class="overview-title">Overview — Risk &amp; EDD Statistics</div>
+        <div class="overview-row">
+          <div class="overview-card">
+            <div id="pieRisk" class="pie-wrap"></div>
+            <div class="overview-legend" id="legendRisk"></div>
+          </div>
+          <div class="overview-card">
+            <div id="pieRiskEdd" class="pie-wrap"></div>
+            <div class="overview-legend" id="legendRiskEdd"></div>
+          </div>
+        </div>
+
+        <div class="section-title">Player Risk Profiles</div>
+        <div class="refresh-line">
+          <button class="refresh-btn" data-refresh><span class="spin">⟳</span> Refresh</button>
+          <span>Last updated: <span class="lastupdate">2026-08-12 17:16:29</span></span>
+        </div>
+        <div class="bulk-bar" id="bulkRisk">
+          <span><span class="bcount">0</span> selected</span>
+          <div class="bactions">
+            <button data-bulk="Escalate to EDD">Escalate to EDD</button>
+            <button data-bulk="Add Tag">Add Tag</button>
+            <button data-bulk="Export Selected">Export Selected</button>
+          </div>
+          <span class="bclear">Clear</span>
+        </div>
+        <div class="table-scroll">
+          <table id="tableRisk">
+            <thead><tr>
+              <th style="width:32px;"><input type="checkbox" class="headchk" data-group="risk"></th>
+              <th>Photo</th><th class="sortable" data-sort="text">Member Information <span class="sort-ic">⇅</span></th>
+              <th class="sortable" data-sort="number">Risk Score <span class="sort-ic">⇅</span></th>
+              <th>KYC Status</th>
+              <th>Tags</th><th>EDD Status</th><th>Last Assessed</th><th>Operation</th>
+            </tr></thead>
+            <tbody>
+              <tr>
+                <td><input type="checkbox" class="rowchk" data-group="risk"></td>
+                <td><div class="photo-ph">👤</div></td>
+                <td class="member-cell">Member ID：<b>28993380</b><br>User Name：<b>okbet3119j7kbs</b><br>Real Name：ANALYN DOMINGO MANLINO</td>
+                <td data-val="82"><span class="badge high">High Risk</span><div class="risk-bar-track"><div class="risk-bar-fill high" style="width:82%"></div></div><div class="risk-score-txt">82 / 100</div></td>
+                <td><span class="badge low">Fully Verify</span></td>
+                <td><div class="taglist"><span class="chip">KYC Passed</span><span class="chip">EDD COMPLETED</span><span class="chip">VVIP</span></div></td>
+                <td><span class="badge low">EDD Completed</span></td>
+                <td>2026-08-05</td>
+                <td><span class="op-link">Risk Profile</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="rowchk" data-group="risk"></td>
+                <td><div class="photo-ph">👤</div></td>
+                <td class="member-cell">Member ID：<b>30021144</b><br>User Name：<b>michael.uy</b><br>Real Name：MICHAEL UY</td>
+                <td data-val="54"><span class="badge med">Medium Risk</span><div class="risk-bar-track"><div class="risk-bar-fill med" style="width:54%"></div></div><div class="risk-score-txt">54 / 100</div></td>
+                <td><span class="badge med">Pending Review</span></td>
+                <td><div class="taglist"><span class="chip">PENDING EDD</span><span class="chip">SUSPICIOUS BETTING BEHAVIOUR</span></div></td>
+                <td><span class="badge high">Pending EDD</span></td>
+                <td>2026-08-10</td>
+                <td><span class="op-link">Risk Profile</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="rowchk" data-group="risk"></td>
+                <td><div class="photo-ph">👤</div></td>
+                <td class="member-cell">Member ID：<b>25510983</b><br>User Name：<b>k.torres</b><br>Real Name：KAREN TORRES</td>
+                <td data-val="18"><span class="badge low">Low Risk</span><div class="risk-bar-track"><div class="risk-bar-fill low" style="width:18%"></div></div><div class="risk-score-txt">18 / 100</div></td>
+                <td><span class="badge low">Verified</span></td>
+                <td><div class="taglist"><span class="chip">No Label</span></div></td>
+                <td><span class="badge neutral">Not Applicable</span></td>
+                <td>2026-07-30</td>
+                <td><span class="op-link">Risk Profile</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="rowchk" data-group="risk"></td>
+                <td><div class="photo-ph">👤</div></td>
+                <td class="member-cell">Member ID：<b>26610234</b><br>User Name：<b>d.fernandez</b><br>Real Name：DIEGO FERNANDEZ</td>
+                <td data-val="91"><span class="badge high">High Risk</span><div class="risk-bar-track"><div class="risk-bar-fill high" style="width:91%"></div></div><div class="risk-score-txt">91 / 100</div></td>
+                <td><span class="badge high">Authentication Failed</span></td>
+                <td><div class="taglist"><span class="chip">RESTRICTED PLAYER (FRAUDULENT DOCUMENTS)</span></div></td>
+                <td><span class="badge high">Pending EDD</span></td>
+                <td>2026-08-11</td>
+                <td><span class="op-link">Risk Profile</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="rowchk" data-group="risk"></td>
+                <td><div class="photo-ph">👤</div></td>
+                <td class="member-cell">Member ID：<b>29104512</b><br>User Name：<b>ph_lchen21</b><br>Real Name：LI CHEN</td>
+                <td data-val="47"><span class="badge med">Medium Risk</span><div class="risk-bar-track"><div class="risk-bar-fill med" style="width:47%"></div></div><div class="risk-score-txt">47 / 100</div></td>
+                <td><span class="badge med">Pending Review</span></td>
+                <td><div class="taglist"><span class="chip">PENDING VCKYC</span></div></td>
+                <td><span class="badge neutral">Not Applicable</span></td>
+                <td>2026-08-09</td>
+                <td><span class="op-link">Risk Profile</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="pager">
+            <span class="total-txt">Total 150,000</span>
+            <div class="pagesize" data-options="10/page|20/page|50/page|100/page">10/page <span class="caret">⌄</span></div>
+            <div class="pages" data-group="risk"><span class="arrow">‹</span><span class="num active">1</span><span class="num">2</span><span class="num">3</span><span class="arrow">›</span></div>
+            <div class="goto">Go to <input value="1"></div>
+          </div>
+        </div>
+      </div>
+
+            <!-- ================================================================
+           TAB 3 / 7 — ACCOUNT STATUS TAB
+           Filters: Status, Status-change date range, Username
+           Extras: status stat cards, 2 pie charts
+      ================================================================ -->
+      <div class="panel" id="acctstatus">
+        <div class="filter-panel">
+          <div class="filter-row">
+            <div class="fctrl" data-options="All Status|Under Review|Normal|Freeze|Deactivate|Deleted|banBet|Temporarily frozen|ndrp frozen" data-fcol="3" data-fmatch="contains">All Status<span class="caret">⌄</span></div>
+            <div class="fctrl wide" data-fcol="5" data-fmatch="daterange"><span class="ic">📅</span>Status Change Start<span class="range-sep">~</span>Status Change End</div>
+            <div class="fctrl wide placeholder" data-fcol="2" data-fmatch="contains">Username / Member ID<span class="caret"></span></div>
+          </div>
+          <div class="filter-actions">
+            <label class="checkline"><input type="checkbox" checked>Filter Test Users</label>
+            <button class="search-btn" data-filter-panel="acctstatus">Search</button>
+            <button class="btn-outline" id="exportAcct">⬇ Export to Excel</button>
+          </div>
+        </div>
+
+        <div class="stat-strip">
+          <div class="stat-box"><div class="slabel">Normal</div><div class="sval">486,210</div></div>
+          <div class="stat-box"><div class="slabel">Under Review</div><div class="sval">1,340</div></div>
+          <div class="stat-box"><div class="slabel">Freeze</div><div class="sval">214</div></div>
+          <div class="stat-box"><div class="slabel">Deactivate</div><div class="sval">1,088</div></div>
+          <div class="stat-box"><div class="slabel">banBet</div><div class="sval">522</div></div>
+        </div>
+
+        <div class="overview-title">Overview — Account Status Statistics</div>
+        <div class="overview-row">
+          <div class="overview-card">
+            <div id="pieAcct" class="pie-wrap"></div>
+            <div class="overview-legend" id="legendAcct"></div>
+          </div>
+          <div class="overview-card">
+            <div id="pieAcctRestricted" class="pie-wrap"></div>
+            <div class="overview-legend" id="legendAcctRestricted"></div>
+          </div>
+        </div>
+
+        <div class="refresh-line">
+          <button class="refresh-btn" data-refresh><span class="spin">⟳</span> Refresh</button>
+          <span>Last updated: <span class="lastupdate">2026-08-12 17:16:29</span></span>
+        </div>
+        <div class="bulk-bar" id="bulkAcct">
+          <span><span class="bcount">0</span> selected</span>
+          <div class="bactions">
+            <button data-bulk="Restore to Normal">Restore to Normal</button>
+            <button data-bulk="Freeze">Freeze</button>
+            <button data-bulk="Export Selected">Export Selected</button>
+          </div>
+          <span class="bclear">Clear</span>
+        </div>
+        <div class="table-scroll">
+          <table id="tableAcct">
+            <thead><tr>
+              <th style="width:32px;"><input type="checkbox" class="headchk" data-group="acct"></th>
+              <th>Photo</th><th class="sortable" data-sort="text">Member Information <span class="sort-ic">⇅</span></th>
+              <th>Account Status</th><th>Reason</th>
+              <th class="sortable" data-sort="date">Status Since <span class="sort-ic">⇅</span></th><th>Operation</th>
+            </tr></thead>
+            <tbody>
+              <tr>
+                <td><input type="checkbox" class="rowchk" data-group="acct"></td>
+                <td><div class="photo-ph">👤</div></td>
+                <td class="member-cell">Member ID：<b>27788013</b><br>User Name：<b>r.torres01</b><br>Real Name：RICARDO TORRES</td>
+                <td><span class="badge off">Deactivate</span></td>
+                <td>Failed EDD document check</td>
+                <td>2026-08-08</td>
+                <td><span class="op-link">View</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="rowchk" data-group="acct"></td>
+                <td><div class="photo-ph">👤</div></td>
+                <td class="member-cell">Member ID：<b>26610234</b><br>User Name：<b>d.fernandez</b><br>Real Name：DIEGO FERNANDEZ</td>
+                <td><span class="badge high">Freeze</span></td>
+                <td>AMLA order</td>
+                <td>2026-08-09</td>
+                <td><span class="op-link">View</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="rowchk" data-group="acct"></td>
+                <td><div class="photo-ph">👤</div></td>
+                <td class="member-cell">Member ID：<b>24901187</b><br>User Name：<b>p.aquino</b><br>Real Name：PAOLO AQUINO</td>
+                <td><span class="badge med">Under Review</span></td>
+                <td>Suspicious structuring pattern</td>
+                <td>2026-08-06</td>
+                <td><span class="op-link">View</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="rowchk" data-group="acct"></td>
+                <td><div class="photo-ph">👤</div></td>
+                <td class="member-cell">Member ID：<b>22190456</b><br>User Name：<b>j.bautista</b><br>Real Name：JERICHO BAUTISTA</td>
+                <td><span class="badge off">banBet</span></td>
+                <td>Bonus abuse pattern confirmed</td>
+                <td>2026-07-28</td>
+                <td><span class="op-link">View</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="rowchk" data-group="acct"></td>
+                <td><div class="photo-ph">👤</div></td>
+                <td class="member-cell">Member ID：<b>28844021</b><br>User Name：<b>s.delrosario</b><br>Real Name：SOFIA DEL ROSARIO</td>
+                <td><span class="badge neutral">Temporarily frozen</span></td>
+                <td>Pending re-verification of ID</td>
+                <td>2026-08-01</td>
+                <td><span class="op-link">View</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="pager">
+            <span class="total-txt">Total 3,164</span>
+            <div class="pagesize" data-options="10/page|20/page|50/page|100/page">10/page <span class="caret">⌄</span></div>
+            <div class="pages" data-group="acctstatus"><span class="arrow">‹</span><span class="num active">1</span><span class="num">2</span><span class="arrow">›</span></div>
+            <div class="goto">Go to <input value="1"></div>
+          </div>
+        </div>
+      </div>
+
+            <!-- ================================================================
+           TAB 4 / 7 — DAILY TRANSACTION MONITORING
+           Filters: Date range, Username, Transaction Type
+           Sample rows are modeled on an uploaded real deposit/withdrawal
+           summary spreadsheet (see the code comment near the table below).
+           Extras: 3 pie charts (volume / order count / top depositors)
+      ================================================================ -->
+      <div class="panel" id="txn">
+        <p style="font-size:12.5px; color:var(--text-mid); margin:0 0 14px;">Every player's transaction activity for a chosen date range — count and sum of amount per username. Sample data modeled on DAILY_FUNDS_TRANSACTIONS_GLIFEOKPLAY_02_24_2026.</p>
+        <div class="filter-panel">
+          <div class="filter-row">
+            <div class="fctrl wide" data-fcol="6" data-fmatch="daterange"><span class="ic">📅</span>Start Date<span class="range-sep">~</span>End Date</div>
+            <div class="fctrl wide placeholder" data-fcol="0" data-fmatch="contains">Username / Member ID<span class="caret"></span></div>
+            <div class="fctrl" data-options="Transaction Type|Deposit|Withdrawal|Transfer|Bonus" data-fcol="2,4" data-fmatch="txntype">Transaction Type<span class="caret">⌄</span></div>
+          </div>
+          <div class="filter-actions">
+            <label class="checkline"><input type="checkbox" checked>Filter Test Users</label>
+            <button class="search-btn" data-filter-panel="txn">Search</button>
+            <button class="btn-outline" id="exportTxn">⬇ Export to Excel</button>
+          </div>
+        </div>
+
+        <div class="overview-title">Overview — Today's Order Records</div>
+        <div class="overview-row">
+          <div class="overview-card">
+            <div id="pieTxn" class="pie-wrap"></div>
+            <div class="overview-legend" id="legendTxn"></div>
+          </div>
+          <div class="overview-card">
+            <div id="pieTxnCount" class="pie-wrap"></div>
+            <div class="overview-legend" id="legendTxnCount"></div>
+          </div>
+          <div class="overview-card">
+            <div id="pieTxnTop" class="pie-wrap"></div>
+            <div class="overview-legend" id="legendTxnTop"></div>
+          </div>
+        </div>
+
+        <div class="refresh-line">
+          <button class="refresh-btn" data-refresh><span class="spin">⟳</span> Refresh</button>
+          <span>Last updated: <span class="lastupdate">2026-02-24 23:59:59</span></span>
+        </div>
+        <div class="table-scroll">
+          <table id="tableTxn">
+            <thead><tr>
+              <th class="sortable" data-sort="text">Username <span class="sort-ic">⇅</span></th><th>Member ID</th>
+              <th class="sortable" data-sort="number">Count of Deposit <span class="sort-ic">⇅</span></th>
+              <th class="sortable" data-sort="number">Sum of Deposit <span class="sort-ic">⇅</span></th>
+              <th class="sortable" data-sort="number">Count of Withdrawal <span class="sort-ic">⇅</span></th>
+              <th class="sortable" data-sort="number">Sum of Withdrawal <span class="sort-ic">⇅</span></th><th>Date</th>
+            </tr></thead>
+            <tbody>
+              <tr><td>gc702515393</td><td>PLY-702515393</td><td>8</td><td>₱156,000.00</td><td>4</td><td>₱160,000.00</td><td>2026-02-24</td></tr>
+              <tr><td>gc243874633</td><td>PLY-243874633</td><td>0</td><td>₱0.00</td><td>9</td><td>₱176,200.00</td><td>2026-02-24</td></tr>
+              <tr><td>gc448105185</td><td>PLY-448105185</td><td>27</td><td>₱72,000.00</td><td>13</td><td>₱63,070.00</td><td>2026-02-24</td></tr>
+              <tr><td>gc818633144</td><td>PLY-818633144</td><td>3</td><td>₱57,000.00</td><td>2</td><td>₱90,271.00</td><td>2026-02-24</td></tr>
+              <tr><td>gc388827558</td><td>PLY-388827558</td><td>11</td><td>₱45,000.00</td><td>3</td><td>₱80,000.00</td><td>2026-02-24</td></tr>
+              <tr><td>gc379002082</td><td>PLY-379002082</td><td>8</td><td>₱75,000.00</td><td>2</td><td>₱59,050.00</td><td>2026-02-24</td></tr>
+            </tbody>
+          </table>
+          <div class="pager">
+            <span class="total-txt">Total 80,726</span>
+            <div class="pagesize" data-options="10/page|20/page|50/page|100/page">10/page <span class="caret">⌄</span></div>
+            <div class="pages" data-group="txn"><span class="arrow">‹</span><span class="num active">1</span><span class="num">2</span><span class="num">3</span><span class="arrow">›</span></div>
+            <div class="goto">Go to <input value="1"></div>
+          </div>
+        </div>
+      </div>
+
+            <!-- ================================================================
+           TAB 5 / 7 — RED FLAG ALERTS
+           Top: editable "rule cards" with an on/off .switch (visual only —
+           doesn't actually change which rows show as flagged).
+           Filters: Severity, Rule, Date range, Username
+           Extras: 2 pie charts (by severity / by rule type)
+      ================================================================ -->
+      <div class="panel" id="redflag">
+        <p style="font-size:12.5px; color:var(--text-mid); margin:0 0 14px;">Automated alerts generated whenever a player's activity trips a predefined rule — no manual scanning required.</p>
+
+        <div class="overview-title">Overview — Alert Statistics</div>
+        <div class="overview-row">
+          <div class="overview-card">
+            <div id="pieRedflag" class="pie-wrap"></div>
+            <div class="overview-legend" id="legendRedflag"></div>
+          </div>
+          <div class="overview-card">
+            <div id="pieRedflagRule" class="pie-wrap"></div>
+            <div class="overview-legend" id="legendRedflagRule"></div>
+          </div>
+        </div>
+
+        <div class="section-title">Active Rules</div>
+        <div class="rule-card">
+          <div class="ricon">⚑</div>
+          <div>
+            <div class="rname">High-Value Threshold — Single Player</div>
+            <div class="rdesc">Flag when a player's cumulative transactions exceed ₱400,000 within 24 hours.</div>
+          </div>
+          <div class="rmeta">Triggered 6x today</div>
+          <div class="switch"></div>
+        </div>
+        <div class="rule-card">
+          <div class="ricon">⚑</div>
+          <div>
+            <div class="rname">Structuring Pattern</div>
+            <div class="rdesc">Flag 3+ deposits just under the reporting threshold within 48 hours.</div>
+          </div>
+          <div class="rmeta">Triggered 2x today</div>
+          <div class="switch"></div>
+        </div>
+        <div class="rule-card">
+          <div class="ricon">⚑</div>
+          <div>
+            <div class="rname">Rapid Deposit–Withdrawal Cycling</div>
+            <div class="rdesc">Flag when funds are withdrawn within 10 minutes of a deposit, 5+ times in a week.</div>
+          </div>
+          <div class="rmeta">Triggered 3x today</div>
+          <div class="switch off"></div>
+        </div>
+        <div class="rule-card">
+          <div class="ricon">⚑</div>
+          <div>
+            <div class="rname">Dormant Account Reactivation</div>
+            <div class="rdesc">Flag when a player inactive for 6+ months deposits more than ₱50,000 within 24 hours of reactivating.</div>
+          </div>
+          <div class="rmeta">Triggered 1x today</div>
+          <div class="switch"></div>
+        </div>
+
+        <div class="filter-panel" style="margin-top:20px;">
+          <div class="filter-row">
+            <div class="fctrl" data-options="All Severity|High|Medium|Low" data-fcol="6" data-fmatch="contains">All Severity<span class="caret">⌄</span></div>
+            <div class="fctrl" data-options="Rule|High-Value Threshold|Structuring Pattern|Rapid Deposit-Withdrawal Cycling" data-fcol="3" data-fmatch="contains">Rule<span class="caret">⌄</span></div>
+            <div class="fctrl wide" data-fcol="7" data-fmatch="daterange"><span class="ic">📅</span>Start Date<span class="range-sep">~</span>End Date</div>
+            <div class="fctrl wide placeholder" data-fcol="1" data-fmatch="contains">Username / Member ID<span class="caret"></span></div>
+          </div>
+          <div class="filter-actions">
+            <button class="search-btn" data-filter-panel="redflag">Search</button>
+            <button class="btn-outline" id="exportRedflag">⬇ Export to Excel</button>
+          </div>
+        </div>
+
+        <div class="section-title">Flagged Transactions</div>
+        <div class="refresh-line">
+          <button class="refresh-btn" data-refresh><span class="spin">⟳</span> Refresh</button>
+          <span>Last updated: <span class="lastupdate">2026-08-12 17:16:29</span></span>
+        </div>
+        <div class="bulk-bar" id="bulkRedflag">
+          <span><span class="bcount">0</span> selected</span>
+          <div class="bactions">
+            <button data-bulk="Mark Reviewed">Mark Reviewed</button>
+            <button data-bulk="Escalate to EDD">Escalate to EDD</button>
+            <button data-bulk="Export Selected">Export Selected</button>
+          </div>
+          <span class="bclear">Clear</span>
+        </div>
+        <div class="table-scroll">
+          <table id="tableRedflag">
+            <thead><tr>
+              <th style="width:32px;"><input type="checkbox" class="headchk" data-group="redflag"></th>
+              <th class="sortable" data-sort="text">Username <span class="sort-ic">⇅</span></th><th>Member ID</th>
+              <th>Rule Triggered</th><th>Threshold</th><th>Value Hit</th><th>Severity</th>
+              <th class="sortable" data-sort="date">Date / Time <span class="sort-ic">⇅</span></th><th>Status</th><th>Operation</th>
+            </tr></thead>
+            <tbody>
+              <tr>
+                <td><input type="checkbox" class="rowchk" data-group="redflag"></td>
+                <td>michael.uy</td><td>30021144</td><td>High-Value Threshold</td><td>₱400,000 / 24h</td><td>₱412,000.00</td>
+                <td><span class="badge high">High</span></td><td>2026-08-12 13:05</td><td><span class="badge med">Open</span></td>
+                <td><span class="op-link">Investigate</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="rowchk" data-group="redflag"></td>
+                <td>p.aquino</td><td>24901187</td><td>Structuring Pattern</td><td>3 deposits / 48h</td><td>4 deposits</td>
+                <td><span class="badge high">High</span></td><td>2026-08-12 10:22</td><td><span class="badge med">Open</span></td>
+                <td><span class="op-link">Investigate</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="rowchk" data-group="redflag"></td>
+                <td>r.dizon</td><td>29904471</td><td>Rapid Cycling</td><td>5x / 7 days</td><td>6x</td>
+                <td><span class="badge med">Medium</span></td><td>2026-08-11 18:41</td><td><span class="badge low">Reviewed</span></td>
+                <td><span class="op-link">Investigate</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="rowchk" data-group="redflag"></td>
+                <td>d.fernandez</td><td>26610234</td><td>High-Value Threshold</td><td>₱400,000 / 24h</td><td>₱210,000.00 x2</td>
+                <td><span class="badge med">Medium</span></td><td>2026-08-11 09:14</td><td><span class="badge low">Reviewed</span></td>
+                <td><span class="op-link">Investigate</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="rowchk" data-group="redflag"></td>
+                <td>c.villar</td><td>23310987</td><td>Structuring Pattern</td><td>3 deposits / 48h</td><td>5 deposits</td>
+                <td><span class="badge high">High</span></td><td>2026-08-10 20:47</td><td><span class="badge med">Open</span></td>
+                <td><span class="op-link">Investigate</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="rowchk" data-group="redflag"></td>
+                <td>e.gomez</td><td>21109887</td><td>Rapid Cycling</td><td>5x / 7 days</td><td>5x</td>
+                <td><span class="badge low">Low</span></td><td>2026-08-09 16:52</td><td><span class="badge low">Reviewed</span></td>
+                <td><span class="op-link">Investigate</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="pager">
+            <span class="total-txt">Total 214</span>
+            <div class="pagesize" data-options="10/page|20/page|50/page|100/page">10/page <span class="caret">⌄</span></div>
+            <div class="pages" data-group="redflag"><span class="arrow">‹</span><span class="num active">1</span><span class="num">2</span><span class="arrow">›</span></div>
+            <div class="goto">Go to <input value="1"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LARGET AMOUNT REPORT -->
+            <!-- ================================================================
+           TAB 6 / 7 — LARGET AMOUNT REPORT
+           (matches the real "Larget Amount Report" screen — note the typo
+           in "Larget" is intentional, copied from the live system)
+           Contains 2 INNER tabs: Deposit statistics / Withdrawal statistics
+           (see .inner-tabs / .inner-panel — a tab-bar nested inside this tab).
+           Only shows today's orders that exceed the ₱500,000 threshold.
+           Extras: 2 combined pie charts + 1 per-substat pie chart
+      ================================================================ -->
+      <div class="panel" id="bigamount">
+        <p style="font-size:12.5px; color:var(--text-mid); margin:0 0 14px;">Today's deposits and withdrawals that tripped the large-amount alert — only transactions exceeding the ₱500,000 threshold appear here.</p>
+
+        <div class="overview-title">Overview — Flagged Order Records</div>
+        <div class="overview-row">
+          <div class="overview-card">
+            <div id="pieBigSplit" class="pie-wrap"></div>
+            <div class="overview-legend" id="legendBigSplit"></div>
+          </div>
+          <div class="overview-card">
+            <div id="pieBigCount" class="pie-wrap"></div>
+            <div class="overview-legend" id="legendBigCount"></div>
+          </div>
+        </div>
+
+        <div class="inner-tabs">
+          <div class="inner-tab active" data-inner="deposit">Deposit statistics</div>
+          <div class="inner-tab" data-inner="withdrawal">Withdrawal statistics</div>
+        </div>
+
+        <div class="inner-panel active" id="innerDeposit">
+          <div class="threshold-note">⚑ Showing alerts &gt; ₱500,000</div>
+          <div class="filter-panel">
+            <div class="filter-row">
+              <div class="fctrl wide"><span class="ic">📅</span>2026-08-18<span class="range-sep">~</span>2026-08-18</div>
+              <span style="display:flex; align-items:center; font-size:12.5px; color:var(--text-mid); padding:0 4px;">userName</span>
+              <div class="fctrl wide placeholder" data-fcol="0" data-fmatch="contains">Username<span class="caret"></span></div>
+            </div>
+            <div class="filter-actions">
+              <button class="search-btn" data-filter-panel="innerDeposit">Search</button>
+              <button class="btn-outline" id="exportDeposit">⬇ Export to Excel</button>
+            </div>
+          </div>
+
+          <div class="overview-card">
+            <div id="pieDeposit" class="pie-wrap"></div>
+            <div class="overview-legend" id="legendDeposit"></div>
+          </div>
+
+          <div class="table-scroll">
+            <table id="tableDeposit">
+              <thead><tr>
+                <th class="sortable" data-sort="text">userName <span class="sort-ic">⇅</span></th>
+                <th class="sortable" data-sort="number">Amount <span class="sort-ic">⇅</span></th>
+              </tr></thead>
+              <tbody>
+                <tr><td>okbet3070ee91p</td><td>804,953</td></tr>
+                <tr><td>okbet16141fdp8</td><td>650,000</td></tr>
+              </tbody>
+              <tfoot><tr><td>Total</td><td>1,454,953</td></tr></tfoot>
+            </table>
+            <div class="pager">
+              <span class="total-txt">Total 2</span>
+              <div class="pagesize" data-options="10/page|20/page|50/page|100/page">10/page <span class="caret">⌄</span></div>
+              <div class="pages" data-group="bigdep"><span class="arrow">‹</span><span class="num active">1</span><span class="arrow">›</span></div>
+              <div class="goto">Go to <input value="1"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="inner-panel" id="innerWithdrawal">
+          <div class="threshold-note">⚑ Showing alerts &gt; ₱500,000</div>
+          <div class="filter-panel">
+            <div class="filter-row">
+              <div class="fctrl wide"><span class="ic">📅</span>2026-08-18<span class="range-sep">~</span>2026-08-18</div>
+              <span style="display:flex; align-items:center; font-size:12.5px; color:var(--text-mid); padding:0 4px;">userName</span>
+              <div class="fctrl wide placeholder" data-fcol="0" data-fmatch="contains">Username<span class="caret"></span></div>
+            </div>
+            <div class="filter-actions">
+              <button class="search-btn" data-filter-panel="innerWithdrawal">Search</button>
+              <button class="btn-outline" id="exportWithdrawal">⬇ Export to Excel</button>
+            </div>
+          </div>
+
+          <div class="overview-card">
+            <div id="pieWithdrawal" class="pie-wrap"></div>
+            <div class="overview-legend" id="legendWithdrawal"></div>
+          </div>
+
+          <div class="table-scroll">
+            <table id="tableWithdrawal">
+              <thead><tr>
+                <th class="sortable" data-sort="text">userName <span class="sort-ic">⇅</span></th>
+                <th class="sortable" data-sort="number">Amount <span class="sort-ic">⇅</span></th>
+              </tr></thead>
+              <tbody>
+                <tr><td>okbet3070ee91p</td><td>562,000</td></tr>
+                <tr><td>okbet1964hwju0</td><td>762,003</td></tr>
+                <tr><td>okbet7200fe31t</td><td>550,000</td></tr>
+                <tr><td>okbet88474hq7c</td><td>775,790</td></tr>
+                <tr><td>okbet16141fdp8</td><td>600,000</td></tr>
+                <tr><td>okbet8520q2jib</td><td>1,022,500</td></tr>
+              </tbody>
+              <tfoot><tr><td>Total</td><td>4,272,293</td></tr></tfoot>
+            </table>
+            <div class="pager">
+              <span class="total-txt">Total 6</span>
+              <div class="pagesize" data-options="10/page|20/page|50/page|100/page">10/page <span class="caret">⌄</span></div>
+              <div class="pages" data-group="bigwd"><span class="arrow">‹</span><span class="num active">1</span><span class="arrow">›</span></div>
+              <div class="goto">Go to <input value="1"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PERIODIC UPDATING OF USERS (KYC completeness) -->
+            <!-- ================================================================
+           TAB 7 / 7 — PERIODIC UPDATING OF USERS (KYC completeness)
+           Lists players with missing KYC info; each gets 3 consecutive days
+           to update (see .progress-track / .progress-dot in the CSS).
+           Filters: Progress stage, Missing item, Username
+           Extras: 2 pie charts (progress stage / missing item breakdown)
+      ================================================================ -->
+      <div class="panel" id="kycupdate">
+        <p style="font-size:12.5px; color:var(--text-mid); margin:0 0 14px;">Players with incomplete or missing KYC information. Once flagged, a player has 3 consecutive days to update their profile — one confirmed update per day — before the account is escalated.</p>
+        <div class="filter-panel">
+          <div class="filter-row">
+            <div class="fctrl" data-options="All Progress|Not Started|Day 1 of 3|Day 2 of 3|Completed 3 / 3|Overdue" data-fcol="4" data-fmatch="contains">All Progress<span class="caret">⌄</span></div>
+            <div class="fctrl" data-options="Missing Item|Valid ID|Proof of Address|Selfie / Liveness|Source of Funds|Contact Number|Email Verification" data-fcol="3" data-fmatch="contains">Missing Item<span class="caret">⌄</span></div>
+            <div class="fctrl wide placeholder" data-fcol="2" data-fmatch="contains">Username / Member ID<span class="caret"></span></div>
+          </div>
+          <div class="filter-actions">
+            <label class="checkline"><input type="checkbox" checked>Filter Test Users</label>
+            <button class="search-btn" data-filter-panel="kycupdate">Search</button>
+            <button class="btn-outline" id="exportKyc">⬇ Export to Excel</button>
+          </div>
+        </div>
+
+        <div class="overview-title">Overview — Completion Statistics</div>
+        <div class="overview-row">
+          <div class="overview-card">
+            <div id="pieKyc" class="pie-wrap"></div>
+            <div class="overview-legend" id="legendKyc"></div>
+          </div>
+          <div class="overview-card">
+            <div id="pieKycMissing" class="pie-wrap"></div>
+            <div class="overview-legend" id="legendKycMissing"></div>
+          </div>
+        </div>
+
+        <div class="refresh-line">
+          <button class="refresh-btn" data-refresh><span class="spin">⟳</span> Refresh</button>
+          <span>Last updated: <span class="lastupdate">2026-08-18 09:00:00</span></span>
+        </div>
+        <div class="bulk-bar" id="bulkKyc">
+          <span><span class="bcount">0</span> selected</span>
+          <div class="bactions">
+            <button data-bulk="Send Reminder">Send Reminder</button>
+            <button data-bulk="Escalate">Escalate</button>
+            <button data-bulk="Export Selected">Export Selected</button>
+          </div>
+          <span class="bclear">Clear</span>
+        </div>
+        <div class="table-scroll">
+          <table id="tableKyc">
+            <thead><tr>
+              <th style="width:32px;"><input type="checkbox" class="headchk" data-group="kyc"></th>
+              <th class="sortable" data-sort="text">Photo</th>
+              <th class="sortable" data-sort="text">Member Information <span class="sort-ic">⇅</span></th>
+              <th>Missing Information</th>
+              <th>Update Progress</th>
+              <th class="sortable" data-sort="date">Flagged Since <span class="sort-ic">⇅</span></th>
+              <th>Operation</th>
+            </tr></thead>
+            <tbody>
+              <tr>
+                <td><input type="checkbox" class="rowchk" data-group="kyc"></td>
+                <td><div class="photo-ph">👤</div></td>
+                <td class="member-cell">Member ID：<b>31500221</b><br>User Name：<b>j.bautista</b><br>Real Name：JERICHO BAUTISTA</td>
+                <td><div class="missing-list"><span class="chip">Valid ID</span><span class="chip">Selfie / Liveness</span></div></td>
+                <td><div class="progress-track"><div class="progress-dot done"></div><div class="progress-dot"></div><div class="progress-dot"></div></div><div class="progress-txt">Day 1 of 3 updated</div></td>
+                <td>2026-08-16</td>
+                <td><span class="op-link">Send Reminder</span><span class="op-link">View</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="rowchk" data-group="kyc"></td>
+                <td><div class="photo-ph">👤</div></td>
+                <td class="member-cell">Member ID：<b>29450871</b><br>User Name：<b>m.reyes</b><br>Real Name：MARIA REYES</td>
+                <td><div class="missing-list"><span class="chip">Proof of Address</span></div></td>
+                <td><div class="progress-track"><div class="progress-dot done"></div><div class="progress-dot done"></div><div class="progress-dot today"></div></div><div class="progress-txt">Day 3 of 3 — due today</div></td>
+                <td>2026-08-14</td>
+                <td><span class="op-link">Send Reminder</span><span class="op-link">View</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="rowchk" data-group="kyc"></td>
+                <td><div class="photo-ph">👤</div></td>
+                <td class="member-cell">Member ID：<b>30234109</b><br>User Name：<b>n.cruz</b><br>Real Name：NIÑO CRUZ</td>
+                <td><div class="missing-list"><span class="chip">Valid ID</span><span class="chip">Source of Funds</span><span class="chip">Contact Number</span></div></td>
+                <td><div class="progress-track"><div class="progress-dot"></div><div class="progress-dot"></div><div class="progress-dot"></div></div><div class="progress-txt">Not started</div></td>
+                <td>2026-08-17</td>
+                <td><span class="op-link">Send Reminder</span><span class="op-link">View</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="rowchk" data-group="kyc"></td>
+                <td><div class="photo-ph">👤</div></td>
+                <td class="member-cell">Member ID：<b>28844021</b><br>User Name：<b>s.delrosario</b><br>Real Name：SOFIA DEL ROSARIO</td>
+                <td><div class="missing-list"><span class="chip">Email Verification</span></div></td>
+                <td><div class="progress-track"><div class="progress-dot done"></div><div class="progress-dot done"></div><div class="progress-dot done"></div></div><div class="progress-txt">Completed 3 / 3</div></td>
+                <td>2026-08-11</td>
+                <td><span class="op-link">Send Reminder</span><span class="op-link">View</span></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="rowchk" data-group="kyc"></td>
+                <td><div class="photo-ph">👤</div></td>
+                <td class="member-cell">Member ID：<b>33210456</b><br>User Name：<b>t.nguyen</b><br>Real Name：THANH NGUYEN</td>
+                <td><div class="missing-list"><span class="chip">Valid ID</span></div></td>
+                <td><div class="progress-track"><div class="progress-dot"></div><div class="progress-dot"></div><div class="progress-dot"></div></div><div class="progress-txt">Overdue — no response</div></td>
+                <td>2026-08-08</td>
+                <td><span class="op-link">Send Reminder</span><span class="op-link">View</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="pager">
+            <span class="total-txt">Total 842</span>
+            <div class="pagesize" data-options="10/page|20/page|50/page|100/page">10/page <span class="caret">⌄</span></div>
+            <div class="pages" data-group="kyc"><span class="arrow">‹</span><span class="num active">1</span><span class="num">2</span><span class="num">3</span><span class="arrow">›</span></div>
+            <div class="goto">Go to <input value="1"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shown when clicking Menu / Personal center / User Management in the
+           sidebar instead of AML Monitoring — see showPlaceholder() in the JS. -->
+      <div class="placeholder-view" id="placeholderView" style="display:none;">
+        <b id="placeholderTitle">Personal center</b>
+        Outside the AML dashboard mockup — click "AML" in the sidebar to return.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================================
+     FLOATING ELEMENTS — outside .shell so they can overlay everything.
+     Their content (list items, modal title/body, toast text) is filled in
+     dynamically by JS; the empty markup below is just the shell/skeleton.
+============================================================================ -->
+<div class="dd-backdrop" id="ddBackdrop"></div>  <!-- invisible click-catcher, see CSS notes above -->
+
+<!-- "Select Tags" popup used by the Risk Profiling "All Tags" filter -->
+<div class="modal-overlay" id="tagPickerOverlay">
+  <div class="modal-box" style="width:400px;">
+    <div class="modal-head"><h3>Select Tags</h3><span class="modal-close" id="tagPickerClose">✕</span></div>
+    <div class="modal-body" style="max-height:360px; overflow-y:auto; padding:8px 8px;">
+      <ul class="tagpicker-list" id="tagPickerList"></ul> <!-- populated from the ALL_TAGS array in JS -->
+    </div>
+    <div class="tagpicker-footer">
+      <button id="tagPickerApply">Apply</button>
+    </div>
+  </div>
+</div>
+
+<!-- Generic "row detail" popup — opened whenever any blue Operation link is
+     clicked. Its rows are built automatically from that table's column
+     headers + the clicked row's cells (see openModal() / the op-link
+     click-delegation handler in the JS). You never need to edit this markup
+     to add new detail fields — just add a new <td> to the table row. -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <div class="modal-head"><h3 id="modalTitle">Details</h3><span class="modal-close" id="modalClose">✕</span></div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div> <!-- bottom pop-up message, filled by showToast(text) -->
+
+<!-- SheetJS library — powers the "Export to Excel" buttons. Needs internet;
+     if it fails to load, exportTableToExcel() shows a toast instead of crashing. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+  /* ==========================================================================
+     MAIN SCRIPT — organized top to bottom in the order things happen:
+       1. ALL_TAGS constant + sidebar tab switching
+       2. Toast + modal helpers
+       3. Dropdown / date-picker / tag-picker "make filters clickable" setup
+       4. Generic row filtering (the Search button logic)
+       5. Export to Excel
+       6. Operation-link modal, pagination goto box, rule switches
+       7. Top-level sidebar nav (Menu/Personal center/User Mgmt/AML) + topbar menus
+       8. Refresh buttons, bulk-select bars, sortable headers
+       9. Pagination page-swapping (PAGE_DATA_EXTRA)
+      10. Inner tabs (Deposit/Withdrawal statistics)
+      11. Pie charts (renderPie + the actual numbers for every tab)
+     Everything runs once, top-to-bottom, when the page loads (no framework,
+     no build step — just plain DOM APIs).
+  ========================================================================== */
+
+  /* Full tag list for the Risk Profiling "All Tags" picker — edit this array
+     to add/remove/rename tags; it automatically populates the popup AND the
+     dropdown filter option list wherever it's used. */
+  const ALL_TAGS = ["SELF EXCLUSION BY PLAYER","COMPLAINT-PRONE","EXCLUDE","CEBU CALLBACK TEAM","EXP. GEL HOLDER","PENDING VCKYC","PENDING EDD","INTERNAL TEST ACCOUNT","VIP BONUS ABUSER","PARTIAL VERIFIED","EDD COMPLETED","RESTRICTED PLAYER (UNDERAGE)","RESTRICTED PLAYER (FRAUDULENT DOCUMENTS)","RESTRICTED PLAYER (EMANATING EXCLUSION)","RESTRICTED PLAYER (FAMILY EXCLUSION)","RESTRICTED PLAYER (SELF EXCLUSION)","VIP LIVECHAT","VVIP","VIP SALES","VIP REACTIVATION","INCOMPLETE DETAILS","BIG WINNING","LOW RISK","MEDIUM RISK","HIGH RISK","KYC Passed","VIP RETENTION","MONITORING PLAYER","RESTRICTED PLAYER (DIFFERENT ACCOUNT HOLDER)","RESTRICTED PLAYER (MULTIPLE ACCOUNT)","RESTRICTED PLAYER (GEL HOLDER)","RESTRICTED PLAYER (GOVERMENT EMPLOYEES)","MODIFIED KYC","SUSPICIOUS BETTING BEHAVIOUR","RESTRICTED PLAYER","BONUS ABUSER","No Label"];
+
+  /* ---------------- SIDEBAR TAB SWITCHING ----------------
+     Clicking any <li class="sub-item"> in #railNav:
+       - marks it (and only it) "active" in the sidebar
+       - hides every .panel and shows the one whose id matches its data-target
+       - rewrites the breadcrumb text and the blue tab pill to match
+     This is the ONLY place that connects a sidebar item to its panel, and it
+     works automatically for any tab you add (no per-tab code needed). */
+  const items = document.querySelectorAll('#railNav .sub-item');
+  const panels = document.querySelectorAll('.panel');
+  const crumbTxt = document.getElementById('crumbTxt');
+  const tabTag = document.getElementById('tabTag');
+  items.forEach(li => {
+    li.addEventListener('click', () => {
+      items.forEach(i => i.classList.remove('active'));
+      li.classList.add('active');
+      const target = li.getAttribute('data-target');
+      panels.forEach(p => p.classList.remove('active'));
+      document.getElementById(target).classList.add('active');
+      const label = li.textContent.replace('▸', '').trim();
+      crumbTxt.textContent = 'AML Monitoring / ' + label;
+      tabTag.innerHTML = label + ' <span class="x">✕</span>';
+    });
+  });
+
+  /* ---------------- TOAST HELPER ----------------
+     Call showToast('Your message') anywhere to pop up the bottom message
+     for ~2 seconds. Used everywhere (search results, export status, etc). */
+  const toastEl = document.getElementById('toast');
+  let toastTimer;
+  function showToast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 1900);
+  }
+
+  /* ---------------- DETAIL MODAL HELPER ----------------
+     openModal('Title', [['Label','Value'], ...]) fills and shows the popup.
+     Used by the Operation-link click handler further down, which builds the
+     [label, value] pairs automatically from a table row — you won't usually
+     call openModal() directly. */
+  const modalOverlay = document.getElementById('modalOverlay');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalBody = document.getElementById('modalBody');
+  function openModal(title, rows){
+    modalTitle.textContent = title;
+    modalBody.innerHTML = rows.map(r => `<div class="modal-row"><span class="mk">${r[0]}</span><span class="mv">${r[1]}</span></div>`).join('');
+    modalOverlay.classList.add('show');
+  }
+  document.getElementById('modalClose').addEventListener('click', () => modalOverlay.classList.remove('show'));
+  modalOverlay.addEventListener('click', e => { if(e.target === modalOverlay) modalOverlay.classList.remove('show'); });
+
+  /* ---------------- DROPDOWN CLOSE / BACKDROP HELPERS ----------------
+     closeAllDropdowns() hides every open .dd-menu (call it whenever a new
+     one opens, or when clicking elsewhere). syncBackdrop() shows/hides the
+     invisible .dd-backdrop click-catcher to match whether anything is open. */
+  function closeAllDropdowns(except){
+    document.querySelectorAll('.dd-menu.show').forEach(m => { if(m !== except) m.classList.remove('show'); });
+    syncBackdrop();
+  }
+  const ddBackdrop = document.getElementById('ddBackdrop');
+  function syncBackdrop(){
+    ddBackdrop.classList.toggle('show', !!document.querySelector('.dd-menu.show'));
+  }
+  ddBackdrop.addEventListener('click', () => closeAllDropdowns());
+  document.addEventListener('click', () => closeAllDropdowns());
+
+  /* ---------------- GENERIC FILTER DROPDOWNS ----------------
+     Finds every element with a data-options="Opt A|Opt B|Opt C" attribute
+     (these are the .fctrl filter boxes like "All Status", "Risk Level", the
+     10/page picker, etc.) and builds a clickable <ul class="dd-menu"> for it
+     automatically. Selecting an option rewrites the box's visible text.
+     TO ADD A NEW DROPDOWN FILTER: just add data-options="First Option|..."
+     (first option = the "no filter" default) to any .fctrl div in the HTML —
+     no JS changes needed. Pair it with data-fcol + data-fmatch (see the
+     "GENERIC ROW FILTERING" section below) if you also want it to actually
+     filter table rows. */
+  document.querySelectorAll('[data-options]').forEach(el => {
+    const opts = el.getAttribute('data-options').split('|');
+    el.dataset.defaultOpt = opts[0];
+    const menu = document.createElement('ul');
+    menu.className = 'dd-menu';
+    opts.forEach((opt, idx) => {
+      const li = document.createElement('li');
+      li.textContent = opt;
+      if (idx === 0) li.classList.add('selected');
+      li.addEventListener('click', (e) => {
+        e.stopPropagation();
+        el.innerHTML = opt + ' <span class="caret">⌄</span>';
+        el.appendChild(menu);
+        menu.querySelectorAll('li').forEach(x => x.classList.remove('selected'));
+        li.classList.add('selected');
+        menu.classList.remove('show');
+        syncBackdrop();
+      });
+      menu.appendChild(li);
+    });
+    el.appendChild(menu);
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isShown = menu.classList.contains('show');
+      closeAllDropdowns(menu);
+      menu.classList.toggle('show', !isShown);
+      syncBackdrop();
+    });
+  });
+
+  /* ---------------- TAG-PICKER MODAL (multi-select "All Tags" filter) ----------------
+     openTagPicker(selectedSet, onApply) fills the #tagPickerOverlay checklist
+     from ALL_TAGS, pre-checking whatever is already in selectedSet, and calls
+     onApply() when the user clicks Apply. */
+  const tagPickerOverlay = document.getElementById('tagPickerOverlay');
+  const tagPickerList = document.getElementById('tagPickerList');
+  const tagPickerApply = document.getElementById('tagPickerApply');
+  function openTagPicker(selectedSet, onApply){
+    tagPickerList.innerHTML = '';
+    ALL_TAGS.forEach(tag => {
+      const li = document.createElement('li');
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = selectedSet.has(tag);
+      cb.addEventListener('change', () => { cb.checked ? selectedSet.add(tag) : selectedSet.delete(tag); });
+      li.appendChild(cb);
+      li.appendChild(document.createTextNode(tag));
+      li.addEventListener('click', (e) => { if (e.target !== cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); } });
+      tagPickerList.appendChild(li);
+    });
+    tagPickerOverlay.classList.add('show');
+    tagPickerApply.onclick = () => { tagPickerOverlay.classList.remove('show'); onApply(); };
+  }
+  document.getElementById('tagPickerClose').addEventListener('click', () => tagPickerOverlay.classList.remove('show'));
+  tagPickerOverlay.addEventListener('click', e => { if (e.target === tagPickerOverlay) tagPickerOverlay.classList.remove('show'); });
+
+  /* Wires up any .fctrl whose id starts with "tagFilter" (currently just
+     #tagFilterRisk) to open the tag picker above and show the selection as
+     removable chips in the matching #tagChips<Name> row. TO ADD ANOTHER
+     multi-select tag filter elsewhere: give a new .fctrl the id
+     "tagFilterXxx" and add a matching <div id="tagChipsXxx"> nearby. */
+  document.querySelectorAll('[id^="tagFilter"]').forEach(el => {
+    const chipRowId = 'tagChips' + el.id.replace('tagFilter', '');
+    const chipRow = document.getElementById(chipRowId);
+    const selected = new Set();
+
+    function renderField(){
+      const label = selected.size ? selected.size + ' tag' + (selected.size > 1 ? 's' : '') + ' selected' : 'All Tags';
+      el.innerHTML = label + ' <span class="caret">⌄</span>';
+    }
+    function renderChips(){
+      chipRow.innerHTML = '';
+      selected.forEach(tag => {
+        const chip = document.createElement('span');
+        chip.className = 'chip';
+        chip.innerHTML = tag + ' <span class="rm">✕</span>';
+        chip.querySelector('.rm').addEventListener('click', (e) => {
+          e.stopPropagation();
+          selected.delete(tag);
+          renderChips();
+          renderField();
+        });
+        chipRow.appendChild(chip);
+      });
+      renderField();
+    }
+    renderField();
+
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openTagPicker(selected, renderChips);
+    });
+  });
+
+  /* ---------------- TEXT / DATE-RANGE FILTERS BECOME EDITABLE ON CLICK ----------------
+     Any remaining .fctrl (no data-options, not a tag filter) is either:
+       - a date range (has a .range-sep "~" span)   → becomes 2 <input type=date>
+       - plain text (e.g. "Username / Member ID")    → becomes 1 <input type=text>
+     Only converts once per element ({ once:true }), so re-clicking just focuses it. */
+  document.querySelectorAll('.fctrl:not([data-options]):not([id^="tagFilter"])').forEach(el => {
+    if (el.querySelector('.range-sep')) {
+      el.addEventListener('click', function handler(){
+        el.removeEventListener('click', handler);
+        const icon = el.querySelector('.ic') ? el.querySelector('.ic').outerHTML : '';
+        el.classList.add('editing');
+        el.innerHTML = icon + '<input type="date"><span class="range-sep">~</span><input type="date">';
+        el.querySelectorAll('input')[0].focus();
+      }, { once:true });
+    } else {
+      el.addEventListener('click', function handler(){
+        el.removeEventListener('click', handler);
+        const isPlaceholder = el.classList.contains('placeholder');
+        const original = el.textContent.trim();
+        el.classList.add('editing');
+        el.classList.remove('placeholder');
+        el.innerHTML = `<input type="text" placeholder="${isPlaceholder ? original : ''}" value="${isPlaceholder ? '' : original}">`;
+        el.querySelector('input').focus();
+      }, { once:true });
+    }
+  });
+
+  // ---------------- GENERIC ROW FILTERING ----------------
+  // This is the engine behind every "Search" button. It reads whatever is
+  // currently selected/typed in each filter control, then shows/hides table
+  // rows that don't match. Two pieces:
+  //   getFilterValue(el)   → reads ONE filter control's current value
+  //                          (or null if it's at its default/empty state)
+  //   applyFilters(panelId)→ runs every filter control inside a tab against
+  //                          that tab's table and toggles row visibility
+  //
+  // TO WIRE UP A NEW FILTER FIELD: on the .fctrl div in the HTML, add:
+  //   data-fcol="N"        — which <td> column index to compare against
+  //                          (count from 0, including any checkbox column)
+  //   data-fmatch="..."    — how to compare, one of:
+  //       contains   — case-insensitive substring match (dropdowns & text)
+  //       nation     — special-cased for "Local (Philippines)" vs "Foreign"
+  //       daterange  — parses a YYYY-MM-DD out of the cell and checks range
+  //       tags       — cell must contain ANY of the selected tag chips
+  //       txntype    — special-cased for the transaction Deposit/Withdrawal
+  //                    count columns (data-fcol="2,4" — two column indexes)
+  // Then put a matching data-filter-panel="<panel id>" on that tab's Search
+  // button — the rest just works.
+  function getFilterValue(el){
+    if (el.hasAttribute('data-options')) {
+      const selectedLi = el.querySelector('li.selected');
+      const val = selectedLi ? selectedLi.textContent.trim() : null;
+      if (!val || val === el.dataset.defaultOpt) return null;
+      return val;
+    }
+    if (el.id && el.id.startsWith('tagFilter')) {
+      const chipRowId = 'tagChips' + el.id.replace('tagFilter', '');
+      const chipRow = document.getElementById(chipRowId);
+      if (!chipRow) return null;
+      const tags = Array.from(chipRow.querySelectorAll('.chip')).map(c => c.firstChild.textContent.trim());
+      return tags.length ? tags : null;
+    }
+    const textInput = el.querySelector('input[type="text"]');
+    if (textInput) return textInput.value.trim() || null;
+    const dateInputs = el.querySelectorAll('input[type="date"]');
+    if (dateInputs.length === 2) {
+      const a = dateInputs[0].value, b = dateInputs[1].value;
+      return (a || b) ? [a, b] : null;
+    }
+    return null;
+  }
+
+  function applyFilters(panelId){
+    const panel = document.getElementById(panelId);
+    const filterEls = Array.from(panel.querySelectorAll('.filter-panel [data-fcol]'));
+    const table = panel.querySelector('table');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr')).filter(tr => !tr.classList.contains('js-nodata-row'));
+    let visible = 0;
+
+    const cellText = (tr, idx) => tr.children[idx] ? tr.children[idx].textContent.replace(/\s+/g,' ').trim() : '';
+
+    rows.forEach(tr => {
+      let match = true;
+      filterEls.forEach(el => {
+        if (!match) return;
+        const value = getFilterValue(el);
+        if (!value) return;
+        const fmatch = el.dataset.fmatch;
+        const cols = el.dataset.fcol.split(',').map(Number);
+
+        if (fmatch === 'contains') {
+          if (!cellText(tr, cols[0]).toLowerCase().includes(value.toLowerCase())) match = false;
+        } else if (fmatch === 'nation') {
+          const txt = cellText(tr, cols[0]).toLowerCase();
+          if (value === 'Local (Philippines)' && !txt.includes('philippines')) match = false;
+          if (value === 'Foreign' && txt.includes('philippines')) match = false;
+        } else if (fmatch === 'daterange') {
+          const txt = cellText(tr, cols[0]);
+          const m = txt.match(/\d{4}-\d{2}-\d{2}/);
+          const rowDate = m ? new Date(m[0]).getTime() : null;
+          const start = value[0] ? new Date(value[0]).getTime() : -Infinity;
+          const end = value[1] ? new Date(value[1]).getTime() + 86399999 : Infinity;
+          if (rowDate === null || rowDate < start || rowDate > end) match = false;
+        } else if (fmatch === 'tags') {
+          const txt = cellText(tr, cols[0]).toLowerCase();
+          if (!value.some(tag => txt.includes(tag.toLowerCase()))) match = false;
+        } else if (fmatch === 'txntype') {
+          const depCount = parseInt(cellText(tr, cols[0])) || 0;
+          const wdCount = parseInt(cellText(tr, cols[1])) || 0;
+          if (value === 'Deposit' && depCount <= 0) match = false;
+          if (value === 'Withdrawal' && wdCount <= 0) match = false;
+        }
+      });
+      tr.style.display = match ? '' : 'none';
+      if (match) visible++;
+    });
+
+    const existingNoData = tbody.querySelector('.js-nodata-row');
+    if (existingNoData) existingNoData.remove();
+    if (visible === 0) {
+      const colCount = table.querySelectorAll('thead th').length;
+      const tr = document.createElement('tr');
+      tr.className = 'js-nodata-row';
+      tr.innerHTML = `<td colspan="${colCount}" class="nodata">No matching records for the selected filters.</td>`;
+      tbody.appendChild(tr);
+    }
+    return visible;
+  }
+
+  document.querySelectorAll('.search-btn[data-filter-panel]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.style.opacity = '0.6';
+      setTimeout(() => {
+        btn.style.opacity = '1';
+        const n = applyFilters(btn.dataset.filterPanel);
+        showToast(n === 0 ? 'No matching records on this page' : `Showing ${n} matching result${n === 1 ? '' : 's'} on this page`);
+      }, 350);
+    });
+  });
+
+  // ---------------- EXPORT TO EXCEL ----------------
+  // exportTableToExcel(tableId, filename) grabs a table by id, clones it,
+  // strips out the checkbox column and the "Operation" links column (not
+  // useful in a spreadsheet), drops any currently-hidden/filtered-out rows,
+  // then hands it to SheetJS (window.XLSX) to download as a real .xlsx file.
+  // Needs the cdnjs SheetJS <script> at the top of the page to have loaded —
+  // if it hasn't (e.g. no internet), it shows a toast instead of erroring.
+  // TO ADD A NEW EXPORT BUTTON: give your button an id, then add one line
+  // like the ones below: exportTableToExcel('yourTableId', 'filename.xlsx')
+  function exportTableToExcel(tableId, filename){
+    const table = document.getElementById(tableId);
+    if (!table || typeof XLSX === 'undefined') { showToast('Export library failed to load — check your connection'); return; }
+    const clone = table.cloneNode(true);
+    const headerCells = Array.from(clone.querySelectorAll('thead th'));
+    const stripIdx = [];
+    headerCells.forEach((th, i) => {
+      const t = th.textContent.replace('⇅','').trim();
+      if (t === '' || t === 'Operation') stripIdx.push(i);
+    });
+    stripIdx.sort((a,b) => b - a).forEach(idx => {
+      clone.querySelectorAll('tr').forEach(tr => { if (tr.children[idx]) tr.removeChild(tr.children[idx]); });
+    });
+    Array.from(clone.querySelectorAll('tbody tr')).forEach(tr => {
+      if (tr.style.display === 'none' || tr.classList.contains('js-nodata-row')) tr.remove();
+    });
+    try {
+      const wb = XLSX.utils.table_to_book(clone, { raw: true });
+      XLSX.writeFile(wb, filename);
+      showToast('Exported ' + filename);
+    } catch (err) {
+      showToast('Export failed — see console for details');
+      console.error(err);
+    }
+  }
+  document.getElementById('exportPlayers').addEventListener('click', () => exportTableToExcel('tablePlayers', 'AML_Total_Number_of_Players_2026-08-12.xlsx'));
+  document.getElementById('exportRisk').addEventListener('click', () => exportTableToExcel('tableRisk', 'AML_Risk_Profiling_2026-08-12.xlsx'));
+  document.getElementById('exportAcct').addEventListener('click', () => exportTableToExcel('tableAcct', 'AML_Account_Status_2026-08-12.xlsx'));
+  document.getElementById('exportTxn').addEventListener('click', () => exportTableToExcel('tableTxn', 'AML_Daily_Transaction_Monitoring_2026-02-24.xlsx'));
+  document.getElementById('exportRedflag').addEventListener('click', () => exportTableToExcel('tableRedflag', 'AML_Red_Flag_Alerts_2026-08-12.xlsx'));
+  document.getElementById('exportDeposit').addEventListener('click', () => exportTableToExcel('tableDeposit', 'AML_Larget_Amount_Report_Deposit_2026-08-18.xlsx'));
+  document.getElementById('exportWithdrawal').addEventListener('click', () => exportTableToExcel('tableWithdrawal', 'AML_Larget_Amount_Report_Withdrawal_2026-08-18.xlsx'));
+  document.getElementById('exportKyc').addEventListener('click', () => exportTableToExcel('tableKyc', 'AML_Periodic_Updating_of_Users_2026-08-18.xlsx'));
+
+  // ---------------- OPERATION-LINK → DETAIL MODAL ----------------
+  // Uses event delegation on `document` (rather than binding to each link)
+  // so it automatically works on rows added later by pagination. Builds the
+  // modal's [label, value] rows by pairing each <th> header with that row's
+  // matching <td>, skipping the checkbox column and the Operation column.
+  // You never need to touch this to add fields — just add table columns.
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('.op-link');
+    if (!link) return;
+    e.stopPropagation();
+    const tr = link.closest('tr');
+    const table = link.closest('table');
+    if (!tr || !table) return;
+    const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.replace('⇅','').trim());
+    const cells = Array.from(tr.children).map(td => td.textContent.replace(/\s+/g,' ').trim());
+    const rows = [];
+    headers.forEach((h, i) => {
+      if (h === '' || h === 'Operation') return;
+      rows.push([h, cells[i] || '—']);
+    });
+    openModal(link.textContent.trim(), rows);
+  });
+
+  // "Go to [page]" box — pressing Enter clicks the matching page-number
+  // button if one exists (re-using the same pagination logic below).
+  document.querySelectorAll('.pager .goto input').forEach(input => {
+    input.addEventListener('keydown', e => {
+      if (e.key !== 'Enter') return;
+      const pagesDiv = input.closest('.pager').querySelector('.pages');
+      const target = pagesDiv && Array.from(pagesDiv.querySelectorAll('.num')).find(n => n.textContent.trim() === input.value.trim());
+      if (target) target.click(); else showToast('Page not available in this sample');
+      input.blur();
+    });
+  });
+
+  // Red Flag Alerts rule on/off toggles — purely cosmetic (green ↔ grey +
+  // toast); doesn't actually change which rows are flagged in this mockup.
+  document.querySelectorAll('.switch').forEach(sw => {
+    sw.addEventListener('click', () => {
+      sw.classList.toggle('off');
+      showToast(sw.classList.contains('off') ? 'Rule disabled' : 'Rule enabled');
+    });
+  });
+
+  // Clicking the ✕ on the blue tab pill just jumps back to the first tab
+  // (Total Number of Players) — same as clicking it in the sidebar.
+  document.getElementById('tabTag').querySelector('.x').addEventListener('click', (e) => {
+    e.stopPropagation();
+    items[0].click();
+  });
+
+  // ---------------- TOP-LEVEL SIDEBAR NAV ----------------
+  // Handles the 4 rows ABOVE the tab list: Menu / Personal center /
+  // User Management / AML Monitoring. Clicking "AML Monitoring" shows the
+  // normal tab content; clicking any of the other three hides it and shows
+  // the generic .placeholder-view message instead (those sections aren't
+  // built out in this mockup).
+  const topNavIds = ['navMenu','navPersonal','navUserMgmt','navAml'];
+  const railNav = document.getElementById('railNav');
+  const placeholderView = document.getElementById('placeholderView');
+  const placeholderTitle = document.getElementById('placeholderTitle');
+  const tagRow = document.querySelector('.tag-row');
+  const breadcrumbEl = document.querySelector('.breadcrumb');
+
+  function setTopActive(activeId){
+    topNavIds.forEach(id => document.getElementById(id).classList.toggle('top-active', id === activeId));
+  }
+  function showAmlDashboard(){
+    setTopActive('navAml');
+    railNav.style.display = '';
+    placeholderView.style.display = 'none';
+    tagRow.style.display = '';
+    breadcrumbEl.style.display = '';
+    panels.forEach(p => p.classList.toggle('active', p.id === document.querySelector('#railNav .sub-item.active').dataset.target));
+  }
+  function showPlaceholder(label, id){
+    setTopActive(id);
+    railNav.style.display = 'none';
+    panels.forEach(p => p.classList.remove('active'));
+    tagRow.style.display = 'none';
+    breadcrumbEl.style.display = 'none';
+    placeholderTitle.textContent = label;
+    placeholderView.style.display = 'block';
+  }
+  document.getElementById('navAml').addEventListener('click', showAmlDashboard);
+  document.getElementById('navMenu').addEventListener('click', () => showPlaceholder('Menu', 'navMenu'));
+  document.getElementById('navPersonal').addEventListener('click', () => showPlaceholder('Personal center', 'navPersonal'));
+  document.getElementById('navUserMgmt').addEventListener('click', () => showPlaceholder('User Management', 'navUserMgmt'));
+
+  // ---------------- TOP BAR DROPDOWNS (bell / flag / user avatar) ----------------
+  // Same open/close pattern as the filter dropdowns above, just anchored to
+  // the top bar. Clicking any item inside just closes the menu + shows a toast.
+  ['ddBell','ddFlag','ddUser'].forEach(id => {
+    const wrap = document.getElementById(id);
+    const menu = wrap.querySelector('.dd-menu');
+    wrap.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isShown = menu.classList.contains('show');
+      closeAllDropdowns(menu);
+      menu.classList.toggle('show', !isShown);
+      syncBackdrop();
+    });
+    menu.querySelectorAll('li').forEach(li => {
+      li.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menu.classList.remove('show');
+        syncBackdrop();
+        showToast(li.textContent.trim() + ' selected');
+      });
+    });
+  });
+
+  // ---------------- Bell badge clears once opened ----------------
+  document.getElementById('ddBell').addEventListener('click', () => {
+    const count = document.getElementById('bellCount');
+    if (count) count.style.display = 'none';
+  });
+
+  // ---------------- REFRESH BUTTONS ----------------
+  // Every "⟳ Refresh" button just spins its icon, waits half a second, then
+  // updates that tab's "Last updated" timestamp and shows a toast — no real
+  // data reload happens (there's no backend in this mockup).
+  document.querySelectorAll('[data-refresh]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.classList.add('spinning');
+      const line = btn.closest('.refresh-line');
+      setTimeout(() => {
+        btn.classList.remove('spinning');
+        if (line) {
+          const now = new Date();
+          const pad = n => String(n).padStart(2,'0');
+          const stamp = `2026-08-12 ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+          const lu = line.querySelector('.lastupdate');
+          if (lu) lu.textContent = stamp;
+        }
+        showToast('Data refreshed');
+      }, 500);
+    });
+  });
+
+  // ---------------- ROW SELECTION / BULK ACTION BARS ----------------
+  // "group" ties everything together: a row checkbox <input class="rowchk"
+  // data-group="players">, the header "select all" <input class="headchk"
+  // data-group="players">, and the bulk bar <div id="bulkPlayers"> all share
+  // the same group name "players" (capitalized for the bulk bar's id).
+  // Uses event delegation (document-level 'change' listener) so it keeps
+  // working after pagination swaps in new rows with fresh checkboxes.
+  // TO ADD BULK ACTIONS TO A NEW TABLE: give its checkboxes a new
+  // data-group="yourgroup", add <div class="bulk-bar" id="bulkYourgroup">
+  // with <button data-bulk="Label"> children — everything below auto-detects
+  // the new group from the checkboxes and wires the buttons up.
+  function updateBulkBar(group){
+    const rowchks = document.querySelectorAll(`.rowchk[data-group="${group}"]`);
+    const headchk = document.querySelector(`.headchk[data-group="${group}"]`);
+    const bulkBar = document.getElementById('bulk' + group.charAt(0).toUpperCase() + group.slice(1));
+    const checked = Array.from(rowchks).filter(c => c.checked);
+    if (bulkBar) {
+      bulkBar.querySelector('.bcount').textContent = checked.length;
+      bulkBar.classList.toggle('show', checked.length > 0);
+    }
+    if (headchk) headchk.checked = checked.length === rowchks.length && rowchks.length > 0;
+  }
+  document.addEventListener('change', (e) => {
+    const t = e.target;
+    if (t.classList.contains('headchk')) {
+      const group = t.dataset.group;
+      document.querySelectorAll(`.rowchk[data-group="${group}"]`).forEach(cb => cb.checked = t.checked);
+      updateBulkBar(group);
+    } else if (t.classList.contains('rowchk')) {
+      updateBulkBar(t.dataset.group);
+    }
+  });
+  const bulkGroups = new Set(Array.from(document.querySelectorAll('.rowchk')).map(cb => cb.dataset.group));
+  bulkGroups.forEach(group => {
+    const bulkBar = document.getElementById('bulk' + group.charAt(0).toUpperCase() + group.slice(1));
+    if (!bulkBar) return;
+    bulkBar.querySelectorAll('[data-bulk]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const n = Array.from(document.querySelectorAll(`.rowchk[data-group="${group}"]`)).filter(c => c.checked).length;
+        showToast(`${btn.dataset.bulk} applied to ${n} record${n === 1 ? '' : 's'}`);
+      });
+    });
+    bulkBar.querySelector('.bclear').addEventListener('click', () => {
+      document.querySelectorAll(`.rowchk[data-group="${group}"]`).forEach(c => c.checked = false);
+      const headchk = document.querySelector(`.headchk[data-group="${group}"]`);
+      if (headchk) headchk.checked = false;
+      updateBulkBar(group);
+    });
+  });
+
+  // ---------------- SORTABLE TABLE HEADERS ----------------
+  // Any <th class="sortable" data-sort="text|number|date"> becomes clickable;
+  // clicking re-orders that table's <tbody> rows by the matching column.
+  // If a <td> has a data-val="123" attribute, that's used for sorting instead
+  // of its displayed text (handy for cells like the Risk Score bar, where the
+  // visible content is a badge + mini bar, not a plain number).
+  document.querySelectorAll('thead th.sortable').forEach(th => {
+    th.addEventListener('click', () => {
+      const table = th.closest('table');
+      const tbody = table.querySelector('tbody');
+      const rows = Array.from(tbody.querySelectorAll('tr')).filter(tr => !tr.classList.contains('js-nodata-row'));
+      const idx = Array.from(th.parentNode.children).indexOf(th);
+      const type = th.dataset.sort;
+      const asc = !th.classList.contains('sorted-asc');
+      table.querySelectorAll('thead th.sortable').forEach(h => h.classList.remove('sorted-asc','sorted-desc'));
+      th.classList.add(asc ? 'sorted-asc' : 'sorted-desc');
+
+      function cellValue(tr){
+        const cell = tr.children[idx];
+        if (!cell) return '';
+        const val = cell.dataset.val;
+        if (val !== undefined) return parseFloat(val) || 0;
+        const txt = cell.textContent.replace(/[₱,]/g,'').trim();
+        if (type === 'number') return parseFloat(txt) || 0;
+        if (type === 'date') return new Date(txt.split(' ')[0]).getTime() || 0;
+        return txt.toLowerCase();
+      }
+      rows.sort((a, b) => {
+        const va = cellValue(a), vb = cellValue(b);
+        if (va < vb) return asc ? -1 : 1;
+        if (va > vb) return asc ? 1 : -1;
+        return 0;
+      });
+      rows.forEach(r => tbody.appendChild(r));
+      showToast('Sorted by ' + th.textContent.replace('⇅','').trim() + (asc ? ' (ascending)' : ' (descending)'));
+    });
+  });
+
+  // ============================================================================
+  // PAGINATION: SWAP IN SAMPLE ROWS PER PAGE
+  // Since this mockup has no real backend, clicking page 2 or 3 doesn't fetch
+  // new data — it swaps a table's <tbody> for a pre-written block of HTML
+  // stored here in PAGE_DATA_EXTRA, keyed by [group][pageNumber].
+  // "group" matches the same data-group used for bulk-select above, and the
+  // matching <table> is found by id ("table" + Capitalized group name, e.g.
+  // group "acct" → #tableAcct).
+  //
+  // TO ADD MORE SAMPLE PAGES: write your extra <tr> rows as a template
+  // string under PAGE_DATA_EXTRA.yourgroup['2'] (or '3', '4'...), matching
+  // the exact <td> structure of that table's real rows. Page "1" is NOT
+  // listed here — it's captured automatically from whatever is already in
+  // the HTML (see PAGE1_SNAPSHOT below), so just edit the table's HTML rows
+  // directly to change page 1.
+  // ============================================================================
+  const PAGE_DATA_EXTRA = {
+    players: {
+      '2': `
+        <tr><td><input type="checkbox" class="rowchk" data-group="players"></td><td><span class="badge on">Online</span></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>32011234</b><br>User Name：<b>c.villar</b><br>Real Name：CARLO VILLAR<br>Nickname：ca***ar<br>device：Android<br>Betting station code：Cebu014</td><td>Default<br>VVIP</td><td>Philippines <span class="red">●</span></td><td><span class="badge low">Normal</span></td><td>2026-03-14 10:02</td><td><span class="badge low">Fully Verify</span></td><td><div class="taglist"><span class="chip">VVIP</span></div></td><td><span class="op-link">Funding Details</span><span class="op-link">Bet Details</span></td></tr>
+        <tr><td><input type="checkbox" class="rowchk" data-group="players"></td><td><span class="badge off">Offline</span></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>29982110</b><br>User Name：<b>e.gomez</b><br>Real Name：ELENA GOMEZ<br>Nickname：el***ez<br>device：iOS<br>Betting station code：Davao003</td><td>Default<br>Standard</td><td>Philippines <span class="red">●</span></td><td><span class="badge low">Normal</span></td><td>2026-02-20 08:41</td><td><span class="badge low">Verified</span></td><td><div class="taglist"><span class="chip">No Label</span></div></td><td><span class="op-link">Funding Details</span><span class="op-link">Bet Details</span></td></tr>
+        <tr><td><input type="checkbox" class="rowchk" data-group="players"></td><td><span class="badge off">Offline</span></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>31500221</b><br>User Name：<b>j.bautista</b><br>Real Name：JERICHO BAUTISTA<br>Nickname：je***ta<br>device：Android<br>Betting station code：QC019</td><td>Default<br>Standard</td><td>Philippines <span class="red">●</span></td><td><span class="badge off">banBet</span></td><td>2025-12-02 19:15</td><td><span class="badge high">Not certified</span></td><td><div class="taglist"><span class="chip">BONUS ABUSER</span></div></td><td><span class="op-link">Funding Details</span><span class="op-link">Bet Details</span></td></tr>
+        <tr><td><input type="checkbox" class="rowchk" data-group="players"></td><td><span class="badge on">Online</span></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>28844021</b><br>User Name：<b>s.delrosario</b><br>Real Name：SOFIA DEL ROSARIO<br>Nickname：so***io<br>device：iOS<br>Betting station code：Pasig008</td><td>Default<br>Standard</td><td>Philippines <span class="red">●</span></td><td><span class="badge neutral">Temporarily frozen</span></td><td>2026-01-09 13:27</td><td><span class="badge med">Pending</span></td><td><div class="taglist"><span class="chip">PENDING VCKYC</span></div></td><td><span class="op-link">Funding Details</span><span class="op-link">Bet Details</span></td></tr>
+        <tr><td><input type="checkbox" class="rowchk" data-group="players"></td><td><span class="badge off">Offline</span></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>33210456</b><br>User Name：<b>t.nguyen</b><br>Real Name：THANH NGUYEN<br>Nickname：th***en<br>device：Android<br>Betting station code：Makati011</td><td>Default<br>VIP1</td><td>Vietnam <span class="red">●</span></td><td><span class="badge low">Normal</span></td><td>2026-04-22 21:09</td><td><span class="badge low">Fully Verify</span></td><td><div class="taglist"><span class="chip">VIP LIVECHAT</span></div></td><td><span class="op-link">Funding Details</span><span class="op-link">Bet Details</span></td></tr>
+        <tr><td><input type="checkbox" class="rowchk" data-group="players"></td><td><span class="badge on">Online</span></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>30877654</b><br>User Name：<b>r.dizon</b><br>Real Name：RAFAEL DIZON<br>Nickname：ra***on<br>device：Android<br>Betting station code：Taguig002</td><td>Default<br>Standard</td><td>Philippines <span class="red">●</span></td><td><span class="badge med">Under Review</span></td><td>2026-05-30 07:52</td><td><span class="badge high">Incomplete Info</span></td><td><div class="taglist"><span class="chip">INCOMPLETE DETAILS</span></div></td><td><span class="op-link">Funding Details</span><span class="op-link">Bet Details</span></td></tr>`,
+      '3': `
+        <tr><td><input type="checkbox" class="rowchk" data-group="players"></td><td><span class="badge off">Offline</span></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>34012098</b><br>User Name：<b>a.santiago</b><br>Real Name：ANGELICA SANTIAGO<br>Nickname：an***go<br>device：iOS<br>Betting station code：Antipolo001</td><td>Default<br>Standard</td><td>Philippines <span class="red">●</span></td><td><span class="badge low">Normal</span></td><td>2026-06-02 09:00</td><td><span class="badge low">Verified</span></td><td><div class="taglist"><span class="chip">No Label</span></div></td><td><span class="op-link">Funding Details</span><span class="op-link">Bet Details</span></td></tr>
+        <tr><td><input type="checkbox" class="rowchk" data-group="players"></td><td><span class="badge on">Online</span></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>29450871</b><br>User Name：<b>m.reyes</b><br>Real Name：MARIA REYES<br>Nickname：ma***es<br>device：Android<br>Betting station code：Caloocan005</td><td>Default<br>Standard</td><td>Philippines <span class="red">●</span></td><td><span class="badge high">Freeze</span></td><td>2026-07-01 15:41</td><td><span class="badge high">Authentication Failed</span></td><td><div class="taglist"><span class="chip">RESTRICTED PLAYER (MULTIPLE ACCOUNT)</span></div></td><td><span class="op-link">Funding Details</span><span class="op-link">Bet Details</span></td></tr>
+        <tr><td><input type="checkbox" class="rowchk" data-group="players"></td><td><span class="badge off">Offline</span></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>31788452</b><br>User Name：<b>k.lim</b><br>Real Name：KEVIN LIM<br>Nickname：ke***im<br>device：iOS<br>Betting station code：Ortigas002</td><td>Default<br>VIP1</td><td>Malaysia <span class="red">●</span></td><td><span class="badge low">Normal</span></td><td>2026-04-10 12:18</td><td><span class="badge low">Fully Verify</span></td><td><div class="taglist"><span class="chip">VIP SALES</span></div></td><td><span class="op-link">Funding Details</span><span class="op-link">Bet Details</span></td></tr>
+        <tr><td><input type="checkbox" class="rowchk" data-group="players"></td><td><span class="badge off">Offline</span></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>30234109</b><br>User Name：<b>n.cruz</b><br>Real Name：NIÑO CRUZ<br>Nickname：ni***uz<br>device：Android<br>Betting station code：Marikina001</td><td>Default<br>Standard</td><td>Philippines <span class="red">●</span></td><td><span class="badge off">Deleted</span></td><td>2025-08-19 17:05</td><td><span class="badge high">Not certified</span></td><td><div class="taglist"><span class="chip">EXCLUDE</span></div></td><td><span class="op-link">Funding Details</span><span class="op-link">Bet Details</span></td></tr>`
+    },
+    risk: {
+      '2': `
+        <tr><td><input type="checkbox" class="rowchk" data-group="risk"></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>32011234</b><br>User Name：<b>c.villar</b><br>Real Name：CARLO VILLAR</td><td data-val="76"><span class="badge high">High Risk</span><div class="risk-bar-track"><div class="risk-bar-fill high" style="width:76%"></div></div><div class="risk-score-txt">76 / 100</div></td><td><span class="badge low">Fully Verify</span></td><td><div class="taglist"><span class="chip">SUSPICIOUS BETTING BEHAVIOUR</span></div></td><td><span class="badge high">Pending EDD</span></td><td>2026-08-06</td><td><span class="op-link">Risk Profile</span></td></tr>
+        <tr><td><input type="checkbox" class="rowchk" data-group="risk"></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>29982110</b><br>User Name：<b>e.gomez</b><br>Real Name：ELENA GOMEZ</td><td data-val="12"><span class="badge low">Low Risk</span><div class="risk-bar-track"><div class="risk-bar-fill low" style="width:12%"></div></div><div class="risk-score-txt">12 / 100</div></td><td><span class="badge low">Verified</span></td><td><div class="taglist"><span class="chip">No Label</span></div></td><td><span class="badge neutral">Not Applicable</span></td><td>2026-07-15</td><td><span class="op-link">Risk Profile</span></td></tr>
+        <tr><td><input type="checkbox" class="rowchk" data-group="risk"></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>31500221</b><br>User Name：<b>j.bautista</b><br>Real Name：JERICHO BAUTISTA</td><td data-val="63"><span class="badge med">Medium Risk</span><div class="risk-bar-track"><div class="risk-bar-fill med" style="width:63%"></div></div><div class="risk-score-txt">63 / 100</div></td><td><span class="badge high">Not certified</span></td><td><div class="taglist"><span class="chip">BONUS ABUSER</span></div></td><td><span class="badge high">Pending EDD</span></td><td>2026-08-02</td><td><span class="op-link">Risk Profile</span></td></tr>
+        <tr><td><input type="checkbox" class="rowchk" data-group="risk"></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>28844021</b><br>User Name：<b>s.delrosario</b><br>Real Name：SOFIA DEL ROSARIO</td><td data-val="58"><span class="badge med">Medium Risk</span><div class="risk-bar-track"><div class="risk-bar-fill med" style="width:58%"></div></div><div class="risk-score-txt">58 / 100</div></td><td><span class="badge med">Pending</span></td><td><div class="taglist"><span class="chip">PENDING VCKYC</span></div></td><td><span class="badge neutral">Not Applicable</span></td><td>2026-08-01</td><td><span class="op-link">Risk Profile</span></td></tr>
+        <tr><td><input type="checkbox" class="rowchk" data-group="risk"></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>33210456</b><br>User Name：<b>t.nguyen</b><br>Real Name：THANH NGUYEN</td><td data-val="24"><span class="badge low">Low Risk</span><div class="risk-bar-track"><div class="risk-bar-fill low" style="width:24%"></div></div><div class="risk-score-txt">24 / 100</div></td><td><span class="badge low">Fully Verify</span></td><td><div class="taglist"><span class="chip">VIP LIVECHAT</span></div></td><td><span class="badge neutral">Not Applicable</span></td><td>2026-07-20</td><td><span class="op-link">Risk Profile</span></td></tr>
+        <tr><td><input type="checkbox" class="rowchk" data-group="risk"></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>30877654</b><br>User Name：<b>r.dizon</b><br>Real Name：RAFAEL DIZON</td><td data-val="88"><span class="badge high">High Risk</span><div class="risk-bar-track"><div class="risk-bar-fill high" style="width:88%"></div></div><div class="risk-score-txt">88 / 100</div></td><td><span class="badge high">Incomplete Info</span></td><td><div class="taglist"><span class="chip">INCOMPLETE DETAILS</span><span class="chip">MONITORING PLAYER</span></div></td><td><span class="badge high">Pending EDD</span></td><td>2026-08-11</td><td><span class="op-link">Risk Profile</span></td></tr>`,
+      '3': `
+        <tr><td><input type="checkbox" class="rowchk" data-group="risk"></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>34012098</b><br>User Name：<b>a.santiago</b><br>Real Name：ANGELICA SANTIAGO</td><td data-val="9"><span class="badge low">Low Risk</span><div class="risk-bar-track"><div class="risk-bar-fill low" style="width:9%"></div></div><div class="risk-score-txt">9 / 100</div></td><td><span class="badge low">Verified</span></td><td><div class="taglist"><span class="chip">No Label</span></div></td><td><span class="badge neutral">Not Applicable</span></td><td>2026-07-02</td><td><span class="op-link">Risk Profile</span></td></tr>
+        <tr><td><input type="checkbox" class="rowchk" data-group="risk"></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>29450871</b><br>User Name：<b>m.reyes</b><br>Real Name：MARIA REYES</td><td data-val="94"><span class="badge high">High Risk</span><div class="risk-bar-track"><div class="risk-bar-fill high" style="width:94%"></div></div><div class="risk-score-txt">94 / 100</div></td><td><span class="badge high">Authentication Failed</span></td><td><div class="taglist"><span class="chip">RESTRICTED PLAYER (MULTIPLE ACCOUNT)</span></div></td><td><span class="badge high">Pending EDD</span></td><td>2026-07-30</td><td><span class="op-link">Risk Profile</span></td></tr>
+        <tr><td><input type="checkbox" class="rowchk" data-group="risk"></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>31788452</b><br>User Name：<b>k.lim</b><br>Real Name：KEVIN LIM</td><td data-val="41"><span class="badge med">Medium Risk</span><div class="risk-bar-track"><div class="risk-bar-fill med" style="width:41%"></div></div><div class="risk-score-txt">41 / 100</div></td><td><span class="badge low">Fully Verify</span></td><td><div class="taglist"><span class="chip">VIP SALES</span></div></td><td><span class="badge neutral">Not Applicable</span></td><td>2026-06-18</td><td><span class="op-link">Risk Profile</span></td></tr>`
+    },
+    acct: {
+      '2': `
+        <tr><td><input type="checkbox" class="rowchk" data-group="acct"></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>32011234</b><br>User Name：<b>c.villar</b><br>Real Name：CARLO VILLAR</td><td><span class="badge med">Under Review</span></td><td>KYC re-verification requested</td><td>2026-08-05</td><td><span class="op-link">View</span></td></tr>
+        <tr><td><input type="checkbox" class="rowchk" data-group="acct"></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>33210456</b><br>User Name：<b>t.nguyen</b><br>Real Name：THANH NGUYEN</td><td><span class="badge low">Normal</span></td><td>Restored to normal after review</td><td>2026-07-25</td><td><span class="op-link">View</span></td></tr>
+        <tr><td><input type="checkbox" class="rowchk" data-group="acct"></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>30234109</b><br>User Name：<b>n.cruz</b><br>Real Name：NIÑO CRUZ</td><td><span class="badge off">Deleted</span></td><td>Self-requested account closure</td><td>2025-08-19</td><td><span class="op-link">View</span></td></tr>
+        <tr><td><input type="checkbox" class="rowchk" data-group="acct"></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>29450871</b><br>User Name：<b>m.reyes</b><br>Real Name：MARIA REYES</td><td><span class="badge high">Freeze</span></td><td>Multiple-account investigation</td><td>2026-07-01</td><td><span class="op-link">View</span></td></tr>`
+    },
+    txn: {
+      '2': `
+        <tr><td>gc693633256</td><td>PLY-693633256</td><td>0</td><td>₱0.00</td><td>3</td><td>₱100,000.00</td><td>2026-02-24</td></tr>
+        <tr><td>gc036691872</td><td>PLY-036691872</td><td>0</td><td>₱0.00</td><td>4</td><td>₱95,000.00</td><td>2026-02-24</td></tr>
+        <tr><td>gc069878314</td><td>PLY-069878314</td><td>0</td><td>₱0.00</td><td>4</td><td>₱85,000.00</td><td>2026-02-24</td></tr>
+        <tr><td>gc344065784</td><td>PLY-344065784</td><td>6</td><td>₱51,000.00</td><td>0</td><td>₱0.00</td><td>2026-02-24</td></tr>
+        <tr><td>9090095560</td><td>PLY-090095560</td><td>6</td><td>₱50,000.00</td><td>0</td><td>₱0.00</td><td>2026-02-24</td></tr>
+        <tr><td>gc010447059</td><td>PLY-010447059</td><td>2</td><td>₱50,000.00</td><td>0</td><td>₱0.00</td><td>2026-02-24</td></tr>`,
+      '3': `
+        <tr><td>gc232937919</td><td>PLY-232937919</td><td>1</td><td>₱50,000.00</td><td>0</td><td>₱0.00</td><td>2026-02-24</td></tr>
+        <tr><td>gc934321634</td><td>PLY-934321634</td><td>36</td><td>₱45,300.00</td><td>0</td><td>₱0.00</td><td>2026-02-24</td></tr>
+        <tr><td>gc033619559</td><td>PLY-033619559</td><td>0</td><td>₱0.00</td><td>3</td><td>₱65,000.00</td><td>2026-02-24</td></tr>
+        <tr><td>gc108457783</td><td>PLY-108457783</td><td>0</td><td>₱0.00</td><td>5</td><td>₱50,000.00</td><td>2026-02-24</td></tr>
+        <tr><td>gc530897982</td><td>PLY-530897982</td><td>0</td><td>₱0.00</td><td>1</td><td>₱50,000.00</td><td>2026-02-24</td></tr>
+        <tr><td>gc885709436</td><td>PLY-885709436</td><td>0</td><td>₱0.00</td><td>1</td><td>₱50,000.00</td><td>2026-02-24</td></tr>`
+    },
+    redflag: {
+      '2': `
+        <tr><td><input type="checkbox" class="rowchk" data-group="redflag"></td><td>c.villar</td><td>32011234</td><td>Structuring Pattern</td><td>3 deposits / 48h</td><td>5 deposits</td><td><span class="badge high">High</span></td><td>2026-08-10 20:47</td><td><span class="badge med">Open</span></td><td><span class="op-link">Investigate</span></td></tr>
+        <tr><td><input type="checkbox" class="rowchk" data-group="redflag"></td><td>t.nguyen</td><td>33210456</td><td>Dormant Reactivation</td><td>₱50,000 / 24h post-dormancy</td><td>₱62,000.00</td><td><span class="badge med">Medium</span></td><td>2026-08-09 12:10</td><td><span class="badge low">Reviewed</span></td><td><span class="op-link">Investigate</span></td></tr>
+        <tr><td><input type="checkbox" class="rowchk" data-group="redflag"></td><td>s.delrosario</td><td>28844021</td><td>High-Value Threshold</td><td>₱400,000 / 24h</td><td>₱455,000.00</td><td><span class="badge high">High</span></td><td>2026-08-08 09:44</td><td><span class="badge med">Open</span></td><td><span class="op-link">Investigate</span></td></tr>
+        <tr><td><input type="checkbox" class="rowchk" data-group="redflag"></td><td>j.bautista</td><td>31500221</td><td>Rapid Cycling</td><td>5x / 7 days</td><td>7x</td><td><span class="badge med">Medium</span></td><td>2026-08-07 15:02</td><td><span class="badge low">Reviewed</span></td><td><span class="op-link">Investigate</span></td></tr>`
+    },
+    kyc: {
+      '2': `
+        <tr><td><input type="checkbox" class="rowchk" data-group="kyc"></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>32011234</b><br>User Name：<b>c.villar</b><br>Real Name：CARLO VILLAR</td><td><div class="missing-list"><span class="chip">Source of Funds</span></div></td><td><div class="progress-track"><div class="progress-dot done"></div><div class="progress-dot today"></div><div class="progress-dot"></div></div><div class="progress-txt">Day 2 of 3 updated</div></td><td>2026-08-15</td><td><span class="op-link">Send Reminder</span><span class="op-link">View</span></td></tr>
+        <tr><td><input type="checkbox" class="rowchk" data-group="kyc"></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>29982110</b><br>User Name：<b>e.gomez</b><br>Real Name：ELENA GOMEZ</td><td><div class="missing-list"><span class="chip">Valid ID</span><span class="chip">Proof of Address</span></div></td><td><div class="progress-track"><div class="progress-dot"></div><div class="progress-dot"></div><div class="progress-dot"></div></div><div class="progress-txt">Not started</div></td><td>2026-08-17</td><td><span class="op-link">Send Reminder</span><span class="op-link">View</span></td></tr>
+        <tr><td><input type="checkbox" class="rowchk" data-group="kyc"></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>31788452</b><br>User Name：<b>k.lim</b><br>Real Name：KEVIN LIM</td><td><div class="missing-list"><span class="chip">Selfie / Liveness</span></div></td><td><div class="progress-track"><div class="progress-dot done"></div><div class="progress-dot done"></div><div class="progress-dot done"></div></div><div class="progress-txt">Completed 3 / 3</div></td><td>2026-08-10</td><td><span class="op-link">Send Reminder</span><span class="op-link">View</span></td></tr>
+        <tr><td><input type="checkbox" class="rowchk" data-group="kyc"></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>34012098</b><br>User Name：<b>a.santiago</b><br>Real Name：ANGELICA SANTIAGO</td><td><div class="missing-list"><span class="chip">Contact Number</span></div></td><td><div class="progress-track"><div class="progress-dot done"></div><div class="progress-dot"></div><div class="progress-dot"></div></div><div class="progress-txt">Day 1 of 3 updated</div></td><td>2026-08-16</td><td><span class="op-link">Send Reminder</span><span class="op-link">View</span></td></tr>
+        <tr><td><input type="checkbox" class="rowchk" data-group="kyc"></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>30877654</b><br>User Name：<b>r.dizon</b><br>Real Name：RAFAEL DIZON</td><td><div class="missing-list"><span class="chip">Valid ID</span></div></td><td><div class="progress-track"><div class="progress-dot"></div><div class="progress-dot"></div><div class="progress-dot"></div></div><div class="progress-txt">Overdue — no response</div></td><td>2026-08-09</td><td><span class="op-link">Send Reminder</span><span class="op-link">View</span></td></tr>`,
+      '3': `
+        <tr><td><input type="checkbox" class="rowchk" data-group="kyc"></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>29450871</b><br>User Name：<b>m.reyes</b><br>Real Name：MARIA REYES (2)</td><td><div class="missing-list"><span class="chip">Email Verification</span></div></td><td><div class="progress-track"><div class="progress-dot done"></div><div class="progress-dot today"></div><div class="progress-dot"></div></div><div class="progress-txt">Day 2 of 3 updated</div></td><td>2026-08-15</td><td><span class="op-link">Send Reminder</span><span class="op-link">View</span></td></tr>
+        <tr><td><input type="checkbox" class="rowchk" data-group="kyc"></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>30234109</b><br>User Name：<b>n.cruz2</b><br>Real Name：NIÑO CRUZ II</td><td><div class="missing-list"><span class="chip">Proof of Address</span><span class="chip">Selfie / Liveness</span></div></td><td><div class="progress-track"><div class="progress-dot"></div><div class="progress-dot"></div><div class="progress-dot"></div></div><div class="progress-txt">Not started</div></td><td>2026-08-18</td><td><span class="op-link">Send Reminder</span><span class="op-link">View</span></td></tr>
+        <tr><td><input type="checkbox" class="rowchk" data-group="kyc"></td><td><div class="photo-ph">👤</div></td><td class="member-cell">Member ID：<b>33210457</b><br>User Name：<b>t.nguyen2</b><br>Real Name：THANH NGUYEN II</td><td><div class="missing-list"><span class="chip">Valid ID</span></div></td><td><div class="progress-track"><div class="progress-dot done"></div><div class="progress-dot done"></div><div class="progress-dot done"></div></div><div class="progress-txt">Completed 3 / 3</div></td><td>2026-08-07</td><td><span class="op-link">Send Reminder</span><span class="op-link">View</span></td></tr>`
+    }
+  };
+
+  // Snapshot each table's ORIGINAL (page-1) rows once at page load, before
+  // anything can change them, so "back to page 1" always has something to
+  // restore. groups list here must match the tables that have pagination.
+  const PAGE1_SNAPSHOT = {};
+  ['players','risk','acct','txn','redflag','kyc'].forEach(g => {
+    const tbl = document.getElementById('table' + g.charAt(0).toUpperCase() + g.slice(1));
+    if (tbl) PAGE1_SNAPSHOT[g] = tbl.querySelector('tbody').innerHTML;
+  });
+
+  // Swaps a table's tbody to the requested page's HTML, resets that table's
+  // bulk-select state and sort-arrow indicators. If no sample data exists
+  // for that page number, just shows a toast (nothing visually changes).
+  function loadPage(group, page){
+    const table = document.getElementById('table' + group.charAt(0).toUpperCase() + group.slice(1));
+    if (!table) return;
+    const tbody = table.querySelector('tbody');
+    let html;
+    if (page === '1') html = PAGE1_SNAPSHOT[group];
+    else html = (PAGE_DATA_EXTRA[group] && PAGE_DATA_EXTRA[group][page]) || null;
+    if (!html) { showToast('Loaded page ' + page); return; }
+    tbody.innerHTML = html;
+    const bulkBar = document.getElementById('bulk' + group.charAt(0).toUpperCase() + group.slice(1));
+    if (bulkBar) { bulkBar.classList.remove('show'); const c = bulkBar.querySelector('.bcount'); if (c) c.textContent = '0'; }
+    const headchk = document.querySelector(`.headchk[data-group="${group}"]`);
+    if (headchk) headchk.checked = false;
+    table.querySelectorAll('thead th.sortable').forEach(h => h.classList.remove('sorted-asc','sorted-desc'));
+    showToast('Loaded page ' + page);
+  }
+
+  document.querySelectorAll('.pager .pages[data-group]').forEach(pagesDiv => {
+    const group = pagesDiv.dataset.group;
+    pagesDiv.querySelectorAll('.num').forEach(num => {
+      num.addEventListener('click', () => {
+        pagesDiv.querySelectorAll('.num').forEach(n => n.classList.remove('active'));
+        num.classList.add('active');
+        loadPage(group, num.textContent.trim());
+      });
+    });
+    pagesDiv.querySelectorAll('.arrow').forEach(arrow => {
+      arrow.addEventListener('click', () => {
+        const nums = Array.from(pagesDiv.querySelectorAll('.num'));
+        const activeIdx = nums.findIndex(n => n.classList.contains('active'));
+        const isNext = arrow.textContent.trim() === '›';
+        const newIdx = isNext ? activeIdx + 1 : activeIdx - 1;
+        if (newIdx < 0 || newIdx >= nums.length) { showToast('No more pages'); return; }
+        nums[newIdx].click();
+      });
+    });
+  });
+
+  // ---------------- INNER TABS (Deposit statistics / Withdrawal statistics) ----------------
+  // A small tab-bar nested INSIDE one sidebar tab (currently only used in
+  // "Larget Amount Report"). Looks for a sibling element with id
+  // "inner" + Capitalized data-inner value, e.g. data-inner="deposit" →
+  // #innerDeposit. To add a third inner tab, add a .inner-tab with a new
+  // data-inner="xxx" and a matching <div class="inner-panel" id="innerXxx">.
+  document.querySelectorAll('.inner-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const group = tab.closest('.panel');
+      group.querySelectorAll('.inner-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const target = tab.dataset.inner;
+      group.querySelectorAll('.inner-panel').forEach(p => p.classList.remove('active'));
+      const targetPanel = group.querySelector('#inner' + target.charAt(0).toUpperCase() + target.slice(1));
+      if (targetPanel) targetPanel.classList.add('active');
+    });
+  });
+
+  // ============================================================================
+  // OVERVIEW PIE CHARTS — hand-drawn inline SVG, zero external dependencies
+  // (earlier version used Chart.js from a CDN; replaced because it wasn't
+  // loading reliably everywhere — this version always renders, offline too).
+  //
+  //   PIE_PALETTE          — the color order pies cycle through (edit here to
+  //                          reskin every pie chart's slice colors at once)
+  //   polarPoint / arcPath — small trig helpers that turn "this slice covers
+  //                          40° to 90°" into an SVG <path> arc. You shouldn't
+  //                          need to touch these.
+  //   renderPie(containerId, legendId, labels, values, title)
+  //       Draws one pie into <div id="containerId"> and its legend into
+  //       <div id="legendId">, using `labels`/`values` (parallel arrays) and
+  //       an optional bold `title` line above the legend. Colors are assigned
+  //       automatically from PIE_PALETTE in array order.
+  //
+  // TO ADD A NEW PIE CHART:
+  //   1. In the HTML, add  <div id="pieYourName" class="pie-wrap"></div>
+  //      and  <div class="overview-legend" id="legendYourName"></div>
+  //      inside an .overview-card (see any existing tab for the pattern).
+  //   2. Down at the bottom of this script, add a line like:
+  //      renderPie('pieYourName', 'legendYourName', ['A','B'], [10,20], 'Title');
+  // TO EDIT EXISTING NUMBERS: just change the `values` array in the matching
+  //   renderPie(...) call below — nothing else needs to change.
+  // ============================================================================
+  const PIE_PALETTE = ['#4098fc','#2ba24c','#c8890b','#e0463f','#8f9ac2','#5b6cad','#3d4527'];
+  function polarPoint(cx, cy, r, angleDeg){
+    const rad = (angleDeg - 90) * Math.PI / 180;
+    return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+  }
+  function arcPath(cx, cy, r, startAngle, endAngle){
+    const start = polarPoint(cx, cy, r, endAngle);
+    const end = polarPoint(cx, cy, r, startAngle);
+    const largeArcFlag = (endAngle - startAngle) <= 180 ? '0' : '1';
+    return `M ${cx} ${cy} L ${start.x.toFixed(2)} ${start.y.toFixed(2)} A ${r} ${r} 0 ${largeArcFlag} 0 ${end.x.toFixed(2)} ${end.y.toFixed(2)} Z`;
+  }
+  function renderPie(containerId, legendId, labels, values, title){
+    const container = document.getElementById(containerId);
+    const legendEl = document.getElementById(legendId);
+    if (!container) return;
+    const total = values.reduce((a,b) => a+b, 0) || 1;
+    const colors = labels.map((_, i) => PIE_PALETTE[i % PIE_PALETTE.length]);
+    const nonZero = values.filter(v => v > 0).length;
+    const r = 70, cx = 75, cy = 75;
+    const labelR = r * 0.62; /* how far out from center the % text sits */
+    let svgInner = '';
+    let svgLabels = '';
+    if (nonZero <= 1) {
+      const idx = values.findIndex(v => v > 0);
+      svgInner = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${colors[idx === -1 ? 0 : idx]}"></circle>`;
+      svgLabels = `<text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle" font-size="15" font-weight="700" fill="#fff" stroke="rgba(0,0,0,0.35)" stroke-width="3" paint-order="stroke">100%</text>`;
+    } else {
+      let cumulative = 0;
+      values.forEach((v, i) => {
+        const angle = (v / total) * 360;
+        if (angle <= 0) return;
+        svgInner += `<path d="${arcPath(cx, cy, r, cumulative, cumulative + angle)}" fill="${colors[i]}" stroke="#fff" stroke-width="1.5"></path>`;
+        // Percentage label centered inside this slice (skip tiny slivers < 5% — no room to fit a legible number)
+        const pct = Math.round((v / total) * 100);
+        if (angle >= 18) {
+          const mid = polarPoint(cx, cy, labelR, cumulative + angle / 2);
+          svgLabels += `<text x="${mid.x.toFixed(2)}" y="${mid.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-size="12" font-weight="700" fill="#fff" stroke="rgba(0,0,0,0.35)" stroke-width="3" paint-order="stroke">${pct}%</text>`;
+        }
+        cumulative += angle;
+      });
+    }
+    container.innerHTML = `<svg width="150" height="150" viewBox="0 0 150 150">${svgInner}${svgLabels}</svg>`;
+    if (legendEl) {
+      const pctTotal = values.reduce((a,b) => a+b, 0) || 1;
+      const titleHtml = title ? `<div class="legend-title">${title}</div>` : '';
+      legendEl.innerHTML = titleHtml + labels.map((label, i) => {
+        const pct = Math.round((values[i] / pctTotal) * 100);
+        return `<div class="oi"><span class="sw" style="background:${colors[i]}"></span>${label}<span class="ov">${values[i].toLocaleString()} (${pct}%)</span></div>`;
+      }).join('');
+    }
+  }
+
+  // ---------------- ACTUAL PIE CHART DATA — one line per chart ----------------
+  // This is the easiest place in the whole file to change a stat: just edit
+  // the numbers array. Order of labels/values must line up (index 0 ↔ index 0).
+  renderPie('piePlayers', 'legendPlayers', ['Local (Philippines)', 'Foreign'], [435500, 64500], 'Local vs Foreign');
+  renderPie('piePlayersActive', 'legendPlayersActive', ['Active', 'Inactive'], [150000, 350000], 'Active vs Inactive');
+  renderPie('pieRisk', 'legendRisk', ['Low Risk', 'Medium Risk', 'High Risk'], [120000, 25000, 5000], 'Risk Distribution');
+  renderPie('pieRiskEdd', 'legendRiskEdd', ['EDD Completed', 'Pending EDD', 'Not Applicable'], [520, 720, 148760], 'EDD Status');
+  renderPie('pieAcct', 'legendAcct', ['Normal', 'Under Review', 'Freeze', 'Deactivate', 'banBet'], [486210, 1340, 214, 1088, 522], 'All Statuses');
+  renderPie('pieAcctRestricted', 'legendAcctRestricted', ['Freeze', 'Deactivate', 'banBet', 'Temporarily frozen'], [214, 1088, 522, 340], 'Restricted Accounts by Type');
+  renderPie('pieTxn', 'legendTxn', ['Deposit', 'Withdrawal'], [405000, 628591], 'Volume by Type (this page)');
+  renderPie('pieTxnCount', 'legendTxnCount', ['Deposit orders', 'Withdrawal orders'], [57, 33], 'Order Count by Type (this page)');
+  renderPie('pieTxnTop', 'legendTxnTop', ['gc702515393', 'gc379002082', 'gc448105185', 'Others'], [156000, 75000, 72000, 102000], 'Top Depositors (this page)');
+  renderPie('pieRedflag', 'legendRedflag', ['High', 'Medium', 'Low'], [3, 2, 1], 'By Severity (this page)');
+  renderPie('pieRedflagRule', 'legendRedflagRule', ['High-Value Threshold', 'Structuring Pattern', 'Rapid Cycling', 'Dormant Reactivation'], [76, 68, 54, 16], 'By Rule Type (all alerts)');
+  renderPie('pieDeposit', 'legendDeposit', ['okbet3070ee91p', 'okbet16141fdp8'], [804953, 650000]);
+  renderPie('pieWithdrawal', 'legendWithdrawal', ['okbet3070ee91p','okbet1964hwju0','okbet7200fe31t','okbet88474hq7c','okbet16141fdp8','okbet8520q2jib'], [562000,762003,550000,775790,600000,1022500]);
+  renderPie('pieBigSplit', 'legendBigSplit', ['Deposit alerts', 'Withdrawal alerts'], [1454953, 4272293], 'Flagged Amount by Type');
+  renderPie('pieBigCount', 'legendBigCount', ['Deposit orders', 'Withdrawal orders'], [2, 6], 'Flagged Order Count');
+  renderPie('pieKyc', 'legendKyc', ['Not Started', 'Day 1–2 In Progress', 'Completed 3 / 3', 'Overdue'], [312, 268, 190, 72], 'Update Progress');
+  renderPie('pieKycMissing', 'legendKycMissing', ['Valid ID', 'Proof of Address', 'Selfie / Liveness', 'Source of Funds', 'Contact Number', 'Email Verification'], [210, 150, 180, 95, 120, 87], 'Missing Item Breakdown');
+</script>
+</body>
+</html>
