@@ -931,6 +931,38 @@ body{background:#1a0204;}
 .cs__form input{flex:1;min-width:0;border:1px solid #c9cfdb;border-radius:999px;padding:8px 14px;font-size:.78rem;}
 .cs__form button{border:0;border-radius:999px;padding:0 16px;background:#2b5fd9;color:#fff;font-weight:700;font-size:.78rem;cursor:pointer;}
 
+/* === 抽奖动画（11/12，参照影片）：开箱格子依序弹出 → 金色跑马灯 → 停下即弹 Congratulations（不停留）→ 奖励卡依序弹出 → Claim 出现并呼吸发光 === */
+@keyframes fxPanelIn{from{opacity:0;transform:scale(.88);}to{opacity:1;transform:none;}}
+@keyframes fxTileIn{0%{opacity:0;transform:scale(.55);}70%{opacity:1;transform:scale(1.06);}100%{opacity:1;transform:scale(1);}}
+@keyframes fxFade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+@keyframes fxCardIn{0%{opacity:0;scale:.4;}65%{opacity:1;scale:1.12;}100%{opacity:1;scale:1;}}
+@keyframes fxBtnIn{0%{opacity:0;scale:.6;}70%{opacity:1;scale:1.08;}100%{opacity:1;scale:1;}}
+@keyframes fxBtnGlow{0%,100%{scale:1;filter:drop-shadow(0 0 0 rgba(255,214,110,0));}50%{scale:1.05;filter:drop-shadow(0 0 10px rgba(255,226,122,.95));}}
+/* 开箱：弹窗放大淡入，9 格依跑马灯顺序（顺时针外圈→中间）逐格弹出，最后显示 Draw */
+#boxMask.is-open .mbox{animation:fxPanelIn .3s ease-out both;}
+#boxMask.is-open #grid9 .tile{animation:fxTileIn .3s ease-out both;animation-delay:var(--d,0ms);}
+#boxMask.is-open .mbox__draw{animation:fxFade .25s ease-out both;animation-delay:var(--dd,0ms);}
+/* 跑马灯：目前所在格以外框发光强调（不换底色；签到宝箱、奖池共用） */
+#grid9 .tile.tile--hit,.gtree__grid .tile.tile--hit{border-color:#fff3b0;box-shadow:0 0 0 3px rgba(255,226,122,.8),0 0 22px 4px rgba(255,214,110,.9);transform:scale(1.05);z-index:3;transition:none;}
+/* Congratulations：底板淡入 → 文案 → 奖励卡依序弹出 → Claim 弹出后持续呼吸发光 */
+#cgwMask.is-open .cgw{animation:fxPanelIn .3s ease-out both;}
+#cgwMask.is-open .cgw__lead{animation:fxFade .25s ease-out both;animation-delay:.2s;}
+#cgwMask.is-open .cgw__item{animation:fxCardIn .32s ease-out both;animation-delay:var(--d,0ms);}
+#cgwMask.is-open .cgw__note{animation:fxFade .25s ease-out both;animation-delay:var(--db,0ms);}
+#cgwMask.is-open .cgw__btn{animation:fxBtnIn .3s ease-out both,fxBtnGlow 1.6s ease-in-out infinite;animation-delay:var(--db,0ms),calc(var(--db,0ms) + .3s);}
+@media (prefers-reduced-motion:reduce){
+  #boxMask.is-open .mbox,#boxMask.is-open #grid9 .tile,#boxMask.is-open .mbox__draw,
+  #cgwMask.is-open .cgw,#cgwMask.is-open .cgw__lead,#cgwMask.is-open .cgw__item,#cgwMask.is-open .cgw__note,#cgwMask.is-open .cgw__btn{animation:none;}
+}
+
+/* 跑马灯拖尾（前 1、2 格外框光晕依序变淡） */
+#grid9 .tile.tile--t1,.gtree__grid .tile.tile--t1{border-color:rgba(255,243,176,.75);box-shadow:0 0 0 2px rgba(255,226,122,.45),0 0 12px 2px rgba(255,214,110,.5);transition:none;}
+#grid9 .tile.tile--t2,.gtree__grid .tile.tile--t2{border-color:rgba(255,243,176,.5);box-shadow:0 0 0 1px rgba(255,226,122,.25),0 0 6px 1px rgba(255,214,110,.28);transition:none;}
+/* 获奖格（奖池 1 抽停格）：黄底＋外框，与 GRAND PRIZE 格区隔（11/12） */
+.gtree__grid .tile.tile--won{background:linear-gradient(180deg,#fff6cf,#ffd668 60%,#f0a92a);border-color:#fff3b0;}
+.gtree__grid .tile.tile--won .tile__lb{color:#5a1606;text-shadow:none;}
+.gtree__grid .tile.tile--won .tile__gp{z-index:2;}
+
 /* === B 版：奖池 Tab === */
 .ptabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:0 0 12px;}
 .ptab{padding:8px 4px;border-radius:999px;font-family:Georgia,'Times New Roman',serif;font-weight:700;font-size:.8rem;letter-spacing:.04em;white-space:nowrap;cursor:pointer;
@@ -1688,7 +1720,12 @@ function openCgw(lead,list,ctx){
   const g=$('#cgwList'); g.className='cgw__grid cgw__grid--n'+Math.min(list.length,3);
   g.innerHTML=list.map(({r,n})=>`<li class="cgw__item"><span class="cgw__card"><span class="cgw__ic">${rwIcon(r)}</span>${n>=2?`<span class="cgw__cnt">x${n}</span>`:''}</span><span class="cgw__lb" title="${r.label}">${r.label}</span></li>`).join('');
   $('#cgwNote').textContent=list.some(({r})=>r.physical)?'Contact Customer Service to claim physical rewards.':'';
-  CGW=ctx; $('#cgwMask').classList.add('is-open'); $('#cgwOk').focus();
+  /* 弹窗动画：奖励卡每 110ms 弹出 1 张（第 1 张 0.35 秒），最后一张出现后 Claim 弹出并呼吸发光；Claim 出现前不可点 */
+  const reduceFx=matchMedia('(prefers-reduced-motion: reduce)').matches, items=$$('.cgw__item',g), btnAt=reduceFx?0:350+items.length*110+120;
+  items.forEach((it,i)=>it.style.setProperty('--d',(reduceFx?0:350+i*110)+'ms'));
+  $('.cgw').style.setProperty('--db',btnAt+'ms');
+  const ok=$('#cgwOk'); ok.disabled=!!btnAt; clearTimeout(openCgw.t); if(btnAt) openCgw.t=setTimeout(()=>{ ok.disabled=false; ok.focus(); },btnAt);
+  CGW=ctx; $('#cgwMask').classList.add('is-open'); if(!btnAt) ok.focus();
 }
 function closeCgw(){ if(!CGW) return; const c=CGW; CGW=null; $('#cgwMask').classList.remove('is-open'); renderAll();
   if(c.pool) $(`[data-pdraw="${c.pool}"]`)?.focus(); else $('.day--today,.day[role=button]')?.focus(); }
@@ -1745,6 +1782,11 @@ function openSignWin(day,rw,boxRw){
    · 1 抽：绕 2 圈后逐渐减速，停在抽中格并于原页面高亮（不跳弹窗）；高亮保留至下次抽奖；抽中实体奖励时 toast 提示联系客服
    · 5／10 抽：固定绕 3 圈（约 2 秒），不停在抽中项，结束后跳出恭喜获奖弹窗 */
 const POOL_RING=[0,1,2,5,8,7,6,3,4], POOL_LAPS=3, POOL_STEP_MS=75;
+/* 跑马灯（11/12 参照影片）：只在外圈 8 格顺时针绕行，不经过中间格；抽中中间格时，最后一步才由外圈进入中间格 */
+const OUTER=[0,1,2,5,8,7,6,3];
+/* 金色光点＋拖尾：目前格最亮，前 2 格依序变淡 */
+function fxHit(tiles,trail){ tiles.forEach(t=>t.classList.remove('tile--hit','tile--t1','tile--t2'));
+  const [a,b,c]=trail.slice(-3).reverse(); if(a!=null) tiles[a].classList.add('tile--hit'); if(b!=null) tiles[b].classList.add('tile--t1'); if(c!=null) tiles[c].classList.add('tile--t2'); }
 const poolOrd=C=>{ const g=topIdx(C.box), o=C.box.map((_,i)=>i).filter(i=>i!==g); return [...o.slice(0,4),g,...o.slice(4)]; };   // 格位 → 奖励索引（GP 置中）
 function drawPool(C,d){
   const cost=C.cost*d; if(PD||keysLeft()<cost||!LIVE_OR_REDEEM()) return;
@@ -1765,12 +1807,14 @@ function drawPool(C,d){
   if(matchMedia('(prefers-reduced-motion: reduce)').matches) return finish();   // 减少动态效果：不跑马灯
   const grid=$(`#poolList [data-pool="${C.no}"] .gtree__grid`), tiles=$$('.tile',grid);
   grid.closest('.gtree').scrollIntoView({block:'nearest',behavior:'smooth'});
-  const N=POOL_RING.length, total=single?N*2+POOL_RING.indexOf(cell)+1:N*POOL_LAPS; let st=0;
-  const tick=()=>{ tiles.forEach(t=>t.classList.remove('tile--hit'));
-    if(st>=total) return finish();
-    tiles[POOL_RING[st%N]].classList.add('tile--hit'); st++;
+  /* 路径：1 抽＝外圈 2 圈＋走到抽中格（抽中中间格 Grand Prize 时最后一步才进中间）；5／10 抽＝外圈 3 圈，不停在抽中项 */
+  const lap=n=>Array.from({length:n},()=>OUTER).flat();
+  const path=single?[...lap(2),...(cell===4?[4]:OUTER.slice(0,OUTER.indexOf(cell)+1))]:lap(POOL_LAPS), total=path.length, trail=[]; let st=0;
+  const clear=()=>tiles.forEach(t=>t.classList.remove('tile--hit','tile--t1','tile--t2'));
+  const tick=()=>{ if(st>=total){ clear(); return finish(); }
+    trail.push(path[st]); fxHit(tiles,trail); st++;
     const left=total-st, slow=single&&left<6?(6-left)*45:0;   // 1 抽最后 6 格逐渐减速
-    PD.t=setTimeout(single&&st>=total?()=>{ tiles.forEach(t=>t.classList.remove('tile--hit')); finish(); }:tick,POOL_STEP_MS+slow); };
+    PD.t=setTimeout(single&&st>=total?()=>{ clear(); finish(); }:tick,POOL_STEP_MS+slow); };
   tick();
 }
 $('#btnBetNow').addEventListener('click',()=>{ if(LIVE()) toast('导向游戏大厅（原型示意）'); });
@@ -1804,6 +1848,11 @@ function openBox(o){
   $('#boxResult').textContent=o.mode==='preview'?'All 9 prizes in this chest. Open the chest to draw 1.':'';
   const d=$('#btnDraw'); d.style.display=o.mode==='preview'?'none':''; d.disabled=false; d.textContent=o.drawLabel||'Draw';
   $('#boxRibbon').textContent=o.ribbon||'❄ Christmas Surprise Chest ❄';
+  /* 开箱动画：格子依跑马灯顺序每 60ms 弹出 1 格，全部出现后才显示并启用 Draw（约 0.8 秒） */
+  const reduceFx=matchMedia('(prefers-reduced-motion: reduce)').matches, FX0=180, FXS=60, fxEnd=reduceFx?0:FX0+8*FXS+300;
+  $$('#grid9 .tile').forEach((t,i)=>t.style.setProperty('--d',(reduceFx?0:FX0+RING.indexOf(i)*FXS)+'ms'));
+  $('.mbox__draw').style.setProperty('--dd',fxEnd+'ms');
+  if(o.mode!=='preview'&&!o.auto&&fxEnd){ d.disabled=true; clearTimeout(BX.fxT); BX.fxT=setTimeout(()=>{ if(BX&&!BX.running&&!BX.done) d.disabled=false; },fxEnd); }
   $('#boxMask').classList.add('is-open'); (o.mode==='preview'?$('#boxClose'):d).focus();
   if(o.auto) setTimeout(()=>{ if(BX&&!BX.running&&!BX.done) runMarquee(); },350);   // 奖池 1／5／10 抽：已于奖池按钮扣除 PAROL，开窗后自动开始跑马灯
 }
@@ -1819,25 +1868,27 @@ $('#btnDraw').addEventListener('click',()=>{
 function runMarquee(){
   const wins=BX.wins||[BX.res??weighted(BX.box.map(r=>r.rate))], tiles=$$('#grid9 .tile'), btn=$('#btnDraw');
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const counts={}; let pos=RING.length-1, k=0;
+  const counts={}, trail=[]; let pos=OUTER.length-1, k=0;
   BX.running=true;
   if(BX.onStart){ BX.onStart(); BX.onStart=null; }   // 签到宝箱：按 Draw 当下才完成签到
   if(BX.wins){ btn.disabled=false; btn.textContent='Skip'; } else btn.disabled=true;
-  const hit=i=>{ tiles.forEach(t=>t.classList.remove('tile--hit')); tiles[i].classList.add('tile--hit'); };
+  const hit=i=>{ trail.push(i); fxHit(tiles,trail); };
   const mark=i=>{ counts[i]=(counts[i]||0)+1; const t=tiles[i]; t.classList.add('tile--got');
     if(wins.length>1){ let b=t.querySelector('.tile__cnt'); if(!b){ b=document.createElement('span'); b.className='tile__cnt'; t.appendChild(b); } b.textContent='×'+counts[i]; } };
-  const go=(steps,first,cb)=>{ let st=0, slow=first?6:2;
-    const tick=()=>{ pos=(pos+1)%RING.length; hit(RING[pos]); st++;
+  const go=(path,first,cb)=>{ let st=0, slow=first?6:2; const steps=path.length;
+    const tick=()=>{ hit(path[st]); st++;
       if(st>=steps){ cb(); return; }
       const left=steps-st; BX.t=setTimeout(tick, left<slow?(first?90+(slow-left)*55:45+(slow-left)*35):(first?45:24)); };
     BX.t=setTimeout(tick,first?45:24); };
   const next=()=>{ if(k>=wins.length) return end();
-    const w=wins[k]; let dist=(RING.indexOf(w)-pos+RING.length)%RING.length;
-    if(k===0) dist+=RING.length*2; else if(dist<3) dist+=RING.length;
-    go(dist,k===0,()=>{ mark(w); k++; BX.t=setTimeout(next,wins.length>1?150:0); }); };
+    /* 外圈绕行到抽中格；抽中中间格时先走到外圈左中格（3），最后一步进中间 */
+    const w=wins[k], tgt=w===4?3:w; let dist=(OUTER.indexOf(tgt)-pos+OUTER.length)%OUTER.length;
+    if(k===0) dist+=OUTER.length*2; else if(dist<3) dist+=OUTER.length;
+    const path=Array.from({length:dist},(_,i)=>OUTER[(pos+1+i)%OUTER.length]); pos=(pos+dist)%OUTER.length; if(w===4) path.push(4);
+    go(path,k===0,()=>{ mark(w); k++; BX.t=setTimeout(next,wins.length>1?150:0); }); };
   const end=()=>{ clearTimeout(BX.t); BX.skip=null;
     Object.keys(counts).forEach(i=>delete counts[i]); wins.forEach(w=>{ counts[w]=(counts[w]||0)+1; });
-    tiles.forEach((t,i)=>{ t.classList.remove('tile--hit'); t.classList.toggle('tile--win',!!counts[i]); t.classList.toggle('tile--got',!!counts[i]);
+    tiles.forEach((t,i)=>{ t.classList.remove('tile--hit','tile--t1','tile--t2'); t.classList.toggle('tile--win',!!counts[i]); t.classList.toggle('tile--got',!!counts[i]);
       const b=t.querySelector('.tile__cnt'); if(wins.length>1&&counts[i]){ if(b) b.textContent='×'+counts[i]; else t.insertAdjacentHTML('beforeend',`<span class="tile__cnt">×${counts[i]}</span>`); } });
     $('#grid9').classList.add('is-done');
     const items=wins.map(w=>BX.box[w]), phys=items.filter(r=>r.physical).length;
