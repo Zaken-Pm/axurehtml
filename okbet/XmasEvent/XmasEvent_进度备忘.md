@@ -1,6 +1,7 @@
 # XmasEvent（节庆特别活动）进度备忘
 
 > **存放规则（11/11）**：此需求所有档案只存放于本地 `~/Documents/axurehtml/okbet/XmasEvent/`（含本备忘、`tools/mkB.py`、`tools/spec2md.py`）；不再写入 claude.ai 专案，专案内 XmasEvent 档案已删除。
+> **原型预览（11/12）**：Specs 内嵌原型改为 `<iframe … data-b64="…">`，载入时转 Blob URL（data: URL 超过 2MB 被浏览器封锁，前台原型曾空白）；更新内嵌原型时替换 `data-b64="` 后的 base64。原型预览分页隐藏页首需求说明，只展示前、后台原型。
 
 
 更新：2026-11-04
