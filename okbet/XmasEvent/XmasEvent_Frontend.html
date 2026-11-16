@@ -962,6 +962,15 @@ body{background:#1a0204;}
 .gtree__grid .tile.tile--won{background:linear-gradient(180deg,#fff6cf,#ffd668 60%,#f0a92a);border-color:#fff3b0;}
 .gtree__grid .tile.tile--won .tile__lb{color:#5a1606;text-shadow:none;}
 .gtree__grid .tile.tile--won .tile__gp{z-index:2;}
+
+/* 充值任务：前一个任务未完成（前一个 LV 未领取）→ CLAIM 停用＋上方提示「Previous task incomplete.」（11/16） */
+.mc__act{position:relative;}
+.mbtn--locked{background:linear-gradient(180deg,#8a8a8a,#5a5a5a 55%,#3e3e3e);color:#e9e9e9;border-color:#c9c9c9;box-shadow:none;text-shadow:none;cursor:not-allowed;}
+.mc__lock{position:absolute;right:0;bottom:calc(100% + 6px);width:max-content;max-width:120px;display:flex;align-items:flex-start;gap:4px;padding:4px 8px;border-radius:7px;
+  background:rgba(20,8,10,.88);color:#fff;font-size:.67rem;font-weight:700;line-height:1.25;text-align:left;box-shadow:0 2px 6px rgba(0,0,0,.4);z-index:2;}
+.mc__lock::after{content:"";position:absolute;right:22px;top:100%;border:5px solid transparent;border-top-color:rgba(20,8,10,.88);}
+.mc__lock svg{flex:none;width:11px;height:11px;margin-top:1px;}
+.mc--locked .mc__top{padding-right:124px;}
 </style>
 </head>
 <body>
@@ -1487,7 +1496,14 @@ function weighted(rates){ const sum=rates.reduce((a,b)=>a+b,0); let r=Math.rando
 const bombDone=t=>(t.cond==='bet'?S.dayBet:S.dayDep)>=t.goal;
 /* 活动阶段：live＝活动期间；redeem＝兑换期（结束日隔日 00:00 ～ 结束时间 +3 天，仅可兑换奖池）；closed＝活动页面关闭 */
 const LIVE=()=>S.phase==='live';
-const bombClaimable=()=>BOMB_TASKS.filter(t=>bombDone(t)&&!S.bombClaimed[t.lv]);
+/* 充值任务（11/16）：须先领取前一个 LV（不分投注／充值）才能领取；最低 LV 不受限 */
+const prevLv=t=>{ const i=BOMB_TASKS.findIndex(x=>x.lv===t.lv); return i>0?BOMB_TASKS[i-1]:null; };
+const depBlocked=t=>t.cond==='dep'&&!!prevLv(t)&&!S.bombClaimed[prevLv(t).lv];
+/* 可领取（一键领取／未领取金额／红点／次日补领共用）：同一批依 LV 由小到大，前一个 LV 已领取或同批可领时，充值任务才计入 */
+const bombClaimable=()=>{ const ok=new Set();
+  BOMB_TASKS.forEach(t=>{ if(!bombDone(t)||S.bombClaimed[t.lv]) return; const p=prevLv(t);
+    if(t.cond==='dep'&&p&&!S.bombClaimed[p.lv]&&!ok.has(p.lv)) return; ok.add(t.lv); });
+  return BOMB_TASKS.filter(t=>ok.has(t.lv)); };
 /* 糖果条纹进度条：已完成段（宽度＝进度%）＋尾端发光小点；进度为 0 不显示小点 */
 const EQ=pct=>`<span class="mc__fill" style="width:${pct}%"></span>`
   +(pct>0?`<b class="mc__dot" style="left:clamp(3px,${pct}%,calc(100% - 3px))" aria-hidden="true"></b>`:'');
@@ -1505,13 +1521,14 @@ function renderBomb(){
     /* 按钮：已领取 CLAIMED（停用）／可领 CLAIM／未达成：充值任务 TOP-UP（导向充值页）、投注任务 BET（导向首页）；兑换期 ENDED */
     const act= got?`<button class="mbtn mbtn--claimed" disabled><span>CLAIMED</span></button>`
              : !LIVE()?`<button class="mbtn mbtn--ended" disabled><span>ENDED</span></button>`
+             : done&&depBlocked(t)?`<span class="mc__lock" role="note"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="8" rx="1.5" fill="currentColor"/><path d="M5 7V5a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Previous task incomplete.</span><button class="mbtn mbtn--locked" disabled aria-label="CLAIM（前一个任务未完成）"><span>CLAIM</span></button>`   // 充值任务：前一个 LV 未领取 → CLAIM 停用＋提示（11/16）
              : done?`<button class="mbtn mbtn--claim" data-bomb="${t.lv}"><span>CLAIM</span></button>`
              : dep?`<button class="mbtn mbtn--topup" data-go="topup"><span>TOP-UP</span></button>`
              : `<button class="mbtn mbtn--bet" data-go="bet"><span>BET</span></button>`;
     /* 挑战标签：显示该等级当日挑战加成；领取后不因胜负改变（金额栏仍显示基础金额） */
     /* 充值任务即使勾选挑战（领取时仍会触发翻牌），前台也不显示 CHALLENGE 标签 */
     const ch=(!t.trigger||dep)?'':`<span class="mc__tag mc__tag--ch">BONUS <b>+${(got&&got.ch?CHALLENGES[got.ch-1]:chOf(t)).up}%</b></span>`;   // 领取后标签不变（不因胜负改变）
-    return `<li class="mc ${dep?'mc--dep':''} ${got?'mc--claimed':''}">
+    return `<li class="mc ${dep?'mc--dep':''} ${got?'mc--claimed':''} ${!got&&LIVE()&&done&&depBlocked(t)?'mc--locked':''}">
       <div class="mc__top"><span class="mc__tags"><span class="mc__lv">LV ${t.lv}</span>${dep?'<span class="mc__tag mc__tag--dep">TOP-UP MISSION</span>':''}${ch}</span>
         <span class="mc__prog">${int(Math.min(cur,t.goal))}<small>/${int(t.goal)}</small></span></div>
       <div class="mc__bar" role="progressbar" aria-valuenow="${Math.round(pct)}" aria-valuemin="0" aria-valuemax="100">${EQ(pct)}</div>
@@ -1525,6 +1542,7 @@ function renderBomb(){
   $$('[data-bomb]').forEach(b=>b.addEventListener('click',()=>{
     const lv=+b.dataset.bomb; if(S.bombClaimed[lv]||CH||!LIVE()) return;          // 幂等
     const t=BOMB_TASKS.find(x=>x.lv===lv);
+    if(depBlocked(t)) return;   // 防呆：前一个 LV 未领取时按钮已停用
     // 有赠送 PAROL 的等级：领取后先播礼物盒动画（金币＋PAROL 飞入看板），再弹 PAROL 提示弹窗；单项 CLAIM 不显示 toast（11/10）
     const snap=[$('#boardCash').innerHTML,$('#boardParol').innerHTML];   // 动画结束前看板维持领取前数值，奖励飞入后才更新
     const after=()=>openKeyTip(t.gift);
