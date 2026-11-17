@@ -580,7 +580,7 @@ label.chk input{accent-color:var(--primary);}
                   </tr></thead>
                   <tbody id="ratioBody"></tbody>
                 </table>
-                <p class="hint">· 比例 0～300；留空或未勾选的游戏商按 100% 计算。</p>
+                <p class="hint">· 仅计算「游戏类型」中的厂商，比例 0～300，留空或未勾选的游戏商按 100% 计算</p>
               </div>
             </section>
 
@@ -1737,11 +1737,11 @@ const GAME_CATS=[
   {key:'Mini',groups:[{name:'游乐场',provs:['Mini Games']}]},
 ];
 const catTotal=c=>c.groups.reduce((a,g)=>a+g.provs.length,0);
-/* 游戏商预设全部勾选（Sport 无游戏商选择） */
+/* 游戏商预设全部未勾选（11/17；Sport 无游戏商选择） */
 const allProvs=c=>c.fixed?[]:c.groups.flatMap(g=>g.provs.map(p=>g.name+'|'+p));
-const BLANK_RATIO=()=>Object.fromEntries(GAME_CATS.map(c=>[c.key,{pct:'',sel:allProvs(c)}]));
+const BLANK_RATIO=()=>Object.fromEntries(GAME_CATS.map(c=>[c.key,{pct:'',sel:[]}]));
 let ratio=BLANK_RATIO();
-const SAMPLE_RATIO=()=>{ const r=BLANK_RATIO(); r.Slot.pct='100'; r.Live.pct='50'; r.Sport.pct='30'; return r; };
+const SAMPLE_RATIO=()=>{ const r=BLANK_RATIO(); r.Slot.pct='100'; r.Live.pct='50'; r.Sport.pct='30'; r.Slot.sel=allProvs(GAME_CATS[0]); r.Live.sel=allProvs(GAME_CATS[1]); return r; };   // 编辑示范：已配置的游戏商
 function ratioErr(c){
   const r=ratio[c.key];
   if(r.pct!==''&&Number(r.pct)>300) return {pct:'比例配置不得超过300%'};   // 上限 300%（11/11）
