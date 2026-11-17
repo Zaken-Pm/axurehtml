@@ -973,7 +973,7 @@ const ITEM_EVENTS=[   // 特别任务获得：Job 更新发放时间（每 20 �
 /* 奖池抽中的奖励（示意）：[奖励类型, 备注]；备注＝奖励名称，不加奖励类型（券类如 PT电子免费旋转×1）；彩金／积分＝彩金20、积分100；实体奖品＝「奖品名称、价值」 */
 const POOL_RW={
   1:[['礼金','彩金10'],['积分','积分100'],['免费旋转券','PT电子免费旋转×1'],['优惠券','存送券20%-本金+彩金2倍-有效期24小时'],['抽奖券','Golden Draw Ticket×2'],['礼金','彩金40'],['积分','积分600'],['抽奖券','Golden Draw Ticket×6'],['礼金','彩金100']],
-  2:[['礼金','彩金20'],['积分','积分200'],['免费投注券','体育免费投注×1'],['道具卡','加倍卡×1'],['抽奖券','Golden Draw Ticket×4'],['礼金','彩金80'],['积分','积分1,200'],['实体奖品','iPhone 18 Pro Max 2TB、价值194,990']],
+  2:[['礼金','彩金20'],['积分','积分200'],['免费投注券','体育免费投注×1'],['道具卡','VP強力特色遊戲卡×1'],['抽奖券','Golden Draw Ticket×4'],['礼金','彩金80'],['积分','积分1,200'],['实体奖品','iPhone 18 Pro Max 2TB、价值194,990']],
   3:[['礼金','彩金30'],['积分','积分300'],['免费旋转券','PT电子免费旋转×3'],['抽奖券','Golden Draw Ticket×6'],['礼金','彩金1,000']],
   4:[['礼金','彩金50'],['积分','积分500'],['优惠券','存送券50%-有效期24小时'],['实体奖品','iPhone 18 Pro Max 2TB、价值194,990'],['礼金','彩金100,000']]};
 const POOL_COST={1:1,2:2,3:3,4:5};
@@ -1324,7 +1324,13 @@ const clone=o=>JSON.parse(JSON.stringify(o));
 const FREEBET_LIST=['PT免费投注','PT电子免费旋转','PT_S freeBet test','PS单钱包','PS_S 免費','PT_S freespin test','VP_S test'];
 const COUPON_LIST=['存送10%-有效期240小时-本金+彩金5倍流水','输返10%-有效期240小时 奖金流水5倍流水 -注单有效期48','中奖加奖10%-有效期240小时 -奖金流水8倍',
   '存送券1%-有效期1小时-本金1倍流水','存送券20%-本金+彩金2倍-有效期24小时','存送券10%-彩金3倍-有效期200小时','输返券10%-奖金流水3倍-有效期200小时-注单有效期1小时'];
-const RW_TYPES=['彩金','积分','抽奖券','免费投注','优惠券','实体奖品'];
+const RW_TYPES=['彩金','积分','抽奖券','免费投注','优惠券','实体奖品'];   // 签到奖励（不含实体奖品）
+/* 宝箱／奖池奖励类型（11/17 依截图）：礼金／积分／免费投注券／免费旋转券／优惠券／道具卡／抽奖券／实体奖品 */
+const BOX_TYPES=['礼金','积分','免费投注券','免费旋转券','优惠券','道具卡','抽奖券','实体奖品'];
+const SPIN_LIST=FREEBET_LIST.filter(x=>/旋转|spin/i.test(x)), BET_LIST=FREEBET_LIST.filter(x=>!/旋转|spin/i.test(x));
+const PROPCARD_LIST=['VP超強力特色遊戲卡','VP強力特色遊戲卡','VP一般特色遊戲卡','VP道具卡测试'];   // 道具卡：由既有「道具卡」设定带入（11/17 用户提供）
+/* 下拉类奖励：类型 → [选项来源, placeholder／未选提示] */
+const PICK_SRC={'免费投注':[FREEBET_LIST,'请选择免费投注'],'优惠券':[COUPON_LIST,'请选择优惠券'],'免费投注券':[BET_LIST,'请选择免费投注券'],'免费旋转券':[SPIN_LIST,'请选择免费旋转券'],'道具卡':[PROPCARD_LIST,'请选择道具卡']};
 const RW_LABEL={'抽奖券':'抽奖券（Golden Draw Ticket）'};
 const newReward=()=>({type:'',name:'',val:'',pick:'',img:'',imgName:'',rate:'',fbType:'',fbVal:'',fbPick:''});
 /* 抽奖券兜底奖励（11/17）：奖励类型固定「彩金」，只填数量。
@@ -1340,7 +1346,7 @@ const SAMPLE_IMG='data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http
 function rewardErrors(r,o,strict){
   const e={};
   if(!r.type){ if(strict) e.type='请选择奖励类型'; }
-  else if(r.type==='免费投注'||r.type==='优惠券'){ if(!r.pick&&strict) e.val=r.type==='免费投注'?'请选择免费投注':'请选择优惠券'; }
+  else if(PICK_SRC[r.type]){ if(!r.pick&&strict) e.val=PICK_SRC[r.type][1]; }
   else if(r.type==='实体奖品'){
     /* 实体奖品：奖品名称 → 奖励价值 → 小图，依序提示第一个错误；e.field 标记要标红的栏位 */
     if(!r.name.trim()){ if(strict){ e.val='请输入奖品名称'; e.field='name'; } }
@@ -1374,7 +1380,9 @@ function rvHtml(r){
   const sel=(list,ph)=>`<select class="select js-pick" title="${r.pick||ph}"><option value="">${ph}</option>${list.map(x=>`<option ${r.pick===x?'selected':''}>${x}</option>`).join('')}</select>`;
   switch(r.type){
     case '彩金':
+    case '礼金':
     case '积分': return num('请输入奖励数量');
+    case '免费投注券': case '免费旋转券': case '道具卡': return sel(PICK_SRC[r.type][0],PICK_SRC[r.type][1]);
     case '抽奖券': {
       return `<div class="rv-fb"><div class="rv-fb__main">${num('奖励数量')}</div>
         <div class="rv-fb__row"><span class="rv-fb__lb">抽奖券兜底奖励(彩金)：</span>
@@ -1443,9 +1451,9 @@ function bindRv(tr,r,o){
 }
 function buildRewardRow(r,o){
   const tr=document.createElement('tr');
-  const types=RW_TYPES.filter(t=>o.physical||t!=='实体奖品');
+  const types=(o.types||RW_TYPES).filter(t=>o.physical||t!=='实体奖品');
   tr.innerHTML=`<td>${o.label}</td>
-    <td><select class="select js-rtype" aria-label="奖励类型"><option value="">请选择</option>${types.map(t=>`<option value="${t}" ${r.type===t?'selected':''}>${RW_LABEL[t]||t}</option>`).join('')}</select>
+    <td><select class="select js-rtype" aria-label="奖励类型"><option value="">请选择</option>${types.map(t=>`<option value="${t}" ${r.type===t?'selected':''}>${o.types?t:(RW_LABEL[t]||t)}</option>`).join('')}</select>
       <p class="hint hint--err js-e-type" style="visibility:hidden"></p></td>
     <td><div class="rv js-rv">${rvHtml(r)}</div><p class="hint hint--err js-e-val" style="visibility:hidden"></p></td>
     ${o.rate?`<td><div class="suffix-wrap"><input class="input js-rate" value="${r.rate}" placeholder="0～100" title="0～100，最多小数点后 4 位"><span class="suffix">%</span></div>
@@ -1461,14 +1469,14 @@ function buildRewardRow(r,o){
 /* ---------- 4-1 签到活动配置 ---------- */
 const SIGN_DAYS=['第一天','第二天','第三天以上(含)'];
 let sign={days:[newReward(),newReward(),newReward()],boxOn:true,boxRates:['','','','','','']};
-const SAMPLE_SIGN={days:[{type:'彩金',name:'',val:'10',pick:'',img:false,rate:''},{type:'积分',name:'',val:'100',pick:'',img:false,rate:''},{type:'抽奖券',name:'',val:'1',pick:'',img:false,rate:'',fbType:'彩金',fbVal:'12',fbPick:''}],
+const SAMPLE_SIGN={days:[{type:'礼金',name:'',val:'10',pick:'',img:false,rate:''},{type:'积分',name:'',val:'100',pick:'',img:false,rate:''},{type:'抽奖券',name:'',val:'1',pick:'',img:false,rate:'',fbType:'彩金',fbVal:'12',fbPick:''}],
   boxOn:true,boxRates:['39.9875','25.0125','15','12','8','']};
 const BLANK_SIGN={days:[newReward(),newReward(),newReward()],boxOn:true,boxRates:['','','','','','']};
 /* 宝箱「已配置」＝该款任一栏位有填写；未配置的宝箱中奖率视为 0、输入框停用 */
 const boxTouched=k=>SBOX.touched(k);
 const configuredBoxes=()=>SBOX.configured();
 const boxRateSum=()=>Math.round(configuredBoxes().reduce((a,k)=>a+(Number(sign.boxRates[k])||0),0)*10000)/10000;   // 最多 4 位小数
-const SIGN_OPT={rate:false,physical:false};
+const SIGN_OPT={rate:false,physical:false,types:BOX_TYPES};   // 11/17：奖励类型与宝箱／奖池一致（不含实体奖品）
 function boxRateOk(){ const ks=configuredBoxes();
   if(!ks.length) return true;   // 「至少配置 1 款」由签到宝箱区块校验
   return ks.every(k=>sign.boxRates[k]!==''&&Number(sign.boxRates[k])<=100) && boxRateSum()===100; }
@@ -1565,12 +1573,12 @@ function makeBoxSet(cfg){
 }
 function sampleBox(k){
   const m=k+1, R=(type,val,rate,extra={})=>({type,name:'',val:String(val),pick:'',img:'',imgName:'',rate,fbType:'',fbVal:'',fbPick:'',...extra});
-  return [R('彩金',5*m,'30'),R('积分',50*m,'20'),R('免费投注','','15',{pick:FREEBET_LIST[k%FREEBET_LIST.length]}),
-    R('优惠券','','10',{pick:COUPON_LIST[k%COUPON_LIST.length]}),R('抽奖券',m,'8',{fbType:'彩金',fbVal:String(12*m)}),R('彩金',20*m,'7'),R('积分',300*m,'5'),R('抽奖券',3*m,'4',{fbType:'礼金',fbVal:String(5*m)}),
+  return [R('礼金',5*m,'30'),R('积分',50*m,'20'),k%2?R('免费旋转券','','15',{pick:SPIN_LIST[k%SPIN_LIST.length]}):R('免费投注券','','15',{pick:BET_LIST[k%BET_LIST.length]}),
+    R('优惠券','','10',{pick:COUPON_LIST[k%COUPON_LIST.length]}),R('抽奖券',m,'8',{fbType:'彩金',fbVal:String(12*m)}),k===1?R('道具卡','','7',{pick:PROPCARD_LIST[0]}):R('礼金',20*m,'7'),R('积分',300*m,'5'),R('抽奖券',3*m,'4',{fbType:'礼金',fbVal:String(5*m)}),
     k>=4 ? R('实体奖品',1500*m,'1',{name:k===4?'圣诞限定礼盒':'蓝牙耳机',img:SAMPLE_IMG,imgName:k===4?'xmas_giftbox.png':'earphone.png'})
-         : R('彩金',100*m,'1')];
+         : R('礼金',100*m,'1')];
 }
-const BOX_OPT={rate:true,physical:true};
+const BOX_OPT={rate:true,physical:true,types:BOX_TYPES};
 
 /* ---------- 4-2 签到宝箱配置 ---------- */
 const SBOX=makeBoxSet({tabs:'#boxTabs',body:'#boxBody',sum:'#boxSum',sum100:true,
@@ -1829,7 +1837,7 @@ function buildPreview(){
   const yn=x=>x&&x.checked?'是':'否';
   const applyAll=$('#applyAll').checked;
   /* 步骤4 摘要 */
-  const rwTxt=r=>!r.type?'—':(r.type==='免费投注'||r.type==='优惠券')?`${r.type}：${r.pick||'—'}`
+  const rwTxt=r=>!r.type?'—':PICK_SRC[r.type]?`${r.type}：${r.pick||'—'}`
       :r.type==='实体奖品'?`实体奖品「${r.name||'—'}」（价值 ${r.val||'—'}${r.img?'，已上传小图':''}）`
       :r.type==='抽奖券'?`${RW_LABEL[r.type]} ×${r.val||'—'}（兜底彩金 ${r.fbVal||'—'}）`
       :`${RW_LABEL[r.type]||r.type} ×${r.val||'—'}`;
