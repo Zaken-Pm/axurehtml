@@ -292,6 +292,14 @@ label.chk input{accent-color:var(--primary);}
 .wager-field .input{width:100%;}
 .wager-err{margin:0;font-size:12px;white-space:nowrap;width:max-content;}
 .wager-err:empty{display:none;}
+
+/* 抽奖券兜底奖励（11/17） */
+.rv-fb{display:flex;flex-direction:column;align-items:stretch;gap:8px;width:100%;min-width:0;text-align:left;}
+.rv-fb__main{display:flex;}
+.rv-fb__main .input{width:220px;max-width:100%;}
+.rv-fb__row{display:flex;align-items:center;gap:8px;min-width:0;}
+.rv-fb__lb{flex:none;font-size:13px;color:var(--text-2,#555);white-space:nowrap;}
+.rv-fb__row .input{flex:1 1 0;min-width:72px;max-width:220px;}
 </style>
 </head>
 <body>
@@ -479,7 +487,6 @@ label.chk input{accent-color:var(--primary);}
                   <tbody id="boxBody"></tbody>
                 </table>
                 <div class="sum-line" id="boxSum"></div>
-                <p class="hint">· 每款宝箱固定 9 项奖励，中奖率合计须等于 100%。</p>
               </div>
             </section>
 
@@ -1319,7 +1326,9 @@ const COUPON_LIST=['存送10%-有效期240小时-本金+彩金5倍流水','输�
   '存送券1%-有效期1小时-本金1倍流水','存送券20%-本金+彩金2倍-有效期24小时','存送券10%-彩金3倍-有效期200小时','输返券10%-奖金流水3倍-有效期200小时-注单有效期1小时'];
 const RW_TYPES=['彩金','积分','抽奖券','免费投注','优惠券','实体奖品'];
 const RW_LABEL={'抽奖券':'抽奖券（Golden Draw Ticket）'};
-const newReward=()=>({type:'',name:'',val:'',pick:'',img:'',imgName:'',rate:''});
+const newReward=()=>({type:'',name:'',val:'',pick:'',img:'',imgName:'',rate:'',fbType:'',fbVal:'',fbPick:''});
+/* 抽奖券兜底奖励（11/17）：奖励类型固定「彩金」，只填数量。
+   用途：大奖池（Golden Draw）活动关闭，或用户在大奖池活动黑名单时，抽奖券改发此兜底彩金 */
 const RW_COUNT=9;   // 宝箱奖励固定 9 项（签到宝箱、特别任务奖池共用；不可新增、删除）
 const nineRewards=()=>Array.from({length:RW_COUNT},newReward);
 /* 实体奖品小图：格式与大小限制（沿用后台图片上传规范） */
@@ -1343,6 +1352,11 @@ function rewardErrors(r,o,strict){
   else{
     if(r.val===''){ if(strict) e.val='请输入奖励数量'; }
     else if(!(Number(r.val)>0)) e.val='不可为 0';
+    /* 抽奖券：兜底奖励必填（类型 → 数量／选项） */
+    if(r.type==='抽奖券'&&!e.val){
+      if(r.fbVal===''){ if(strict){ e.val='请输入兜底奖励数量'; e.field='fbVal'; } }
+      else if(!(Number(r.fbVal)>0)){ e.val='兜底奖励数量不可为 0'; e.field='fbVal'; }
+    }
   }
   if(o.rate){
     if(r.rate===''){ if(strict) e.rate='请输入中奖率'; }
@@ -1355,12 +1369,17 @@ const rewardOk=(r,o)=>Object.keys(rewardErrors(r,o,true)).length===0;
 const rewardsOk=(rows,o={rate:true,physical:true})=>rows.every(r=>rewardOk(r,o));
 
 function rvHtml(r){
+  r.fbType=r.fbType||''; r.fbVal=r.fbVal||''; r.fbPick=r.fbPick||'';   // 旧资料补兜底栏位
   const num=ph=>`<input class="input js-val" value="${r.val}" placeholder="${ph}" aria-label="${ph}">`;   // 不显示单位
   const sel=(list,ph)=>`<select class="select js-pick" title="${r.pick||ph}"><option value="">${ph}</option>${list.map(x=>`<option ${r.pick===x?'selected':''}>${x}</option>`).join('')}</select>`;
   switch(r.type){
     case '彩金':
-    case '积分':
-    case '抽奖券': return num('请输入奖励数量');
+    case '积分': return num('请输入奖励数量');
+    case '抽奖券': {
+      return `<div class="rv-fb"><div class="rv-fb__main">${num('奖励数量')}</div>
+        <div class="rv-fb__row"><span class="rv-fb__lb">抽奖券兜底奖励(彩金)：</span>
+          <input class="input js-fbval" value="${r.fbVal}" placeholder="奖励数量" aria-label="抽奖券兜底奖励（彩金）数量"></div></div>`;
+    }
     case '免费投注': return sel(FREEBET_LIST,'请选择免费投注');
     case '优惠券':   return sel(COUPON_LIST,'选择优惠券');
     case '实体奖品': {
@@ -1384,9 +1403,10 @@ function paintReward(tr,r,o){
     fields.forEach(f=>f&&f.classList.toggle('is-error',!!msg)); };
   put('.js-e-type',e.type,[$('.js-rtype',tr)]);
   const nm=$('.js-name',tr); if(nm) nm.classList.remove('is-error');
-  const fields = e.field==='name'?[nm] : e.field==='img'?[] : [$('.js-val',tr),$('.js-pick',tr)];
+  ['.js-fbval'].forEach(c=>{ const x=$(c,tr); if(x) x.classList.remove('is-error'); });
+  const fields = e.field==='name'?[nm] : e.field==='img'?[] : e.field==='fbVal'?[$('.js-fbval',tr)] : [$('.js-val',tr),$('.js-pick',tr)];
   put('.js-e-val',e.val,fields);
-  if(e.field==='val'||!e.field){ /* 已由 put 处理 */ } else { const v=$('.js-val',tr); if(v) v.classList.remove('is-error'); }
+  if(e.field==='val'||!e.field){ /* 已由 put 处理 */ } else { const v=$('.js-val',tr); if(v) v.classList.remove('is-error'); const pk=$('.js-pick',tr); if(pk) pk.classList.remove('is-error'); }
   const img=$('.upl__btn',tr); if(img) img.classList.toggle('is-error',e.field==='img');
   if(o.rate) put('.js-e-rate',e.rate,[$('.js-rate',tr)]);
 }
@@ -1397,6 +1417,9 @@ function openImgViewer(src,title){
 function bindRv(tr,r,o){
   const v=$('.js-val',tr);
   if(v) v.addEventListener('input',e=>{ e.target.value=sanInt(e.target.value);   /* 奖励价值、奖励数量皆为正整数，不可填小数 */ r.val=e.target.value; paintReward(tr,r,o); o.onChange&&o.onChange(); });
+  /* 抽奖券兜底奖励：切换类型清空数量／选项后重画；数量为正整数 */
+  const fbv=$('.js-fbval',tr);
+  if(fbv) fbv.addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r.fbVal=e.target.value; paintReward(tr,r,o); o.onChange&&o.onChange(); });
   const nm=$('.js-name',tr);
   if(nm) nm.addEventListener('input',e=>{ r.name=e.target.value; paintReward(tr,r,o); o.onChange&&o.onChange(); });
   const p=$('.js-pick',tr);
@@ -1428,7 +1451,7 @@ function buildRewardRow(r,o){
     ${o.rate?`<td><div class="suffix-wrap"><input class="input js-rate" value="${r.rate}" placeholder="0～100" title="0～100，最多小数点后 4 位"><span class="suffix">%</span></div>
       <p class="hint hint--err js-e-rate" style="visibility:hidden"></p></td>`:''}`;
   $('.js-rtype',tr).addEventListener('change',e=>{
-    r.type=e.target.value; r.name=''; r.val=''; r.pick=''; r.img=''; r.imgName='';       // 切换类型 → 清空原奖励数量
+    r.type=e.target.value; r.name=''; r.val=''; r.pick=''; r.img=''; r.imgName=''; r.fbType=''; r.fbVal=''; r.fbPick='';       // 切换类型 → 清空原奖励数量
     $('.js-rv',tr).innerHTML=rvHtml(r); bindRv(tr,r,o); paintReward(tr,r,o); o.onChange&&o.onChange(); });
   if(o.rate) $('.js-rate',tr).addEventListener('input',e=>{ e.target.value=sanDec4(e.target.value); r.rate=e.target.value; paintReward(tr,r,o); o.onChange&&o.onChange(); });
   bindRv(tr,r,o); paintReward(tr,r,o);
@@ -1438,7 +1461,7 @@ function buildRewardRow(r,o){
 /* ---------- 4-1 签到活动配置 ---------- */
 const SIGN_DAYS=['第一天','第二天','第三天以上(含)'];
 let sign={days:[newReward(),newReward(),newReward()],boxOn:true,boxRates:['','','','','','']};
-const SAMPLE_SIGN={days:[{type:'彩金',name:'',val:'10',pick:'',img:false,rate:''},{type:'积分',name:'',val:'100',pick:'',img:false,rate:''},{type:'抽奖券',name:'',val:'1',pick:'',img:false,rate:''}],
+const SAMPLE_SIGN={days:[{type:'彩金',name:'',val:'10',pick:'',img:false,rate:''},{type:'积分',name:'',val:'100',pick:'',img:false,rate:''},{type:'抽奖券',name:'',val:'1',pick:'',img:false,rate:'',fbType:'彩金',fbVal:'12',fbPick:''}],
   boxOn:true,boxRates:['39.9875','25.0125','15','12','8','']};
 const BLANK_SIGN={days:[newReward(),newReward(),newReward()],boxOn:true,boxRates:['','','','','','']};
 /* 宝箱「已配置」＝该款任一栏位有填写；未配置的宝箱中奖率视为 0、输入框停用 */
@@ -1541,9 +1564,9 @@ function makeBoxSet(cfg){
   return S;
 }
 function sampleBox(k){
-  const m=k+1, R=(type,val,rate,extra={})=>({type,name:'',val:String(val),pick:'',img:'',imgName:'',rate,...extra});
+  const m=k+1, R=(type,val,rate,extra={})=>({type,name:'',val:String(val),pick:'',img:'',imgName:'',rate,fbType:'',fbVal:'',fbPick:'',...extra});
   return [R('彩金',5*m,'30'),R('积分',50*m,'20'),R('免费投注','','15',{pick:FREEBET_LIST[k%FREEBET_LIST.length]}),
-    R('优惠券','','10',{pick:COUPON_LIST[k%COUPON_LIST.length]}),R('抽奖券',m,'8'),R('彩金',20*m,'7'),R('积分',300*m,'5'),R('抽奖券',3*m,'4'),
+    R('优惠券','','10',{pick:COUPON_LIST[k%COUPON_LIST.length]}),R('抽奖券',m,'8',{fbType:'彩金',fbVal:String(12*m)}),R('彩金',20*m,'7'),R('积分',300*m,'5'),R('抽奖券',3*m,'4',{fbType:'礼金',fbVal:String(5*m)}),
     k>=4 ? R('实体奖品',1500*m,'1',{name:k===4?'圣诞限定礼盒':'蓝牙耳机',img:SAMPLE_IMG,imgName:k===4?'xmas_giftbox.png':'earphone.png'})
          : R('彩金',100*m,'1')];
 }
@@ -1808,6 +1831,7 @@ function buildPreview(){
   /* 步骤4 摘要 */
   const rwTxt=r=>!r.type?'—':(r.type==='免费投注'||r.type==='优惠券')?`${r.type}：${r.pick||'—'}`
       :r.type==='实体奖品'?`实体奖品「${r.name||'—'}」（价值 ${r.val||'—'}${r.img?'，已上传小图':''}）`
+      :r.type==='抽奖券'?`${RW_LABEL[r.type]} ×${r.val||'—'}（兜底彩金 ${r.fbVal||'—'}）`
       :`${RW_LABEL[r.type]||r.type} ×${r.val||'—'}`;
   const ratioTxt=GAME_CATS.map(c=>{const r=ratio[c.key]; if(c.fixed) return `${c.key} ${r.pct||100}%（全部游戏商）`; return r.pct!==''&&r.sel.length?`${c.key} ${r.pct}%（${r.sel.length}／${catTotal(c)} 家）`:`${c.key} 100%`;}).join('；');
   const floatOn=$$('input[name=float]')[1]?$$('input[name=float]')[1].checked:false;
