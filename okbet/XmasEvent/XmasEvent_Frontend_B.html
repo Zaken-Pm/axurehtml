@@ -963,14 +963,17 @@ body{background:#1a0204;}
 .gtree__grid .tile.tile--won .tile__lb{color:#5a1606;text-shadow:none;}
 .gtree__grid .tile.tile--won .tile__gp{z-index:2;}
 
-/* 充值任务：前一个任务未完成（前一个 LV 未达成）→ CLAIM 停用＋上方提示「Previous task incomplete.」（11/16） */
-.mc__act{position:relative;}
-.mbtn--locked{background:linear-gradient(180deg,#8a8a8a,#5a5a5a 55%,#3e3e3e);color:#e9e9e9;border-color:#c9c9c9;box-shadow:none;text-shadow:none;cursor:not-allowed;}
-.mc__lock{position:absolute;right:0;bottom:calc(100% + 6px);width:max-content;max-width:120px;display:flex;align-items:flex-start;gap:4px;padding:4px 8px;border-radius:7px;
-  background:rgba(20,8,10,.88);color:#fff;font-size:.67rem;font-weight:700;line-height:1.25;text-align:left;box-shadow:0 2px 6px rgba(0,0,0,.4);z-index:2;}
-.mc__lock::after{content:"";position:absolute;right:22px;top:100%;border:5px solid transparent;border-top-color:rgba(20,8,10,.88);}
-.mc__lock svg{flex:none;width:11px;height:11px;margin-top:1px;}
-.mc--locked .mc__top{padding-right:124px;}
+/* 充值任务：前一个任务未完成（前一个 LV 未达成）→ CLAIM 停用；按钮左侧显示锁头胶囊提示「Previous task incomplete」（11/17 依截图） */
+/* 空间不足时（窄屏或有 PAROL 徽章）提示＋按钮整组换到下一行、靠右 */
+.mc--locked .mc__bot{flex-wrap:wrap;row-gap:8px;}
+.mc--locked .mc__act{display:flex;align-items:center;justify-content:flex-end;gap:6px;flex:1 0 auto;margin-left:auto;}
+.mc--locked .mc__act .mbtn{flex:none;}
+.mbtn--locked{background:linear-gradient(180deg,#bdbdbd,#8c8c8c 55%,#6b6b6b);color:#3a3a3a;border-color:#e6e6e6;box-shadow:none;text-shadow:none;cursor:not-allowed;}
+.mc__lock{display:flex;align-items:center;gap:5px;padding:3px 10px 3px 4px;border-radius:999px;background:linear-gradient(180deg,#8f0f1b,#5e0810);
+  color:#ffd84a;font-size:.67rem;font-weight:800;font-style:italic;line-height:1.15;text-align:center;box-shadow:inset 0 0 0 1px rgba(0,0,0,.25);}
+.mc__lock{flex:none;}
+.mc__lock > span{width:max-content;max-width:96px;}
+.mc__lock svg{flex:none;width:20px;height:20px;padding:4px;border-radius:50%;background:#3a0408;color:#ffd84a;}
 
 /* 气泡／红点：hidden 时不显示（避免 0 仍显示） */
 .tab .bubble[hidden],.tab .dot[hidden]{display:none!important;}
@@ -1538,7 +1541,7 @@ function renderBomb(){
     /* 按钮：已领取 CLAIMED（停用）／可领 CLAIM／未达成：充值任务 TOP-UP（导向充值页）、投注任务 BET（导向首页）；兑换期 ENDED */
     const act= got?`<button class="mbtn mbtn--claimed" disabled><span>CLAIMED</span></button>`
              : !LIVE()?`<button class="mbtn mbtn--ended" disabled><span>ENDED</span></button>`
-             : done&&depBlocked(t)?`<span class="mc__lock" role="note"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="8" rx="1.5" fill="currentColor"/><path d="M5 7V5a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Previous task incomplete.</span><button class="mbtn mbtn--locked" disabled aria-label="CLAIM（前一个任务未完成）"><span>CLAIM</span></button>`   // 充值任务：前一个 LV 未完成 → CLAIM 停用＋提示（11/16）
+             : done&&depBlocked(t)?`<span class="mc__lock" role="note"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="8" rx="1.5" fill="currentColor"/><path d="M5 7V5a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><span>Previous task incomplete</span></span><button class="mbtn mbtn--locked" disabled aria-label="CLAIM（前一个任务未完成）"><span>CLAIM</span></button>`   // 充值任务：前一个 LV 未完成 → CLAIM 停用＋提示（11/16）
              : done?`<button class="mbtn mbtn--claim" data-bomb="${t.lv}"><span>CLAIM</span></button>`
              : dep?`<button class="mbtn mbtn--topup" data-go="topup"><span>TOP-UP</span></button>`
              : `<button class="mbtn mbtn--bet" data-go="bet"><span>BET</span></button>`;
