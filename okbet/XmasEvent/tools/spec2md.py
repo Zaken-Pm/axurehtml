@@ -211,12 +211,10 @@ for p in spec.find_all(class_='spanel', recursive=False):
     md.append('---')
     md.append(block(p))
 chg = soup.find(class_='mview', attrs={'data-m': 'chg'})
-md.append('---\n## 本次调整\n' + clean(inline(chg.find(class_='doc-desc'))))
+md.append('---\n## 本次调整')
 for day in chg.find_all(class_='chg-day'):
-    md.append('### ' + clean(inline(day.find(class_='sub-title'))))
-    for tr in day.select('tbody tr'):
-        td = tr.find_all('td')
-        md.append(f'- **{clean(inline(td[0]))}{clean(inline(td[1]))}**：' + clean(inline(td[2])).replace('\n', '\n  '))
+    md.append('### ' + clean(inline(day.find(class_='doc-eyebrow'))).replace('🔧', '').strip())
+    md.append('\n'.join(f'{n}. ' + re.sub(r'^[·•]\s*', '', clean(inline(li))) for n, li in enumerate(day.select('ol.chg-list > li'), 1)))
 text = '\n\n'.join(x for x in md if x.strip())
 text = re.sub(r'\n{3,}', '\n\n', text)
 text = re.sub(HID + r'\s*[·•]\s*', HID, text)

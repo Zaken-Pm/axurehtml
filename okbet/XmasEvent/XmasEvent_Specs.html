@@ -147,6 +147,9 @@ code{font-family:inherit;}
 /* 原型预览：只展示前、后台原型（隐藏页首需求说明） */
 body.view-proto .wrap > .doc-header{display:none;}
 body.view-proto .proto-wide{margin-top:8px;}
+.chg-list{margin:14px 0 4px;padding-left:1.4em;font-size:14px;line-height:1.9;color:var(--text);}
+.chg-list li{margin:2px 0;}
+.chg-day + .chg-day{margin-top:22px;}
 </style>
 
 </head>
@@ -1091,19 +1094,17 @@ body.view-proto .proto-wide{margin-top:8px;}
   <!-- ===================== 主分页：本次调整（规格交付后开始记录） ===================== -->
   <div class="mview" data-m="chg">
     <div class="doc-header">
-      <div class="doc-eyebrow" style="color:var(--green);background:var(--green-bg);border-color:var(--green-border)">🔧 本次调整</div>
-      <p class="doc-desc" style="margin:0">规格变更以「日」为单位记录，最新日期在最上方；细节见各模组规则（标示 <span class="badge badge-new">新增</span>／<span class="badge badge-change">异动</span>）。</p>
-    </div>
-    <div class="chg-day">
-      <div class="sub-title">2026-11-18</div>
-      <div class="card" style="padding:0;overflow:hidden;"><table class="data-table"><thead><tr><th style="width:170px">模组</th><th style="width:72px">类型</th><th>调整内容</th></tr></thead><tbody>
-        <tr><td>通用规则 活动黑名单</td><td><span class="badge badge-new">新增</span></td><td>黑名单用户：首页浮窗、Rewards 页面的 X-Bomb 圣诞入口照常显示，进入详情页弹错误提示 <code>Sorry</code>／<code>Promotion Ended</code>；每日推广弹窗（F12）、次日补领弹窗（F11）皆隐藏。F11／F12、判断逻辑、情境穷举同步补充。</td></tr>
-        <tr><td>F5 礼物盒动画</td><td><span class="badge badge-change">异动</span></td><td>每日任务单笔 <code>CLAIM</code> 一律播放礼物盒动画（原仅赠送 PAROL 时）；最终画面依是否赠送 PAROL 区分：无＝礼盒＋金币，有＝礼盒＋金币＋PAROL。</td></tr>
-        <tr><td>F4 一键领取</td><td><span class="badge badge-change">异动</span></td><td>领取成功的 toast 改为「一键领取结果弹窗」（UNCLAIMED REWARDS／YOU HAVE WON!／CONFIRM），领取等级数、彩金合计、PAROL 数量显示在 <code>YOU HAVE WON!</code> 上方；点 <code>CONFIRM</code> 关闭。</td></tr>
-        <tr><td>F1 活动页顶栏</td><td><span class="badge badge-change">异动</span></td><td>页面标题由 <code>Christmas Activities</code> 改为 <code>Reward Details</code>。</td></tr>
-        <tr><td>F12 每日推广弹窗</td><td><span class="badge badge-new">新增</span></td><td>平台首页每日推广弹窗：无可补领时每日首次进入首页弹出 1 次、仅活动期间；导向按钮进入活动详情页，✕ 关闭停留首页。</td></tr>
-        <tr><td>F11 次日补领弹窗</td><td><span class="badge badge-change">异动</span></td><td>· 改用新设计稿；提示文案改为 <code>Your cash reward from yesterday is waiting.</code><br>· 点 <code>CLAIM</code> 补领成功后不再显示 toast，改弹「补领成功弹窗」（Today's Bonus &amp; Missions），<code>VIEW BONUS &amp; MISSIONS</code> 导向活动详情页</td></tr>
-      </tbody></table></div>
+      <div class="chg-day">
+        <div class="doc-eyebrow" style="color:var(--green);background:var(--green-bg);border-color:var(--green-border)">🔧 本次调整 · 2026-11-18（6 项）</div>
+        <ol class="chg-list">
+          <li>新增<b>活动黑名单</b>规则：首页浮窗、Rewards 页面的 X-Bomb 圣诞入口照常显示，进入详情页弹错误提示 <code>Sorry</code>／<code>Promotion Ended</code>；每日推广弹窗、次日补领弹窗皆隐藏。</li>
+          <li>每日任务单笔 <code>CLAIM</code> <b>一律播放礼物盒动画</b>；最终画面依是否赠送 PAROL 区分（无：礼盒＋金币；有：礼盒＋金币＋PAROL）。</li>
+          <li>一键领取成功的 toast 改为<b>「一键领取结果弹窗」</b>（UNCLAIMED REWARDS／YOU HAVE WON!／CONFIRM），领取等级数、彩金合计、PAROL 数量显示在 <code>YOU HAVE WON!</code> 上方。</li>
+          <li>活动页标题由 <code>Christmas Activities</code> 改为 <b><code>Reward Details</code></b>。</li>
+          <li>新增平台首页<b>每日推广弹窗</b>：无可补领时每日首次进入首页弹出 1 次，仅活动期间；导向按钮进入活动详情页。</li>
+          <li>次日补领弹窗改用新设计稿，提示文案改为 <code>Your cash reward from yesterday is waiting.</code>；补领成功不再显示 toast，改弹<b>「补领成功弹窗」</b>，<code>VIEW BONUS &amp; MISSIONS</code> 导向活动详情页。</li>
+        </ol>
+      </div>
     </div>
   </div>
 </div>

@@ -1198,19 +1198,12 @@ CLAIMED 移至列表底部；看板 Cash Bonus Claimed Today＋实得金额；My
 
 ---
 ## 本次调整
-规格变更以「日」为单位记录，最新日期在最上方；细节见各模组规则（标示 【新增】／【异动】）。
 
-### 2026-11-18
+### 本次调整 · 2026-11-18（6 项）
 
-- **通用规则 活动黑名单【新增】**：黑名单用户：首页浮窗、Rewards 页面的 X-Bomb 圣诞入口照常显示，进入详情页弹错误提示 `Sorry`／`Promotion Ended`；每日推广弹窗（F12）、次日补领弹窗（F11）皆隐藏。F11／F12、判断逻辑、情境穷举同步补充。
-
-- **F5 礼物盒动画【异动】**：每日任务单笔 `CLAIM` 一律播放礼物盒动画（原仅赠送 PAROL 时）；最终画面依是否赠送 PAROL 区分：无＝礼盒＋金币，有＝礼盒＋金币＋PAROL。
-
-- **F4 一键领取【异动】**：领取成功的 toast 改为「一键领取结果弹窗」（UNCLAIMED REWARDS／YOU HAVE WON!／CONFIRM），领取等级数、彩金合计、PAROL 数量显示在 `YOU HAVE WON!` 上方；点 `CONFIRM` 关闭。
-
-- **F1 活动页顶栏【异动】**：页面标题由 `Christmas Activities` 改为 `Reward Details`。
-
-- **F12 每日推广弹窗【新增】**：平台首页每日推广弹窗：无可补领时每日首次进入首页弹出 1 次、仅活动期间；导向按钮进入活动详情页，✕ 关闭停留首页。
-
-- **F11 次日补领弹窗【异动】**：· 改用新设计稿；提示文案改为 `Your cash reward from yesterday is waiting.`
-  · 点 `CLAIM` 补领成功后不再显示 toast，改弹「补领成功弹窗」（Today's Bonus & Missions），`VIEW BONUS & MISSIONS` 导向活动详情页
+1. 新增**活动黑名单**规则：首页浮窗、Rewards 页面的 X-Bomb 圣诞入口照常显示，进入详情页弹错误提示 `Sorry`／`Promotion Ended`；每日推广弹窗、次日补领弹窗皆隐藏。
+2. 每日任务单笔 `CLAIM` **一律播放礼物盒动画**；最终画面依是否赠送 PAROL 区分（无：礼盒＋金币；有：礼盒＋金币＋PAROL）。
+3. 一键领取成功的 toast 改为**「一键领取结果弹窗」**（UNCLAIMED REWARDS／YOU HAVE WON!／CONFIRM），领取等级数、彩金合计、PAROL 数量显示在 `YOU HAVE WON!` 上方。
+4. 活动页标题由 `Christmas Activities` 改为 **`Reward Details`**。
+5. 新增平台首页**每日推广弹窗**：无可补领时每日首次进入首页弹出 1 次，仅活动期间；导向按钮进入活动详情页。
+6. 次日补领弹窗改用新设计稿，提示文案改为 `Your cash reward from yesterday is waiting.`；补领成功不再显示 toast，改弹**「补领成功弹窗」**，`VIEW BONUS & MISSIONS` 导向活动详情页。
