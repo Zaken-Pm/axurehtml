@@ -217,6 +217,16 @@ label.chk input{accent-color:var(--primary);}
 /* 派奖审核 / 活动报表 */
 .tbl-scroll{overflow-x:auto;}
 #itemBody td{white-space:nowrap;vertical-align:top;}
+/* 活动道具统计（依测试站）：表格置中、时间起迄两栏、分页 */
+#reportItem .list-tbl th,#itemBody td{text-align:center;}
+.it-range{display:flex;align-items:center;gap:6px;}
+.it-range .input{width:170px;}
+.it-pager{display:flex;justify-content:flex-end;align-items:center;flex-wrap:wrap;gap:8px;margin-top:14px;font-size:13px;color:var(--text-2);}
+.it-pager__size{width:110px;height:30px;}
+.it-pager__btn,.it-pager__num{min-width:28px;height:28px;padding:0 6px;border:0;border-radius:4px;background:transparent;color:var(--text-2);cursor:pointer;font-size:13px;}
+.it-pager__btn:disabled{color:#c0c4cc;cursor:not-allowed;}
+.it-pager__num.is-cur{color:var(--primary);font-weight:700;}
+.it-pager__go{width:50px;height:30px;text-align:center;}
 .refresh-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;color:var(--text-2);font-size:13px;}
 .rtabs{display:flex;gap:26px;border-bottom:1px solid var(--border-l);margin:-4px 0 16px;}
 .rtab{padding:10px 2px;font-size:14px;color:var(--text-3);cursor:pointer;border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;}
@@ -734,17 +744,23 @@ select.select.is-open{border-color:var(--primary);}
             <select class="select" id="itPool"><option value="">全部</option><option>POOL1</option><option>POOL2</option><option>POOL3</option><option>POOL4</option></select></div>
           <div class="fld"><label for="itRType">奖励类型：</label>
             <select class="select" id="itRType"><option value="">全选</option><option>彩金</option><option>积分</option><option>免费投注券</option><option>免费旋转券</option><option>优惠券</option><option>道具卡</option><option>抽奖券（Golden Draw Ticket）</option><option>实体奖品</option></select></div>
-          <div class="fld"><label>时间：</label><input class="input dp-trigger" id="itTime" readonly placeholder="开始时间 ~ 结束时间" value="2026-11-18 00:00:00 ~ 2026-11-18 23:59:59" style="width:340px"></div>
+          <div class="fld"><label for="itTimeS">时间：</label><div class="it-range"><input class="input" id="itTimeS" placeholder="开始时间" value="2026-11-18 00:00:00" aria-label="开始时间"><span>~</span><input class="input" id="itTimeE" placeholder="结束时间" value="2026-11-18 23:59:59" aria-label="结束时间"></div></div>
           <button class="btn btn--primary" id="itSearch">🔍 搜寻</button>
           <button class="btn btn--primary" id="itExport">⬇ 导出</button>
         </div>
         <div class="tbl-scroll">
         <table class="list-tbl" style="min-width:1080px">
           <thead><tr>
-            <th>时间</th><th>活动类型</th><th>活动ID</th><th>活动名称</th><th>会员账号</th><th>统计类型</th><th>获得数量</th><th>消耗数量</th><th>剩余数量</th><th>奖池类型</th><th>奖励类型</th><th>奖励数量</th><th style="min-width:200px">备注</th>
+            <th>时间</th><th>活动类型</th><th>活动 ID</th><th>活动名称</th><th>会员账号</th><th>统计类型</th><th>获得数量</th><th>消耗数量</th><th>剩余数量</th><th>奖池类型</th><th>奖励类型</th><th>奖励数量</th><th style="min-width:200px">备注</th>
           </tr></thead>
           <tbody id="itemBody"></tbody>
         </table>
+        </div>
+        <div class="it-pager" aria-label="分页">
+          <span id="itTotal">Total 0</span>
+          <select class="select it-pager__size" id="itSize" aria-label="每页笔数"><option value="10">10/page</option><option value="20" selected>20/page</option><option value="50">50/page</option><option value="100">100/page</option></select>
+          <button class="it-pager__btn" id="itPrev" aria-label="上一页">‹</button><span id="itPages"></span><button class="it-pager__btn" id="itNext" aria-label="下一页">›</button>
+          <span>Go to</span><input class="input it-pager__go" id="itGo" value="1" aria-label="跳至页码">
         </div>
         
       </div>
@@ -982,6 +998,7 @@ const ITEM_ACT=['节庆特别活动','222','圣诞活动XBomb Xmas'], ITEM_NAME=
 const G=(t,u,n,bal)=>({t,u,kind:'PAROL获取',gain:n,use:null,bal,pool:null,rtype:null,qty:null,note:'-'});
 const U=(t,u,use,bal,pool,rtype,qty,note)=>({t,u,kind:'PAROL消耗',gain:null,use,bal,pool,rtype,qty,note});
 const itemRows=[
+  U('2026-11-18 16:01:25','okbet8445t08hp',1,0,'POOL1','道具卡',2,'VP一般特色遊戲卡×2'),
   G('2026-11-18 13:40:29','okbet045233qqd',8,42),
   G('2026-11-18 13:40:27','okbet4781ygac2',3,3),
   U('2026-11-18 13:37:13','okbet8127tyf6w',10,11,'POOL4','实体奖品',1,'大汽车 (Value 777)'),
@@ -998,15 +1015,26 @@ const itemRows=[
 function renderItemReport(){
   const aid=$('#itActId').value.trim(), uid=$('#itUser').value.trim(), kind={gain:'PAROL获取',use:'PAROL消耗'}[$('#itKind').value]||'',
         pool=$('#itPool').value, rt=$('#itRType').value,
-        tr=(()=>{ const m=$('#itTime').value.match(/^(\d{4}-\d{2}-\d{2}).*~ (\d{4}-\d{2}-\d{2})/); return m?{s:m[1],e:m[2]}:null; })();
-  const rows=itemRows.filter(r=>(!aid||ITEM_ACT[1]===aid)&&(!uid||r.u.includes(uid))&&(!kind||r.kind===kind)&&(!pool||r.pool===pool)&&(!rt||r.rtype===rt)&&(!tr||(r.t.slice(0,10)>=tr.s&&r.t.slice(0,10)<=tr.e)));
+        ts=$('#itTimeS').value.trim(), te=$('#itTimeE').value.trim();
+  const rows=itemRows.filter(r=>(!aid||ITEM_ACT[1]===aid)&&(!uid||r.u.includes(uid))&&(!kind||r.kind===kind)&&(!pool||r.pool===pool)&&(!rt||r.rtype===rt)&&(!ts||r.t>=ts)&&(!te||r.t<=te));
+  const size=+$('#itSize').value, pages=Math.max(1,Math.ceil(rows.length/size)); IT_PAGE=Math.min(Math.max(1,IT_PAGE),pages);
+  const view=rows.slice((IT_PAGE-1)*size,IT_PAGE*size);
   const v=x=>x==null?'-':x.toLocaleString();
-  $('#itemBody').innerHTML=rows.length?rows.map(r=>`<tr><td style="white-space:nowrap">${r.t}</td><td class="hl">${ITEM_ACT[0]}</td><td>${ITEM_ACT[1]}</td><td>${ITEM_ACT[2]}</td><td>${r.u}</td>
+  $('#itemBody').innerHTML=view.length?view.map(r=>`<tr><td style="white-space:nowrap">${r.t}</td><td class="hl">${ITEM_ACT[0]}</td><td>${ITEM_ACT[1]}</td><td>${ITEM_ACT[2]}</td><td>${r.u}</td>
       <td style="white-space:nowrap">${r.kind}</td><td>${v(r.gain)}</td><td>${v(r.use)}</td><td>${r.bal.toLocaleString()}</td><td>${r.pool||'-'}</td><td>${r.rtype||'-'}</td><td>${r.qty==null?'-':r.qty}</td><td style="white-space:normal;line-height:1.6">${r.note}</td></tr>`).join('')
     :'<tr><td colspan="13" style="text-align:center;color:var(--text-3);padding:28px">暂无数据</td></tr>';
+  $('#itTotal').textContent=`Total ${rows.length}`;
+  $('#itPages').innerHTML=Array.from({length:pages},(_,k)=>`<button class="it-pager__num${k+1===IT_PAGE?' is-cur':''}" data-itpg="${k+1}">${k+1}</button>`).join('');
+  $('#itPrev').disabled=IT_PAGE<=1; $('#itNext').disabled=IT_PAGE>=pages; $('#itGo').value=IT_PAGE;
+  $$('[data-itpg]').forEach(b=>b.onclick=()=>{ IT_PAGE=+b.dataset.itpg; renderItemReport(); });
   return rows.length;
 }
-$('#itSearch').addEventListener('click',renderItemReport);
+let IT_PAGE=1;
+$('#itPrev').addEventListener('click',()=>{ IT_PAGE--; renderItemReport(); });
+$('#itNext').addEventListener('click',()=>{ IT_PAGE++; renderItemReport(); });
+$('#itSize').addEventListener('change',()=>{ IT_PAGE=1; renderItemReport(); });
+$('#itGo').addEventListener('change',e=>{ IT_PAGE=parseInt(e.target.value,10)||1; renderItemReport(); });
+$('#itSearch').addEventListener('click',()=>{ IT_PAGE=1; renderItemReport(); });
 $('#itExport').addEventListener('click',()=>{ const n=renderItemReport(); if(!n){ toast('暂无数据可导出',true); return; } toast(`已导出 ${n} 笔活动道具统计（示意）`); });
 
 /* 活动数据统计：联名挑战活动 → 天数「-」、申请领取时间=审核时间、状态「已通过」；活动类型不加括号 */
