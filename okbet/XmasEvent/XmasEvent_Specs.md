@@ -887,21 +887,25 @@
 
 | 来源 | 格式 | 范例 |
 |---|---|---|
-| 签到奖励 | `Check-In Day N, <奖励>` | `Check-In Day 1, Reward 1` |
-| 签到宝箱 | `Check-In Day N, Chest <奖励>` | `Check-In Day 3, Chest Reward 4`<br>`Check-In Day 9, Chest 圣诞限定礼盒` |
-| 特别任务奖池 | `Pool N, <奖励>` | `Pool 2, Reward 1`<br>`Pool 1, VP一般特色遊戲卡/投注次数:10单次旋转/投注金额:10中奖上限:500次数有效期:2H免费旋转券/投注有效期:1DAY` |
-| 每日返水 | `User VIP Level n, LVx Base Reward <金额>`<br>触发挑战时同一行再加 `, Challenge y +z%` | `User VIP Level 4, LV1 Base Reward 5`<br>`User VIP Level 4, LV10 Base Reward 100, Challenge 2 +20%` |
+| 签到奖励 | `Check-In Day N, <奖励内容>` | `Check-In Day 1, Cash Bonus PHP 10` |
+| 签到宝箱 | `Surprise Chest Day N, <奖励内容>` | `Surprise Chest Day 3, Cash Bonus PHP 50` |
+| 特别任务奖池 | `Pool N, <奖励内容>` | `Pool 2, Golden Draw Ticket×3`<br>`Pool 4, 大汽车`（实体奖品，有奖品名称） |
+| 每日返水 | `User VIP Level n, LVx Base Reward <金额>`<br>触发挑战时同一行再加 `, Challenge y +z%` | `User VIP Level 5, LV4 Base Reward 40`<br>`User VIP Level 5, LV4 Base Reward 40, Challenge 2 +50%` |
 | 次日补领 | 同每日返水；**依补领内容逐级各记 1 笔**；挑战等级补领不翻牌，备注不带 Challenge | `User VIP Level 1, LV1 Base Reward 5`<br>`User VIP Level 1, LV2 Base Reward 8` |
 
-| <奖励>（依奖励类型） | 写法 |
+| <奖励内容>（依奖励类型） | 写法（金额、张数为示例） |
 |---|---|
-| 礼金、积分、抽奖券 | `Reward M`：M＝该奖励在后台配置的编号<br>· 签到奖励：第一天＝1、第二天＝2、第三天以上(含)＝3<br>· 签到宝箱、特别任务奖池：配置表「#」栏 1～9 |
-| 免费旋转券、优惠券 | 券**名称**（＝后台下拉选单所选名称，不带张数） |
-| 免费投注券 【异动】 | 券**名称＋设定内容**（不带张数），依系统免费投注券设定带出：<br>`<名称>免费旋转/投注次数:<n>，单次旋转/投注金额:<n>，次数有效期:<n>，免费旋转券/投注有效期:<n>`<br>例：`Pool 1, 百家乐 (ID: 32)免费旋转/投注次数:32，单次旋转/投注金额:32，次数有效期:1，免费旋转券/投注有效期:1` |
-| 道具卡 | 道具卡**名称＋设定内容**（不带张数），依系统道具卡设定带出：<br>`<道具卡名称>/投注次数:<n>单次旋转/投注金额:<n>中奖上限:<n>次数有效期:<n>H免费旋转券/投注有效期:<n>DAY` |
-| 实体奖品 | 奖品**名称**（不含价值） |
+| 礼金 | `Cash Bonus PHP 40` |
+| 积分 | `Points 100` |
+| 免费投注券 | `Free Bet Coupon×2` |
+| 免费旋转券 | `Free Spin Coupon×2` |
+| 优惠券 | `Coupon`（不带张数） |
+| 道具卡 | `Prop Card×2` |
+| 大奖池抽奖券 | `Golden Draw Ticket×3` |
+| 实体奖品 | `Physical Prize` |
 
-*· `Check-In Day N`：N＝连续签到第几天；签到奖励与签到宝箱同一天皆写同一天数
+*· 上表为**未配置奖品名称**时的写法；**有配置奖品名称（prizeName）时优先显示奖品名称**，不再追加金额或张数，如 `Pool 2, Special Prize`
+· `Check-In Day N`／`Surprise Chest Day N`：N＝连续签到第几天；签到奖励与签到宝箱同一天皆写同一天数
 · `Pool N`：N＝1～4
 · `User VIP Level n`：发放时用户的 VIP 等级；`LVx`＝每日返水等级；`Base Reward`＝该等级后台配置的奖励金额（未加成，不带币种）
 · `Challenge y +z%`：y＝挑战编号（1～5），z＝该挑战的奖励提升*
