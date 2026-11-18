@@ -202,7 +202,7 @@ def block(el, depth=0):
 md = []
 hdr = soup.find(class_='doc-header')
 md.append(f'# {clean(inline(hdr.find(class_="doc-title")))}（规格文字版）')
-md.append('> 转出日期：2026-11-04。本档由最新版 `XmasEvent_Specs.html` 自动转出的纯文字版，供 Claude 阅读与比对；截图、原型 iframe 已省略（仅保留截图标题）。'
+md.append('> 转出日期：2026-11-18。本档由最新版 `XmasEvent_Specs.html` 自动转出的纯文字版，供 Claude 阅读与比对；截图、原型 iframe 已省略（仅保留截图标题）。'
           f'标有「{HID}」者为规格中目前隐藏、暂不提供予开发／QA 的内容（失败情境相关）。')
 md.append(clean(inline(hdr.find(class_='doc-desc'))).replace('\n', '\n'))
 md.append(' ｜ '.join(clean(inline(c)) for c in hdr.find_all(class_='meta-chip')))
@@ -212,6 +212,11 @@ for p in spec.find_all(class_='spanel', recursive=False):
     md.append(block(p))
 chg = soup.find(class_='mview', attrs={'data-m': 'chg'})
 md.append('---\n## 本次调整\n' + clean(inline(chg.find(class_='doc-desc'))))
+for day in chg.find_all(class_='chg-day'):
+    md.append('### ' + clean(inline(day.find(class_='sub-title'))))
+    for tr in day.select('tbody tr'):
+        td = tr.find_all('td')
+        md.append(f'- **{clean(inline(td[0]))}{clean(inline(td[1]))}**：' + clean(inline(td[2])).replace('\n', '\n  '))
 text = '\n\n'.join(x for x in md if x.strip())
 text = re.sub(r'\n{3,}', '\n\n', text)
 text = re.sub(HID + r'\s*[·•]\s*', HID, text)

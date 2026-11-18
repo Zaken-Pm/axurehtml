@@ -227,6 +227,10 @@ label.chk input{accent-color:var(--primary);}
 .hl{color:var(--primary);font-weight:600;}
 /* 报表：日期／时间／状态等栏不换行（表格可横向捲动），奖励内容栏允许换行 */
 #awardBody td,#dataBody td{white-space:nowrap;}
+/* 派奖审核备注：完整显示，过长自动换行（不截断、不用悬浮提示） */
+#auditBody td{white-space:nowrap;}
+#auditBody td.au-wrap{white-space:normal;}
+#auditBody td.au-note{min-width:240px;max-width:320px;white-space:normal;overflow-wrap:anywhere;line-height:1.5;}
 #awardBody td:nth-child(6),#dataBody td:nth-child(6){white-space:normal;min-width:200px;}
 /* ---------- 节庆特别活动：步骤4 新增元件 ---------- */
 .block__head .sub{font-weight:400;font-size:12px;color:var(--text-2);}
@@ -293,13 +297,21 @@ label.chk input{accent-color:var(--primary);}
 .wager-err{margin:0;font-size:12px;white-space:nowrap;width:max-content;}
 .wager-err:empty{display:none;}
 
-/* 抽奖券兜底奖励（11/17） */
+/* Golden Draw Ticket 兜底奖励（11/17） */
 .rv-fb{display:flex;flex-direction:column;align-items:stretch;gap:8px;width:100%;min-width:0;text-align:left;}
 .rv-fb__main{display:flex;}
 .rv-fb__main .input{width:220px;max-width:100%;}
 .rv-fb__row{display:flex;align-items:center;gap:8px;min-width:0;}
 .rv-fb__lb{flex:none;font-size:13px;color:var(--text-2,#555);white-space:nowrap;}
 .rv-fb__row .input{flex:1 1 0;min-width:72px;max-width:220px;}
+/* === 下拉选单：固定往下展开（取代系统原生弹出清单；macOS 原生清单会以已选项对齐而往上展开） === */
+select.select.is-open{border-color:var(--primary);}
+.dd-pop{position:fixed;z-index:3000;margin:0;padding:6px 0;list-style:none;background:#fff;border:1px solid #e4e7ed;border-radius:4px;
+  box-shadow:0 2px 12px rgba(0,0,0,.12);overflow-y:auto;font-size:13.5px;}
+.dd-pop__opt{padding:0 20px;height:34px;line-height:34px;white-space:nowrap;cursor:pointer;color:var(--text-2,#606266);}
+.dd-pop__opt:hover{background:#f5f7fa;}
+.dd-pop__opt.is-sel{color:var(--primary);font-weight:600;}
+.dd-pop__opt.is-dis{color:#c0c4cc;cursor:not-allowed;background:transparent;}
 </style>
 </head>
 <body>
@@ -627,7 +639,7 @@ label.chk input{accent-color:var(--primary);}
         <div class="fld"><label>活动ID：</label><input class="input" placeholder="请输入"></div>
         <div class="fld"><label>会员帐号：</label><input class="input" placeholder="请输入"></div>
         <div class="fld"><label for="auType">奖励类型：</label>
-          <select class="select" id="auType"><option value="">全选</option><option>礼金</option><option>积分</option><option>免费投注券</option><option>免费旋转券</option><option>优惠券</option><option>道具卡</option><option>抽奖券</option><option>实体奖品</option></select></div>
+          <select class="select" id="auType"><option value="">全选</option><option>礼金</option><option>积分</option><option>免费投注券</option><option>免费旋转券</option><option>优惠券</option><option>道具卡</option><option>Golden Draw Ticket</option><option>实体奖品</option></select></div>
         <div class="fld"><label for="auAct">活动类型：</label>
           <select class="select" id="auAct"><option value="">全选</option><option>预约活动</option><option>周卡活动</option><option>联名挑战活动</option><option>节庆特别活动</option></select></div>
         <div class="fld"><label>状态：</label>
@@ -641,10 +653,10 @@ label.chk input{accent-color:var(--primary);}
         <input class="input" value="30" style="width:60px;height:30px;text-align:center"> 秒自动刷新
       </div>
       <div class="tbl-scroll">
-      <table class="list-tbl" style="min-width:1180px">
+      <table class="list-tbl" style="min-width:1440px">
         <thead><tr>
           <th>活动ID</th><th>会员帐号</th><th>活动类型</th><th>活动名称</th><th>奖励类型</th><th>奖励金额/内容</th>
-          <th>状态</th><th>申请时间</th><th>审核人</th><th>审核时间</th><th style="min-width:220px">备注</th><th>操作</th>
+          <th>状态</th><th>申请时间</th><th>审核人</th><th>审核时间</th><th style="min-width:240px">备注</th><th>操作</th>
         </tr></thead>
         <tbody id="auditBody"></tbody>
       </table>
@@ -667,7 +679,7 @@ label.chk input{accent-color:var(--primary);}
           <div class="fld"><label for="awAct">活动类型：</label>
             <select class="select" id="awAct"><option value="">全选</option><option>预约活动</option><option>周卡活动</option><option>联名挑战活动</option><option>节庆特别活动</option></select></div>
           <div class="fld"><label for="awType">奖励类型：</label>
-            <select class="select" id="awType"><option value="">全选</option><option>礼金</option><option>积分</option><option>免费投注券</option><option>免费旋转券</option><option>优惠券</option><option>道具卡</option><option>抽奖券</option><option>实体奖品</option></select></div>
+            <select class="select" id="awType"><option value="">全选</option><option>礼金</option><option>积分</option><option>免费投注券</option><option>免费旋转券</option><option>优惠券</option><option>道具卡</option><option>Golden Draw Ticket</option><option>实体奖品</option></select></div>
           <div class="fld"><label>起始日期 ~ 结束日期：</label><input class="input dp-trigger" readonly placeholder="开始时间 ~ 结束时间" style="width:230px"></div>
           <button class="btn btn--primary" id="awSearch">🔍 搜寻</button>
           <button class="btn btn--primary">⬇ 导出</button>
@@ -693,7 +705,7 @@ label.chk input{accent-color:var(--primary);}
           <div class="fld"><label for="dtAct">活动类型：</label>
             <select class="select" id="dtAct"><option value="">全选</option><option>预约活动</option><option>周卡活动</option><option>联名挑战活动</option><option>节庆特别活动</option></select></div>
           <div class="fld"><label for="dtType">奖励类型：</label>
-            <select class="select" id="dtType"><option value="">全选</option><option>礼金</option><option>积分</option><option>免费投注券</option><option>免费旋转券</option><option>优惠券</option><option>道具卡</option><option>抽奖券</option><option>实体奖品</option></select></div>
+            <select class="select" id="dtType"><option value="">全选</option><option>礼金</option><option>积分</option><option>免费投注券</option><option>免费旋转券</option><option>优惠券</option><option>道具卡</option><option>Golden Draw Ticket</option><option>实体奖品</option></select></div>
           <div class="fld"><label for="dtStatus">状态：</label>
             <select class="select" id="dtStatus"><option value="">全部</option><option>待审核</option><option>已通过</option><option>已拒绝</option></select></div>
           <button class="btn btn--primary" id="dtSearch">🔍 搜寻</button>
@@ -717,12 +729,12 @@ label.chk input{accent-color:var(--primary);}
           <div class="fld"><label for="itActId">活动 ID：</label><input class="input" id="itActId" placeholder="请输入"></div>
           <div class="fld"><label for="itUser">会员账号：</label><input class="input" id="itUser" placeholder="请输入"></div>
           <div class="fld"><label for="itKind">统计类型：</label>
-            <select class="select" id="itKind"><option value="gain">PAROL 获取</option><option value="use">PAROL 消耗</option></select></div>
+            <select class="select" id="itKind"><option value="">全部</option><option value="gain">PAROL获取</option><option value="use">PAROL消耗</option></select></div>
           <div class="fld"><label for="itPool">奖池类型：</label>
             <select class="select" id="itPool"><option value="">全部</option><option>POOL1</option><option>POOL2</option><option>POOL3</option><option>POOL4</option></select></div>
           <div class="fld"><label for="itRType">奖励类型：</label>
-            <select class="select" id="itRType"><option value="">全选</option><option>礼金</option><option>积分</option><option>免费投注券</option><option>免费旋转券</option><option>优惠券</option><option>道具卡</option><option>抽奖券</option><option>实体奖品</option></select></div>
-          <div class="fld"><label>起始日期 ~ 结束日期：</label><input class="input dp-trigger" id="itTime" readonly placeholder="开始时间 ~ 结束时间" style="width:230px"></div>
+            <select class="select" id="itRType"><option value="">全选</option><option>彩金</option><option>积分</option><option>免费投注券</option><option>免费旋转券</option><option>优惠券</option><option>道具卡</option><option>抽奖券（Golden Draw Ticket）</option><option>实体奖品</option></select></div>
+          <div class="fld"><label>时间：</label><input class="input dp-trigger" id="itTime" readonly placeholder="开始时间 ~ 结束时间" value="2026-11-18 00:00:00 ~ 2026-11-18 23:59:59" style="width:340px"></div>
           <button class="btn btn--primary" id="itSearch">🔍 搜寻</button>
           <button class="btn btn--primary" id="itExport">⬇ 导出</button>
         </div>
@@ -883,17 +895,28 @@ $$('.side__subitem').forEach(s=>{ const t=s.textContent.trim();
 /* ---------- 派奖审核：资料与渲染 ---------- */
 /* 规则：联名挑战活动 → 状态一律「审核通过」、审核人一律「自动审核」 */
 const auditRows=[
-  /* 节庆特别活动：每获得 1 个奖励＝1 笔；备注只记录来源＋获得的奖励（11/11）：签到 Check-in Day N／奖池 PoolN，后接奖励内容（实体奖品只写名称）；每日返水不写备注（显示 —） */
-  ['191','vip_king88','节庆特别活动','Christmas Activities 2026','实体奖品','iPhone 18 Pro Max 2TB（价值 PHP 194,990.00）','审核通过','2026-12-03 20:11:47','自动审核','2026-12-03 20:11:47','Pool4, iPhone 18 Pro Max 2TB'],
-  ['191','member07','节庆特别活动','Christmas Activities 2026','实体奖品','圣诞限定礼盒（价值 PHP 7,500.00）','审核通过','2026-11-30 21:40:12','自动审核','2026-11-30 21:40:12','Check-in Day 9, 圣诞限定礼盒'],
-  ['191','member02','节庆特别活动','Christmas Activities 2026','优惠券','存送券20%-本金+彩金2倍-有效期24小时','审核通过','2026-11-22 15:21:08','自动审核','2026-11-22 15:21:08','Pool1, 存送券20%-本金+彩金2倍-有效期24小时'],
-  ['191','member03','节庆特别活动','Christmas Activities 2026','礼金','PHP 12.00','审核通过','2026-11-20 09:12:30','自动审核','2026-11-20 09:12:30','—'],
-  ['191','member03','节庆特别活动','Christmas Activities 2026','礼金','PHP 5.00','审核通过','2026-11-20 09:12:30','自动审核','2026-11-20 09:12:30','—'],
-  ['191','member01','节庆特别活动','Christmas Activities 2026','礼金','PHP 5.00','审核通过','2026-11-19 00:00:05','自动审核','2026-11-19 00:00:05','—'],
-  ['191','member01','节庆特别活动','Christmas Activities 2026','免费投注券','PT电子免费旋转 ×1','审核通过','2026-11-18 10:05:12','自动审核','2026-11-18 10:05:12','Check-in Day 3, PT电子免费旋转 ×1'],
-  ['191','member01','节庆特别活动','Christmas Activities 2026','抽奖券','Golden Draw Ticket ×1','审核通过','2026-11-18 10:05:12','自动审核','2026-11-18 10:05:12','Check-in Day 3, Golden Draw Ticket ×1'],
-  ['191','member01','节庆特别活动','Christmas Activities 2026','积分','100 pts','审核通过','2026-11-17 09:58:40','自动审核','2026-11-17 09:58:40','Check-in Day 2, 100 pts'],
-  ['191','member01','节庆特别活动','Christmas Activities 2026','礼金','PHP 10.00','审核通过','2026-11-16 10:02:15','自动审核','2026-11-16 10:02:15','Check-in Day 1, PHP 10.00'],
+  /* 节庆特别活动：资料依测试站派奖审核页面（11/18 撷取；礼金只留 5 笔示意）；每获得 1 个奖励＝1 笔；
+     备注：签到 Check-In Day N／奖池 Pool N，后接奖励：礼金／积分／Golden Draw Ticket＝Reward M（后台配置编号），券＝名称、道具卡＝名称＋设定内容；
+     每日返水／次日补领（含挑战加成）＝User VIP Level n, LVx Base Reward 金额[, Challenge y +z%]；备注栏完整显示（自动换行，不用悬浮） */
+  ['222','okbet8127tyf6w','节庆特别活动','圣诞活动XBomb Xmas','实体奖品','PHP 777','审核通过','2026-11-18 13:37:13','自动审核','2026-11-18 13:37:13','Pool 4, 大汽车'],
+  ['222','okbet8127tyf6w','节庆特别活动','圣诞活动XBomb Xmas','优惠券','×1 张','审核通过','2026-11-18 13:36:42','自动审核','2026-11-18 13:36:42','Pool 4, 存送券1%-有效期1小时-本金1倍流水'],
+  ['222','okbet8129f6fkb','节庆特别活动','圣诞活动XBomb Xmas','免费投注券','×3 张','审核通过','2026-11-18 13:26:38','自动审核','2026-11-18 13:26:38','Pool 1, 百家乐 (ID: 32)免费旋转/投注次数:32，单次旋转/投注金额:32，次数有效期:1，免费旋转券/投注有效期:1'],
+  ['222','okbet045233qqd','节庆特别活动','圣诞活动XBomb Xmas','礼金','PHP 100.00','审核通过','2026-11-18 11:49:14','自动审核','2026-11-18 11:49:14','User VIP Level 5, LV10 Base Reward 100'],
+  ['222','okbet8127tyf6w','节庆特别活动','圣诞活动XBomb Xmas','积分','20 pts','审核通过','2026-11-18 11:18:04','自动审核','2026-11-18 11:18:04','Check-In Day 2, Reward 2'],
+  ['222','testc8','节庆特别活动','圣诞活动XBomb Xmas','礼金','PHP 10.00','审核通过','2026-11-18 11:14:06','自动审核','2026-11-18 11:14:06','Check-In Day 1, Reward 1'],
+  ['222','okbet045319v5w','节庆特别活动','圣诞活动XBomb Xmas','礼金','PHP 120.00','审核通过','2026-11-18 10:57:43','自动审核','2026-11-18 10:57:43','User VIP Level 4, LV10 Base Reward 100, Challenge 2 +20%'],
+  ['222','okbet81228cd8x','节庆特别活动','圣诞活动XBomb Xmas','积分','20 pts','审核通过','2026-11-18 10:57:15','自动审核','2026-11-18 10:57:15','Check-In Day 2, Reward 2'],
+  ['222','okbet045319v5w','节庆特别活动','圣诞活动XBomb Xmas','Golden Draw Ticket','×3 张','审核通过','2026-11-18 10:52:48','自动审核','2026-11-18 10:52:48','Pool 2, Reward 7'],
+  ['222','okbet045319v5w','节庆特别活动','圣诞活动XBomb Xmas','Golden Draw Ticket','×3 张','审核通过','2026-11-18 10:52:48','自动审核','2026-11-18 10:52:48','Pool 2, Reward 7'],
+  ['222','okbet045319v5w','节庆特别活动','圣诞活动XBomb Xmas','积分','1000 pts','审核通过','2026-11-18 10:52:48','自动审核','2026-11-18 10:52:48','Pool 2, Reward 2'],
+  ['222','okbet045319v5w','节庆特别活动','圣诞活动XBomb Xmas','免费旋转券','×2 张','审核通过','2026-11-18 10:52:48','自动审核','2026-11-18 10:52:48','Pool 2, 免费旋转10次-SuperAce游戏-次数有效期1小时-券有效期1天'],
+  ['222','okbet045319v5w','节庆特别活动','圣诞活动XBomb Xmas','礼金','PHP 90.00','审核通过','2026-11-18 10:52:48','自动审核','2026-11-18 10:52:48','Pool 2, Reward 1'],
+  ['222','okbet045319v5w','节庆特别活动','圣诞活动XBomb Xmas','积分','20 pts','审核通过','2026-11-18 10:32:30','自动审核','2026-11-18 10:32:30','Check-In Day 2, Reward 2'],
+  ['222','xnjobe10','节庆特别活动','圣诞活动XBomb Xmas','积分','20 pts','审核通过','2026-11-18 09:37:14','自动审核','2026-11-18 09:37:14','Check-In Day 2, Reward 2'],
+  ['222','xnjobe10','节庆特别活动','圣诞活动XBomb Xmas','道具卡','×1 张','审核通过','2026-11-17 22:25:32','自动审核','2026-11-17 22:25:32','Pool 1, VP一般特色遊戲卡/投注次数:10单次旋转/投注金额:10中奖上限:500次数有效期:2H免费旋转券/投注有效期:1DAY'],
+  ['222','xnjobe10','节庆特别活动','圣诞活动XBomb Xmas','道具卡','×1 张','审核通过','2026-11-17 22:25:32','自动审核','2026-11-17 22:25:32','Pool 1, VP一般特色遊戲卡/投注次数:10单次旋转/投注金额:10中奖上限:500次数有效期:2H免费旋转券/投注有效期:1DAY'],
+  ['222','xnjobe10','节庆特别活动','圣诞活动XBomb Xmas','Golden Draw Ticket','×3 张','审核通过','2026-11-17 22:21:03','自动审核','2026-11-17 22:21:03','Pool 2, Reward 7'],
+  ['222','okbet8127tyf6w','节庆特别活动','圣诞活动XBomb Xmas','礼金','PHP 12.00','审核通过','2026-11-17 20:35:46','自动审核','2026-11-17 20:35:46','User VIP Level 10, LV1 Base Reward 10, Challenge 2 +20%'],
   ['190','member01','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 100.00','审核通过','2026-08-21 12:03:11','自动审核','2026-08-21 12:03:11','User VIP Level 1, LV3 Base Reward 100'],
   ['190','member02','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 115.00','审核通过','2026-08-21 12:10:44','自动审核','2026-08-21 12:10:44','User VIP Level 1, LV3 Base Reward 100, Challenge 3 +15%'],
   ['190','member03','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 200.00','审核通过','2026-08-22 12:00:02','自动审核','2026-08-22 12:00:02','User VIP Level 1, Scratch Card N2-1 Reward 200'],
@@ -909,8 +932,8 @@ function renderAudit(){
   $('#auditBody').innerHTML=rows.map(r=>{
     const isX=r[2]===TPL;
     return `<tr>
-      <td>${r[0]}</td><td>${r[1]}</td><td class="${isX?'hl':''}">${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td style="max-width:240px">${r[5]}</td>
-      <td>${statusTag(r[6])}</td><td>${r[7]}</td><td>${r[8]}</td><td>${r[9]}</td><td>${r[10]}</td>
+      <td>${r[0]}</td><td>${r[1]}</td><td class="${isX?'hl':''}">${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td class="au-wrap" style="max-width:240px">${r[5]}</td>
+      <td>${statusTag(r[6])}</td><td>${r[7]}</td><td>${r[8]}</td><td>${r[9]}</td><td class="au-note">${r[10]}</td>
       <td style="white-space:nowrap">${r[6]==='待审核'?`<button class="btn--link" data-au-pass="${auditRows.indexOf(r)}">通过</button><span class="op-sep">|</span><button class="btn--link red" data-au-reject="${auditRows.indexOf(r)}">拒绝</button>`:'—'}</td></tr>`;
   }).join('');
   $$('[data-au-pass]').forEach(b=>b.onclick=()=>openAuditModal(+b.dataset.auPass,'pass'));
@@ -952,104 +975,84 @@ $$('.rtab').forEach(b=>b.addEventListener('click',()=>{
   if(k==='item') renderItemReport();
 }));
 
-/* 活动道具统计（示意资料）：获取每次发放 1 笔；消耗每抽出 1 个奖励 1 笔；依时间由近到远
-   获得事件 [时间, 会员账号, 'gain', 数量]；获得＝特别任务每次 Job 更新（每 20 分钟）有发放 1 笔、每日返水赠送于领取时 1 笔；剩余数量依会员时间顺序累计计算
-   消耗事件 [时间, 会员, 'use', 消耗数量, 奖池编号, 抽数]；消耗数量＝奖池道具消耗数量×抽数
-   奖池道具消耗数量对应后台示范：奖池1=1、奖池2=2、奖池3=3、奖池4=5（个／抽）；特别任务奖励数量=1；每日返水赠送：LV2=1、LV3=2 */
-const ITEM_ACT=['节庆特别活动','191','Christmas Activities 2026'], ITEM_NAME='PAROL';
-const ITEM_EVENTS=[   // 特别任务获得：Job 更新发放时间（每 20 分钟一次）；每日返水赠送：领取当下
-  ['2026-11-16 10:23:14','member01','gain',1],['2026-11-16 10:25:13','member01','use',1,1,1],['2026-11-16 21:03:37','member01','gain',1],
-  ['2026-11-16 13:43:08','member02','gain',2],['2026-11-16 18:43:52','member02','gain',2],
-  ['2026-11-16 18:45:13','member02','use',2,2,1],['2026-11-16 18:46:02','member02','use',2,2,1],
-  ['2026-11-17 09:12:47','member01','gain',1],['2026-11-17 11:03:19','member01','gain',2],['2026-11-17 11:08:44','member01','use',3,3,1],
-  ['2026-11-17 15:43:45','vip_king88','gain',2],['2026-11-17 16:02:31','vip_king88','gain',2],
-  ['2026-11-17 16:20:09','vip_king88','use',1,1,1],['2026-11-17 16:21:55','vip_king88','use',2,2,1],
-  ['2026-11-18 20:23:03','member01','gain',1],
-  ['2026-11-19 09:03:26','member02','gain',1],['2026-11-19 12:28:16','member02','gain',1],['2026-11-19 12:43:41','member02','gain',1],['2026-11-19 19:03:11','member02','gain',2],
-  ['2026-11-19 19:06:51','member02','use',5,1,5],
-  ['2026-11-19 22:23:58','vip_king88','gain',10],['2026-11-19 22:47:39','vip_king88','use',10,1,10],
-  ['2026-11-20 10:03:33','member05','gain',1],['2026-11-20 14:23:07','member05','gain',1],['2026-11-20 14:25:07','member05','use',1,1,1],
+/* 活动道具统计（11/18 依测试站实作，精简示意）：获取每次发放 1 笔；消耗每抽出 1 个奖励 1 笔（多抽拆笔、同一时间）；依时间由近到远
+   统计类型预设「全部」；奖励类型：彩金／积分／免费投注券／免费旋转券／优惠券／道具卡／抽奖券（Golden Draw Ticket）／实体奖品
+   备注：彩金＝Cash Bonus N；积分＝Points N；优惠券＝名称；免费旋转券＝名称×N；免费投注券＝名称＋设定内容×N；抽奖券＝Golden Draw Ticket×N；实体奖品＝名称 (Value N)；获取＝- */
+const ITEM_ACT=['节庆特别活动','222','圣诞活动XBomb Xmas'], ITEM_NAME='PAROL';
+const G=(t,u,n,bal)=>({t,u,kind:'PAROL获取',gain:n,use:null,bal,pool:null,rtype:null,qty:null,note:'-'});
+const U=(t,u,use,bal,pool,rtype,qty,note)=>({t,u,kind:'PAROL消耗',gain:null,use,bal,pool,rtype,qty,note});
+const itemRows=[
+  G('2026-11-18 13:40:29','okbet045233qqd',8,42),
+  G('2026-11-18 13:40:27','okbet4781ygac2',3,3),
+  U('2026-11-18 13:37:13','okbet8127tyf6w',10,11,'POOL4','实体奖品',1,'大汽车 (Value 777)'),
+  U('2026-11-18 13:36:56','okbet8127tyf6w',10,21,'POOL4','彩金',800,'Cash Bonus 800'),
+  U('2026-11-18 13:36:42','okbet8127tyf6w',10,31,'POOL4','优惠券',1,'存送券1%-有效期1小时-本金1倍流水'),
+  U('2026-11-18 13:26:38','okbet8129f6fkb',1,3,'POOL1','免费投注券',3,'百家乐 (ID: 32)免费旋转/投注次数:32，单次旋转/投注金额:32，次数有效期:1，免费旋转券/投注有效期:1×3'),
+  U('2026-11-18 10:52:48','okbet045319v5w',2,11,'POOL2','抽奖券（Golden Draw Ticket）',3,'Golden Draw Ticket×3'),
+  U('2026-11-18 10:52:48','okbet045319v5w',2,13,'POOL2','抽奖券（Golden Draw Ticket）',3,'Golden Draw Ticket×3'),
+  U('2026-11-18 10:52:48','okbet045319v5w',2,15,'POOL2','积分',1000,'Points 1,000'),
+  U('2026-11-18 10:52:48','okbet045319v5w',2,17,'POOL2','免费旋转券',2,'免费旋转10次-SuperAce游戏-次数有效期1小时-券有效期1天×2'),
+  U('2026-11-18 10:52:48','okbet045319v5w',2,19,'POOL2','彩金',90,'Cash Bonus 90'),
+  G('2026-11-18 10:16:48','okbet8129f6fkb',4,4),
 ];
-/* 奖池抽中的奖励（示意）：[奖励类型, 备注]；备注＝奖励名称，不加奖励类型（券类如 PT电子免费旋转×1）；彩金／积分＝彩金20、积分100；实体奖品＝「奖品名称、价值」 */
-const POOL_RW={
-  1:[['礼金','彩金10'],['积分','积分100'],['免费旋转券','PT电子免费旋转×1'],['优惠券','存送券20%-本金+彩金2倍-有效期24小时'],['抽奖券','Golden Draw Ticket×2'],['礼金','彩金40'],['积分','积分600'],['抽奖券','Golden Draw Ticket×6'],['礼金','彩金100']],
-  2:[['礼金','彩金20'],['积分','积分200'],['免费投注券','体育免费投注×1'],['道具卡','VP強力特色遊戲卡×1'],['抽奖券','Golden Draw Ticket×4'],['礼金','彩金80'],['积分','积分1,200'],['实体奖品','iPhone 18 Pro Max 2TB、价值194,990']],
-  3:[['礼金','彩金30'],['积分','积分300'],['免费旋转券','PT电子免费旋转×3'],['抽奖券','Golden Draw Ticket×6'],['礼金','彩金1,000']],
-  4:[['礼金','彩金50'],['积分','积分500'],['优惠券','存送券50%-有效期24小时'],['实体奖品','iPhone 18 Pro Max 2TB、价值194,990'],['礼金','彩金100,000']]};
-const POOL_COST={1:1,2:2,3:3,4:5};
-/* 奖励数量（只显示数字）：礼金＝金额、积分＝点数、券类／道具卡＝张数（×N）、实体奖品＝1 */
-const rwQty=(rtype,note)=>{ if(rtype==='实体奖品') return 1; const m=rtype==='礼金'||rtype==='积分'?note.match(/[\d,]+$/):note.match(/×([\d,]+)/);
-  return m?Number((m[1]||m[0]).replace(/,/g,'')):1; };
-/* 指定部分抽奖结果，与派奖审核示意资料一致（member02 11/22 Pool1 优惠券、vip_king88 12/03 Pool4 实体奖品） */
-const ITEM_PICK={'2026-11-22 15:21:08':[3],'2026-12-03 20:11:47':[3]};
-ITEM_EVENTS.push(['2026-11-22 15:05:31','member02','gain',1],['2026-11-22 15:21:08','member02','use',1,1,1],
-  ['2026-12-03 20:00:12','vip_king88','gain',5],['2026-12-03 20:11:47','vip_king88','use',5,4,1]);
-/* → {t,u,kind,gain,use,bal,pool,rtype,note}；获取：每次发放 1 笔；消耗：一个奖励一笔（多抽拆笔，同一时间、最后一抽在上） */
-const itemRows=(()=>{ const bal={}, out=[]; let seed=0;
-  [...ITEM_EVENTS].sort((a,b)=>a[0].localeCompare(b[0])).forEach(([t,u,k,n,pool,draws])=>{
-    if(k==='gain'){ bal[u]=(bal[u]||0)+n; out.push({t,u,kind:'PAROL 获取',gain:n,use:null,bal:bal[u],pool:null,rtype:null,note:'-'}); return; }   // 获取不写备注（11/11）
-    const list=POOL_RW[pool], pick=ITEM_PICK[t];
-    for(let d=0;d<draws;d++){ let idx=pick?pick[d%pick.length]:(seed++*5+d*3+pool)%list.length;
-      if(!pick) while(list[idx][0]==='实体奖品') idx=(idx+1)%list.length;   // 示意资料：实体奖品只出现在指定结果（与派奖审核一致）
-      const [rtype,note]=list[idx];
-      bal[u]-=POOL_COST[pool]; out.push({t,u,kind:'PAROL 消耗',gain:null,use:POOL_COST[pool],bal:bal[u],pool:'POOL'+pool,rtype,qty:rwQty(rtype,note),note}); } });
-  return out.reverse(); })();
-/* 统计类型＝PAROL 获取：奖池类型／奖励类型不适用（停用、固定全部） */
-function syncItemFilters(){ const g=$('#itKind').value==='gain';
-  ['#itPool','#itRType'].forEach(id=>{ const el=$(id); el.disabled=g; if(g) el.value=''; }); }
-$('#itKind').addEventListener('change',syncItemFilters);
 function renderItemReport(){
-  const aid=$('#itActId').value.trim(), uid=$('#itUser').value.trim(), kind=$('#itKind').value==='gain'?'PAROL 获取':'PAROL 消耗',
+  const aid=$('#itActId').value.trim(), uid=$('#itUser').value.trim(), kind={gain:'PAROL获取',use:'PAROL消耗'}[$('#itKind').value]||'',
         pool=$('#itPool').value, rt=$('#itRType').value,
         tr=(()=>{ const m=$('#itTime').value.match(/^(\d{4}-\d{2}-\d{2}).*~ (\d{4}-\d{2}-\d{2})/); return m?{s:m[1],e:m[2]}:null; })();
-  const rows=itemRows.filter(r=>(!aid||ITEM_ACT[1]===aid)&&(!uid||r.u.includes(uid))&&r.kind===kind&&(!pool||r.pool===pool)&&(!rt||r.rtype===rt)&&(!tr||(r.t.slice(0,10)>=tr.s&&r.t.slice(0,10)<=tr.e)));
+  const rows=itemRows.filter(r=>(!aid||ITEM_ACT[1]===aid)&&(!uid||r.u.includes(uid))&&(!kind||r.kind===kind)&&(!pool||r.pool===pool)&&(!rt||r.rtype===rt)&&(!tr||(r.t.slice(0,10)>=tr.s&&r.t.slice(0,10)<=tr.e)));
   const v=x=>x==null?'-':x.toLocaleString();
   $('#itemBody').innerHTML=rows.length?rows.map(r=>`<tr><td style="white-space:nowrap">${r.t}</td><td class="hl">${ITEM_ACT[0]}</td><td>${ITEM_ACT[1]}</td><td>${ITEM_ACT[2]}</td><td>${r.u}</td>
-      <td style="white-space:nowrap">${r.kind}</td><td>${v(r.gain)}</td><td>${v(r.use)}</td><td>${r.bal.toLocaleString()}</td><td>${r.pool||'-'}</td><td>${r.rtype||'-'}</td><td>${v(r.qty)}</td><td style="white-space:normal;line-height:1.6">${r.note}</td></tr>`).join('')
+      <td style="white-space:nowrap">${r.kind}</td><td>${v(r.gain)}</td><td>${v(r.use)}</td><td>${r.bal.toLocaleString()}</td><td>${r.pool||'-'}</td><td>${r.rtype||'-'}</td><td>${r.qty==null?'-':r.qty}</td><td style="white-space:normal;line-height:1.6">${r.note}</td></tr>`).join('')
     :'<tr><td colspan="13" style="text-align:center;color:var(--text-3);padding:28px">暂无数据</td></tr>';
   return rows.length;
 }
-syncItemFilters();
 $('#itSearch').addEventListener('click',renderItemReport);
 $('#itExport').addEventListener('click',()=>{ const n=renderItemReport(); if(!n){ toast('暂无数据可导出',true); return; } toast(`已导出 ${n} 笔活动道具统计（示意）`); });
 
-/* 活动奖励统计：活动类型不加括号；同一日期＋同一活动ID＋同一奖励类型合并为 1 列（不分奖励来源）。
-   奖励内容只显示单一奖励：礼金／积分当日有多种金额时只显示单位「PHP」「PTS」；券类依项目各自成列；实体奖品奖励内容一律显示「实体奖励」（不显示奖品名称与价值，同日合并 1 列，11/16）。
-   参与人数为去重人数；领取次数、派发金额、积分小计、券张数加总。 */
-const awardRows=[
-  /* 节庆特别活动 */
-  /* 实体奖品自动审核，发放即计入 */
-  ['2026-12-03','节庆特别活动','191','Christmas Activities 2026','实体奖品','实体奖励','1','1','0.00','0.00','0'],
-  ['2026-11-30','节庆特别活动','191','Christmas Activities 2026','实体奖品','实体奖励','1','1','0.00','0.00','0'],
-  ['2026-11-22','节庆特别活动','191','Christmas Activities 2026','优惠券','存送券20%-本金+彩金2倍-有效期24小时','18','18','0.00','0.00','18'],
-  ['2026-11-19','节庆特别活动','191','Christmas Activities 2026','礼金','PHP','250','263','2,500.00','0.00','0'],   // 复数礼金示意：每日返水 PHP 5×205 次 ＋ 签到宝箱开出 PHP 25×58 次 → 同日＋同活动ID＋同为礼金合并，金额不同故奖励内容只显示「PHP」（参与人数去重 250；金额 1,025＋1,475）
-  ['2026-11-18','节庆特别活动','191','Christmas Activities 2026','免费投注券','PT电子免费旋转 ×1','64','64','0.00','0.00','64'],
-  ['2026-11-18','节庆特别活动','191','Christmas Activities 2026','抽奖券','Golden Draw Ticket ×1','312','312','0.00','0.00','312'],
-  ['2026-11-17','节庆特别活动','191','Christmas Activities 2026','积分','100 PTS','356','356','0.00','35,600.00','0'],
-  ['2026-11-16','节庆特别活动','191','Christmas Activities 2026','礼金','PHP 10','402','402','4,020.00','0.00','0'],
-  ['2026-08-21','联名挑战活动','190','X-Bomb Lucky Blast','礼金','PHP','140','151','4,126.00','0.00','0'],   // 同日＋同活动ID＋同为礼金，含 PHP 7、PHP 100 两种金额 → 合并且奖励内容只显示「PHP」（参与人数去重 140；领取次数 118+33；金额 826+3,300）
-  ['2026-08-22','联名挑战活动','190','X-Bomb Lucky Blast','礼金','PHP 25','96','90','2,250.00','0.00','0'],
-  ['2026-08-06','周卡活动','184','最新周卡','礼金','PHP 12','1','1','12.00','0.00','0'],
-  ['2026-08-05','周卡活动','184','最新周卡','积分','22 PTS','1','1','0.00','22.00','0'],
-];
 /* 活动数据统计：联名挑战活动 → 天数「-」、申请领取时间=审核时间、状态「已通过」；活动类型不加括号 */
 const dataRows=[
   /* 节庆特别活动（与派奖审核同一批纪录） */
-  ['191','vip_king88','节庆特别活动','Christmas Activities 2026','实体奖品','iPhone 18 Pro Max 2TB（价值 PHP 194,990.00）','-','2026-12-03 20:11:47','2026-12-03 20:11:47','已通过'],
-  ['191','member07','节庆特别活动','Christmas Activities 2026','实体奖品','圣诞限定礼盒（价值 PHP 7,500.00）','Day 9','2026-11-30 21:40:12','2026-11-30 21:40:12','已通过'],
-  ['191','member02','节庆特别活动','Christmas Activities 2026','优惠券','存送券20%-本金+彩金2倍-有效期24小时','-','2026-11-22 15:21:08','2026-11-22 15:21:08','已通过'],
-  ['191','member03','节庆特别活动','Christmas Activities 2026','礼金','PHP 12.00','-','2026-11-20 09:12:30','2026-11-20 09:12:30','已通过'],
-  ['191','member03','节庆特别活动','Christmas Activities 2026','礼金','PHP 5.00','-','2026-11-20 09:12:30','2026-11-20 09:12:30','已通过'],
-  ['191','member01','节庆特别活动','Christmas Activities 2026','礼金','PHP 5.00','-','2026-11-19 00:00:05','2026-11-19 00:00:05','已通过'],
-  ['191','member01','节庆特别活动','Christmas Activities 2026','免费投注券','PT电子免费旋转 ×1','Day 3','2026-11-18 10:05:12','2026-11-18 10:05:12','已通过'],
-  ['191','member01','节庆特别活动','Christmas Activities 2026','抽奖券','Golden Draw Ticket ×1','Day 3','2026-11-18 10:05:12','2026-11-18 10:05:12','已通过'],
-  ['191','member01','节庆特别活动','Christmas Activities 2026','积分','100 pts','Day 2','2026-11-17 09:58:40','2026-11-17 09:58:40','已通过'],
-  ['191','member01','节庆特别活动','Christmas Activities 2026','礼金','PHP 10.00','Day 1','2026-11-16 10:02:15','2026-11-16 10:02:15','已通过'],
+  ['222','member03','节庆特别活动','圣诞活动XBomb Xmas','礼金','PHP 12','-','2026-11-20 09:12:30','2026-11-20 09:12:30','已通过'],
+  ['222','member03','节庆特别活动','圣诞活动XBomb Xmas','礼金','PHP 5','-','2026-11-20 09:12:30','2026-11-20 09:12:30','已通过'],
+  ['222','member01','节庆特别活动','圣诞活动XBomb Xmas','礼金','PHP 5','-','2026-11-19 00:00:05','2026-11-19 00:00:05','已通过'],
+  /* 实体奖品／优惠券／免费投注券：依测试站实作（11/18）——奖励内容券类显示张数「x N 张」、实体显示「名称 (Value PHP 价值)」 */
+  ['222','okbet0451vwnyr','节庆特别活动','圣诞活动XBomb Xmas','礼金','PHP 111','Day 1','2026-11-18 15:05:44','2026-11-18 15:05:44','已通过'],
+  ['222','xnjobe6','节庆特别活动','圣诞活动XBomb Xmas','礼金','PHP 10','Day 1','2026-11-18 14:53:18','2026-11-18 14:53:18','已通过'],
+  ['222','okbet8140ktpg4','节庆特别活动','圣诞活动XBomb Xmas','礼金','PHP 40','-','2026-11-18 14:50:17','2026-11-18 14:50:16','已通过'],
+  ['222','okbet8445t08hp','节庆特别活动','圣诞活动XBomb Xmas','礼金','PHP 10','-','2026-11-18 14:28:05','2026-11-18 14:28:05','已通过'],
+  ['222','xnjobe5','节庆特别活动','圣诞活动XBomb Xmas','道具卡','x 1 张','-','2026-11-18 14:21:56','2026-11-18 14:21:56','已通过'],
+  ['222','okbet8127tyf6w','节庆特别活动','圣诞活动XBomb Xmas','实体奖品','大汽车 (Value PHP 777)','-','2026-11-18 13:37:13','2026-11-18 13:37:13','已通过'],
+  ['222','okbet8127tyf6w','节庆特别活动','圣诞活动XBomb Xmas','Golden Draw Ticket','x 12 张','-','2026-11-18 13:36:56','2026-11-18 13:36:56','已通过'],
+  ['222','okbet8127tyf6w','节庆特别活动','圣诞活动XBomb Xmas','优惠券','x 1 张','-','2026-11-18 13:36:42','2026-11-18 13:36:42','已通过'],
+  ['222','okbet8129f6fkb','节庆特别活动','圣诞活动XBomb Xmas','免费投注券','x 3 张','-','2026-11-18 13:26:38','2026-11-18 13:26:38','已通过'],
+  ['222','okbet045233qqd','节庆特别活动','圣诞活动XBomb Xmas','实体奖品','摩托 (Value PHP 322)','-','2026-11-18 13:25:15','2026-11-18 13:25:15','已通过'],
+  ['222','okbet045233qqd','节庆特别活动','圣诞活动XBomb Xmas','优惠券','x 4 张','-','2026-11-18 13:24:56','2026-11-18 13:24:56','已通过'],
+  ['222','okbet8127tyf6w','节庆特别活动','圣诞活动XBomb Xmas','积分','20 pts','Day 2','2026-11-18 11:18:04','2026-11-18 11:18:04','已通过'],
+  ['222','okbet045319v5w','节庆特别活动','圣诞活动XBomb Xmas','积分','1000 pts','-','2026-11-18 10:52:48','2026-11-18 10:52:48','已通过'],
+  ['222','okbet045319v5w','节庆特别活动','圣诞活动XBomb Xmas','免费旋转券','x 2 张','-','2026-11-18 10:52:48','2026-11-18 10:52:48','已通过'],
+  ['222','member01','节庆特别活动','圣诞活动XBomb Xmas','Golden Draw Ticket','x 1 张','Day 3','2026-11-18 10:05:12','2026-11-18 10:05:12','已通过'],
+  ['222','member01','节庆特别活动','圣诞活动XBomb Xmas','积分','100 pts','Day 2','2026-11-17 09:58:40','2026-11-17 09:58:40','已通过'],
+  ['222','member01','节庆特别活动','圣诞活动XBomb Xmas','礼金','PHP 10','Day 1','2026-11-16 10:02:15','2026-11-16 10:02:15','已通过'],
   ['190','member01','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 7','-','2026-08-21 12:03:11','2026-08-21 12:03:11','已通过'],
   ['190','member03','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 100','-','2026-08-22 12:00:02','2026-08-22 12:00:02','已通过'],
   ['190','member02','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 25','-','2026-08-21 12:10:44','2026-08-21 12:10:44','已通过'],
   ['183','xnjobe11','周卡活动','周卡时间到期活动测试','礼金','PHP 17','Day 7','—','—','待审核'],
 ];
+/* 活动奖励统计（11/18）：数据来自「活动数据统计」——同一日期（申请领取时间）＋同一活动 ID＋同一奖励类型合并为 1 列，只计「已通过」记录
+   参与人数＝去重会员数；领取次数＝记录笔数；派发金额＝礼金金额加总；积分小计＝积分加总；券张数＝免费投注券／免费旋转券／优惠券／道具卡／Golden Draw Ticket 张数加总
+   奖励内容：礼金 PHP N、积分 N pts、券类／道具卡／抽奖券 x N 张（取当日最近一笔，同测试站：活动 222 显示 PHP 111）；实体奖品 Physical Prize */
+const awardRows=(()=>{
+  const num=c=>{ const m=String(c).match(/([\d.]+)/); return m?Number(m[1]):0; };
+  const TICKET=['免费投注券','免费旋转券','优惠券','道具卡','Golden Draw Ticket'], g={}, order=[];
+  dataRows.filter(r=>r[9]==='已通过').forEach(r=>{   // dataRows 依时间由近到远，第一笔即当日最近一笔
+    const d=r[7].slice(0,10), k=d+'|'+r[0]+'|'+r[4];
+    if(!g[k]){ g[k]={d,act:r[2],id:r[0],name:r[3],type:r[4],content:r[4]==='实体奖品'?'Physical Prize':r[5],users:new Set(),n:0,cash:0,pts:0,tk:0}; order.push(k); }
+    const x=g[k]; x.users.add(r[1]); x.n++;
+    if(r[4]==='礼金') x.cash+=num(r[5]); else if(r[4]==='积分') x.pts+=num(r[5]); else if(TICKET.includes(r[4])) x.tk+=num(r[5]);
+  });
+  return order.map(k=>g[k]).sort((a,b)=>b.d.localeCompare(a.d))
+    .map(x=>[x.d,x.act,x.id,x.name,x.type,x.content,String(x.users.size),String(x.n),x.cash.toFixed(2),x.pts.toFixed(2),String(x.tk)]);
+})();
 $('#auSearch').addEventListener('click',renderAudit);
 
 const actBase=t=>t;   // 活动类型已不加括号，直接比对
@@ -1063,9 +1066,9 @@ function renderReport(){
       <td>${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td>${r[9]}</td><td>${r[10]}</td></tr>`;
   }).join(''):emptyRow(11);
   /* 合计依目前筛选结果计算 */
-  const num=v=>Number(String(v).replace(/,/g,''))||0, fmt=n=>n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const num=v=>Number(String(v).replace(/,/g,''))||0, fmt=n=>n.toFixed(2);   // 合计不加千分位（依测试站）
   const tM=aRows.reduce((a,r)=>a+num(r[8]),0), tP=aRows.reduce((a,r)=>a+num(r[9]),0), tC=aRows.reduce((a,r)=>a+num(r[10]),0);
-  $('#awTotals').innerHTML=`总金额：<b class="m">${fmt(tM)}</b>　总积分：<b class="p">${fmt(tP)}</b>　总券张数：<b class="c">${tC}</b>`;
+  $('#awTotals').innerHTML=`总金额：<b class="m">${fmt(tM)}</b>　总积分：<b class="p">${fmt(tP)}</b>　总免费券：<b class="c">${tC}</b>`;
   const dA=$('#dtAct').value, dT=$('#dtType').value, dS=$('#dtStatus').value;
   const dRows=dataRows.filter(r=>(!dA||actBase(r[2])===dA)&&(!dT||r[4]===dT)&&(!dS||r[9]===dS));
   $('#dataBody').innerHTML=dRows.length?dRows.map(r=>{
@@ -1324,17 +1327,17 @@ const clone=o=>JSON.parse(JSON.stringify(o));
 const FREEBET_LIST=['PT免费投注','PT电子免费旋转','PT_S freeBet test','PS单钱包','PS_S 免費','PT_S freespin test','VP_S test'];
 const COUPON_LIST=['存送10%-有效期240小时-本金+彩金5倍流水','输返10%-有效期240小时 奖金流水5倍流水 -注单有效期48','中奖加奖10%-有效期240小时 -奖金流水8倍',
   '存送券1%-有效期1小时-本金1倍流水','存送券20%-本金+彩金2倍-有效期24小时','存送券10%-彩金3倍-有效期200小时','输返券10%-奖金流水3倍-有效期200小时-注单有效期1小时'];
-const RW_TYPES=['彩金','积分','抽奖券','免费投注','优惠券','实体奖品'];   // 签到奖励（不含实体奖品）
-/* 宝箱／奖池奖励类型（11/17 依截图）：礼金／积分／免费投注券／免费旋转券／优惠券／道具卡／抽奖券／实体奖品 */
-const BOX_TYPES=['礼金','积分','免费投注券','免费旋转券','优惠券','道具卡','抽奖券','实体奖品'];
+const RW_TYPES=['彩金','积分','Golden Draw Ticket','免费投注','优惠券','实体奖品'];   // 签到奖励（不含实体奖品）
+/* 宝箱／奖池奖励类型（11/17 依截图）：礼金／积分／免费投注券／免费旋转券／优惠券／道具卡／Golden Draw Ticket／实体奖品 */
+const BOX_TYPES=['礼金','积分','免费投注券','免费旋转券','优惠券','道具卡','Golden Draw Ticket','实体奖品'];
 const SPIN_LIST=FREEBET_LIST.filter(x=>/旋转|spin/i.test(x)), BET_LIST=FREEBET_LIST.filter(x=>!/旋转|spin/i.test(x));
 const PROPCARD_LIST=['VP超強力特色遊戲卡','VP強力特色遊戲卡','VP一般特色遊戲卡','VP道具卡测试'];   // 道具卡：由既有「道具卡」设定带入（11/17 用户提供）
 /* 下拉类奖励：类型 → [选项来源, placeholder／未选提示] */
 const PICK_SRC={'免费投注':[FREEBET_LIST,'请选择免费投注'],'优惠券':[COUPON_LIST,'请选择优惠券'],'免费投注券':[BET_LIST,'请选择免费投注券'],'免费旋转券':[SPIN_LIST,'请选择免费旋转券'],'道具卡':[PROPCARD_LIST,'请选择道具卡']};
-const RW_LABEL={'抽奖券':'抽奖券（Golden Draw Ticket）'};
+const RW_LABEL={'Golden Draw Ticket':'Golden Draw Ticket（Golden Draw Ticket）'};
 const newReward=()=>({type:'',name:'',val:'',pick:'',img:'',imgName:'',rate:'',fbType:'',fbVal:'',fbPick:''});
-/* 抽奖券兜底奖励（11/17）：奖励类型固定「彩金」，只填数量。
-   用途：大奖池（Golden Draw）活动关闭，或用户在大奖池活动黑名单时，抽奖券改发此兜底彩金 */
+/* Golden Draw Ticket 兜底奖励（11/17）：奖励类型固定「彩金」，只填数量。
+   用途：大奖池（Golden Draw）活动关闭，或用户在大奖池活动黑名单时，Golden Draw Ticket改发此兜底彩金 */
 const RW_COUNT=9;   // 宝箱奖励固定 9 项（签到宝箱、特别任务奖池共用；不可新增、删除）
 const nineRewards=()=>Array.from({length:RW_COUNT},newReward);
 /* 实体奖品小图：格式与大小限制（沿用后台图片上传规范） */
@@ -1358,8 +1361,8 @@ function rewardErrors(r,o,strict){
   else{
     if(r.val===''){ if(strict) e.val='请输入奖励数量'; }
     else if(!(Number(r.val)>0)) e.val='不可为 0';
-    /* 抽奖券：兜底奖励必填（类型 → 数量／选项） */
-    if(r.type==='抽奖券'&&!e.val){
+    /* Golden Draw Ticket：兜底奖励必填（类型 → 数量／选项） */
+    if(r.type==='Golden Draw Ticket'&&!e.val){
       if(r.fbVal===''){ if(strict){ e.val='请输入兜底奖励数量'; e.field='fbVal'; } }
       else if(!(Number(r.fbVal)>0)){ e.val='兜底奖励数量不可为 0'; e.field='fbVal'; }
     }
@@ -1383,10 +1386,10 @@ function rvHtml(r){
     case '礼金':
     case '积分': return num('请输入奖励数量');
     case '免费投注券': case '免费旋转券': case '道具卡': return sel(PICK_SRC[r.type][0],PICK_SRC[r.type][1]);
-    case '抽奖券': {
+    case 'Golden Draw Ticket': {
       return `<div class="rv-fb"><div class="rv-fb__main">${num('奖励数量')}</div>
-        <div class="rv-fb__row"><span class="rv-fb__lb">抽奖券兜底奖励(彩金)：</span>
-          <input class="input js-fbval" value="${r.fbVal}" placeholder="奖励数量" aria-label="抽奖券兜底奖励（彩金）数量"></div></div>`;
+        <div class="rv-fb__row"><span class="rv-fb__lb">Golden Draw Ticket 兜底奖励(彩金)：</span>
+          <input class="input js-fbval" value="${r.fbVal}" placeholder="奖励数量" aria-label="Golden Draw Ticket 兜底奖励（彩金）数量"></div></div>`;
     }
     case '免费投注': return sel(FREEBET_LIST,'请选择免费投注');
     case '优惠券':   return sel(COUPON_LIST,'选择优惠券');
@@ -1425,7 +1428,7 @@ function openImgViewer(src,title){
 function bindRv(tr,r,o){
   const v=$('.js-val',tr);
   if(v) v.addEventListener('input',e=>{ e.target.value=sanInt(e.target.value);   /* 奖励价值、奖励数量皆为正整数，不可填小数 */ r.val=e.target.value; paintReward(tr,r,o); o.onChange&&o.onChange(); });
-  /* 抽奖券兜底奖励：切换类型清空数量／选项后重画；数量为正整数 */
+  /* Golden Draw Ticket 兜底奖励：切换类型清空数量／选项后重画；数量为正整数 */
   const fbv=$('.js-fbval',tr);
   if(fbv) fbv.addEventListener('input',e=>{ e.target.value=sanInt(e.target.value); r.fbVal=e.target.value; paintReward(tr,r,o); o.onChange&&o.onChange(); });
   const nm=$('.js-name',tr);
@@ -1469,7 +1472,7 @@ function buildRewardRow(r,o){
 /* ---------- 4-1 签到活动配置 ---------- */
 const SIGN_DAYS=['第一天','第二天','第三天以上(含)'];
 let sign={days:[newReward(),newReward(),newReward()],boxOn:true,boxRates:['','','','','','']};
-const SAMPLE_SIGN={days:[{type:'礼金',name:'',val:'10',pick:'',img:false,rate:''},{type:'积分',name:'',val:'100',pick:'',img:false,rate:''},{type:'抽奖券',name:'',val:'1',pick:'',img:false,rate:'',fbType:'彩金',fbVal:'12',fbPick:''}],
+const SAMPLE_SIGN={days:[{type:'礼金',name:'',val:'10',pick:'',img:false,rate:''},{type:'积分',name:'',val:'100',pick:'',img:false,rate:''},{type:'Golden Draw Ticket',name:'',val:'1',pick:'',img:false,rate:'',fbType:'彩金',fbVal:'12',fbPick:''}],
   boxOn:true,boxRates:['39.9875','25.0125','15','12','8','']};
 const BLANK_SIGN={days:[newReward(),newReward(),newReward()],boxOn:true,boxRates:['','','','','','']};
 /* 宝箱「已配置」＝该款任一栏位有填写；未配置的宝箱中奖率视为 0、输入框停用 */
@@ -1574,7 +1577,7 @@ function makeBoxSet(cfg){
 function sampleBox(k){
   const m=k+1, R=(type,val,rate,extra={})=>({type,name:'',val:String(val),pick:'',img:'',imgName:'',rate,fbType:'',fbVal:'',fbPick:'',...extra});
   return [R('礼金',5*m,'30'),R('积分',50*m,'20'),k%2?R('免费旋转券','','15',{pick:SPIN_LIST[k%SPIN_LIST.length]}):R('免费投注券','','15',{pick:BET_LIST[k%BET_LIST.length]}),
-    R('优惠券','','10',{pick:COUPON_LIST[k%COUPON_LIST.length]}),R('抽奖券',m,'8',{fbType:'彩金',fbVal:String(12*m)}),k===1?R('道具卡','','7',{pick:PROPCARD_LIST[0]}):R('礼金',20*m,'7'),R('积分',300*m,'5'),R('抽奖券',3*m,'4',{fbType:'礼金',fbVal:String(5*m)}),
+    R('优惠券','','10',{pick:COUPON_LIST[k%COUPON_LIST.length]}),R('Golden Draw Ticket',m,'8',{fbType:'彩金',fbVal:String(12*m)}),k===1?R('道具卡','','7',{pick:PROPCARD_LIST[0]}):R('礼金',20*m,'7'),R('积分',300*m,'5'),R('Golden Draw Ticket',3*m,'4',{fbType:'礼金',fbVal:String(5*m)}),
     k>=4 ? R('实体奖品',1500*m,'1',{name:k===4?'圣诞限定礼盒':'蓝牙耳机',img:SAMPLE_IMG,imgName:k===4?'xmas_giftbox.png':'earphone.png'})
          : R('礼金',100*m,'1')];
 }
@@ -1800,7 +1803,7 @@ $('#provConfirm').addEventListener('click',()=>{
 
 /* ---------- 4-8 彩金所需流水倍数（单一配置；错误即时红框＋红字，不使用 toast） ---------- */
 function wagerOk(){ const wv=$('#fWager').value.trim(), wn=Number(wv); return wv===''||(wn>=0.01&&wn<=999999.99&&/^\d{1,8}(\.\d{1,2})?$/.test(wv)); }
-const WAGER_ERR='彩金所需流水倍数必须为 0.01～999999.99，且最多 2 位小数';
+const WAGER_ERR='彩金所需流水倍数最多 2 位小数';
 function paintWager(){ const bad=!wagerOk(), i=$('#fWager'); i.classList.toggle('is-error',bad); $('#fWagerErr').textContent=bad?WAGER_ERR:''; return !bad; }
 
 /* ---------- 步骤4 各区块校验（下一步／提交时依序检查） ---------- */
@@ -1839,7 +1842,7 @@ function buildPreview(){
   /* 步骤4 摘要 */
   const rwTxt=r=>!r.type?'—':PICK_SRC[r.type]?`${r.type}：${r.pick||'—'}`
       :r.type==='实体奖品'?`实体奖品「${r.name||'—'}」（价值 ${r.val||'—'}${r.img?'，已上传小图':''}）`
-      :r.type==='抽奖券'?`${RW_LABEL[r.type]} ×${r.val||'—'}（兜底彩金 ${r.fbVal||'—'}）`
+      :r.type==='Golden Draw Ticket'?`${RW_LABEL[r.type]} ×${r.val||'—'}（兜底彩金 ${r.fbVal||'—'}）`
       :`${RW_LABEL[r.type]||r.type} ×${r.val||'—'}`;
   const ratioTxt=GAME_CATS.map(c=>{const r=ratio[c.key]; if(c.fixed) return `${c.key} ${r.pct||100}%（全部游戏商）`; return r.pct!==''&&r.sel.length?`${c.key} ${r.pct}%（${r.sel.length}／${catTotal(c)} 家）`:`${c.key} 100%`;}).join('；');
   const floatOn=$$('input[name=float]')[1]?$$('input[name=float]')[1].checked:false;
@@ -1965,6 +1968,41 @@ document.addEventListener('click',()=>{ if(dp.target) dpClose(); });
 
 /* ---------- 初始化 ---------- */
 renderStep4();
+/* ---------- 下拉选单：固定往下展开（保留原生 select 的值与 change 事件，只替换弹出清单） ---------- */
+(function(){
+  let pop=null, cur=null;
+  const close=()=>{ if(pop){ pop.remove(); pop=null; } if(cur){ cur.classList.remove('is-open'); cur=null; } };
+  function open(sel){
+    cur=sel; sel.classList.add('is-open'); sel.focus({preventScroll:true});
+    pop=document.createElement('ul'); pop.className='dd-pop'; pop.setAttribute('role','listbox');
+    [...sel.options].forEach((o,i)=>{
+      if(o.hidden) return;
+      const li=document.createElement('li');
+      li.className='dd-pop__opt'+(i===sel.selectedIndex?' is-sel':'')+(o.disabled?' is-dis':'');
+      li.textContent=o.textContent; li.setAttribute('role','option');
+      li.addEventListener('mousedown',ev=>{ ev.preventDefault(); if(o.disabled) return;
+        if(sel.selectedIndex!==i){ sel.selectedIndex=i; sel.dispatchEvent(new Event('input',{bubbles:true})); sel.dispatchEvent(new Event('change',{bubbles:true})); }
+        close(); });
+      pop.appendChild(li);
+    });
+    document.body.appendChild(pop);
+    const r=sel.getBoundingClientRect();
+    pop.style.left=r.left+'px'; pop.style.top=(r.bottom+4)+'px'; pop.style.minWidth=r.width+'px';
+    pop.style.maxHeight=Math.max(120,Math.min(274,window.innerHeight-r.bottom-12))+'px';   // 一律往下；下方空间不足时清单内卷动
+    const s=pop.querySelector('.is-sel'); if(s) pop.scrollTop=s.offsetTop-pop.clientHeight/2+s.offsetHeight/2;
+  }
+  document.addEventListener('mousedown',e=>{
+    if(pop && pop.contains(e.target)) return;
+    const sel=e.target.closest && e.target.closest('select');
+    if(!sel||sel.multiple||sel.size>1||sel.disabled){ close(); return; }
+    e.preventDefault();                       // 阻止系统原生清单
+    if(cur===sel){ close(); return; }
+    close(); open(sel);
+  },true);
+  window.addEventListener('scroll',e=>{ if(pop && !pop.contains(e.target)) close(); },true);
+  window.addEventListener('resize',close);
+  document.addEventListener('keydown',e=>{ if(pop && e.key==='Escape'){ close(); e.stopPropagation(); } },true);
+})();
 </script>
 </body>
 </html>
