@@ -2121,7 +2121,7 @@ $$('[data-sim]').forEach(b=>b.addEventListener('click',()=>{
   const k=b.dataset.sim;
   if((k==='bet'||k==='dep')&&!LIVE()){ toast('兑换期／关闭后不计算投注与充值'); renderAll(); return; }
   if(k==='bet'){ const k0=taskKeys(); S.dayBet+=10000; S.xBet+=10000; const g=taskKeys()-k0;
-    toast(`模拟投注 +10,000（每日任务进度实际依注单报表约 30 分钟更新）${g?` · 特别任务完成 ${g/CYCLE.qty} 轮，自动发放 PAROL ×${g}（实际 Job 每 20 分钟更新）`:''}`); }
+    toast(`模拟投注 +10,000（每日任务进度实际以会员游戏报表为数据源）${g?` · 特别任务完成 ${g/CYCLE.qty} 轮，自动发放 PAROL ×${g}（实际 Job 每 20 分钟更新）`:''}`); }
   if(k==='parol'){ S.bonusKeys+=20; toast('模拟获得 PAROL +20（测试 5 抽／10 抽用）'); }
   if(k==='dep'){ S.dayDep+=5000; toast('模拟充值 +5,000'); }
   if(k==='nextday'){
