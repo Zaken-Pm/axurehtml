@@ -40,7 +40,7 @@
 - **Specs HTML 每次修改后，同步重转 `XmasEvent_Specs.md`**（`python3 spec2md.py XmasEvent_Specs.html XmasEvent_Specs.md`）并一起交付到用户电脑
 
 ## 档案
-- `XmasEvent_User_Manual_cn.html`：运营／客服操作手册（11/19，参照 X-BOMB_User_Manual_cn.html 版型；8 章：活动简介、必读注意事项、活动列表、六步骤〔步骤4 分 8 区块〕、派奖审核〔备注英文对照〕、活动报表、客服须知〔前台画面＋12 题 FAQ〕、名词辞典）；后台图为原型重新截图＋编号徽章，前台图取自 Specs 截图。规格／原型有变动时需同步更新手册
+- `X-BombParol Fiesta_User_Manual_cn.html`：运营／客服操作手册（11/19，参照 X-BOMB_User_Manual_cn.html 版型；8 章：活动简介、必读注意事项、活动列表、六步骤〔步骤4 分 8 区块〕、派奖审核〔备注英文对照〕、活动报表、客服须知〔前台画面＋12 题 FAQ〕、名词辞典）；后台图为原型重新截图＋编号徽章，前台图取自 Specs 截图。规格／原型有变动时需同步更新手册
 - 后台原型：`claude/XmasEvent_Backend.html`（最新版；挑战任务 `challengeMsg()`、每日返水 `rebateMsg()` 产生 toast；两表皆 `.tbl--compact`；每日返水／挑战任务下方提示用用户指定文案；达上限按钮停用；实体奖品奖励价值只能填正整数；币种预设且下拉仅 PHP）
 - 前台原型：`claude/XmasEvent_Frontend.html`（最新版）
   - **奖池＝9 宫格＋圣诞树底图（11/04 定案；经历：卡片 9 宫格 → 玻璃许愿树 → 许愿树无罩 → 现版）**：`renderPools` → `renderTreePools`；4 个奖池上下排列；**卡片紧凑（约 400px）**：第 1 行 `POOL N` 铭牌（左）＋拐杖糖消耗标签（右）→ 圣诞树底图（`TREE_SVG`，略大于 9 宫格）上叠 3×3 格子（`.gtree__grid`，Grand Prize 置中、标 GRAND PRIZE）→ 1／5／10 抽（**下方不显示 PAROL 不足提示，11/04 移除**；不足的按钮停用）；最高级奖池卡片金框光晕
@@ -227,7 +227,7 @@
 - 主页面：Banner、RULES 钮、Xmas Reward Board＋签到日历（Today 格）、Tab（Parol Quest／Parol Wish Draw 图）、Unclaimed（Claim All 图）、Christmas Mission 卡、DAILY MISSIONS 卡（Lv 图、BONUS／TOP-UP 装饰、按钮图）、奖池（POOL 图、9 宫格、Grand 图、1/5/10 抽钮）、页尾雪景
 - 弹窗：签到宝箱＝LotteryModal、恭喜获奖＝DrawResultModal（4 项以上用 lg 版）、翻牌＝ChallengeModal＋PickCardModal（牌面用测试站扑克图）、礼物盒＝GiftOpenModal 素材、PAROL 提示＝ParolTipModal、一键领取结果＝ClaimAllModal（数字图）、大奖＝GrandPrizeModal、History＝HistoryModal、规则＝RulesModal（内容同测试站，活动时间与 Important Dates 套用配置）；平台首页的补领／补领成功／每日推广维持原设计图
 - 原型逻辑不变；档案 2.8 MB → 4.5 MB
-- Specs：文案同步（Parol Quest、Xmas Reward Board、Christmas Mission／PAROL xN、Lv.N、Claim/Bet/Top-Up/Claimed/Ended），本次调整 11-19 第 4 项；前台原型重新内嵌（Specs 内的前台截图尚未重截）
+- Specs：文案同步（Parol Quest、Xmas Reward Board、Christmas Mission／PAROL xN、Lv.N、Claim/Bet/Top-Up/Claimed/Ended），本次调整不记录；前台原型重新内嵌（Specs 内的前台截图尚未重截）
 - 手册：第 7 章弹窗截图换成新原型（规则、签到宝箱、签到奖励、礼物盒、PAROL 提示、一键领取结果、翻牌 3 张、奖池、10 抽、大奖、History、兑换期），文案同步
 - （追加）Specs 前台规则截图全部依新原型重截（26 张；黑名单错误提示、客服聊天室、次日补领、每日推广维持原图）；F9 新增「1 抽：恭喜获奖弹窗（1 项）」截图
 - 恭喜获奖弹窗修正跑版（清除 ul 预设边距）；标题行同测试站：You Won／Prize、Day N 为白字，数量与 Check-In Rewards 为金字
@@ -239,6 +239,8 @@
 - 手册：黑名单说明改为「入口照常显示，进入活动详情页后才弹提示弹窗 Sorry／Promotion Ended」（第 4 章步骤 3、第 7 章首页弹窗、FAQ Q11）
 - 手册：移除「活动已结束」截图与活动结束页说明，第 7 章小节改名「兑换期」
 - 原型：兑换期看板 Cash Bonus Claimed Today 显示 0.00（同 Specs F10）；兑换期截图（Specs／手册）重截，不含原型控制 toast
-- 操作手册英文版：XmasEvent_User_Manual_en.html（内容与中文版 11-19 一致；后台截图维持中文介面，正文以英文说明；后台中文字串如「检测到相同活动正在进行中」保留原文并附英文注解）
-- PDF：XmasEvent_User_Manual_cn.pdf（36 页）、XmasEvent_User_Manual_en.pdf（41 页），A4、各章换页、页尾页码；PDF 内图片转 JPEG 压缩（约 4–5 MB）
-- 手册档名改为 XmasEvent_User_Manual_cn／_en（.html、.pdf）
+- 操作手册英文版：X-BombParol Fiesta_User_Manual_en.html（内容与中文版 11-19 一致；后台截图维持中文介面，正文以英文说明；后台中文字串如「检测到相同活动正在进行中」保留原文并附英文注解）
+- PDF：X-BombParol Fiesta_User_Manual_cn.pdf（36 页）、X-BombParol Fiesta_User_Manual_en.pdf（41 页），A4、各章换页、页尾页码；PDF 内图片转 JPEG 压缩（约 4–5 MB）
+- 手册档名改为 X-BombParol Fiesta_User_Manual_cn／_en（.html、.pdf）
+- Specs 本次调整 11-19 仅保留 2 项（B12 关联后台页面、Festival Special Event 名词）；规则弹窗、前台测试站同步、奖池 1 抽、兑换期等不记录
+- 手册档名改为「X-BombParol Fiesta_User_Manual_cn／_en」（.html、.pdf），不用 XmasEvent 命名（前缀为 X-BombParol Fiesta）

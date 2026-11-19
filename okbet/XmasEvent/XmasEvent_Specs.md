@@ -1226,14 +1226,10 @@ CLAIMED 移至列表底部；看板 Cash Bonus Claimed Today＋实得金额；My
 ---
 ## 本次调整
 
-### 本次调整 · 2026-11-19（6 项）
+### 本次调整 · 2026-11-19（2 项）
 
 1. 新增 **B12 关联后台页面**：券奖纪录「类型」筛选、用户积分纪录「原因」栏位、免费项目记录与优惠券记录「全部来源」筛选，皆新增 `节庆特别活动`；并标示各报表显示 `节庆特别活动` 的栏位（券奖纪录「类型」、用户积分纪录「原因」、免费项目记录／优惠券记录「获得方式」）。
 2. 名词定义补充：`节庆特别活动` 英文显示 **`Festival Special Event`**。
-3. **活动规则弹窗**：标题改为 `RULES`，新增右上角关闭钮 `✕`，按钮文案 `Confirm`；开头改为 `X-BOMB PAROL FIESTA`＋`Promotion period: 00:00 on 16 November to 23:59 on 31 December 2026.`＋小标 `HOW TO PLAY:`；章节标题不加编号。
-4. **前台活动页依前台测试站更新**：分页名称 `Parol Quest`／`Parol Wish Draw`；看板标题 `Xmas Reward Board`；签到日历今天格显示 `Today`；特别任务卡标题 `Christmas Mission`、奖励 `PAROL xN`；每日任务等级 `Lv.N`，按钮 `Claim`／`Bet`／`Top-Up`／`Claimed`；弹窗（签到宝箱、恭喜获奖、翻牌挑战、礼物盒、PAROL 提示、一键领取结果、大奖、History、规则）改用测试站素材。
-5. 奖池 **1 抽**：跑马灯停格高亮后，接着跳出**恭喜获奖弹窗**（1 项，`You Won 1 Prize`）；抽中 Grand Prize 跳大奖弹窗。
-6. **兑换期**：`Parol Quest` 按钮照常显示但呈不可点击状态（停用、不显示气泡）；移除该分页内各元件的兑换期样式（`Ended` 按钮、`Daily missions have ended`）；签到日历不显示今天高亮（无 `Today`）。
 
 ### 本次调整 · 2026-11-18（4 项）
 
