@@ -811,11 +811,11 @@ body.view-proto .proto-wide{margin-top:8px;}
               <li class="rule-item"><div class="rule-num">3</div><div class="rule-text"><b>实体奖品</b> <span class="badge badge-change">异动</span>：同样自动审核；前台抽中时提示用户「请联系客服」，由客服线下安排寄送／领取。「奖励金额/内容」显示奖励价值 <code>PHP X</code>，奖品名称写在备注（如 <code>Pool 4, 大汽车</code>）。</div></li>
               <li class="rule-item"><div class="rule-num">4</div><div class="rule-text"><b>奖励金额/内容</b> <span class="badge badge-change">异动</span>：礼金 <code>PHP X.XX</code>（如 <code>PHP 100.00</code>）；积分 <code>X pts</code>；券类、道具卡、抽奖券显示张数 <code>×N 张</code>；实体奖品 <code>PHP 价值</code>。</div></li>
             </ul>
-            <div class="callout tip"><span>📝</span><div style="width:100%"><b>备注格式 <span class="badge badge-change">异动</span>（每笔 1 个备注）：</b>以「, 」分隔；备注栏<b>完整显示</b>，文字过长自动换行（不截断、不用悬浮提示）。</div></div>
+            <div class="callout tip"><span>📝</span><div style="width:100%"><b>备注格式 <span class="badge badge-change">异动</span>（每笔 1 个备注）：</b>以「, 」分隔。</div></div>
               <div class="card" style="padding:0;overflow:hidden;margin-top:8px"><table class="data-table"><thead><tr><th style="width:150px">来源</th><th>格式</th><th>范例</th></tr></thead><tbody>
-                <tr><td>签到奖励</td><td><code>Check-In Day N, &lt;奖励内容&gt;</code></td><td><code>Check-In Day 1, Cash Bonus PHP 10</code></td></tr>
+                <tr><td>签到奖励</td><td><code>Check-In Day N, &lt;奖励内容&gt;</code></td><td><code>Check-In Day 1, Cash Bonus PHP 111</code></td></tr>
                 <tr><td>签到宝箱</td><td><code>Surprise Chest Day N, &lt;奖励内容&gt;</code></td><td><code>Surprise Chest Day 3, Cash Bonus PHP 50</code></td></tr>
-                <tr><td>特别任务奖池</td><td><code>Pool N, &lt;奖励内容&gt;</code></td><td><code>Pool 2, Golden Draw Ticket×3</code><br><code>Pool 4, 大汽车</code>（实体奖品，有奖品名称）</td></tr>
+                <tr><td>特别任务奖池</td><td><code>Pool N, &lt;奖励内容&gt;</code></td><td><code>Pool 2, Golden Draw Ticket×3</code><br><code>Pool 4, Coupon</code><br><code>Pool 4, 大汽车</code>（实体奖品，有奖品名称）</td></tr>
                 <tr><td>每日返水</td><td><code>User VIP Level n, LVx Base Reward &lt;金额&gt;</code><br>触发挑战时同一行再加 <code>, Challenge y +z%</code></td><td><code>User VIP Level 5, LV4 Base Reward 40</code><br><code>User VIP Level 5, LV4 Base Reward 40, Challenge 2 +50%</code></td></tr>
                 <tr><td>次日补领</td><td>同每日返水；<b>依补领内容逐级各记 1 笔</b>；挑战等级补领不翻牌，备注不带 Challenge</td><td><code>User VIP Level 1, LV1 Base Reward 5</code><br><code>User VIP Level 1, LV2 Base Reward 8</code></td></tr>
               </tbody></table></div>

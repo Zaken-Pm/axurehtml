@@ -883,13 +883,13 @@
 3. **实体奖品** 【异动】：同样自动审核；前台抽中时提示用户「请联系客服」，由客服线下安排寄送／领取。「奖励金额/内容」显示奖励价值 `PHP X`，奖品名称写在备注（如 `Pool 4, 大汽车`）。
 4. **奖励金额/内容** 【异动】：礼金 `PHP X.XX`（如 `PHP 100.00`）；积分 `X pts`；券类、道具卡、抽奖券显示张数 `×N 张`；实体奖品 `PHP 价值`。
 
-> 📝 **备注格式 【异动】（每笔 1 个备注）：**以「, 」分隔；备注栏**完整显示**，文字过长自动换行（不截断、不用悬浮提示）。
+> 📝 **备注格式 【异动】（每笔 1 个备注）：**以「, 」分隔。
 
 | 来源 | 格式 | 范例 |
 |---|---|---|
-| 签到奖励 | `Check-In Day N, <奖励内容>` | `Check-In Day 1, Cash Bonus PHP 10` |
+| 签到奖励 | `Check-In Day N, <奖励内容>` | `Check-In Day 1, Cash Bonus PHP 111` |
 | 签到宝箱 | `Surprise Chest Day N, <奖励内容>` | `Surprise Chest Day 3, Cash Bonus PHP 50` |
-| 特别任务奖池 | `Pool N, <奖励内容>` | `Pool 2, Golden Draw Ticket×3`<br>`Pool 4, 大汽车`（实体奖品，有奖品名称） |
+| 特别任务奖池 | `Pool N, <奖励内容>` | `Pool 2, Golden Draw Ticket×3`<br>`Pool 4, Coupon`<br>`Pool 4, 大汽车`（实体奖品，有奖品名称） |
 | 每日返水 | `User VIP Level n, LVx Base Reward <金额>`<br>触发挑战时同一行再加 `, Challenge y +z%` | `User VIP Level 5, LV4 Base Reward 40`<br>`User VIP Level 5, LV4 Base Reward 40, Challenge 2 +50%` |
 | 次日补领 | 同每日返水；**依补领内容逐级各记 1 笔**；挑战等级补领不翻牌，备注不带 Challenge | `User VIP Level 1, LV1 Base Reward 5`<br>`User VIP Level 1, LV2 Base Reward 8` |
 
