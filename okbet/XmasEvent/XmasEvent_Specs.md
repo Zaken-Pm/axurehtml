@@ -724,6 +724,7 @@
   - 奖励类型选「抽奖券」时，奖励数量下方显示 `抽奖券兜底奖励(彩金)：`＋数量输入框（placeholder `奖励数量`），**必填**
   - 兜底奖励类型**固定为彩金**，不可选择其他类型；数量为大于 0 的整数
   - **发放时机**：大奖池（Golden Draw）活动**关闭**，或用户在大奖池活动**黑名单**内时，抽中／获得的抽奖券改为发放此兜底彩金（不发抽奖券）
+  - **记录**：一律以**彩金**记录（派奖审核、活动数据统计、活动奖励统计、活动道具统计），备注标示 `Golden Draw Ticket fallback`（见 B10／B11）
   - 切换奖励类型（非抽奖券）时兜底数量一并清空
   - 错误提示（点「下一步」／「提交」时检核，标红该栏）：`请输入兜底奖励数量`／`兜底奖励数量不可为 0`
   - 适用：签到奖励（B4）、签到宝箱（B3）、特别任务奖池（B7）中所有抽奖券；步骤6 预览显示于该奖励后，如 `抽奖券（Golden Draw Ticket） ×1（兜底彩金 12）`
@@ -891,6 +892,7 @@
 | 签到宝箱 | `Surprise Chest Day N, <奖励内容>` | `Surprise Chest Day 3, Cash Bonus PHP 50` |
 | 特别任务奖池 | `Pool N, <奖励内容>` | `Pool 2, Golden Draw Ticket×3`<br>`Pool 4, Coupon`<br>`Pool 4, 大汽车`（实体奖品，有奖品名称） |
 | 每日返水 | `User VIP Level n, LVx Base Reward <金额>`<br>触发挑战时同一行再加 `, Challenge y +z%` | `User VIP Level 5, LV4 Base Reward 40`<br>`User VIP Level 5, LV4 Base Reward 40, Challenge 2 +50%` |
+| Golden Draw Ticket 兜底彩金 | `<来源>, Reward <金额>, Golden Draw Ticket fallback`<br>· 来源沿用 `Check-In Day N`／`Surprise Chest Day N`／`Pool N`<br>· 大奖池活动关闭、用户在大奖池活动黑名单，两种情境同一写法<br>· 奖励类型＝礼金，奖励金额/内容＝`PHP 100.00` | `Pool 1, Reward 100, Golden Draw Ticket fallback`<br>`Check-In Day 3, Reward 12, Golden Draw Ticket fallback`<br>`Surprise Chest Day 5, Reward 12, Golden Draw Ticket fallback` |
 | 次日补领 | 同每日返水；**依补领内容逐级各记 1 笔**；挑战等级补领不翻牌，备注不带 Challenge | `User VIP Level 1, LV1 Base Reward 5`<br>`User VIP Level 1, LV2 Base Reward 8` |
 
 | <奖励内容>（依奖励类型） | 写法（金额、张数为示例） |
@@ -920,7 +922,7 @@
 
 1. **数据来源** 【异动】：数据来自「**活动数据统计**」的记录（状态「已通过」），同一日期（申请领取时间）＋同一活动 ID＋同一奖励类型合并 1 列（不分来源）：
    - 参与人数＝去重会员数；领取次数＝记录笔数
-   - **派发金额(系统币)**＝礼金记录的金额加总
+   - **派发金额(系统币)**＝礼金记录的金额加总（**含 Golden Draw Ticket 兜底彩金**，以礼金汇总、不计入券张数）
    - **积分小计**＝积分记录的点数加总
    - **券张数**＝免费投注券／免费旋转券／优惠券／道具卡／**抽奖券（Golden Draw Ticket）**记录的张数加总
    - 实体奖品统计人数与笔数，不计入派发金额
@@ -933,7 +935,7 @@
 ### 活动数据统计 【新增活动类型】
 
 1. 每获得 1 个奖励＝1 笔（与派奖审核一致）。天数：签到相关显示 `Day N`，其余（含次日补领）显示 `-`。状态：所有奖励（含实体奖品）一律「已通过」。
-2. **奖励内容** 【异动】：礼金 `PHP N`（不带小数，如 `PHP 10`）；积分 `N pts`；券类（免费投注券／免费旋转券／优惠券）、道具卡、抽奖券显示张数 `x N 张`；实体奖品显示 `名称 (Value PHP 价值)`，如 `大汽车 (Value PHP 777)`。
+2. **奖励内容** 【异动】：礼金 `PHP N`（不带小数，如 `PHP 10`；Golden Draw Ticket 兜底彩金同样记为礼金）；积分 `N pts`；券类（免费投注券／免费旋转券／优惠券）、道具卡、抽奖券显示张数 `x N 张`；实体奖品显示 `名称 (Value PHP 价值)`，如 `大汽车 (Value PHP 777)`。
 
 ### 活动道具统计 【新增页签】
 
@@ -964,6 +966,7 @@
   - 道具卡：名称×张数（如 `VP一般特色遊戲卡×2`）
   - 优惠券：名称（不带张数，如 `存送券1%-有效期1小时-本金1倍流水`）
   - 抽奖券：`Golden Draw Ticket×N`
+  - Golden Draw Ticket 兜底彩金：奖励类型＝彩金、奖励数量＝金额，备注 `Cash Bonus N (Golden Draw Ticket fallback)`（如 `Cash Bonus 100 (Golden Draw Ticket fallback)`）
   - 实体奖品：`名称 (Value 价值)`（如 `大汽车 (Value 777)`）
 - **显示**：数量不加 +／−；剩余数量＝该笔异动后的持有数。
 

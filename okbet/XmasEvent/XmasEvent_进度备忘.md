@@ -148,6 +148,7 @@
 - 名称单行，放不下缩字（最小 12px）再「…」截断
 - 活动道具统计新增「奖励数量」栏（奖励类型与备注之间，**只显示数字**：礼金金额／积分点数／券张数／实体 1；获取显示 -）
 - **活动道具统计（11/11，原「活动道具消耗统计」）**：移除活动类型筛选；新增统计类型（PAROL 获取／PAROL 消耗，预设获取）、奖池类型（全部／POOL1～4）、奖励类型（全选＋8 类）；获取时奖池／奖励类型停用；栏位新增统计类型、奖池类型、奖励类型；获取：消耗数量／奖池／奖励类型／备注皆「-」（获取不写备注）；消耗：获得数量「-」、一个奖励一笔（多抽拆笔）、备注＝实际奖励（彩金100、积分10、实体奖品＝「奖品名称、价值」如 iPhone 18 Pro Max 2TB、价值194,990（11/11 改以 iPhone 18 Pro Max 2TB 官方菲律宾售价 ₱194,990 示意）、券类／道具卡＝只写名称不加类型（如 PT电子免费旋转×1））
+- **Golden Draw Ticket 兜底彩金记录（11/19，依开发代码，用户确认）**：一律以彩金记录；派奖审核 奖励类型礼金、金额 PHP 100.00、备注 `<来源>, Reward <金额>, Golden Draw Ticket fallback`（来源 Check-In Day N／Surprise Chest Day N／Pool N；大奖池活动关闭与黑名单同一写法，原代码后缀 Jackpot Activity Blacklist User 改为 Golden Draw Ticket fallback，需请开发改）；道具统计 彩金、数量＝金额、备注 `Cash Bonus 100 (Golden Draw Ticket fallback)`；数据统计／奖励统计按礼金汇总、不计券张数；资金流水不写进 Specs；未列入本次调整
 - ~~派奖审核备注再依测试站（11/19）~~ → **用户：依新的写法即可**（不跟测试站现有资料）：维持 11/18 开发提供的新格式 Coupon／Free Bet Coupon×N／Free Spin Coupon×N／Prop Card×N／Points N（不加千分位）…；prizeName 优先显示名称（例 Pool 2, Special Prize）
 - **派奖审核备注改版（11/18 用户提供开发格式，不列入本次调整）**：签到 `Check-In Day N, <奖励内容>`、签到宝箱 `Surprise Chest Day N, <奖励内容>`（原开发写 Mystery Box，用户 11/18 改为 Surprise Chest）、奖池 `Pool N, <奖励内容>`；奖励内容（未配置奖品名称时）：Cash Bonus PHP N／Points N／Free Bet Coupon×N／Free Spin Coupon×N／Coupon／Prop Card×N／Golden Draw Ticket×N／Physical Prize；有 prizeName 优先显示名称、不追加金额张数；每日返水／补领维持 User VIP Level…；取代先前 Reward M、Chest、券名称＋设定内容写法
 - **活动道具统计再同步测试站（11/18，不列入本次调整）**：表格置中、时间改开始／结束两栏、加分页（Total N、10/20/50/100 预设 20、页码、Go to）、栏名「活动 ID」、补道具卡消耗示意（备注 `VP一般特色遊戲卡×2`）；Specs B11 同步（含道具卡备注、分页）
