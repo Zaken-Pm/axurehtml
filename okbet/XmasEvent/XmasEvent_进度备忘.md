@@ -40,7 +40,7 @@
 - **Specs HTML 每次修改后，同步重转 `XmasEvent_Specs.md`**（`python3 spec2md.py XmasEvent_Specs.html XmasEvent_Specs.md`）并一起交付到用户电脑
 
 ## 档案
-- `XmasEvent_User_Manualcn.html`：运营／客服操作手册（11/19，参照 X-BOMB_User_Manualcn.html 版型；8 章：活动简介、必读注意事项、活动列表、六步骤〔步骤4 分 8 区块〕、派奖审核〔备注英文对照〕、活动报表、客服须知〔前台画面＋12 题 FAQ〕、名词辞典）；后台图为原型重新截图＋编号徽章，前台图取自 Specs 截图。规格／原型有变动时需同步更新手册
+- `XmasEvent_User_Manual_cn.html`：运营／客服操作手册（11/19，参照 X-BOMB_User_Manual_cn.html 版型；8 章：活动简介、必读注意事项、活动列表、六步骤〔步骤4 分 8 区块〕、派奖审核〔备注英文对照〕、活动报表、客服须知〔前台画面＋12 题 FAQ〕、名词辞典）；后台图为原型重新截图＋编号徽章，前台图取自 Specs 截图。规格／原型有变动时需同步更新手册
 - 后台原型：`claude/XmasEvent_Backend.html`（最新版；挑战任务 `challengeMsg()`、每日返水 `rebateMsg()` 产生 toast；两表皆 `.tbl--compact`；每日返水／挑战任务下方提示用用户指定文案；达上限按钮停用；实体奖品奖励价值只能填正整数；币种预设且下拉仅 PHP）
 - 前台原型：`claude/XmasEvent_Frontend.html`（最新版）
   - **奖池＝9 宫格＋圣诞树底图（11/04 定案；经历：卡片 9 宫格 → 玻璃许愿树 → 许愿树无罩 → 现版）**：`renderPools` → `renderTreePools`；4 个奖池上下排列；**卡片紧凑（约 400px）**：第 1 行 `POOL N` 铭牌（左）＋拐杖糖消耗标签（右）→ 圣诞树底图（`TREE_SVG`，略大于 9 宫格）上叠 3×3 格子（`.gtree__grid`，Grand Prize 置中、标 GRAND PRIZE）→ 1／5／10 抽（**下方不显示 PAROL 不足提示，11/04 移除**；不足的按钮停用）；最高级奖池卡片金框光晕
@@ -203,3 +203,42 @@
 - 测试站复扫（15:5x）：免费项目「获得方式」已显示节庆特别活动；优惠券「获得方式」显示代码 15；券奖纪录「类型」仍为活动奖励；三处筛选尚未新增
 
 - （追加）节庆特别活动英文显示「Festival Special Event」：写入名词定义＋B12 规则1；本次调整 11-19 改 2 项
+
+## 2026-11-19 · 后台原型「活动报表」同步测试站（不记本次调整、specs 不补充）
+- 奖励统计：日期改两栏（预设 2026-11-18 当日）、加分页（Total/每页 20/页码/Go to）；同日排序＝活动 ID 小→大、奖励类型固定顺序（礼金→积分→免费投注券→免费旋转券→优惠券→道具卡→Golden Draw Ticket→实体奖品）
+- 数据统计：加「申请领取时间」两栏筛选（预设当日）＋分页
+- 栏名「活动 ID」加空格；三分页表格置中；活动类型不加粗高亮
+- 道具统计无合计列（与测试站一致）；测试站 11/18 礼金最近一笔已是 PHP 100（兜底彩金），specs 例句仍写 PHP 111
+
+## 2026-11-19 · 操作手册同步
+- 第 6 章：奖励统计／数据统计／道具统计截图依新版后台原型重截（日期两栏、分页、置中、排序）；奖励统计加说明 ⑤ 起始日期~结束日期（预设当天、排序、翻页），数据统计加 ④ 申请领取时间
+- 第 6 章新增「其他后台页面也查得到本活动记录」：券奖纪录／用户积分纪录／免费项目记录／优惠券记录 4 张示意图＋查法表（英文 Festival Special Event）
+- FAQ 新增 Q13（券或积分没收到去哪查）；名词小辞典新增「节庆特别活动」
+- 手册改为直接编辑 HTML（cap2.py 只重截报表三图），build.py 未同步这些变更
+
+## 2026-11-19 · 活动规则弹窗换设计组件
+- 依设计稿：RULES 框体图（含标题美术）、右上关闭钮（由效果图裁切）、Confirm 按钮图；内容区内滚动、底部淡出、白色细滚动条；文字斜体、金色标题
+- 文案依效果图：去掉 Light Up Your Christmas Luck!；活动时间改 Promotion period: 00:00 on 16 November to 23:59 on 31 December 2026.（同年起始不显示年份）；加小标 HOW TO PLAY:；章节标题改 •• 🎄 … 🎄 ••（去编号）
+- A/B 版前台皆已同步（mkB.py 云端重跑）；Specs F1 活动规则段落与截图更新，本次调整 11-19 改 3 项
+- 操作手册第 7 章「② 规则弹窗」截图换新版、标题改为（RULES）
+
+## 2026-11-19 · 前台原型依前台测试站重建（只做 A 版，B 版不同步）
+- 素材：由测试站 /webview/assets 下载 243 张（经浏览器打包至 ~/Downloads/xmas_testsite_pack.json、xmas_testsite_modals.json），手机版素材转 AVIF（约 2.4 MB），以 CSS 变数 --a-* 内嵌一次；样式取测试站 ChristmasSpecial 模组 CSS（class 简化为 M_*，rem 换成 calc(N*var(--u))，--u＝手机宽/390）
+- 主页面：Banner、RULES 钮、Xmas Reward Board＋签到日历（Today 格）、Tab（Parol Quest／Parol Wish Draw 图）、Unclaimed（Claim All 图）、Christmas Mission 卡、DAILY MISSIONS 卡（Lv 图、BONUS／TOP-UP 装饰、按钮图）、奖池（POOL 图、9 宫格、Grand 图、1/5/10 抽钮）、页尾雪景
+- 弹窗：签到宝箱＝LotteryModal、恭喜获奖＝DrawResultModal（4 项以上用 lg 版）、翻牌＝ChallengeModal＋PickCardModal（牌面用测试站扑克图）、礼物盒＝GiftOpenModal 素材、PAROL 提示＝ParolTipModal、一键领取结果＝ClaimAllModal（数字图）、大奖＝GrandPrizeModal、History＝HistoryModal、规则＝RulesModal（内容同测试站，活动时间与 Important Dates 套用配置）；平台首页的补领／补领成功／每日推广维持原设计图
+- 原型逻辑不变；档案 2.8 MB → 4.5 MB
+- Specs：文案同步（Parol Quest、Xmas Reward Board、Christmas Mission／PAROL xN、Lv.N、Claim/Bet/Top-Up/Claimed/Ended），本次调整 11-19 第 4 项；前台原型重新内嵌（Specs 内的前台截图尚未重截）
+- 手册：第 7 章弹窗截图换成新原型（规则、签到宝箱、签到奖励、礼物盒、PAROL 提示、一键领取结果、翻牌 3 张、奖池、10 抽、大奖、History、兑换期），文案同步
+- （追加）Specs 前台规则截图全部依新原型重截（26 张；黑名单错误提示、客服聊天室、次日补领、每日推广维持原图）；F9 新增「1 抽：恭喜获奖弹窗（1 项）」截图
+- 恭喜获奖弹窗修正跑版（清除 ul 预设边距）；标题行同测试站：You Won／Prize、Day N 为白字，数量与 Check-In Rewards 为金字
+- 奖池 1 抽改为：停格高亮后跳恭喜获奖弹窗（1 项）；抽中 Grand Prize 跳大奖弹窗（同测试站）；Specs F9、情境表、本次调整第 5 项、手册文字同步
+- 重建脚本：scratchpad/ts/build_fe.py（以 base_stage1.html 为底重跑）
+- 操作手册：移除第 6 章「其他后台页面也查得到本活动记录」（4 张示意图＋查法表）与 FAQ Q13，先不加入
+- 兑换期：Parol Quest 按钮照常显示、呈不可点击状态（停用、不显示气泡）；Specs 移除该分页内各元件的兑换期样式（Ended 按钮、Daily missions have ended 等），本次调整第 6 项；手册移除 Ended 按钮说明、补兑换期说明；原型修正停用时气泡显示 0 的问题
+- 兑换期签到日历不显示今天高亮（无 Today／金色底／铃铛）；Specs F2 今日可签改写为标示 Today、兑换期行与 F10 签到行补充，本次调整第 6 项补充；手册兑换期说明补充；兑换期截图更新
+- 手册：黑名单说明改为「入口照常显示，进入活动详情页后才弹提示弹窗 Sorry／Promotion Ended」（第 4 章步骤 3、第 7 章首页弹窗、FAQ Q11）
+- 手册：移除「活动已结束」截图与活动结束页说明，第 7 章小节改名「兑换期」
+- 原型：兑换期看板 Cash Bonus Claimed Today 显示 0.00（同 Specs F10）；兑换期截图（Specs／手册）重截，不含原型控制 toast
+- 操作手册英文版：XmasEvent_User_Manual_en.html（内容与中文版 11-19 一致；后台截图维持中文介面，正文以英文说明；后台中文字串如「检测到相同活动正在进行中」保留原文并附英文注解）
+- PDF：XmasEvent_User_Manual_cn.pdf（36 页）、XmasEvent_User_Manual_en.pdf（41 页），A4、各章换页、页尾页码；PDF 内图片转 JPEG 压缩（约 4–5 MB）
+- 手册档名改为 XmasEvent_User_Manual_cn／_en（.html、.pdf）

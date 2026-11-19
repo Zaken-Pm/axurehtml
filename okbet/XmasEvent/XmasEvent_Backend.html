@@ -218,7 +218,7 @@ label.chk input{accent-color:var(--primary);}
 .tbl-scroll{overflow-x:auto;}
 #itemBody td{white-space:nowrap;vertical-align:top;}
 /* 活动道具统计（依测试站）：表格置中、时间起迄两栏、分页 */
-#reportItem .list-tbl th,#itemBody td{text-align:center;}
+#reportItem .list-tbl th,#itemBody td,#reportAward .list-tbl th,#awardBody td,#reportData .list-tbl th,#dataBody td{text-align:center;}
 .it-range{display:flex;align-items:center;gap:6px;}
 .it-range .input{width:170px;}
 .it-pager{display:flex;justify-content:flex-end;align-items:center;flex-wrap:wrap;gap:8px;margin-top:14px;font-size:13px;color:var(--text-2);}
@@ -690,7 +690,7 @@ select.select.is-open{border-color:var(--primary);}
             <select class="select" id="awAct"><option value="">全选</option><option>预约活动</option><option>周卡活动</option><option>联名挑战活动</option><option>节庆特别活动</option></select></div>
           <div class="fld"><label for="awType">奖励类型：</label>
             <select class="select" id="awType"><option value="">全选</option><option>礼金</option><option>积分</option><option>免费投注券</option><option>免费旋转券</option><option>优惠券</option><option>道具卡</option><option>Golden Draw Ticket</option><option>实体奖品</option></select></div>
-          <div class="fld"><label>起始日期 ~ 结束日期：</label><input class="input dp-trigger" readonly placeholder="开始时间 ~ 结束时间" style="width:230px"></div>
+          <div class="fld"><label for="awTimeS">起始日期 ~ 结束日期：</label><div class="it-range"><input class="input" id="awTimeS" placeholder="开始时间" value="2026-11-18 00:00:00" aria-label="开始时间"><span>~</span><input class="input" id="awTimeE" placeholder="结束时间" value="2026-11-18 23:59:59" aria-label="结束时间"></div></div>
           <button class="btn btn--primary" id="awSearch">🔍 搜寻</button>
           <button class="btn btn--primary">⬇ 导出</button>
         </div>
@@ -698,11 +698,17 @@ select.select.is-open{border-color:var(--primary);}
         <div class="tbl-scroll">
         <table class="list-tbl" style="min-width:1080px">
           <thead><tr>
-            <th>日期</th><th>活动类型</th><th>活动ID</th><th>活动名称</th><th>奖励类型</th><th>奖励内容</th>
+            <th>日期</th><th>活动类型</th><th>活动 ID</th><th>活动名称</th><th>奖励类型</th><th>奖励内容</th>
             <th>参与人数</th><th>领取次数</th><th>派发金额(系统币)</th><th>积分小计</th><th>券张数</th>
           </tr></thead>
           <tbody id="awardBody"></tbody>
         </table>
+        </div>
+        <div class="it-pager" aria-label="分页">
+          <span id="awTotal">Total 0</span>
+          <select class="select it-pager__size" id="awSize" aria-label="每页笔数"><option value="10">10/page</option><option value="20" selected>20/page</option><option value="50">50/page</option><option value="100">100/page</option></select>
+          <button class="it-pager__btn" id="awPrev" aria-label="上一页">‹</button><span id="awPages"></span><button class="it-pager__btn" id="awNext" aria-label="下一页">›</button>
+          <span>Go to</span><input class="input it-pager__go" id="awGo" value="1" aria-label="跳至页码">
         </div>
         
       </div>
@@ -718,17 +724,24 @@ select.select.is-open{border-color:var(--primary);}
             <select class="select" id="dtType"><option value="">全选</option><option>礼金</option><option>积分</option><option>免费投注券</option><option>免费旋转券</option><option>优惠券</option><option>道具卡</option><option>Golden Draw Ticket</option><option>实体奖品</option></select></div>
           <div class="fld"><label for="dtStatus">状态：</label>
             <select class="select" id="dtStatus"><option value="">全部</option><option>待审核</option><option>已通过</option><option>已拒绝</option></select></div>
+          <div class="fld"><label for="dtTimeS">申请领取时间：</label><div class="it-range"><input class="input" id="dtTimeS" placeholder="开始时间" value="2026-11-18 00:00:00" aria-label="开始时间"><span>~</span><input class="input" id="dtTimeE" placeholder="结束时间" value="2026-11-18 23:59:59" aria-label="结束时间"></div></div>
           <button class="btn btn--primary" id="dtSearch">🔍 搜寻</button>
           <button class="btn btn--primary">⬇ 导出</button>
         </div>
         <div class="tbl-scroll">
         <table class="list-tbl" style="min-width:1080px">
           <thead><tr>
-            <th>活动ID</th><th>会员账号</th><th>活动类型</th><th>活动名称</th><th>奖励类型</th><th>奖励内容</th>
+            <th>活动 ID</th><th>会员账号</th><th>活动类型</th><th>活动名称</th><th>奖励类型</th><th>奖励内容</th>
             <th>天数</th><th>申请领取时间</th><th>审核时间</th><th>状态</th>
           </tr></thead>
           <tbody id="dataBody"></tbody>
         </table>
+        </div>
+        <div class="it-pager" aria-label="分页">
+          <span id="dtTotal">Total 0</span>
+          <select class="select it-pager__size" id="dtSize" aria-label="每页笔数"><option value="10">10/page</option><option value="20" selected>20/page</option><option value="50">50/page</option><option value="100">100/page</option></select>
+          <button class="it-pager__btn" id="dtPrev" aria-label="上一页">‹</button><span id="dtPages"></span><button class="it-pager__btn" id="dtNext" aria-label="下一页">›</button>
+          <span>Go to</span><input class="input it-pager__go" id="dtGo" value="1" aria-label="跳至页码">
         </div>
         
       </div>
@@ -1025,7 +1038,7 @@ function renderItemReport(){
   const size=+$('#itSize').value, pages=Math.max(1,Math.ceil(rows.length/size)); IT_PAGE=Math.min(Math.max(1,IT_PAGE),pages);
   const view=rows.slice((IT_PAGE-1)*size,IT_PAGE*size);
   const v=x=>x==null?'-':x.toLocaleString();
-  $('#itemBody').innerHTML=view.length?view.map(r=>`<tr><td style="white-space:nowrap">${r.t}</td><td class="hl">${ITEM_ACT[0]}</td><td>${ITEM_ACT[1]}</td><td>${ITEM_ACT[2]}</td><td>${r.u}</td>
+  $('#itemBody').innerHTML=view.length?view.map(r=>`<tr><td style="white-space:nowrap">${r.t}</td><td>${ITEM_ACT[0]}</td><td>${ITEM_ACT[1]}</td><td>${ITEM_ACT[2]}</td><td>${r.u}</td>
       <td style="white-space:nowrap">${r.kind}</td><td>${v(r.gain)}</td><td>${v(r.use)}</td><td>${r.bal.toLocaleString()}</td><td>${r.pool||'-'}</td><td>${r.rtype||'-'}</td><td>${r.qty==null?'-':r.qty}</td><td style="white-space:normal;line-height:1.6">${r.note}</td></tr>`).join('')
     :'<tr><td colspan="13" style="text-align:center;color:var(--text-3);padding:28px">暂无数据</td></tr>';
   $('#itTotal').textContent=`Total ${rows.length}`;
@@ -1085,7 +1098,8 @@ const awardRows=(()=>{
     const x=g[k]; x.users.add(r[1]); x.n++;
     if(r[4]==='礼金') x.cash+=num(r[5]); else if(r[4]==='积分') x.pts+=num(r[5]); else if(TICKET.includes(r[4])) x.tk+=num(r[5]);
   });
-  return order.map(k=>g[k]).sort((a,b)=>b.d.localeCompare(a.d))
+  const TORD=['礼金','积分','免费投注券','免费旋转券','优惠券','道具卡','Golden Draw Ticket','实体奖品'];   // 同日依活动 ID 由小到大，再依奖励类型固定顺序（同测试站）
+  return order.map(k=>g[k]).sort((a,b)=>b.d.localeCompare(a.d)||(+a.id)-(+b.id)||TORD.indexOf(a.type)-TORD.indexOf(b.type))
     .map(x=>[x.d,x.act,x.id,x.name,x.type,x.content,String(x.users.size),String(x.n),x.cash.toFixed(2),x.pts.toFixed(2),String(x.tk)]);
 })();
 $('#auSearch').addEventListener('click',renderAudit);
@@ -1094,10 +1108,12 @@ const actBase=t=>t;   // 活动类型已不加括号，直接比对
 const emptyRow=n=>`<tr><td colspan="${n}" style="text-align:center;color:var(--text-3);padding:28px">暂无数据</td></tr>`;
 function renderReport(){
   const aA=$('#awAct').value, aT=$('#awType').value;
-  const aRows=awardRows.filter(r=>(!aA||actBase(r[1])===aA)&&(!aT||r[4]===aT));
-  $('#awardBody').innerHTML=aRows.length?aRows.map(r=>{
+  const aS=$('#awTimeS').value.trim().slice(0,10), aE=$('#awTimeE').value.trim().slice(0,10);
+  const aRows=awardRows.filter(r=>(!aA||actBase(r[1])===aA)&&(!aT||r[4]===aT)&&(!aS||r[0]>=aS)&&(!aE||r[0]<=aE));
+  const aView=pageRows('aw',aRows);
+  $('#awardBody').innerHTML=aView.length?aView.map(r=>{
     const isX=/联名挑战活动|节庆特别活动/.test(r[1]);
-    return `<tr><td>${r[0]}</td><td class="${isX?'hl':''}">${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td>
+    return `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td>
       <td>${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td>${r[9]}</td><td>${r[10]}</td></tr>`;
   }).join(''):emptyRow(11);
   /* 合计依目前筛选结果计算 */
@@ -1105,15 +1121,33 @@ function renderReport(){
   const tM=aRows.reduce((a,r)=>a+num(r[8]),0), tP=aRows.reduce((a,r)=>a+num(r[9]),0), tC=aRows.reduce((a,r)=>a+num(r[10]),0);
   $('#awTotals').innerHTML=`总金额：<b class="m">${fmt(tM)}</b>　总积分：<b class="p">${fmt(tP)}</b>　总免费券：<b class="c">${tC}</b>`;
   const dA=$('#dtAct').value, dT=$('#dtType').value, dS=$('#dtStatus').value;
-  const dRows=dataRows.filter(r=>(!dA||actBase(r[2])===dA)&&(!dT||r[4]===dT)&&(!dS||r[9]===dS));
-  $('#dataBody').innerHTML=dRows.length?dRows.map(r=>{
+  const dTs=$('#dtTimeS').value.trim(), dTe=$('#dtTimeE').value.trim();
+  const dRows=dataRows.filter(r=>(!dA||actBase(r[2])===dA)&&(!dT||r[4]===dT)&&(!dS||r[9]===dS)&&(!dTs||r[7]>=dTs)&&(!dTe||r[7]<=dTe));
+  const dView=pageRows('dt',dRows);
+  $('#dataBody').innerHTML=dView.length?dView.map(r=>{
     const isX=/联名挑战活动|节庆特别活动/.test(r[2]);
-    return `<tr><td>${r[0]}</td><td>${r[1]}</td><td class="${isX?'hl':''}">${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td>
+    return `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td>
       <td>${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td>${statusTag(r[9])}</td></tr>`;
   }).join(''):emptyRow(10);
 }
-$('#awSearch').addEventListener('click',renderReport);
-$('#dtSearch').addEventListener('click',renderReport);
+/* 活动奖励统计／活动数据统计分页（同测试站：Total N、每页 10／20／50／100 预设 20、页码、Go to；重新搜寻回第 1 页） */
+const PG={aw:1,dt:1};
+function pageRows(x,rows){
+  const size=+$('#'+x+'Size').value, pages=Math.max(1,Math.ceil(rows.length/size)); PG[x]=Math.min(Math.max(1,PG[x]),pages);
+  $('#'+x+'Total').textContent=`Total ${rows.length}`;
+  $('#'+x+'Pages').innerHTML=Array.from({length:pages},(_,k)=>`<button class="it-pager__num${k+1===PG[x]?' is-cur':''}" data-pg="${x}:${k+1}">${k+1}</button>`).join('');
+  $('#'+x+'Prev').disabled=PG[x]<=1; $('#'+x+'Next').disabled=PG[x]>=pages; $('#'+x+'Go').value=PG[x];
+  return rows.slice((PG[x]-1)*size,PG[x]*size);
+}
+$('#pageReport').addEventListener('click',e=>{ const b=e.target.closest('[data-pg]'); if(!b) return; const [x,n]=b.dataset.pg.split(':'); PG[x]=+n; renderReport(); });
+['aw','dt'].forEach(x=>{
+  $('#'+x+'Prev').addEventListener('click',()=>{ PG[x]--; renderReport(); });
+  $('#'+x+'Next').addEventListener('click',()=>{ PG[x]++; renderReport(); });
+  $('#'+x+'Size').addEventListener('change',()=>{ PG[x]=1; renderReport(); });
+  $('#'+x+'Go').addEventListener('change',e=>{ PG[x]=parseInt(e.target.value,10)||1; renderReport(); });
+});
+$('#awSearch').addEventListener('click',()=>{ PG.aw=1; renderReport(); });
+$('#dtSearch').addEventListener('click',()=>{ PG.dt=1; renderReport(); });
 function resetWizardFields(blank){
   /* blank=true → 新增活动：动态表格全部留空，由用户自行填写；
      blank=false → 编辑既有活动：带入该活动的示范配置。 */
