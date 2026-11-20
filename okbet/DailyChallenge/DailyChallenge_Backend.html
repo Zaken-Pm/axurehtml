@@ -3,13 +3,12 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>每日挑战活动 · 后台原型 v1.3</title>
+<title>每日挑战活动 · 后台原型 v1.6</title>
 <style>
 /* =====================================================================
-   每日挑战活动 后台原型 v1.3
+   每日挑战活动 后台原型 v1.6
    —— 以「联名挑战活动」现行后台（活动配置(新) > 活动列表）为底修改；
-   —— 活动条件移除「挑战任务配置」，每日返水表移除「挑战任务」栏；
-   —— 每个区块右上角的蓝色小标签（如 4.2.4）= 规格文件对应页签编号。
+   —— 活动条件保留「挑战任务配置」与每日返水表「挑战任务（触发）」栏，规则同联名挑战活动现行后台；
    ===================================================================== */
 :root{
   --primary:#2b7de9; --primary-d:#1f66c4; --green:#2fae5a; --red:#e5544b; --orange:#c77700;
@@ -43,8 +42,6 @@ body{margin:0;font-family:"PingFang SC","Microsoft YaHei",system-ui,-apple-syste
 .tabchip.is-active{background:var(--primary);color:#fff;border-color:var(--primary);}
 .content{padding:16px 20px;flex:1;min-width:0;}
 
-/* === 规格页签标签 === */
-.spec-ref{display:inline-block;font-size:12px;font-weight:600;color:var(--primary);background:var(--blue-l);border:1px solid #c6dafc;border-radius:3px;padding:0 6px;line-height:18px;margin-left:8px;vertical-align:middle;}
 .new-tag{display:inline-block;font-size:12px;font-weight:600;color:#fff;background:var(--orange);border-radius:3px;padding:0 6px;line-height:18px;margin-left:6px;vertical-align:middle;}
 
 /* === 通用元件 === */
@@ -126,7 +123,6 @@ label.chk input{accent-color:var(--primary);}
 .block__head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 14px;background:#fafbfc;border-bottom:1px solid var(--border-l);}
 .block__head h3{margin:0;font-size:13.5px;color:var(--text);}
 .block__body{padding:14px;overflow-x:auto;}
-.removed-note{border:1px dashed #f0c78a;background:#fffaf2;color:#8a5a00;border-radius:6px;padding:10px 14px;font-size:12.5px;margin-bottom:18px;line-height:1.7;}
 .upload{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:820px;}
 .upload .block__body{text-align:center;color:var(--text-3);padding:32px;}
 
@@ -235,7 +231,7 @@ label.chk input{accent-color:var(--primary);}
 
     <!-- ============ 4.1 活动列表 ============ -->
     <section id="pageList" class="card" aria-labelledby="ttlList">
-      <h1 class="page-title" id="ttlList">活动列表<span class="spec-ref">4.1</span></h1>
+      <h1 class="page-title" id="ttlList">活动列表</h1>
       <div class="list-filters">
         <div class="fld"><label for="tplFilter">模板：</label>
           <select class="select" id="tplFilter">
@@ -277,7 +273,7 @@ label.chk input{accent-color:var(--primary);}
 
         <div class="wizard__body">
           <div class="wizard__head">
-            <h2>活动配置步骤 <span class="spec-ref" id="stepRef">4.2.1</span></h2>
+            <h2>活动配置步骤</h2>
             <div class="wizard__actions">
               <button class="btn" id="btnPrev">上一步</button>
               <button class="btn btn--primary" id="btnNext">下一步</button>
@@ -355,7 +351,6 @@ label.chk input{accent-color:var(--primary);}
 
           <!-- 步骤4 活动条件（4.2.4，异动） -->
           <div class="wizard__panel" data-panel="4">
-            <div class="removed-note">⚠ 与「联名挑战活动」差异：已移除「挑战任务配置」区块、每日返水表的「挑战任务」栏，以及通用派奖配置的「适用游戏范围」；新增「投注量计算比例」（沿用节庆特别活动）。其余字段与校验规则不异动。</div>
 
             <div class="block">
               <div class="block__head"><h3><span class="req">*</span>每日返水配置</h3>
@@ -363,14 +358,27 @@ label.chk input{accent-color:var(--primary);}
               <div class="block__body">
                 <div class="vip-tabs" id="vipTabs" role="tablist" aria-label="VIP 等级"></div>
                 <label class="chk" style="font-size:12.5px;color:var(--text-2)"><input type="checkbox" id="applyAll">套用至其他等级（勾选后其余 VIP 等级套用 VIP0 配置、不可再编辑）</label>
-                <table class="tbl" style="margin-top:10px;min-width:720px">
+                <table class="tbl" style="margin-top:10px;min-width:820px">
                   <thead><tr>
                     <th style="width:60px">等级</th><th style="width:150px">任务条件</th><th style="width:250px">任务目标</th>
-                    <th style="width:80px">奖励物</th><th>奖励金额</th><th style="width:70px">操作</th>
+                    <th style="width:80px">奖励物</th><th>奖励金额</th><th style="width:100px">挑战任务</th><th style="width:70px">操作</th>
                   </tr></thead>
                   <tbody id="rebateBody"></tbody>
                 </table>
                 <p class="hint">任务目标／固定金额：不可为空、0 或小数点；任务目标需依同「任务条件」逐级递增（不可小于或等于同任务条件）。奖励金额一律为固定金额。等级最低 LV1，最多 LV20。</p>
+              </div>
+            </div>
+
+            <div class="block">
+              <div class="block__head"><h3>挑战任务配置</h3>
+                <button class="btn btn--primary btn--sm" id="btnAddChallenge">＋ 新增挑战</button></div>
+              <div class="block__body">
+                <table class="tbl" style="min-width:620px">
+                  <thead><tr><th style="width:80px">挑战</th><th>奖励提升</th><th>触发机率</th><th>获奖机率</th><th style="width:70px">操作</th></tr></thead>
+                  <tbody id="challengeBody"></tbody>
+                </table>
+                <p class="js-ch-empty hint" style="display:none;text-align:center;padding:12px 0">未设置挑战（勾选「触发」的等级将不会出现挑战）</p>
+                <p class="hint">非必填；可全部删除不设置挑战。如有设置：奖励提升／触发机率／获奖机率不可为空或 0（单位 %）；触发机率为 挑战1～挑战5 加总不得超过100%；获奖机率为各挑战各自不得超过100%；奖励提升无上限。最多 挑战5。</p>
               </div>
             </div>
 
@@ -423,7 +431,7 @@ label.chk input{accent-color:var(--primary);}
 
     <!-- ============ 4.3 派奖审核 ============ -->
     <section id="pageAudit" class="card" style="display:none" aria-labelledby="ttlAudit">
-      <h1 class="page-title" id="ttlAudit">派奖审核<span class="spec-ref">4.3</span></h1>
+      <h1 class="page-title" id="ttlAudit">派奖审核</h1>
       <div class="list-filters">
         <div class="fld"><label>活动ID：</label><input class="input" placeholder="请输入"></div>
         <div class="fld"><label>会员帐号：</label><input class="input" placeholder="请输入"></div>
@@ -439,15 +447,15 @@ label.chk input{accent-color:var(--primary);}
         <tbody id="auditBody"></tbody>
       </table>
       </div>
-      <p class="mini-note">「每日挑战活动」：奖励类型一律「礼金」、状态一律「审核通过」、审核人一律「自动审核」；备注仅记录 VIP 等级与返水等级。</p>
+      <p class="mini-note">「每日挑战活动」：奖励类型一律「礼金」、状态一律「审核通过」、审核人一律「自动审核」；备注记录 VIP 等级、返水等级；若触发挑战且成功，附加「Challenge n +x%」。</p>
     </section>
 
     <!-- ============ 4.4 活动报表 ============ -->
     <section id="pageReport" class="card" style="display:none" aria-labelledby="ttlReport">
-      <h1 class="page-title" id="ttlReport">活动报表<span class="spec-ref">4.4</span></h1>
+      <h1 class="page-title" id="ttlReport">活动报表</h1>
       <div class="rtabs" role="tablist">
-        <button class="rtab is-active" data-rtab="award">活动奖励统计 (4.4.1)</button>
-        <button class="rtab" data-rtab="data">活动数据统计 (4.4.2)</button>
+        <button class="rtab is-active" data-rtab="award">活动奖励统计</button>
+        <button class="rtab" data-rtab="data">活动数据统计</button>
       </div>
       <div id="reportAward">
         <div class="list-filters">
@@ -599,8 +607,8 @@ $$('.side__subitem').forEach(s=>s.addEventListener('click',()=>showPage(s.datase
 
 /* ---------- 配置向导：开启 / 填值 ---------- */
 let editingId=null;  // null = 新增；有值 = 正在编辑哪一个活动
-const BLANK_REBATE=()=>[{cond:'有效投注',goal:'',amt:''}];
-const SAMPLE_REBATE=()=>[{cond:'有效投注',goal:'200',amt:'3'},{cond:'充值',goal:'500',amt:'8'},{cond:'有效投注',goal:'1000',amt:'15'}];
+const BLANK_REBATE=()=>[{cond:'有效投注',goal:'',amt:'',trigger:false}];
+const SAMPLE_REBATE=()=>[{cond:'有效投注',goal:'200',amt:'3',trigger:false},{cond:'充值',goal:'500',amt:'8',trigger:true},{cond:'有效投注',goal:'1000',amt:'15',trigger:true}];
 let rebateRows=BLANK_REBATE();
 
 function openWizard(a){
@@ -618,7 +626,8 @@ function openWizard(a){
   /* 步骤4：编辑带示范值、新增留空 */
   rebateRows=a?SAMPLE_REBATE():BLANK_REBATE();
   $('#applyAll').checked=false; curVip=0; $('#fWager').value=a?a.wager:'';
-  renderVipTabs(); renderRebate(); resetRatio(!!a);
+  challengeRows=a?SAMPLE_CH():BLANK_CH();
+  renderVipTabs(); renderRebate(); renderChallenge(); resetRatio(!!a);
   /* 步骤5：开关全部预设关闭 */
   $$('.js-risk').forEach(c=>c.checked=false); $('#autoReject').checked=false; syncRisk();
   gotoStep(1);
@@ -633,7 +642,6 @@ function gotoStep(n){
   curStep=n;
   $$('#stepRail .step').forEach(s=>{const k=+s.dataset.step; s.classList.toggle('is-active',k===n); s.classList.toggle('is-done',k<n);});
   $$('.wizard__panel').forEach(p=>p.classList.toggle('is-active',+p.dataset.panel===n));
-  $('#stepRef').textContent='4.2.'+n;
   $('#btnPrev').style.visibility=n===1?'hidden':'visible';
   $('#btnNext').style.display=n===LAST?'none':'';
   $('#btnSubmit').style.display=n===LAST?'':'none';
@@ -655,6 +663,10 @@ function validateStep(n){
     const {anyBad,orderBad}=checkRebate(true);
     if(orderBad){toast('任务目标不可小于或等于同任务条件，请检查红框',true);return false;}
     if(anyBad){toast('活动条件有必填/格式错误，请检查红框',true);return false;}
+    const ch=checkChallenge(true);
+    if(ch.empty){toast('挑战任务的奖励提升／触发机率／获奖机率不可为空或 0',true);return false;}
+    if(ch.sumOver){toast('挑战任务「触发机率」加总不得超过100%（目前 '+chSum()+'%）',true);return false;}
+    if(ch.over){toast('挑战任务「获奖机率」不得超过100%',true);return false;}
     const w=$('#fWager'), v=w.value.trim(), num=Number(v);
     if(v!=='' && !(num>=0.01 && num<=999999.99 && /^\d{1,8}(\.\d{1,2})?$/.test(v))){w.classList.add('is-error');toast('彩金所需流水倍数须为 0.01～999999.99（不可为 0）',true);return false;}
     w.classList.remove('is-error');
@@ -672,7 +684,7 @@ function renderVipTabs(){
 $('#vipTabs').addEventListener('click',e=>{const b=e.target.closest('[data-vip]'); if(!b||b.disabled) return; curVip=+b.dataset.vip; renderVipTabs(); toast('切换到 VIP'+curVip+'（示意：各等级各别配置）');});
 $('#applyAll').addEventListener('change',()=>{ if($('#applyAll').checked) curVip=0; renderVipTabs(); });
 
-/* ---------- 每日返水表（LV1~LV20；已移除「挑战任务」栏） ---------- */
+/* ---------- 每日返水表（LV1~LV20；「挑战任务」栏勾选「触发」＝该等级达标领奖时可触发挑战） ---------- */
 const onlyInt=v=>v.replace(/\D/g,'');   // 只留数字（自动挡掉小数点、负号、文字）
 function renderRebate(){
   $('#rebateBody').innerHTML=rebateRows.map((r,i)=>`
@@ -683,6 +695,7 @@ function renderRebate(){
         <p class="hint hint--err js-goal-hint" style="visibility:hidden">任务目标不可小于或等于同任务条件</p></td>
       <td>彩金</td>
       <td><div class="prefix-wrap"><span class="prefix">固定金额</span><input class="input js-amt" value="${r.amt}" inputmode="numeric" aria-label="LV${i+1} 奖励金额"></div></td>
+      <td><label class="chk"><input type="checkbox" class="js-trigger" ${r.trigger?'checked':''}>触发</label></td>
       <td><button class="btn--link red js-del" ${rebateRows.length<=1?'disabled':''}>删除</button></td>
     </tr>`).join('');
   checkRebate(false);
@@ -694,9 +707,44 @@ $('#rebateBody').addEventListener('input',e=>{
   if(e.target.matches('.js-amt')){ e.target.value=onlyInt(e.target.value); r.amt=e.target.value; if(+r.amt>0) e.target.classList.remove('is-error'); }
   checkRebate(false);
 });
-$('#rebateBody').addEventListener('change',e=>{ if(e.target.matches('.js-cond')){ rebateRows[+e.target.closest('tr').dataset.i].cond=e.target.value; checkRebate(false);} });
+$('#rebateBody').addEventListener('change',e=>{ const r=rebateRows[+e.target.closest('tr').dataset.i];
+  if(e.target.matches('.js-cond')){ r.cond=e.target.value; checkRebate(false);}
+  if(e.target.matches('.js-trigger')) r.trigger=e.target.checked; });
 $('#rebateBody').addEventListener('click',e=>{ if(e.target.matches('.js-del')){ rebateRows.splice(+e.target.closest('tr').dataset.i,1); renderRebate(); } });
-$('#btnAddLevel').addEventListener('click',()=>{ if(rebateRows.length>=20){toast('等级最多 LV20',true);return;} rebateRows.push({cond:'有效投注',goal:'',amt:''}); renderRebate(); });
+/* ---------- 挑战任务配置（与 VIP 等级无关、全等级共用；最多 5 个） ----------
+   奖励提升：领奖金额再加成 n%；触发机率：领奖时出现该挑战的机率；获奖机率：挑战成功的机率。 */
+const BLANK_CH=()=>[];   // 新增活动：预设不设置挑战（非必填），需要时按「新增挑战」
+const SAMPLE_CH=()=>[{up:'11',appear:'60',win:'100'},{up:'30',appear:'40',win:'50'}];
+let challengeRows=BLANK_CH();
+const chSum=()=>challengeRows.reduce((s,r)=>s+(+r.appear||0),0);
+function renderChallenge(){
+  $('#challengeBody').innerHTML=challengeRows.map((r,i)=>`<tr data-i="${i}"><td>挑战${i+1}</td>
+    <td><div class="suffix-wrap"><input class="input js-up" value="${r.up}" inputmode="numeric" aria-label="挑战${i+1} 奖励提升"><span class="suffix">%</span></div></td>
+    <td><div class="suffix-wrap"><input class="input js-appear" value="${r.appear}" inputmode="numeric" aria-label="挑战${i+1} 触发机率"><span class="suffix">%</span></div>
+      <p class="hint hint--err js-appear-hint" style="visibility:hidden">触发机率加总不得超过100%</p></td>
+    <td><div class="suffix-wrap"><input class="input js-win" value="${r.win}" inputmode="numeric" aria-label="挑战${i+1} 获奖机率"><span class="suffix">%</span></div>
+      <p class="hint hint--err js-win-hint" style="visibility:hidden">获奖机率不得超过100%</p></td>
+    <td><button class="btn--link red js-ch-del">删除</button></td></tr>`).join('');
+  $('.js-ch-empty').style.display=challengeRows.length?'none':'block';
+  checkChallenge(false);
+}
+/* 检查挑战：strict=true（按下一步）才把空白标红；超过 100% 输入当下就提示 */
+function checkChallenge(strict){
+  let empty=false, over=false; const sumOver=chSum()>100;
+  $$('#challengeBody tr').forEach(tr=>{ const r=challengeRows[+tr.dataset.i];
+    [['up',r.up],['appear',r.appear],['win',r.win]].forEach(([k,v])=>{ const bad=(v===''&&strict)||(v!==''&&+v===0);
+      if(bad) empty=true; $('.js-'+k,tr).classList.toggle('is-error',bad||(k==='appear'&&sumOver)||(k==='win'&&+v>100)); });
+    $('.js-appear-hint',tr).style.visibility=sumOver?'visible':'hidden';
+    const wOver=+r.win>100; $('.js-win-hint',tr).style.visibility=wOver?'visible':'hidden'; if(wOver) over=true;
+  });
+  return {empty,over,sumOver};
+}
+$('#challengeBody').addEventListener('input',e=>{ const k=['up','appear','win'].find(x=>e.target.matches('.js-'+x)); if(!k) return;
+  e.target.value=onlyInt(e.target.value); challengeRows[+e.target.closest('tr').dataset.i][k]=e.target.value; checkChallenge(false); });
+$('#challengeBody').addEventListener('click',e=>{ if(!e.target.matches('.js-ch-del')) return; challengeRows.splice(+e.target.closest('tr').dataset.i,1); renderChallenge(); });
+$('#btnAddChallenge').addEventListener('click',()=>{ if(challengeRows.length>=5){toast('挑战最多 5 个',true);return;} challengeRows.push({up:'',appear:'',win:''}); renderChallenge(); });
+
+$('#btnAddLevel').addEventListener('click',()=>{ if(rebateRows.length>=20){toast('等级最多 LV20',true);return;} rebateRows.push({cond:'有效投注',goal:'',amt:'',trigger:false}); renderRebate(); });
 
 /* 检查规则：任务目标、固定金额不可空 / 0；同一种任务条件的任务目标必须比上一级大
    strict=true（按下一步时）才把「空白」也标红；打字中只提示「递增」错误 */
@@ -784,7 +832,7 @@ $$('.js-risk').forEach(c=>c.addEventListener('change',syncRisk));
 $('#autoReject').addEventListener('change',syncRisk);
 $('#rejectN').addEventListener('input',e=>e.target.value=onlyInt(e.target.value));
 
-/* ---------- 提交预览（已移除挑战任务） ---------- */
+/* ---------- 提交预览 ---------- */
 function buildPreview(){
   const risk=$$('.js-risk').map(c=>[c.dataset.k,c.checked?'是':'否']);
   const rows=[
@@ -792,7 +840,8 @@ function buildPreview(){
       ['币种',$('#fCur').value],['活动名称',$('#fName').value||'—'],['活动时间',$('#fActTime').value||'—']]],
     ['② 活动图片',[['首页浮窗',$('input[name=float]:checked').value],['活动列表',$('input[name=listShow]:checked').value],['备注',$('#fRemark').value||'—']]],
     ['③ 参与对象与名单',[['充值层级','全选'],['指定代理','不指定'],['新会员限制','否'],['会员等级','全选'],['黑名单',$('#fBlack').value||'—']]],
-    ['④ 活动条件',[['套用至其他等级',$('#applyAll').checked?'是':'否'],['每日返水配置',rebateRows.length+' 个等级'],
+    ['④ 活动条件',[['套用至其他等级',$('#applyAll').checked?'是':'否'],['每日返水配置',rebateRows.length+' 个等级（触发挑战 '+rebateRows.filter(r=>r.trigger).length+' 个）'],['挑战任务配置',challengeRows.length?challengeRows.length+' 个（触发机率合计 '+chSum()+'%）':'未设置'],
+      
       ['彩金所需流水倍数',$('#fWager').value||'—'],['审核方式','自动审核'],['领取方式','手动领取'],
       ['投注量计算比例',RATIO_TYPES.map((t,i)=>`${t.type} ${ratioRows[i].rate||100}%`+(t.all?'（全部体育）':`（${ratioRows[i].picked.filter(Boolean).length}/${t.providers.length} 家）`)).join('；')]]],
     ['⑤ 风控条件',[...risk,['自动拒绝',$('#autoReject').checked?'是（'+$('#rejectN').value+' 笔）':'否']]],
@@ -814,7 +863,7 @@ $('#btnSubmit').addEventListener('click',()=>{
 /* ---------- 派奖审核 / 活动报表 示意资料 ---------- */
 const auditRows=[
   ['226','member01','每日挑战活动','Daily Challenge 12月','礼金','PHP 3.00','审核通过','2026-11-21 10:03:11','自动审核','2026-11-21 10:03:11','User VIP Level 1, LV1 Base Reward 3'],
-  ['226','member02','每日挑战活动','Daily Challenge 12月','礼金','PHP 15.00','审核通过','2026-11-21 18:10:44','自动审核','2026-11-21 18:10:44','User VIP Level 2, LV3 Base Reward 15'],
+  ['226','member02','每日挑战活动','Daily Challenge 12月','礼金','PHP 19.50','审核通过','2026-11-21 18:10:44','自动审核','2026-11-21 18:10:44','User VIP Level 2, LV3 Base Reward 15, Challenge 2 +30%'],
   ['190','member03','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 115.00','审核通过','2026-08-21 12:10:44','自动审核','2026-08-21 12:10:44','User VIP Level 1, LV3 Base Reward 100, Challenge 3 +15%'],
 ];
 const st=s=>`<span class="${/不通过|拒绝/.test(s)?'tag-off':'tag-on'}">${s}</span>`;
@@ -862,7 +911,7 @@ $$('.dp-trigger').forEach(i=>i.addEventListener('click',e=>{e.stopPropagation();
 document.addEventListener('click',()=>{ if(dp.target) dpClose(); });
 
 /* ---------- 初始化 ---------- */
-renderList(); renderVipTabs(); renderRebate(); resetRatio(false); syncRisk();
+renderList(); renderVipTabs(); renderRebate(); renderChallenge(); resetRatio(false); syncRisk();
 </script>
 </body>
 </html>
