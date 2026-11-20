@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>每日挑战活动 · 后台原型 v1.3</title>
+<style>
+/* =====================================================================
+   每日挑战活动 后台原型 v1.3
+   —— 以「联名挑战活动」现行后台（活动配置(新) > 活动列表）为底修改；
+   —— 活动条件移除「挑战任务配置」，每日返水表移除「挑战任务」栏；
+   —— 每个区块右上角的蓝色小标签（如 4.2.4）= 规格文件对应页签编号。
+   ===================================================================== */
+:root{
+  --primary:#2b7de9; --primary-d:#1f66c4; --green:#2fae5a; --red:#e5544b; --orange:#c77700;
+  --border:#dcdfe6; --border-l:#e9edf2; --text:#303133; --text-2:#606266; --text-3:#7a7f87;
+  --ph:#a8abb2; --bg:#f4f6f9; --panel:#fff; --blue-l:#ecf3fe; --radius:4px;
+  --space-1:4px; --space-2:8px; --space-3:16px; --space-4:24px;
+}
+*{box-sizing:border-box;}
+html{font-size:14px;}
+body{margin:0;font-family:"PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+  color:var(--text);background:var(--bg);display:flex;min-height:100vh;font-size:14px;}
+:focus-visible{outline:2px solid var(--primary);outline-offset:1px;}
+
+/* === 左侧菜单 === */
+.side{width:200px;flex:0 0 200px;background:#fff;border-right:1px solid var(--border-l);height:100vh;position:sticky;top:0;overflow-y:auto;}
+.side__logo{height:52px;display:flex;align-items:center;gap:8px;padding:0 16px;font-weight:700;color:var(--primary);border-bottom:1px solid var(--border-l);}
+.side__item{display:flex;align-items:center;gap:10px;padding:11px 16px;color:var(--text-2);font-size:13.5px;}
+.side__item .badge{margin-left:auto;background:var(--red);color:#fff;border-radius:10px;font-size:12px;padding:0 6px;line-height:16px;}
+.side__item.is-parent{color:var(--primary);background:var(--blue-l);font-weight:600;}
+.side__sub{padding:8px 0;background:#fafbfc;}
+.side__subitem{display:block;width:100%;text-align:left;border:none;background:none;padding:8px 16px 8px 40px;font-size:13px;color:var(--text-2);cursor:pointer;border-left:3px solid transparent;}
+.side__subitem:hover{color:var(--primary);}
+.side__subitem.is-active{color:var(--primary);border-left-color:var(--primary);background:#eef4ff;font-weight:600;}
+
+/* === 右侧主体 === */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.crumb{height:44px;display:flex;align-items:center;gap:6px;padding:0 20px;font-size:13px;color:var(--text-3);background:#fff;border-bottom:1px solid var(--border-l);}
+.crumb b{color:var(--text);font-weight:600;}
+.tabbar{display:flex;gap:6px;padding:8px 20px;background:#fff;border-bottom:1px solid var(--border-l);flex-wrap:wrap;}
+.tabchip{font-size:12.5px;padding:3px 10px;border:1px solid var(--border);border-radius:3px;color:var(--text-2);background:#fff;}
+.tabchip.is-active{background:var(--primary);color:#fff;border-color:var(--primary);}
+.content{padding:16px 20px;flex:1;min-width:0;}
+
+/* === 规格页签标签 === */
+.spec-ref{display:inline-block;font-size:12px;font-weight:600;color:var(--primary);background:var(--blue-l);border:1px solid #c6dafc;border-radius:3px;padding:0 6px;line-height:18px;margin-left:8px;vertical-align:middle;}
+.new-tag{display:inline-block;font-size:12px;font-weight:600;color:#fff;background:var(--orange);border-radius:3px;padding:0 6px;line-height:18px;margin-left:6px;vertical-align:middle;}
+
+/* === 通用元件 === */
+.btn{border:1px solid var(--border);background:#fff;color:var(--text-2);padding:7px 15px;border-radius:var(--radius);cursor:pointer;font-size:13.5px;line-height:1;}
+.btn:hover{color:var(--primary);border-color:var(--primary);}
+.btn:active{transform:translateY(1px);}
+.btn--primary{background:var(--primary);border-color:var(--primary);color:#fff;}
+.btn--primary:hover{background:var(--primary-d);color:#fff;}
+.btn--green{background:var(--green);border-color:var(--green);color:#fff;}
+.btn--green:hover{filter:brightness(1.05);color:#fff;}
+.btn--red{color:var(--red);border-color:#f5c6c2;}
+.btn--red:hover{background:var(--red);color:#fff;border-color:var(--red);}
+.btn--sm{padding:5px 10px;font-size:12.5px;}
+.btn--link{border:none;background:none;color:var(--primary);cursor:pointer;padding:2px 4px;font-size:13px;}
+.btn--link.red{color:var(--red);}
+.btn--link.green{color:var(--green);}
+.btn--link:disabled{color:var(--ph);cursor:not-allowed;}
+.op-sep{color:var(--border);margin:0 3px;font-size:12px;}
+.input,.select{height:34px;border:1px solid var(--border);border-radius:var(--radius);padding:0 10px;font-size:13.5px;color:var(--text);background:#fff;width:100%;}
+.input::placeholder{color:var(--ph);}
+.input:focus,.select:focus{border-color:var(--primary);outline:none;}
+.input.is-error,.select.is-error{border-color:var(--red);}
+.input:disabled,.select:disabled{background:#f5f7fa;color:var(--text-3);cursor:not-allowed;}
+select.select{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' stroke='%23909399' fill='none' stroke-width='1.5'/></svg>");background-repeat:no-repeat;background-position:right 10px center;padding-right:26px;}
+.req{color:var(--red);margin-right:2px;}
+.hint{font-size:12px;color:var(--text-3);margin-top:4px;line-height:1.6;}
+.hint--warn{color:var(--orange);}
+.hint--err{color:var(--red);}
+.card{background:var(--panel);border-radius:6px;padding:20px;}
+.sec-title{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--text);margin:0 0 16px;font-size:14.5px;}
+.sec-title::before{content:"";width:4px;height:15px;background:var(--primary);border-radius:2px;}
+.form-row{display:grid;grid-template-columns:130px minmax(0,1fr);align-items:center;gap:12px;margin-bottom:16px;max-width:680px;}
+.form-row>label,.form-row>.lbl{color:var(--text-2);font-size:13.5px;text-align:right;}
+.radio{display:inline-flex;align-items:center;gap:6px;margin-right:24px;cursor:pointer;color:var(--text-2);}
+.radio input{accent-color:var(--primary);}
+.radio:has(input:disabled){color:var(--text-3);cursor:not-allowed;}
+.switch{position:relative;width:42px;height:22px;flex:0 0 auto;cursor:pointer;display:inline-block;}
+.switch input{opacity:0;width:0;height:0;position:absolute;}
+.switch .track{position:absolute;inset:0;background:#dcdfe6;border-radius:11px;transition:.2s;}
+.switch .track::before{content:"";position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:2px;left:2px;transition:.2s;}
+.switch input:checked + .track{background:var(--primary);}
+.switch input:checked + .track::before{transform:translateX(20px);}
+.switch input:focus-visible + .track{outline:2px solid var(--primary);outline-offset:2px;}
+.switch:has(input:disabled){cursor:not-allowed;}
+.switch:has(input:disabled) .track{background:#f0f2f5;}
+label.chk{display:inline-flex;gap:6px;align-items:center;cursor:pointer;}
+label.chk input{accent-color:var(--primary);}
+
+/* === 表格（配置用） === */
+.tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.tbl th{background:#f5f7fa;color:var(--text-2);font-weight:600;padding:9px 8px;border:1px solid var(--border-l);text-align:center;white-space:nowrap;}
+.tbl td{padding:7px 8px 22px;border:1px solid var(--border-l);text-align:center;vertical-align:middle;position:relative;}
+.tbl .input,.tbl .select{height:30px;font-size:12.5px;}
+/* 表格内错误提示：固定在储存格底部，出现/消失不改变版面高度 */
+.tbl .hint--err{position:absolute;left:8px;right:6px;bottom:3px;margin:0;font-size:12px;line-height:1.2;white-space:nowrap;text-align:left;overflow:hidden;text-overflow:ellipsis;}
+.prefix-wrap{display:flex;align-items:center;}
+.prefix-wrap .prefix{height:30px;line-height:30px;padding:0 8px;background:#f5f7fa;border:1px solid var(--border);border-right:none;border-radius:4px 0 0 4px;color:var(--text-3);font-size:12.5px;white-space:nowrap;}
+.prefix-wrap .input{border-radius:0 4px 4px 0;min-width:0;}
+.suffix-wrap{display:flex;align-items:center;}
+.suffix-wrap .input{border-radius:4px 0 0 4px;border-right:none;min-width:0;}
+.suffix-wrap .suffix{height:30px;line-height:30px;padding:0 8px;background:#f5f7fa;border:1px solid var(--border);border-radius:0 4px 4px 0;color:var(--text-3);font-size:12.5px;}
+
+/* === 向导两栏 === */
+.wizard{display:grid;grid-template-columns:210px minmax(0,1fr);gap:16px;}
+.steps{background:#fff;border-radius:6px;padding:18px 6px;align-self:start;}
+.step{display:flex;align-items:center;gap:10px;padding:11px 16px;color:var(--text-3);font-size:13.5px;cursor:pointer;border:none;background:none;width:100%;text-align:left;}
+.step .num{width:22px;height:22px;border-radius:50%;border:1px solid #c0c4cc;display:grid;place-items:center;font-size:12px;flex:0 0 auto;}
+.step.is-done{color:var(--text-2);}
+.step.is-done .num,.step.is-active .num{background:var(--primary);border-color:var(--primary);color:#fff;}
+.step.is-active{color:var(--primary);font-weight:600;background:var(--blue-l);}
+.wizard__body{background:#fff;border-radius:6px;min-width:0;}
+.wizard__head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border-l);flex-wrap:wrap;}
+.wizard__head h2{margin:0;color:var(--primary);font-size:15px;}
+.wizard__actions{display:flex;gap:10px;}
+.wizard__panel{padding:22px 24px;display:none;}
+.wizard__panel.is-active{display:block;}
+.panel-desc{color:var(--text-3);font-size:12.5px;margin:0 0 16px;}
+.block{border:1px solid var(--border-l);border-radius:6px;margin-bottom:18px;}
+.block__head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 14px;background:#fafbfc;border-bottom:1px solid var(--border-l);}
+.block__head h3{margin:0;font-size:13.5px;color:var(--text);}
+.block__body{padding:14px;overflow-x:auto;}
+.removed-note{border:1px dashed #f0c78a;background:#fffaf2;color:#8a5a00;border-radius:6px;padding:10px 14px;font-size:12.5px;margin-bottom:18px;line-height:1.7;}
+.upload{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:820px;}
+.upload .block__body{text-align:center;color:var(--text-3);padding:32px;}
+
+/* === VIP 页签 === */
+.vip-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.vip-tab{padding:5px 12px;border:1px solid var(--border);border-radius:4px;font-size:12.5px;color:var(--text-2);cursor:pointer;background:#fff;}
+.vip-tab.is-active{background:var(--primary);color:#fff;border-color:var(--primary);}
+.vip-tab:disabled{opacity:.45;cursor:not-allowed;}
+
+/* === 弹窗 === */
+.mask{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:50;}
+.mask.is-open{display:flex;}
+.modal{background:#fff;border-radius:8px;width:min(620px,92vw);max-height:86vh;display:flex;flex-direction:column;overflow:hidden;}
+.modal--sm{width:min(440px,92vw);}
+.modal__head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border-l);font-weight:600;}
+.modal__head .x{cursor:pointer;color:var(--text-3);border:none;background:none;font-size:18px;}
+.modal__body{padding:16px 18px;overflow-y:auto;line-height:1.7;}
+.modal__foot{padding:12px 18px;display:flex;justify-content:flex-end;gap:10px;border-top:1px solid var(--border-l);}
+.game-provider{border:1px solid var(--border-l);border-radius:6px;margin-bottom:10px;}
+.game-provider__head{padding:9px 12px;background:#f7f9fc;font-weight:600;color:var(--primary);}
+.game-provider__grid{padding:10px 12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;font-size:12.5px;color:var(--text-2);}
+
+/* === 提交预览 === */
+.pv{width:100%;border-collapse:collapse;font-size:13px;}
+.pv td{padding:10px 14px;border:1px solid var(--border-l);vertical-align:top;}
+.pv .pv-step{width:140px;font-weight:600;color:var(--primary);background:#fafbfc;}
+.pv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:6px 30px;}
+.pv-grid .k{color:var(--text-3);}
+
+/* === 时间区间选择器 === */
+.dp-wrap{position:relative;}
+.dp-trigger{padding-right:32px;cursor:pointer;}
+.dp-icon{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--text-3);pointer-events:none;font-size:13px;}
+.dp-pop{position:absolute;z-index:70;background:#fff;border:1px solid var(--border);border-radius:6px;box-shadow:0 6px 24px rgba(0,0,0,.15);padding:12px;display:none;width:560px;max-width:92vw;}
+.dp-pop.is-open{display:block;}
+.dp-head{display:flex;align-items:center;gap:6px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border-l);flex-wrap:wrap;}
+.dp-input{border:1px solid var(--border);border-radius:4px;padding:5px 8px;font-size:12.5px;width:100px;}
+.dp-input.dp-time{width:88px;}
+.dp-cals{display:flex;gap:16px;}
+.dp-cal{flex:1;min-width:0;}
+.dp-cal-head{display:flex;align-items:center;margin-bottom:6px;font-size:13px;font-weight:600;}
+.dp-nav{border:none;background:none;cursor:pointer;color:var(--text-2);font-size:15px;padding:2px 6px;}
+.dp-cal-title{flex:1;text-align:center;}
+.dp-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;font-size:12px;text-align:center;}
+.dp-cal-grid .dow{color:var(--text-3);padding:4px 0;font-weight:600;}
+.dp-day{padding:6px 0;border-radius:4px;cursor:pointer;}
+.dp-day:hover{background:var(--blue-l);}
+.dp-day.is-empty{visibility:hidden;}
+.dp-day.is-start,.dp-day.is-end{background:var(--primary);color:#fff;}
+.dp-day.is-in-range{background:var(--blue-l);}
+.dp-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border-l);}
+
+/* === Toast === */
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-12px);background:#fff;border:1px solid var(--border);border-left:4px solid var(--green);box-shadow:0 4px 16px rgba(0,0,0,.12);padding:10px 18px;border-radius:6px;font-size:13px;opacity:0;transition:.25s;z-index:80;pointer-events:none;}
+.toast.err{border-left-color:var(--red);}
+.toast.is-show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* === 列表 / 审核 / 报表 === */
+.list-filters{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:14px;}
+.list-filters .fld{display:flex;align-items:center;gap:8px;}
+.list-filters label{color:var(--text-2);font-size:13px;white-space:nowrap;}
+.list-filters .input,.list-filters .select{width:150px;}
+.tbl-scroll{overflow-x:auto;}
+.list-tbl{width:100%;border-collapse:collapse;font-size:13px;background:#fff;}
+.list-tbl th{background:#fafbfc;padding:11px 10px;border-bottom:1px solid var(--border-l);color:var(--text-2);text-align:left;white-space:nowrap;}
+.list-tbl td{padding:11px 10px;border-bottom:1px solid var(--border-l);color:var(--text-2);}
+.list-tbl .ellipsis{max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.list-tbl tr.is-daily td{background:#fffaf2;}
+.tag-on{color:var(--green);} .tag-off{color:var(--red);}
+.hl{color:var(--primary);font-weight:600;}
+.mini-note{font-size:12px;color:var(--text-3);margin-top:10px;line-height:1.6;}
+.rtabs{display:flex;gap:26px;border-bottom:1px solid var(--border-l);margin:-4px 0 16px;}
+.rtab{padding:10px 2px;font-size:14px;color:var(--text-3);cursor:pointer;border:none;border-bottom:2px solid transparent;background:none;}
+.rtab.is-active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600;}
+.page-title{display:flex;align-items:center;margin:0 0 14px;font-size:15px;}
+
+@media(max-width:1024px){ .wizard{grid-template-columns:minmax(0,1fr);} .side{display:none;} }
+@media(max-width:640px){ .form-row{grid-template-columns:minmax(0,1fr);} .form-row>label{text-align:left;} .upload{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<!-- ============ 左侧菜单 ============ -->
+<aside class="side" aria-label="后台菜单">
+  <div class="side__logo">⬡ Sports Admin</div>
+  <div class="side__item">📊 数据报表</div>
+  <div class="side__item">🎮 游戏管理</div>
+  <div class="side__item">💳 充值配置（新）</div>
+  <div class="side__item">📁 活动配置 <span class="badge">99+</span></div>
+  <div class="side__item is-parent">⚙️ 活动配置（新）</div>
+  <nav class="side__sub" aria-label="活动配置（新）">
+    <button class="side__subitem is-active" data-nav="list">活动列表</button>
+    <button class="side__subitem" data-nav="audit">派奖审核</button>
+    <button class="side__subitem" data-nav="report">活动报表</button>
+  </nav>
+</aside>
+
+<div class="main">
+  <div class="crumb">位置 › 活动配置(新) › <b id="crumbTail">活动列表</b></div>
+  <div class="tabbar">
+    <span class="tabchip">联名挑战活动</span>
+    <span class="tabchip is-active" id="tabMain">活动列表</span>
+  </div>
+
+  <main class="content">
+
+    <!-- ============ 4.1 活动列表 ============ -->
+    <section id="pageList" class="card" aria-labelledby="ttlList">
+      <h1 class="page-title" id="ttlList">活动列表<span class="spec-ref">4.1</span></h1>
+      <div class="list-filters">
+        <div class="fld"><label for="tplFilter">模板：</label>
+          <select class="select" id="tplFilter">
+            <option>全选</option><option>预约活动</option><option>周卡活动</option>
+            <option>节庆特别活动</option><option>联名挑战活动</option><option>每日挑战活动</option>
+          </select></div>
+        <div class="fld"><label for="qId">活动ID：</label><input class="input" id="qId"></div>
+        <div class="fld"><label for="qName">活动名：</label><input class="input" id="qName"></div>
+        <div class="fld"><label for="qStatus">状态：</label>
+          <select class="select" id="qStatus"><option>全部</option><option>开启</option><option>关闭</option></select></div>
+        <button class="btn btn--primary" id="btnSearch">🔍 搜索</button>
+        <button class="btn btn--primary" id="btnNew">＋ 新增活动</button>
+      </div>
+      <div class="tbl-scroll">
+      <table class="list-tbl" style="min-width:1360px">
+        <thead><tr>
+          <th>ID</th><th>排序</th><th>状态</th><th>起止时间</th><th>币种</th><th>语系</th>
+          <th>活动模板</th><th>活动名称</th><th>预览图片</th><th>黑名单</th><th>指定代理</th>
+          <th>参与/中奖人数</th><th>彩金所需流水倍数</th><th>操作</th>
+        </tr></thead>
+        <tbody id="listBody"></tbody>
+      </table>
+      </div>
+      <p class="mini-note">· 浅橘底色行＝本次新增的「每日挑战活动」模板。「模板」筛选选「每日挑战活动」可只看该模板。<br>
+        · 每日挑战活动同期仅能开启 1 个；可与联名挑战活动同时开启（两种模板各自计算）。</p>
+    </section>
+
+    <!-- ============ 4.2 配置向导 ============ -->
+    <section id="pageWizard" style="display:none" aria-label="活动配置向导">
+      <div class="wizard">
+        <nav class="steps" id="stepRail" aria-label="配置步骤">
+          <button class="step is-active" data-step="1"><span class="num">1</span>活动模板设置</button>
+          <button class="step" data-step="2"><span class="num">2</span>活动图片</button>
+          <button class="step" data-step="3"><span class="num">3</span>参与对象与名单</button>
+          <button class="step" data-step="4"><span class="num">4</span>活动条件</button>
+          <button class="step" data-step="5"><span class="num">5</span>风控条件</button>
+          <button class="step" data-step="6"><span class="num">6</span>提交预览</button>
+        </nav>
+
+        <div class="wizard__body">
+          <div class="wizard__head">
+            <h2>活动配置步骤 <span class="spec-ref" id="stepRef">4.2.1</span></h2>
+            <div class="wizard__actions">
+              <button class="btn" id="btnPrev">上一步</button>
+              <button class="btn btn--primary" id="btnNext">下一步</button>
+              <button class="btn btn--green" id="btnSubmit" style="display:none">提交</button>
+              <button class="btn btn--red" id="btnExit">退出编辑</button>
+            </div>
+          </div>
+
+          <!-- 步骤1 活动模板设置（4.2.1） -->
+          <div class="wizard__panel is-active" data-panel="1">
+            <p class="panel-desc">将活动模板配置保存至系统，系统将自动配置相关功能。</p>
+            <div class="sec-title">活动模板</div>
+            <div class="form-row"><label for="fType"><span class="req">*</span>活动类型：</label>
+              <div><select class="select" id="fType">
+                <option>每日挑战活动</option><option>联名挑战活动</option><option>节庆特别活动</option><option>周卡活动</option><option>预约活动</option>
+              </select>
+              <p class="hint">编辑既有活动时不可变更（灰底）。原型仅示范「每日挑战活动」流程。</p></div></div>
+            <div class="form-row"><label for="fName"><span class="req">*</span>活动名称：</label>
+              <div><input class="input" id="fName" placeholder="请输入" maxlength="50">
+              <p class="hint"><span id="nameCount">0</span>/50 字；不可留空、不可全为空白。</p></div></div>
+            <div class="form-row"><label for="fCur"><span class="req">*</span>币种：</label>
+              <select class="select" id="fCur"><option>PHP</option><option>USD</option></select></div>
+            <div class="form-row"><span class="lbl">状态：</span>
+              <div><label class="radio"><input type="radio" name="status" value="关闭" checked>关闭</label>
+                   <label class="radio"><input type="radio" name="status" value="开启">开启</label>
+                   <p class="hint hint--warn">同一时间只能开启一个每日挑战活动（可与联名挑战活动同时开启）。</p></div></div>
+            <div class="sec-title" style="margin-top:24px">时间设定</div>
+            <div class="form-row"><label for="fActTime"><span class="req">*</span>活动时间：</label>
+              <div class="dp-wrap"><input class="input dp-trigger" id="fActTime" type="text" readonly placeholder="开始时间 ~ 结束时间"><span class="dp-icon" aria-hidden="true">📅</span></div></div>
+            <p class="hint hint--warn">· 活动时间到期：停止计算／产生新奖励。<br>
+              · 前台入口于活动时间内显示，活动结束时间到即隐藏。</p>
+          </div>
+
+          <!-- 步骤2 活动图片（4.2.2，不异动） -->
+          <div class="wizard__panel" data-panel="2">
+            <p class="panel-desc">设置首页浮窗图片、活动列表图片及活动备注。活动列表图片用于前台 Rewards → Promotion 分类显示（Event time／标题依步骤1配置，排序照旧依有无角标）。</p>
+            <div class="sec-title">首页浮窗设置</div>
+            <div style="margin-bottom:14px">
+              <label class="radio"><input type="radio" name="float" value="开启">开启</label>
+              <label class="radio"><input type="radio" name="float" value="关闭" checked>关闭</label></div>
+            <div class="upload">
+              <div class="block"><div class="block__head"><h3>PC 图片</h3></div><div class="block__body">⬆<br>点击上传图片</div></div>
+              <div class="block"><div class="block__head"><h3>H5 图片</h3></div><div class="block__body">⬆<br>点击上传图片</div></div>
+            </div>
+            <p class="hint">图片格式：png、bmp、jpg、gif、webp；大小限制 5MB 内。</p>
+            <hr style="border:none;border-top:1px solid var(--border-l);margin:18px 0">
+            <div class="sec-title">活动列表设置</div>
+            <div style="margin-bottom:14px">
+              <label class="radio"><input type="radio" name="listShow" value="开启">开启</label>
+              <label class="radio"><input type="radio" name="listShow" value="关闭" checked>关闭</label></div>
+            <div class="upload">
+              <div class="block"><div class="block__head"><h3>PC 图片</h3></div><div class="block__body">⬆<br>点击上传图片</div></div>
+              <div class="block"><div class="block__head"><h3>H5 图片</h3></div><div class="block__body">⬆<br>点击上传图片</div></div>
+            </div>
+            <div class="sec-title" style="margin-top:18px">备注</div>
+            <textarea class="input" id="fRemark" style="height:80px;padding:8px 10px;max-width:820px" placeholder="请输入备注内容…"></textarea>
+          </div>
+
+          <!-- 步骤3 参与对象与名单（4.2.3，不异动） -->
+          <div class="wizard__panel" data-panel="3">
+            <p class="panel-desc">设置活动的参与对象与黑名单规则（沿用联名挑战活动，不异动）。</p>
+            <div class="sec-title">参与对象设置</div>
+            <div class="form-row"><span class="lbl">1. 充值层级：</span><select class="select" disabled><option>全选</option></select></div>
+            <div class="form-row"><span class="lbl">2. 指定代理：</span>
+              <div><label class="radio"><input type="radio" name="agent" checked disabled>不指定</label>
+                   <label class="radio"><input type="radio" name="agent" disabled>指定代理线</label></div></div>
+            <div class="form-row"><span class="lbl">3. 新会员限制：</span>
+              <div style="display:flex;gap:8px;align-items:center"><label class="switch"><input type="checkbox" disabled aria-label="新会员限制"><span class="track"></span></label><span class="hint" style="margin:0">活动开始后注册的新会员</span></div></div>
+            <div class="form-row"><span class="lbl">4. 会员等级：</span><select class="select" disabled><option>全选</option></select></div>
+            <div class="form-row"><span class="lbl">5. 用户标签：</span><select class="select" disabled><option>请选择用户标签</option></select></div>
+            <div class="sec-title" style="margin-top:20px">黑名单设置</div>
+            <div class="form-row"><label for="fBlack">黑名单：</label><textarea class="input" id="fBlack" style="height:56px;padding:8px 10px" placeholder="请输入，以逗号分隔多个用户名"></textarea></div>
+            <div class="form-row"><span class="lbl">用户标签：</span><select class="select" disabled><option>请选择用户标签</option></select></div>
+          </div>
+
+          <!-- 步骤4 活动条件（4.2.4，异动） -->
+          <div class="wizard__panel" data-panel="4">
+            <div class="removed-note">⚠ 与「联名挑战活动」差异：已移除「挑战任务配置」区块、每日返水表的「挑战任务」栏，以及通用派奖配置的「适用游戏范围」；新增「投注量计算比例」（沿用节庆特别活动）。其余字段与校验规则不异动。</div>
+
+            <div class="block">
+              <div class="block__head"><h3><span class="req">*</span>每日返水配置</h3>
+                <button class="btn btn--primary btn--sm" id="btnAddLevel">＋ 新增等级</button></div>
+              <div class="block__body">
+                <div class="vip-tabs" id="vipTabs" role="tablist" aria-label="VIP 等级"></div>
+                <label class="chk" style="font-size:12.5px;color:var(--text-2)"><input type="checkbox" id="applyAll">套用至其他等级（勾选后其余 VIP 等级套用 VIP0 配置、不可再编辑）</label>
+                <table class="tbl" style="margin-top:10px;min-width:720px">
+                  <thead><tr>
+                    <th style="width:60px">等级</th><th style="width:150px">任务条件</th><th style="width:250px">任务目标</th>
+                    <th style="width:80px">奖励物</th><th>奖励金额</th><th style="width:70px">操作</th>
+                  </tr></thead>
+                  <tbody id="rebateBody"></tbody>
+                </table>
+                <p class="hint">任务目标／固定金额：不可为空、0 或小数点；任务目标需依同「任务条件」逐级递增（不可小于或等于同任务条件）。奖励金额一律为固定金额。等级最低 LV1，最多 LV20。</p>
+              </div>
+            </div>
+
+            <div class="sec-title">通用派奖配置</div>
+            <div class="block">
+              <div class="block__head"><h3>投注量计算比例 <span class="new-tag">新</span></h3></div>
+              <div class="block__body">
+                <table class="tbl" style="min-width:640px">
+                  <thead><tr><th style="width:110px">游戏类型</th><th style="width:200px">流水计算比例</th><th>套用游戏商</th></tr></thead>
+                  <tbody id="ratioBody"></tbody>
+                </table>
+                <p class="hint">仅计算「游戏类型」中的厂商，比例 0～300，留空或未勾选的游戏商按 100% 计算。</p>
+              </div>
+            </div>
+            <div class="form-row"><label for="fWager">彩金所需流水倍数：</label>
+              <div><input class="input" id="fWager" placeholder="0.01～999999.99（可空；不可为 0）" style="max-width:240px"></div></div>
+            <div class="form-row"><span class="lbl">审核方式：</span><span>自动审核</span></div>
+            <div class="form-row"><span class="lbl">领取方式：</span><span>手动领取</span></div>
+          </div>
+
+          <!-- 步骤5 风控条件（4.2.5，不异动） -->
+          <div class="wizard__panel" data-panel="5">
+            <p class="panel-desc">设置活动的风险控制规则，确保活动安全进行（沿用联名挑战活动，不异动）。</p>
+            <div class="sec-title">风险检测设置</div>
+            <div class="form-row"><span class="lbl">同IP检测：</span><label class="switch"><input type="checkbox" class="js-risk" data-k="同IP检测" aria-label="同IP检测"><span class="track"></span></label></div>
+            <div class="form-row"><span class="lbl">同手机号检测：</span><label class="switch"><input type="checkbox" class="js-risk" data-k="同手机号检测" aria-label="同手机号检测"><span class="track"></span></label></div>
+            <div class="form-row"><span class="lbl">同姓名检测：</span><label class="switch"><input type="checkbox" class="js-risk" data-k="同姓名检测" aria-label="同姓名检测"><span class="track"></span></label></div>
+            <div class="form-row"><span class="lbl">同email检测：</span><label class="switch"><input type="checkbox" class="js-risk" data-k="同email检测" aria-label="同email检测"><span class="track"></span></label></div>
+            <div class="block" style="max-width:680px">
+              <div class="block__head"><h3 style="color:var(--red)">自动拒绝</h3></div>
+              <div class="block__body">
+                <div class="form-row"><span class="lbl">自动拒绝：</span>
+                  <label class="switch"><input type="checkbox" id="autoReject" aria-label="自动拒绝"><span class="track"></span></label></div>
+                <div class="form-row" style="margin-bottom:0"><span class="lbl">触发条件：</span>
+                  <div style="display:flex;align-items:center;gap:8px;color:var(--text-2)">当违反
+                    <input class="input" id="rejectN" value="0" style="width:80px" disabled aria-label="违反笔数"> 笔以上，将自动拒绝</div></div>
+                <p class="hint">任一风险检测开启后，「自动拒绝」才可开启；自动拒绝关闭时触发条件不可编辑。</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 步骤6 提交预览（4.2.6，异动） -->
+          <div class="wizard__panel" data-panel="6">
+            <p class="panel-desc">请确认以下活动配置信息，确认无误后点击「提交」按钮。</p>
+            <table class="pv"><tbody id="previewBody"></tbody></table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 4.3 派奖审核 ============ -->
+    <section id="pageAudit" class="card" style="display:none" aria-labelledby="ttlAudit">
+      <h1 class="page-title" id="ttlAudit">派奖审核<span class="spec-ref">4.3</span></h1>
+      <div class="list-filters">
+        <div class="fld"><label>活动ID：</label><input class="input" placeholder="请输入"></div>
+        <div class="fld"><label>会员帐号：</label><input class="input" placeholder="请输入"></div>
+        <div class="fld"><label>活动类型：</label>
+          <select class="select"><option>全选</option><option>预约活动</option><option>周卡活动</option><option>联名挑战活动</option><option>每日挑战活动</option></select></div>
+        <div class="fld"><label>状态：</label><select class="select"><option>全部</option><option>审核通过</option><option>审核不通过</option></select></div>
+        <button class="btn btn--primary">🔍 搜索</button><button class="btn btn--primary">⬇ 导出</button>
+      </div>
+      <div class="tbl-scroll">
+      <table class="list-tbl" style="min-width:1180px">
+        <thead><tr><th>活动ID</th><th>会员帐号</th><th>活动类型</th><th>活动名称</th><th>奖励类型</th><th>奖励金额/内容</th>
+          <th>状态</th><th>申请时间</th><th>审核人</th><th>审核时间</th><th style="min-width:220px">备注</th></tr></thead>
+        <tbody id="auditBody"></tbody>
+      </table>
+      </div>
+      <p class="mini-note">「每日挑战活动」：奖励类型一律「礼金」、状态一律「审核通过」、审核人一律「自动审核」；备注仅记录 VIP 等级与返水等级。</p>
+    </section>
+
+    <!-- ============ 4.4 活动报表 ============ -->
+    <section id="pageReport" class="card" style="display:none" aria-labelledby="ttlReport">
+      <h1 class="page-title" id="ttlReport">活动报表<span class="spec-ref">4.4</span></h1>
+      <div class="rtabs" role="tablist">
+        <button class="rtab is-active" data-rtab="award">活动奖励统计 (4.4.1)</button>
+        <button class="rtab" data-rtab="data">活动数据统计 (4.4.2)</button>
+      </div>
+      <div id="reportAward">
+        <div class="list-filters">
+          <div class="fld"><label>活动类型：</label>
+            <select class="select"><option>全选</option><option>预约活动</option><option>周卡活动</option><option>联名挑战活动</option><option>每日挑战活动</option></select></div>
+          <button class="btn btn--primary">🔍 搜寻</button><button class="btn btn--primary">⬇ 导出</button>
+        </div>
+        <div class="tbl-scroll"><table class="list-tbl" style="min-width:1000px">
+          <thead><tr><th>日期</th><th>活动类型</th><th>活动ID</th><th>活动名称</th><th>奖励类型</th><th>奖励内容</th><th>参与人数</th><th>领取次数</th><th>派发金额(系统币)</th></tr></thead>
+          <tbody id="awardBody"></tbody></table></div>
+        <p class="mini-note">「每日挑战活动」奖励类型一律「礼金」。</p>
+      </div>
+      <div id="reportData" style="display:none">
+        <div class="list-filters">
+          <div class="fld"><label>活动类型：</label>
+            <select class="select"><option>全选</option><option>预约活动</option><option>周卡活动</option><option>联名挑战活动</option><option>每日挑战活动</option></select></div>
+          <button class="btn btn--primary">🔍 搜寻</button><button class="btn btn--primary">⬇ 导出</button>
+        </div>
+        <div class="tbl-scroll"><table class="list-tbl" style="min-width:1000px">
+          <thead><tr><th>活动ID</th><th>会员账号</th><th>活动类型</th><th>活动名称</th><th>奖励类型</th><th>奖励内容</th><th>天数</th><th>申请领取时间</th><th>审核时间</th><th>状态</th></tr></thead>
+          <tbody id="dataBody"></tbody></table></div>
+        <p class="mini-note">「每日挑战活动」：天数固定「-」；申请领取时间＝审核时间；状态一律「已通过」。</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ============ 弹窗：选择游戏商（投注量计算比例） ============ -->
+<div class="mask" id="gameMask" role="dialog" aria-modal="true" aria-labelledby="gameTitle">
+  <div class="modal">
+    <div class="modal__head"><span id="gameTitle">选择游戏商</span> <button class="x" data-close-modal aria-label="关闭">×</button></div>
+    <div class="modal__body">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <label class="chk" style="font-weight:600"><input type="checkbox" id="gameAll">全选</label>
+        <span class="hint" style="margin:0" id="gameModalCount"></span></div>
+      <div id="gameList"></div>
+    </div>
+    <div class="modal__foot"><button class="btn" data-close-modal>取消</button><button class="btn btn--primary" id="gameConfirm">确认</button></div>
+  </div>
+</div>
+
+<!-- ============ 弹窗：通用确认（关闭 / 删除） ============ -->
+<div class="mask" id="confirmMask" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <div class="modal modal--sm">
+    <div class="modal__head"><span id="confirmTitle">提示</span> <button class="x" data-close-modal aria-label="关闭">×</button></div>
+    <div class="modal__body" id="confirmText"></div>
+    <div class="modal__foot"><button class="btn" data-close-modal>取消</button><button class="btn btn--primary" id="confirmOk">确定</button></div>
+  </div>
+</div>
+
+<!-- ============ 时间区间选择器 ============ -->
+<div class="dp-pop" id="dpPop">
+  <div class="dp-head">
+    <input class="dp-input" id="dpStartDate" placeholder="开始日期" readonly aria-label="开始日期">
+    <input class="dp-input dp-time" id="dpStartTime" type="time" aria-label="开始时间">
+    <span aria-hidden="true">→</span>
+    <input class="dp-input" id="dpEndDate" placeholder="结束日期" readonly aria-label="结束日期">
+    <input class="dp-input dp-time" id="dpEndTime" type="time" aria-label="结束时间">
+  </div>
+  <div class="dp-cals">
+    <div class="dp-cal" id="dpCal0"><div class="dp-cal-head"><button class="dp-nav" data-nav="prev" aria-label="上个月">‹</button><span class="dp-cal-title"></span><span style="width:22px"></span></div><div class="dp-cal-grid"></div></div>
+    <div class="dp-cal" id="dpCal1"><div class="dp-cal-head"><span style="width:22px"></span><span class="dp-cal-title"></span><button class="dp-nav" data-nav="next" aria-label="下个月">›</button></div><div class="dp-cal-grid"></div></div>
+  </div>
+  <div class="dp-foot"><button class="btn btn--sm" id="dpClear">清除</button><button class="btn btn--primary btn--sm" id="dpOk">确定</button></div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* =====================================================================
+   原型交互（白话注解）
+   这份程式只负责「让画面能点、能看到提示」，不会连到真正的后台。
+   ===================================================================== */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+
+/* 右上方跳出的小提示；err=true 时左边是红色（失败），否则绿色（成功） */
+function toast(msg,err){const t=$('#toast');t.textContent=msg;t.className='toast'+(err?' err':'')+' is-show';
+  clearTimeout(t._t);t._t=setTimeout(()=>t.className='toast'+(err?' err':''),2400);}
+
+/* ---------- 活动列表的示意资料（就像一张小型资料表） ---------- */
+let ACTS=[
+  {id:226,sort:0,status:'开启',time:'2026-11-21 00:00 ~ 2026-12-31 23:59',cur:'PHP',lang:'预设',type:'每日挑战活动',name:'Daily Challenge 12月',black:'—',join:'0 / 0',wager:'1'},
+  {id:225,sort:0,status:'关闭',time:'2026-11-21 00:00 ~ 2026-12-31 00:00',cur:'PHP',lang:'—',type:'联名挑战活动',name:'1111',black:'—',join:'0 / 0',wager:'1'},
+  {id:222,sort:0,status:'开启',time:'2026-11-17 00:00 ~ 2026-11-20 15:30',cur:'PHP',lang:'—',type:'节庆特别活动',name:'圣诞活动XBomb Xmas',black:'okbet04504qxpa, xcbet17',join:'55 / 55',wager:'1'},
+  {id:221,sort:999,status:'开启',time:'2026-10-01 00:00 ~ 2026-11-30 23:59',cur:'PHP',lang:'—',type:'周卡活动',name:'test周卡活动_Jasmine',black:'—',join:'46 / 46',wager:'1'},
+];
+const DAILY='每日挑战活动';
+
+/* 把「2026-11-21 00:00 ~ 2026-12-31 23:59」变成列表上的两行「26/11/21 / 26/12/31」 */
+function timeCell(v){const m=v&&v.match(/^(\d{4})-(\d{2})-(\d{2}).*~ (\d{4})-(\d{2})-(\d{2})/);
+  return m?`${m[1].slice(2)}/${m[2]}/${m[3]}<br>${m[4].slice(2)}/${m[5]}/${m[6]}`:'—';}
+
+/* 画出活动列表（依「模板」筛选） */
+function renderList(){
+  const f=$('#tplFilter').value;
+  $('#listBody').innerHTML=ACTS.filter(a=>f==='全选'||a.type===f).map(a=>`
+    <tr class="${a.type===DAILY?'is-daily':''}">
+      <td>${a.id}</td><td>${a.sort}</td><td class="${a.status==='开启'?'tag-on':'tag-off'}">${a.status}</td>
+      <td>${timeCell(a.time)}</td><td>${a.cur}</td><td>${a.lang}</td>
+      <td>${a.type===DAILY?'<b>每日挑战活动</b><span class="new-tag">新</span>':a.type}</td>
+      <td class="ellipsis" title="${a.name}">${a.name}</td>
+      <td><button class="btn btn--primary btn--sm">上传</button></td>
+      <td class="ellipsis" title="${a.black}">${a.black}</td><td>—</td><td>${a.join}</td><td>${a.wager}</td>
+      <td><button class="btn--link" data-act="edit" data-id="${a.id}">编辑</button><span class="op-sep">|</span><button class="btn--link red" data-act="del" data-id="${a.id}">删除</button><br>
+        ${a.status==='开启'?`<button class="btn--link red" data-act="close" data-id="${a.id}">关闭</button>`:`<button class="btn--link green" data-act="open" data-id="${a.id}">开启</button>`}</td>
+    </tr>`).join('') || '<tr><td colspan="14" style="text-align:center;padding:30px">暂无数据</td></tr>';
+}
+$('#tplFilter').addEventListener('change',renderList);
+$('#btnSearch').addEventListener('click',renderList);
+
+/* 检查：除了自己以外，是否已有「同模板」的活动是开启的（每日挑战只跟每日挑战比，不跟联名挑战比） */
+function sameTypeOpen(type,excludeId){
+  if(type!==DAILY && type!=='联名挑战活动') return false;     // 其他模板不限制
+  return ACTS.some(a=>a.type===type && a.status==='开启' && a.id!==excludeId);
+}
+
+/* ---------- 列表操作：编辑 / 删除 / 开启 / 关闭（集中处理） ---------- */
+let pendingConfirm=null;   // 记住「按下确定后要做什么」
+function askConfirm(title,text,onOk){ $('#confirmTitle').textContent=title; $('#confirmText').innerHTML=text; pendingConfirm=onOk; $('#confirmMask').classList.add('is-open'); }
+$('#confirmOk').addEventListener('click',()=>{ $('#confirmMask').classList.remove('is-open'); if(pendingConfirm) pendingConfirm(); pendingConfirm=null; });
+
+$('#listBody').addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]'); if(!b) return;
+  const a=ACTS.find(x=>x.id===+b.dataset.id);
+  if(b.dataset.act==='edit'){
+    if(a.type!==DAILY){ toast('原型仅示范「每日挑战活动」配置',true); return; }
+    openWizard(a);
+  }
+  if(b.dataset.act==='del') askConfirm('删除确认','⚠️ 确定要删除此活动吗？删除后该活动将从列表中移除，且无法复原。',()=>{
+    ACTS=ACTS.filter(x=>x!==a); renderList(); toast('删除成功'); });
+  if(b.dataset.act==='close') askConfirm('提示','⚠️ 关闭后前台入口将隐藏并停止计算新奖励。确定关闭？',()=>{
+    a.status='关闭'; renderList(); toast('活动已关闭'); });
+  if(b.dataset.act==='open'){
+    if(sameTypeOpen(a.type,a.id)){ toast('检测到相同活动正在进行中',true); return; }
+    a.status='开启'; renderList(); toast('活动已开启');
+  }
+});
+
+/* ---------- 页面切换（左侧子菜单） ---------- */
+function showPage(name){
+  ['#pageList','#pageWizard','#pageAudit','#pageReport'].forEach(s=>$(s).style.display='none');
+  const map={list:['#pageList','活动列表'],audit:['#pageAudit','派奖审核'],report:['#pageReport','活动报表']};
+  if(map[name]){ $(map[name][0]).style.display=''; $('#crumbTail').textContent=map[name][1]; $('#tabMain').textContent=map[name][1]; }
+  $$('.side__subitem').forEach(s=>s.classList.toggle('is-active',s.dataset.nav===name));
+  if(name==='audit') renderAudit(); if(name==='report') renderReport(); if(name==='list') renderList();
+}
+$$('.side__subitem').forEach(s=>s.addEventListener('click',()=>showPage(s.dataset.nav)));
+
+/* ---------- 配置向导：开启 / 填值 ---------- */
+let editingId=null;  // null = 新增；有值 = 正在编辑哪一个活动
+const BLANK_REBATE=()=>[{cond:'有效投注',goal:'',amt:''}];
+const SAMPLE_REBATE=()=>[{cond:'有效投注',goal:'200',amt:'3'},{cond:'充值',goal:'500',amt:'8'},{cond:'有效投注',goal:'1000',amt:'15'}];
+let rebateRows=BLANK_REBATE();
+
+function openWizard(a){
+  editingId=a?a.id:null;
+  const label=a?'编辑活动':'新增活动';
+  $('#pageList').style.display='none'; $('#pageWizard').style.display='';
+  $('#crumbTail').textContent=label; $('#tabMain').textContent=label;
+  /* 步骤1：编辑时带入原值、活动类型锁住；新增时全部清空 */
+  $('#fType').value=DAILY; $('#fType').disabled=!!a;
+  $('#fName').value=a?a.name:''; $('#fCur').value=a?a.cur:'PHP';
+  $(`input[name=status][value="${a?a.status:'关闭'}"]`).checked=true;
+  $('#fActTime').value=a?a.time:'';
+  $('#nameCount').textContent=$('#fName').value.length;
+  $$('.is-error').forEach(x=>x.classList.remove('is-error'));
+  /* 步骤4：编辑带示范值、新增留空 */
+  rebateRows=a?SAMPLE_REBATE():BLANK_REBATE();
+  $('#applyAll').checked=false; curVip=0; $('#fWager').value=a?a.wager:'';
+  renderVipTabs(); renderRebate(); resetRatio(!!a);
+  /* 步骤5：开关全部预设关闭 */
+  $$('.js-risk').forEach(c=>c.checked=false); $('#autoReject').checked=false; syncRisk();
+  gotoStep(1);
+}
+$('#btnNew').addEventListener('click',()=>openWizard(null));
+$('#btnExit').addEventListener('click',()=>{ toast('已退出编辑，未保存任何变更'); showPage('list'); });
+$('#fName').addEventListener('input',e=>{ $('#nameCount').textContent=e.target.value.length; if(e.target.value.trim()) e.target.classList.remove('is-error'); });
+
+/* ---------- 步骤导航 ---------- */
+let curStep=1; const LAST=6;
+function gotoStep(n){
+  curStep=n;
+  $$('#stepRail .step').forEach(s=>{const k=+s.dataset.step; s.classList.toggle('is-active',k===n); s.classList.toggle('is-done',k<n);});
+  $$('.wizard__panel').forEach(p=>p.classList.toggle('is-active',+p.dataset.panel===n));
+  $('#stepRef').textContent='4.2.'+n;
+  $('#btnPrev').style.visibility=n===1?'hidden':'visible';
+  $('#btnNext').style.display=n===LAST?'none':'';
+  $('#btnSubmit').style.display=n===LAST?'':'none';
+  if(n===6) buildPreview();
+}
+/* 左侧步骤条可直接跳；但往后跳时要先通过目前这一步的检查 */
+$$('#stepRail .step').forEach(s=>s.addEventListener('click',()=>{const t=+s.dataset.step; if(t>curStep && !validateStep(curStep)) return; gotoStep(t);}));
+$('#btnPrev').addEventListener('click',()=>gotoStep(Math.max(1,curStep-1)));
+$('#btnNext').addEventListener('click',()=>{ if(validateStep(curStep)) gotoStep(Math.min(LAST,curStep+1)); });
+
+/* ---------- 校验：挡下不合规的输入 ---------- */
+function validateStep(n){
+  if(n===1){
+    const name=$('#fName'); if(!name.value.trim()){name.classList.add('is-error');toast('活动名称必填',true);return false;}
+    const t=$('#fActTime'); if(!t.value){t.classList.add('is-error');toast('活动时间必填',true);return false;}
+    const p=dpParse(t.value); if(p && p.endFull<=p.startFull){t.classList.add('is-error');toast('结束时间需晚于开始时间',true);return false;}
+  }
+  if(n===4){
+    const {anyBad,orderBad}=checkRebate(true);
+    if(orderBad){toast('任务目标不可小于或等于同任务条件，请检查红框',true);return false;}
+    if(anyBad){toast('活动条件有必填/格式错误，请检查红框',true);return false;}
+    const w=$('#fWager'), v=w.value.trim(), num=Number(v);
+    if(v!=='' && !(num>=0.01 && num<=999999.99 && /^\d{1,8}(\.\d{1,2})?$/.test(v))){w.classList.add('is-error');toast('彩金所需流水倍数须为 0.01～999999.99（不可为 0）',true);return false;}
+    w.classList.remove('is-error');
+    if(!checkRatio()){toast('投注量计算比例须为 0～300',true);return false;}
+  }
+  return true;
+}
+
+/* ---------- VIP 页签（VIP0~VIP10） ---------- */
+let curVip=0;
+function renderVipTabs(){
+  const applied=$('#applyAll').checked;
+  $('#vipTabs').innerHTML=Array.from({length:11},(_,i)=>`<button class="vip-tab ${i===curVip?'is-active':''}" role="tab" data-vip="${i}" ${applied&&i!==0?'disabled':''}>VIP${i}</button>`).join('');
+}
+$('#vipTabs').addEventListener('click',e=>{const b=e.target.closest('[data-vip]'); if(!b||b.disabled) return; curVip=+b.dataset.vip; renderVipTabs(); toast('切换到 VIP'+curVip+'（示意：各等级各别配置）');});
+$('#applyAll').addEventListener('change',()=>{ if($('#applyAll').checked) curVip=0; renderVipTabs(); });
+
+/* ---------- 每日返水表（LV1~LV20；已移除「挑战任务」栏） ---------- */
+const onlyInt=v=>v.replace(/\D/g,'');   // 只留数字（自动挡掉小数点、负号、文字）
+function renderRebate(){
+  $('#rebateBody').innerHTML=rebateRows.map((r,i)=>`
+    <tr data-i="${i}">
+      <td>LV${i+1}</td>
+      <td><select class="select js-cond" aria-label="LV${i+1} 任务条件"><option ${r.cond==='有效投注'?'selected':''}>有效投注</option><option ${r.cond==='充值'?'selected':''}>充值</option></select></td>
+      <td><div class="prefix-wrap"><span class="prefix">≥</span><input class="input js-goal" value="${r.goal}" inputmode="numeric" aria-label="LV${i+1} 任务目标"></div>
+        <p class="hint hint--err js-goal-hint" style="visibility:hidden">任务目标不可小于或等于同任务条件</p></td>
+      <td>彩金</td>
+      <td><div class="prefix-wrap"><span class="prefix">固定金额</span><input class="input js-amt" value="${r.amt}" inputmode="numeric" aria-label="LV${i+1} 奖励金额"></div></td>
+      <td><button class="btn--link red js-del" ${rebateRows.length<=1?'disabled':''}>删除</button></td>
+    </tr>`).join('');
+  checkRebate(false);
+}
+/* 用「事件委派」一次处理整张表的输入，避免每列各绑一次 */
+$('#rebateBody').addEventListener('input',e=>{
+  const tr=e.target.closest('tr'); const r=rebateRows[+tr.dataset.i];
+  if(e.target.matches('.js-goal')){ e.target.value=onlyInt(e.target.value); r.goal=e.target.value; }
+  if(e.target.matches('.js-amt')){ e.target.value=onlyInt(e.target.value); r.amt=e.target.value; if(+r.amt>0) e.target.classList.remove('is-error'); }
+  checkRebate(false);
+});
+$('#rebateBody').addEventListener('change',e=>{ if(e.target.matches('.js-cond')){ rebateRows[+e.target.closest('tr').dataset.i].cond=e.target.value; checkRebate(false);} });
+$('#rebateBody').addEventListener('click',e=>{ if(e.target.matches('.js-del')){ rebateRows.splice(+e.target.closest('tr').dataset.i,1); renderRebate(); } });
+$('#btnAddLevel').addEventListener('click',()=>{ if(rebateRows.length>=20){toast('等级最多 LV20',true);return;} rebateRows.push({cond:'有效投注',goal:'',amt:''}); renderRebate(); });
+
+/* 检查规则：任务目标、固定金额不可空 / 0；同一种任务条件的任务目标必须比上一级大
+   strict=true（按下一步时）才把「空白」也标红；打字中只提示「递增」错误 */
+function checkRebate(strict){
+  let anyBad=false, orderBad=false; const last={};
+  $$('#rebateBody tr').forEach(tr=>{
+    const r=rebateRows[+tr.dataset.i], goal=$('.js-goal',tr), amt=$('.js-amt',tr), hint=$('.js-goal-hint',tr);
+    let gBad=false, oBad=false;
+    if(r.goal===''){ gBad=strict; } else if(+r.goal<=0){ gBad=true; }
+    else if(last[r.cond]!==undefined && +r.goal<=last[r.cond]){ gBad=true; oBad=true; }
+    if(r.goal!=='' && +r.goal>0) last[r.cond]=+r.goal;
+    const aBad = r.amt==='' ? strict : +r.amt<=0;
+    goal.classList.toggle('is-error',gBad); amt.classList.toggle('is-error',aBad);
+    hint.style.visibility=oBad?'visible':'hidden';
+    if(gBad||aBad) anyBad=true; if(oBad) orderBad=true;
+  });
+  return {anyBad,orderBad};
+}
+
+/* ---------- 彩金所需流水倍数：最多 8 位整数 + 2 位小数 ---------- */
+$('#fWager').addEventListener('input',e=>{ let v=e.target.value.replace(/[^\d.]/g,''); const i=v.indexOf('.');
+  v= i<0 ? v.slice(0,8) : v.slice(0,i).slice(0,8)+'.'+v.slice(i+1).replace(/\./g,'').slice(0,2);
+  e.target.value=v; e.target.classList.remove('is-error'); });
+
+/* ---------- 投注量计算比例（沿用节庆特别活动） ----------
+   每种游戏类型一行：填「流水计算比例」(0～300%)，并勾选要套用此比例的游戏商。
+   没勾选的游戏商、或比例留空 → 投注量照 100% 计算（不是排除，只是不加成/不打折）。
+   Sport 一律套用全部体育游戏商，所以没有「选择游戏商」按钮。 */
+const RATIO_TYPES=[
+  {type:'Slot', all:false, providers:['JILI','PG','PlayStar Gaming','TPG','FA CHAI','Jili电子','CQ9','Spade Gaming']},
+  {type:'Live', all:false, providers:['Evolution LIVE CASINO','SA Gaming','ONCASINO Live','ONCASINO','PRAGMATIC PLAY LIVE','Playtech Live','SEXY CASINO','Playtech Live_S']},
+  {type:'Sport',all:true,  providers:[]},
+  {type:'Mini', all:false, providers:['Mini Games']},
+];
+let ratioRows=[];      // 每行：{rate:'150', picked:[true,true,...]}
+let editingType=null;  // 弹窗目前正在编辑哪一种游戏类型
+function resetRatio(sample){
+  ratioRows=RATIO_TYPES.map(t=>({rate: sample?({Slot:'150',Live:'250',Sport:'100',Mini:'100'})[t.type]:'', picked:t.providers.map(()=>true)}));
+  renderRatio();
+}
+function renderRatio(){
+  $('#ratioBody').innerHTML=RATIO_TYPES.map((t,i)=>{const r=ratioRows[i], n=r.picked.filter(Boolean).length;
+    return `<tr data-i="${i}"><td>${t.type}</td>
+      <td><div class="suffix-wrap"><input class="input js-rate" value="${r.rate}" inputmode="numeric" placeholder="100" aria-label="${t.type} 流水计算比例"><span class="suffix">%</span></div>
+        <p class="hint hint--err js-rate-hint" style="visibility:hidden">比例需为 0～300</p></td>
+      <td style="text-align:${t.all?'center':'left'}">${t.all?'套用全部体育游戏商'
+        :`<button class="btn btn--sm js-pick">选择游戏商</button> <span class="hint" style="margin-left:6px">已勾选 ${n} / ${t.providers.length} 家游戏商</span>`}</td></tr>`;}).join('');
+}
+/* 检查比例：只能 0～300 的整数；留空可以（视为 100%） */
+function checkRatio(){
+  let bad=false;
+  $$('#ratioBody tr').forEach(tr=>{const v=ratioRows[+tr.dataset.i].rate, b=v!==''&&+v>300;
+    $('.js-rate',tr).classList.toggle('is-error',b); $('.js-rate-hint',tr).style.visibility=b?'visible':'hidden'; if(b) bad=true;});
+  return !bad;
+}
+$('#ratioBody').addEventListener('input',e=>{ if(!e.target.matches('.js-rate')) return;
+  e.target.value=onlyInt(e.target.value).slice(0,3); ratioRows[+e.target.closest('tr').dataset.i].rate=e.target.value; checkRatio(); });
+$('#ratioBody').addEventListener('click',e=>{ if(!e.target.matches('.js-pick')) return; openPicker(+e.target.closest('tr').dataset.i); });
+
+/* 选择游戏商弹窗：先照目前已保存的勾选画出来，按「确认」才写回；「取消／×」不变更 */
+function openPicker(i){
+  editingType=i; const t=RATIO_TYPES[i];
+  $('#gameTitle').textContent=`${t.type} – 选择游戏商`;
+  $('#gameList').innerHTML=`<div class="game-provider"><div class="game-provider__head"><label class="chk"><input type="checkbox" class="js-prov">${t.type}</label></div>
+    <div class="game-provider__grid">${t.providers.map((p,k)=>`<label class="chk"><input type="checkbox" class="js-game" ${ratioRows[i].picked[k]?'checked':''}>${p}</label>`).join('')}</div></div>`;
+  syncPicker(); $('#gameMask').classList.add('is-open');
+}
+function syncPicker(){ const boxes=$$('#gameList .js-game'), n=boxes.filter(c=>c.checked).length, all=n===boxes.length;
+  $('#gameAll').checked=all; $('#gameList .js-prov').checked=all; $('#gameModalCount').textContent=`已勾选 ${n} / ${boxes.length} 家游戏商`; }
+$('#gameList').addEventListener('change',e=>{ if(e.target.matches('.js-prov')) $$('#gameList .js-game').forEach(c=>c.checked=e.target.checked); syncPicker(); });
+$('#gameAll').addEventListener('change',e=>{ $$('#gameList .js-game').forEach(c=>c.checked=e.target.checked); syncPicker(); });
+$('#gameConfirm').addEventListener('click',()=>{
+  ratioRows[editingType].picked=$$('#gameList .js-game').map(c=>c.checked);
+  renderRatio(); checkRatio(); $('#gameMask').classList.remove('is-open'); toast('已更新套用游戏商');
+});
+$$('[data-close-modal]').forEach(b=>b.addEventListener('click',e=>{ pendingConfirm=null; e.target.closest('.mask').classList.remove('is-open'); }));
+
+/* ---------- 风控：任一检测开启 → 才能开「自动拒绝」；自动拒绝开启 → 才能填笔数 ---------- */
+function syncRisk(){
+  const anyRisk=$$('.js-risk').some(c=>c.checked);
+  $('#autoReject').disabled=!anyRisk; if(!anyRisk) $('#autoReject').checked=false;
+  $('#rejectN').disabled=!$('#autoReject').checked;
+}
+$$('.js-risk').forEach(c=>c.addEventListener('change',syncRisk));
+$('#autoReject').addEventListener('change',syncRisk);
+$('#rejectN').addEventListener('input',e=>e.target.value=onlyInt(e.target.value));
+
+/* ---------- 提交预览（已移除挑战任务） ---------- */
+function buildPreview(){
+  const risk=$$('.js-risk').map(c=>[c.dataset.k,c.checked?'是':'否']);
+  const rows=[
+    ['① 活动模板设置',[['活动ID',editingId||'（提交后产生）'],['模板类型',$('#fType').value],['状态',$('input[name=status]:checked').value],
+      ['币种',$('#fCur').value],['活动名称',$('#fName').value||'—'],['活动时间',$('#fActTime').value||'—']]],
+    ['② 活动图片',[['首页浮窗',$('input[name=float]:checked').value],['活动列表',$('input[name=listShow]:checked').value],['备注',$('#fRemark').value||'—']]],
+    ['③ 参与对象与名单',[['充值层级','全选'],['指定代理','不指定'],['新会员限制','否'],['会员等级','全选'],['黑名单',$('#fBlack').value||'—']]],
+    ['④ 活动条件',[['套用至其他等级',$('#applyAll').checked?'是':'否'],['每日返水配置',rebateRows.length+' 个等级'],
+      ['彩金所需流水倍数',$('#fWager').value||'—'],['审核方式','自动审核'],['领取方式','手动领取'],
+      ['投注量计算比例',RATIO_TYPES.map((t,i)=>`${t.type} ${ratioRows[i].rate||100}%`+(t.all?'（全部体育）':`（${ratioRows[i].picked.filter(Boolean).length}/${t.providers.length} 家）`)).join('；')]]],
+    ['⑤ 风控条件',[...risk,['自动拒绝',$('#autoReject').checked?'是（'+$('#rejectN').value+' 笔）':'否']]],
+  ];
+  $('#previewBody').innerHTML=rows.map(([s,kv])=>`<tr><td class="pv-step">${s}</td><td><div class="pv-grid">${kv.map(([k,v])=>`<div><span class="k">${k}：</span>${v}</div>`).join('')}</div></td></tr>`).join('');
+}
+
+/* ---------- 提交：再检查一次 → 同期限制 → 写回列表 ---------- */
+$('#btnSubmit').addEventListener('click',()=>{
+  if(!validateStep(1)){gotoStep(1);return;}
+  if(!validateStep(4)){gotoStep(4);return;}
+  const d={type:DAILY,name:$('#fName').value.trim(),cur:$('#fCur').value,status:$('input[name=status]:checked').value,time:$('#fActTime').value,wager:$('#fWager').value||'—'};
+  if(d.status==='开启' && sameTypeOpen(DAILY,editingId)){ toast('检测到相同活动正在进行中',true); return; }
+  if(editingId){ Object.assign(ACTS.find(a=>a.id===editingId),d); toast('保存成功'); }
+  else{ const id=Math.max(...ACTS.map(a=>a.id))+1; ACTS.unshift({id,sort:0,lang:'预设',black:'—',join:'0 / 0',...d}); toast('新增成功'); }
+  showPage('list');
+});
+
+/* ---------- 派奖审核 / 活动报表 示意资料 ---------- */
+const auditRows=[
+  ['226','member01','每日挑战活动','Daily Challenge 12月','礼金','PHP 3.00','审核通过','2026-11-21 10:03:11','自动审核','2026-11-21 10:03:11','User VIP Level 1, LV1 Base Reward 3'],
+  ['226','member02','每日挑战活动','Daily Challenge 12月','礼金','PHP 15.00','审核通过','2026-11-21 18:10:44','自动审核','2026-11-21 18:10:44','User VIP Level 2, LV3 Base Reward 15'],
+  ['190','member03','联名挑战活动','X-Bomb Lucky Blast','礼金','PHP 115.00','审核通过','2026-08-21 12:10:44','自动审核','2026-08-21 12:10:44','User VIP Level 1, LV3 Base Reward 100, Challenge 3 +15%'],
+];
+const st=s=>`<span class="${/不通过|拒绝/.test(s)?'tag-off':'tag-on'}">${s}</span>`;
+function renderAudit(){ $('#auditBody').innerHTML=auditRows.map(r=>`<tr>${r.map((c,i)=>`<td class="${i===2&&c===DAILY?'hl':''}">${i===6?st(c):c}</td>`).join('')}</tr>`).join(''); }
+$$('.rtab').forEach(b=>b.addEventListener('click',()=>{ $$('.rtab').forEach(x=>x.classList.toggle('is-active',x===b));
+  $('#reportAward').style.display=b.dataset.rtab==='award'?'':'none'; $('#reportData').style.display=b.dataset.rtab==='data'?'':'none'; }));
+function renderReport(){
+  const aw=[['2026-11-21','每日挑战活动','226','Daily Challenge 12月','礼金','PHP 3','120','118','354.00'],['2026-11-21','每日挑战活动','226','Daily Challenge 12月','礼金','PHP 15','40','37','555.00']];
+  const da=[['226','member01','每日挑战活动','Daily Challenge 12月','礼金','PHP 3','-','2026-11-21 10:03:11','2026-11-21 10:03:11','已通过'],['226','member02','每日挑战活动','Daily Challenge 12月','礼金','PHP 15','-','2026-11-21 18:10:44','2026-11-21 18:10:44','已通过']];
+  $('#awardBody').innerHTML=aw.map(r=>`<tr>${r.map((c,i)=>`<td class="${i===1&&c===DAILY?'hl':''}">${c}</td>`).join('')}</tr>`).join('');
+  $('#dataBody').innerHTML=da.map(r=>`<tr>${r.map((c,i)=>`<td class="${i===2?'hl':''}">${i===9?st(c):c}</td>`).join('')}</tr>`).join('');
+}
+
+/* ---------- 时间区间选择器 ---------- */
+const dp={target:null,base:null,start:null,end:null};
+const pad=n=>String(n).padStart(2,'0');
+const dpFmt=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+function dpParse(s){const m=s&&s.match(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}) ~ (\d{4}-\d{2}-\d{2}) (\d{2}:\d{2})$/); if(!m) return null;
+  return {start:new Date(m[1]+'T00:00:00'),startTime:m[2],end:new Date(m[3]+'T00:00:00'),endTime:m[4],startFull:new Date(m[1]+'T'+m[2]),endFull:new Date(m[3]+'T'+m[4])};}
+function dpRender(){
+  $('#dpStartDate').value=dp.start?dpFmt(dp.start):''; $('#dpEndDate').value=dp.end?dpFmt(dp.end):'';
+  [0,1].forEach(i=>{
+    const m=new Date(dp.base.getFullYear(),dp.base.getMonth()+i,1);
+    $('#dpCal'+i+' .dp-cal-title').textContent=`${m.getFullYear()}年${m.getMonth()+1}月`;
+    const days=new Date(m.getFullYear(),m.getMonth()+1,0).getDate();
+    let h=['日','一','二','三','四','五','六'].map(d=>`<div class="dow">${d}</div>`).join('')+'<div class="dp-day is-empty"></div>'.repeat(m.getDay());
+    for(let d=1;d<=days;d++){const c=new Date(m.getFullYear(),m.getMonth(),d);
+      const cls=(dp.start&&+c===+dp.start?' is-start':'')+(dp.end&&+c===+dp.end?' is-end':'')+(dp.start&&dp.end&&c>dp.start&&c<dp.end?' is-in-range':'');
+      h+=`<div class="dp-day${cls}" data-t="${+c}">${d}</div>`;}
+    $('#dpCal'+i+' .dp-cal-grid').innerHTML=h;
+  });
+}
+$('#dpPop').addEventListener('click',e=>{ e.stopPropagation(); const d=e.target.closest('[data-t]'); if(!d) return; const c=new Date(+d.dataset.t);
+  if(!dp.start||dp.end){dp.start=c;dp.end=null;} else if(c<dp.start){dp.end=dp.start;dp.start=c;} else dp.end=c; dpRender(); });
+$$('#dpPop [data-nav]').forEach(b=>b.addEventListener('click',()=>{dp.base=new Date(dp.base.getFullYear(),dp.base.getMonth()+(b.dataset.nav==='prev'?-1:1),1);dpRender();}));
+function dpOpen(inp){ dp.target=inp; const p=dpParse(inp.value); dp.start=p?p.start:null; dp.end=p?p.end:null;
+  $('#dpStartTime').value=p?p.startTime:'00:00'; $('#dpEndTime').value=p?p.endTime:'23:59';
+  const b=p?p.start:new Date(); dp.base=new Date(b.getFullYear(),b.getMonth(),1); dpRender();
+  const r=inp.getBoundingClientRect(), pop=$('#dpPop'); pop.style.top=(r.bottom+scrollY+4)+'px'; pop.style.left=(r.left+scrollX)+'px'; pop.classList.add('is-open'); }
+const dpClose=()=>{ $('#dpPop').classList.remove('is-open'); dp.target=null; };
+$('#dpClear').addEventListener('click',()=>{ if(dp.target) dp.target.value=''; dpClose(); });
+$('#dpOk').addEventListener('click',()=>{ if(!dp.start||!dp.end){toast('请选择完整的起止日期',true);return;}
+  dp.target.value=`${dpFmt(dp.start)} ${$('#dpStartTime').value||'00:00'} ~ ${dpFmt(dp.end)} ${$('#dpEndTime').value||'23:59'}`; dp.target.classList.remove('is-error'); dpClose(); });
+$$('.dp-trigger').forEach(i=>i.addEventListener('click',e=>{e.stopPropagation();dpOpen(i);}));
+document.addEventListener('click',()=>{ if(dp.target) dpClose(); });
+
+/* ---------- 初始化 ---------- */
+renderList(); renderVipTabs(); renderRebate(); resetRatio(false); syncRisk();
+</script>
+</body>
+</html>

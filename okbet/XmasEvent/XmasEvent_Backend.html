@@ -2014,16 +2014,15 @@ $('#dpClear').addEventListener('click',()=>{
   if(dp.target){ dp.target.value=''; dp.target.classList.remove('is-error'); }
   dpClose();
 });
-/* 兑换期：结束日隔日 00:00 ～ 结束时间 +3 天 */
+/* 兑换期：活动结束时间起立即进入 ～ 结束时间 +3 天（中间无空档） */
 function paintRedeem(){
   const el=$('#fRedeem'); if(!el) return;
   const m=($('#fActTime').value||'').match(/~\s*(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})/);
   if(!m){ el.textContent='—（设定活动时间后自动计算）'; return; }
-  const p2=n=>String(n).padStart(2,'0'), f=(d,hm)=>`${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())} ${hm}`;
+  const p2=n=>String(n).padStart(2,'0'), f=(d,hm)=>`${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())} ${hm}`, hm=m[4]+':'+m[5];
   const end=new Date(+m[1],+m[2]-1,+m[3]);
-  const st=new Date(end); st.setDate(st.getDate()+1);
   const cl=new Date(end); cl.setDate(cl.getDate()+3);
-  el.innerHTML=`${f(st,'00:00')} ~ ${f(cl,m[4]+':'+m[5])}`;
+  el.innerHTML=`${f(end,hm)} ~ ${f(cl,hm)}`;
 }
 $('#dpOk').addEventListener('click',()=>{
   if(!dp.start||!dp.end){ toast('请选择完整的起止日期',true); return; }
