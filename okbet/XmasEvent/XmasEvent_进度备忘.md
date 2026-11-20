@@ -245,3 +245,5 @@
 - Specs 本次调整 11-19 仅保留 2 项（B12 关联后台页面、Festival Special Event 名词）；规则弹窗、前台测试站同步、奖池 1 抽、兑换期等不记录
 - 手册档名改为「X-BombParol Fiesta_User_Manual_cn／_en」（.html、.pdf），不用 XmasEvent 命名（前缀为 X-BombParol Fiesta）
 - 11-20 礼物盒动画：有挑战的等级翻牌结束后不播放；有赠送 PAROL 者于翻牌弹窗 Confirm 关闭后弹 PAROL 提示。原型 A（B 不同步）、Specs（礼物盒动画、按钮表、PAROL 提示跳出时机，本次调整 11-20 第 1 项，前台原型重新内嵌）、手册中英文 HTML＋PDF 同步
+- 11-20 原型控制面板新增「奖池抽中实体大奖」：设定下次 1 抽必中、捲到 Pool 2（iPhone 实体大奖），验证 Contact CS → 客服聊天室；Specs 重新内嵌
+- 11-20 恭喜获奖弹窗（签到奖励＋奖池 1／5／10 抽）实体奖励提示：文案改 Physical prizes: contact CS，位置改至 Claim 按钮下方（依设计稿，白色斜体、置中单行，弹窗尺寸不变）；标题提示文案不变。原型 A、Specs（F2 第 5 条、F9、情境表、截图「签到奖励弹窗实体」、本次调整 11-20 第 2 项）、手册中英文＋PDF 同步

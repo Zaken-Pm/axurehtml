@@ -1453,7 +1453,7 @@ main.phone{background:#661708;font-family:system-ui,-apple-system,"Segoe UI",Rob
 .M_drawResultModal{flex:none;}
 .M_drawResultModal .drawResultModal-prizes{margin:0;padding:0;list-style:none;}
 .M_drawResultModal .drawResultModal-subtitle{margin:0;}
-.M_drawResultModal .drawResultModal-note{position:absolute;left:0;right:0;bottom:calc(52*var(--u));margin:0;text-align:center;font-size:calc(10*var(--u));font-weight:700;color:#ffe7a6;}
+
 .M_drawResultModal--lg{height:calc(391*var(--u));background-image:var(--a-checkin-result-modal-lg);}
 .M_drawResultModal--lg .drawResultModal-claimWrap{top:auto;bottom:calc(-22*var(--u));}
 .M_drawResultModal .drawResultModal-prizeIcon .ri{width:100%;height:100%;}
@@ -1509,6 +1509,11 @@ main.phone{background:#661708;font-family:system-ui,-apple-system,"Segoe UI",Rob
 .M_pickCardModal #chMsg{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
 #caBox:focus,#cgwBox:focus{outline:none;}
 
+
+
+/* 实体奖励提示（依设计稿）：位于 Claim 按钮下方（弹窗外）、置中单行；弹窗尺寸不变 */
+.M_drawResultModal .drawResultModal-note{position:absolute;left:50%;top:calc(100% + 4*var(--u));transform:translateX(-50%);width:calc(300*var(--u));margin:0;text-align:center;font-size:calc(12.5*var(--u));line-height:1.3;font-style:italic;font-weight:600;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.M_drawResultModal .drawResultModal-note:empty{display:none;}
 </style>
 </head>
 <body>
@@ -1614,6 +1619,7 @@ main.phone{background:#661708;font-family:system-ui,-apple-system,"Segoe UI",Rob
       <span style="font-size:.67rem;color:#5a6274">抽奖模拟：</span>
       <button data-sim="gp-single">奖池 1 抽中大奖</button>
       <button data-sim="gp-multi">奖池多抽中大奖</button>
+      <button data-sim="gp-phys">奖池抽中实体大奖</button>
       <button data-sim="sign-phys">签到宝箱抽中实体奖励</button>
     </div>
     <p style="margin:0;font-size:.67rem;color:#5a6274">大奖：Pool 1 ₱100｜Pool 2 iPhone（实体）｜Pool 3 ₱1,000｜Pool 4 ₱100,000。设定后对下一次对应抽奖生效。</p>
@@ -1740,8 +1746,7 @@ main.phone{background:#661708;font-family:system-ui,-apple-system,"Segoe UI",Rob
     <h2 class="cgw__sr" id="cgwTitle">Congratulations!</h2>
     <p class="drawResultModal-subtitle" id="cgwLead" aria-live="polite"></p>
     <ul class="drawResultModal-prizes" id="cgwList"></ul>
-    <p class="drawResultModal-note" id="cgwNote"></p>
-    <div class="drawResultModal-claimWrap"><button class="drawResultModal-claim" id="cgwOk" aria-label="Claim"></button></div>
+    <div class="drawResultModal-claimWrap"><p class="drawResultModal-note" id="cgwNote"></p><button class="drawResultModal-claim" id="cgwOk" aria-label="Claim"></button></div>
   </div>
 </div>
 <!-- ============ 客服聊天室（原型示意；实体大奖 Contact CS 开启） ============ -->
@@ -2190,14 +2195,15 @@ function renderTreePools(keys){
 
 /* 恭喜获奖弹窗（依设计稿，签到奖励与奖池 5／10 抽共用）：Congratulations! 标题图＋文案＋奖励卡（拐杖糖框＋光芒）＋Claim
    · 奖励卡 3 张一列、置中；相同奖励合并，抽中 ≥2 次于卡片右上标示 ×N
-   · 有实体奖励时，Claim 上方显示 Contact Customer Service to claim physical rewards.
+   · 有实体奖励时，Claim 按钮下方显示 Physical prizes: contact CS；标题下方提示文案不变
    · 点 Claim／Esc 关闭；点遮罩不关 */
 let CGW=null;   // {pool:N} 或 {sign:N}
 function openCgw(lead,list,ctx){
   $('#cgwLead').innerHTML=lead;
-  const g=$('#cgwList'), box=$('#cgwBox'); box.className='M_drawResultModal'+(list.length>3?' M_drawResultModal--lg':''); g.className='drawResultModal-prizes';
+  const g=$('#cgwList'), box=$('#cgwBox'), phys=list.some(({r})=>r.physical); box.className='M_drawResultModal'+(list.length>3?' M_drawResultModal--lg':'')+(phys?' has-note':'');
+  /* 抽到实体奖励：Claim 按钮下方显示联系客服提示（依设计稿）；无实体奖励不显示 */
+  $('#cgwNote').textContent=phys?'Physical prizes: contact CS':''; g.className='drawResultModal-prizes';
   g.innerHTML=list.map(({r,n})=>`<li class="drawResultModal-prize"><span class="drawResultModal-prizeBox"><span class="drawResultModal-prizeGlow"></span><span class="drawResultModal-prizeFrame"><span class="drawResultModal-prizeIcon">${rwIcon(r)}</span></span>${n>=2?`<span class="drawResultModal-badge"><span class="drawResultModal-badgeText">x${n}</span></span>`:''}</span><span class="drawResultModal-amount"><span class="drawResultModal-amountText" title="${r.label}">${r.label}</span></span></li>`).join('');
-  $('#cgwNote').textContent=list.some(({r})=>r.physical)?'Contact Customer Service to claim physical rewards.':'';
   /* 弹窗动画：奖励卡每 110ms 弹出 1 张（第 1 张 0.35 秒），最后一张出现后 Claim 弹出并呼吸发光；Claim 出现前不可点 */
   const reduceFx=matchMedia('(prefers-reduced-motion: reduce)').matches, items=$$('.drawResultModal-prize',g), btnAt=reduceFx?0:350+items.length*110+120;
   items.forEach((it,i)=>it.style.setProperty('--d',(reduceFx?0:350+i*110)+'ms'));
@@ -2529,6 +2535,13 @@ $$('[data-sim]').forEach(b=>b.addEventListener('click',()=>{
   if(k==='break'){ S.streak=0; S.checked=false; toast('已模拟断签'); }
   if(k==='reset'){ S=clone(INIT); FORCE={gp:null,signPhys:false}; toast('已重置示范资料'); }
   /* 抽奖模拟：指定下一次抽奖结果（仅原型；正式环境一律由后端依中奖率抽出） */
+  /* 实体大奖：Pool 2 的 Grand Prize 为实体奖品（iPhone）；设定下次 1 抽必中并捲到 Pool 2 */
+  if(k==='gp-phys'){
+    if(!LIVE_OR_REDEEM()){ toast('活动已关闭，无法抽奖'); renderAll(); return; }
+    FORCE.gp='single'; const C=CHESTS.find(x=>gpPhys(gpKind(topOf(x.box))));
+    if(keysLeft()<C.cost) S.bonusKeys+=C.cost-keysLeft();
+    setTab('xmas'); renderAll(); $(`#poolList [data-pool="${C.no}"]`).scrollIntoView({block:'center',behavior:'smooth'});
+    toast(`已设定：点 Pool ${C.no}「1 Draw」必中实体大奖 ${topOf(C.box).label}（已补足 PAROL）`); return; }
   if(k==='gp-single'||k==='gp-multi'){
     if(!LIVE_OR_REDEEM()){ toast('活动已关闭，无法抽奖'); renderAll(); return; }
     FORCE.gp=k==='gp-single'?'single':'multi'; const need=Math.max(...CHESTS.map(C=>C.cost))*10;

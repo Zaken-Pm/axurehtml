@@ -208,7 +208,7 @@
    - **Day 1～2**：签到成功后立即弹出，1 张奖励卡置中
    - **Day 3 起（有签到宝箱）**：点今日格先弹出 Christmas Surprise Chest（F3），按 Draw 完成签到；宝箱跑马灯结束后，**签到奖励与宝箱抽中奖励合并在同一个弹窗**，2 张奖励卡并排置中（不标示奖励来源）
    - 每张卡＝奖励图示，卡片下方显示奖励名称（最多两行，超过以「…」截断）
-   - **抽到实体奖励时**，`Claim` 按钮上方显示 `Contact Customer Service to claim physical rewards.`（置中，过长时以两行呈现，超过两行以「…」截断）；无实体奖励不显示
+   - **抽到实体奖励时**，`Claim` 按钮下方显示 `Physical prizes: contact CS`（置中、单行，放不下以「…」截断；弹窗尺寸不变）；标题下方提示文案不变；无实体奖励不显示
    - 点 `Claim`（或 Esc）关闭；点遮罩不关闭；奖励于签到当下已入帐
 6. **签到宝箱：**Day 3 起点今日格立即弹出「Christmas Surprise Chest」弹窗（F3），按 Draw 才完成签到；后台关闭「额外随机宝箱」时只发签到奖励、直接弹签到奖励弹窗。宝箱款式依后台「随机宝箱中奖率」抽出 1 款。
 
@@ -506,7 +506,7 @@
    - 跑马灯**停在抽中格**
    - 停格后于原页面**高亮抽中格**（保留至下次抽奖），接着跳出**恭喜获奖弹窗**（1 项，标题下方 `You Won 1 Prize`） 【异动】
    - 抽中 **Grand Prize**：停格高亮后改跳**大奖弹窗**（见下方）
-   - 抽中实体奖励：恭喜获奖弹窗内提示 `Contact Customer Service to claim physical rewards.`
+   - 抽中实体奖励：恭喜获奖弹窗 `Claim` 按钮下方显示 `Physical prizes: contact CS`
 3. **5／10 抽（多个奖励）：**跑马灯**不停在抽中项**；结束后跳出**恭喜获奖弹窗**（见下方），9 宫格恢复原本样式。
    - 本次结果含 Grand Prize：**优先跳出大奖弹窗**，关闭后再跳恭喜获奖弹窗（实体大奖为关闭客服聊天室后，见下方大奖弹窗第 4 条）；大奖仍列在恭喜获奖弹窗内（含 `xN` 合并）
 4. 跑马灯进行中**不可跳过**；若该奖池不在画面内，自动滚动至可见范围。
@@ -520,7 +520,7 @@
    - 相同奖励合并，依首次抽中顺序排列；同一奖励抽中 ≥2 次于卡片右上标示 `xN`，只抽中 1 次不标示
    - 卡片下方显示奖励名称（最多两行，超过以「…」截断）
    - 内容超过弹窗高度时，奖励列表可上下滚动
-3. **抽中实体奖励：**`Claim` 按钮上方显示 `Contact Customer Service to claim physical rewards.`（置中，过长时以两行呈现，超过两行以「…」截断）；无实体奖励不显示。
+3. **抽中实体奖励：**`Claim` 按钮下方显示 `Physical prizes: contact CS`（置中、单行，放不下以「…」截断；弹窗尺寸不变）；标题下方提示文案不变；无实体奖励不显示。
 4. **关闭：**点 `Claim`（或 Esc）关闭，点遮罩不关闭；关闭后回到奖池页面，按钮恢复可继续抽。奖励于抽奖当下已入帐，关闭弹窗不影响发放。
 
 ### 大奖弹窗（抽中 Grand Prize） 【新增】
@@ -1133,7 +1133,7 @@ CLAIMED 移至列表底部；看板 Cash Bonus Claimed Today＋实得金额；My
 | 后台修改奖池中奖率／消耗数量（活动中） | 对之后的抽奖生效；已扣除、已抽出不追溯 |
 | PAROL 刚好等于 1 抽所需 | 1 Draw 可点；5／10 停用；抽完后红点消失 |
 | PAROL 为 0 | 3 个按钮皆停用（不显示提示文字） |
-| 抽中实体奖品 | · 前台结果区提示：<br>- 1 抽：恭喜获奖弹窗提示 `Contact Customer Service to claim physical rewards.`<br>- 5／10 抽：`You won N physical prize(s) — please contact Customer Service to claim.`<br>· 派奖审核、数据统计皆为自动审核「审核通过／已通过」<br>· 奖励统计即时计入笔数 |
+| 抽中实体奖品 | · 前台结果区提示：<br>- 1／5／10 抽：恭喜获奖弹窗 `Claim` 按钮下方显示 `Physical prizes: contact CS`<br>· 派奖审核、数据统计皆为自动审核「审核通过／已通过」<br>· 奖励统计即时计入笔数 |
 | 每日任务 CLAIM 领到 PAROL 后，PAROL 仍少于最低级奖池 1 抽所需 | 弹出 PAROL 提示弹窗（不足）：`Parols to Draw: X / Y`，CONFIRM 后停留原页 |
 | 每日任务 CLAIM 领到 PAROL 后，PAROL ≥ 最低级奖池 1 抽所需 | 弹出 PAROL 提示弹窗（满足），CONFIRM 后跳转 Parol Wish Draw 分页 |
 | 额外随机宝箱关闭 | Day 3 起只发签到奖励、不弹 Christmas Surprise Chest（点今日格即完成签到） |
@@ -1226,9 +1226,10 @@ CLAIMED 移至列表底部；看板 Cash Bonus Claimed Today＋实得金额；My
 ---
 ## 本次调整
 
-### 本次调整 · 2026-11-20（1 项）
+### 本次调整 · 2026-11-20（2 项）
 
 1. **礼物盒动画**：每日任务单笔 `Claim` 有挑战者，翻牌结束后**不播放**礼物盒动画；该等级有赠送 PAROL 时，于翻牌弹窗按 `Confirm` 关闭后跳出 PAROL 提示弹窗。
+2. **恭喜获奖弹窗实体奖励提示**：文案由 `Contact Customer Service to claim physical rewards.` 改为 `Physical prizes: contact CS`，位置由 `Claim` 按钮上方改至**按钮下方**（置中、单行，弹窗尺寸不变），不与奖励名称重叠；标题下方提示文案不变。签到奖励弹窗、奖池 1／5／10 抽皆适用。
 
 ### 本次调整 · 2026-11-19（2 项）
 
