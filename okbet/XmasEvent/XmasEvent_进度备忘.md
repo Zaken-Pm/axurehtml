@@ -244,3 +244,4 @@
 - 手册档名改为 X-BombParol Fiesta_User_Manual_cn／_en（.html、.pdf）
 - Specs 本次调整 11-19 仅保留 2 项（B12 关联后台页面、Festival Special Event 名词）；规则弹窗、前台测试站同步、奖池 1 抽、兑换期等不记录
 - 手册档名改为「X-BombParol Fiesta_User_Manual_cn／_en」（.html、.pdf），不用 XmasEvent 命名（前缀为 X-BombParol Fiesta）
+- 11-20 礼物盒动画：有挑战的等级翻牌结束后不播放；有赠送 PAROL 者于翻牌弹窗 Confirm 关闭后弹 PAROL 提示。原型 A（B 不同步）、Specs（礼物盒动画、按钮表、PAROL 提示跳出时机，本次调整 11-20 第 1 项，前台原型重新内嵌）、手册中英文 HTML＋PDF 同步

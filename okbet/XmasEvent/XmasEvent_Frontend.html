@@ -1991,10 +1991,10 @@ function renderBomb(){
     const lv=+b.dataset.bomb; if(S.bombClaimed[lv]||CH||!LIVE()) return;          // 幂等
     const t=BOMB_TASKS.find(x=>x.lv===lv);
     if(depBlocked(t)) return;   // 防呆：前一个 LV 未完成时按钮已停用
-    // 每日任务单笔 CLAIM 一律播礼物盒动画（11/18）：最终画面依是否赠送 PAROL 切换；有赠送 PAROL 者动画后弹 PAROL 提示弹窗；单项 CLAIM 不显示 toast
+    // 每日任务单笔 CLAIM 播礼物盒动画：最终画面依是否赠送 PAROL 切换；有挑战者翻牌结束后不播放（11/20）；有赠送 PAROL 者于动画（有挑战者为翻牌弹窗关闭）后弹 PAROL 提示弹窗；单项 CLAIM 不显示 toast
     const snap=[$('#boardCash').innerHTML,$('#boardParol').innerHTML];   // 动画结束前看板维持领取前数值，奖励飞入后才更新
     const after=()=>openKeyTip(t.gift);
-    if(t.trigger){ runChallenges([t],res=>playGift(res[0].amt,t.gift||0,()=>after(res[0].amt),snap)); return; }
+    if(t.trigger){ runChallenges([t],res=>after(res[0].amt)); return; }   // 有挑战：翻牌结束后不播礼物盒动画
     S.bombClaimed[lv]={amt:t.reward}; giveKeys(t); renderAll();
     playGift(t.reward,t.gift||0,()=>after(t.reward),snap);
   }));
