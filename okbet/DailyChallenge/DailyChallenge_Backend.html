@@ -377,7 +377,7 @@ label.chk input{accent-color:var(--primary);}
                   <thead><tr><th style="width:80px">挑战</th><th>奖励提升</th><th>触发机率</th><th>获奖机率</th><th style="width:70px">操作</th></tr></thead>
                   <tbody id="challengeBody"></tbody>
                 </table>
-                <p class="js-ch-empty hint" style="display:none;text-align:center;padding:12px 0">未设置挑战（勾选「触发」的等级将不会出现挑战）</p>
+                <p class="js-ch-empty" style="display:none;text-align:center;padding:16px 0;margin:0;border:1px solid var(--border-l);border-top:none;color:var(--text-3);font-size:13px">No Data</p>
                 <p class="hint">非必填；可全部删除不设置挑战。如有设置：奖励提升／触发机率／获奖机率不可为空或 0（单位 %）；触发机率为 挑战1～挑战5 加总不得超过100%；获奖机率为各挑战各自不得超过100%；奖励提升无上限。最多 挑战5。</p>
               </div>
             </div>
@@ -663,6 +663,8 @@ function validateStep(n){
     const {anyBad,orderBad}=checkRebate(true);
     if(orderBad){toast('任务目标不可小于或等于同任务条件，请检查红框',true);return false;}
     if(anyBad){toast('活动条件有必填/格式错误，请检查红框',true);return false;}
+    /* 有等级勾选「触发」却未设置任何挑战：挡下（同联名挑战活动现网） */
+    if(rebateRows.some(r=>r.trigger)&&!challengeRows.length){toast('已有任务开启挑战，请至少配置 1 条挑战任务',true);return false;}
     const ch=checkChallenge(true);
     if(ch.empty){toast('挑战任务的奖励提升／触发机率／获奖机率不可为空或 0',true);return false;}
     if(ch.sumOver){toast('挑战任务「触发机率」加总不得超过100%（目前 '+chSum()+'%）',true);return false;}
@@ -782,7 +784,7 @@ const RATIO_TYPES=[
 let ratioRows=[];      // 每行：{rate:'150', picked:[true,true,...]}
 let editingType=null;  // 弹窗目前正在编辑哪一种游戏类型
 function resetRatio(sample){
-  ratioRows=RATIO_TYPES.map(t=>({rate: sample?({Slot:'150',Live:'250',Sport:'100',Mini:'100'})[t.type]:'', picked:t.providers.map(()=>true)}));
+  ratioRows=RATIO_TYPES.map(t=>({rate: sample?({Slot:'50',Live:'250',Sport:'150',Mini:'100'})[t.type]:'', picked:t.providers.map(()=>true)}));
   renderRatio();
 }
 function renderRatio(){
