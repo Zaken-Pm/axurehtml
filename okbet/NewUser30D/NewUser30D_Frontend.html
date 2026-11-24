@@ -343,7 +343,7 @@ button.cal__d:hover{border-color:rgba(255,207,63,.6);}
 /* === 首页（参考 okbet.com 手机版一般首页结构，浅色）=== */
 .home{background:#f2f4f8;color:#1b2340;position:relative;}
 .hbar{position:sticky;top:8px;z-index:5;margin:8px var(--sp-2) 0;display:flex;align-items:center;gap:var(--sp-2);padding:6px var(--sp-2);border-radius:14px;background:rgba(255,255,255,.78);backdrop-filter:blur(8px);box-shadow:0 2px 10px rgba(20,30,60,.15);}
-.hbar__av{width:34px;height:34px;border-radius:50%;background:#8a5a48;color:#fff;display:grid;place-items:center;font-weight:700;flex:0 0 auto;}
+.hbar__av{width:34px;height:34px;border-radius:50%;overflow:hidden;flex:0 0 auto;display:block;box-shadow:0 0 0 2px #fff;}
 .hbar__bal{display:flex;flex-direction:column;font-size:.72rem;font-weight:800;line-height:1.3;color:#1b2340;}
 .hbar__bal>span{display:flex;align-items:center;gap:4px;}
 .hbar__r{color:#1677ff;font-weight:400;}
@@ -502,7 +502,8 @@ button.cal__d:hover{border-color:rgba(255,207,63,.6);}
 .my__icons{position:absolute;right:10px;top:8px;display:flex;gap:6px;}
 .my__icons button{background:none;font-size:.95rem;}
 .my__row{display:flex;align-items:center;gap:var(--sp-3);margin-top:8px;}
-.my__av{position:relative;width:52px;height:52px;border-radius:50%;background:#8a5a48;color:#fff;font-size:1.3rem;font-weight:700;display:grid;place-items:center;border:3px solid #fff;flex:0 0 auto;}
+.my__av{position:relative;width:52px;height:52px;border-radius:50%;border:3px solid #fff;flex:0 0 auto;display:block;}
+.my__av svg{border-radius:50%;display:block;}
 .my__av i{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);background:#8a93a8;color:#fff;font-style:normal;font-size:.67rem;font-weight:900;border-radius:8px;padding:0 6px;white-space:nowrap;}
 .my__id{flex:1;min-width:0;}
 .my__name{margin:0;font-weight:800;font-size:.85rem;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
@@ -597,6 +598,10 @@ button.nt[data-amt]:hover{border-color:var(--c-gold);}
 .dep__add{position:relative;}
 .dep__grid--tag{row-gap:14px;padding-top:8px;}
 .dep__tag{position:absolute;top:-10px;right:-2px;background:#e5503f;color:#fff;font-size:.67rem;font-weight:900;line-height:1;padding:4px 10px;border-radius:10px 10px 10px 2px;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+
+/* 未登录用户列 */
+.hbar__av--guest{display:grid !important;place-items:center;background:#c9d2e3;color:#fff;font-size:1rem;}
+.hbar__login{background:#fff;color:#1667e8;border:1.5px solid #1667e8;font-weight:800;border-radius:8px;padding:7px 14px;font-size:.78rem;}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
 </style>
 </head>
@@ -618,9 +623,7 @@ button.nt[data-amt]:hover{border-color:var(--c-gold);}
       <select id="selElig" data-ctl="elig">
         <option value="ok">配发有效</option>
         <option value="notLogin">未登录</option>
-        <option value="loading">查询中</option>
-        <option value="error">查询失败</option>
-        <option value="notEligible">不在名单（不适用）</option>
+        <option value="notEligible">不在名单中</option>
         <option value="pendingAlloc">等待营运配发</option>
       </select></div>
     <div class="panel__row"><label for="selStage">个人30日阶段</label>
@@ -893,10 +896,24 @@ function bannerSvg(){
     '<rect x="44" y="238" width="170" height="50" rx="25" fill="#ffd23f"/><text x="129" y="271" text-anchor="middle" fill="#3a2100" font-size="22" font-weight="900" font-family="Arial,sans-serif">JOIN NOW</text>'+
     '</svg>';
 }
+/* 示意头像（SVG 插画：圆形底＋短发人像），用于首页／Rewards／My */
+function avatarSvg(){
+  return '<svg viewBox="0 0 64 64" width="100%" height="100%" aria-hidden="true">'+
+    '<defs><linearGradient id="avBg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7ec8ff"/><stop offset="1" stop-color="#4f6bff"/></linearGradient></defs>'+
+    '<circle cx="32" cy="32" r="32" fill="url(#avBg)"/>'+
+    '<path d="M12 60c2-12 10-18 20-18s18 6 20 18" fill="#ffb347"/>'+
+    '<circle cx="32" cy="28" r="12" fill="#ffd7b5"/>'+
+    '<path d="M19 27c0-9 6-14 13-14s13 5 13 13c-3-3-7-5-12-5-5 0-9 2-14 6z" fill="#3b2a20"/>'+
+    '<circle cx="27.5" cy="29" r="1.6" fill="#3b2a20"/><circle cx="36.5" cy="29" r="1.6" fill="#3b2a20"/>'+
+    '<path d="M28.5 34c2 1.6 5 1.6 7 0" stroke="#c0604a" stroke-width="1.6" fill="none" stroke-linecap="round"/>'+
+    '</svg>';
+}
 function viewHome(){
   var h = '<div class="phone__scroll home light">';
   /* 浮动用户列：头像、余额／Bonus、Deposit、搜寻 */
-  h += '<header class="hbar"><span class="hbar__av" aria-hidden="true">J</span><div class="hbar__bal"><span><i class="coin coin--p" aria-hidden="true">₱</i>'+state.mainBal.toLocaleString('en-US')+' <span class="hbar__r" aria-hidden="true">↻</span></span><span><i class="coin coin--b" aria-hidden="true">B</i>'+state.bonusBal.toLocaleString('en-US')+' <span class="hbar__r" aria-hidden="true">↻</span></span></div><span class="topbar__sp"></span><button class="hbar__dep" data-go="dep">Deposit</button><button class="hbar__search" aria-label="搜寻">🔍</button></header>';
+  /* 浮动用户列：已登录＝头像、余额／Bonus、Deposit、搜寻；未登录＝访客头像、Log In／Sign Up、搜寻 */
+  if(state.elig==='notLogin') h += '<header class="hbar hbar--guest"><span class="hbar__av hbar__av--guest" aria-hidden="true">👤</span><span class="topbar__sp"></span><button class="hbar__login" data-act="login">Log In</button><button class="hbar__dep" data-act="soon">Sign Up</button><button class="hbar__search" aria-label="搜寻">🔍</button></header>';
+  else h += '<header class="hbar"><span class="hbar__av" aria-hidden="true">'+avatarSvg()+'</span><div class="hbar__bal"><span><i class="coin coin--p" aria-hidden="true">₱</i>'+state.mainBal.toLocaleString('en-US')+' <span class="hbar__r" aria-hidden="true">↻</span></span><span><i class="coin coin--b" aria-hidden="true">B</i>'+state.bonusBal.toLocaleString('en-US')+' <span class="hbar__r" aria-hidden="true">↻</span></span></div><span class="topbar__sp"></span><button class="hbar__dep" data-go="dep">Deposit</button><button class="hbar__search" aria-label="搜寻">🔍</button></header>';
   /* 首页 Banner 轮播：满版图片位 750×360（正式图由美术提供），此处为自绘示意图 */
   h += '<section class="bn" aria-label="首页 Banner 轮播">'+bannerSvg()+
        '<div class="bn__dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></div></section>';
@@ -980,7 +997,8 @@ var TASKS = [
   {n:'Complete basic info - Real Name', c:1, r:50, a:'To do', k:'todo'}
 ];
 function lightTopbar(){
-  return '<header class="lt"><button class="lt__menu" data-act="soon" aria-label="菜单">☰</button><span class="hbar__av" aria-hidden="true">J</span><span class="lt__pts"><i class="coin coin--p" aria-hidden="true">₱</i>'+state.mainBal.toLocaleString('en-US')+' <span class="hbar__r" aria-hidden="true">↻</span></span><span class="topbar__sp"></span><button class="hbar__dep" data-go="dep">Deposit</button><button class="hbar__search" aria-label="搜寻">🔍</button></header>';
+  if(state.elig==='notLogin') return '<header class="lt"><button class="lt__menu" data-act="soon" aria-label="菜单">☰</button><span class="hbar__av hbar__av--guest" aria-hidden="true">👤</span><span class="topbar__sp"></span><button class="hbar__login" data-act="login">Log In</button><button class="hbar__dep" data-act="soon">Sign Up</button><button class="hbar__search" aria-label="搜寻">🔍</button></header>';
+  return '<header class="lt"><button class="lt__menu" data-act="soon" aria-label="菜单">☰</button><span class="hbar__av" aria-hidden="true">'+avatarSvg()+'</span><span class="lt__pts"><i class="coin coin--p" aria-hidden="true">₱</i>'+state.mainBal.toLocaleString('en-US')+' <span class="hbar__r" aria-hidden="true">↻</span></span><span class="topbar__sp"></span><button class="hbar__dep" data-go="dep">Deposit</button><button class="hbar__search" aria-label="搜寻">🔍</button></header>';
 }
 function promoImg(g, e, label){
   return '<div class="pc__img" style="--g:linear-gradient(120deg,'+g+')"><span class="pc__e" aria-hidden="true">'+e+'</span><span class="pc__lbl">'+label+'</span></div>';
@@ -1023,7 +1041,7 @@ function viewMy(){
   var h = '<div class="phone__scroll light my">';
   var kyc = state.kyc==='yes' ? '<span class="my__kyc my__kyc--ok">Verified ›</span>' : state.kyc==='pending' ? '<span class="my__kyc">Under review ›</span>' : '<span class="my__kyc">Unverified ›</span>';
   h += '<section class="my__prof"><div class="my__icons"><button aria-label="客服" data-act="soon">🎧</button><button aria-label="信箱" data-act="soon">✉️</button></div>'+
-       '<div class="my__row"><span class="my__av" aria-hidden="true">J<i>VIP1</i></span><div class="my__id"><p class="my__name">juan_dc88 '+kyc+'</p><p class="my__uid">ID:100001 <span aria-hidden="true">⧉</span></p></div><span class="my__go" aria-hidden="true">›</span></div>'+
+       '<div class="my__row"><span class="my__av" aria-hidden="true">'+avatarSvg()+'<i>VIP1</i></span><div class="my__id"><p class="my__name">juan_dc88 '+kyc+'</p><p class="my__uid">ID:100001 <span aria-hidden="true">⧉</span></p></div><span class="my__go" aria-hidden="true">›</span></div>'+
        '<button class="my__vip" data-act="soon"><span>VIP Exclusive Privileges</span><span aria-hidden="true">›</span></button></section>';
   h += '<section class="my__bal"><p class="my__bk">Account Balance</p><p class="my__bv"><i class="coin coin--p" aria-hidden="true">₱</i>'+state.mainBal.toLocaleString('en-US',{minimumFractionDigits:2})+' <span class="hbar__r" aria-hidden="true">↻</span></p>'+
        '<p class="my__bonus'+(state.balFlash?' my__bonus--flash':'')+'">Bonus Wallet '+peso(state.bonusBal)+'</p>'+
@@ -1612,8 +1630,9 @@ document.getElementById('navScreens').addEventListener('click', function(e){
    ===================================================================== */
 var T = '<span class="tbc">【待确认】</span>';
 var NOTES = {
-  home:['首页版面参考 okbet.com 手机版一般首页：浮动用户列（头像、余额／Bonus、Deposit、搜寻）→ Banner 轮播（满版图片位 750×360，美术提供）→ 白色内容卡（新人入口、Game Gallery、分类、Must-Try／What\'s New）→ 底部导航 Home／Rewards／Points Mall／Tourney／My。不放品牌名称，游戏素材为示意。',
-        '仅对名单内、资格有效、个人30日未结束的用户渲染；非名单／未登录／查询失败不渲染。',
+  home:['未登录：用户列改为访客头像＋「Log In」（外框）＋「Sign Up」（实心）＋搜寻，不显示余额与 Deposit；Log In 后回到已登录样式。',
+        '首页版面参考 okbet.com 手机版一般首页：浮动用户列（头像、余额／Bonus、Deposit、搜寻）→ Banner 轮播（满版图片位 750×360，美术提供）→ 白色内容卡（新人入口、Game Gallery、分类、Must-Try／What\'s New）→ 底部导航 Home／Rewards／Points Mall／Tourney／My。不放品牌名称，游戏素材为示意。',
+        '仅对名单内、资格有效、个人30日未结束的用户渲染；非名单／未登录不渲染。',
         '入口改为「标题列＋三档任务卡」：卡片可左右滑动（露出下一张），每张显示档位、奖金、门槛、进度条（当日累计／该档门槛）与动作（Deposit／Claim／Processing／Credited／Closed），下方圆点随滑动同步；进入首页自动滑到第一张可领取或下一个未达标的卡。',
         '标题列：≥2 档可领时右侧显示「Claim all」一次领取，否则显示「View ›」进活动页。',
         '状态文案：未首存「首存开启30日」→ View Offer → 04；进行中「Day X/30＋下一档差额」→ Continue 定位 06 对应档位；有可领「₱X ready · expires at 00:00」→ 原位 Claim（领取今日全部可领档）；今日全领「倒数至 00:00」。',
@@ -1625,7 +1644,7 @@ var NOTES = {
            'UI 03 新人活动：与其他活动卡相同呈现（图片、Event time、名称、Read More ›），卡片高度、宽度、图片比例与文字栏位皆一致，Event time 与名称各 1 行、超出以「…」，不因本活动加高；归在 Newcomer 分类，点击 Read More 导向活动详情页（04 Landing）。',
            'Event time 显示个人 30 日起讫；未首存显示「30 days from first deposit」【待确认】。非名单或 30 日结束：不渲染此卡。',
            '其他活动卡、积分、优惠券、Task List 为示意，非本次需求范围。'],
-  landing:['04 配发：显示有效方案（等级、Day X/30、结束日）、Rules 与 Your Rewards 入口；异常：未登录／查询中／失败／非名单／等待配发（不以 L1 兜底）。',
+  landing:['04 配发：显示有效方案（等级、Day X/30、结束日）、Rules 与 Your Rewards 入口；异常：未登录／非名单／等待配发（不以 L1 兜底）。',
            '首存前（Day 0）显示「How to join」三步骤：① Verify identity → ② First deposit → ③ Claim rewards，目前步骤以金框标示，完成显示 ✓。',
            '已开始但 KYC 状态异常时显示验证提示条；任何 Deposit 按钮在未验证时先走 UI 09。',
            '06 当前任务：三档共用一条「当日累计有效存款」进度；里程碑上方为该档奖金，下方为累计门槛。',
