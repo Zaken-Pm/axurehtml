@@ -160,12 +160,12 @@
 2. **点击**：弹出「活动规则」弹窗，标题 `RULES`；内容超过弹窗高度时，内容区可上下滚动，每次开启回到最上方。
 3. **关闭**：点底部 `Confirm` 或右上角 `✕` 关闭（桌机可按 Esc）；点遮罩不关闭。
 4. **规则内容（前台英文，固定文案，依运营提供文案原文照录）**：
-   · 第 1 行 `X-BOMB PAROL FIESTA`；第 2 行活动时间**套用后台 B2「活动时间」**，格式 `Promotion period: HH:mm on D Month to HH:mm on D Month YYYY.`（如 `Promotion period: 00:00 on 21 November to 23:59 on 31 December 2026.`；起讫同年时起始不显示年份）；接着小标 `HOW TO PLAY:`
-   · 章节：`Parol Quest — Earn Sparks & Get Rewards!`（Christmas Mission、Daily Mission）／`How to Earn Sparks`（换算表「Activity／Sparks Earned」＋IMPORTANT NOTE）／`Important Dates`
-   · `Important Dates` 只保留 1 项：活动结束时间（英文日期＋12 小时制，如 `December 31, 2026, 11:59 PM`），**依后台活动时间推算**
-   · **规则文案不随后台配置变动**；唯活动时间与 Important Dates 日期套用后台配置
-
-> 📝 **待运营确认**：目前规则文案为暂用版本（含 Sparks／Parols 字样），正式上线前需由运营提供每日挑战版本文案替换。
+   · 第 1 行 `X-BOMB X'MAS CASH BLAST`；第 2 行活动时间**套用后台 B2「活动时间」**，格式 `Promotion period: HH:mm on D Month to HH:mm on D Month YYYY.`（如 `Promotion period: 00:00 on 21 November to 23:59 on 31 December 2026.`；起讫同年时起始不显示年份）
+   · 小标 `HOW TO PLAY:`：`Explore your VIP reward tiers`／`Complete your daily deposit or betting tiers`／`Claim your Christmas cash`
+   · 小标 `RULES:`：`Daily progress and resets`／`Claim windows and expiry`／`Tier rewards and rebate percentages`／`Cash Bonus withdrawals`／`VIP upgrades`
+   · 版面：小标与章节标题（`•• 🎄 标题 🎄 ••`）为黄字；内文为粉色斜体、项目符号条列，粗体处依规则图标示
+   · **套用后台的日期**：`Claim windows and expiry` 第 2 点的结束日（例 `31 December 2026`）与最后领取时间（结束日隔日 23:59，例 `23:59 on 1 January 2027`），依后台活动结束时间推算
+   · 其余为**固定文案**，不随后台配置变动（含 `18 cash reward tiers`、`VIP0–1, VIP2 or VIP3–4`、`1×`）
 
 ### F2 一键领取（Unclaimed Mission Rewards）【新增】
 
@@ -203,6 +203,7 @@
    · 金额栏**维持显示基础金额**：触发挑战且获胜也不改为加成后金额（例基础 `₱12`、实得 `₱14.40` → 卡片仍显示 `₱12`）；实得金额计入看板
 4. **卡片底色**：依列表**显示顺序红绿交错**：一键领取区块（红）之后，第 1 张为绿色、第 2 张红色、第 3 张绿色……依此类推；**与任务类型（投注／充值）无关**，已领取卡片移至底部后同样依位置交错。
 5. **数值显示**：金额依金额显示规则（整数不显示 .00）、进度数值加千分位，皆不截断。
+   · **进度当前值**：后端回传有小数时，前台**无条件舍去小数、只显示整数**（例当前有效投注 `14.5`、目标 20 → 显示 `14/20`）；进度条与达成判定仍以后端原始数值计算（例 `19.9/20` 显示 `19/20`，未达成）
 
 #### 按钮状态
 
@@ -563,6 +564,7 @@ CLAIMED 移至列表底部；看板 Cash Bonus Claimed Today＋实得金额
 | 挑战任务全部删除，但等级仍勾选「触发」 | 点「下一步」／「提交」挡下，toast `已有任务开启挑战，请至少配置 1 条挑战任务`（须新增挑战或取消触发） |
 | 投注量计算比例 Slot 50%、Sport 150% | Slot（已勾选游戏商）投注 10,000 → 任务进度计入 5,000；Sport 投注 10,000 → 计入 15,000；未勾选的游戏商按 100% |
 | 新增活动只填比例、未勾选游戏商（预设 0 家） | 比例不生效：该类型投注全部按 100% 计入进度（Sport 固定套用全部体育游戏商，不受影响） |
+| 后端回传当前值有小数（currentValidBet 14.5、目标 20） | 卡片显示 `14/20`（无条件舍去）；进度条依 14.5 计算；未达成，按钮 `Bet` |
 | 投注量计算比例填 0 | 该类型（已勾选游戏商）投注不计入进度 |
 | 中奖名单无任何领取纪录 | 跑马灯不显示 |
 | 中奖名单用户未设定头像 | 显示预设头像 |
@@ -588,3 +590,11 @@ CLAIMED 移至列表底部；看板 Cash Bonus Claimed Today＋实得金额
 | 状态关闭 11/25 22:00 → 11/26 08:00 重开 | 每日任务 11/26 照常重置；11/25 已达成未领 → 重开后跳次日补领弹窗 |
 | 状态关闭 11/25 09:59 前投注，报表 10:20 才更新（10:00 关闭） | 以投注时间判定，照常计入 11/25 进度 |
 | 状态关闭 11/25 → 11/27 重开 | 每日任务重置；11/26 无奖励 → 不跳补领（11/25 未领已超过前一日、作废） |
+
+## 本次调整
+
+> 规格交付开发后的调整记录（依日期由新到旧）
+
+### 2026-11-25
+
+1. **F3 每日任务列表 › 进度当前值**：后端回传有小数时，前台**无条件舍去小数、只显示整数**（例 `currentValidBet` 14.5、目标 20 → 显示 `14/20`）；进度条与达成判定仍以后端原始数值计算（例 19.9/20 显示 `19/20`，未达成）。
