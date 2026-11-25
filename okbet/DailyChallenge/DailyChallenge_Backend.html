@@ -179,6 +179,7 @@ label.chk input{accent-color:var(--primary);}
 .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-12px);background:#fff;border:1px solid var(--border);border-left:4px solid var(--green);box-shadow:0 4px 16px rgba(0,0,0,.12);padding:10px 18px;border-radius:6px;font-size:13px;opacity:0;transition:.25s;z-index:80;pointer-events:none;}
 .toast.err{border-left-color:var(--red);}
 .toast.is-show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast--2{top:62px;}   /* 第二则 toast：叠在第一则下方 */
 
 /* === 列表 / 审核 / 报表 === */
 .list-filters{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:14px;}
@@ -524,6 +525,7 @@ label.chk input{accent-color:var(--primary);}
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="toast toast--2" id="toast2" role="status" aria-live="polite"></div>
 
 <script>
 /* =====================================================================
@@ -536,6 +538,9 @@ const $$=(s,r=document)=>[...r.querySelectorAll(s)];
 /* 右上方跳出的小提示；err=true 时左边是红色（失败），否则绿色（成功） */
 function toast(msg,err){const t=$('#toast');t.textContent=msg;t.className='toast'+(err?' err':'')+' is-show';
   clearTimeout(t._t);t._t=setTimeout(()=>t.className='toast'+(err?' err':''),2400);}
+/* 同时跳两则错误 toast（上下叠放）：例 列表开启被挡下时 */
+function toast2(m1,m2){ toast(m1,true); const t=$('#toast2'); t.textContent=m2; t.className='toast toast--2 err is-show';
+  clearTimeout(t._t); t._t=setTimeout(()=>t.className='toast toast--2 err',2400); }
 
 /* ---------- 活动列表的示意资料（就像一张小型资料表） ---------- */
 let ACTS=[
@@ -591,7 +596,7 @@ $('#listBody').addEventListener('click',e=>{
   if(b.dataset.act==='close') askConfirm('提示','⚠️ 关闭后前台入口将隐藏并停止计算新奖励。确定关闭？',()=>{
     a.status='关闭'; renderList(); toast('活动已关闭'); });
   if(b.dataset.act==='open'){
-    if(sameTypeOpen(a.type,a.id)){ toast('检测到相同活动正在进行中',true); return; }
+    if(sameTypeOpen(a.type,a.id)){ toast2('检测到相同活动正在进行中','状态更新失败'); return; }   // 依现网：两则 toast 同时显示
     a.status='开启'; renderList(); toast('活动已开启');
   }
 });

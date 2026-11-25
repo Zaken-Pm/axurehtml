@@ -9,7 +9,7 @@
    每日挑战活动（Daily Challenge）前台原型 · H5
    —— 完全参照「节庆特别活动 · 前台原型」的版面、素材与交互；圣诞素材仅为占位，美术后续替换。
    —— 新增（对应后台）：黑名单／不符资格提示弹窗（进入活动详情页即弹出）、风控自动拒绝提示（领取时 toast）。
-   —— 保留：今日已领彩金看板、一键领取、每日任务（含充值任务）、挑战翻牌、礼物盒动画、RULES、
+   —— 保留：今日已领彩金看板、一键领取、每日任务（含充值任务）、挑战翻牌、领取金币飞入动画（取代礼物盒动画）、RULES、
             平台首页每日推广弹窗、次日补领弹窗。
    —— 移除：签到日历／签到宝箱、PAROL（道具）、Christmas Mission、Parol Wish Draw 奖池、History、大奖、客服、兑换期。
    —— 右侧「原型控制／规则说明」仅供评审，不属于前台画面。
@@ -1306,20 +1306,6 @@ main.phone{background:#661708;font-family:system-ui,-apple-system,"Segoe UI",Rob
     <div class="claimAllModal-confirmWrap"><button class="claimAllModal-confirm" id="caOk" aria-label="CONFIRM"></button></div>
   </div>
 </div>
-<!-- ============ 礼物盒动画（每日任务单笔 CLAIM 时；约 1.8 秒，不可关闭） ============ -->
-<div class="mask gfx" id="giftMask" aria-hidden="true">
-  <div class="M_giftOpenModal gfx__stage">
-    <div class="giftOpenModal-stage">
-      <span class="giftOpenModal-ring"></span>
-      <div class="giftOpenModal-shake">
-        <span class="giftOpenModal-body"></span>
-        <span class="giftOpenModal-reward"></span>
-        <span class="giftOpenModal-bodyFront"></span>
-        <span class="giftOpenModal-lid"></span>
-      </div>
-    </div>
-  </div>
-</div>
 <!-- ============ 弹窗：不符资格（黑名单／不符合参与对象；进入活动详情页立即弹出；✕／Confirm 返回平台首页；样式依平台通用提示弹窗） ============ -->
 <div class="mask" id="blkMask" role="alertdialog" aria-modal="true" aria-labelledby="blkTitle" aria-describedby="blkMsg">
   <div class="blk" id="blkBox" tabindex="-1">
@@ -1427,11 +1413,13 @@ function renderBomb(){
     const t=BOMB_TASKS.find(x=>x.lv===lv);
     if(depBlocked(t)) return;   // 防呆：前一个 LV 未完成时按钮已停用
     if(blockMsg()) return;      // 黑名单／风控拒绝：不进入翻牌、不播动画、不发奖
-    // 每日任务单笔 CLAIM 播礼物盒动画；有挑战者改为翻牌（翻牌结束后不播放）；单项 CLAIM 不显示 toast
-    const snap=[$('#boardCash').innerHTML];   // 动画结束前看板维持领取前数值，奖励飞入后才更新
-    if(t.trigger){ runChallenges([t]); return; }   // 有挑战：翻牌结束后不播礼物盒动画
-    S.bombClaimed[lv]={amt:t.reward}; renderAll();
-    playGift(t.reward,()=>{},snap);
+    // 每日任务单笔 CLAIM：金币自按钮飞入看板金额栏；有挑战者改为翻牌（翻牌结束后不播金币）；单项 CLAIM 不显示 toast
+    if(t.trigger){ runChallenges([t]); return; }
+    S.bombClaimed[lv]={amt:t.reward};
+    // 按钮当下改为 Claimed（卡片先留在原位），金币自按钮飞出；飞抵后看板加上金额，卡片再移到列表最下方
+    b.className='missionCard-btn missionCard-btn--claimed'; b.disabled=true; b.setAttribute('aria-label','Claimed');
+    renderReclaim(); sim();
+    flyCoins(b.getBoundingClientRect(),t.reward,()=>renderAll());
   }));
 }
 /* 一键领取结果弹窗：N reward(s) claimed＋彩金合计（不含触发挑战的等级）；金额过长依比例缩小；点 CONFIRM 关闭 */
@@ -1468,32 +1456,26 @@ function pickChallenge(){
   for(const c of asc){ acc+=c.appear; if(r<acc) return c; }
   return asc[asc.length-1];
 }
-/* 礼物盒动画（依设计稿步骤，合计约 1.8 秒，不可关闭／跳过）：
-   Step 1 礼盒左右晃动（0～0.5s）→ Step 2 静止后盒盖掀起（0.5～0.8s）→ Step 3 盒盖逐渐隐藏、金币露出（0.8～1.15s）
-   → 金币露出当下（约 0.9s）即一枚枚往上飞入看板「Cash Bonus Claimed Today」，飞入约 1.2 秒；盒子于飞入途中消失（1.35s）→ 约 2.15s 结束回调 */
-let GFX=null;
+/* 领取金币飞入（取代原礼物盒动画）：单笔 Claim 成功（未触发挑战）时，金币自该张卡片的 Claim 按钮
+   一枚枚往上飞入看板「Cash Bonus Claimed Today」金额栏（8 枚、每枚间隔 0.05s、单枚 0.85s，合计约 1.25 秒）；
+   金币全部飞抵后看板才加上本次金额；看板不在画面内时金币往上飞出画面；不遮罩、不挡操作；系统「减少动态效果」时不播放、直接更新 */
+let GFX=null;   // 保留变数（Esc 判断用）；金币飞入不锁画面
+let FLY_PEND=0; // 飞行中尚未计入看板的金额
 const COIN_SVG='<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="#f5a623" stroke="#b8700b" stroke-width="2"/><circle cx="16" cy="16" r="10" fill="#ffd54a"/><text x="16" y="21" text-anchor="middle" font-size="13" font-weight="900" fill="#b8700b" font-family="Arial">₱</text></svg>';
-function playGift(amt,done,snap){
-  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return done();
-  if(snap){ $('#boardCash').innerHTML=snap[0]; }
-  const m=$('#giftMask'), st=$('.gfx__stage',m); GFX=true;
-  m.classList.remove('s1','s2','s3','s4'); void m.offsetWidth; m.classList.add('is-open','s1');
-  const T=[[500,'s2'],[800,'s3'],[1350,'s4']];   // 金币自 0.92s 起飞入，盒子保留到 1.35s 才消失
-  T.forEach(([t,c])=>setTimeout(()=>{ m.classList.remove('s1','s2','s3'); m.classList.add(c); if(c==='s3') setTimeout(fly,120); },t));   // 金币露出当下即开始飞入（不等盒子消失）
-  /* Step 3～4：金币露出的当下，金币由盒中位置一枚枚往上飞入「Cash Bonus Claimed Today」（不另显示金币堆与金额） */
-  function fly(){
-    const r=st.getBoundingClientRect(), cx=r.left+r.width/2, cy=r.top+r.height*.5;
-    const burst=(sel,html,n,cls)=>{ const tr=$(sel).getBoundingClientRect();
-      const tx=Math.min(Math.max(tr.left+tr.width-40,16),innerWidth-16), ty=tr.bottom<0||tr.top>innerHeight?-30:tr.top+tr.height/2;   // 看板不在画面内时往上飞出画面
-      for(let k=0;k<n;k++){ const c=document.createElement('span'); c.className='gfx__coin '+cls; c.innerHTML=html; document.body.appendChild(c);
-        const x0=cx+(Math.random()-.5)*60, y0=cy-10+(Math.random()-.5)*20; c.style.left=x0+'px'; c.style.top=y0+'px';
-        const mx=(x0+tx)/2+(Math.random()-.5)*80, my=Math.min(y0,ty)-40-Math.random()*40;   // 先往上弹再弧线飞向栏位
-        c.animate([{transform:'translate(-50%,-50%) scale(.4)',opacity:0},{transform:`translate(calc(${mx-x0}px - 50%),calc(${my-y0}px - 50%)) scale(1)`,opacity:1,offset:.4},
-          {transform:`translate(calc(${tx-x0}px - 50%),calc(${ty-y0}px - 50%)) scale(.6)`,opacity:.95}],{duration:850,delay:k*50,easing:'cubic-bezier(.45,0,.55,1)',fill:'both'});   // 飞入阶段合计约 1.2 秒（8 枚 × 50ms 错开＋每枚 0.85s）
-        setTimeout(()=>c.remove(),k*50+870); } };
-    burst('#boardCash',COIN_SVG,8,'gfx__coin--c');
-  }
-  setTimeout(()=>{ m.classList.remove('is-open','s4'); GFX=null; renderAll(); done(); },2150);
+function flyCoins(fromRect,amt,done){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){ renderBoard(); done&&done(); return; }
+  FLY_PEND+=amt; renderBoard();
+  const cx=fromRect.left+fromRect.width/2, cy=fromRect.top+fromRect.height/2;
+  const tr=$('#boardCash').getBoundingClientRect();
+  const tx=Math.min(Math.max(tr.left+tr.width-40,16),innerWidth-16), ty=tr.bottom<0||tr.top>innerHeight?-30:tr.top+tr.height/2;
+  const N=8, DUR=850, GAP=50;
+  for(let k=0;k<N;k++){ const c=document.createElement('span'); c.className='gfx__coin gfx__coin--c'; c.innerHTML=COIN_SVG; document.body.appendChild(c);
+    const x0=cx+(Math.random()-.5)*40, y0=cy+(Math.random()-.5)*12; c.style.left=x0+'px'; c.style.top=y0+'px';
+    const mx=(x0+tx)/2+(Math.random()-.5)*80, my=Math.min(y0,ty)-30-Math.random()*40;   // 先往上弹，再以弧线飞向金额栏
+    c.animate([{transform:'translate(-50%,-50%) scale(.5)',opacity:0},{transform:`translate(calc(${mx-x0}px - 50%),calc(${my-y0}px - 50%)) scale(1)`,opacity:1,offset:.35},
+      {transform:`translate(calc(${tx-x0}px - 50%),calc(${ty-y0}px - 50%)) scale(.6)`,opacity:.95}],{duration:DUR,delay:k*GAP,easing:'cubic-bezier(.45,0,.55,1)',fill:'both'});
+    setTimeout(()=>c.remove(),k*GAP+DUR+20); }
+  setTimeout(()=>{ FLY_PEND=Math.max(0,FLY_PEND-amt); renderBoard(); done&&done(); },(N-1)*GAP+DUR);   // 最后一枚飞抵后更新看板、已领卡片移到底部
 }
 function runChallenges(tasks,done){ CH={queue:tasks,idx:0,results:[],done}; showChallenge(); }
 function showChallenge(){
@@ -1575,7 +1557,7 @@ $('#btnRules').addEventListener('click',()=>{ $('#rulesMask').classList.add('is-
 const closeRules=()=>{ $('#rulesMask').classList.remove('is-open'); $('#btnRules').focus(); };
 $('#rulesOk').addEventListener('click',closeRules);
 $('#rulesX').addEventListener('click',closeRules);
-/* Esc：由最上层弹窗开始关闭（挑战弹窗、礼物盒动画进行中不可用 Esc 关闭） */
+/* Esc：由最上层弹窗开始关闭（挑战弹窗进行中不可用 Esc 关闭） */
 document.addEventListener('keydown',e=>{ if(e.key!=='Escape'||CH||GFX) return;
   if($('#blkMask').classList.contains('is-open')){ closeBlk(); return; }
   if($('#promoMask').classList.contains('is-open')){ closePromo(); return; }
@@ -1621,9 +1603,9 @@ function renderReclaim(){
   if(!LIVE()) ur.textContent='Daily missions have ended';
   else if(!$('#uncTimer')){ ur.innerHTML='<span class="cgw__sr">Daily Missions reset in: </span><span class="claimAll-resetTime" id="uncTimer">--:--:--</span>'; tickReset(); }
 }
-/* 今日奖励看板：Cash Bonus Claimed Today＝今日每日任务已领取彩金合计（含挑战加成，次日归零；不含次日补领） */
-const bombCashToday=()=>Object.values(S.bombClaimed).reduce((a,c)=>a+(c&&c.amt||0),0);
-function renderBoard(){ $('#boardCash').innerHTML=`<span>${money2(LIVE()?bombCashToday():0)}</span>`; }
+/* 今日奖励看板：Cash Bonus Claimed Today＝今日领取的每日任务基础彩金＋今日判奖的挑战加成＋今日于首页补领的前一日基础彩金（补领也算今日已领取；次日归零） */
+const bombCashToday=()=>Object.values(S.bombClaimed).reduce((a,c)=>a+(c&&c.amt||0),0)+(S.makeupCash||0);
+function renderBoard(){ $('#boardCash').innerHTML=`<span>${money2(LIVE()?Math.max(0,bombCashToday()-FLY_PEND):0)}</span>`; }   // 金币飞行中的金额，飞抵后才计入
 /* 每日任务重置倒数：依系统时间 UTC+8，距离 UTC+8 下一个 00:00 每秒更新（与用户装置所在时区无关） */
 const TZ_OFFSET=8*3600*1000;
 function tickReset(){ const nowShift=Date.now()+TZ_OFFSET, DAY=86400000;
