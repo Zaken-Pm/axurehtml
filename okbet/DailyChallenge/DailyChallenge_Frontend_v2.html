@@ -1359,7 +1359,7 @@ const ACT_PERIOD={start:'2026-11-21 00:00', end:'2026-12-31 23:59'};   // 原型
 const BOMB_TASKS=[{lv:1,cond:'bet',goal:200,reward:3},{lv:2,cond:'dep',goal:200,reward:5,trigger:true},{lv:3,cond:'bet',goal:1000,reward:12,trigger:true},
   {lv:4,cond:'bet',goal:5000,reward:30},{lv:5,cond:'dep',goal:1000,reward:20},{lv:6,cond:'bet',goal:8000,reward:88}];
 /* 示范：LV5（充值）已达成，但前一级 LV4（投注 3,200/5,000）未完成 → LV5 显示「Previous task incomplete」、Claim 灰掉；LV4 完成后即可领取 */
-/* 挑战任务配置（全等级共用）：up＝奖励提升 %、appear＝触发机率 %（加总 ≤100；未匹配时由触发机率最大者承接）、win＝获奖机率 % */
+/* 挑战任务配置（全等级共用）：up＝奖励提升 %、appear＝触发机率 %（合计须＝100%）、win＝获奖机率 % */
 const CHALLENGES=[{no:1,up:20,appear:60,win:60},{no:2,up:50,appear:40,win:50}];
 /* 投注量计算比例（后台：Slot／Live／Sport／Mini；留空或未勾选的游戏商＝100%）：有效投注 × 比例 才计入「有效投注」任务进度；充值不套用 */
 const BET_RATIO={slot:50,live:250,sport:150,mini:100};
@@ -1462,7 +1462,7 @@ $('#btnReclaimBomb').addEventListener('click',()=>{
 let CH=null;   // {queue, idx, results, done, cur:{t,c,win,picked,step}}
 const RANKS=['A','K','Q','J','10','9','8','7','6','5','4','3','2'];   // 扑克牌由大至小
 const SUITS=['♠','♥','♦','♣'];
-/* 选哪一个挑战：由「触发机率最小」开始匹配（累计），皆未匹配则以「触发机率最大」者必定触发 */
+/* 选哪一个挑战：由「触发机率最小」开始累计匹配；后台触发机率合计＝100%，必定命中其一 */
 function pickChallenge(){
   const asc=[...CHALLENGES].sort((a,b)=>a.appear-b.appear), r=Math.random()*100; let acc=0;
   for(const c of asc){ acc+=c.appear; if(r<acc) return c; }

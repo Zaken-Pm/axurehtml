@@ -292,8 +292,8 @@ label.chk input{accent-color:var(--primary);}
               </select>
               <p class="hint">编辑既有活动时不可变更（灰底）。原型仅示范「每日挑战活动」流程。</p></div></div>
             <div class="form-row"><label for="fName"><span class="req">*</span>活动名称：</label>
-              <div><input class="input" id="fName" placeholder="请输入" maxlength="50">
-              <p class="hint"><span id="nameCount">0</span>/50 字；不可留空、不可全为空白。</p></div></div>
+              <div><input class="input" id="fName" placeholder="请输入">
+              <p class="hint">不可留空、不可全为空白。</p></div></div>
             <div class="form-row"><label for="fCur"><span class="req">*</span>币种：</label>
               <select class="select" id="fCur"><option>PHP</option><option>USD</option></select></div>
             <div class="form-row"><span class="lbl">状态：</span>
@@ -378,7 +378,8 @@ label.chk input{accent-color:var(--primary);}
                   <tbody id="challengeBody"></tbody>
                 </table>
                 <p class="js-ch-empty" style="display:none;text-align:center;padding:16px 0;margin:0;border:1px solid var(--border-l);border-top:none;color:var(--text-3);font-size:13px">No Data</p>
-                <p class="hint">非必填；可全部删除不设置挑战。如有设置：奖励提升／触发机率／获奖机率不可为空或 0（单位 %）；触发机率为 挑战1～挑战5 加总不得超过100%；获奖机率为各挑战各自不得超过100%；奖励提升无上限。最多 挑战5。</p>
+                <p class="js-ch-sum" style="display:none;margin:8px 0 0;font-size:13px;color:var(--text-2)">触发机率合计：<span>0</span>%</p>
+                <p class="hint">非必填；可全部删除不设置挑战。如有设置：奖励提升／触发机率／获奖机率不可为空或 0（单位 %）；触发机率为 挑战1～挑战5 合计须为 100%；获奖机率为各挑战各自不得超过100%；奖励提升无上限。最多 挑战5。</p>
               </div>
             </div>
 
@@ -621,7 +622,6 @@ function openWizard(a){
   $('#fName').value=a?a.name:''; $('#fCur').value=a?a.cur:'PHP';
   $(`input[name=status][value="${a?a.status:'关闭'}"]`).checked=true;
   $('#fActTime').value=a?a.time:'';
-  $('#nameCount').textContent=$('#fName').value.length;
   $$('.is-error').forEach(x=>x.classList.remove('is-error'));
   /* 步骤4：编辑带示范值、新增留空 */
   rebateRows=a?SAMPLE_REBATE():BLANK_REBATE();
@@ -634,7 +634,7 @@ function openWizard(a){
 }
 $('#btnNew').addEventListener('click',()=>openWizard(null));
 $('#btnExit').addEventListener('click',()=>{ toast('已退出编辑，未保存任何变更'); showPage('list'); });
-$('#fName').addEventListener('input',e=>{ $('#nameCount').textContent=e.target.value.length; if(e.target.value.trim()) e.target.classList.remove('is-error'); });
+$('#fName').addEventListener('input',e=>{ if(e.target.value.trim()) e.target.classList.remove('is-error'); });
 
 /* ---------- 步骤导航 ---------- */
 let curStep=1; const LAST=6;
@@ -661,16 +661,16 @@ function validateStep(n){
   }
   if(n===4){
     const {anyBad,orderBad}=checkRebate(true);
-    if(orderBad){toast('任务目标不可小于或等于同任务条件，请检查红框',true);return false;}
+    if(orderBad){toast('VIP'+curVip+' 同类型任务的目标金额必须随任务等级递增',true);return false;}
     if(anyBad){toast('活动条件有必填/格式错误，请检查红框',true);return false;}
     /* 有等级勾选「触发」却未设置任何挑战：挡下（同联名挑战活动现网） */
     if(rebateRows.some(r=>r.trigger)&&!challengeRows.length){toast('已有任务开启挑战，请至少配置 1 条挑战任务',true);return false;}
     const ch=checkChallenge(true);
     if(ch.empty){toast('挑战任务的奖励提升／触发机率／获奖机率不可为空或 0',true);return false;}
-    if(ch.sumOver){toast('挑战任务「触发机率」加总不得超过100%（目前 '+chSum()+'%）',true);return false;}
+    if(ch.sumOver){$('#challengeBody').closest('.block').scrollIntoView({behavior:'smooth',block:'center'});return false;}   // 触发机率合计≠100%：红框＋红字提示（不跳 toast）
     if(ch.over){toast('挑战任务「获奖机率」不得超过100%',true);return false;}
     const w=$('#fWager'), v=w.value.trim(), num=Number(v);
-    if(v!=='' && !(num>=0.01 && num<=999999.99 && /^\d{1,8}(\.\d{1,2})?$/.test(v))){w.classList.add('is-error');toast('彩金所需流水倍数须为 0.01～999999.99（不可为 0）',true);return false;}
+    if(v!=='' && !(num>=0.01 && num<=999999.99 && /^\d{1,8}(\.\d{1,2})?$/.test(v))){w.classList.add('is-error');toast('彩金所需流水倍数必须为 0.01～999999.99，且最多 2 位小数',true);return false;}
     w.classList.remove('is-error');
     if(!checkRatio()){toast('投注量计算比例须为 0～300',true);return false;}
   }
@@ -723,16 +723,22 @@ function renderChallenge(){
   $('#challengeBody').innerHTML=challengeRows.map((r,i)=>`<tr data-i="${i}"><td>挑战${i+1}</td>
     <td><div class="suffix-wrap"><input class="input js-up" value="${r.up}" inputmode="numeric" aria-label="挑战${i+1} 奖励提升"><span class="suffix">%</span></div></td>
     <td><div class="suffix-wrap"><input class="input js-appear" value="${r.appear}" inputmode="numeric" aria-label="挑战${i+1} 触发机率"><span class="suffix">%</span></div>
-      <p class="hint hint--err js-appear-hint" style="visibility:hidden">触发机率加总不得超过100%</p></td>
+      <p class="hint hint--err js-appear-hint" style="visibility:hidden">挑战任务的触发机率合计必须为 100%。</p></td>
     <td><div class="suffix-wrap"><input class="input js-win" value="${r.win}" inputmode="numeric" aria-label="挑战${i+1} 获奖机率"><span class="suffix">%</span></div>
       <p class="hint hint--err js-win-hint" style="visibility:hidden">获奖机率不得超过100%</p></td>
     <td><button class="btn--link red js-ch-del">删除</button></td></tr>`).join('');
   $('.js-ch-empty').style.display=challengeRows.length?'none':'block';
   checkChallenge(false);
 }
-/* 检查挑战：strict=true（按下一步）才把空白标红；超过 100% 输入当下就提示 */
+/* 检查挑战：strict=true（按下一步）才把空白标红
+   触发机率合计须＝100%：超过 100% 输入当下就提示；未满 100% 于按下一步／提交时提示，之后随输入即时更新，合计＝100% 才消失 */
+let chSumErr=false;
 function checkChallenge(strict){
-  let empty=false, over=false; const sumOver=chSum()>100;
+  let empty=false, over=false; const sum=chSum();
+  if(strict&&challengeRows.length&&sum!==100) chSumErr=true;
+  if(sum===100||!challengeRows.length) chSumErr=false;
+  const sumOver=sum>100||chSumErr;
+  const sl=$('.js-ch-sum'); sl.style.display=challengeRows.length?'block':'none'; $('span',sl).textContent=sum; sl.style.color=sumOver?'var(--red)':'var(--text-2)';
   $$('#challengeBody tr').forEach(tr=>{ const r=challengeRows[+tr.dataset.i];
     [['up',r.up],['appear',r.appear],['win',r.win]].forEach(([k,v])=>{ const bad=(v===''&&strict)||(v!==''&&+v===0);
       if(bad) empty=true; $('.js-'+k,tr).classList.toggle('is-error',bad||(k==='appear'&&sumOver)||(k==='win'&&+v>100)); });
@@ -784,7 +790,7 @@ const RATIO_TYPES=[
 let ratioRows=[];      // 每行：{rate:'150', picked:[true,true,...]}
 let editingType=null;  // 弹窗目前正在编辑哪一种游戏类型
 function resetRatio(sample){
-  ratioRows=RATIO_TYPES.map(t=>({rate: sample?({Slot:'50',Live:'250',Sport:'150',Mini:'100'})[t.type]:'', picked:t.providers.map(()=>true)}));
+  ratioRows=RATIO_TYPES.map(t=>({rate: sample?({Slot:'50',Live:'250',Sport:'150',Mini:'100'})[t.type]:'', picked:t.providers.map(()=>!!sample)}));   // 新增活动：游戏商预设全部不勾选（0 家）；编辑示范活动：沿用已保存的勾选
   renderRatio();
 }
 function renderRatio(){
@@ -908,6 +914,9 @@ function dpOpen(inp){ dp.target=inp; const p=dpParse(inp.value); dp.start=p?p.st
 const dpClose=()=>{ $('#dpPop').classList.remove('is-open'); dp.target=null; };
 $('#dpClear').addEventListener('click',()=>{ if(dp.target) dp.target.value=''; dpClose(); });
 $('#dpOk').addEventListener('click',()=>{ if(!dp.start||!dp.end){toast('请选择完整的起止日期',true);return;}
+  /* 结束时间须晚于开始时间（至分钟比较，相同亦不可）：选择器按「确定」时即挡下，选择器维持开启 */
+  { const st=$('#dpStartTime').value||'00:00', et=$('#dpEndTime').value||'23:59';
+    if(new Date(dpFmt(dp.end)+'T'+et)<=new Date(dpFmt(dp.start)+'T'+st)){toast('结束时间需晚于开始时间',true);return;} }
   dp.target.value=`${dpFmt(dp.start)} ${$('#dpStartTime').value||'00:00'} ~ ${dpFmt(dp.end)} ${$('#dpEndTime').value||'23:59'}`; dp.target.classList.remove('is-error'); dpClose(); });
 $$('.dp-trigger').forEach(i=>i.addEventListener('click',e=>{e.stopPropagation();dpOpen(i);}));
 document.addEventListener('click',()=>{ if(dp.target) dpClose(); });
