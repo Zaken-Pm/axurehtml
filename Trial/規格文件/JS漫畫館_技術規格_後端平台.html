@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JS 漫畫館 ─ 技術規格</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#140b28; --surface:#1e1340; --surface-2:#2a1b55; --line:#39276b;
+  --fg:#f3eefe; --muted:#b4a6df; --faint:#897bb6;
+  --pink:#ff2e9a; --cyan:#2ee6ff; --purple:#9d5cff; --gold:#ffc84a; --good:#36d399;
+  --display:"Chakra Petch","Noto Sans TC",system-ui,sans-serif;
+  --body:"Noto Sans TC",system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.85 var(--body)}
+a{color:var(--cyan)}
+.wrap{max-width:1360px;margin:0 auto;padding:0 clamp(16px,3vw,32px)}
+
+header.top{padding:34px 0 24px;border-bottom:1px solid var(--line)}
+.eyebrow{font:600 12px var(--display);letter-spacing:.16em;color:var(--cyan);text-transform:uppercase;margin:0 0 8px}
+h1{font:700 clamp(25px,4.4vw,36px)/1.25 var(--display);margin:0}
+.lead{color:var(--muted);margin:12px 0 0;max-width:70ch;font-size:14.5px}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.chip{font:500 12px var(--body);color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 13px}
+.chip b{color:var(--fg);font-weight:600}
+.chip.who{border-color:var(--pink);color:#ffd6ec}
+
+.cols{display:grid;gap:34px;padding:28px 0 64px}
+@media(min-width:1040px){.cols{grid-template-columns:248px minmax(0,1fr);gap:44px}}
+nav.toc{align-self:start}
+@media(min-width:1040px){nav.toc{position:sticky;top:18px;max-height:calc(100vh - 36px);overflow:auto}}
+nav.toc h2{font:700 12px var(--display);letter-spacing:.1em;color:var(--faint);margin:0 0 10px;text-transform:uppercase}
+nav.toc ol{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+nav.toc a{display:block;color:var(--muted);text-decoration:none;font-size:13.5px;line-height:1.5;padding:5px 10px;border-radius:8px;border-left:2px solid transparent}
+nav.toc a:hover{background:var(--surface);color:var(--fg)}
+nav.toc a.sub{padding-left:22px;font-size:12.5px;color:var(--faint)}
+nav.toc a.on{background:var(--surface-2);color:var(--fg);border-left-color:var(--pink)}
+
+main{min-width:0}
+section{margin:0 0 42px;scroll-margin-top:16px}
+h2{font:700 21px/1.35 var(--display);margin:0 0 14px;padding-bottom:10px;border-bottom:2px solid var(--line)}
+h2 .n{color:var(--pink);margin-right:10px}
+h3{font:700 16px/1.5 var(--display);margin:26px 0 8px;color:#e7ddff}
+h4{font:700 14px var(--display);margin:18px 0 6px;color:var(--muted)}
+p{margin:0 0 11px}
+ul,ol{margin:0 0 12px;padding-left:1.25em}
+li{margin:0 0 5px}
+b,strong{color:var(--fg);font-weight:600}
+code{font:500 12.5px ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:#d9c7ff;white-space:nowrap}
+pre{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--purple);border-radius:10px;padding:14px 16px;overflow:auto;margin:0 0 14px}
+pre code{background:none;border:0;padding:0;white-space:pre;color:#ddd2ff;font-size:12.5px;line-height:1.75}
+
+table{width:100%;border-collapse:collapse;margin:0 0 16px;font-size:13.5px;background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.7}
+th{background:var(--surface-2);font:700 12.5px var(--display);color:#e7ddff;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td code{font-size:12px}
+.tw{overflow-x:auto;margin:0 0 16px}
+.tw table{margin:0;min-width:660px}
+
+.note,.warn,.ok{border:1px solid var(--line);border-left:3px solid var(--cyan);background:rgba(46,230,255,.05);
+  border-radius:0 10px 10px 0;padding:12px 15px;margin:0 0 16px;font-size:13.5px;line-height:1.8;color:var(--muted)}
+.warn{border-left-color:var(--gold);background:rgba(255,200,74,.06);color:#ffe9bd}
+.ok{border-left-color:var(--good);background:rgba(54,211,153,.05);color:#c5f2e0}
+.note b,.warn b,.ok b{color:#fff}
+
+.pill{display:inline-block;font:600 11px var(--display);padding:2px 8px;border-radius:999px;border:1px solid;margin-right:5px;white-space:nowrap}
+.p-new{color:#ffd6ec;border-color:var(--pink);background:rgba(255,46,154,.12)}
+.p-keep{color:#cdf7ff;border-color:var(--cyan);background:rgba(46,230,255,.1)}
+.p-mod{color:#ffeec2;border-color:var(--gold);background:rgba(255,200,74,.1)}
+.p-off{color:#b9b9c8;border-color:#6f6f80;background:rgba(140,140,160,.1)}
+.p-p0{color:#ffd6ec;border-color:var(--pink)}
+.p-p1{color:#ddd2ff;border-color:var(--purple)}
+.p-p2{color:#b9b9c8;border-color:#6f6f80}
+
+footer{border-top:1px solid var(--line);padding:18px 0 40px;color:var(--faint);font-size:12.5px}
+
+@media print{
+  :root{--bg:#fff;--surface:#fff;--surface-2:#f4f1fa;--line:#ccc3e0;--fg:#1a1030;--muted:#43384f;--faint:#6b6080}
+  body{font-size:11.5pt;line-height:1.6}
+  nav.toc{display:none}
+  .cols{display:block;padding:12px 0}
+  section{break-inside:auto}
+  h2{break-after:avoid}
+  table,pre,.note,.warn,.ok{break-inside:avoid}
+  a{color:#1a1030;text-decoration:none}
+  .chip{border-color:#ccc3e0}
+}
+</style>
+</head>
+<body>
+<div class="wrap"><header class="top"><p class="eyebrow">JS GAME ・ 漫畫館改版</p><h1>JS 漫畫館 ─ 技術規格</h1><p class="lead">服務分界、API 契約、購買交握與補償、資料模型、閱讀串流與排程。搭配系統流程圖與 API 試算表一起看。</p><div class="meta"><span class="chip">版本 <b>v1</b></span><span class="chip">更新 <b>2026.11.17</b></span><span class="chip">對應原型 <b>V50</b></span><span class="chip who">讀者 <b>後端 ・ 平台後端 ・ PM</b></span></div></header></div>
+<div class="wrap"><div class="cols"><nav class="toc" id="toc"><h2>目錄</h2></nav>
+<main>
+<section>
+<h2><span class="n">0</span>這份文件怎麼用</h2>
+<p>這是 JS 漫畫館的<b>技術規格</b>：服務怎麼切、哪些是遊戲站要改的、API 契約、購買的交握順序與補償、資料模型、排程。
+給<b>後端、平台（遊戲站）後端、PM</b>。畫面與互動規則另見《產品規格》。</p>
+<div class="tw"><table>
+<tr><th>搭配的成品</th><th>用來做什麼</th></tr>
+<tr><td><b>系統流程圖</b>（10 張）</td><td>這份文件的圖解版：分界、交握、補償、上架流程</td></tr>
+<tr><td><b>API 清單與時程表</b>（試算表）</td><td>可排序篩選的 API 清單、會自動算日期的時程表、待確認事項追蹤</td></tr>
+<tr><td><b>互動原型</b></td><td>回傳值要長什麼樣、前端會怎麼用，看原型最快</td></tr>
+</table></div>
+</section>
+
+<section>
+<h2><span class="n">1</span>架構的三條分界線</h2>
+<p>整體原則：<b>帳戶層沿用遊戲、內容層漫畫自訂</b>。漫畫館是同網域的子路徑（<code>/comic</code>），不是子網域，登入狀態與平台幣才能零成本共用。</p>
+
+<h3>1.1 直接沿用（漫畫館不碰）</h3>
+<p>帳號 SSO、平台幣錢包的查餘額、充值金流、客服系統。漫畫館只呼叫，不複製一份。</p>
+<div class="warn"><b>平台幣絕對不能有第二本帳。</b></div>
+
+<h3>1.2 需要改造（遊戲站側的工項，要排進他們的時程）</h3>
+<div class="tw"><table>
+<tr><th>服務</th><th>要改什麼</th><th>為什麼</th></tr>
+<tr><td><b>平台幣錢包</b></td><td>扣款要支援<b>冪等鍵</b>，並提供<b>退款 API</b></td><td>沒有冪等鍵，網路重試與使用者連點都會重複扣款；沒有退款 API，開通權益失敗就無法補償</td></tr>
+<tr><td><b>交易帳本</b></td><td>加 <code>site</code> 欄位，查詢支援站別與類型篩選</td><td>歷史紀錄是同一本帳、分頁只是篩選；充值屬平台層級，兩個站別都要回傳</td></tr>
+<tr><td><b>兌換碼</b></td><td>要能發放漫畫館的優惠券，並補一筆「贈送」進帳本</td><td>否則兌換後餘額接不上</td></tr>
+<tr><td><b>通知中心</b></td><td>支援 <code>work:{workId}</code> 與 <code>filter:{...}</code> 兩種深連結型別</td><td>指名作品的通知要能直接跳作品頁</td></tr>
+</table></div>
+<div class="warn"><b>錢包那一項是整個購買流程的前置條件。</b>如果現有錢包沒有冪等扣款與退款，訂單服務無法開工，時程會整段往後推。<b>這是第一件要去確認的事。</b></div>
+
+<h3>1.3 漫畫館新建</h3>
+<p>作品目錄、搜尋與排行、定價 Offer、訂單、優惠券、權益／書櫃／進度、閱讀串流，外加一套營運後台（建檔、轉檔切片、定價、排程上架）。</p>
+</section>
+
+<section>
+<h2><span class="n">2</span>API 設計的五個原則</h2>
+<ol>
+<li><b>作品一律以 <code>workId</code> 為 key</b>，路徑、參數、回傳都不出現作品名。</li>
+<li><b>購買範圍 <code>scope</code> 一路貫穿</b>：<code>single</code>（單卷買斷）／<code>vol</code>（單冊）／<code>set</code>（整套）／<code>ch</code>（單話）／<code>bundle</code>（整部）。定價、優惠券適用判斷、訂單、權益開通全部靠它對齊。</li>
+<li><b>寫入金額的請求一律帶冪等鍵</b>。<code>POST /comic/orders</code> 用 <code>Idempotency-Key</code> 標頭，往下對錢包與券的呼叫一律以 <code>orderId</code> 當冪等鍵。</li>
+<li><b>折抵金額由後端重算</b>。前端算只為了即時顯示，傳上來的金額一律不信任。</li>
+<li><b>主按鈕的文字是算出來的</b>。前端不寫死「購買」或「開始閱讀」，而是由 <code>GET /comic/entitlements/{workId}</code> 的結果 ＋ 商品型態決定（<code>立即购买 → 开始阅读 → 续看第 N 话 → 重新阅读</code>）。</li>
+</ol>
+</section>
+
+<section>
+<h2><span class="n">3</span>購買的交握順序與補償</h2>
+<pre><code>鎖券 → 扣款 → 開通權益 → 核銷券 → 訂單 PAID</code></pre>
+<div class="warn"><b>這個順序不可以改。</b>任何一步失敗都要往回退。</div>
+<div class="tw"><table>
+<tr><th>失敗點</th><th>處理</th></tr>
+<tr><td>券鎖定失敗</td><td>回 <code>409</code>，請使用者重選</td></tr>
+<tr><td>扣款失敗（餘額不足）</td><td>解鎖券 → 回 <code>402</code> 並引導充值。充值完成要回到同一筆購買</td></tr>
+<tr><td><b>開通權益失敗</b></td><td><b>退款 ＋ 解鎖券 ＋ 訂單標記 <code>REVERSED</code></b></td></tr>
+</table></div>
+<p>扣款成功後由錢包服務寫交易帳本（<code>site=comic, kind=消費</code>），<b>漫畫館不自己寫帳</b>。</p>
+<div class="warn"><code>REVERSED</code> 的訂單必須在<b>對帳報表</b>裡查得出來，否則這類失敗會變成無聲的客訴。</div>
+
+<h3>3.1 付款完成要同時發生的三件事</h3>
+<ol>
+<li>作品寫入權益書櫃的「已購」</li>
+<li>歷史紀錄多一筆消費</li>
+<li>用掉的那張優惠券從帳號扣除</li>
+</ol>
+</section>
+
+<section>
+<h2><span class="n">4</span>優惠券</h2>
+<h3>4.1 規則欄位（必須機器可讀）</h3>
+<pre><code>{
+  id   : 'cp1',        // 唯一識別，結帳扣券用
+  t    : '单本 9 折券',  // 顯示名稱
+  kind : 'pct',        // pct = 打折 ｜ amt = 定額折
+  val  : 10,           // pct：折幾 % ｜ amt：折多少平台幣
+  max  : 50,           // pct 專用：折抵上限
+  min  : 300,          // amt 專用：門檻金額
+  sc   : ['single'],   // 適用購買 scope 陣列；null = 全站
+  exp  : '2026.11.30',
+  sub  : '单卷单行本买断适用，最多折抵 50 平台币'
+}</code></pre>
+<h3>4.2 折抵計算</h3>
+<pre><code>pct :  min( floor(價格 × val / 100), max )
+amt :  價格 >= min ? min(val, 價格) : 0</code></pre>
+<p><b>「可用」＝購買類型對得上，而且實際折得到錢。</b>滿額券沒到門檻時<b>不回傳</b>，不是回傳但標示不可用。</p>
+<div class="warn"><b>折抵不可信任前端。</b>實際扣款金額與券的核銷一定要後端重算與驗證。<b>上線要擋過期券。</b>目前假設<b>一次只能用一張</b>；若要允許併用，必須先定義疊加順序與上限。</div>
+
+<h3>4.3 兌換碼</h3>
+<ul>
+<li>兌換碼換到的是<b>平台幣或優惠券</b>，不是訂單折扣，所以不在結帳頁。</li>
+<li>兌換成功要<b>同時補一筆「贈送」進交易帳本</b>，否則餘額接不上。</li>
+<li>成功回應要夠前端顯示「這次拿到什麼」（前端用畫面上方的浮層提示列出內容）。</li>
+<li>失敗要分得出原因：代碼無效／已過期／已使用過。</li>
+<li>前端從購買彈窗點條款／退款政策後返回，要能<b>原樣回到同一筆購買</b>（含已選的券），所以彈窗的參數由前端自己保存，不需要後端配合。</li>
+</ul>
+</section>
+
+<section>
+<h2><span class="n">5</span>API 清單（41 支）</h2>
+<p>歸屬三值：<span class="pill p-keep">共用・沿用</span><span class="pill p-mod">共用・改造</span><span class="pill p-new">漫畫館新增</span>。
+優先序：<span class="pill p-p0">P0</span> 第一版必須、<span class="pill p-p1">P1</span> 第一版應該有、<span class="pill p-p2">P2</span> 可以留到第二版。
+備註標 ⚠ 的是有前置條件或有坑的，開工前先看。</p>
+<div class="tw"><table><tr><th>編號</th><th>方法</th><th>路徑</th><th>用途</th><th>歸屬</th><th>優先序</th><th>使用頁面</th><th>備註</th></tr><tr><td colspan="8" style="background:#241744;font-weight:700;color:#e7ddff">共用平台</td></tr><tr><td><code>P-01</code></td><td>GET</td><td><code>/auth/session</code></td><td>取得登入狀態與會員身分</td><td><span class="pill p-keep">共用・沿用</span></td><td><span class="pill p-p0">P0</span></td><td>全站</td><td>/comic 子路徑要能讀到同一組 Session</td></tr><tr><td><code>P-02</code></td><td>POST</td><td><code>/auth/login</code></td><td>導向統一登入（SSO）</td><td><span class="pill p-keep">共用・沿用</span></td><td><span class="pill p-p0">P0</span></td><td>登入攔截</td><td>回跳要帶 returnTo 與 pendingAction</td></tr><tr><td><code>P-03</code></td><td>GET</td><td><code>/me</code></td><td>暱稱、會員 ID、綁定 Email</td><td><span class="pill p-keep">共用・沿用</span></td><td><span class="pill p-p0">P0</span></td><td>會員中心</td><td></td></tr><tr><td><code>P-04</code></td><td>PATCH</td><td><code>/me</code></td><td>修改暱稱／密碼</td><td><span class="pill p-keep">共用・沿用</span></td><td><span class="pill p-p1">P1</span></td><td>會員中心</td><td></td></tr><tr><td><code>P-05</code></td><td>GET</td><td><code>/wallet/balance</code></td><td>平台幣餘額</td><td><span class="pill p-keep">共用・沿用</span></td><td><span class="pill p-p0">P0</span></td><td>會員中心、購買彈窗</td><td></td></tr><tr><td><code>P-06</code></td><td>POST</td><td><code>/wallet/debit</code></td><td>扣款（需冪等鍵）</td><td><span class="pill p-mod">共用・改造</span></td><td><span class="pill p-p0">P0</span></td><td>購買</td><td>⚠ 必須確認錢包是否已支援冪等鍵；沒有就是遊戲站側的前置工項</td></tr><tr><td><code>P-07</code></td><td>POST</td><td><code>/wallet/refund</code></td><td>退款（開通權益失敗時補償）</td><td><span class="pill p-mod">共用・改造</span></td><td><span class="pill p-p0">P0</span></td><td>購買補償</td><td>⚠ 同上，退款 API 若不存在要先補</td></tr><tr><td><code>P-08</code></td><td>POST</td><td><code>/topup/orders</code></td><td>充值面額清單與建立充值訂單</td><td><span class="pill p-keep">共用・沿用</span></td><td><span class="pill p-p1">P1</span></td><td>充值中心</td><td>充值中心沿用遊戲站；充值完成要能回到原本那筆購買</td></tr><tr><td><code>P-09</code></td><td>GET</td><td><code>/transactions</code></td><td>歷史紀錄查詢（site／kind／區間）</td><td><span class="pill p-mod">共用・改造</span></td><td><span class="pill p-p1">P1</span></td><td>歷史紀錄</td><td>⚠ 要加 site 欄位；充值屬平台層級，兩個站別都要回傳</td></tr><tr><td><code>P-10</code></td><td>POST</td><td><code>/redeem</code></td><td>兌換碼兌換</td><td><span class="pill p-mod">共用・改造</span></td><td><span class="pill p-p1">P1</span></td><td>會員中心</td><td>⚠ 要能發漫畫館的券，並補一筆「贈送」進帳本；成功回應要夠前端顯示拿到什麼</td></tr><tr><td><code>P-11</code></td><td>GET</td><td><code>/notifications</code></td><td>通知列表與詳情</td><td><span class="pill p-mod">共用・改造</span></td><td><span class="pill p-p1">P1</span></td><td>通知中心</td><td>⚠ 要支援 work:{id} 與 filter:{} 兩種深連結型別</td></tr><tr><td><code>P-12</code></td><td>PATCH</td><td><code>/notifications/{id}/read</code></td><td>標記已讀</td><td><span class="pill p-mod">共用・改造</span></td><td><span class="pill p-p1">P1</span></td><td>通知中心</td><td>點進該則即已讀</td></tr><tr><td colspan="8" style="background:#241744;font-weight:700;color:#e7ddff">作品目錄</td></tr><tr><td><code>C-01</code></td><td>GET</td><td><code>/comic/home</code></td><td>首頁各區塊的策展內容</td><td><span class="pill p-new">漫畫館新增</span></td><td><span class="pill p-p0">P0</span></td><td>首頁</td><td>BN 輪播、熱門排行、常用標籤、活動橫幅、新刊、編輯精選、特價、本週話題標籤</td></tr><tr><td><code>C-02</code></td><td>GET</td><td><code>/comic/works</code></td><td>作品列表（搜尋／篩選／排序／分頁）</td><td><span class="pill p-new">漫畫館新增</span></td><td><span class="pill p-p0">P0</span></td><td>找漫畫</td><td>一頁 12 筆；組內 OR、組間 AND；結果數要是真的算出來的；sort 支援 熱門／最多收藏／最新上架／價格↑↓</td></tr><tr><td><code>C-03</code></td><td>GET</td><td><code>/comic/works/{workId}</code></td><td>作品詳情</td><td><span class="pill p-new">漫畫館新增</span></td><td><span class="pill p-p0">P0</span></td><td>作品介紹頁</td><td>workId 是唯一識別，絕不用作品名</td></tr><tr><td><code>C-04</code></td><td>GET</td><td><code>/comic/works/{workId}/units</code></td><td>冊／話清單與試閱範圍</td><td><span class="pill p-new">漫畫館新增</span></td><td><span class="pill p-p0">P0</span></td><td>作品介紹頁、閱讀器</td><td>單位依商品型態：冊 or 話</td></tr><tr><td><code>C-05</code></td><td>GET</td><td><code>/comic/rankings</code></td><td>排行榜（日／週／月 × 分類）</td><td><span class="pill p-new">漫畫館新增</span></td><td><span class="pill p-p1">P1</span></td><td>排行榜</td><td>第一版可人工策展＋簡單統計</td></tr><tr><td><code>C-06</code></td><td>GET</td><td><code>/comic/tags</code></td><td>標籤與篩選選項</td><td><span class="pill p-new">漫畫館新增</span></td><td><span class="pill p-p1">P1</span></td><td>找漫畫、首頁</td><td>只有單本時要能回報「類型」篩選應隱藏</td></tr><tr><td><code>C-07</code></td><td>GET</td><td><code>/comic/search/suggest</code></td><td>搜尋建議</td><td><span class="pill p-new">漫畫館新增</span></td><td><span class="pill p-p2">P2</span></td><td>搜尋</td><td>第二版再做</td></tr><tr><td colspan="8" style="background:#241744;font-weight:700;color:#e7ddff">商品與購買</td></tr><tr><td><code>B-01</code></td><td>GET</td><td><code>/comic/works/{workId}/offers</code></td><td>各購買範圍的定價</td><td><span class="pill p-new">漫畫館新增</span></td><td><span class="pill p-p0">P0</span></td><td>作品介紹頁、購買彈窗</td><td>scope：single／vol／set／ch／bundle</td></tr><tr><td><code>B-02</code></td><td>POST</td><td><code>/comic/coupons/applicable</code></td><td>本次可用券與試算折抵</td><td><span class="pill p-new">漫畫館新增</span></td><td><span class="pill p-p0">P0</span></td><td>購買彈窗</td><td>帶 {scope, price}；不符條件的券不回傳</td></tr><tr><td><code>B-03</code></td><td>POST</td><td><code>/comic/orders</code></td><td>建立訂單並完成付款</td><td><span class="pill p-new">漫畫館新增</span></td><td><span class="pill p-p0">P0</span></td><td>購買彈窗</td><td>必帶 Idempotency-Key；折抵由後端重算</td></tr><tr><td><code>B-04</code></td><td>GET</td><td><code>/comic/orders/{orderId}</code></td><td>查訂單狀態</td><td><span class="pill p-new">漫畫館新增</span></td><td><span class="pill p-p1">P1</span></td><td>購買彈窗、客服</td><td>PENDING／PAID／FAILED／REVERSED</td></tr><tr><td colspan="8" style="background:#241744;font-weight:700;color:#e7ddff">優惠券</td></tr><tr><td><code>N-01</code></td><td>GET</td><td><code>/comic/coupons</code></td><td>我的優惠券（唯讀清單）</td><td><span class="pill p-new">漫畫館新增</span></td><td><span class="pill p-p1">P1</span></td><td>會員中心</td><td>回傳 kind／val／max／min／sc／exp，規則必須機器可讀</td></tr><tr><td><code>N-02</code></td><td>POST</td><td><code>/comic/coupons/{lock|consume|unlock}</code></td><td>訂單用的鎖定／核銷／解鎖</td><td><span class="pill p-new">漫畫館新增</span></td><td><span class="pill p-p0">P0</span></td><td>（內部）</td><td>只給訂單服務呼叫，不對前端開放</td></tr><tr><td colspan="8" style="background:#241744;font-weight:700;color:#e7ddff">權益與書櫃</td></tr><tr><td><code>L-01</code></td><td>GET</td><td><code>/comic/library</code></td><td>書櫃三分頁（續讀／已購／收藏）</td><td><span class="pill p-new">漫畫館新增</span></td><td><span class="pill p-p0">P0</span></td><td>書櫃、會員中心</td><td>排序只排時間軸；狀態類條件走篩選</td></tr><tr><td><code>L-02</code></td><td>GET</td><td><code>/comic/entitlements/{workId}</code></td><td>單一作品的權益</td><td><span class="pill p-new">漫畫館新增</span></td><td><span class="pill p-p0">P0</span></td><td>作品介紹頁、閱讀器</td><td>主按鈕文字是由這支算出來的</td></tr><tr><td><code>L-03</code></td><td>POST</td><td><code>/comic/favorites/{workId}</code></td><td>加入收藏</td><td><span class="pill p-new">漫畫館新增</span></td><td><span class="pill p-p0">P0</span></td><td>四個收藏入口</td><td>回饋只變愛心顏色</td></tr><tr><td><code>L-04</code></td><td>DELETE</td><td><code>/comic/favorites/{workId}</code></td><td>取消收藏</td><td><span class="pill p-new">漫畫館新增</span></td><td><span class="pill p-p0">P0</span></td><td>四個收藏入口</td><td></td></tr><tr><td><code>L-05</code></td><td>GET</td><td><code>/comic/progress/{workId}</code></td><td>讀取閱讀進度</td><td><span class="pill p-new">漫畫館新增</span></td><td><span class="pill p-p1">P1</span></td><td>作品介紹頁、書櫃</td><td></td></tr><tr><td><code>L-06</code></td><td>PUT</td><td><code>/comic/progress/{workId}</code></td><td>回寫閱讀進度</td><td><span class="pill p-new">漫畫館新增</span></td><td><span class="pill p-p1">P1</span></td><td>閱讀器</td><td>前端節流；伺服器端是唯一真相</td></tr><tr><td colspan="8" style="background:#241744;font-weight:700;color:#e7ddff">閱讀串流</td></tr><tr><td><code>R-01</code></td><td>POST</td><td><code>/comic/reader/session</code></td><td>建立閱讀工作階段</td><td><span class="pill p-new">漫畫館新增</span></td><td><span class="pill p-p0">P0</span></td><td>閱讀器</td><td>回傳頁面索引＋簽名短效網址＋浮水印參數</td></tr><tr><td><code>R-02</code></td><td>GET</td><td><code>(CDN) 簽名圖片網址</code></td><td>逐頁取圖</td><td><span class="pill p-new">漫畫館新增</span></td><td><span class="pill p-p0">P0</span></td><td>閱讀器</td><td>綁會員、綁工作階段、數分鐘到期</td></tr><tr><td colspan="8" style="background:#241744;font-weight:700;color:#e7ddff">營運後台</td></tr><tr><td><code>O-01</code></td><td>POST</td><td><code>/admin/works</code></td><td>建立／更新作品與商品型態</td><td><span class="pill p-new">漫畫館新增</span></td><td><span class="pill p-p1">P1</span></td><td>後台</td><td>狀態標示：完結才標完结、單行本未完結不標、連載標连载中。封面角標只有 X% off；NEW（近 30 天上架）在標題右側</td></tr><tr><td><code>O-02</code></td><td>POST</td><td><code>/admin/works/{id}/assets</code></td><td>上傳頁面檔並送轉檔</td><td><span class="pill p-new">漫畫館新增</span></td><td><span class="pill p-p1">P1</span></td><td>後台</td><td>非同步佇列</td></tr><tr><td><code>O-03</code></td><td>GET</td><td><code>/admin/jobs/{jobId}</code></td><td>轉檔狀態</td><td><span class="pill p-new">漫畫館新增</span></td><td><span class="pill p-p1">P1</span></td><td>後台</td><td>失敗要退回待處理清單並通知營運</td></tr><tr><td><code>O-04</code></td><td>PUT</td><td><code>/admin/works/{id}/pricing</code></td><td>定價與促銷</td><td><span class="pill p-new">漫畫館新增</span></td><td><span class="pill p-p1">P1</span></td><td>後台</td><td>單本／每冊／每話／整套／整部折扣</td></tr><tr><td><code>O-05</code></td><td>PUT</td><td><code>/admin/works/{id}/schedule</code></td><td>排程上架／下架</td><td><span class="pill p-new">漫畫館新增</span></td><td><span class="pill p-p1">P1</span></td><td>後台</td><td>⚠ 下架必須保留已購者的權益</td></tr><tr><td><code>O-06</code></td><td>POST</td><td><code>/admin/coupons</code></td><td>建立券與兌換碼批次</td><td><span class="pill p-new">漫畫館新增</span></td><td><span class="pill p-p2">P2</span></td><td>後台</td><td></td></tr><tr><td><code>O-07</code></td><td>GET</td><td><code>/admin/reports/orders</code></td><td>訂單與對帳報表</td><td><span class="pill p-new">漫畫館新增</span></td><td><span class="pill p-p2">P2</span></td><td>後台</td><td>要查得出 REVERSED 的補償訂單</td></tr></table></div>
+</section>
+
+<section>
+<h2><span class="n">6</span>資料模型</h2>
+
+<h3>6.1 作品</h3>
+<div class="tw"><table>
+<tr><th>欄位</th><th>說明</th></tr>
+<tr><td><code>workId</code></td><td>唯一識別。書櫃、收藏、進度、通知深連結、卡片點擊全部用它</td></tr>
+<tr><td><code>type</code></td><td>商品型態：單卷單行本／多卷單行本／每話連載</td></tr>
+<tr><td><code>vols</code> / <code>chapters</code></td><td>冊數／話數</td></tr>
+<tr><td><code>done</code></td><td>是否完結。決定狀態標示、價格是否加「起」、冊數欄寫「全 N 冊」還是「既刊 N 冊」</td></tr>
+<tr><td><code>nw</code></td><td>近 30 天上架 → 標題右側顯示 NEW</td></tr>
+<tr><td><code>up</code></td><td><b>最新話／最新冊的上架日</b>。書櫃「最近更新」排序與卡片上的「更新 MM/DD」都取這個欄位</td></tr>
+<tr><td><code>lang</code></td><td>中文版／日文原版，供篩選使用</td></tr>
+<tr><td><code>favCount</code></td><td>收藏這部作品的會員人數。找漫畫的「最多收藏」排序取這個欄位</td></tr>
+<tr><td><code>freeChapters</code></td><td>免費話數，可為 0。為 0 時作品頁主按鈕要變成「購買第 1 話」</td></tr>
+</table></div>
+
+<h3>6.2 權益與進度</h3>
+<p>權益以作品為單位，裡面記每一冊／話的擁有狀況；進度分成兩種，兩者都要回傳，前端才算得出按鈕文字。</p>
+<div class="tw"><table>
+<tr><th>欄位</th><th>意義</th><th>用在哪</th></tr>
+<tr><td>已購的冊／話</td><td>哪些單位有權益（含免費話）</td><td>作品頁、冊數列表、閱讀器權益檢查</td></tr>
+<tr><td><b>開過的最高話／冊</b></td><td>在閱讀器實際開啟並顯示過的最高單位（<b>鎖話、鎖冊不計</b>）</td><td>「續看」的目標、列表的「已讀」標記</td></tr>
+<tr><td><b>讀到章末的最高話／冊</b></td><td>已經讀到該單位最後一頁</td><td>區分「讀完 → 買下一個」與「讀一半 → 續看目前這個」</td></tr>
+<tr><td>單卷的閱讀旗標</td><td><code>未讀 / 閱讀中 / 已讀完</code></td><td>單卷單行本沒有話／冊可記，書櫃要靠它分狀態</td></tr>
+<tr><td>最後購買時間 / 最後閱讀時間</td><td></td><td>書櫃的「最近購買」「最近閱讀」排序</td></tr>
+</table></div>
+<div class="note"><b>購買不預先推進進度。</b>確認購買只寫權益；進度要等真的載入該話／冊才更新。</div>
+
+<h3>6.3 書櫃三分頁的判定</h3>
+<div class="tw"><table>
+<tr><th>分頁</th><th>條件</th></tr>
+<tr><td>續讀</td><td>進度 &gt; 0 <b>且</b> 還沒把擁有的內容讀完。讀完的退出續讀、留在已購；連載更新或多卷出新刊時自動回到續讀</td></tr>
+<tr><td>已購</td><td>有任一權益</td></tr>
+<tr><td>收藏</td><td>加過愛心，與是否購買無關</td></tr>
+</table></div>
+
+<h3>6.4 交易帳本</h3>
+<ul>
+<li>每一筆帶 <code>site</code>（<code>comic</code> / <code>game</code> / <code>both</code>）與 <code>kind</code>（消費／充值／贈送／訂閱／簽到）。</li>
+<li><b>充值是 <code>both</code></b>：屬平台層級，兩個站別的查詢都要回傳。</li>
+<li>每一筆要帶<b>當下餘額</b>，最新一筆的餘額＝錢包餘額，整本帳才連得起來。</li>
+<li>查詢條件：站別 × 類型 × 時間區間（最近 90 / 30 / 7 天）。</li>
+</ul>
+</section>
+
+<section>
+<h2><span class="n">7</span>閱讀串流與內容保護</h2>
+<ol>
+<li>開閱讀器時<b>重新檢查權益</b>，免費話與試閱範圍也走同一支檢查。</li>
+<li>建立<b>閱讀工作階段</b>後才發圖片網址。</li>
+<li>回傳：頁面清單 ＋ <b>簽名短效圖片網址</b>（綁會員、綁工作階段、數分鐘到期）＋ 使用者專屬浮水印參數。</li>
+<li>保護手段：簽名短效網址、切片打散重組、使用者專屬浮水印、逐頁載入、停用右鍵。</li>
+<li>進度回寫要<b>節流</b>；伺服器端是唯一真相。</li>
+</ol>
+<div class="warn"><b>付費內容只做串流、不提供原始下載。</b>內容保護的強度（浮水印是否必須、切片打散到什麼程度）要和法務／版權方確認後才動工——轉檔管線重做的成本很高。</div>
+</section>
+
+<section>
+<h2><span class="n">8</span>內容上架流程</h2>
+<pre><code>建檔 → 設定商品型態 → 轉檔切片（非同步）→ 定價 → 狀態標示 → 試閱範圍 → 排程上架 → CDN 預熱</code></pre>
+<ul>
+<li>轉檔是<b>非同步佇列</b>，失敗要退回待處理清單並通知營運，<b>不能卡死上架流程</b>。</li>
+<li>狀態標示規則：<b>完結才標「完结」，單行本未完結不標狀態，每話連載標「连载中」</b>。</li>
+<li>封面角標：<b>左上只有 <code>X% off</code></b>，右下狀態；NEW（近 30 天上架）由前端放在標題右側。</li>
+<li>連載更新＝新增話次後回到轉檔，完成再推播給收藏者。</li>
+<li><b>下架要保留已購使用者的權益</b>——這是第一版就要定義的規則（見第 10 節待確認）。</li>
+</ul>
+</section>
+
+<section>
+<h2><span class="n">9</span>時程</h2>
+<p>42 個工項、六個階段、<b>總計 289 人日、18 週</b>。試算表的 B1 是「專案啟動日」，改那一格每個工項的日期會跟著重算，<b>要換成實際的 kickoff</b>。</p>
+
+<h3>9.1 六個階段與里程碑</h3>
+<div class="tw"><table>
+<tr><th>階段</th><th>週次</th><th>里程碑</th></tr>
+<tr><td>0 定案與準備</td><td>W1–W3</td><td><b>M0 規格凍結</b></td></tr>
+<tr><td>1 共用層改造（遊戲站側）</td><td>W2–W5</td><td><b>M1 共用層可用</b></td></tr>
+<tr><td>2 漫畫館後端</td><td>W3–W9</td><td><b>M2 後端 API 可串</b></td></tr>
+<tr><td>3 前端手機版</td><td>W4–W12</td><td><b>M3 手機版功能完成</b></td></tr>
+<tr><td>4 營運後台與內容</td><td>W6–W14</td><td><b>M4 首批內容上架</b></td></tr>
+<tr><td>5 PC 版</td><td>W11–W15</td><td><b>M5 PC 版完成</b></td></tr>
+<tr><td>6 測試與上線</td><td>W13–W18</td><td><b>M6 正式上線</b></td></tr>
+</table></div>
+
+<h3>9.2 關鍵路徑</h3>
+<pre><code>M0 規格凍結 → 錢包冪等扣款 → 訂單服務 → 購買彈窗 → 整合測試 → 上線</code></pre>
+<p>另一條平行但同樣會卡人的是：</p>
+<pre><code>環境建置 → 轉檔切片管線 → 閱讀串流 → 閱讀器 ／ 首批內容上架</code></pre>
+<div class="warn"><b>轉檔管線同時擋住閱讀串流與內容上架兩件事</b>，是最容易被低估的工項。</div>
+
+<h3>9.3 估算的前提（任何一條不成立都要重估）</h3>
+<ol>
+<li><b>人力</b>：前端 2 人、漫畫館後端 2 人、平台後端 1 人（遊戲站團隊支援）、設計 1 人、QA 1 人、營運 1 人。</li>
+<li><b>設計稿</b>在 W3 前交付完整的手機版，PC 版可以晚到 W11。</li>
+<li><b>現有錢包</b>可以在 8 人日內加上冪等扣款與退款（如果要從頭改金流，這個數字會翻倍）。</li>
+<li><b>首批內容</b>以單行本為主，連載為次要。</li>
+<li><b>PC 版與手機版同時上線</b>。</li>
+<li>未包含：Peachy Party、留言功能、PWA、跨裝置進度同步、題材榜。</li>
+</ol>
+
+<h3>9.4 可以壓縮的地方</h3>
+<div class="tw"><table>
+<tr><th>做法</th><th>省多少</th><th>代價</th></tr>
+<tr><td>PC 版延後</td><td>約 3 週</td><td>—</td></tr>
+<tr><td>排行榜第一版用人工策展</td><td>約 1 週</td><td>統計服務延後</td></tr>
+<tr><td>搜尋先用資料庫 LIKE、不建索引</td><td>約 1 週</td><td>作品量上去會回頭重做</td></tr>
+</table></div>
+<div class="warn"><b>不建議壓縮</b>：訂單服務、轉檔管線、整合測試與對帳驗證。這三項出問題都是錢的問題。</div>
+</section>
+
+<section>
+<h2><span class="n">10</span>待確認事項</h2>
+<p>共 13 項，四項<b>阻斷</b>的要最先解決。試算表第 3 分頁有「狀態」下拉（待決定／討論中／已定案），可以直接拿去會議上追。</p>
+<div class="tw"><table>
+<tr><th>編號</th><th>事項</th><th>程度</th><th>誰決定</th><th>不決定的後果</th></tr>
+<tr><td>Q-01</td><td>三條退款規則：數位內容開啟後可否退、儲值可否退、誤購處理與申請期限</td><td><b>阻斷</b></td><td>法務＋營運</td><td>購買彈窗的文案不能定稿，法務文件也停在草稿</td></tr>
+<tr><td>Q-02</td><td>平台代金券能不能用於漫畫消費</td><td><b>阻斷</b></td><td>營運＋平台</td><td>可用的話要回頭改會員中心與購買彈窗的支付選擇（代金券是支付工具，與優惠券的折抵是兩層）</td></tr>
+<tr><td>Q-03</td><td>作品下架後已購者的權益怎麼處理</td><td><b>阻斷</b></td><td>法務＋營運</td><td>買斷商品最容易出客訴的一點，會動到權益模型、書櫃顯示與閱讀器</td></tr>
+<tr><td>Q-04</td><td>現有錢包是否已支援冪等鍵與退款 API</td><td><b>阻斷</b></td><td>平台後端</td><td>沒有的話是遊戲站側的前置工項，會把訂單服務整段往後推</td></tr>
+<tr><td>Q-05</td><td>優惠券可否併用</td><td>重要</td><td>營運</td><td>目前一次一張；要併用必須先定疊加順序與上限</td></tr>
+<tr><td>Q-06</td><td>內容保護的強度（浮水印是否必須、切片打散到什麼程度）</td><td>重要</td><td>法務＋版權方</td><td>轉檔管線重做成本高，要在開工前定</td></tr>
+<tr><td>Q-07</td><td>未登入狀態的頁面行為與樣式</td><td>重要</td><td>產品＋設計</td><td>目前所有頁面都假設已登入</td></tr>
+<tr><td>Q-08</td><td>首批上架作品的數量與型態（是否含連載）</td><td>重要</td><td>營運</td><td>只有單本時有一批 UI 要遮蔽，要提前知道</td></tr>
+<tr><td>Q-09</td><td>歷史紀錄保留 90 天對買斷商品是否足夠</td><td>重要</td><td>營運＋平台</td><td>建議消費類延長，或至少靠書櫃「已購」提供完整清單</td></tr>
+<tr><td>Q-10</td><td>PC 版是否與手機版同時上線</td><td>重要</td><td>產品</td><td>不同時上線可以把總時程縮短約三週</td></tr>
+<tr><td>Q-11</td><td>排行榜第一版用人工策展還是真實統計</td><td>一般</td><td>營運</td><td>作品量少時真實統計會很難看</td></tr>
+<tr><td>Q-12</td><td>歷史紀錄的類型要不要加「全部」</td><td>一般</td><td>產品</td><td>要對帳的人會想要混合時間軸；建議加</td></tr>
+<tr><td>Q-13</td><td>券的發放來源有哪些（活動自動發、消費回饋、客服補償）</td><td>一般</td><td>營運</td><td>影響後台要做哪些發券介面</td></tr>
+</table></div>
+</section>
+
+<section>
+<h2><span class="n">11</span>上線前的技術檢查</h2>
+<ul>
+<li><b>折抵金額由後端重算</b>；券的核銷要後端驗證；<b>擋過期券</b>。</li>
+<li>書櫃、歷史紀錄、優惠券改接會員 API；收藏與兌換碼接 API。</li>
+<li>作品的<b>最近更新日</b>與<b>語言</b>換成真實欄位，否則書櫃的「最近更新」排序與卡片上的更新日都是假的。</li>
+<li>「已解鎖 N / M 話」的 M 會隨連載更新變動，要以後端回傳的最新話數為準。</li>
+<li>已購量大時，書櫃要改分頁載入或無限捲動。</li>
+<li>列表與搜尋改接<b>後端分頁</b>。</li>
+<li>作品下架／授權到期的已購作品要有標示與說明文案；退款／撤銷購買後書櫃要即時移除。</li>
+<li>未登入時點收藏／進會員中心要導登入。</li>
+<li><code>REVERSED</code> 訂單要能在對帳報表查出來。</li>
+</ul>
+</section>
+</main></div></div>
+<div class="wrap"><footer>JS GAME ・ 漫畫館改版　|　本文件只寫最終規格；互動細節以互動原型為準，畫面順序以前端操作流程為準。</footer></div>
+<script>
+(function(){
+  var main=document.querySelector('main'), toc=document.getElementById('toc');
+  var items=[].slice.call(main.querySelectorAll('h2,h3'));
+  var ol=document.createElement('ol'), links=[];
+  items.forEach(function(h,i){
+    if(!h.id) h.id='s'+i;
+    var li=document.createElement('li'), a=document.createElement('a');
+    var num=h.querySelector('.n');
+    a.href='#'+h.id;
+    a.textContent=(num? num.textContent.trim()+'　'+h.textContent.replace(num.textContent,'').trim()
+                      : h.textContent.replace(/\s+/g,' ').trim());
+    if(h.tagName==='H3') a.className='sub';
+    li.appendChild(a); ol.appendChild(li); links.push(a);
+  });
+  toc.appendChild(ol);
+  var obs=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting) return;
+      links.forEach(function(a){ a.classList.toggle('on', a.getAttribute('href')==='#'+e.target.id); });
+      var on=toc.querySelector('a.on');
+      if(on && toc.scrollHeight>toc.clientHeight){
+        var t=on.offsetTop-toc.clientHeight/2;
+        if(Math.abs(toc.scrollTop-t)>40) toc.scrollTop=t;
+      }
+    });
+  },{rootMargin:'-8% 0px -70% 0px'});
+  items.forEach(function(h){ obs.observe(h); });
+})();
+</script>
+</body>
+</html>

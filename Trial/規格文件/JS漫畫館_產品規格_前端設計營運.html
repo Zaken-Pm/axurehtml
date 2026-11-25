@@ -1,0 +1,775 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JS 漫畫館 ─ 產品規格</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#140b28; --surface:#1e1340; --surface-2:#2a1b55; --line:#39276b;
+  --fg:#f3eefe; --muted:#b4a6df; --faint:#897bb6;
+  --pink:#ff2e9a; --cyan:#2ee6ff; --purple:#9d5cff; --gold:#ffc84a; --good:#36d399;
+  --display:"Chakra Petch","Noto Sans TC",system-ui,sans-serif;
+  --body:"Noto Sans TC",system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.85 var(--body)}
+a{color:var(--cyan)}
+.wrap{max-width:1360px;margin:0 auto;padding:0 clamp(16px,3vw,32px)}
+
+header.top{padding:34px 0 24px;border-bottom:1px solid var(--line)}
+.eyebrow{font:600 12px var(--display);letter-spacing:.16em;color:var(--cyan);text-transform:uppercase;margin:0 0 8px}
+h1{font:700 clamp(25px,4.4vw,36px)/1.25 var(--display);margin:0}
+.lead{color:var(--muted);margin:12px 0 0;max-width:70ch;font-size:14.5px}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.chip{font:500 12px var(--body);color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 13px}
+.chip b{color:var(--fg);font-weight:600}
+.chip.who{border-color:var(--pink);color:#ffd6ec}
+
+.cols{display:grid;gap:34px;padding:28px 0 64px}
+@media(min-width:1040px){.cols{grid-template-columns:248px minmax(0,1fr);gap:44px}}
+nav.toc{align-self:start}
+@media(min-width:1040px){nav.toc{position:sticky;top:18px;max-height:calc(100vh - 36px);overflow:auto}}
+nav.toc h2{font:700 12px var(--display);letter-spacing:.1em;color:var(--faint);margin:0 0 10px;text-transform:uppercase}
+nav.toc ol{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+nav.toc a{display:block;color:var(--muted);text-decoration:none;font-size:13.5px;line-height:1.5;padding:5px 10px;border-radius:8px;border-left:2px solid transparent}
+nav.toc a:hover{background:var(--surface);color:var(--fg)}
+nav.toc a.sub{padding-left:22px;font-size:12.5px;color:var(--faint)}
+nav.toc a.on{background:var(--surface-2);color:var(--fg);border-left-color:var(--pink)}
+
+main{min-width:0}
+section{margin:0 0 42px;scroll-margin-top:16px}
+h2{font:700 21px/1.35 var(--display);margin:0 0 14px;padding-bottom:10px;border-bottom:2px solid var(--line)}
+h2 .n{color:var(--pink);margin-right:10px}
+h3{font:700 16px/1.5 var(--display);margin:26px 0 8px;color:#e7ddff}
+h4{font:700 14px var(--display);margin:18px 0 6px;color:var(--muted)}
+p{margin:0 0 11px}
+ul,ol{margin:0 0 12px;padding-left:1.25em}
+li{margin:0 0 5px}
+b,strong{color:var(--fg);font-weight:600}
+code{font:500 12.5px ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:#d9c7ff;white-space:nowrap}
+pre{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--purple);border-radius:10px;padding:14px 16px;overflow:auto;margin:0 0 14px}
+pre code{background:none;border:0;padding:0;white-space:pre;color:#ddd2ff;font-size:12.5px;line-height:1.75}
+
+table{width:100%;border-collapse:collapse;margin:0 0 16px;font-size:13.5px;background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.7}
+th{background:var(--surface-2);font:700 12.5px var(--display);color:#e7ddff;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td code{font-size:12px}
+.tw{overflow-x:auto;margin:0 0 16px}
+.tw table{margin:0;min-width:660px}
+
+.note,.warn,.ok{border:1px solid var(--line);border-left:3px solid var(--cyan);background:rgba(46,230,255,.05);
+  border-radius:0 10px 10px 0;padding:12px 15px;margin:0 0 16px;font-size:13.5px;line-height:1.8;color:var(--muted)}
+.warn{border-left-color:var(--gold);background:rgba(255,200,74,.06);color:#ffe9bd}
+.ok{border-left-color:var(--good);background:rgba(54,211,153,.05);color:#c5f2e0}
+.note b,.warn b,.ok b{color:#fff}
+
+.pill{display:inline-block;font:600 11px var(--display);padding:2px 8px;border-radius:999px;border:1px solid;margin-right:5px;white-space:nowrap}
+.p-new{color:#ffd6ec;border-color:var(--pink);background:rgba(255,46,154,.12)}
+.p-keep{color:#cdf7ff;border-color:var(--cyan);background:rgba(46,230,255,.1)}
+.p-mod{color:#ffeec2;border-color:var(--gold);background:rgba(255,200,74,.1)}
+.p-off{color:#b9b9c8;border-color:#6f6f80;background:rgba(140,140,160,.1)}
+.p-p0{color:#ffd6ec;border-color:var(--pink)}
+.p-p1{color:#ddd2ff;border-color:var(--purple)}
+.p-p2{color:#b9b9c8;border-color:#6f6f80}
+
+footer{border-top:1px solid var(--line);padding:18px 0 40px;color:var(--faint);font-size:12.5px}
+
+@media print{
+  :root{--bg:#fff;--surface:#fff;--surface-2:#f4f1fa;--line:#ccc3e0;--fg:#1a1030;--muted:#43384f;--faint:#6b6080}
+  body{font-size:11.5pt;line-height:1.6}
+  nav.toc{display:none}
+  .cols{display:block;padding:12px 0}
+  section{break-inside:auto}
+  h2{break-after:avoid}
+  table,pre,.note,.warn,.ok{break-inside:avoid}
+  a{color:#1a1030;text-decoration:none}
+  .chip{border-color:#ccc3e0}
+}
+</style>
+</head>
+<body>
+<div class="wrap"><header class="top"><p class="eyebrow">JS GAME ・ 漫畫館改版</p><h1>JS 漫畫館 ─ 產品規格</h1><p class="lead">全站的頁面、區塊、狀態與跳轉規則。搭配互動原型與前端操作流程一起看：這份寫規則，原型是互動的最終依據。</p><div class="meta"><span class="chip">版本 <b>v1</b></span><span class="chip">更新 <b>2026.11.17</b></span><span class="chip">對應原型 <b>V50</b></span><span class="chip who">讀者 <b>前端 ・ 設計 ・ 營運</b></span></div></header></div>
+<div class="wrap"><div class="cols"><nav class="toc" id="toc"><h2>目錄</h2></nav>
+<main>
+<section>
+<h2><span class="n">0</span>這份文件怎麼用</h2>
+<p>這是 JS 漫畫館的<b>產品規格</b>：全站有哪些頁、每一頁有哪些區塊、點下去會到哪裡、各種狀態下畫面長什麼樣。
+給<b>前端、設計、營運</b>照著做與驗收。後端的架構、API 契約與時程另見《技術規格》。</p>
+<h3>搭配的三個成品</h3>
+<div class="tw"><table>
+<tr><th>成品</th><th>用來做什麼</th></tr>
+<tr><td><b>互動原型</b>（手機版）</td><td>所有互動的最終依據。文字敘述和原型不一致時，以原型為準並回頭修這份文件。</td></tr>
+<tr><td><b>前端操作流程</b>（12 張）</td><td>8 張頁面說明逐項標出區塊與跳轉目的地；4 條操作流程是畫面的先後順序。</td></tr>
+<tr><td><b>API 清單與時程表</b></td><td>每個區塊要接哪一支 API、排在第幾週。</td></tr>
+</table></div>
+<div class="warn"><b>介面文字一律簡體。</b>本文件為內部文件，維持繁體；寫進畫面的字請用簡體（例：<code>立即购买</code>、<code>书柜</code>、<code>续看</code>）。</div>
+</section>
+
+<section>
+<h2><span class="n">1</span>產品定位與基本規則</h2>
+<ul>
+<li>漫畫館是 JS GAME 遊戲官網<b>同網域下的子路徑</b>（例 <code>/comic</code>），不是子網域，登入狀態與平台幣因此與遊戲站共用。</li>
+<li>漫畫館與遊戲站是<b>兩個平行世界</b>，各有自己的底部導覽，彼此的入口要對稱。</li>
+<li><b>帳戶層沿用遊戲、內容層漫畫自訂</b>：帳號、平台幣、充值、客服共用；目錄、購買、書櫃、閱讀是漫畫館自己的。</li>
+<li><b>作品一律以 <code>workId</code> 為識別</b>。書櫃、收藏、進度、通知深連結、卡片點擊都用 ID，不可用作品名當 key。</li>
+<li><b>線上串流閱讀、不提供付費內容下載</b>，所以書櫃沒有下載鈕。App 體驗用 PWA。</li>
+<li>內容型態以<b>日系翻頁漫畫</b>為主（右翻、支援見開き跨頁、相鄰頁預載），非條漫直捲。</li>
+</ul>
+
+<h3>1.1 商業模式</h3>
+<ul>
+<li><b>第一版以單本買斷為主</b>，連載為次要。</li>
+<li>三種商品型態：<b>單卷單行本 ／ 多卷單行本 ／ 每話連載</b>。<b>多卷＝比照連載、單位從「話」換成「冊」</b>是核心原則。</li>
+<li>價格一律標單位：<b>單本 ／ 每冊 ／ 每話</b>；多卷各冊不同價時加「起」。</li>
+<li>連載購買分兩層：下一話一鍵解鎖 ＋ 整部購買（折扣）。<b>不做勾選式多選，也不做購物車。</b></li>
+<li><b>每部作品都有免費試閱</b>（前幾頁或前幾話），所以免費試閱不是促銷條件，不做角標、也不做篩選維度。</li>
+<li><b>頁面架構以作品為單位</b>，不是以冊為單位；書櫃同樣一個作品一格。</li>
+</ul>
+
+<h3>1.2 購買範圍 scope</h3>
+<p>五種購買範圍會一路貫穿定價、優惠券適用判斷、訂單與權益開通，前端每一個購買動作都要帶：</p>
+<div class="tw"><table>
+<tr><th>scope</th><th>對應購買行為</th><th>介面文字</th></tr>
+<tr><td><code>single</code></td><td>單卷單行本買斷</td><td>單本買斷</td></tr>
+<tr><td><code>vol</code></td><td>多卷作品的第 N 冊</td><td>單冊</td></tr>
+<tr><td><code>set</code></td><td>整套購買／解鎖剩餘冊</td><td>整套</td></tr>
+<tr><td><code>ch</code></td><td>連載的第 N 話</td><td>單話</td></tr>
+<tr><td><code>bundle</code></td><td>整部購買／解鎖剩餘話</td><td>整部</td></tr>
+</table></div>
+
+<h3>1.3 營運型態開關</h3>
+<p>全站有一個<b>營運型態</b>開關：<code>含連載</code> ／ <code>只有單行本</code>。切到「只有單行本」時三處同時隱藏，且已選的條件會被清掉：</p>
+<ul>
+<li>排行榜的分類切換（綜合／單行本／連載）</li>
+<li>找漫畫的「類型」篩選整組</li>
+<li>書櫃的「型態」篩選（收藏分頁因此一組都不剩，連篩選鈕都不出現）</li>
+</ul>
+</section>
+
+<section>
+<h2><span class="n">2</span>視覺與全站共通規則</h2>
+
+<h3>2.1 設計 token</h3>
+<div class="tw"><table>
+<tr><th>用途</th><th>值</th><th>用途</th><th>值</th></tr>
+<tr><td>底色 bg</td><td><code>#140b28</code></td><td>粉紅 pink</td><td><code>#ff2e9a</code></td></tr>
+<tr><td>卡面 surface</td><td><code>#1e1340</code></td><td>青色 cyan</td><td><code>#2ee6ff</code></td></tr>
+<tr><td>卡面 2</td><td><code>#2a1b55</code></td><td>紫 purple</td><td><code>#9d5cff</code></td></tr>
+<tr><td>分隔線 line</td><td><code>#39276b</code></td><td>金 gold</td><td><code>#ffc84a</code></td></tr>
+<tr><td>主文字 fg</td><td><code>#f3eefe</code></td><td>成功 good</td><td><code>#36d399</code></td></tr>
+<tr><td>次文字 muted</td><td><code>#b4a6df</code></td><td>NEW 標紅</td><td><code>#e8243f</code></td></tr>
+<tr><td>弱文字 faint</td><td><code>#897bb6</code></td><td>淺紫（年齡彈窗「是」、頁尾「閱讀更多」）</td><td><code>#c6a3f2</code></td></tr>
+</table></div>
+<ul>
+<li>主漸層 purple → pink。單一深色主題，不做淺色。</li>
+<li>字體：顯示字 <code>Chakra Petch</code>、內文 <code>Noto Sans TC</code>。手機框寬 452px。</li>
+<li><b>金色＝錢的顏色</b>：平台幣、價格、優惠折抵都用金色；粉紅保留給警示與強調。</li>
+<li>還原遊戲官網的元件時，<b>結構與互動 100% 照做、配色換成漫畫館 token</b>。</li>
+</ul>
+
+<h3>2.2 封面角標與 NEW</h3>
+<div class="tw"><table>
+<tr><th>位置</th><th>放什麼</th></tr>
+<tr><td>封面左上</td><td><b>只放促銷角標 <code>X% off</code></b>，沒有特價就不放</td></tr>
+<tr><td>封面右下</td><td>狀態（完结／连载中）</td></tr>
+<tr><td>封面右上</td><td>收藏愛心（<b>只在夠大的卡片上</b>，見 2.4）</td></tr>
+<tr><td>標題右側</td><td><b>NEW</b>（近 30 天上架），紅底小標。標題過長時<b>省略標題、保留 NEW 的位置</b>：<code>XXXXXXXX… [NEW]</code></td></tr>
+</table></div>
+
+<h3>2.3 作品狀態標示</h3>
+<div class="tw"><table>
+<tr><th>情況</th><th>狀態文字</th><th>價格</th><th>冊數欄</th></tr>
+<tr><td>單行本・已完結</td><td><code>完结</code></td><td>一般</td><td>全 N 冊</td></tr>
+<tr><td>單行本・未完結（既刊）</td><td><b>不標任何狀態</b></td><td>加「起」</td><td>既刊 N 冊</td></tr>
+<tr><td>每話連載</td><td><code>连载中</code></td><td>一般</td><td>已更新 N 話</td></tr>
+</table></div>
+<p>作品資料欄位：<code>id</code>、<code>vols</code>（冊數）、<code>done</code>（是否完結）、<code>nw</code>（近 30 天上架）、<code>up</code>（最近更新日）、<code>lang</code>。</p>
+
+<h3>2.4 收藏入口</h3>
+<div class="tw"><table>
+<tr><th>位置</th><th>有沒有愛心</th></tr>
+<tr><td>找漫畫列表卡（封面右上）、作品介紹頁、書櫃收藏分頁</td><td>✅ 有</td></tr>
+<tr><td>首頁的編輯精選大卡</td><td>✅ 有（<code>收藏 ／ 已收藏</code> 切換鈕）</td></tr>
+<tr><td>首頁的小卡（熱門排行、新刊、特價、話題標籤）、排行榜頁</td><td>❌ 沒有</td></tr>
+</table></div>
+<ul>
+<li>收藏<b>只有一份真相</b>，以作品 ID 為 key；任一處收藏或取消，其他入口立刻同步。</li>
+<li>回饋<b>只用愛心變色</b>（粉紅實心），不跳提示、不跳頁。</li>
+<li>用字一律「<b>收藏</b>」，不要用「加入書櫃」（書櫃是已購的地方，會被誤會成購買）。</li>
+</ul>
+
+<h3>2.5 排序與篩選的分工</h3>
+<div class="warn"><b>狀態類條件（已讀／未讀、作品型態）一律走篩選，不做成排序。</b>書櫃的排序只排時間軸；找漫畫的排序是人氣與價格的名次。日後要加排序先問一句「這是名次或時間軸，還是狀態？」是狀態就加進篩選。</div>
+<ul>
+<li>排序標籤要<b>寫明方向</b>：<code>价格由低到高</code>，不要只寫「價格」讓人猜。</li>
+<li><b>不做標題排序</b>：中文沒有讀者共用的字序，瀏覽器實際是依筆畫排，找不到書。</li>
+<li>找漫畫的價格排序一律比<b>單次購買的最低金額</b>（連載＝每話價、單卷＝單本價、多卷＝最便宜那一冊），否則混合單位會把連載全排到前面。</li>
+</ul>
+
+<h3>2.6 成功與失敗的回饋</h3>
+<ul>
+<li><b>成功用浮層提示</b>（toast）：畫面上方的膠囊，數秒後淡出。比照遊戲站的「已複製禮包碼」。</li>
+<li><b>失敗留在欄位旁邊</b>（粉紅色說明文字），讓人知道是哪一格出錯。</li>
+<li>收藏例外：只變愛心顏色，不跳提示。</li>
+</ul>
+
+<h3>2.7 全站 z-index 階梯</h3>
+<div class="tw"><table>
+<tr><th>層</th><th>z-index</th><th>元素</th></tr>
+<tr><td>卡片內的角標與按鈕</td><td><b>≤3</b></td><td>促銷／狀態角標、列表卡愛心、書櫃收藏愛心</td></tr>
+<tr><td>框架</td><td>5 / 6</td><td>頂部列、底部導覽（5）、吸底購買列（6）</td></tr>
+<tr><td>頁面內的吸頂列</td><td><b>6</b></td><td>找漫畫工具列、書櫃分頁列</td></tr>
+<tr><td>覆蓋層</td><td>30 → 70</td><td>搜尋 30 → 篩選面板 40/41 → 面板遮罩 50 → 漢堡／會員 51 → 通知 52 → 閱讀器 60 → 購買彈窗 70</td></tr>
+<tr><td>年齡確認</td><td>90</td><td>擋在所有頁面之前</td></tr>
+<tr><td>提示浮層</td><td>95</td><td>成功提示</td></tr>
+</table></div>
+<div class="warn"><b>規則：卡片裡的東西一律 ≤3、吸頂列一律 6。</b>z-index 相同時由 DOM 順序決勝，卡片在吸頂列後面會蓋過它。</div>
+
+<h3>2.8 其他共通規則</h3>
+<ul>
+<li>首屏以外的封面一律 <code>loading="lazy"</code> ＋ <code>decoding="async"</code>；封面 <code>alt</code> 寫「&lt;作品名&gt; 封面」。</li>
+<li>找漫畫的結果數要能被讀螢幕器播報（<code>role="status" aria-live="polite"</code>）。</li>
+<li>行動版點擊不要出現藍色色塊（<code>-webkit-tap-highlight-color:transparent</code>）。</li>
+<li>橫滑卡列與標籤列支援滑鼠按住拖曳，拖超過 6px 才啟動。</li>
+</ul>
+</section>
+
+<section>
+<h2><span class="n">3</span>導覽架構</h2>
+
+<h3>3.1 底部導覽（五格互斥）</h3>
+<p><code>首页 / 找漫画 / 排行榜 / 书柜 / 游戏</code>。第五格是青色的，點了離開漫畫館回到遊戲站。</p>
+<p>會員中心、歷史紀錄、條款頁、充值中心、登入頁<b>都不佔底部導覽高亮</b>，它們是下鑽頁。</p>
+
+<h3>3.2 頂部列</h3>
+<p>漢堡 ／ logo＋「漫画馆」 ／ 搜尋 ／ 通知（鈴鐺，有未讀時顯示紅點、不顯示數字） ／ 個人。</p>
+<p><b>漫畫館不做簽到</b>，遊戲站簽到的位置讓給搜尋。</p>
+
+<h3>3.3 三大面板</h3>
+<div class="tw"><table>
+<tr><th>面板</th><th>內容</th></tr>
+<tr><td><b>左側漢堡選單</b></td><td>窄面板 116px，圖示在上文字在下。站台級連結：永久收藏（備用網域）／聯繫我們／商務合作／下載APP，兩站一致。</td></tr>
+<tr><td><b>通知中心</b>（鈴鐺）</td><td>列表層 ＋ 詳情層（原地替換）。只顯示紅點、點進該則即已讀、右上「全部已讀」。</td></tr>
+<tr><td><b>右側會員選單</b></td><td>暱稱＋遮罩 Email → 會員中心／充值中心／推廣工具／歷史紀錄 → 登出。</td></tr>
+</table></div>
+<p>三個面板同時只能開一個；點遮罩、ESC、各自的關閉鈕都能關；開啟時鎖背景捲動；滑入 250ms。</p>
+
+<h4>通知的 CTA 四種型別</h4>
+<div class="tw"><table>
+<tr><th>型</th><th>用在哪</th><th>行為</th></tr>
+<tr><td>複製</td><td>禮包碼類</td><td>複製後跳提示</td></tr>
+<tr><td>作品深連結</td><td>通知指名了某部作品</td><td><code>work:{workId}</code> → 直接開該作品的介紹頁</td></tr>
+<tr><td>篩選深連結</td><td>全站檔期活動</td><td><code>filter:{...}</code> → 找漫畫並套上條件</td></tr>
+<tr><td>無按鈕</td><td>純告知的帳戶通知</td><td>充值成功、帳號安全提醒</td></tr>
+</table></div>
+<p>通知分流：<b>內容類</b>（更新、促銷、新刊、檔期）各站自己發；<b>帳戶／系統類</b>（充值成功、帳安）兩站共用。</p>
+
+<h3>3.4 返回與導覽堆疊</h3>
+<ul>
+<li>返回＝<b>導覽堆疊逐層回退</b>，每一層保存狀態快照（捲動位置、篩選條件、作品頁的擁有與進度狀態）。</li>
+<li>由底部導覽跳轉時<b>清空堆疊</b>；逐層下鑽的頁面（會員中心 → 歷史紀錄）不清空，返回兩次會依序退回。</li>
+<li>從作品頁進條款頁，返回會回到<b>同一部作品的同一個狀態</b>。</li>
+<li>通知的作品深連結會先清空堆疊、再 push 進入前的分頁，所以從排行榜開通知、看完作品頁按返回會回到排行榜。</li>
+</ul>
+<div class="warn">沒有落地頁的入口不要放；<b>入口的文案要和實際位置對得上</b>（例：兌換碼目前在會員中心，通知文案就不能寫「到充值中心兌換」）。</div>
+</section>
+
+<section>
+<h2><span class="n">4</span>頁面規格</h2>
+
+<h3>4.1 首頁</h3>
+<p>首頁不放作品內容，只做分流：上下七個區塊，每一個都是入口。各區塊的資料由後台統計或營運排程，<b>順序與數量都能調</b>。</p>
+<div class="tw"><table>
+<tr><th>區塊</th><th>內容</th><th>點下去會到哪裡</th></tr>
+<tr><td><b>BN 輪播</b></td><td>可自動輪播，<b>張數不固定</b>，隨檔期增減</td><td>每張各自設定去處：活動公告頁或作品介紹頁</td></tr>
+<tr><td>熱門排行榜</td><td>2×3 共六名，帶名次與促銷角標</td><td>卡片 → 作品介紹頁；「完整排行」→ 排行榜</td></tr>
+<tr><td>常用標籤</td><td>可展開更多</td><td>點標籤 → 找漫畫，以該標籤為關鍵字顯示結果</td></tr>
+<tr><td>活動橫幅</td><td>檔期活動入口，內容依當期更換</td><td>相關活動的公告頁</td></tr>
+<tr><td>新刊上架</td><td>橫向滑動；近 30 天上架的作品標題右側帶 NEW</td><td>卡片 → 作品介紹頁；「更多」→ 找漫畫並套用「最新上架」排序</td></tr>
+<tr><td>編輯精選</td><td>大卡加簡介，可左右滑。<b>首頁只有這裡能收藏</b></td><td>「開始試閱」→ 閱讀器；「收藏」就地切換</td></tr>
+<tr><td>特價精選</td><td>橫向滑動，帶原價與折扣徽章</td><td>「更多」→ 找漫畫並套用「特價中」篩選</td></tr>
+<tr><td>本週話題標籤</td><td>每週換一個主題標籤。卡片下方的標籤<b>只顯示一行、可橫向捲動</b></td><td>點任何一個標籤 → 以該標籤為關鍵字顯示結果；「更多」→ 整個主題標籤</td></tr>
+<tr><td>購買・閱讀說明</td><td>可收合</td><td>不跳轉</td></tr>
+<tr><td>頁尾</td><td>見 4.11</td><td>展開狀態全站同步</td></tr>
+</table></div>
+
+<h3>4.2 找漫畫</h3>
+<p>全站作品只有這一頁可以逐一瀏覽。<b>三條路進來看到的是同一頁</b>：底部導覽的「找漫畫」、右上放大鏡搜尋、點任何一個標籤。差別只在最上面有沒有多一列目前的條件。</p>
+
+<h4>版面</h4>
+<ul>
+<li><b>2 欄網格、一頁 12 筆</b>，真實分頁。封面右上有收藏愛心。</li>
+<li>工具列捲動時固定在頂端：左為篩選（右上角數字＝已選條件數），右為排序。</li>
+<li>套用搜尋或篩選後，最上面出現<b>結果列</b>：顯示目前條件與符合的件數，右側的叉可清除搜尋詞。</li>
+</ul>
+
+<h4>搜尋</h4>
+<ul>
+<li>比對<b>標題／作者／標籤</b>三個欄位，不分大小寫、部分比對（包含即命中），開頭的 <code>#</code> 會被忽略。</li>
+<li>結果數是真的算出來的，並記住最近搜尋過的詞（上限 6 筆、最新在上、去重）。</li>
+<li>點標籤＝<b>以該標籤為關鍵字送出搜尋</b>，也會寫進最近搜尋。</li>
+</ul>
+
+<h4>篩選（四組）</h4>
+<div class="tw"><table>
+<tr><th>組</th><th>選項</th><th>備註</th></tr>
+<tr><td>類型</td><td>單本 ／ 連載</td><td>只經營單行本時整組隱藏</td></tr>
+<tr><td>狀態</td><td>完結 ／ 未完結</td><td>與類型正交，四種組合都說得通</td></tr>
+<tr><td>優惠</td><td>特價中</td><td></td></tr>
+<tr><td>語言</td><td>中文版 ／ 日文原版</td><td></td></tr>
+</table></div>
+<div class="note"><b>同一組選多個＝符合其中之一（OR）；不同組之間要同時符合（AND）。</b>面板底部要直接寫這一行說明。面板從底部升起，蓋住列表但不離開找漫畫；「重設」一次清掉所有條件。</div>
+
+<h4>排序</h4>
+<p><code>热门（預設） / 最多收藏 / 最新上架 / 价格由低到高 / 价格由高到低</code>。單選，點完就收起。</p>
+<ul>
+<li><b>最多收藏</b>比的是收藏這部作品的會員人數，由後台統計。</li>
+</ul>
+
+<h4>分頁</h4>
+<ul>
+<li>一頁 12 筆（2 欄 × 6 列）；按鈕 <code>« ‹ 1 2 3 › »</code>，第一頁時前兩顆禁用、最後一頁時後兩顆禁用。</li>
+<li><b>換頁會捲回頂部</b>；換搜尋詞、篩選或排序時都回到第 1 頁。</li>
+<li>資料管線：<code>作品 → 搜尋詞 → 篩選 → 排序 → 切頁</code>。</li>
+</ul>
+
+<h4>空狀態</h4>
+<pre><code>找不到符合的作品
+換個關鍵字，或把篩選條件放寬一點。
+[ 清除搜尋與篩選 ]   ← 同時清掉搜尋詞與所有篩選條件（含數字徽章）</code></pre>
+
+<h3>4.3 排行榜</h3>
+<ul>
+<li>資料<b>建議由後台統計，反映真實數據</b>。</li>
+<li>兩層切換：期間（日／週／月，預設日）× 分類（綜合／單行本／連載）。</li>
+<li><b>第 1 名用全寬大卡</b>（16:10 封面＋底部漸層，左下大數字 1、左上促銷角標）；<b>第 2 名起是三欄網格</b>，取 12 筆剛好 4 整列。</li>
+<li>網格內只放封面、名次大字、狀態小標、標題、價格。<b>不放作者、標籤、漲跌、收藏愛心。</b></li>
+<li>由底部導覽或首頁「完整排行」進來一律重設成「日 ＋ 綜合」；從作品介紹頁返回則保留原本的選擇。</li>
+<li>建議規則：分類作品數不足 9 部（3 整列）就不開該分類。</li>
+</ul>
+
+<h3>4.4 作品介紹頁</h3>
+<p>同一個版型要撐三種商品型態。進頁時先讀這位讀者的購買紀錄與閱讀進度，再決定價格區、冊數列表與底部購買列各顯示什麼。</p>
+
+<h4>版面順序（手機版：圖在上、資訊在下）</h4>
+<pre><code>主視覺        整張作品圖，標題壓在圖片底部的漸層上，右上角收藏愛心
+              圖下方那一行：作者 · 狀態 · 全 N 冊／已更新 N 話，再下面最多 3 個標籤
+價格區        依型態顯示單本／每冊／每話價格，以及特價倒數與已購進度
+次要動作      整部購買／整套購買／解鎖剩餘（沒有就整塊不顯示）
+簡介          預設收合，可展開全文
+作品資訊      作者、出版社、冊數、頁數、語言、更新日期
+冊數／話數列表  單卷單行本沒有這一區
+推薦其他作品
+購買・閱讀說明
+───────────────────────────────
+購買列        固定在螢幕畫面底部，往下捲時一直留在原位</code></pre>
+<ul>
+<li>主視覺比例 <code>aspect-ratio:2/3</code> ＋ <code>max-height:58vh</code>：螢幕越高越接近原比例，矮螢幕自動多裁一點，<b>保證一屏內看得到圖＋標題＋購買列</b>。</li>
+<li><b>PC 版用左圖右資訊</b>的版型，標題從圖裡拉回右欄。</li>
+</ul>
+
+<h4>三種商品型態</h4>
+<div class="tw"><table>
+<tr><th></th><th>單卷單行本</th><th>多卷單行本</th><th>每話連載</th></tr>
+<tr><td>價格區</td><td>單本</td><td>每冊 ＋ 整套</td><td>每話 ＋ 整部</td></tr>
+<tr><td>下方列表</td><td><b>無</b></td><td>冊數列表</td><td>話數列表</td></tr>
+<tr><td>次要動作</td><td><b>無</b></td><td>整套購買／解鎖剩餘冊</td><td>整部購買／解鎖剩餘話</td></tr>
+<tr><td>單位</td><td>—</td><td>冊</td><td>話</td></tr>
+</table></div>
+
+<h4>底部購買列：各狀態的內容</h4>
+<div class="tw"><table>
+<tr><th>狀態</th><th>購買列</th><th>頁內次要動作</th></tr>
+<tr><td>單卷未購・有特價</td><td><code>[免费试阅] [立即购买 ◎96 120]</code></td><td>—</td></tr>
+<tr><td>單卷未購・無特價</td><td><code>[免费试阅] [立即购买 ◎120]</code></td><td>—</td></tr>
+<tr><td>單卷已購・未讀完</td><td><code>[开始阅读]</code></td><td>—</td></tr>
+<tr><td>單卷已讀完</td><td><code>[重新阅读]</code></td><td>—</td></tr>
+<tr><td>多卷未購</td><td><code>[试阅第 1 册] [购买第 1 册 ◎96]</code></td><td><code>整套购买 ◎336（省 30%）</code></td></tr>
+<tr><td>多卷部分已購</td><td><code>[续看 第 1 册 1/4]</code></td><td><code>解锁全部剩余 2 册 ◎192</code></td></tr>
+<tr><td>多卷全部已購・讀完</td><td><code>[重新阅读 4/4]</code></td><td>—</td></tr>
+<tr><td>連載・有免費話</td><td><code>[开始阅读（前 2 话免费）]</code></td><td><code>整部购买 ◎336（省 30%）</code></td></tr>
+<tr><td>連載・無免費話</td><td><code>[免费试阅] [购买第 1 话 ◎24]</code></td><td><code>整部购买 ◎378（省 30%）</code></td></tr>
+</table></div>
+<ul>
+<li>左側三分之一是試閱，<b>已經可以閱讀時試閱整顆消失</b>、主按鈕佔滿整列。</li>
+<li>試閱文案：單卷／連載＝<code>免费试阅</code>；多卷＝<code>试阅第 1 册</code>。</li>
+<li>特價時主按鈕帶實付金額＋刪除線原價；<b>% OFF 徽章與倒數不重複</b>放進購買列，留在價格區。</li>
+<li>次要動作（整套／整部／解鎖剩餘）<b>留在價格區下方</b>，要跟旁邊的整套價一起看才有意義。</li>
+</ul>
+
+<h4>主按鈕的文字怎麼決定</h4>
+<pre><code>還沒讀過 → 有已擁有的 → 开始阅读（第一個已擁有的單位）
+         → 都沒有     → 购买第 1 话／册
+讀過之後：
+  目前這一話／冊還沒讀完 → 续看 第 N
+  已經是最後一個         → 重新阅读
+  下一個已擁有           → 续看 第 N+1
+  下一個還沒買           → 购买第 N+1</code></pre>
+<div class="warn">順序不可以顛倒。先判斷「有沒有讀完目前這一個」，再判斷「下一個是否已擁有」——否則整套購買後讀到第 1 冊第 1 頁就退出，按鈕會跳成「續看 第 2 冊」。</div>
+
+<h4>冊數／話數列表</h4>
+<p>冊＝<code>第 N 冊 ／ 發售日 ／ 已購或價格</code>；話＝<code>第 N 話 ／ 更新日 ／ 免費試閱、已購或價格</code>。
+已購的直接開閱讀器，未購的開確認購買彈窗；已讀的標「已讀」；可排序；超過 6 筆可展開。<b>列內不放試閱連結。</b></p>
+
+<h4>價格規則</h4>
+<ul>
+<li>各冊／各話可以不同價：<b>聚合處顯示「起」、列表顯示各自價格</b>；購買列已指定第幾冊時顯示該冊的實際價格，不用「起」。</li>
+<li>整套／整部價＝各單位實價加總後再打折。</li>
+<li>已全數擁有時不顯示價格；部分擁有時顯示「已購 N 冊／話，其餘 M 冊／話可補購」。</li>
+</ul>
+
+<h3>4.5 確認購買彈窗</h3>
+<pre><code>購買項目（小封面＋作品名＋單位＋價格）
+優惠券        ← 預設帶入折抵最多的一張
+支付選擇      ← 平台幣
+金額列
+按鈕          [確認購買] [平台幣充值]
+退款聲明</code></pre>
+
+<h4>優惠券區塊</h4>
+<ul>
+<li>開啟時<b>自動帶入折抵最多的一張</b>（不是最先到期的）。</li>
+<li>「更換」展開清單，可改選或選「不使用優惠券」。</li>
+<li><b>不符條件的券不列出來</b>；完全沒有可用券時不出現空的選擇器，只顯示一行「本次購買沒有可用的優惠券」。</li>
+<li>換券時<b>保留卷動位置</b>，重繪不該把畫面彈回最上面。</li>
+</ul>
+
+<h4>金額列</h4>
+<pre><code>支付方式    平台幣
+商品金額    96 平台幣      ← 只在有折抵時出現
+優惠折抵    −9 平台幣      ← 金色
+扣款金額    87 平台幣      ← 支付卡的「購後剩」也是折抵後的數字</code></pre>
+
+<h4>不使用優惠券的顯示方式</h4>
+<p>優惠券那一列改成「不使用優惠券」並標示本次還有幾張可用，左側色條轉為灰色；<b>金額區的「商品金額」與「優惠折抵」兩列一併消失</b>，只留「扣款金額」，等於原價。</p>
+
+<h4>餘額不足的顯示方式</h4>
+<p>支付區塊整塊變暗，平台幣旁邊出現「余额不足」標籤，下一行標出<b>還差多少</b>（粉紅色）。「確認購買」停用，只剩「平台幣充值」可以按。<b>金額仍然照算</b>，讓讀者知道要補多少。充值完成後回到同一筆購買。</p>
+
+<h4>購買成功</h4>
+<p>說明用掉哪一張券、折抵多少，底下兩個出口：<b>開始閱讀</b> 或 <b>回作品頁</b>。
+付款完成當下同時發生三件事：作品寫入書櫃的「已購」、歷史紀錄多一筆消費、用掉的那張券從帳號扣除。</p>
+<div class="warn">退款聲明固定在彈窗底部：<b>規則要出現在付錢的那一刻</b>，不是只躺在條款頁。實際文案待法務定案。</div>
+
+<h4>從彈窗點條款／退款政策</h4>
+<p>點了會先把彈窗收起、開條款頁；<b>條款頁的「返回」要回到原本那一筆購買</b>——重新打開確認購買彈窗，連<b>已經選好的優惠券（含「不使用優惠券」）都要帶回來</b>，不可以把人丟回作品介紹頁從頭再來。</p>
+<p>若使用者不是按返回、而是從底部導覽離開條款頁，那筆購買就放掉，之後不該莫名其妙跳出彈窗。</p>
+
+<h3>4.6 閱讀器</h3>
+<p>全螢幕覆蓋層。日系翻頁・右翻・單頁，每頁為全頁圖置中黑底，帶<b>使用者專屬浮水印</b>。</p>
+
+<h4>操作區</h4>
+<div class="tw"><table>
+<tr><th>區域</th><th>行為</th></tr>
+<tr><td>左側 38%</td><td>下一頁（日系右翻，往左點是往後讀）</td></tr>
+<tr><td>中央 24%</td><td>開關工具列，收起後畫面全滿</td></tr>
+<tr><td>右側 38%</td><td>上一頁</td></tr>
+<tr><td>頂部工具列</td><td>返回（回作品介紹頁，進度已存）＋ 作品名・第 N 話／冊（試閱標「（試閱）」）</td></tr>
+<tr><td>底部工具列</td><td>進度滑桿（可拖到任一頁）＋ 頁碼 <code>X / Y</code></td></tr>
+<tr><td>操作導引</td><td>首次進入時覆蓋全畫面（見下）</td></tr>
+</table></div>
+
+<h4>首次進入的操作導引</h4>
+<ul>
+<li>第一次開閱讀器時<b>覆蓋一層半透明深色導引</b>，用粉色箭頭與說明標出：左側「点击左侧 翻下一页」、右側「点击右侧 回上一页」、中央手指圖示「点击中央 开关工具列」。</li>
+<li>上方引線指向返回鈕「点「返回」回作品介绍页」；下方兩個說明框用引線指向進度條「拖曳进度条可直接跳到任一页」與頁碼「当前页 / 总页数」。</li>
+<li>底部有「知道了」按鈕；<b>點按鈕或畫面任一處都關閉</b>，同一次造訪不再出現。</li>
+</ul>
+
+<h4>章末／冊末卡（讀到最後一頁再往下）</h4>
+<div class="tw"><table>
+<tr><th>情況</th><th>畫面</th></tr>
+<tr><td><b>下一話／冊已擁有</b></td><td>「第 N 话 结束」＋下一話封面＋<b>阅读下一话</b>＋回作品頁</td></tr>
+<tr><td><b>下一話／冊要購買</b></td><td>🔒「接下来是付费内容」＋下一話封面（付費標）＋<b>购买下一话 ◎每話價</b>＋<b>整部购买（省 N%）</b>＋回作品頁</td></tr>
+<tr><td><b>已經是最後一話／冊</b></td><td>完結作品：「全话完／全书完・感谢阅读《作品名》」＋回作品頁＋<b>从第 1 话重新阅读</b><br>還在連載：「已是最新话，敬请期待更新」＋回作品頁</td></tr>
+<tr><td><b>鎖話／鎖冊</b>（直接開到未購的）</td><td>🔒「购买后即可阅读本话」＋购买本话＋整部购买＋回作品頁</td></tr>
+<tr><td><b>試閱結束</b></td><td>🔒 單卷→立即购买；多卷→购买第 N 册＋整套购买；連載→购买第 N 话</td></tr>
+</table></div>
+<div class="note"><b>最後一話的結尾卡停在原地等讀者按，不自動跳回作品頁。</b>回到作品介紹頁後，購買列的主按鈕變成「重新閱讀」，從第 1 頁開始；作品同時從書櫃的「續讀」移出、留在「已購」。</div>
+
+<h4>閱讀進度</h4>
+<ul>
+<li><b>每翻一頁存一次</b>，伺服器端是唯一真相，換裝置接得上。</li>
+<li>分兩種紀錄：<b>開過的最高話／冊</b>（決定「續看」的目標與列表的「已讀」標記）與<b>讀到章末的最高話／冊</b>（區分「讀完→買下一個」和「讀一半→續看目前這個」）。鎖話、鎖冊不計。</li>
+<li>單卷單行本另記一個 <code>未讀／閱讀中／已讀完</code> 的旗標，書櫃才分得出來。</li>
+<li><b>購買不會立刻推進進度</b>：確認購買只記擁有狀態，成功頁點「開始閱讀」才載入並更新進度。按「回作品頁」不動進度。</li>
+</ul>
+
+<h3>4.7 書櫃</h3>
+<p>三個分頁收的東西不同：<b>續讀</b>是還沒讀完的、<b>已購</b>是買過的、<b>收藏</b>只是加過愛心、不一定買過。
+一個作品一格，多卷作品也只佔一格。每個分頁的標籤帶即時數字，分頁列捲動時固定在頂端。</p>
+
+<h4>續讀分頁</h4>
+<ul>
+<li>橫式大卡：封面 ＋ 標題 ＋ <code>第 2 冊 / 既刊 4 冊　50%</code> ＋ 進度條 ＋ 右側「續看」。</li>
+<li>排序固定<b>最近閱讀由新到舊</b>，<b>沒有工具列</b>。</li>
+<li>最上面一行提示「接着上次的进度继续看」——<b>只有續讀分頁有這一行</b>。</li>
+<li>單卷單行本顯示 <code>单本买断 阅读中</code>，進度條用 0／50／100% 表示未讀／閱讀中／已讀完。</li>
+<li>「續看」＝<b>先開作品頁再開閱讀器</b>，退出閱讀器落在作品頁、再返回才回書櫃。</li>
+<li>點卡片其他地方＝進作品頁。</li>
+</ul>
+
+<h4>已購分頁</h4>
+<ul>
+<li>2 欄網格。封面底部深色條：左邊擁有量、右邊閱讀狀態。</li>
+<li>擁有量三種：單卷＝<code>单本买断</code>；多卷＝<code>已购 N / M 册</code>；連載＝<code>已解锁 N / M 话</code>（含免費話）。</li>
+<li>閱讀狀態：<code>未读</code> ／ <code>已读 N 册（话）</code> ／ <code>已读完</code>（綠字）。</li>
+<li>作者後面接 <code>· 更新 MM/DD</code>：<b>只有連載與既刊未完結的單行本顯示</b>，完結作品不會再更新所以不顯示。</li>
+</ul>
+
+<h4>收藏分頁</h4>
+<p>卡片＝封面＋狀態角標＋標題＋作者＋價格，節奏與找漫畫列表一致。封面右上角<b>實心愛心＝一鍵取消收藏</b>，與作品頁雙向同步。</p>
+
+<h4>排序與篩選（只有已購與收藏有，兩個分頁的選項不一樣）</h4>
+<div class="tw"><table>
+<tr><th>分頁</th><th>排序（預設在前）</th><th>篩選</th></tr>
+<tr><td>續讀</td><td>無（固定最近閱讀）</td><td>無</td></tr>
+<tr><td><b>已購</b></td><td>最近閱讀 ／ 最近購買 ／ 最近更新</td><td>型態（全部／單行本／連載）＋ <b>閱讀進度</b>（全部／未讀／閱讀中／已讀完）</td></tr>
+<tr><td><b>收藏</b></td><td>最近加入 ／ 最近更新</td><td><b>只有型態</b>（全部／單行本／連載）</td></tr>
+</table></div>
+<p>兩個選單都是從按鈕下方展開、就地換內容，不離開書櫃。篩選每一組單選＋「全部」，選了幾組就在按鈕上顯示數字徽章。</p>
+
+<h4>續讀的判定規則</h4>
+<ul>
+<li><b>進入續讀</b>：已開始閱讀（進度 &gt; 0）<b>且</b>還沒把擁有的內容讀完。</li>
+<li>讀完的作品<b>退出續讀、留在已購</b>（標示「已讀完」），避免續讀列被已看完的作品塞滿。</li>
+<li>連載更新新話、多卷出新刊時會<b>自動回到續讀列</b>。</li>
+<li>買了但一頁都沒開的作品不進續讀，只在已購。</li>
+<li>「續看」開到哪一話／冊：沒讀過→第一個擁有的；目前這一個沒讀完→續看目前這一個；讀完且下一個已擁有→下一個；讀完但下一個要付費→停在目前這一個。</li>
+</ul>
+
+<h3>4.8 會員中心（漫畫館版）</h3>
+<p>漫畫館做<b>自己一頁</b>，只輸出用得到的區塊——不是畫出來再隱藏。</p>
+<div class="tw"><table>
+<tr><th>區塊</th><th>處置</th><th>說明</th></tr>
+<tr><td>暱稱 ＋ 會員 ID</td><td><span class="pill p-keep">與遊戲站共用</span></td><td>跨站同一個身分</td></tr>
+<tr><td>綁定 Email ／ 修改暱稱 ／ 修改密碼</td><td><span class="pill p-keep">與遊戲站共用</span></td><td></td></tr>
+<tr><td>快捷格</td><td><span class="pill p-mod">三格改兩格</span></td><td>歷史紀錄 ／ 聯絡客服。<b>最新消息</b>等公告頁做出來再加回，屆時恢復三格</td></tr>
+<tr><td>平台幣 ＋ 儲值</td><td><span class="pill p-keep">與遊戲站共用</span></td><td>漫畫消費的唯一幣別，整頁最重要的東西</td></tr>
+<tr><td><b>我的書櫃</b></td><td><span class="pill p-new">漫畫館新增</span></td><td>續讀／已購／收藏三格數字，點數字進書櫃對應分頁</td></tr>
+<tr><td><b>我的優惠券</b></td><td><span class="pill p-new">漫畫館新增</span></td><td>唯讀清單，標適用範圍與有效期限</td></tr>
+<tr><td><b>兌換碼</b></td><td><span class="pill p-new">漫畫館新增</span></td><td>獨立一區，見第 5 節</td></tr>
+<tr><td>頁尾</td><td><span class="pill p-mod">文案換漫畫館版</span></td><td></td></tr>
+<tr><td>簽到 ／ 已預約遊戲 ／ 推廣禮包碼 ／ 遊戲禮包碼</td><td><span class="pill p-off">不顯示（永久）</span></td><td>遊戲專屬</td></tr>
+<tr><td>平台代金券 ／ 遊戲代金券 ／ 週月卡</td><td><span class="pill p-off">不顯示（暫時）</span></td><td>待確認能否用於漫畫消費</td></tr>
+</table></div>
+<p>平台幣區塊加一行說明：<code>平台币与 JS GAME 游戏帐号共用，游戏站与漫画馆通用。</code></p>
+
+<h3>4.9 歷史紀錄</h3>
+<p>版面照遊戲站，<b>在時間區間上方加一排站別分頁</b> <code>漫画 / 游戏</code>。</p>
+<div class="note"><b>這是同一本帳，分頁只是篩站別。</b>平台幣兩站共用，餘額是一條線，由最新一筆往回推算（最新一筆的餘額＝錢包餘額）。</div>
+<div class="tw"><table>
+<tr><th>類型</th><th>在哪個分頁出現</th></tr>
+<tr><td><b>充值</b></td><td><b>兩邊都出現</b>（平台層級）</td></tr>
+<tr><td>贈送 ／ 消費</td><td>看來源與消費標的，各自的分頁</td></tr>
+<tr><td>訂閱（週月卡）／ 簽到</td><td>只有遊戲</td></tr>
+</table></div>
+<ul>
+<li>類型 chips 依站別變動：漫畫＝<code>消费（預設）/ 充值 / 赠送</code>；遊戲＝<code>充值（預設）/ 赠送 / 消费 / 订阅 / 签到</code>。切換站別時回到該站的第一個類型。</li>
+<li>時間區間：<code>最近 90 天（預設）/ 30 天 / 7 天</code>。</li>
+<li>每一列第二行＝<b>項目・當下餘額</b>（例：《龙女郎》单本买断・余额 695）。<b>入帳 + 綠色、扣款 − 白色。</b></li>
+<li>說明文字分站別，<b>漫畫分頁不提代金券</b>。</li>
+<li>進入時一律重設為「漫畫・消費・最近 90 天」。空狀態：「此区间没有『消费』的纪录 / 换个类型或拉长时间区间试试」。</li>
+</ul>
+
+<h3>4.10 充值中心與登入頁</h3>
+<p>兩頁都沿用遊戲站的結構與流程，換成漫畫館配色。</p>
+<ul>
+<li><b>充值中心</b>：金幣圖 → 「请选择储值的面额」→ 選擇其他幣別 → 三欄面額格。
+<b>漫畫館只有平台幣</b>，代金券與週月卡在待確認前不顯示。從購買彈窗的「平台幣充值」進來，完成後要回到原本那筆購買。</li>
+<li><b>登入頁</b>：分頁 <code>登录 / Email 注册</code>（<b>沒有快速註冊</b>）、帳號、密碼（可切換顯示）、驗證碼、忘記密碼、服務條款、登入、返回。</li>
+<li>登入攔截要<b>保存意圖</b>：登入完回原頁並自動續行原本的動作；取消也要回得了原頁，不可以停在空白頁。</li>
+</ul>
+
+<h3>4.11 年齡確認、法務文件與頁尾</h3>
+<h4>年齡確認</h4>
+<ul>
+<li>彈窗式卡片，結構與配色照正式站：logo ＋「您是否已年满 18 岁」＋限制級說明＋服務條款／隱私權政策連結＋<code>否</code>／<code>是</code> 兩顆按鈕。</li>
+<li><b>點「否」在同一張卡裡出現一行粉紅提示</b>「本网站需要满 18 岁才可以进入」，不換頁、不導外、按鈕保持可用。</li>
+<li>從彈窗點條款連結會<b>先收起彈窗</b>，看完返回時彈窗會回來。</li>
+<li>確認後記在本機；<b>上線前務必打開「記住」</b>，否則每次進站都擋人。</li>
+</ul>
+<h4>法務文件（三份，各自獨立的頁面）</h4>
+<div class="tw"><table>
+<tr><th>文件</th><th>入口</th><th>必須涵蓋</th></tr>
+<tr><td>服务条款</td><td>年齡彈窗、購買彈窗</td><td>年齡限制、帳號規範、<b>授權性質（買的是線上閱讀權，非著作權）</b>、作品下架時已購內容怎麼辦、平台幣性質、使用者禁止行為（截圖外流／重製／轉售帳號）、侵權通報走客服、準據法</td></tr>
+<tr><td>隐私权政策</td><td>年齡彈窗</td><td>蒐集範圍（含閱讀行為與進度）、保存期限需與歷史紀錄一致、Cookie 與第三方、當事人權利</td></tr>
+<tr><td>退款与取消政策</td><td>購買彈窗</td><td>見第 7 節的三條待定規則</td></tr>
+</table></div>
+<p>目前三份都是<b>條文架構草稿</b>，列出每份必須涵蓋什麼，上線前由法務定稿取代。</p>
+<h4>頁尾（七頁共用同一份）</h4>
+<pre><code>四行 18+ 須知（永遠顯示）
+可收合的站台說明：共三段，收合時只顯示第一段
+社群圖示 → JS GAME logo → 版權</code></pre>
+<ul>
+<li>站台說明是<b>SEO 文案</b>，寫平台特色與吸引點，不寫使用方式；以遊戲站原文為主，融入漫畫館的關鍵字。</li>
+<li>收合時只顯示第一段＋「阅读更多 ▼」，展開變「收合 ▲」，<b>展開狀態全站同步</b>。</li>
+<li><b>頁尾不放條款連結</b>（與正式站一致）。</li>
+</ul>
+<h4>頁尾文案（定稿）</h4>
+<p><b>18+ 四行須知</b></p>
+<pre><code>本网站所有登场角色均年满 18 岁。
+本站内容涉及性、暴力、恐怖元素。
+请注意使用时间，避免沉迷。
+本平台部分内容或服务需另行付费。</code></pre>
+<p>沿用遊戲站原文，只把「请注意<b>游戏</b>时间」「本<b>游戏</b>部分内容」改成「请注意<b>使用</b>时间」「本<b>平台</b>部分内容」。</p>
+<p><b>第一段（收合時唯一顯示的一段）</b></p>
+<pre><code>免费畅玩 R18 成人游戏、阅读人气黄漫就上 JS GAME
+
+JS GAME 是一个专注于 R18 成人游戏的线上平台，主打各类激色游戏与人气黄游，
+题材从美少女互动、剧情向 AVG，到养成类 RPG 都找得到，为喜欢深夜限定内容的
+玩家提供更多选择。平台旗下另设 JS 漫画馆，收录各类无修正黄漫与人气本子，
+题材涵盖校园恋爱、后宫制服、异世界奇幻等。</code></pre>
+<p><b>第二段</b></p>
+<pre><code>手机下载即可畅玩的绅士游戏，开启网页就能看的成人漫画
+
+JS GAME 收录的成人游戏多数同时支持 Android 与 iOS，下载安装后即可开玩，
+游玩前可先查看各游戏页面的说明，确认兼容性与安装方式，操作简单、免繁复设定。
+漫画馆不必安装，手机、平板、电脑开启网页即可在线阅读，随开随看。
+平台也会不定期加入新作与限时活动，内容持续更新。</code></pre>
+<p><b>第三段</b></p>
+<pre><code>持续上新的免费黄游库与无修正漫画
+
+JS GAME 服务中文与海外玩家，持续上架各类免费黄游与热门 H-Game，漫画馆也同步
+更新人气新刊与完结套书、每部作品皆开放免费试阅，希望让每位造访平台的玩家，
+都能找到符合喜好的成人游戏与漫画题材。</code></pre>
+</section>
+
+<section>
+<h2><span class="n">5</span>優惠券與兌換碼</h2>
+<div class="note"><b>兌換碼是「取得」的入口，優惠券是「使用」的資產。</b>兩者分開放：兌換碼在會員中心獨立一區，優惠券在結帳頁選用。</div>
+<div class="tw"><table>
+<tr><th></th><th>兌換碼</th><th>優惠券</th></tr>
+<tr><td>它是什麼</td><td>一串字，用來<b>取得</b>東西</td><td>帳號裡<b>已經持有</b>的資產</td></tr>
+<tr><td>來源</td><td>活動、禮包、客服補償</td><td>兌換碼、活動自動發放、消費回饋</td></tr>
+<tr><td>在哪裡用</td><td>會員中心（輸入一次）</td><td><b>結帳頁</b>（每次購買時選用）</td></tr>
+<tr><td>有沒有代碼</td><td>有，就是它本身</td><td><b>沒有</b></td></tr>
+<tr><td>用完之後</td><td>失效，內容進帳號</td><td>從帳號扣除一張</td></tr>
+</table></div>
+<p>遊戲站的「遊戲禮包碼」要給一串可複製的碼，是因為它在<b>遊戲客戶端那個另一個系統</b>裡消耗；漫畫館的券和結帳在同一個系統裡，所以直接勾選使用。</p>
+
+<h3>5.1 會員中心「我的優惠券」</h3>
+<ul>
+<li>純清單、不可點。每張券標<b>適用範圍</b>（單本買斷／全站…）與<b>有效期限</b>，標題右側顯示「N 張可用」。</li>
+<li>底下一行說明：優惠券放在帳號裡，結帳時於「確認購買」頁勾選，系統會預設帶入折最多的一張。</li>
+</ul>
+
+<h3>5.2 會員中心「兌換碼」</h3>
+<ul>
+<li>輸入框 placeholder：<code>输入礼包／活动兑换码</code>，右邊一顆「兑换」。</li>
+<li>說明：兌換成功後，平台幣或優惠券會直接進入您的帳號。</li>
+<li><b>成功</b>：畫面上方浮出提示列出這次拿到什麼（數秒後淡出），券張數與餘額同時變，並<b>補一筆「贈送」進歷史紀錄</b>。</li>
+<li>原型在輸入框下方放了一條<b>示範用兌換碼</b>（<code>JSMH2026COMIC</code>，點一下自動填入）方便測試成功的提示，<b>上線移除</b>。</li>
+<li><b>失敗</b>（代碼無效、已過期、已使用過）：輸入框下方出現粉紅色提示，停在原地。</li>
+</ul>
+
+<h3>5.3 券的適用判斷</h3>
+<p><b>「可用」＝購買類型對得上，而且實際折得到錢。</b>滿額券沒到門檻時<b>根本不列出來</b>，不是列出來但不能點。</p>
+<p>券的規則必須機器可讀（打折／定額、折抵上限、門檻、適用的購買 scope、有效期限），詳細欄位見《技術規格》。
+<b>折抵金額一律由後端重算</b>，前端算的只拿來顯示。</p>
+</section>
+
+<section>
+<h2><span class="n">6</span>前端實作備忘</h2>
+<h3>6.1 反覆踩到的 CSS 陷阱</h3>
+<ol>
+<li><b>class 撞名</b>：單檔＋全域 CSS，新增 class 前一定要先搜尋全檔。踩過兩次（<code>.dhead</code> 撞到搜尋下拉、<code>.more</code> 撞到「更多 ›」連結）。
+各頁用前綴：書櫃 <code>sh</code>、會員中心 <code>mc</code>、歷史紀錄 <code>hs</code>、條款 <code>lg</code>、年齡彈窗 <code>ag</code>、頁尾 <code>foot-</code>、結帳券 <code>cp-</code>。</li>
+<li><b>後代選擇器權重蓋過單一 class</b>：<code>.agegate p</code>（0,1,1）會蓋掉 <code>.ag-warn</code>（0,1,0），要寫成 <code>.agegate p.ag-warn</code>。</li>
+<li><b>z-index 相同時由 DOM 順序決勝</b>：見 2.7。驗收時用 <code>elementFromPoint()</code> 實際點一下，不要只斷言數值。</li>
+<li><b><code>scrollIntoView</code> 會把整個手機外框捲走</b>：<code>overflow:hidden</code> 只擋使用者捲動、不擋程式設定 <code>scrollTop</code>。自己算位置只設內層容器的捲動量。</li>
+<li><b><code>var</code> 的賦值不會提升</b>：共用資料（收藏、圖示）必須宣告在第一次渲染之前。</li>
+<li><b><code>[hidden]</code> 失效</b>：若外層骨架被移除，要自己補一條 <code>[hidden]{display:none!important}</code>。驗收時斷言 <code>getComputedStyle(el).display</code>，不要斷言 <code>el.hidden</code>（那永遠是 true）。</li>
+</ol>
+<h3>6.2 其他</h3>
+<ul>
+<li>點卡片開作品頁用全域委派，<b>排除清單要含收藏愛心</b>，否則點愛心會順便開作品頁。</li>
+<li>彈窗內重繪要<b>保留卷動位置</b>。</li>
+<li>標題列是 flex：標題負責省略、NEW 標固定不縮。用文字比對找卡片時記得先去掉結尾的 NEW。</li>
+<li>篩選 chip 用 <code>data-*</code> 比對，不要比 <code>textContent</code>（通知的篩選深連結也走這條）。</li>
+</ul>
+</section>
+
+<section>
+<h2><span class="n">7</span>還沒做、還沒定案</h2>
+<h3>7.1 還沒做的頁面與功能（依優先序）</h3>
+<ol>
+<li><b>PC 版</b>（Figma 的 <code>header/web</code>、<code>footer/web</code> 已備好；作品介紹頁用左圖右資訊版型，書櫃／會員中心／歷史紀錄也要）</li>
+<li><b>公告／活動頁</b>：BN 輪播與活動橫幅的落地頁。做完要把會員中心的「最新消息」快捷加回來。</li>
+<li><b>未登入狀態</b>：目前所有頁面都假設已登入。</li>
+<li>篩選加「價格區間」；分頁超過 10 頁要加省略號。</li>
+<li>排行榜接真實統計；作品量足夠後加題材榜。</li>
+<li>閱讀器進階：見開き跨頁、相鄰頁預載、設定（亮度／翻頁模式／單雙頁）、進度跨裝置同步。</li>
+<li>通知接 API 與推播；追蹤更新的推播開關。</li>
+<li>書櫃：瀏覽紀錄、分頁載入、書櫃內搜尋、收藏連載的「有新話」角標。</li>
+<li>留言功能（作品／每話）；「下載APP」改 PWA 引導。</li>
+</ol>
+
+<h3>7.2 待確認（會回頭改掉已完成的頁面）</h3>
+<div class="tw"><table>
+<tr><th>事項</th><th>誰決定</th><th>會影響什麼</th></tr>
+<tr><td><b>三條退款規則</b>：數位內容開啟後可否退、儲值可否退、誤購處理與申請期限</td><td>法務＋營運</td><td>購買彈窗文案、退款政策頁、客服 SOP</td></tr>
+<tr><td><b>平台代金券能否用於漫畫消費</b></td><td>營運＋平台</td><td>會員中心版面、購買彈窗的<b>支付選擇</b>、歷史紀錄幣別。<b>代金券是支付工具、優惠券是折抵，兩層不要混</b></td></tr>
+<tr><td><b>作品下架後已購者的權益</b></td><td>法務＋營運</td><td>書櫃顯示、閱讀器、客服 SOP</td></tr>
+<tr><td>優惠券可否併用</td><td>營運</td><td>目前一次一張；要併用得先定疊加順序與上限</td></tr>
+<tr><td>內容保護強度（浮水印是否必須、切片打散到什麼程度）</td><td>法務＋版權方</td><td>閱讀串流與轉檔管線</td></tr>
+<tr><td>首批上架作品的數量與型態（是否含連載）</td><td>營運</td><td>營運型態開關、排行榜分類、找漫畫的類型篩選</td></tr>
+<tr><td>歷史紀錄保留 90 天對買斷商品是否足夠</td><td>營運＋平台</td><td>建議消費類延長，或靠書櫃「已購」提供完整清單</td></tr>
+<tr><td>歷史紀錄的類型要不要加「全部」</td><td>產品</td><td>要對帳的人會想要混合時間軸；建議加</td></tr>
+<tr><td>PC 版是否與手機版同時上線</td><td>產品</td><td>不同時上線總時程約可縮短三週</td></tr>
+</table></div>
+
+<h3>7.3 上線前檢查清單</h3>
+<ul>
+<li>年齡確認改成<b>記住一次</b>（否則每次進站都擋人）。</li>
+<li>移除作品介紹頁與排行榜的<b>示範切換列</b>，以及兌換碼區塊的<b>示範用兌換碼</b>那一條。</li>
+<li><b>推廣工具</b>依決策關閉。</li>
+<li>「下載APP」改 PWA 引導。</li>
+<li>所有示意數字換成真實資料；作品的最近更新日、語言換成真實欄位。</li>
+<li>書櫃、歷史紀錄、優惠券改接會員 API；收藏與兌換碼接 API；未登入時點愛心／進會員中心要導登入。</li>
+<li><b>上線要擋過期券</b>；折抵金額一律由後端重算。</li>
+<li>會員中心平台幣那行「代金券待確認」的註記依結論移除或改寫。</li>
+<li>三份法務文件由法務定稿，取代架構草稿。</li>
+<li>公告頁上線後把「最新消息」快捷加回會員中心。</li>
+</ul>
+</section>
+</main></div></div>
+<div class="wrap"><footer>JS GAME ・ 漫畫館改版　|　本文件只寫最終規格；互動細節以互動原型為準，畫面順序以前端操作流程為準。</footer></div>
+<script>
+(function(){
+  var main=document.querySelector('main'), toc=document.getElementById('toc');
+  var items=[].slice.call(main.querySelectorAll('h2,h3'));
+  var ol=document.createElement('ol'), links=[];
+  items.forEach(function(h,i){
+    if(!h.id) h.id='s'+i;
+    var li=document.createElement('li'), a=document.createElement('a');
+    var num=h.querySelector('.n');
+    a.href='#'+h.id;
+    a.textContent=(num? num.textContent.trim()+'　'+h.textContent.replace(num.textContent,'').trim()
+                      : h.textContent.replace(/\s+/g,' ').trim());
+    if(h.tagName==='H3') a.className='sub';
+    li.appendChild(a); ol.appendChild(li); links.push(a);
+  });
+  toc.appendChild(ol);
+  var obs=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting) return;
+      links.forEach(function(a){ a.classList.toggle('on', a.getAttribute('href')==='#'+e.target.id); });
+      var on=toc.querySelector('a.on');
+      if(on && toc.scrollHeight>toc.clientHeight){
+        var t=on.offsetTop-toc.clientHeight/2;
+        if(Math.abs(toc.scrollTop-t)>40) toc.scrollTop=t;
+      }
+    });
+  },{rootMargin:'-8% 0px -70% 0px'});
+  items.forEach(function(h){ obs.observe(h); });
+})();
+</script>
+</body>
+</html>
