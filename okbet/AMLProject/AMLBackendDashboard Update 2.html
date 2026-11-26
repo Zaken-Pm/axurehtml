@@ -296,6 +296,21 @@
      Alerts tab, each with a toggle .switch on the right (click to enable/disable —
      purely visual, see the "RULE TOGGLE SWITCHES" JS block).
   ========================================================================== */
+  /* Trigger-type cards at the top of Red Flag Alerts */
+  .trig-label{font-size:12px; font-weight:700; color:var(--text-mid); letter-spacing:.4px; text-transform:uppercase; margin:0 0 8px;}
+  .trig-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:18px;}
+  .trig-card{border:1px solid var(--border-light); border-top:3px solid #e0463f; border-radius:3px; padding:14px 16px; background:#fff; cursor:pointer; transition:box-shadow .15s;}
+  .trig-card:hover{box-shadow:0 2px 10px rgba(0,0,0,.09);}
+  .trig-card.t2{border-top-color:#7c5cdb;} .trig-card.t3{border-top-color:#e8890c;}
+  .trig-card .th{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
+  .trig-card .ti{width:32px; height:32px; border-radius:50%; background:#fdeaea; color:#e0463f; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0;}
+  .trig-card.t2 .ti{background:#efeafc; color:#7c5cdb;} .trig-card.t3 .ti{background:#fff1de; color:#e8890c;}
+  .trig-card .tn{font-weight:700; font-size:13px; color:var(--text-dark); line-height:1.3;}
+  .trig-card .td{font-size:12px; color:var(--text-mid); line-height:1.5; min-height:54px;}
+  .trig-card .tm{display:flex; justify-content:space-between; align-items:center; margin-top:10px; font-size:11.5px; color:var(--text-light);}
+  .trig-card .tm b{color:var(--text-dark); font-size:15px;}
+  .notif-item.trig .nt::before{content:'⚑ '; color:#e0463f;}
+  .notif-item.trig{background:#fffaf9;}
   .rule-card{border:1px solid var(--border-light); border-radius:2px; padding:14px 16px; margin-bottom:10px; display:flex; align-items:center; gap:16px;}
   .rule-card .ricon{width:34px; height:34px; border-radius:50%; background:#fdeaea; color:#e0463f; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0;}
   .rule-card .rname{font-weight:700; font-size:13px; color:var(--text-dark);}
@@ -436,6 +451,72 @@
   .progress-txt{font-size:11px; color:var(--text-light); margin-top:4px;} /* e.g. "Day 1 of 3 updated" */
   .missing-list{display:flex; flex-wrap:wrap; gap:5px; max-width:210px;} /* red chips: "Valid ID", "Proof of Address"… */
   .missing-list .chip{background:#fdeaea; color:#e0463f; font-size:10.5px; padding:2px 8px; border-radius:9px; white-space:nowrap;}
+
+/* ===== QUEUE TABS (General Alert Queue / AMLA Queue) ===== */
+.q-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.q-head h2{margin:0;font-size:20px;color:#14213d}
+.q-pill{background:#7c5cdb;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:12px}
+.q-sub{color:var(--text-mid);font-size:12.5px;margin:2px 0 14px}
+.q-switch{display:flex;gap:8px;margin-bottom:14px}
+.q-switch button{border:1px solid var(--border);background:#fff;border-radius:6px;padding:9px 18px;cursor:pointer;text-align:left;font-size:13px;font-weight:700;color:var(--text-mid)}
+.q-switch button small{display:block;font-weight:400;font-size:11px}
+.q-switch button.on{background:#1b5fe0;border-color:#1b5fe0;color:#fff}
+.q-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--border-light);border-radius:8px;margin-bottom:14px;background:#fff}
+.q-stats.three{grid-template-columns:repeat(3,1fr)}
+.q-stat{display:flex;gap:12px;align-items:center;padding:16px 18px;border-right:1px solid var(--border-light)}
+.q-stat:last-child{border-right:0}
+.q-ico{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:18px;color:#fff;flex-shrink:0}
+.q-stat span{font-size:12px;color:var(--text-mid)}.q-stat b{display:block;font-size:24px;color:#14213d;line-height:1.2}
+.q-stat em{font-style:normal;font-size:11px;font-weight:600}.up{color:#e0463f}.dn{color:#2ba24c}
+.q-tabs{display:flex;gap:26px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.q-tabs span{padding:8px 2px;font-size:13px;color:var(--text-mid);cursor:pointer;border-bottom:2px solid transparent}
+.q-tabs span.on{color:#1b5fe0;font-weight:700;border-color:#1b5fe0}
+.q-filters{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.q-filters input,.q-filters select{border:1px solid var(--border);border-radius:5px;padding:7px 10px;font-size:12.5px;background:#fff}
+.q-filters input{flex:1;min-width:200px}
+.q-tbl{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff}
+.q-tbl th{background:#0f2a5c;color:#fff;text-align:left;padding:10px 8px;font-weight:600;white-space:nowrap}
+.q-tbl td{padding:9px 8px;border-bottom:1px solid var(--border-light);color:var(--text-dark)}
+.q-tbl tr.sel td{background:#eef4ff}
+.q-tag{display:inline-block;padding:2px 9px;border-radius:11px;font-size:11.5px;font-weight:600}
+.q-tag.High{background:#fdeaea;color:#d93a33}.q-tag.Medium{background:#fdf6d8;color:#b8860b}.q-tag.Low{background:#e4f6ea;color:#2ba24c}
+.q-st{display:inline-block;padding:3px 8px;border-radius:4px;font-size:11px;background:#e8f0fe;color:#1b5fe0}
+.q-st.Escalated{background:#fdeaea;color:#d93a33}.q-st.Pending{background:#fff3df;color:#c8890b}
+.q-flag{font-size:9px;background:#fdeaea;color:#d93a33;border:1px solid #f3b6b3;border-radius:3px;padding:1px 4px;font-weight:700;margin-left:4px}
+.q-flag.dr{background:#fff3df;color:#c8890b;border-color:#f0cf93}
+.q-view{border:1px solid #1b5fe0;background:#fff;color:#1b5fe0;border-radius:4px;padding:3px 12px;cursor:pointer;font-size:12px;font-weight:600}
+.q-view:hover{background:#1b5fe0;color:#fff}
+.q-foot{display:grid;grid-template-columns:1fr 1.2fr 1.2fr;gap:12px;margin-top:16px}
+.q-card{border:1px solid var(--border);border-radius:8px;overflow:hidden;background:#fff}
+.q-card h4{margin:0;background:#0f2a5c;color:#fff;font-size:13px;padding:9px 14px}
+.q-card div.b{padding:12px 14px;font-size:12px;color:var(--text-mid);line-height:1.6}
+.q-card .b b{color:#14213d}
+.q-flow{display:flex;align-items:center;gap:6px;justify-content:space-around;text-align:center;font-size:11px}
+.q-flow i{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#e8f0fe;color:#1b5fe0;font-style:normal;font-weight:700;margin:0 auto 4px}
+.q-flow u{text-decoration:none;color:#aab}
+/* drawer */
+.q-ov{position:fixed;inset:0;background:rgba(10,20,40,.35);display:none;z-index:900}
+.q-ov.show{display:block}
+.q-dr{position:fixed;top:0;right:0;bottom:0;width:440px;max-width:96vw;background:#f5f7fb;z-index:901;transform:translateX(100%);transition:transform .25s;display:flex;flex-direction:column;box-shadow:-6px 0 24px rgba(0,0,0,.2)}
+.q-dr.show{transform:none}
+.q-dr header{background:#0f2a5c;color:#fff;padding:14px 18px;font-size:17px;font-weight:700;display:flex;justify-content:space-between}
+.q-dr header span{cursor:pointer}
+.q-dr .body{flex:1;overflow:auto;padding:14px}
+.q-dr .id{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px;font-size:15px;font-weight:700}
+.q-sec{background:#fff;border:1px solid var(--border-light);border-radius:8px;padding:12px 14px;margin-bottom:12px}
+.q-sec h5{margin:0 0 8px;font-size:13px;color:#14213d}
+.q-kv{display:grid;grid-template-columns:110px 1fr;gap:5px 8px;font-size:12px}.q-kv span{color:var(--text-light)}
+.q-bars{display:flex;align-items:flex-end;gap:6px;height:90px;margin-top:6px}
+.q-bars div{flex:1;background:#6aa8f7;border-radius:3px 3px 0 0;position:relative}
+.q-bars div.r{background:#f06b6b}.q-bars em{position:absolute;top:-14px;left:0;right:0;text-align:center;font-size:9px;font-style:normal}
+.q-bars small{position:absolute;bottom:-14px;left:0;right:0;text-align:center;font-size:9px;color:#888}
+.q-dr textarea{width:100%;height:76px;border:1px solid var(--border);border-radius:5px;padding:8px;font-size:12px;font-family:inherit;resize:none}
+.q-cnt{text-align:right;font-size:10px;color:var(--text-light)}
+.q-act{display:flex;gap:8px;padding:12px 14px;background:#fff;border-top:1px solid var(--border)}
+.q-act button{flex:1;border:0;border-radius:6px;color:#fff;font-weight:700;font-size:12px;padding:10px 6px;cursor:pointer;line-height:1.3}
+.q-act button small{display:block;font-weight:400;font-size:10px}
+.q-act .g{background:#17803d}.q-act .y{background:#f5c542;color:#4a3800}.q-act .r{background:#e0463f}.q-act .b{background:#1b5fe0}.q-act .p{background:#6d4fd6}
+.q-warn{background:#fdeaea;border:1px solid #f3b6b3;color:#c0392b;border-radius:6px;padding:9px 12px;font-size:11.5px;margin:0 14px 12px}
 </style>
 </head>
 <body>
@@ -489,6 +570,13 @@
       <li class="sub-item" data-target="bigamount"><span class="tri">▸</span>Larget Amount Report</li>
       <li class="sub-item" data-target="kycupdate"><span class="tri">▸</span>Periodic Updating of Users</li>
     </ul>
+
+    <!-- General Alert Queue — its own top-level sidebar item, sitting BELOW
+         "AML Monitoring" (not one of its sub-tabs). Handled by showRcpd() in the JS. -->
+    <div class="side-item" id="navRcpd">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#606266" stroke-width="2"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1"/><path d="M8.5 11h7M8.5 15h7"/></svg>
+      General Alert Queue
+    </div>
   </aside>
 
   <!-- ============================================================
@@ -501,9 +589,12 @@
       <div class="topbar-dd" id="ddBell">
         <div class="icon-btn">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#606266" stroke-width="2"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>
-          <span class="badge-count" id="bellCount">4</span>
+          <span class="badge-count" id="bellCount">7</span>
         </div>
-        <ul class="dd-menu" style="min-width:240px;">
+        <ul class="dd-menu" style="min-width:300px; max-height:420px; overflow-y:auto;">
+          <li class="notif-item trig" data-goto="redflag"><span class="nt">Duplicate Account Detection</span><span class="nd">New login shares device &amp; IP with 2 existing accounts — 4 min ago</span></li>
+          <li class="notif-item trig" data-goto="redflag"><span class="nt">NDRP / Restricted Player Detection</span><span class="nd">Player matched NDRP list (2026-0412) — 9 min ago</span></li>
+          <li class="notif-item trig" data-goto="redflag"><span class="nt">Dormant Account Reactivation with a Significant Deposit</span><span class="nd">Inactive 8 months, reactivated and deposited ₱180,000 — 21 min ago</span></li>
           <li class="notif-item"><span class="nt">High-risk threshold hit</span><span class="nd">okbet3119j7kbs crossed ₱400,000 — 12 min ago</span></li>
           <li class="notif-item"><span class="nt">New EDD tag applied</span><span class="nd">Player tagged PENDING EDD — 1 hr ago</span></li>
           <li class="notif-item"><span class="nt">Account frozen</span><span class="nd">Repeat account attempt detected — 3 hrs ago</span></li>
@@ -534,6 +625,7 @@
            Filters: Status, Nation, Register date range, Username search
            Extras: population stat cards, 2 pie charts, full player table
       ================================================================ -->
+      <div class="panel" id="rcpdq"></div>
       <div class="panel active" id="players">
         <div class="filter-panel">
           <!-- Each .fctrl below is a filter control. Ones with data-options="A|B|C"
@@ -1053,13 +1145,33 @@
 
             <!-- ================================================================
            TAB 5 / 7 — RED FLAG ALERTS
-           Top: editable "rule cards" with an on/off .switch (visual only —
-           doesn't actually change which rows show as flagged).
+           Top: 2 pie charts, then the AMLA Queue (rendered into #amlaq by the
+           queue script at the bottom of the file).
            Filters: Severity, Rule, Date range, Username
-           Extras: 2 pie charts (by severity / by rule type)
       ================================================================ -->
       <div class="panel" id="redflag">
         <p style="font-size:12.5px; color:var(--text-mid); margin:0 0 14px;">Automated alerts generated whenever a player's activity trips a predefined rule — no manual scanning required.</p>
+
+        <!-- TRIGGER TYPES — the website-side triggers that feed Red Flag Alerts.
+             Each also raises a bell notification (see ddBell in the top bar). -->
+        <div class="trig-label">Trigger Types</div>
+        <div class="trig-grid">
+          <div class="trig-card" data-trig="Duplicate Account">
+            <div class="th"><div class="ti">⧉</div><div class="tn">Duplicate Account Detection</div></div>
+            <div class="td">Flags a new registration or login that shares a device, IP, ID, phone or payment account with an existing player.</div>
+            <div class="tm"><span>Triggered today</span><b>5</b></div>
+          </div>
+          <div class="trig-card t2" data-trig="NDRP">
+            <div class="th"><div class="ti">⛔</div><div class="tn">NDRP / Restricted Player Detection</div></div>
+            <div class="td">Flags a player who matches the National Database of Restricted Persons (NDRP) or is tagged as a restricted player.</div>
+            <div class="tm"><span>Triggered today</span><b>3</b></div>
+          </div>
+          <div class="trig-card t3" data-trig="Dormant Account Reactivation">
+            <div class="th"><div class="ti">⏻</div><div class="tn">Dormant Account Reactivation with a Significant Deposit</div></div>
+            <div class="td">Flags a long-inactive account that is reactivated and makes a significant deposit shortly after.</div>
+            <div class="tm"><span>Triggered today</span><b>2</b></div>
+          </div>
+        </div>
 
         <div class="overview-title">Overview — Alert Statistics</div>
         <div class="overview-row">
@@ -1073,125 +1185,8 @@
           </div>
         </div>
 
-        <div class="section-title">Active Rules</div>
-        <div class="rule-card">
-          <div class="ricon">⚑</div>
-          <div>
-            <div class="rname">High-Value Threshold — Single Player</div>
-            <div class="rdesc">Flag when a player's cumulative transactions exceed ₱400,000 within 24 hours.</div>
-          </div>
-          <div class="rmeta">Triggered 6x today</div>
-          <div class="switch"></div>
-        </div>
-        <div class="rule-card">
-          <div class="ricon">⚑</div>
-          <div>
-            <div class="rname">Structuring Pattern</div>
-            <div class="rdesc">Flag 3+ deposits just under the reporting threshold within 48 hours.</div>
-          </div>
-          <div class="rmeta">Triggered 2x today</div>
-          <div class="switch"></div>
-        </div>
-        <div class="rule-card">
-          <div class="ricon">⚑</div>
-          <div>
-            <div class="rname">Rapid Deposit–Withdrawal Cycling</div>
-            <div class="rdesc">Flag when funds are withdrawn within 10 minutes of a deposit, 5+ times in a week.</div>
-          </div>
-          <div class="rmeta">Triggered 3x today</div>
-          <div class="switch off"></div>
-        </div>
-        <div class="rule-card">
-          <div class="ricon">⚑</div>
-          <div>
-            <div class="rname">Dormant Account Reactivation</div>
-            <div class="rdesc">Flag when a player inactive for 6+ months deposits more than ₱50,000 within 24 hours of reactivating.</div>
-          </div>
-          <div class="rmeta">Triggered 1x today</div>
-          <div class="switch"></div>
-        </div>
-
-        <div class="filter-panel" style="margin-top:20px;">
-          <div class="filter-row">
-            <div class="fctrl" data-options="All Severity|High|Medium|Low" data-fcol="6" data-fmatch="contains">All Severity<span class="caret">⌄</span></div>
-            <div class="fctrl" data-options="Rule|High-Value Threshold|Structuring Pattern|Rapid Deposit-Withdrawal Cycling" data-fcol="3" data-fmatch="contains">Rule<span class="caret">⌄</span></div>
-            <div class="fctrl wide" data-fcol="7" data-fmatch="daterange"><span class="ic">📅</span>Start Date<span class="range-sep">~</span>End Date</div>
-            <div class="fctrl wide placeholder" data-fcol="1" data-fmatch="contains">Username / Member ID<span class="caret"></span></div>
-          </div>
-          <div class="filter-actions">
-            <button class="search-btn" data-filter-panel="redflag">Search</button>
-            <button class="btn-outline" id="exportRedflag">⬇ Export to Excel</button>
-          </div>
-        </div>
-
-        <div class="section-title">Flagged Transactions</div>
-        <div class="refresh-line">
-          <button class="refresh-btn" data-refresh><span class="spin">⟳</span> Refresh</button>
-          <span>Last updated: <span class="lastupdate">2026-08-12 17:16:29</span></span>
-        </div>
-        <div class="bulk-bar" id="bulkRedflag">
-          <span><span class="bcount">0</span> selected</span>
-          <div class="bactions">
-            <button data-bulk="Mark Reviewed">Mark Reviewed</button>
-            <button data-bulk="Escalate to EDD">Escalate to EDD</button>
-            <button data-bulk="Export Selected">Export Selected</button>
-          </div>
-          <span class="bclear">Clear</span>
-        </div>
-        <div class="table-scroll">
-          <table id="tableRedflag">
-            <thead><tr>
-              <th style="width:32px;"><input type="checkbox" class="headchk" data-group="redflag"></th>
-              <th class="sortable" data-sort="text">Username <span class="sort-ic">⇅</span></th><th>Member ID</th>
-              <th>Rule Triggered</th><th>Threshold</th><th>Value Hit</th><th>Severity</th>
-              <th class="sortable" data-sort="date">Date / Time <span class="sort-ic">⇅</span></th><th>Status</th><th>Operation</th>
-            </tr></thead>
-            <tbody>
-              <tr>
-                <td><input type="checkbox" class="rowchk" data-group="redflag"></td>
-                <td>michael.uy</td><td>30021144</td><td>High-Value Threshold</td><td>₱400,000 / 24h</td><td>₱412,000.00</td>
-                <td><span class="badge high">High</span></td><td>2026-08-12 13:05</td><td><span class="badge med">Open</span></td>
-                <td><span class="op-link">Investigate</span></td>
-              </tr>
-              <tr>
-                <td><input type="checkbox" class="rowchk" data-group="redflag"></td>
-                <td>p.aquino</td><td>24901187</td><td>Structuring Pattern</td><td>3 deposits / 48h</td><td>4 deposits</td>
-                <td><span class="badge high">High</span></td><td>2026-08-12 10:22</td><td><span class="badge med">Open</span></td>
-                <td><span class="op-link">Investigate</span></td>
-              </tr>
-              <tr>
-                <td><input type="checkbox" class="rowchk" data-group="redflag"></td>
-                <td>r.dizon</td><td>29904471</td><td>Rapid Cycling</td><td>5x / 7 days</td><td>6x</td>
-                <td><span class="badge med">Medium</span></td><td>2026-08-11 18:41</td><td><span class="badge low">Reviewed</span></td>
-                <td><span class="op-link">Investigate</span></td>
-              </tr>
-              <tr>
-                <td><input type="checkbox" class="rowchk" data-group="redflag"></td>
-                <td>d.fernandez</td><td>26610234</td><td>High-Value Threshold</td><td>₱400,000 / 24h</td><td>₱210,000.00 x2</td>
-                <td><span class="badge med">Medium</span></td><td>2026-08-11 09:14</td><td><span class="badge low">Reviewed</span></td>
-                <td><span class="op-link">Investigate</span></td>
-              </tr>
-              <tr>
-                <td><input type="checkbox" class="rowchk" data-group="redflag"></td>
-                <td>c.villar</td><td>23310987</td><td>Structuring Pattern</td><td>3 deposits / 48h</td><td>5 deposits</td>
-                <td><span class="badge high">High</span></td><td>2026-08-10 20:47</td><td><span class="badge med">Open</span></td>
-                <td><span class="op-link">Investigate</span></td>
-              </tr>
-              <tr>
-                <td><input type="checkbox" class="rowchk" data-group="redflag"></td>
-                <td>e.gomez</td><td>21109887</td><td>Rapid Cycling</td><td>5x / 7 days</td><td>5x</td>
-                <td><span class="badge low">Low</span></td><td>2026-08-09 16:52</td><td><span class="badge low">Reviewed</span></td>
-                <td><span class="op-link">Investigate</span></td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="pager">
-            <span class="total-txt">Total 214</span>
-            <div class="pagesize" data-options="10/page|20/page|50/page|100/page">10/page <span class="caret">⌄</span></div>
-            <div class="pages" data-group="redflag"><span class="arrow">‹</span><span class="num active">1</span><span class="num">2</span><span class="arrow">›</span></div>
-            <div class="goto">Go to <input value="1"></div>
-          </div>
-        </div>
+        <div class="section-title">AMLA Queue</div>
+        <div id="amlaq"></div>
       </div>
 
       <!-- LARGET AMOUNT REPORT -->
@@ -1513,7 +1508,7 @@
       const target = li.getAttribute('data-target');
       panels.forEach(p => p.classList.remove('active'));
       document.getElementById(target).classList.add('active');
-      const label = li.textContent.replace('▸', '').trim();
+      const label = enText(li).replace('▸', '').trim();
       crumbTxt.textContent = 'AML Monitoring / ' + label;
       tabTag.innerHTML = label + ' <span class="x">✕</span>';
     });
@@ -1717,7 +1712,7 @@
   function getFilterValue(el){
     if (el.hasAttribute('data-options')) {
       const selectedLi = el.querySelector('li.selected');
-      const val = selectedLi ? selectedLi.textContent.trim() : null;
+      const val = selectedLi ? enText(selectedLi).trim() : null;
       if (!val || val === el.dataset.defaultOpt) return null;
       return val;
     }
@@ -1725,7 +1720,7 @@
       const chipRowId = 'tagChips' + el.id.replace('tagFilter', '');
       const chipRow = document.getElementById(chipRowId);
       if (!chipRow) return null;
-      const tags = Array.from(chipRow.querySelectorAll('.chip')).map(c => c.firstChild.textContent.trim());
+      const tags = Array.from(chipRow.querySelectorAll('.chip')).map(c => enText(c.firstChild).trim());
       return tags.length ? tags : null;
     }
     const textInput = el.querySelector('input[type="text"]');
@@ -1746,7 +1741,7 @@
     const rows = Array.from(tbody.querySelectorAll('tr')).filter(tr => !tr.classList.contains('js-nodata-row'));
     let visible = 0;
 
-    const cellText = (tr, idx) => tr.children[idx] ? tr.children[idx].textContent.replace(/\s+/g,' ').trim() : '';
+    const cellText = (tr, idx) => tr.children[idx] ? enText(tr.children[idx]).replace(/\s+/g,' ').trim() : '';
 
     rows.forEach(tr => {
       let match = true;
@@ -1823,7 +1818,7 @@
     const headerCells = Array.from(clone.querySelectorAll('thead th'));
     const stripIdx = [];
     headerCells.forEach((th, i) => {
-      const t = th.textContent.replace('⇅','').trim();
+      const t = enText(th).replace('⇅','').trim();
       if (t === '' || t === 'Operation') stripIdx.push(i);
     });
     stripIdx.sort((a,b) => b - a).forEach(idx => {
@@ -1845,7 +1840,7 @@
   document.getElementById('exportRisk').addEventListener('click', () => exportTableToExcel('tableRisk', 'AML_Risk_Profiling_2026-08-12.xlsx'));
   document.getElementById('exportAcct').addEventListener('click', () => exportTableToExcel('tableAcct', 'AML_Account_Status_2026-08-12.xlsx'));
   document.getElementById('exportTxn').addEventListener('click', () => exportTableToExcel('tableTxn', 'AML_Daily_Transaction_Monitoring_2026-02-24.xlsx'));
-  document.getElementById('exportRedflag').addEventListener('click', () => exportTableToExcel('tableRedflag', 'AML_Red_Flag_Alerts_2026-08-12.xlsx'));
+  document.getElementById('exportRedflag')?.addEventListener('click', () => exportTableToExcel('tableRedflag', 'AML_Red_Flag_Alerts_2026-08-12.xlsx'));
   document.getElementById('exportDeposit').addEventListener('click', () => exportTableToExcel('tableDeposit', 'AML_Larget_Amount_Report_Deposit_2026-08-18.xlsx'));
   document.getElementById('exportWithdrawal').addEventListener('click', () => exportTableToExcel('tableWithdrawal', 'AML_Larget_Amount_Report_Withdrawal_2026-08-18.xlsx'));
   document.getElementById('exportKyc').addEventListener('click', () => exportTableToExcel('tableKyc', 'AML_Periodic_Updating_of_Users_2026-08-18.xlsx'));
@@ -1863,14 +1858,14 @@
     const tr = link.closest('tr');
     const table = link.closest('table');
     if (!tr || !table) return;
-    const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.replace('⇅','').trim());
-    const cells = Array.from(tr.children).map(td => td.textContent.replace(/\s+/g,' ').trim());
+    const headers = Array.from(table.querySelectorAll('thead th')).map(th => enText(th).replace('⇅','').trim());
+    const cells = Array.from(tr.children).map(td => enText(td).replace(/\s+/g,' ').trim());
     const rows = [];
     headers.forEach((h, i) => {
       if (h === '' || h === 'Operation') return;
       rows.push([h, cells[i] || '—']);
     });
-    openModal(link.textContent.trim(), rows);
+    openModal(enText(link).trim(), rows);
   });
 
   // "Go to [page]" box — pressing Enter clicks the matching page-number
@@ -1885,6 +1880,14 @@
     });
   });
 
+  // Trigger-type cards: click to filter the AMLA Queue table by that trigger type
+  document.querySelectorAll('.trig-card').forEach(c => c.addEventListener('click', () => {
+    const name = c.querySelector('.tn').textContent;
+    if (window.setAmlaTrigger) window.setAmlaTrigger(name);   // filters the AMLA Queue table below
+    document.querySelector('#amlaq').scrollIntoView({behavior:'smooth', block:'start'});
+    showToast('AMLA Queue filtered: ' + name);
+  }));
+
   // Red Flag Alerts rule on/off toggles — purely cosmetic (green ↔ grey +
   // toast); doesn't actually change which rows are flagged in this mockup.
   document.querySelectorAll('.switch').forEach(sw => {
@@ -1896,10 +1899,14 @@
 
   // Clicking the ✕ on the blue tab pill just jumps back to the first tab
   // (Total Number of Players) — same as clicking it in the sidebar.
-  document.getElementById('tabTag').querySelector('.x').addEventListener('click', (e) => {
-    e.stopPropagation();
-    items[0].click();
-  });
+  function bindTagClose(){
+    document.getElementById('tabTag').querySelector('.x').addEventListener('click', (e) => {
+      e.stopPropagation();
+      items[0].click();
+      showAmlDashboard();
+    });
+  }
+  bindTagClose();
 
   // ---------------- TOP-LEVEL SIDEBAR NAV ----------------
   // Handles the 4 rows ABOVE the tab list: Menu / Personal center /
@@ -1907,7 +1914,7 @@
   // normal tab content; clicking any of the other three hides it and shows
   // the generic .placeholder-view message instead (those sections aren't
   // built out in this mockup).
-  const topNavIds = ['navMenu','navPersonal','navUserMgmt','navAml'];
+  const topNavIds = ['navMenu','navPersonal','navUserMgmt','navAml','navRcpd'];
   const railNav = document.getElementById('railNav');
   const placeholderView = document.getElementById('placeholderView');
   const placeholderTitle = document.getElementById('placeholderTitle');
@@ -1923,7 +1930,24 @@
     placeholderView.style.display = 'none';
     tagRow.style.display = '';
     breadcrumbEl.style.display = '';
-    panels.forEach(p => p.classList.toggle('active', p.id === document.querySelector('#railNav .sub-item.active').dataset.target));
+    const activeItem = document.querySelector('#railNav .sub-item.active');
+    panels.forEach(p => p.classList.toggle('active', p.id === activeItem.dataset.target));
+    const label = enText(activeItem).replace('▸', '').trim();   // restore breadcrumb + pill (RCPD view overwrites them)
+    crumbTxt.textContent = 'AML Monitoring / ' + label;
+    tabTag.innerHTML = label + ' <span class="x">✕</span>';
+    bindTagClose();
+  }
+  // General Alert Queue: a top-level section of its own (not under AML Monitoring)
+  function showRcpd(){
+    setTopActive('navRcpd');
+    railNav.style.display = 'none';
+    placeholderView.style.display = 'none';
+    tagRow.style.display = '';
+    breadcrumbEl.style.display = '';
+    panels.forEach(p => p.classList.toggle('active', p.id === 'rcpdq'));
+    crumbTxt.textContent = 'General Alert Queue';
+    tabTag.innerHTML = 'General Alert Queue <span class="x">✕</span>';
+    bindTagClose();
   }
   function showPlaceholder(label, id){
     setTopActive(id);
@@ -1935,6 +1959,7 @@
     placeholderView.style.display = 'block';
   }
   document.getElementById('navAml').addEventListener('click', showAmlDashboard);
+  document.getElementById('navRcpd').addEventListener('click', showRcpd);
   document.getElementById('navMenu').addEventListener('click', () => showPlaceholder('Menu', 'navMenu'));
   document.getElementById('navPersonal').addEventListener('click', () => showPlaceholder('Personal center', 'navPersonal'));
   document.getElementById('navUserMgmt').addEventListener('click', () => showPlaceholder('User Management', 'navUserMgmt'));
@@ -1957,6 +1982,12 @@
         e.stopPropagation();
         menu.classList.remove('show');
         syncBackdrop();
+        if (li.dataset.goto) {                       // trigger-type notifications open Red Flag Alerts
+          showAmlDashboard();
+          document.querySelector('#railNav [data-target="' + li.dataset.goto + '"]').click();
+          showToast('Opened Red Flag Alerts');
+          return;
+        }
         showToast(li.textContent.trim() + ' selected');
       });
     });
@@ -2074,7 +2105,7 @@
         return 0;
       });
       rows.forEach(r => tbody.appendChild(r));
-      showToast('Sorted by ' + th.textContent.replace('⇅','').trim() + (asc ? ' (ascending)' : ' (descending)'));
+      showToast('Sorted by ' + enText(th).replace('⇅','').trim() + (asc ? ' (ascending)' : ' (descending)'));
     });
   });
 
@@ -2324,13 +2355,485 @@
   renderPie('pieTxnCount', 'legendTxnCount', ['Deposit orders', 'Withdrawal orders'], [57, 33], 'Order Count by Type (this page)');
   renderPie('pieTxnTop', 'legendTxnTop', ['gc702515393', 'gc379002082', 'gc448105185', 'Others'], [156000, 75000, 72000, 102000], 'Top Depositors (this page)');
   renderPie('pieRedflag', 'legendRedflag', ['High', 'Medium', 'Low'], [3, 2, 1], 'By Severity (this page)');
-  renderPie('pieRedflagRule', 'legendRedflagRule', ['High-Value Threshold', 'Structuring Pattern', 'Rapid Cycling', 'Dormant Reactivation'], [76, 68, 54, 16], 'By Rule Type (all alerts)');
+  renderPie('pieRedflagRule', 'legendRedflagRule', ['High-Value Threshold', 'Structuring Pattern', 'Rapid Cycling', 'Duplicate Account', 'NDRP / Restricted', 'Dormant Reactivation'], [76, 68, 54, 41, 27, 16], 'By Rule Type (all alerts)');
   renderPie('pieDeposit', 'legendDeposit', ['okbet3070ee91p', 'okbet16141fdp8'], [804953, 650000]);
   renderPie('pieWithdrawal', 'legendWithdrawal', ['okbet3070ee91p','okbet1964hwju0','okbet7200fe31t','okbet88474hq7c','okbet16141fdp8','okbet8520q2jib'], [562000,762003,550000,775790,600000,1022500]);
   renderPie('pieBigSplit', 'legendBigSplit', ['Deposit alerts', 'Withdrawal alerts'], [1454953, 4272293], 'Flagged Amount by Type');
   renderPie('pieBigCount', 'legendBigCount', ['Deposit orders', 'Withdrawal orders'], [2, 6], 'Flagged Order Count');
   renderPie('pieKyc', 'legendKyc', ['Not Started', 'Day 1–2 In Progress', 'Completed 3 / 3', 'Overdue'], [312, 268, 190, 72], 'Update Progress');
   renderPie('pieKycMissing', 'legendKycMissing', ['Valid ID', 'Proof of Address', 'Selfie / Liveness', 'Source of Funds', 'Contact Number', 'Email Verification'], [210, 150, 180, 95, 120, 87], 'Missing Item Breakdown');
+</script>
+<script id="i18n-layer">
+/* ============================================================================
+   LANGUAGE SWITCH (English / 中文)
+   Uses the existing flag dropdown in the top bar. The page markup stays in
+   English; this layer swaps the visible text at runtime, remembers each
+   node's original English (so switching back is lossless), and translates
+   anything the script adds later (pie legends, toasts, modals, pagination).
+   TO EDIT A TRANSLATION: change the text after "=" in TRANSLATIONS below.
+   TO ADD ONE: add a line  English text=中文 . Filters/sorting keep working on
+   the English text via enText(), so the two languages never conflict.
+============================================================================ */
+(function(){
+const TRANSLATIONS=`PENDING EDD=待EDD
+EDD COMPLETED=EDD已完成
+KYC Status=KYC状态
+Not Started=未开始
+Menu=菜单
+Personal center=个人中心
+User Management=用户管理
+AML Monitoring=反洗钱监控
+Total Number of Players=玩家总数
+Risk Profiling Tab=风险画像
+Account Status Tab=账户状态
+Daily Transaction Monitoring=每日交易监控
+Red Flag Alerts=红旗预警
+Larget Amount Report=大额交易报告
+Periodic Updating of Users=用户定期更新
+Server Time：=服务器时间：
+High-risk threshold hit=触发高风险阈值
+New EDD tag applied=新增EDD标签
+Player tagged PENDING EDD=玩家被标记为“待EDD”
+Account frozen=账户已冻结
+Repeat account attempt detected=检测到重复开户尝试
+Structuring pattern flagged=发现拆分交易模式
+4 deposits under threshold=4笔存款低于阈值
+My Profile=我的资料
+Account Settings=账户设置
+Log Out=退出登录
+Location=当前位置
+All Status=全部状态
+All Nation=全部国籍
+Register Start Time=注册开始时间
+Register End Time=注册结束时间
+Username / Member ID=用户名 / 会员ID
+Filter Test Users=过滤测试用户
+Search=搜索
+⬇ Export to Excel=⬇ 导出Excel
+Population Summary=玩家概况
+Total Registered Players=注册玩家总数
+Foreign=外籍
+Local=本地
+Total Active=活跃玩家总数
+Newly Registered (3 mo)=近3个月新注册
+▲ last 90 days=▲ 近90天
+Overview=概览
+Population Statistics=玩家人口统计
+Player List=玩家列表
+Refresh=刷新
+Last updated:=最近更新：
+Add Tag=添加标签
+Freeze Accounts=冻结账户
+Export Selected=导出所选
+Clear=清除
+selected=已选择
+Online=在线
+Offline=离线
+Photo=照片
+Member Information=会员信息
+Category=类别
+Nation=国籍
+Account Status=账户状态
+Register Time=注册时间
+User Tags=用户标签
+Operation=操作
+Member ID=会员ID
+User Name=用户名
+Real Name=真实姓名
+Nickname=昵称
+device=设备
+Betting station code=投注站代码
+Default=默认
+Philippines=菲律宾
+China=中国
+Normal=正常
+Fully Verify=完全验证
+KYC Passed=KYC已通过
+Funding Details=资金明细
+Bet Details=投注明细
+Standard=标准
+Pending Review=待审核
+PENDING VCKYC=待视频KYC
+Deactivate=停用
+Not certified=未认证
+INTERNAL TEST ACCOUNT=内部测试账户
+Verified=已验证
+No Label=无标签
+Freeze=冻结
+Authentication Failed=认证失败
+Go to=前往
+Combines Risk Assessment and EDD Monitoring — filter by KYC Status and Tags to see how a player's risk profile was built.=综合风险评估与EDD监控——按KYC状态和标签筛选，查看玩家风险画像的形成依据。
+kyc Status=KYC状态
+All Tags=全部标签
+Risk Level=风险等级
+Risk Distribution=风险分布
+Low Risk=低风险
+Medium Risk=中风险
+High Risk=高风险
+Under EDD=EDD中
+Risk & EDD Statistics=风险与EDD统计
+Player Risk Profiles=玩家风险画像
+Escalate to EDD=升级至EDD
+Risk Score=风险评分
+Tags=标签
+EDD Status=EDD状态
+Last Assessed=最近评估
+EDD Completed=EDD已完成
+Pending EDD=待EDD
+Risk Profile=风险画像
+Not Applicable=不适用
+Status Change Start=状态变更开始
+Status Change End=状态变更结束
+Under Review=审核中
+Account Status Statistics=账户状态统计
+Restore to Normal=恢复正常
+Reason=原因
+Status Since=状态起始
+Failed EDD document check=EDD文件核查未通过
+View=查看
+AMLA order=AMLA命令
+Suspicious structuring pattern=可疑拆分交易模式
+Bonus abuse pattern confirmed=已确认奖金滥用模式
+Temporarily frozen=临时冻结
+Pending re-verification of ID=待重新验证身份证件
+Every player's transaction activity for a chosen date range — count and sum of amount per username. Sample data modeled on DAILY_FUNDS_TRANSACTIONS_GLIFEOKPLAY_02_24_2026.=各玩家在所选日期范围内的交易活动——按用户名统计笔数与金额合计。示例数据参照 DAILY_FUNDS_TRANSACTIONS_GLIFEOKPLAY_02_24_2026 建模。
+Start Date=开始日期
+End Date=结束日期
+Transaction Type=交易类型
+Today's Order Records=今日订单记录
+Username=用户名
+Count of Deposit=存款笔数
+Sum of Deposit=存款总额
+Count of Withdrawal=提款笔数
+Sum of Withdrawal=提款总额
+Date=日期
+Automated alerts generated whenever a player's activity trips a predefined rule — no manual scanning required.=玩家行为触发预设规则时自动生成预警——无需人工逐条筛查。
+Alert Statistics=预警统计
+Active Rules=启用规则
+High-Value Threshold=大额阈值
+Single Player=单一玩家
+Flag when a player's cumulative transactions exceed ₱400,000 within 24 hours.=玩家24小时内累计交易额超过 ₱400,000 时触发预警。
+Structuring Pattern=拆分交易模式
+Flag 3+ deposits just under the reporting threshold within 48 hours.=48小时内出现3笔及以上略低于申报阈值的存款时触发预警。
+Rapid Deposit–Withdrawal Cycling=存提款快速循环
+Rapid Deposit-Withdrawal Cycling=存提款快速循环
+Flag when funds are withdrawn within 10 minutes of a deposit, 5+ times in a week.=一周内出现5次及以上存款后10分钟内提款时触发预警。
+Dormant Account Reactivation=休眠账户重新激活
+Flag when a player inactive for 6+ months deposits more than ₱50,000 within 24 hours of reactivating.=闲置6个月以上的玩家在重新激活后24小时内存入超过 ₱50,000 时触发预警。
+All Severity=全部严重程度
+Rule=规则
+Flagged Transactions=预警交易
+Mark Reviewed=标记为已复核
+Rule Triggered=触发规则
+Threshold=阈值
+Value Hit=触及数值
+Severity=严重程度
+Date / Time=日期 / 时间
+Status=状态
+High=高
+Medium=中
+Low=低
+Open=待处理
+Investigate=调查
+3 deposits / 48h=48小时内3笔存款
+5x / 7 days=7天内5次
+Rapid Cycling=快速循环
+Dormant Reactivation=休眠账户重新激活
+Reviewed=已复核
+Today's deposits and withdrawals that tripped the large-amount alert — only transactions exceeding the ₱500,000 threshold appear here.=今日触发大额预警的存款和提款——仅显示超过 ₱500,000 阈值的交易。
+Flagged Order Records=预警订单记录
+Deposit statistics=存款统计
+Withdrawal statistics=提款统计
+⚑ Showing alerts > ₱500,000=⚑ 显示金额 > ₱500,000 的预警
+Amount=金额
+Total=合计
+Players with incomplete or missing KYC information. Once flagged, a player has 3 consecutive days to update their profile — one confirmed update per day — before the account is escalated.=KYC信息不完整或缺失的玩家。一经标记，玩家须在连续3天内更新资料（每天确认一次更新），否则账户将被升级处理。
+All Progress=全部进度
+Missing Item=缺失项目
+Completion Statistics=完成情况统计
+Send Reminder=发送提醒
+Escalate=升级处理
+Missing Information=缺失信息
+Update Progress=更新进度
+Flagged Since=标记起始
+Valid ID=有效身份证件
+Selfie / Liveness=自拍 / 活体检测
+Proof of Address=地址证明
+due today=今日到期
+Source of Funds=资金来源
+Contact Number=联系电话
+Not started=未开始
+Email Verification=邮箱验证
+Completed 3 / 3=已完成 3 / 3
+Overdue=逾期
+no response=无回应
+Outside the AML dashboard mockup=此页面不在反洗钱看板原型范围内
+click "AML" in the sidebar to return.=请点击侧边栏的“AML”返回。
+Select Tags=选择标签
+Apply=应用
+Details=详情
+Additional Info=补充资料
+Withdrawal=提款
+Deposit=存款
+Transfer=转账
+Bonus=奖金
+ndrp frozen=ndrp冻结
+banBet=禁止投注
+Local (Philippines)=本地（菲律宾）
+Pending=待处理
+Deleted=已删除
+Incomplete Info=资料不完整
+Deposit orders=存款订单
+Withdrawal orders=提款订单
+Deposit alerts=存款预警
+Withdrawal alerts=提款预警
+Others=其他
+Local vs Foreign=本地与外籍
+Active vs Inactive=活跃与非活跃
+Active=活跃
+Inactive=非活跃
+All Statuses=全部状态
+Restricted Accounts by Type=按类型划分的受限账户
+Volume by Type=按类型划分的金额
+Order Count by Type=按类型划分的订单数
+Top Depositors=存款额最高的玩家
+By Severity=按严重程度
+By Rule Type=按规则类型
+Flagged Amount by Type=按类型划分的预警金额
+Flagged Order Count=预警订单数
+Missing Item Breakdown=缺失项目明细
+Day 1–2 In Progress=第1–2天进行中
+SELF EXCLUSION BY PLAYER=玩家自我排除
+COMPLAINT-PRONE=易投诉
+EXCLUDE=排除
+CEBU CALLBACK TEAM=宿务回访组
+EXP. GEL HOLDER=EXP. GEL持有人
+VIP BONUS ABUSER=VIP奖金滥用者
+PARTIAL VERIFIED=部分验证
+VIP LIVECHAT=VIP在线客服
+VIP SALES=VIP销售
+VIP REACTIVATION=VIP重新激活
+INCOMPLETE DETAILS=资料不完整
+BIG WINNING=大额赢利
+LOW RISK=低风险
+MEDIUM RISK=中风险
+HIGH RISK=高风险
+VIP RETENTION=VIP挽留
+MONITORING PLAYER=监控中玩家
+MODIFIED KYC=KYC已修改
+SUSPICIOUS BETTING BEHAVIOUR=可疑投注行为
+BONUS ABUSER=奖金滥用者
+UNDERAGE=未成年
+FRAUDULENT DOCUMENTS=伪造证件
+EMANATING EXCLUSION=衍生排除
+SELF EXCLUSION=自我排除
+FAMILY EXCLUSION=家属排除
+DIFFERENT ACCOUNT HOLDER=不同账户持有人
+MULTIPLE ACCOUNT=多账户
+GEL HOLDER=GEL持有人
+GOVERMENT EMPLOYEES=政府雇员
+Data refreshed=数据已刷新
+Rule enabled=规则已启用
+Rule disabled=规则已停用
+No more pages=没有更多页面
+Page not available in this sample=示例中无此页面
+No matching records on this page=本页无匹配记录
+No matching records for the selected filters.=没有符合所选筛选条件的记录。`;
+const D={},R={};
+TRANSLATIONS.split('\n').forEach(l=>{const i=l.indexOf('=');if(i>0){const k=l.slice(0,i),v=l.slice(i+1);D[k]=v;if(!(v in R))R[v]=k;}});
+const RX=[
+[/^(\d+)\/page$/,'$1条/页'],[/^Total ([\d,]+)$/,'共 $1 条'],[/^(\d+)% of registered$/,'占注册玩家 $1%'],
+[/^Triggered (\d+)x today$/,'今日触发 $1 次'],[/^Day (\d) of 3 updated$/,'第$1天已更新（共3天）'],[/^Day (\d) of 3$/,'第$1天（共3天）'],
+[/^(\d+) deposits$/,'$1 笔存款'],[/^(\d+) min ago$/,'$1 分钟前'],[/^(\d+) hrs? ago$/,'$1 小时前'],
+[/^(\S+) crossed ₱400,000$/,'$1 已超过 ₱400,000'],[/^Showing (\d+) matching results? on this page$/,'本页显示 $1 条匹配结果'],
+[/^Loaded page (\d+)$/,'已加载第 $1 页'],[/^Exported (.+)$/,'已导出 $1'],
+[/^RESTRICTED PLAYER(?: \((.+)\))?$/,(_,a)=>'受限玩家'+(a?'（'+tr(a)+'）':'')],
+[/^(.+) applied to (\d+) records?$/,(_,a,n)=>'已对 '+n+' 条记录执行“'+tr(a)+'”'],
+[/^Sorted by (.+) \((ascending|descending)\)$/,(_,a,b)=>'按“'+tr(a)+'”排序（'+(b=='ascending'?'升序':'降序')+'）'],
+[/^(.+) selected$/,(_,a)=>'已选择：'+tr(a)]];
+function tr(t){
+  if(D[t]!==undefined)return D[t];
+  for(const [re,f] of RX)if(re.test(t))return t.replace(re,f);
+  let m=t.match(/^(Member ID|User Name|Real Name|Nickname|device|Betting station code)：(.*)$/);
+  if(m)return D[m[1]]+'：'+m[2];
+  m=t.match(/^(.+) \((this page|all alerts)\)$/);
+  if(m&&D[m[1]])return D[m[1]]+(m[2]=='this page'?'（本页）':'（全部预警）');
+  if(t.includes(' — '))return t.split(' — ').map(tr).join(' — ');
+  if(t.includes(' / '))return t.split(' / ').map(tr).join(' / ');
+  return t;
+}
+let lang='en';const O=new WeakMap();
+const parts=s=>s.match(/^(\s*)([\s\S]*?)(\s*)$/);
+function txt(n){
+  const v=n.nodeValue;if(!v.trim())return;
+  let s=O.get(n);
+  if(!s||(v!==s.en&&v!==s.zh)){ // new node, or the script rewrote it
+    const p=parts(v),c=p[2].replace(/\s+/g,' ');
+    s={en:R[c]!==undefined?p[1]+R[c]+p[3]:v,zh:null};
+    const q=parts(s.en);s.zh=q[1]+tr(q[2].replace(/\s+/g,' '))+q[3];O.set(n,s);
+  }
+  const want=lang==='zh'?s.zh:s.en;
+  if(n.nodeValue!==want)n.nodeValue=want;
+}
+function ph(e){
+  if(!e.dataset.enPh)e.dataset.enPh=e.getAttribute('placeholder');
+  e.setAttribute('placeholder',lang==='zh'?tr(e.dataset.enPh):e.dataset.enPh);
+}
+const okText=n=>{const t=n.parentNode&&n.parentNode.nodeName;return t==='SCRIPT'||t==='STYLE'?2:1;};
+function walk(root){
+  if(root.nodeType===3){txt(root);return;}
+  if(root.nodeType!==1||/^(SCRIPT|STYLE)$/.test(root.nodeName))return;
+  const w=document.createTreeWalker(root,4,{acceptNode:okText});let n;
+  while(n=w.nextNode())txt(n);
+  root.querySelectorAll('[placeholder]').forEach(ph);
+}
+// English text of an element/text node, unaffected by the current language.
+// Filters, sorting and the detail popup use this so they work in both languages.
+window.enText=function(x){
+  if(x.nodeType===3){const s=O.get(x);return s?s.en:x.nodeValue;}
+  let out='';const w=document.createTreeWalker(x,4,{acceptNode:okText});let n;
+  while(n=w.nextNode()){const s=O.get(n);out+=s?s.en:n.nodeValue;}
+  return out;
+};
+const obs=new MutationObserver(ms=>{
+  ms.forEach(m=>{if(m.type==='characterData')txt(m.target);else m.addedNodes.forEach(walk);});
+  obs.takeRecords(); // ignore the changes we just made ourselves
+});
+obs.observe(document.body,{childList:true,subtree:true,characterData:true});
+function setLang(l){
+  lang=l;walk(document.body);
+  document.documentElement.lang=l==='zh'?'zh-CN':'en';
+  const fl=document.querySelector('#ddFlag .flag');if(fl)fl.textContent=l==='zh'?'🇨🇳':'🇺🇸';
+  try{localStorage.setItem('amlLang',l);}catch(e){}
+}
+document.querySelectorAll('#ddFlag .dd-menu li').forEach(li=>li.addEventListener('click',()=>{
+  const t=li.textContent;
+  if(t.includes('中文'))setLang('zh');else if(t.includes('English'))setLang('en');
+}));
+let saved=null;try{saved=localStorage.getItem('amlLang');}catch(e){}
+walk(document.body);
+if(saved==='zh')setLang('zh');
+})();
+</script>
+<div class="q-ov" id="qOv"></div><aside class="q-dr" id="qDr"></aside>
+
+<script>
+(function(){
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+function toast(m){const t=document.getElementById('toast');if(!t)return;t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+// RCPD alerts: id,user,flag,risk,type,detail,kyc,ts,assigned
+let rcpd=[
+['P-45872','LuckyJhon','N','High','NDRP Hit','NDRP list match (2025-0987)','Verified','Oct 12, 2026 09:42 AM','Maria S.'],
+['P-36291','PlayerMax21','D','Medium','Reactivated Dormant','Account active after 180 days (₱250k)','Verified','Oct 12, 2026 09:21 AM','Rodel T.'],
+['P-78342','GCashKing','','Medium','Deposit Velocity Spike','₱150k vs ₱10k avg (6 transactions)','Verified','Oct 12, 2026 09:17 AM','Carla D.'],
+['P-61123','SweetWin88','','Medium','Not Winning','Deposited ₱80k, Total Wins: ₱1.2k','Pending','Oct 12, 2026 09:03 AM','James L.'],
+['P-99231','FastCashPH','','Medium','Multiple Accounts','3 linked accounts, same device','Verified','Oct 12, 2026 08:47 AM','Ana R.'],
+['P-44777','BetsOnly','','High','Large Transaction','₱500k single deposit','Verified','Oct 12, 2026 08:32 AM','Mark P.'],
+['P-22109','CasinoLover','','Low','Geolocation / VPN','Login from non-local IP','Verified','Oct 12, 2026 08:16 AM','Ella B.'],
+['P-66320','GameChanger','','Medium','Watchlist Match','Local watchlist (PH)','Verified','Oct 12, 2026 08:05 AM','Daniel R.']];
+// AMLA cases: id,user,risk,type,detail,by,date,status
+let amla=[
+['P-45872','LuckyJhon','High','NDRP / Restricted Player Detection','NDRP list match (2025-0987)','Oct 12, 2026 09:42 AM','Pending Review'],
+['P-77123','QueenB777','Medium','Duplicate Account Detection','Shared device + IP with 2 existing accounts','Oct 12, 2026 08:17 AM','Under Review'],
+['P-69211','AcePlayer99','High','NDRP / Restricted Player Detection','Positive hit (2024-0987)','Oct 11, 2026 05:21 PM','Pending Review'],
+['P-36455','MoneyMoves','Medium','Dormant Account Reactivation with a Significant Deposit','Inactive 7 months, deposited ₱120k','Oct 11, 2026 02:13 PM','Under Review'],
+['P-88310','GoldRush88','Medium','Dormant Account Reactivation with a Significant Deposit','Inactive 9 months, ₱750k deposit','Oct 10, 2026 11:46 AM','Pending Review'],
+['P-55219','SkyWalker','Medium','Duplicate Account Detection','Same ID / phone as another account','Oct 10, 2026 10:02 AM','Escalated'],
+['P-77102','HappyGirl','Medium','Duplicate Account Detection','3 linked accounts, same device','Oct 09, 2026 04:33 PM','Pending Review'],
+['P-66342','DragonKing','Low','NDRP / Restricted Player Detection','Restricted player tag (exclusion)','Oct 09, 2026 01:17 PM','Under Review'],
+['P-44781','WinMaster','High','NDRP / Restricted Player Detection','Link to restricted entity','Oct 08, 2026 07:55 PM','Pending Review'],
+['P-22903','LadyLuck','Medium','Duplicate Account Detection','Multiple accounts / same IP','Oct 08, 2026 03:26 PM','Under Review'],
+['P-99821','JpTrader','Medium','Dormant Account Reactivation with a Significant Deposit','Inactive 6 months, ₱260k deposit','Oct 07, 2026 09:12 AM','Pending Review'],
+['P-66118','XtremeBet','Low','Duplicate Account Detection','Shared payment account (GCash)','Oct 07, 2026 08:04 AM','Under Review']];
+const logo=r=>`<span class="q-tag ${r}">● ${r}</span>`;
+const bars=[['Oct 6',10],['Oct 7',12],['Oct 8',8],['Oct 9',22],['Oct 10',130],['Oct 11',320],['Oct 12',150]];
+const flagsOf=f=>f==='N'?'<span class="q-flag">NDRP-FLAG</span>':f==='D'?'<span class="q-flag dr">DORMANT-REACTIVATED</span>':'';
+
+function shell(id,title,pill,sub){return `<div class="q-head"><h2>${title}</h2>${pill?`<span class="q-pill">${pill}</span>`:''}</div><div class="q-sub">${sub}</div>
+`;}
+function stat(ico,c,l,v,d,cls){return `<div class="q-stat"><div class="q-ico" style="background:${c}">${ico}</div><div><span>${l}</span><b>${v}</b><em class="${cls}">${d}</em></div></div>`;}
+function foot(){return `<div class="q-foot">
+<div class="q-card"><h4>Queue Comparison</h4><div class="b"><b>RCPD (Frontline):</b> junior &amp; senior investigators; all automated flags — NDRP hits, reactivated dormant accounts, deposit spikes, not-winning. Actions: Cleared, Pending EDD, Escalate to AMLA.<br><b>AMLA (Senior):</b> only cases escalated by RCPD — structuring, takeover, U-turn churning. Actions: Confirm &amp; Terminate, De-escalate, File STR.</div></div>
+<div class="q-card"><h4>Key Features</h4><div class="b"><b>Dynamic Action Panel</b> — 30-day average vs. current 24-hour spike.<br><b>Mandatory Audit Controls</b> — 20+ character justification before any action; audit trail is unalterable.<br><b>Auto “Dormant Risk” tagging</b> — [NDRP-FLAG] / [DORMANT-REACTIVATED] badges across the admin suite.</div></div>
+<div class="q-card"><h4>Workflow Flow</h4><div class="b"><div class="q-flow"><div><i>1</i>eKYC</div><u>→</u><div><i>2</i>Risk Engine</div><u>→</u><div><i>3</i>RCPD<br>(Initial Review)</div><u>→</u><div><i>4</i>AMLA<br>(Escalation / STR)</div></div></div></div></div>`;}
+
+function renderR(){
+ $('#rcpdq').innerHTML=shell('rcpdq','General Alert Queue','Frontline Investigators','Real-time monitoring. Safer play. A cleaner tomorrow.')+
+ `<div class="q-stats three">${stat('⚠','#e84b4b','Pending Alerts',rcpd.length+40,'↑ 12% vs. yesterday','up')}${stat('◔','#2468d8','Avg. Resolution Time','1h 36m','↓ 34% vs. yesterday','dn')}${stat('⇄','#5b5bd6','Total Escalations Today',7+(amla.length-12),'↑ 75% vs. yesterday','up')}</div>
+ <div class="q-filters"><input id="rq" placeholder="Search by Player ID, Username, or NDRP #..."><select id="rl"><option>All Levels</option><option>High</option><option>Medium</option><option>Low</option></select><select id="rt"><option>All Trigger Types</option>${[...new Set(rcpd.map(r=>r[4]))].map(t=>`<option>${t}</option>`).join('')}</select></div>
+ <div class="table-scroll"><table class="q-tbl"><thead><tr><th>#</th><th>Player ID</th><th>Username</th><th>Risk Level</th><th>Trigger Type</th><th>Trigger Details</th><th>KYC Status</th><th>System Timestamp</th><th>Assigned To</th><th>Actions</th></tr></thead><tbody id="rb"></tbody></table></div>
+ <div class="q-sub" id="rc" style="margin-top:8px"></div>`+foot();
+ fillR();
+ ['rq','rl','rt'].forEach(i=>$('#'+i).addEventListener('input',fillR));
+}
+function fillR(){
+ const q=$('#rq').value.toLowerCase(),l=$('#rl').value,t=$('#rt').value;
+ const rows=rcpd.filter(r=>(!q||(r[0]+r[1]).toLowerCase().includes(q))&&(l==='All Levels'||r[3]===l)&&(t==='All Trigger Types'||r[4]===t));
+ $('#rb').innerHTML=rows.map((r,i)=>`<tr><td>${i+1}</td><td>${r[0]}</td><td>${r[1]}${flagsOf(r[2])}</td><td>${logo(r[3])}</td><td>${r[4]}</td><td>${r[5]}</td><td style="color:${r[6]==='Verified'?'#2ba24c':'#c8890b'}">${r[6]==='Verified'?'✔ ':'◔ '}${r[6]}</td><td>${r[7]}</td><td>${r[8]}</td><td><button class="q-view" data-r="${r[0]}">View</button></td></tr>`).join('')||'<tr><td colspan="10" style="text-align:center;padding:20px">No alerts</td></tr>';
+ $('#rc').textContent=`Showing 1–${rows.length} of ${rows.length} alerts`;
+ $$('#rb .q-view').forEach(b=>b.onclick=()=>openR(b.dataset.r));
+}
+let aTab='All Escalated Cases';
+function renderA(){
+ const pend=amla.filter(a=>a[6]==='Pending Review').length;
+ $('#amlaq').innerHTML=`<div class="q-sub" style="margin-top:0">Senior Compliance Queue — manage escalations, high-risk cases, and file regulatory reports.</div>`+
+ `<div class="q-stats">${stat('⚠','#e84b4b','Pending AMLA Cases',amla.length+6,'↑ 3 vs. yesterday','up')}${stat('◔','#2468d8','Avg. Resolution Time','6h 24m','↓ 42% vs. yesterday','dn')}${stat('⇄','#5b5bd6','Total Escalations Today',12+(amla.length-12),'↑ 71% vs. yesterday','up')}${stat('▤','#2a7de1','STR Filed Today',5,'↑ 150% vs. yesterday','up')}</div>
+ <div class="q-tabs">${['All Escalated Cases','High Risk','STR / PSTR','Investigation','Closed'].map(t=>`<span class="${t===aTab?'on':''}">${t}</span>`).join('')}</div>
+ <div class="q-filters"><input id="aq" placeholder="Search by Player ID, Username, or Case No..."><select id="at"><option>Trigger Type: All</option><option>Duplicate Account Detection</option><option>NDRP / Restricted Player Detection</option><option>Dormant Account Reactivation with a Significant Deposit</option></select><select id="al"><option>Risk Level: All</option><option>High</option><option>Medium</option><option>Low</option></select><button class="q-view" id="ar" style="padding:6px 14px">⟳ Reset</button></div>
+ <div class="table-scroll"><table class="q-tbl"><thead><tr><th>#</th><th>Player ID</th><th>Username</th><th>Risk Level</th><th>Trigger Type</th><th>Trigger Details</th><th>Escalated By</th><th>Escalation Date</th><th>Status</th><th>Actions</th></tr></thead><tbody id="ab"></tbody></table></div>
+ <div class="q-sub" id="ac" style="margin-top:8px"></div>`+
+ `<div class="q-foot" style="grid-template-columns:1fr 1fr"><div class="q-card"><h4>AMLA Queue Workflow</h4><div class="b"><div class="q-flow"><div><i>1</i>RCPD Escalation<br>(Initial Review)</div><u>→</u><div><i>2</i>AMLA Review<br>(Full Assessment)</div><u>→</u><div><i>3</i>Decision<br>(STR / Terminate / De-escalate)</div><u>→</u><div><i>4</i>Regulatory Filing<br>(AMLC / PAGCOR)</div></div></div></div>
+ <div class="q-card"><h4>Key Features (Senior Queue)</h4><div class="b"><b>Full Audit Trail</b> — exact time RCPD clicked Escalate and all actions taken.<br><b>RCPD Investigator Notes</b> — mandatory field explaining why the case is suspicious.<br><b>Regulatory Report Links</b> — PAGCOR report, AMLC STR / PSTR templates.<br><b>Advanced Analytics</b> — player behavior, link analysis, risk scoring.</div></div></div>`;
+ fillA();
+ $$('#amlaq .q-tabs span').forEach(s=>s.onclick=()=>{aTab=s.textContent;$$('#amlaq .q-tabs span').forEach(x=>x.classList.toggle('on',x===s));fillA();});
+ ['aq','al','at'].forEach(i=>$('#'+i).addEventListener('input',fillA));
+ $('#ar').onclick=()=>{$('#aq').value='';$('#al').value='Risk Level: All';$('#at').value='Trigger Type: All';aTab='All Escalated Cases';renderA();};
+}
+function fillA(){
+ const q=$('#aq').value.toLowerCase(),l=$('#al').value,tt=$('#at').value;
+ const tabOk=a=>aTab==='All Escalated Cases'||(aTab==='High Risk'&&a[2]==='High')||(aTab==='STR / PSTR'&&a[6]==='Escalated')||(aTab==='Investigation'&&a[6]==='Under Review')||(aTab==='Closed'&&a[6]==='Closed');
+ const rows=amla.filter(a=>tabOk(a)&&(!q||(a[0]+a[1]).toLowerCase().includes(q))&&(l==='Risk Level: All'||a[2]===l)&&(tt==='Trigger Type: All'||a[3]===tt));
+ $('#ab').innerHTML=rows.map((a,i)=>`<tr><td>${i+1}</td><td>${a[0]}</td><td>${a[1]}</td><td>${logo(a[2])}</td><td>${a[3]}</td><td>${a[4]}</td><td>RCPD</td><td>${a[5]}</td><td><span class="q-st ${a[6].split(' ')[0]}">${a[6]}</span></td><td><button class="q-view" data-a="${a[0]}">View ⌄</button></td></tr>`).join('')||'<tr><td colspan="10" style="text-align:center;padding:20px">No cases</td></tr>';
+ $('#ac').textContent=`Showing 1–${rows.length} of ${rows.length} cases`;
+ $$('#ab .q-view').forEach(b=>b.onclick=()=>openA(b.dataset.a));
+}
+function close(){$('#qOv').classList.remove('show');$('#qDr').classList.remove('show');}
+function open(html){$('#qDr').innerHTML=html;$('#qOv').classList.add('show');$('#qDr').classList.add('show');$('#qDr .x').onclick=close;}
+$('#qOv').onclick=close;
+const chart=`<div class="q-bars">${bars.map(b=>`<div class="${b[0]==='Oct 12'?'r':''}" style="height:${Math.max(6,b[1]/320*85)}px"><em>₱${b[1]}k</em><small>${b[0]}</small></div>`).join('')}</div><div style="height:14px"></div>`;
+function openR(id){
+ const r=rcpd.find(x=>x[0]===id);
+ open(`<header>Alert Details<span class="x">✕</span></header><div class="body">
+ <div class="id">${r[0]} ${r[1]} ${flagsOf(r[2])} ${logo(r[3])}</div>
+ <div class="q-sec"><h5>Player Information</h5><div class="q-kv"><span>Player ID</span>${r[0]}<span>Username</span>${r[1]}<span>KYC Status</span>${r[6]}<span>Account Status</span>Active<span>Date Created</span>Jan 15, 2025<span>Trigger</span>${r[4]}<span>Details</span>${r[5]}<span>Assigned To</span>${r[8]}</div></div>
+ <div class="q-sec"><h5>Payment Methods</h5><div class="q-kv"><span>GCash</span>Primary · Last used Oct 11, 2026<span>Maya</span>Secondary · Last used Oct 10, 2026</div></div>
+ <div class="q-sec"><h5>Deposit Velocity (Last 7 Days)</h5><div class="q-kv"><span>30-day avg deposit</span>₱5,000 · 1x / day<span>Current 24h spike</span>₱150,000 · 6 (GCash)<span>Total wins</span>₱200 <b style="color:#d93a33">Not Winning (Condition C)</b></div>${chart}</div>
+ <div class="q-sec"><h5>Investigator Justification Note <span style="color:#d93a33">(Mandatory)</span></h5><textarea id="qn" maxlength="250" placeholder="Type at least 20 characters..."></textarea><div class="q-cnt"><span id="qc">0</span>/250</div></div></div>
+ <div class="q-act"><button class="g" data-x="clear">Cleared<small>(False Positive)</small></button><button class="y" data-x="edd">Pending EDD<small>(Request SOF)</small></button><button class="r" data-x="esc">+ Escalate to AMLA<small>(Hand over case)</small></button></div>`);
+ $('#qn').oninput=e=>$('#qc').textContent=e.target.value.length;
+ $$('#qDr [data-x]').forEach(b=>b.onclick=()=>{
+  if($('#qn').value.trim().length<20){toast('Justification note requires at least 20 characters');$('#qn').focus();return;}
+  const k=b.dataset.x; rcpd=rcpd.filter(x=>x[0]!==id);
+  if(k==='esc'){amla.unshift([r[0],r[1],r[3],r[4],r[5],'Oct 13, 2026 '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),'Pending Review']);}
+  toast(k==='clear'?'Alert cleared (false positive)':k==='edd'?'Pending EDD — SOF requested':'Escalated to AMLA queue');
+  close();renderR();renderA();});
+}
+function openA(id){
+ const a=amla.find(x=>x[0]===id);
+ open(`<header>Case Details<span class="x">✕</span></header><div class="body">
+ <div class="id">${a[0]} ${a[1]} ${logo(a[2])} <span class="q-st ${a[6].split(' ')[0]}">${a[6]}</span></div>
+ <div class="q-sub">Escalated by: RCPD · ${a[5]}</div>
+ <div class="q-sec"><h5>Risk Summary</h5><div class="q-kv"><span>Risk Level</span>${a[2]}<span>Trigger</span>${a[3]}<span>Trigger Details</span>${a[4]}<span>Current Status</span>${a[6]}</div></div>
+ <div class="q-sec"><h5>Player Information</h5><div class="q-kv"><span>Player ID</span>${a[0]}<span>Username</span>${a[1]} <span class="q-flag" style="width:max-content">NDRP-FLAG</span><span>KYC Status</span>Verified<span>Account Status</span>Active<span>Date Created</span>Jan 15, 2025<span>Country</span>Philippines</div></div>
+ <div class="q-sec"><h5>Transaction &amp; Payment Methods</h5><div class="q-kv"><span>GCash</span>…4821 Primary<span>Maya</span>…3176 Secondary<span>Bank Transfer</span>…5589<span>Total deposits (7d)</span>₱980,000<span>Avg daily deposit</span>₱140,000 · 6x / day<span>Total wins</span>₱200</div>${chart}</div>
+ <div class="q-sec"><h5>Investigator Notes</h5><textarea readonly>Player shows unusual deposit pattern with no corresponding wins. Possible structuring behavior using GCash. Recommend further review and EDD request.</textarea><div class="q-cnt">158/500</div></div></div>
+ <div class="q-act"><button class="g" data-x="Case confirmed — player banned">Confirm &amp; Terminate<small>(Ban Player)</small></button><button class="b" data-x="De-escalated to cleared — account unblocked">De-escalate to Cleared<small>(Unblock Account)</small></button><button class="p" data-x="STR filed via AMLC Portal">File STR<small>(AMLC Portal)</small></button></div>
+ <div class="q-warn">🔒 All withdrawals will be locked immediately once this case is confirmed by AMLA.</div>`);
+ $$('#qDr [data-x]').forEach(b=>b.onclick=()=>{amla=amla.filter(x=>x[0]!==id);toast(b.dataset.x);close();renderA();renderR();});
+}
+window.setAmlaTrigger=t=>{aTab='All Escalated Cases';renderA();$('#at').value=t;fillA();};
+renderR();renderA();
+})();
 </script>
 </body>
 </html>

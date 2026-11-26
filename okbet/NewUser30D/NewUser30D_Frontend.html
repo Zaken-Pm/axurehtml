@@ -602,6 +602,20 @@ button.nt[data-amt]:hover{border-color:var(--c-gold);}
 /* 未登录用户列 */
 .hbar__av--guest{display:grid !important;place-items:center;background:#c9d2e3;color:#fff;font-size:1rem;}
 .hbar__login{background:#fff;color:#1667e8;border:1.5px solid #1667e8;font-weight:800;border-radius:8px;padding:7px 14px;font-size:.78rem;}
+
+/* 活动页资讯列（Progress＋倒数） */
+.info2{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:var(--sp-2) var(--sp-3);}
+.info2__cell{background:rgba(0,0,0,.25);border-radius:var(--radius-s);padding:8px 10px;display:flex;flex-direction:column;}
+.info2__cell--r{align-items:flex-end;text-align:right;}
+.info2__k{font-size:.67rem;color:var(--c-text-3);}
+.info2__v{font-weight:800;color:var(--c-gold);font-variant-numeric:tabular-nums;}
+.info2__v--big{font-size:1.05rem;}
+/* History 弹窗：Claimed 清单 */
+.hist2__h{margin:0 0 var(--sp-2);font-size:.85rem;color:var(--c-gold);}
+.hlink{display:flex;justify-content:flex-end;margin:6px var(--sp-3) 0;}
+.hlink__btn{background:none;color:var(--c-text-2);font-size:.74rem;font-weight:600;text-decoration:underline;text-underline-offset:2px;padding:2px 0;}
+.hlink__btn:hover{color:var(--c-gold);}
+.hlink + .tiers{margin-top:var(--sp-2);}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
 </style>
 </head>
@@ -788,7 +802,7 @@ var SCREENS = [
   {id:'kyc',         ui:'09', name:'KYC 充值前分支'},
   {id:'my',          ui:'10', name:'MY 可领卡'},
   {id:'yourRewards', ui:'11', name:'Your Rewards'},
-  {id:'history',     ui:'12', name:'Reward History（弹窗）'}
+  {id:'history',     ui:'12', name:'History（弹窗）'}
 ];
 
 function render(){
@@ -1147,26 +1161,15 @@ function allRecords(){
 /* ---------- UI 12 Reward History（弹窗）----------
    以底部弹窗呈现，不切换页面：筛选、明细与有效奖励 Claim；关闭即回到原画面 */
 function historySheet(){
+  var list = allRecords().filter(function(r){ return r.status==='credited' || r.status==='processing'; })
+    .sort(function(a,b){ return b.day-a.day || a.tier-b.tier; });
   var h = '<div class="mask mask--sheet" role="dialog" aria-modal="true" aria-labelledby="histT"><div class="sheet sheet--dark">'+
-          '<div class="sheet__h"><h2 id="histT">Reward History</h2><button class="dlg__x dlg__x--light" style="position:static" data-close aria-label="关闭">✕</button></div>';
-  var tabs = [['all','All'],['claimable','To claim'],['credited','Credited'],['expired','Expired']];
-  h += '<div class="tabs" role="tablist" style="margin:0 0 8px">'+tabs.map(function(t){return '<button role="tab" aria-selected="'+(state.histTab===t[0])+'" class="tabs__t'+(state.histTab===t[0]?' tabs__t--on':'')+'" data-tab="'+t[0]+'">'+t[1]+'</button>';}).join('')+'</div>';
-  var list = allRecords().filter(function(r){
-    if(state.histTab==='all') return true;
-    if(state.histTab==='claimable') return r.status==='claimable' || r.status==='claiming';
-    if(state.histTab==='credited') return r.status==='credited' || r.status==='processing';
-    return r.status==='expired';
-  }).sort(function(a,b){ return b.day-a.day || a.tier-b.tier; });
-  if(!list.length) h += '<p class="yr__empty">No records</p>';
-  else {
-    h += '<div class="sheet__scroll"><table class="hist" style="width:100%;margin:0"><thead><tr><th>Day</th><th>Tier</th><th>Bonus</th><th>Status</th></tr></thead><tbody>';
-    list.forEach(function(r){
-      var cell = r.status==='claimable' ? '<button class="btn btn--claim" data-claim="'+r.idx+'" data-from="history">Claim</button>' : statusChip(r.status);
-      h += '<tr><td>Day '+r.day+'<br><span class="legend" style="margin:0">'+shortDate(r.day)+'</span></td><td>Tier '+r.tier+'</td><td>'+peso(r.amt)+'</td><td>'+cell+'</td></tr>';
-    });
-    h += '</tbody></table></div>';
-  }
-  h += '<p class="legend" style="margin:8px 0 0">Rewards can only be claimed on the day they are earned (before 00:00, UTC+8).</p>';
+          '<div class="sheet__h"><h2 id="histT">History</h2><button class="dlg__x dlg__x--light" style="position:static" data-close aria-label="关闭">✕</button></div>';
+  h += '<h3 class="hist2__h">Claimed</h3>';
+  if(!list.length) h += '<p class="yr__empty">No claimed rewards yet.</p>';
+  else h += '<div class="sheet__scroll"><ul class="mini" style="margin:0">'+list.map(function(r){
+    return '<li class="mini__i"><div>Day '+r.day+' · Tier '+r.tier+' · '+peso(r.amt)+'</div>'+statusChip(r.status)+'</li>';
+  }).join('')+'</ul></div>';
   return h + '</div></div>';
 }
 
@@ -1176,18 +1179,18 @@ function viewLanding(){
   if(state.elig==='notLogin') return h+stateBox('🔒','Log in to view your offer','This offer is for selected new players.','<button class="btn btn--deposit" data-act="login">Log in</button>')+'</div>';
   if(state.elig==='loading') return h+'<div class="skel" style="height:150px"></div><div class="skel" style="height:60px"></div><div class="skel" style="height:110px"></div><div class="skel" style="height:110px"></div></div>';
   if(state.elig==='error') return h+stateBox('⚠️','Couldn\'t load your offer','Please check your connection and try again. Regular deposits are still available.','<button class="btn btn--deposit" data-act="retry">Retry</button>')+'</div>';
-  if(state.elig==='notEligible') return h+stateBox('🎁','This offer isn\'t available for your account','Check Rewards for other promotions.','<button class="btn btn--ghost" data-go="rewards">Go to Rewards</button>')+'';
-  if(state.elig==='pendingAlloc') return h+heroBlock()+stateBox('⏳','Your offer is being prepared','We\'re setting up your personal plan. Regular deposits are still available.','<button class="btn btn--ghost" data-go="home">Back to Home</button>')+'';
+  if(state.elig==='notEligible') return h+stateBox('🎁','This offer isn\'t available for your account','Check Rewards for other promotions.','<button class="btn btn--ghost" data-go="rewards">Go to Rewards</button>')+'</div>';
+  if(state.elig==='pendingAlloc') return h+heroBlock()+stateBox('⏳','Your offer is being prepared','We\'re setting up your personal plan. Regular deposits are still available.','<button class="btn btn--ghost" data-go="home">Back to Home</button>')+'</div>';
 
   h += heroBlock() + infoRow();
   if(state.stage==='ended'){
-    h += stateBox('🏁','Your 30-day promo has ended','Thanks for joining! You can still view your reward records.','<button class="btn btn--claim" data-act="toHist" data-from="landing">Reward History</button>');
+    h += stateBox('🏁','Your 30-day promo has ended','Thanks for joining! You can still view your reward records.','<button class="btn btn--claim" data-act="toHist" data-from="landing">History</button>');
     return h + '</div>';
   }
-  h += dailyHeader();
   if(state.time==='closed') h += '<div class="banner-warn" role="note">Today\'s count closed at 23:50. Deposits made between 23:50 and 00:00 don\'t count toward any day\'s rewards. New tasks start at 00:00.</div>';
   if(state.stage==='before') h += steps();
-  h += kycBar() + progressBlock() + expireHint() + tierList() + yourRewardsEntry();
+  /* History：文字连结，放在进度区块与档位卡之间的右侧，点击开启 History 弹窗（不在底部另加区块） */
+  h += kycBar() + progressBlock() + expireHint() + '<div class="hlink"><button class="hlink__btn" data-act="toHist" data-from="landing">History ›</button></div>' + tierList();
   return h + '</div>';
 }
 /* 首存前流程引导：① 完成 KYC → ② 充值 → ③ 充值成功后领取奖励 */
@@ -1210,16 +1213,14 @@ function kycBar(){
 function heroBlock(){
   return '<section class="hero" aria-label="活动主视觉"><div class="hero__gift" aria-hidden="true">🎁</div><p class="hero__title">Newcomer 30 Days Promo</p><p class="hero__sub">Deposit daily, unlock up to 3 bonuses every day</p><button class="hero__rules" data-ov="rules">Rules</button></section>';
 }
+/* 资讯列（依截图）：左＝Progress Day X/30，右＝倒数（统计开放时到 23:50；关闭后到 00:00） */
 function infoRow(){
   var day = state.stage==='before' ? 'Not started' : (state.stage==='ended' ? 'Ended' : 'Day '+state.day+' / 30');
-  return '<div class="info"><div class="info__cell"><span class="info__k">My Level</span><span class="info__v"><span class="lv">'+state.level.replace('L','Lv')+'</span></span></div>'+
-    '<div class="info__cell"><span class="info__k">Progress</span><span class="info__v">'+day+'</span></div>'+
-    '<div class="info__cell"><span class="info__k">Ends</span><span class="info__v">'+(state.stage==='active'?dateOf(DAY_TOTAL):'—')+'</span></div></div>'+
-    (state.stage==='before' ? '<div class="banner-warn" style="background:rgba(255,207,63,.12);border-color:rgba(255,207,63,.5);color:#ffe7a0">Your 30 days start with your first successful deposit. It also counts toward Day 1 rewards.</div>' : '');
-}
-function dailyHeader(){
   var closed = state.time==='closed';
-  return '<div class="daily"><h2 class="daily__title">Daily Deposit</h2><div class="daily__cd"><small>'+(closed?'New tasks in':'Deposit count ends in')+'</small>⏳ <span data-cd="'+(closed?'midnight':'cutoff')+'">--:--:--</span></div></div>';
+  var right = state.stage==='ended' ? '<span class="info2__k">Promo</span><span class="info2__v">Ended</span>' :
+    '<span class="info2__k">'+(closed?'New tasks in':'Deposit count ends in')+'</span><span class="info2__v">⏳ <span data-cd="'+(closed?'midnight':'cutoff')+'">--:--:--</span></span>';
+  return '<div class="info2"><div class="info2__cell"><span class="info2__k">Progress</span><span class="info2__v info2__v--big">'+day+'</span></div><div class="info2__cell info2__cell--r">'+right+'</div></div>'+
+    (state.stage==='before' ? '<div class="banner-warn" style="background:rgba(255,207,63,.12);border-color:rgba(255,207,63,.5);color:#ffe7a0">Your 30 days start with your first successful deposit. It also counts toward Day 1 rewards.</div>' : '');
 }
 function progressBlock(){
   var p = plan(), max = maxTh(), w = Math.min(state.cum/max,1)*100;
@@ -1257,6 +1258,10 @@ function tierCard(i){
   else { act='<button class="btn btn--deposit" data-dep="'+(t.th-state.cum)+'">Deposit</button>'; sub=peso(Math.min(state.cum,t.th))+' / '+peso(t.th); }
   return '<li class="tier'+(st==='claimable'?' tier--claimable':'')+'" data-tier="'+i+'"><span class="tier__flag">'+peso(t.b)+'</span><span class="tier__gift" aria-hidden="true">'+gifts[i]+'</span>'+
     '<div class="tier__body"><p class="tier__name">Deposit <em>'+peso(t.th)+'</em> today, get <em>'+peso(t.b)+'</em></p><p class="tier__sub">'+sub+'</p></div><div class="tier__act">'+act+'</div></li>';
+}
+/* 活动页最下方 History 入口：开启 History 弹窗（只显示已领取清单） */
+function historyEntry(){
+  return '<button class="yr-entry" data-act="toHist" data-from="landing"><span style="font-size:1.6rem" aria-hidden="true">📜</span><span style="flex:1;min-width:0"><span class="yr-entry__t" style="display:block">History</span><span class="yr-entry__d">Your claimed rewards</span></span><span aria-hidden="true">›</span></button>';
 }
 function yourRewardsEntry(){
   var ci = claimableIdx();
@@ -1644,7 +1649,7 @@ var NOTES = {
            'UI 03 新人活动：与其他活动卡相同呈现（图片、Event time、名称、Read More ›），卡片高度、宽度、图片比例与文字栏位皆一致，Event time 与名称各 1 行、超出以「…」，不因本活动加高；归在 Newcomer 分类，点击 Read More 导向活动详情页（04 Landing）。',
            'Event time 显示个人 30 日起讫；未首存显示「30 days from first deposit」【待确认】。非名单或 30 日结束：不渲染此卡。',
            '其他活动卡、积分、优惠券、Task List 为示意，非本次需求范围。'],
-  landing:['04 配发：显示有效方案（等级、Day X/30、结束日）、Rules 与 Your Rewards 入口；异常：未登录／非名单／等待配发（不以 L1 兜底）。',
+  landing:['04 配发（依截图）：主视觉＋Rules，资讯列左为 Progress Day X/30、右为倒数（Deposit count ends in／New tasks in）；进度区块下方右侧为「History ›」文字连结（开启 History 弹窗，不另加底部区块），已移除 Your Rewards 入口与 Daily Deposit 标题；异常：未登录／非名单／等待配发（不以 L1 兜底）。',
            '首存前（Day 0）显示「How to join」三步骤：① Verify identity → ② First deposit → ③ Claim rewards，目前步骤以金框标示，完成显示 ✓。',
            '已开始但 KYC 状态异常时显示验证提示条；任何 Deposit 按钮在未验证时先走 UI 09。',
            '06 当前任务：三档共用一条「当日累计有效存款」进度；里程碑上方为该档奖金，下方为累计门槛。',
@@ -1679,7 +1684,9 @@ var NOTES = {
                '可领奖励直接在「Today」区块逐档 Claim；≥2 档可领时显示「Claim total」一次领取，并显示 00:00 过期倒数（原独立 To Claim 区块已移除，避免重复）。',
                '已领（Claimed）显示最近 5 笔。',
                'Reward History › 以弹窗开启 12，不离开本页；返回键回到来源（Landing／Rewards／MY）。'],
-  history:['以底部弹窗呈现，不切换页面；入口：Your Rewards「Reward History ›」、MY「Bonus Reward History」、30 日结束页按钮。','筛选：All／To claim／Credited／Expired；明细：Day＋日期、档位、奖金、状态。','只有当日可领奖励可 Claim；领取成功弹窗关闭后回到 History 弹窗，状态同步所有入口。','往日未领一律显示 Expired。','打开时由下向上展开，关闭（✕、点遮罩、Esc）时由上向下收起；底层页面保持原捲动位置，不跳回顶部。'],
+  history:['以底部弹窗呈现（由下向上展开、由上向下收起），不切换页面；入口：活动详情页进度区块下方右侧「History ›」、MY「Bonus History」、Your Rewards「Reward History ›」、30 日结束页按钮。',
+           '内容只显示「Claimed」已领取清单：Day · Tier · 奖金＋状态（Credited／Processing），依日期新到旧排列；无资料显示「No claimed rewards yet.」。',
+           '关闭（✕、点遮罩、Esc）后停留原画面并保留捲动位置。'],
 };
 function renderNotes(){
   var key = currentKey(), sc = SCREENS.filter(function(s){return s.id===key;})[0];

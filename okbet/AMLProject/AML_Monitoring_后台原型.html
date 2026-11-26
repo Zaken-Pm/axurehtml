@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AML Monitoring 后台原型</title>
+</head>
+<body>
+
+<style>
+/* ==========================================================================
+   AML Monitoring · 后台原型（v1.0，依《AML_需求盘点与待确认_v1.6》决议）
+   版面：沿用测试站后台——左侧选单＋顶部资讯列＋白底内容卡片；字级最小 12px
+   ========================================================================== */
+
+/* === Design Tokens === */
+:root{
+  --c-page:#e9eef6; --c-bg:#ffffff; --c-surface:#f5f7fa; --c-sidebar:#eef2f8; --c-sidebar-active:#dce6f6;
+  --c-text:#303133; --c-text-2:#4f545c; --c-text-3:#6b7079;
+  --c-border:#dcdfe6; --c-border-2:#ebeef5;
+  --c-primary:#1f6fd6; --c-primary-hover:#185bb3; --c-primary-soft:#e8f1fd;
+  --c-danger:#c62f2a; --c-danger-soft:#fdeceb; --c-warn:#9a5b00; --c-warn-soft:#fff4e0;
+  --c-ok:#1d7a3a; --c-ok-soft:#e7f5ec; --c-muted:#eef0f3; --c-neutral:#4a5a9c; --c-neutral-soft:#eef1f9; --c-off:#6b7079;
+  --c-new:#c4127a; --c-new-soft:#fbe9f3; --c-chg:#9a5b00;
+  --c-switch-off:#c4c9d2; --c-overlay:rgba(20,24,33,.45);
+  --c-chart-1:#1f6fd6; --c-chart-2:#e3a008; --c-chart-3:#c62f2a; --c-chart-4:#1d7a3a; --c-chart-5:#7c5cc4; --c-chart-6:#2aa3b8;
+  --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:24px; --space-6:32px;
+  --radius-s:4px; --radius:6px; --radius-l:8px;
+  --shadow-pop:0 12px 32px rgba(20,24,33,.18);
+  --font-ui:"Helvetica Neue",Helvetica,Arial,"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;
+  --fs-min:.75rem;   /* 12px：本原型最小字级 */
+  --fs-s:.8125rem;   /* 13px */
+  --fs-m:.875rem;    /* 14px */
+  --fs-l:1rem;
+  --fs-xl:1.25rem;
+  --sidebar-w:232px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --c-page:#13161c; --c-bg:#1b1f27; --c-surface:#222731; --c-sidebar:#1b1f28; --c-sidebar-active:#263252;
+  --c-text:#e6e8ec; --c-text-2:#c3c7cf; --c-text-3:#a2a8b3; --c-border:#363c49; --c-border-2:#2c313c;
+  --c-primary:#6aa6f5; --c-primary-hover:#8bbaf7; --c-primary-soft:#1e2c45;
+  --c-danger:#f07a74; --c-danger-soft:#3a2121; --c-warn:#f0b35a; --c-warn-soft:#3a2d17; --c-ok:#6fcf8d; --c-ok-soft:#1a3324; --c-muted:#2a2f39; --c-neutral:#a9b6ec; --c-neutral-soft:#262d45; --c-off:#a2a8b3;
+  --c-new:#f06bb5; --c-new-soft:#3a1f2f; --c-chg:#f0b35a; --c-switch-off:#4a5160; --c-overlay:rgba(0,0,0,.6); color-scheme:dark; } }
+:root[data-theme="dark"]{
+  --c-page:#13161c; --c-bg:#1b1f27; --c-surface:#222731; --c-sidebar:#1b1f28; --c-sidebar-active:#263252;
+  --c-text:#e6e8ec; --c-text-2:#c3c7cf; --c-text-3:#a2a8b3; --c-border:#363c49; --c-border-2:#2c313c;
+  --c-primary:#6aa6f5; --c-primary-hover:#8bbaf7; --c-primary-soft:#1e2c45;
+  --c-danger:#f07a74; --c-danger-soft:#3a2121; --c-warn:#f0b35a; --c-warn-soft:#3a2d17; --c-ok:#6fcf8d; --c-ok-soft:#1a3324; --c-muted:#2a2f39; --c-neutral:#a9b6ec; --c-neutral-soft:#262d45; --c-off:#a2a8b3;
+  --c-new:#f06bb5; --c-new-soft:#3a1f2f; --c-chg:#f0b35a; --c-switch-off:#4a5160; --c-overlay:rgba(0,0,0,.6); color-scheme:dark; }
+
+/* === Base === */
+[hidden]{display:none!important;}
+html{font-size:16px;}
+body{background:var(--c-page);color:var(--c-text);font-family:var(--font-ui);font-size:var(--fs-m);line-height:1.5;}
+h1,h2,h3,h4{margin:0;line-height:1.3;}
+p{margin:0;}
+button,input,select,textarea{font:inherit;color:inherit;}
+:focus-visible{outline:2px solid var(--c-primary);outline-offset:2px;}
+.num{font-variant-numeric:tabular-nums;}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+.muted{color:var(--c-text-3);}
+
+/* === App layout === */
+.app{display:grid;grid-template-columns:var(--sidebar-w) minmax(0,1fr);min-height:100vh;}
+.main-col{min-width:0;display:flex;flex-direction:column;}
+@media (max-width:1023px){ .app{grid-template-columns:minmax(0,1fr);} }
+
+/* === Sidebar === */
+.sidebar{background:var(--c-sidebar);border-right:1px solid var(--c-border-2);padding-block:var(--space-3);padding-left:max(0px, env(safe-area-inset-left,0px));overflow-y:auto;}
+.nav,.nav ul{list-style:none;margin:0;padding:0;}
+.nav__group{display:flex;align-items:center;justify-content:space-between;width:100%;padding:10px var(--space-4);border:0;background:none;text-align:left;font-weight:700;color:var(--c-text);cursor:pointer;}
+.nav__group:hover{background:var(--c-sidebar-active);}
+.nav__group[aria-expanded="true"]{color:var(--c-primary);background:var(--c-sidebar-active);}
+.nav__link{display:flex;align-items:center;gap:var(--space-2);width:100%;padding:7px var(--space-4) 7px 36px;border:0;background:none;text-align:left;color:var(--c-text-2);font-size:var(--fs-s);cursor:pointer;}
+.nav__link::before{content:"▸";font-size:var(--fs-min);color:var(--c-text-3);}
+.nav__link:hover{color:var(--c-primary);}
+.nav__link--parent{font-weight:700;color:var(--c-text);}
+.nav__link--parent::before{content:"▾";}
+.nav__link--parent[aria-expanded="false"]::before{content:"▸";}
+.nav__sub .nav__link{padding-left:54px;}
+.nav__link--active{color:var(--c-primary)!important;background:var(--c-sidebar-active);box-shadow:inset 3px 0 0 var(--c-primary);font-weight:700;}
+.badge-new,.badge-chg{font-size:var(--fs-min);font-weight:700;border-radius:var(--radius-s);padding:0 4px;line-height:1.4;border:1px solid currentColor;}
+.badge-new{color:var(--c-new);}
+.badge-chg{color:var(--c-chg);}
+@media (max-width:1023px){ .sidebar{border-right:0;border-bottom:1px solid var(--c-border-2);max-height:260px;} }
+
+/* === Topbar === */
+.topbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-3);padding-block:var(--space-3);
+  padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px));background:var(--c-bg);border-bottom:1px solid var(--c-border-2);}
+.topbar__left{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-4);}
+.topbar__stats{display:flex;flex-wrap:wrap;gap:var(--space-3);background:var(--c-primary-soft);border-radius:999px;padding:4px 14px;font-size:var(--fs-min);color:var(--c-text-2);}
+.topbar__stats b{color:var(--c-primary);}
+.topbar__right{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2) var(--space-3);min-width:0;}
+.demo{flex-wrap:wrap;}
+.demo{display:flex;align-items:center;gap:var(--space-2);font-size:var(--fs-min);color:var(--c-text-2);background:var(--c-warn-soft);border:1px dashed var(--c-warn);border-radius:var(--radius);padding:3px 8px;}
+.lang{display:flex;align-items:center;gap:var(--space-2);font-size:var(--fs-s);color:var(--c-text-2);}
+.lang select{border:1px solid var(--c-border);border-radius:var(--radius-s);background:var(--c-bg);padding:3px 8px;font-size:var(--fs-s);}
+.demo select{border:1px solid var(--c-border);border-radius:var(--radius-s);background:var(--c-bg);padding:2px 6px;font-size:var(--fs-min);}
+.bell{position:relative;border:0;background:none;font-size:1.2rem;cursor:pointer;padding:4px 6px;color:var(--c-text-2);}
+.bell__count{position:absolute;top:-2px;right:-4px;min-width:18px;height:18px;border-radius:9px;background:var(--c-danger);color:#fff;font-size:var(--fs-min);line-height:18px;text-align:center;padding:0 4px;font-weight:700;}
+.bell-pop{position:absolute;right:max(16px, env(safe-area-inset-right,0px));top:56px;width:min(380px,92vw);background:var(--c-bg);border:1px solid var(--c-border);border-radius:var(--radius-l);box-shadow:var(--shadow-pop);z-index:60;}
+.bell-pop__head{display:flex;justify-content:space-between;padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--c-border-2);font-weight:700;}
+.bell-pop ul{list-style:none;margin:0;padding:0;max-height:320px;overflow:auto;}
+.bell-pop li button{display:block;width:100%;text-align:left;border:0;background:none;padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--c-border-2);cursor:pointer;}
+.bell-pop li button:hover{background:var(--c-surface);}
+.bell-pop li .t{font-weight:700;color:var(--c-danger);}
+.bell-pop li .d{font-size:var(--fs-min);color:var(--c-text-3);}
+.bell-pop li.read .t{color:var(--c-text-2);font-weight:400;}
+
+/* === Content === */
+.content{padding-block:var(--space-4) var(--space-6);padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px));min-width:0;}
+.panel{background:var(--c-bg);border-radius:var(--radius-l);padding:var(--space-4) var(--space-5) var(--space-5);display:flex;flex-direction:column;gap:var(--space-4);min-width:0;}
+.breadcrumb{display:flex;flex-wrap:wrap;gap:var(--space-2);color:var(--c-text-2);font-size:var(--fs-s);}
+.breadcrumb ol{display:flex;flex-wrap:wrap;gap:var(--space-2);list-style:none;margin:0;padding:0;}
+.breadcrumb li + li::before{content:"›";margin-right:var(--space-2);color:var(--c-text-3);}
+.page-title{font-size:var(--fs-xl);}
+.page-desc{color:var(--c-text-2);font-size:var(--fs-s);max-width:80ch;}
+.note{font-size:var(--fs-min);color:var(--c-text-3);}
+.noperm{padding:var(--space-6);text-align:center;color:var(--c-text-2);border:1px dashed var(--c-border);border-radius:var(--radius-l);}
+
+/* === Filters === */
+.filters{display:flex;flex-wrap:wrap;gap:var(--space-2) var(--space-3);align-items:center;}
+.input,.select,.textarea{border:1px solid var(--c-border);border-radius:var(--radius-s);background:var(--c-bg);padding:5px 10px;min-height:32px;font-size:var(--fs-s);}
+.input:hover,.select:hover,.textarea:hover{border-color:var(--c-text-3);}
+.input:focus,.select:focus,.textarea:focus{border-color:var(--c-primary);}
+.input--error,.textarea--error{border-color:var(--c-danger)!important;}
+.input--w{width:200px;max-width:100%;}
+.date-range{display:inline-flex;align-items:center;gap:6px;}
+.check{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:var(--fs-s);}
+.check input{accent-color:var(--c-primary);width:15px;height:15px;}
+.field{display:flex;flex-direction:column;gap:var(--space-1);min-width:0;}
+.field__label{font-size:var(--fs-s);color:var(--c-text-2);font-weight:700;}
+.field__label .req{color:var(--c-danger);margin-right:2px;}
+.field__error{color:var(--c-danger);font-size:var(--fs-min);min-height:1.2em;}
+.field__help{color:var(--c-text-3);font-size:var(--fs-min);}
+
+/* === Buttons === */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:6px 14px;border-radius:var(--radius-s);border:1px solid var(--c-border);background:var(--c-bg);color:var(--c-text);cursor:pointer;font-size:var(--fs-s);white-space:nowrap;}
+.btn:hover{border-color:var(--c-primary);color:var(--c-primary);}
+.btn:active{transform:translateY(1px);}
+.btn--primary{background:var(--c-primary);border-color:var(--c-primary);color:#fff;}
+.btn--primary:hover{background:var(--c-primary-hover);border-color:var(--c-primary-hover);color:#fff;}
+.btn--danger{background:var(--c-danger);border-color:var(--c-danger);color:#fff;}
+.btn--danger:hover{filter:brightness(.92);color:#fff;}
+.btn--link{border:0;background:none;padding:0 2px;color:var(--c-primary);}
+.btn--link:hover{text-decoration:underline;}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+:root[data-theme="dark"] .btn--primary,:root[data-theme="dark"] .btn--danger{color:#10131a;}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .btn--primary,:root:not([data-theme="light"]) .btn--danger{color:#10131a;} }
+
+/* === Stat cards & charts === */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:var(--space-3);}
+.stat{border:1px solid var(--c-border-2);border-radius:var(--radius-l);padding:var(--space-3) var(--space-4);background:var(--c-surface);}
+.stat__label{font-size:var(--fs-min);color:var(--c-text-3);}
+.stat__value{font-size:1.375rem;font-weight:700;font-variant-numeric:tabular-nums;}
+.stat__sub{font-size:var(--fs-min);color:var(--c-text-3);}
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--space-3);}
+.chart{display:flex;align-items:center;gap:var(--space-4);border:1px solid var(--c-border-2);border-radius:var(--radius-l);padding:var(--space-3) var(--space-4);}
+.donut{width:96px;height:96px;border-radius:50%;flex:none;position:relative;}
+.donut::after{content:"";position:absolute;inset:22px;border-radius:50%;background:var(--c-bg);}
+.legend{list-style:none;margin:0;padding:0;font-size:var(--fs-min);display:flex;flex-direction:column;gap:4px;}
+.legend li{display:flex;align-items:center;gap:6px;}
+.legend i{width:10px;height:10px;border-radius:2px;flex:none;}
+.chart__title{font-size:var(--fs-s);font-weight:700;margin-bottom:4px;}
+
+/* === Table === */
+.table-wrap{overflow-x:auto;border:1px solid var(--c-border-2);border-radius:var(--radius-s);}
+.table{width:100%;border-collapse:collapse;min-width:960px;font-size:var(--fs-s);}
+.table th,.table td{padding:10px 12px;text-align:left;vertical-align:middle;border-bottom:1px solid var(--c-border-2);}
+.table thead th{background:var(--c-surface);color:var(--c-text-2);font-weight:700;white-space:nowrap;}
+.table tbody tr:hover td{background:color-mix(in srgb, var(--c-primary-soft) 45%, transparent);}
+.table .c{text-align:center;}
+.member{display:flex;flex-direction:column;gap:2px;font-size:var(--fs-min);color:var(--c-text-2);}
+.member b{color:var(--c-text);font-size:var(--fs-s);}
+.empty{padding:var(--space-6);text-align:center;color:var(--c-text-3);}
+.pager{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:var(--space-3);color:var(--c-text-2);font-size:var(--fs-s);}
+.bulk{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-3);background:var(--c-primary-soft);border-radius:var(--radius-s);font-size:var(--fs-s);}
+.avatar{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:var(--c-muted);font-size:1.1rem;}
+.list-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-2);}
+.list-head__title{font-size:var(--fs-m);font-weight:700;}
+.list-head__right{display:flex;align-items:center;gap:var(--space-3);}
+.th-sort{border:0;background:none;padding:0;font:inherit;font-weight:700;color:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;}
+.th-sort:hover{color:var(--c-primary);}
+.th-sort__icon{font-size:var(--fs-min);color:var(--c-text-3);}
+th[aria-sort="ascending"] .th-sort__icon,th[aria-sort="descending"] .th-sort__icon{color:var(--c-primary);}
+.table tfoot td{font-weight:700;background:var(--c-surface);border-top:1px solid var(--c-border);}
+.threshold{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;background:var(--c-danger-soft);color:var(--c-danger);font-size:var(--fs-min);font-weight:700;padding:4px 12px;border-radius:999px;}
+.tag-filter{display:inline-flex;flex-wrap:wrap;align-items:center;gap:4px;}
+.chip--x{display:inline-flex;align-items:center;gap:4px;background:var(--c-primary-soft);color:var(--c-primary);}
+.chip--x button{border:0;background:none;padding:0 2px;color:inherit;cursor:pointer;font-size:var(--fs-min);line-height:1;}
+.ops{display:flex;flex-wrap:wrap;gap:4px 10px;}
+.bulk__count{font-weight:700;margin-right:auto;}
+
+/* === Pills / tags === */
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-min);font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap;}
+.pill--high{background:var(--c-danger-soft);color:var(--c-danger);}
+.pill--mid{background:var(--c-warn-soft);color:var(--c-warn);}
+.pill--low{background:var(--c-ok-soft);color:var(--c-ok);}
+.pill--muted{background:var(--c-muted);color:var(--c-text-2);}
+.pill--off{background:var(--c-muted);color:var(--c-off);}
+.pill--neutral{background:var(--c-neutral-soft);color:var(--c-neutral);}
+.pill--info{background:var(--c-primary-soft);color:var(--c-primary);}
+.chip{display:inline-block;font-size:var(--fs-min);padding:1px 8px;border-radius:999px;background:var(--c-muted);color:var(--c-text-2);margin:1px 2px 1px 0;}
+.chip--warn{background:var(--c-warn-soft);color:var(--c-warn);}
+
+/* === Tabs === */
+.tabs{display:flex;gap:var(--space-5);border-bottom:1px solid var(--c-border);}
+.tabs button{border:0;background:none;padding:var(--space-2) 2px;margin-bottom:-1px;border-bottom:2px solid transparent;color:var(--c-text-2);font-weight:700;cursor:pointer;}
+.tabs button[aria-selected="true"]{color:var(--c-primary);border-bottom-color:var(--c-primary);}
+
+/* === 风控配置式版面（AML配置） === */
+.cfg-title{font-size:var(--fs-l);font-weight:700;}
+.cfg-card{border:1px solid var(--c-border-2);border-radius:var(--radius-s);}
+.cfg-card__head{padding:var(--space-3);border-bottom:1px solid var(--c-border-2);color:var(--c-primary);font-size:var(--fs-m);font-weight:400;}
+.cfg-card__note{padding:var(--space-2) var(--space-3);font-size:var(--fs-min);color:var(--c-text-3);background:var(--c-surface);border-bottom:1px solid var(--c-border-2);}
+.cfg-row{display:grid;grid-template-columns:220px minmax(0,1fr) auto 96px;gap:var(--space-3) var(--space-4);align-items:start;padding:var(--space-3);border-bottom:1px solid var(--c-border-2);}
+.cfg-row:last-child{border-bottom:0;}
+.cfg-row--switch{grid-template-columns:minmax(0,1fr) 96px;}
+.cfg-row--noswitch{grid-template-columns:220px minmax(0,1fr) auto;}
+.cfg-row__label{padding-top:6px;}
+.cfg-row__fields{display:flex;flex-direction:column;gap:var(--space-2);min-width:0;}
+.cfg-row__inline{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2) var(--space-3);}
+.cfg-row__inline .input{width:110px;}
+.cfg-row__switch{display:flex;justify-content:flex-end;padding-top:4px;}
+.check-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:6px var(--space-3);}
+@media (max-width:767px){ .cfg-row,.cfg-row--switch,.cfg-row--noswitch{grid-template-columns:minmax(0,1fr) auto;} .cfg-row__label,.cfg-row__fields{grid-column:1 / -1;} }
+.switch{display:inline-flex;align-items:center;gap:var(--space-2);border:0;background:none;padding:0;cursor:pointer;color:var(--c-text);font-size:var(--fs-s);}
+.switch__track{position:relative;width:34px;height:18px;border-radius:999px;background:var(--c-switch-off);transition:background .15s;flex:none;}
+.switch__track::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .15s;}
+.switch[aria-checked="true"] .switch__track{background:var(--c-primary);}
+.switch[aria-checked="true"] .switch__track::after{transform:translateX(16px);}
+.switch[aria-checked="true"] .switch__text{color:var(--c-primary);}
+.tag-select{display:flex;flex-wrap:wrap;gap:4px;align-items:center;border:1px solid var(--c-border);border-radius:var(--radius-s);padding:4px 8px;min-height:32px;background:var(--c-bg);cursor:pointer;}
+
+/* === Permission tree === */
+.tree{list-style:none;margin:0;padding:0;font-size:var(--fs-s);}
+.tree ul{list-style:none;margin:0;padding-left:22px;}
+.tree__row{display:flex;align-items:center;gap:4px;padding:2px 4px;border-radius:var(--radius-s);}
+.tree__row--new{background:var(--c-new-soft);}
+.tree__toggle{width:20px;height:20px;border:0;background:none;color:var(--c-text-3);cursor:pointer;padding:0;flex:none;font-size:var(--fs-min);}
+.tree__toggle[aria-expanded="true"]{transform:rotate(90deg);}
+.tree__spacer{width:20px;flex:none;}
+.tree-box{border:1px solid var(--c-border-2);border-radius:var(--radius);padding:var(--space-2);max-height:460px;overflow:auto;}
+.perm-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:var(--space-5);}
+@media (max-width:767px){ .perm-form{grid-template-columns:minmax(0,1fr);} }
+
+/* === Modal / Drawer === */
+.overlay{position:fixed;inset:0;background:var(--c-overlay);display:flex;align-items:flex-start;justify-content:center;
+  padding:max(40px, env(safe-area-inset-top,0px)) max(16px, env(safe-area-inset-right,0px)) 24px max(16px, env(safe-area-inset-left,0px));z-index:70;overflow-y:auto;}
+.modal{width:100%;max-width:560px;background:var(--c-bg);border-radius:var(--radius-l);box-shadow:var(--shadow-pop);display:flex;flex-direction:column;}
+.modal--l{max-width:900px;}
+.modal__head{display:flex;justify-content:space-between;align-items:flex-start;gap:var(--space-3);padding:var(--space-4) var(--space-5);border-bottom:1px solid var(--c-border-2);}
+.modal__title{font-size:var(--fs-l);}
+.modal__close{border:0;background:none;font-size:1.25rem;line-height:1;color:var(--c-text-3);cursor:pointer;padding:4px;}
+.modal__body{padding:var(--space-4) var(--space-5);display:flex;flex-direction:column;gap:var(--space-4);}
+.modal__foot{display:flex;justify-content:flex-end;gap:var(--space-2);padding:var(--space-3) var(--space-5) var(--space-4);border-top:1px solid var(--c-border-2);}
+.kv{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px var(--space-4);font-size:var(--fs-s);}
+.kv dt{color:var(--c-text-3);}
+.kv dd{margin:0;}
+.sec-title{font-size:var(--fs-m);font-weight:700;border-left:3px solid var(--c-primary);padding-left:8px;}
+.mini-table{width:100%;border-collapse:collapse;font-size:var(--fs-s);}
+.mini-table th,.mini-table td{border:1px solid var(--c-border-2);padding:6px 8px;text-align:left;}
+.mini-table th{background:var(--c-surface);}
+.mini-table .hit{color:var(--c-danger);font-weight:700;}
+
+/* === Toast === */
+.toast-zone{position:fixed;top:max(16px, env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:90;display:flex;flex-direction:column;gap:var(--space-2);pointer-events:none;}
+.toast{background:var(--c-ok-soft);color:var(--c-ok);border:1px solid color-mix(in srgb, var(--c-ok) 30%, transparent);padding:8px 16px;border-radius:var(--radius-s);box-shadow:var(--shadow-pop);min-width:240px;font-weight:700;}
+.toast--err{background:var(--c-danger-soft);color:var(--c-danger);}
+.toast--info{background:var(--c-primary-soft);color:var(--c-text);}
+@media (prefers-reduced-motion:no-preference){ .toast{animation:t-in .18s ease-out;} @keyframes t-in{from{opacity:0;transform:translateY(-6px);}} }
+</style>
+
+<div class="app">
+  <!-- === Sidebar === -->
+  <aside class="sidebar" aria-label="后台选单">
+    <nav>
+      <ul class="nav" id="nav"></ul>
+    </nav>
+  </aside>
+
+  <div class="main-col">
+    <!-- === Topbar === -->
+    <header class="topbar">
+      <div class="topbar__left">
+        <span class="muted">当前时间：<span class="num" id="clock">2026/11/27 10:00:00</span> +08:00</span>
+        <span class="topbar__stats" aria-label="平台概况">在线人数：<b>28</b> 当日注册：<b>13</b> 充值：<b>0</b> 提款：<b>0</b></span>
+      </div>
+      <div class="topbar__right">
+        <label class="lang">语言 <select id="langSel" data-no-i18n><option value="zh">中文</option><option value="en">English</option></select></label>
+        <label class="demo">原型示意 · 当前账号权限
+          <select id="roleSel">
+            <option value="all">AML 全部权限</option>
+            <option value="view">只有查询权限</option>
+            <option value="none">无 AML Monitoring 权限</option>
+          </select>
+        </label>
+        <button class="bell" id="bellBtn" type="button" aria-label="告警提示" aria-expanded="false">🔔<span class="bell__count" id="bellCount">3</span></button>
+        <strong>admin01</strong>
+      </div>
+      <div class="bell-pop" id="bellPop" hidden>
+        <div class="bell-pop__head"><span>AML 告警</span><button class="btn--link btn" type="button" id="bellAll">查看全部</button></div>
+        <ul id="bellList"></ul>
+      </div>
+    </header>
+
+    <main class="content" id="main"></main>
+  </div>
+</div>
+
+<div id="modalRoot"></div>
+<div class="toast-zone" id="toastZone" aria-live="polite"></div>
+
+<script>
+/* ==========================================================================
+   基础工具
+   ========================================================================== */
+const $ = (s, el=document) => el.querySelector(s);
+const $$ = (s, el=document) => [...el.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = n => Number(n).toLocaleString('en-US');
+const peso = n => '₱' + Number(n).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+function toast(msg, type){ const t=document.createElement('div'); t.className='toast'+(type?' toast--'+type:''); t.textContent=msg; $('#toastZone').append(t); setTimeout(()=>t.remove(), 2800); }
+const NOW = '2026-11-27 10:00';
+
+/* ==========================================================================
+   示意资料
+   ========================================================================== */
+const STATUS = ['待审核','正常','冻结','停用','注销','禁止投注','临时冻结','ndrp冻结'];
+const KYC = ['未认证','已认证','待审核','补充信息','待复审','待补充信息','验证失败','完全验证'];
+const TAGS = ['Nancy_member','自我约束标签','未满21岁标签','NDRP标签','aaa bbb ccc','AAmember','OPS TEST ACCOUNT','jasmine_member','test','bug验证','okbetmember','会员标签测试','会员yale','会员测试','VIP LIVECHAT','BA_Test','钻石会员','小会员','sunmi会员','炒鸡会员','超级会员','优质会员','高级会员','普通会员','无标签'];
+const SALARY = ['15,000以下/月','15,001 – 30,000/月','30,001 – 70,000/月','70,001 – 150,000/月','150,001 – 300,000/月','300,001 – 500,000/月','500,000以上/月'];
+const SALARY_LV = ['低','低','中','高','高','高','高'];
+const MISSING = ['Valid ID','Proof of Address','Selfie／Liveness','Source of Funds','Contact Number','Email Verification'];
+const MISSING_FIELD = {'Valid ID':'证件号码','Proof of Address':'永久居住地址','Selfie／Liveness':'证件照或 EKYC 截屏','Source of Funds':'收入来源','Contact Number':'手机号码','Email Verification':'邮箱'};
+const DUP_FIELDS = ['姓名（姓、名、中间名）','出生日期','国籍','地址','银行／金融账户号码','证件号码','手机号码','电子邮件','设备','支付资料'];
+const COUNTRIES = ['伊朗','朝鲜','俄罗斯','阿富汗','缅甸','叙利亚','也门','中国','美国','日本','韩国','越南','印度尼西亚','马来西亚','新加坡','泰国'];
+
+const players = [
+  { id:'1059549', acc:'okbet1668cy81z', name:'ANALYN D. MANLINO', nick:'ok***1z', dev:'Android', st:'zdl', level:'默认层', vip:'VIP2', nat:'菲律宾', status:'正常', reg:'2026-07-18 11:51', kyc:'完全验证', tags:['AAmember'], online:true,
+    salary:2, age:34, ndrp:'未命中', risk:'中', edd:'不适用', assessed:'2026-11-27 00:00' },
+  { id:'1059548', acc:'ph_lchen21', name:'LI CHEN', nick:'li***21', dev:'iOS', st:'Makati004', level:'默认层', vip:'VIP0', nat:'中国', status:'正常', reg:'2026-05-02 09:14', kyc:'完全验证', tags:[], online:false,
+    salary:3, age:29, ndrp:'未命中', risk:'高', edd:'待 EDD', assessed:'2026-11-26 14:22' },
+  { id:'1059547', acc:'r.torres01', name:'RICARDO TORRES', nick:'r***01', dev:'Android', st:'QC012', level:'默认层', vip:'VIP1', nat:'菲律宾', status:'停用', reg:'2024-06-30 08:20', kyc:'完全验证', tags:['OPS TEST ACCOUNT'], online:false,
+    salary:0, age:45, ndrp:'未命中', risk:'低', edd:'不适用', assessed:'2026-11-27 00:00' },
+  { id:'1059546', acc:'michael.uy', name:'MICHAEL UY', nick:'mi***uy', dev:'Android', st:'Cebu009', level:'VIP层', vip:'VIP5', nat:'菲律宾', status:'正常', reg:'2026-06-11 14:02', kyc:'完全验证', tags:['钻石会员'], online:true,
+    salary:5, age:41, ndrp:'未命中', risk:'高', edd:'EDD 完成', assessed:'2026-11-27 00:00' },
+  { id:'1059545', acc:'d.fernandez', name:'DIEGO FERNANDEZ', nick:'di***ez', dev:'Android', st:'Taguig007', level:'默认层', vip:'VIP0', nat:'菲律宾', status:'ndrp冻结', reg:'2025-11-03 08:55', kyc:'完全验证', tags:['NDRP标签'], online:false,
+    salary:1, age:38, ndrp:'确认命中', risk:'高', edd:'待 EDD', assessed:'2026-11-26 09:14' },
+  { id:'1059544', acc:'k.torres', name:'KAREN TORRES', nick:'k***rs', dev:'iOS', st:'Pasig002', level:'默认层', vip:'VIP0', nat:'菲律宾', status:'冻结', reg:'2026-04-27 17:38', kyc:'已认证', tags:['未满21岁标签'], online:false,
+    salary:0, age:20, ndrp:'未命中', risk:'高', edd:'不适用', assessed:'2026-11-27 00:00' },
+  { id:'1059543', acc:'s.delrosario', name:'SOFIA DEL ROSARIO', nick:'s***io', dev:'H5', st:'zdl', level:'默认层', vip:'VIP1', nat:'菲律宾', status:'临时冻结', reg:'2026-09-21 10:05', kyc:'未认证', tags:[], online:false,
+    salary:null, age:null, ndrp:'—', risk:'—', edd:'不适用', assessed:'—' },
+];
+const findP = id => players.find(p=>p.id===id);
+
+let alerts = [
+  { aid:'AL20261127003', pid:'1059548', type:'重复账户侦测', sev:'中', time:'2026-11-27 09:42', detail:'与 1 个账户证件号码相同', state:'待处理', handler:'', handledAt:'', remark:'',
+    dup:{ fields:['证件号码'], matches:[{id:'1048772', acc:'lchen_ph', status:'停用', field:'证件号码', val:'P2391****8'}] } },
+  { aid:'AL20261127002', pid:'1059545', type:'NDRP／受限玩家侦测', sev:'高', time:'2026-11-27 08:15', detail:'NDRP 名单全名、生日皆相同（登录筛查）', state:'待处理', handler:'', handledAt:'', remark:'',
+    ndrp:{ timing:'登录', result:'命中', listName:'DIEGO FERNANDEZ', listBirth:'1988-03-14', pName:'DIEGO FERNANDEZ', pBirth:'1988-03-14', action:'账户改为 ndrp冻结；加上标签「NDRP标签」' } },
+  { aid:'AL20261127001', pid:'1059546', type:'休眠账户重新激活并伴随大额存款', sev:'中', time:'2026-11-27 01:03', detail:'休眠 213 天，激活当日存款 ₱250,000.00', state:'待处理', handler:'', handledAt:'', remark:'',
+    dorm:{ lastDep:'2026-04-20 13:10', lastWd:'2026-04-18 09:02', lastBet:'2026-04-27 21:45', days:213, react:'2026-11-26', sum:250000 } },
+  { aid:'AL20261126004', pid:'1059548', type:'NDRP／受限玩家侦测', sev:'中', time:'2026-11-26 14:22', detail:'NDRP 名单仅全名相同（生日不同）', state:'已处理', handler:'admin01', handledAt:'2026-11-26 15:10', remark:'生日不同，经 RCPD 比对证件确认非同一人。',
+    ndrp:{ timing:'eKYC', result:'仅全名相同', listName:'LI CHEN', listBirth:'1975-08-02', pName:'LI CHEN', pBirth:'1997-01-19', action:'只产生告警，不冻结' } },
+];
+
+/* ==========================================================================
+   权限（原型示意）
+   ========================================================================== */
+let role = 'all';
+const can = key => role==='all' || (role==='view' && key==='view');
+
+/* ==========================================================================
+   选单
+   ========================================================================== */
+const AML_PAGES = [
+  { id:'players', name:'Total Number of Players' },
+  { id:'risk', name:'Risk Profiling' },
+  { id:'acct', name:'Account Status' },
+  { id:'txn', name:'Daily Transaction Monitoring' },
+  { id:'alerts', name:'Red Flag Alerts' },
+  { id:'large', name:'Large Amount Report' },
+  { id:'periodic', name:'Periodic Updating of Users' },
+  { id:'config', name:'AML配置' },
+];
+const USER_ITEMS = ['总代','投注站','大代理','代理','会员','会员状态变更记录','子账号','会员代理标签配置','VIP特权','KYC审核','会员资料修改审核','一级标签数据变更记录','二级标签数据变更记录'];
+let current = 'players';
+function renderNav(){
+  const aml = role==='none' ? '' : `
+    <li><button class="nav__link nav__link--parent" type="button" aria-expanded="true" data-toggle="amlSub">AML Monitoring <span class="badge-new">新增</span></button>
+      <ul class="nav__sub" id="amlSub">${AML_PAGES.map(p=>`<li><button class="nav__link${current===p.id?' nav__link--active':''}" type="button" data-page="${p.id}" ${current===p.id?'aria-current="page"':''}>${esc(p.name)}</button></li>`).join('')}</ul></li>`;
+  $('#nav').innerHTML = `
+    <li><button class="nav__group" type="button" data-demo>菜单</button></li>
+    <li><button class="nav__group" type="button" data-demo>个人中心</button></li>
+    <li><button class="nav__group" type="button" aria-expanded="true">用户管理 <span>⌄</span></button>
+      <ul>${USER_ITEMS.map(t=>`<li><button class="nav__link" type="button" data-demo>${t}</button></li>`).join('')}${aml}</ul></li>
+    <li><button class="nav__group" type="button" data-demo>财务管理 ›</button></li>
+    <li><button class="nav__group" type="button" data-demo>数据报表 ›</button></li>
+    <li><button class="nav__group" type="button" aria-expanded="true">系统管理 <span>⌄</span></button>
+      <ul><li><button class="nav__link${current==='perm'?' nav__link--active':''}" type="button" data-page="perm">权限管理 <span class="badge-chg">异动</span></button></li>
+          <li><button class="nav__link" type="button" data-demo>角色管理</button></li>
+          <li><button class="nav__link" type="button" data-demo>系统参数管理</button></li></ul></li>`;
+}
+
+/* ==========================================================================
+   共用片段
+   ========================================================================== */
+const crumb = (...items) => `<nav class="breadcrumb" aria-label="位置"><span>位置</span><ol>${items.map((t,i)=>`<li${i===items.length-1?' aria-current="page"':''}>${esc(t)}</li>`).join('')}</ol></nav>`;
+const sel = (id, label, opts) => `<label class="sr-only" for="${id}">${label}</label><select class="select" id="${id}">${opts.map(o=>`<option>${esc(o)}</option>`).join('')}</select>`;
+const dateRange = (id, a, b) => `<span class="date-range"><label class="sr-only" for="${id}A">${a}</label><input class="input" type="date" id="${id}A" aria-label="${a}">～<label class="sr-only" for="${id}B">${b}</label><input class="input" type="date" id="${id}B" aria-label="${b}"></span>`;
+const acctSearch = id => `${sel(id+'T','账号类型',['会员ID','账号','真实姓名','手机号','邮箱','身分证字号'])}<label class="sr-only" for="${id}K">关键字</label><input class="input input--w" id="${id}K" placeholder="请输入关键字">`;
+const testChk = id => `<label class="check"><input type="checkbox" id="${id}" checked> 过滤测试用户</label>`;
+const searchBtns = (exp=true) => `<button class="btn btn--primary" type="button" data-act="search">搜索</button>${exp?`<button class="btn" type="button" data-act="export" ${can('op')?'':'disabled title="需「导出」权限"'}>导出</button>`:''}`;
+const pager = n => `<div class="pager"><span>共 ${fmt(n)} 笔</span><span>10 笔/页</span><span>‹ 1 2 3 ›</span><span>前往 <input class="input" style="width:48px;min-height:28px" aria-label="页码" value="1"> 页</span></div>`;
+const pillRisk = r => r==='高'?'<span class="pill pill--high">高</span>':r==='中'?'<span class="pill pill--mid">中</span>':r==='低'?'<span class="pill pill--low">低</span>':'<span class="pill pill--muted">未计算</span>';
+const member = p => `<div class="member"><span>会员ID：<b class="num">${p.id}</b></span><span>账号：${esc(p.acc)}</span><span>真实姓名：${esc(p.name)}</span></div>`;
+const memberFull = p => `<div class="member"><span>会员ID：<b class="num">${p.id}</b></span><span>账号：${esc(p.acc)}</span><span>真实姓名：${esc(p.name)}</span><span>昵称：${esc(p.nick)}</span><span>装置：${esc(p.dev)}</span><span>投注站代码：${esc(p.st)}</span></div>`;
+const photo = () => `<td class="c"><span class="avatar" aria-hidden="true">👤</span></td>`;
+const thS = label => `<th aria-sort="none"><button class="th-sort" type="button" data-sort>${label}<span class="th-sort__icon" aria-hidden="true">⇅</span></button></th>`;
+const listHead = (title, ts) => `<div class="list-head"><h2 class="list-head__title">${title}</h2><div class="list-head__right"><span class="note">最后更新：<span class="num">${ts}</span></span><button class="btn" type="button" data-act="refresh">⟳ 刷新</button></div></div>`;
+const LV = {'高':3,'中':2,'低':1};
+/* KYC 状态颜色（依需求方原型）：绿＝已通过；橘＝审核中；红＝未通过／缺资料 */
+const KYC_TONE = {'完全验证':'low','已认证':'low','待审核':'mid','待复审':'mid','补充信息':'high','待补充信息':'high','验证失败':'high','未认证':'high'};
+/* 账户状态颜色（依需求方原型）：绿＝正常；橘＝待审核；红＝冻结类；灰＝停用／注销／禁止投注；蓝灰＝临时冻结 */
+const STATUS_TONE = {'正常':'low','待审核':'mid','冻结':'high','ndrp冻结':'high','停用':'off','注销':'off','禁止投注':'off','临时冻结':'neutral'};
+const statusPill = st => `<span class="pill pill--${STATUS_TONE[st]||'muted'}">${esc(st)}</span>`;
+const kycPill = k => `<span class="pill pill--${KYC_TONE[k]||'muted'}">${esc(k)}</span>`;
+const donut = (title, items) => {
+  const tot = items.reduce((a,b)=>a+b[1],0); let acc = 0;
+  if(!tot) return `<div class="chart"><div class="donut" style="background:var(--c-muted)" role="img" aria-label="${esc(title)}：无资料"></div><div><p class="chart__title">${esc(title)}</p><p class="note">无资料</p></div></div>`;
+  const seg = items.map((it,i)=>{ const s=acc/tot*100; acc+=it[1]; return `var(--c-chart-${i+1}) ${s}% ${acc/tot*100}%`; }).join(',');
+  return `<div class="chart"><div class="donut" style="background:conic-gradient(${seg})" role="img" aria-label="${esc(title)}"></div>
+    <div><p class="chart__title">${esc(title)}</p><ul class="legend">${items.map((it,i)=>`<li><i style="background:var(--c-chart-${i+1})"></i>${esc(it[0])}：<span class="num">${fmt(it[1])}（${Math.round(it[1]/tot*100)}%）</span></li>`).join('')}</ul></div></div>`;
+};
+const bulkBar = (id, actions) => `<div class="bulk" id="${id}" hidden><span class="bulk__count">已选 <b data-count>0</b> 笔</span>${actions.map(a=>`<button class="btn" type="button" data-bulk="${a[0]}" ${can('op')?'':'disabled'}>${a[1]}</button>`).join('')}<button class="btn btn--link" type="button" data-bulk="clear">清除</button></div>`;
+const head = (t, d) => `<div><h1 class="page-title">${esc(t)}</h1>${d?`<p class="page-desc">${d}</p>`:''}</div>`;
+
+/* ==========================================================================
+   页面：Total Number of Players
+   ========================================================================== */
+function pagePlayers(){
+  return `${crumb('用户管理','AML Monitoring','Total Number of Players')}
+  ${head('Total Number of Players','玩家总览。统计每日 00:00（菲律宾时间）更新；栏位与筛选沿用「用户管理 › 会员」。')}
+  <div class="filters">
+    ${sel('pS','状态',['全部状态',...STATUS])}${sel('pN','国籍',['全部国籍','本地（菲律宾）','外籍'])}
+    ${dateRange('pR','注册起始时间','注册结束时间')}${acctSearch('pA')}${testChk('pT')}${searchBtns()}
+  </div>
+  <div class="stats">
+    <div class="stat"><p class="stat__label">注册总数</p><p class="stat__value">1,052,301</p></div>
+    <div class="stat"><p class="stat__label">本地（菲律宾）</p><p class="stat__value">958,420</p><p class="stat__sub">依实名审核「国籍」</p></div>
+    <div class="stat"><p class="stat__label">外籍</p><p class="stat__value">93,881</p></div>
+    <div class="stat"><p class="stat__label">活跃（前一天）</p><p class="stat__value">48,207</p><p class="stat__sub">前一天有充值或投注</p></div>
+    <div class="stat"><p class="stat__label">近 3 个月新注册</p><p class="stat__value">61,350</p></div>
+  </div>
+  <div class="charts">${donut('本地 vs 外籍',[['本地',958420],['外籍',93881]])}${donut('活跃 vs 非活跃（前一天）',[['活跃',48207],['非活跃',1004094]])}</div>
+  ${listHead('玩家列表','2026-11-27 10:00:00')}
+  ${bulkBar('bulkP',[['tag','加标签'],['freeze','冻结'],['expSel','导出所选']])}
+  <div class="table-wrap"><table class="table"><thead><tr>
+    <th class="c"><input type="checkbox" data-all aria-label="全选"></th><th>在线</th><th>照片</th>${thS('会员信息')}<th>层级＆VIP</th>${thS('国籍')}<th>状态</th>${thS('注册时间')}<th>KYC状态</th><th>会员标签</th><th>操作</th></tr></thead>
+    <tbody>${players.map(p=>`<tr><td class="c"><input type="checkbox" data-row="${p.id}" aria-label="选取 ${p.acc}"></td>
+      <td>${p.online?'<span class="pill pill--low">在线</span>':'<span class="muted">离线</span>'}</td>${photo()}<td data-v="${p.id}">${memberFull(p)}</td>
+      <td>${p.level}<br><span class="muted">${p.vip}</span></td><td>${p.nat}</td><td>${statusPill(p.status)}</td><td class="num">${p.reg}</td><td>${kycPill(p.kyc)}</td>
+      <td>${p.tags.map(t=>`<span class="chip">${esc(t)}</span>`).join('')||'<span class="muted">—</span>'}</td>
+      <td><div class="ops"><button class="btn btn--link" type="button" data-jump="资金明细" data-acc="${p.acc}">资金明细</button><button class="btn btn--link" type="button" data-jump="投注记录" data-acc="${p.acc}">投注记录</button><button class="btn btn--link" type="button" data-jump="第三方对局记录" data-acc="${p.acc}">第三方对局记录</button></div></td></tr>`).join('')}</tbody></table></div>
+  ${pager(1052301)}`;
+}
+
+/* ==========================================================================
+   页面：Risk Profiling
+   ========================================================================== */
+let riskTags = [];
+const factorLv = p => p.risk==='—' ? null : {
+  inc: p.salary==null ? '高' : SALARY_LV[p.salary], age: p.age==null ? '高' : (p.age<21?'高':'低'),
+  ndrp: p.ndrp==='确认命中'?'高':'低', nat: ['伊朗','朝鲜','俄罗斯'].includes(p.nat)?'高':(p.nat==='菲律宾'?'低':'中') };
+function pageRisk(){
+  return `${crumb('用户管理','AML Monitoring','Risk Profiling')}
+  ${head('Risk Profiling','风险等级依 Automated Risk Factor 四项因子自动判定，取最高等级；不显示分数、不开放手动调整。EDD 状态由后台人员手动更新。')}
+  <div class="filters">
+    ${sel('rK','KYC状态',['KYC状态（全部）',...KYC])}<span class="tag-filter"><label class="sr-only" for="rT">会员标签（可多选）</label><select class="select" id="rT"><option value="">全部标签（可多选）</option>${TAGS.filter(t=>!riskTags.includes(t)).map(t=>`<option>${esc(t)}</option>`).join('')}</select>${riskTags.map(t=>`<span class="chip chip--x">${esc(t)}<button type="button" data-untag="${esc(t)}" aria-label="移除 ${esc(t)}">✕</button></span>`).join('')}</span>${sel('rL','风险等级',['风险等级（全部）','高','中','低','未计算'])}
+    ${sel('rE','EDD状态',['EDD状态（全部）','不适用','待 EDD','EDD 完成'])}${acctSearch('rA')}${testChk('rX')}${searchBtns()}
+  </div>
+  <div class="stats">
+    <div class="stat"><p class="stat__label">低风险</p><p class="stat__value">812,405</p></div>
+    <div class="stat"><p class="stat__label">中风险</p><p class="stat__value">152,880</p></div>
+    <div class="stat"><p class="stat__label">高风险</p><p class="stat__value">41,936</p></div>
+    <div class="stat"><p class="stat__label">待 EDD</p><p class="stat__value">1,240</p></div>
+    <div class="stat"><p class="stat__label">未计算（未完成 KYC）</p><p class="stat__value">45,080</p></div>
+  </div>
+  <div class="charts">${donut('风险等级分布',[['低',812405],['中',152880],['高',41936]])}${donut('EDD 状态',[['不适用',1005461],['待 EDD',1240],['EDD 完成',520]])}</div>
+  ${listHead('玩家风险列表','2026-11-27 10:00:00')}
+  ${bulkBar('bulkR',[['edd','更新 EDD 状态'],['tag','加标签'],['expSel','导出所选']])}
+  <div class="table-wrap"><table class="table"><thead><tr>
+    <th class="c"><input type="checkbox" data-all aria-label="全选"></th><th>照片</th>${thS('会员信息')}${thS('风险等级')}<th>收入</th><th>年龄</th><th>NDRP</th><th>国籍</th><th>KYC状态</th><th>会员标签</th><th>EDD 状态</th><th>最后评估</th><th>操作</th></tr></thead>
+    <tbody>${players.map(p=>{ const f=factorLv(p); const lv=v=>f?pillRisk(v):'<span class="muted">—</span>';
+      return `<tr><td class="c"><input type="checkbox" data-row="${p.id}" aria-label="选取 ${p.acc}"></td>${photo()}<td data-v="${p.id}">${member(p)}</td><td data-v="${LV[p.risk]||0}">${pillRisk(p.risk)}</td>
+      <td>${lv(f&&f.inc)}</td><td>${lv(f&&f.age)}</td><td>${lv(f&&f.ndrp)}</td><td>${lv(f&&f.nat)}</td><td>${kycPill(p.kyc)}</td>
+      <td>${p.tags.map(t=>`<span class="chip">${esc(t)}</span>`).join('')||'<span class="muted">—</span>'}</td>
+      <td>${p.edd==='待 EDD'?'<span class="pill pill--mid">待 EDD</span>':p.edd==='EDD 完成'?'<span class="pill pill--low">EDD 完成</span>':'<span class="muted">不适用</span>'}</td>
+      <td class="num">${p.assessed}</td><td><button class="btn btn--link" type="button" data-risk="${p.id}">风险详情</button></td></tr>`;}).join('')}</tbody></table></div>
+  ${pager(1052301)}`;
+}
+function openRisk(id){
+  const p=findP(id); const f=factorLv(p);
+  if(!f){ openModal(`${mHead('风险详情 · '+p.acc)}<div class="modal__body"><p>此玩家尚未完成 KYC，不计算风险等级。</p></div><footer class="modal__foot"><button class="btn" data-close>关闭</button></footer>`); return; }
+  const rows=[['收入区间（薪资范围）', p.salary==null?'（无资料）':SALARY[p.salary], f.inc],['出生日期（年龄）', p.age==null?'（无资料）':p.age+' 岁', f.age],['本地观察名单／NDRP', p.ndrp, f.ndrp],['国籍', p.nat, f.nat]];
+  openModal(`${mHead('风险详情 · '+p.acc)}<div class="modal__body">
+    <dl class="kv"><dt>整体风险等级</dt><dd>${pillRisk(p.risk)} <span class="muted">（四项中最高者）</span></dd><dt>最后评估</dt><dd class="num">${p.assessed}</dd></dl>
+    <table class="mini-table"><thead><tr><th>风险因子</th><th>玩家资料</th><th>等级</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r[0]}</td><td>${esc(r[1])}</td><td>${pillRisk(r[2])}</td></tr>`).join('')}</tbody></table>
+    <p class="note">资料来源：会员 › 实名审核（薪资范围、生日、国籍）、NDRP名单配置。KYC 已通过但缺资料者，该因子视为高风险。</p></div>
+    <footer class="modal__foot"><button class="btn" data-close>关闭</button></footer>`);
+}
+
+/* ==========================================================================
+   页面：Account Status
+   ========================================================================== */
+const acctLog = [
+  ['1059547','正常','停用','EDD 资料不符','admin01','2026-11-26 16:20'],
+  ['1059545','正常','ndrp冻结','系统：NDRP 名单命中（AL20261127002）','系统','2026-11-27 08:15'],
+  ['1059544','正常','冻结','系统：未满21岁自动冻结','系统','2026-11-25 11:02'],
+  ['1059543','正常','临时冻结','批量临时冻结未KYC会员','ops01','2026-11-24 09:30'],
+];
+function pageAcct(){
+  return `${crumb('用户管理','AML Monitoring','Account Status')}
+  ${head('Account Status','账户状态与限制原因。原因沿用「会员状态变更记录」的备注。')}
+  <div class="filters">${sel('aS','状态',['全部状态',...STATUS])}${dateRange('aR','状态变更起始时间','状态变更结束时间')}${acctSearch('aA')}${testChk('aX')}${searchBtns()}</div>
+  <div class="stats">${[['正常',986210],['冻结',214],['停用',1088],['禁止投注',522],['临时冻结',340],['ndrp冻结',30]].map(s=>`<div class="stat"><p class="stat__label">${s[0]}</p><p class="stat__value">${fmt(s[1])}</p></div>`).join('')}</div>
+  <div class="charts">${donut('全部状态',[['正常',986210],['冻结',214],['停用',1088],['禁止投注',522],['临时冻结',340],['ndrp冻结',30]])}${donut('受限账户类型',[['冻结',214],['停用',1088],['禁止投注',522],['临时冻结',340],['ndrp冻结',30]])}</div>
+  ${listHead('账户状态列表','2026-11-27 10:00:00')}
+  ${bulkBar('bulkA',[['restore','恢复正常'],['freeze','冻结'],['expSel','导出所选']])}
+  <div class="table-wrap"><table class="table"><thead><tr><th class="c"><input type="checkbox" data-all aria-label="全选"></th><th>照片</th>${thS('会员信息')}<th>账户状态</th><th>原因（备注）</th><th>操作人</th>${thS('变更时间')}<th>操作</th></tr></thead>
+  <tbody>${acctLog.map(r=>{const p=findP(r[0]);return `<tr><td class="c"><input type="checkbox" data-row="${p.id}" aria-label="选取 ${p.acc}"></td>${photo()}<td data-v="${p.id}">${member(p)}</td><td>${statusPill(r[2])}</td><td>${esc(r[3])}</td><td>${r[4]}</td><td class="num">${r[5]}</td><td><button class="btn btn--link" type="button" data-chst="${p.id}" ${can('op')?'':'disabled'}>修改状态</button></td></tr>`;}).join('')}</tbody></table></div>
+  ${pager(acctLog.length)}`;
+}
+
+/* ==========================================================================
+   页面：Daily Transaction Monitoring
+   ========================================================================== */
+const txn = [['2026-11-26','okbet1668cy81z','1059549',4,156000,1,160000],['2026-11-26','michael.uy','1059546',2,250000,0,0],['2026-11-26','ph_lchen21','1059548',9,72000,6,63070],['2026-11-25','okbet1668cy81z','1059549',1,20000,2,45000],['2026-11-25','k.torres','1059544',3,15000,0,0]];
+function pageTxn(){
+  return `${crumb('用户管理','AML Monitoring','Daily Transaction Monitoring')}
+  ${head('Daily Transaction Monitoring','每人每日存提款统计。只计入充值「成功」与提款「出款成功」订单，按菲律宾时间逐日计算。')}
+  <div class="filters">${dateRange('tR','开始日期','结束日期')}${acctSearch('tA')}${sel('tT','交易类型',['全部类型','存款','提款'])}${testChk('tX')}${searchBtns()}</div>
+  <div class="charts">${donut('金额（本次查询）',[['存款',513000],['提款',268070]])}${donut('笔数（本次查询）',[['存款',19],['提款',9]])}${donut('存款金额前 3 名（本次查询）',[['michael.uy',250000],['okbet1668cy81z',176000],['ph_lchen21',72000],['其他',15000]])}</div>
+  ${listHead('每日交易列表','2026-11-27 10:00:00')}
+  <div class="table-wrap"><table class="table"><thead><tr>${thS('日期')}${thS('账号')}<th>会员ID</th>${thS('存款笔数')}${thS('存款金额')}${thS('提款笔数')}${thS('提款金额')}</tr></thead>
+  <tbody>${txn.map(r=>`<tr><td class="num">${r[0]}</td><td>${r[1]}</td><td class="num">${r[2]}</td><td class="num">${r[3]}</td><td class="num">${peso(r[4])}</td><td class="num">${r[5]}</td><td class="num">${peso(r[6])}</td></tr>`).join('')}</tbody></table></div>
+  ${pager(txn.length)}`;
+}
+
+/* ==========================================================================
+   页面：Red Flag Alerts（含原 General Alert Queue）
+   ========================================================================== */
+const TYPES = ['重复账户侦测','NDRP／受限玩家侦测','休眠账户重新激活并伴随大额存款'];
+let alertFilter = { type:'全部', sev:'全部', state:'全部' };
+function pageAlerts(){
+  const today = t => alerts.filter(a=>a.type===t && a.time.startsWith('2026-11-27')).length;
+  const pending = alerts.filter(a=>a.state==='待处理').length;
+  const list = alerts.filter(a=>(alertFilter.type==='全部'||a.type===alertFilter.type)&&(alertFilter.sev==='全部'||a.sev===alertFilter.sev)&&(alertFilter.state==='全部'||a.state===alertFilter.state));
+  return `${crumb('用户管理','AML Monitoring','Red Flag Alerts')}
+  ${head('Red Flag Alerts','系统依 AML配置的三项规则自动产生告警，只供后台查询与提示，不对外申报。')}
+  <div class="stats">${TYPES.map(t=>`<div class="stat"><p class="stat__label">${t}（今日）</p><p class="stat__value">${today(t)}</p></div>`).join('')}<div class="stat"><p class="stat__label">待处理</p><p class="stat__value">${pending}</p></div></div>
+  <div class="charts">${donut('严重度分布（本次查询）',[['高',list.filter(a=>a.sev==='高').length],['中',list.filter(a=>a.sev==='中').length]])}${donut('告警类型分布（全部告警）',TYPES.map(t=>[t,alerts.filter(a=>a.type===t).length]))}</div>
+  <div class="filters">
+    <label class="sr-only" for="fType">告警类型</label><select class="select" id="fType">${['全部',...TYPES].map(o=>`<option value="${o}" ${alertFilter.type===o?'selected':''}>${o==='全部'?'告警类型（全部）':o}</option>`).join('')}</select>
+    <label class="sr-only" for="fSev">严重度</label><select class="select" id="fSev">${['全部','高','中'].map(o=>`<option value="${o}" ${alertFilter.sev===o?'selected':''}>${o==='全部'?'严重度（全部）':o}</option>`).join('')}</select>
+    <label class="sr-only" for="fState">处理状态</label><select class="select" id="fState">${['全部','待处理','已处理'].map(o=>`<option value="${o}" ${alertFilter.state===o?'selected':''}>${o==='全部'?'处理状态（全部）':o}</option>`).join('')}</select>
+    ${dateRange('fR','触发起始时间','触发结束时间')}<label class="sr-only" for="fK">关键字</label><input class="input input--w" id="fK" placeholder="告警ID／账号／会员ID">
+    <button class="btn btn--primary" type="button" id="alertSearch">搜索</button><button class="btn" type="button" data-act="export" ${can('op')?'':'disabled'}>导出</button>
+  </div>
+  <div class="table-wrap"><table class="table"><thead><tr><th>告警ID</th><th>会员信息</th><th>告警类型</th><th>触发详情</th><th>严重度</th><th>风险等级</th><th>触发时间</th><th>处理状态</th><th>处理人</th><th>操作</th></tr></thead>
+  <tbody>${list.length?list.map(a=>{const p=findP(a.pid);return `<tr><td class="num">${a.aid}</td><td>${member(p)}</td><td>${a.type}</td><td>${esc(a.detail)}</td>
+    <td>${pillRisk(a.sev)}</td><td>${pillRisk(p.risk)}</td><td class="num">${a.time}</td>
+    <td>${a.state==='待处理'?'<span class="pill pill--mid">待处理</span>':'<span class="pill pill--low">已处理</span>'}</td><td>${a.handler||'<span class="muted">—</span>'}</td>
+    <td><button class="btn btn--link" type="button" data-alert="${a.aid}">${a.state==='待处理'&&can('op')?'处理':'详情'}</button></td></tr>`;}).join(''):'<tr><td colspan="10" class="empty">没有符合条件的告警</td></tr>'}</tbody></table></div>
+  ${pager(list.length)}`;
+}
+function evidence(a){
+  if(a.dup) return `<p class="sec-title">比对结果</p><p class="note">比对字段（AML配置勾选）：${a.dup.fields.join('、')}；勾选字段全部相同才命中。</p>
+    <table class="mini-table"><thead><tr><th>相符账户</th><th>账号</th><th>账户状态</th><th>相符字段</th><th>值</th></tr></thead><tbody>${a.dup.matches.map(m=>`<tr><td class="num">${m.id}</td><td>${m.acc}</td><td>${statusPill(m.status)}</td><td class="hit">${m.field}</td><td>${m.val}</td></tr>`).join('')}</tbody></table>
+    <p class="note">系统动作：加上标签（AML配置所选标签）。</p>`;
+  if(a.ndrp) return `<p class="sec-title">NDRP 名单比对</p><dl class="kv"><dt>筛查时机</dt><dd>${a.ndrp.timing}</dd><dt>比对结果</dt><dd>${a.ndrp.result==='命中'?'<span class="pill pill--high">命中</span>':'<span class="pill pill--mid">仅全名相同</span>'}</dd></dl>
+    <table class="mini-table"><thead><tr><th></th><th>全名</th><th>生日</th></tr></thead><tbody><tr><td>NDRP 名单</td><td>${a.ndrp.listName}</td><td class="${a.ndrp.listBirth===a.ndrp.pBirth?'hit':''}">${a.ndrp.listBirth}</td></tr><tr><td>玩家</td><td>${a.ndrp.pName}</td><td class="${a.ndrp.listBirth===a.ndrp.pBirth?'hit':''}">${a.ndrp.pBirth}</td></tr></tbody></table>
+    <p class="note">系统动作：${a.ndrp.action}</p>`;
+  if(a.dorm) return `<p class="sec-title">休眠与激活</p><dl class="kv"><dt>最后存款</dt><dd class="num">${a.dorm.lastDep}</dd><dt>最后提款</dt><dd class="num">${a.dorm.lastWd}</dd><dt>最后投注</dt><dd class="num">${a.dorm.lastBet}</dd>
+    <dt>休眠天数</dt><dd class="num">${a.dorm.days} 天（门槛 &gt; 180 天）</dd><dt>激活日期</dt><dd class="num">${a.dorm.react}</dd><dt>激活当日存款合计</dt><dd class="num">${peso(a.dorm.sum)}（门槛 ≥ ₱200,000.00）</dd></dl><p class="note">系统动作：只产生告警，不冻结、不加标签。</p>`;
+  return '';
+}
+function openAlert(aid){
+  const a=alerts.find(x=>x.aid===aid); const p=findP(a.pid); const editable = a.state==='待处理' && can('op');
+  bellRead.add(aid); renderBell();
+  openModal(`${mHead(`告警详情 · ${a.aid}`)}<div class="modal__body">
+    <dl class="kv"><dt>告警类型</dt><dd>${a.type}</dd><dt>严重度</dt><dd>${pillRisk(a.sev)}</dd><dt>触发时间</dt><dd class="num">${a.time}</dd></dl>
+    <p class="sec-title">玩家资料</p><dl class="kv"><dt>账号</dt><dd>${p.acc}（会员ID ${p.id}）</dd><dt>真实姓名</dt><dd>${p.name}</dd><dt>KYC状态</dt><dd>${kycPill(p.kyc)}</dd><dt>账户状态</dt><dd>${statusPill(p.status)}</dd><dt>风险等级</dt><dd>${pillRisk(p.risk)}</dd></dl>
+    ${evidence(a)}
+    <p class="sec-title">存款概况</p><dl class="kv"><dt>近 24 小时成功充值</dt><dd class="num">${peso(250000)}</dd><dt>近 30 日平均（每日）</dt><dd class="num">${peso(8333.33)}</dd></dl>
+    <p class="sec-title">处理</p>
+    ${editable?`<fieldset class="field" style="border:0;padding:0;margin:0"><legend class="field__label"><span class="req">*</span>处理状态</legend>
+      <span style="display:flex;gap:16px"><label class="check"><input type="radio" name="hs" value="待处理" checked> 待处理</label><label class="check"><input type="radio" name="hs" value="已处理"> 已处理</label></span></fieldset>
+      <div class="field"><label class="field__label" for="hr">结论备注</label><textarea class="textarea" id="hr" rows="3" maxlength="500" placeholder="改为「已处理」时必填，最多 500 字">${esc(a.remark)}</textarea>
+      <div style="display:flex;justify-content:space-between"><span class="field__error" id="hrErr"></span><span class="note" id="hrCnt">${a.remark.length}/500</span></div></div>`
+    :`<dl class="kv"><dt>处理状态</dt><dd>${a.state}</dd><dt>处理人</dt><dd>${a.handler||'—'}</dd><dt>处理时间</dt><dd class="num">${a.handledAt||'—'}</dd><dt>结论备注</dt><dd>${esc(a.remark)||'—'}</dd></dl>`}
+    </div><footer class="modal__foot"><button class="btn" data-close>${editable?'取消':'关闭'}</button>${editable?'<button class="btn btn--primary" id="hSave">保存</button>':''}</footer>`, 'modal--l');
+  if(!editable) return;
+  const ta=$('#hr'); ta.addEventListener('input',()=>{ $('#hrCnt').textContent=ta.value.length+'/500'; if(ta.value.trim()) { ta.classList.remove('textarea--error'); $('#hrErr').textContent=''; } });
+  $('#hSave').onclick=()=>{ const st=$('input[name="hs"]:checked').value;
+    if(st==='已处理' && !ta.value.trim()){ ta.classList.add('textarea--error'); $('#hrErr').textContent='请填写结论备注'; return; }
+    if(st==='待处理'){ a.remark=ta.value.trim(); closeModal(); toast('已保存'); return; }
+    Object.assign(a,{state:'已处理',handler:'admin01',handledAt:NOW,remark:ta.value.trim()}); closeModal(); render(); renderBell(); toast('已标记为已处理'); };
+}
+
+/* ==========================================================================
+   页面：Large Amount Report（沿用「数据报表 › 大额存取款报表」）
+   ========================================================================== */
+let largeTab='dep';
+function pageLarge(){
+  const rows = largeTab==='dep' ? [['okbet3070ee91p',804953],['okbet16141fdp8',650000]] : [['okbet3070ee91p',562000],['okbet1964hwju0',762003],['okbet8520q2jib',1022500]];
+  return `${crumb('用户管理','AML Monitoring','Large Amount Report')}
+  ${head('Large Amount Report','直接沿用「数据报表 › 大额存取款报表」，门槛依现有报表；本次新增「导出」。')}
+  <div class="tabs" role="tablist"><button role="tab" type="button" aria-selected="${largeTab==='dep'}" data-ltab="dep">存款统计</button><button role="tab" type="button" aria-selected="${largeTab==='wd'}" data-ltab="wd">取款统计</button></div>
+  <div class="charts">${donut('存取款金额',[['存款',1454953],['取款',2346503]])}${donut('存取款笔数',[['存款',2],['取款',3]])}${donut((largeTab==='dep'?'存款':'取款')+'金额占比（本页）',rows.map(r=>[r[0],r[1]]))}</div>
+  <span class="threshold">⚑ 只显示金额超过门槛的订单（门槛沿用现有报表）</span>
+  <div class="filters"><span class="date-range"><label class="sr-only" for="lRA">开始时间</label><input class="input" type="date" id="lRA" value="2026-11-27">～<label class="sr-only" for="lRB">结束时间</label><input class="input" type="date" id="lRB" value="2026-11-27"></span><label class="sr-only" for="lK">账号</label><input class="input input--w" id="lK" placeholder="用户名">${searchBtns()}</div>
+  <div class="table-wrap"><table class="table" style="min-width:480px"><thead><tr>${thS('用户名')}${thS('金额')}</tr></thead><tbody>${rows.map(r=>`<tr><td>${r[0]}</td><td class="num">${peso(r[1])}</td></tr>`).join('')}</tbody>
+  <tfoot><tr><td>合计</td><td class="num">${peso(rows.reduce((a,r)=>a+r[1],0))}</td></tr></tfoot></table></div>${pager(rows.length)}`;
+}
+
+/* ==========================================================================
+   页面：Periodic Updating of Users
+   ========================================================================== */
+const periodic = [['1059543',['Valid ID','Selfie／Liveness','Source of Funds'],'2026-11-24'],['1059548',['Proof of Address'],'2026-11-26'],['1059544',['Email Verification','Contact Number'],'2026-11-27']];
+function pagePeriodic(){
+  return `${crumb('用户管理','AML Monitoring','Periodic Updating of Users')}
+  ${head('Periodic Updating of Users','6 个项目任一缺漏即列入；系统每日更新一次，「会员」资料更新时同步。「发送提醒」寄 Email 给 RCPD，不通知玩家。')}
+  <div class="filters">${sel('uM','缺少项目',['全部缺少项目',...MISSING])}${dateRange('uR','列入起始日期','列入结束日期')}${acctSearch('uA')}${testChk('uX')}${searchBtns()}</div>
+  <div class="charts">${donut('缺少项目分布',[['Valid ID',210],['Proof of Address',150],['Selfie／Liveness',180],['Source of Funds',95],['Contact Number',120],['Email Verification',87]])}</div>
+  ${listHead('待更新玩家列表','2026-11-27 00:00:00')}
+  ${bulkBar('bulkU',[['remind','发送提醒'],['expSel','导出所选']])}
+  <div class="table-wrap"><table class="table"><thead><tr><th class="c"><input type="checkbox" data-all aria-label="全选"></th><th>照片</th>${thS('会员信息')}<th>缺少项目</th>${thS('列入日期')}<th>操作</th></tr></thead>
+  <tbody>${periodic.map(r=>{const p=findP(r[0]);return `<tr><td class="c"><input type="checkbox" data-row="${p.id}" aria-label="选取 ${p.acc}"></td>${photo()}<td data-v="${p.id}">${member(p)}</td>
+    <td>${r[1].map(m=>`<span class="chip chip--warn" title="后台字段：${MISSING_FIELD[m]}">${m}</span>`).join('')}</td><td class="num">${r[2]}</td>
+    <td><button class="btn btn--link" type="button" data-remind="${p.id}" ${can('op')?'':'disabled'}>发送提醒</button><button class="btn btn--link" type="button" data-demo>查看会员</button></td></tr>`;}).join('')}</tbody></table></div>
+  ${pager(periodic.length)}`;
+}
+function openRemind(ids){
+  const ps = ids.map(findP);
+  const miss = id => (periodic.find(r=>r[0]===id)||[0,[]])[1].join('、');
+  openModal(`${mHead('发送提醒')}<div class="modal__body">
+    <div class="field"><label class="field__label" for="rmTo"><span class="req">*</span>收件 Email</label><input class="input" id="rmTo" placeholder="多个以逗号分隔，例：rcpd@company.com, rcpd2@company.com"><span class="field__error" id="rmToErr"></span></div>
+    <p class="sec-title">信件预览（共 ${ps.length} 封，每位玩家一封）</p>
+    <dl class="kv"><dt>主旨</dt><dd>[AML] 定期资料更新提醒－${ps[0].acc}${ps.length>1?' 等':''}</dd>
+    <dt>内容</dt><dd>玩家账号：${ps[0].acc}<br>会员 ID：${ps[0].id}<br>缺少项目：${miss(ps[0].id)}<br>列入日期：${(periodic.find(r=>r[0]===ps[0].id)||['','',''])[2]}<br>寄件人：admin01<br>寄送时间：（寄出当下）</dd></dl>
+    <p class="note">寄送记录写入「日志管理 › 操作日志」。</p></div>
+    <footer class="modal__foot"><button class="btn" data-close>取消</button><button class="btn btn--primary" id="rmSend">寄出</button></footer>`);
+  const to=$('#rmTo');
+  const check=()=>{ const v=to.value.split(',').map(s=>s.trim()).filter(Boolean);
+    const msg=!v.length?'请输入收件 Email':(v.some(e=>!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e))?'Email 格式不正确，请检查':''); to.classList.toggle('input--error',!!msg); $('#rmToErr').textContent=msg; return !msg; };
+  to.addEventListener('blur',check); to.addEventListener('input',()=>{ if(to.classList.contains('input--error')) check(); });
+  $('#rmSend').onclick=()=>{ if(!check()) return; closeModal(); toast(`已寄出 ${ps.length} 封提醒`); };
+}
+
+/* ==========================================================================
+   页面：AML配置（版面比照「系统参数管理 › 风控配置」）
+   ========================================================================== */
+const cfg = { dupOn:true, dupFields:['证件号码'], dupTag:'', ndrpOn:true, dormOn:true, dormDays:'180', dormAmt:'200000', salary:[...SALARY_LV], highNat:['伊朗','朝鲜','俄罗斯'] };
+const sw = (key, on, label) => `<button class="switch" type="button" role="switch" aria-checked="${on}" aria-label="${label} 开启" data-sw="${key}" ${can('op')?'':'disabled'}><span class="switch__track"></span><span class="switch__text">开启</span></button>`;
+function pageConfig(){
+  const dis = can('op')?'':'disabled';
+  return `${crumb('用户管理','AML Monitoring','AML配置')}
+  <h1 class="sr-only">AML配置</h1>
+  <h2 class="cfg-title">国家设置</h2>
+  <div class="filters"><label for="cfgC">国家</label><select class="select" id="cfgC"><option>菲律宾 (默认)</option></select></div>
+
+  <section class="cfg-card" aria-labelledby="c1"><h3 class="cfg-card__head" id="c1">AML 告警条件配置</h3>
+    <div class="cfg-row"><span class="cfg-row__label">重复账户侦测</span>
+      <div class="cfg-row__fields">
+        <fieldset style="border:0;padding:0;margin:0"><legend class="field__label">比对字段（勾选的字段全部相同才命中）</legend>
+          <div class="check-grid" id="dupFields">${DUP_FIELDS.map(f=>`<label class="check"><input type="checkbox" value="${f}" ${cfg.dupFields.includes(f)?'checked':''} ${dis}> ${f}</label>`).join('')}</div></fieldset>
+        <span class="field__error" id="dupFieldsErr"></span>
+        <div class="cfg-row__inline"><label for="dupTag">命中后加上标签</label><select class="select" id="dupTag" ${dis}><option value="">请选择</option>${TAGS.map(t=>`<option ${cfg.dupTag===t?'selected':''}>${t}</option>`).join('')}</select></div>
+        <span class="field__error" id="dupTagErr"></span>
+        <span class="note">比对时机：新玩家 KYC 验证通过时；旧玩家于上线后第一次登录时比对一次。比对对象含已冻结、停用、注销账户。标签来源：会员代理标签配置（类型：会员）。</span>
+      </div>
+      <span><button class="btn btn--primary" type="button" data-save="dup" ${dis}>保存</button></span>
+      <span class="cfg-row__switch">${sw('dupOn',cfg.dupOn,'重复账户侦测')}</span></div>
+
+    <div class="cfg-row cfg-row--switch"><span class="cfg-row__label">登录时比对 NDRP 名单<br><span class="note">每次登录比对「NDRP名单配置」；全名、生日都相同为命中（冻结＋上标签，沿用 KYC配置「NDRP名单自动冻结用户标签」）；只有全名相同产生告警、不冻结</span></span>
+      <span class="cfg-row__switch">${sw('ndrpOn',cfg.ndrpOn,'登录时比对 NDRP 名单')}</span></div>
+
+    <div class="cfg-row"><span class="cfg-row__label">休眠账户重新激活</span>
+      <div class="cfg-row__fields"><div class="cfg-row__inline">
+        <span>无存款、提款、投注: &gt;</span><label class="sr-only" for="dDays">休眠天数</label><input class="input num" id="dDays" inputmode="numeric" value="${cfg.dormDays}" ${dis}><span>天</span>
+        <span>激活当日累计存款: &gt;=</span><label class="sr-only" for="dAmt">激活当日累计存款</label><input class="input num" id="dAmt" inputmode="numeric" value="${cfg.dormAmt}" ${dis}></div>
+        <span class="field__error" id="dormErr"></span><span class="note">登录不重置休眠；只产生告警，不冻结、不加标签。</span></div>
+      <span><button class="btn btn--primary" type="button" data-save="dorm" ${dis}>保存</button></span>
+      <span class="cfg-row__switch">${sw('dormOn',cfg.dormOn,'休眠账户重新激活')}</span></div>
+  </section>
+
+  <section class="cfg-card" aria-labelledby="c2"><h3 class="cfg-card__head" id="c2">风险分级配置</h3>
+    <p class="cfg-card__note">风险等级取以下四项中最高者：收入区间（本卡）、高风险国籍（本卡）、出生日期（未满 21 岁＝高，固定）、NDRP 名单（命中＝高，固定）。保存后，系统于背景重新计算所有已完成 KYC 玩家的风险等级。</p>
+    ${SALARY.map((s,i)=>`<div class="cfg-row cfg-row--noswitch"><span class="cfg-row__label">薪资范围：${s}</span>
+      <div class="cfg-row__inline"><label for="sl${i}">风险等级</label><select class="select" id="sl${i}" ${dis}>${['低','中','高'].map(l=>`<option ${cfg.salary[i]===l?'selected':''}>${l}</option>`).join('')}</select></div>
+      <span><button class="btn btn--primary" type="button" data-save="sl${i}" ${dis}>保存</button></span></div>`).join('')}
+    <div class="cfg-row cfg-row--noswitch"><span class="cfg-row__label">高风险国籍</span>
+      <div class="cfg-row__fields"><div class="tag-select" id="natBox" role="button" tabindex="0" aria-label="选择高风险国籍">${cfg.highNat.map(n=>`<span class="chip">${n}</span>`).join('')||'<span class="muted">请选择</span>'}</div>
+      <span class="field__error" id="natErr"></span><span class="note">菲律宾以外、未列入此名单的国籍为「中」。</span></div>
+      <span><button class="btn btn--primary" type="button" data-save="nat" ${dis}>保存</button></span></div>
+  </section>`;
+}
+function saveCfg(k){
+  if(k==='dup'){
+    const f=$$('#dupFields input:checked').map(i=>i.value); const t=$('#dupTag').value; let ok=true;
+    $('#dupFieldsErr').textContent = f.length?'':'请至少勾选一个比对字段'; if(!f.length) ok=false;
+    $('#dupTagErr').textContent = t?'':'请选择命中后加上的标签'; if(!t) ok=false;
+    if(!ok) return; cfg.dupFields=f; cfg.dupTag=t;
+  }
+  if(k==='dorm'){
+    const d=$('#dDays').value.trim(), a=$('#dAmt').value.trim(); const bad = v => !/^\d+$/.test(v) || Number(v)<1;
+    const msg = bad(d)?'休眠天数请输入大于 0 的整数':(bad(a)?'存款金额请输入大于 0 的整数':'');
+    $('#dDays').classList.toggle('input--error',bad(d)); $('#dAmt').classList.toggle('input--error',!bad(d)&&bad(a)); $('#dormErr').textContent=msg; if(msg) return;
+    cfg.dormDays=d; cfg.dormAmt=a;
+  }
+  if(k.startsWith('sl')){ const i=+k.slice(2); cfg.salary[i]=$('#sl'+i).value; }
+  if(k==='nat'){ if(!cfg.highNat.length){ $('#natErr').textContent='请至少选择一个国籍'; return; } $('#natErr').textContent=''; }
+  toast('保存成功');
+}
+function openNat(){
+  if(!can('op')) return;
+  const tmp=new Set(cfg.highNat);
+  openModal(`${mHead('选择高风险国籍')}<div class="modal__body"><div class="check-grid" id="natList">${COUNTRIES.filter(c=>c!=='菲律宾').map(c=>`<label class="check"><input type="checkbox" value="${c}" ${tmp.has(c)?'checked':''}> ${c}</label>`).join('')}</div>
+    <p class="note">国籍选项来源：实名审核「国籍」下拉（原型仅列部分）。</p></div><footer class="modal__foot"><button class="btn" data-close>取消</button><button class="btn btn--primary" id="natOk">确定</button></footer>`);
+  $('#natOk').onclick=()=>{ cfg.highNat=$$('#natList input:checked').map(i=>i.value); closeModal(); render(); };
+}
+
+/* ==========================================================================
+   页面：系统管理 › 权限管理（异动）
+   ========================================================================== */
+const PTREE = { id:'root', name:'顶层菜单', open:true, children:[
+  { id:'user', name:'用户管理', open:true, children:[
+    ...['总代理','代理','会员','在线用户','子账号','会员等级管理','成长值配置','投注站','下级代理','KYC审核','会员资料修改审核','VIP特权','用户一级标签变更记录','用户二级标签变更记录','会员状态变更记录'].map((n,i)=>({id:'u'+i,name:n})),
+    { id:'aml', name:'AML Monitoring', isNew:true, open:true, children:[
+      { id:'a1', name:'Total Number of Players', open:true, children:[{id:'a1s',name:'搜索条件'},{id:'a1v',name:'查看列表'},{id:'a1e',name:'导出'},{id:'a1t',name:'批量加标签'},{id:'a1f',name:'批量冻结'}]},
+      { id:'a2', name:'Risk Profiling', children:[{id:'a2v',name:'查看列表、风险详情'},{id:'a2d',name:'更新 EDD 状态'},{id:'a2t',name:'批量加标签'},{id:'a2e',name:'导出'}]},
+      { id:'a3', name:'Account Status', children:[{id:'a3v',name:'查看列表'},{id:'a3r',name:'恢复正常、冻结'},{id:'a3e',name:'导出'}]},
+      { id:'a4', name:'Daily Transaction Monitoring', children:[{id:'a4v',name:'查看列表'},{id:'a4e',name:'导出'}]},
+      { id:'a5', name:'Red Flag Alerts', children:[{id:'a5v',name:'查看告警'},{id:'a5h',name:'处理告警（处理状态、结论备注）'},{id:'a5e',name:'导出'}]},
+      { id:'a6', name:'Large Amount Report', children:[{id:'a6v',name:'查看'},{id:'a6e',name:'导出'}]},
+      { id:'a7', name:'Periodic Updating of Users', children:[{id:'a7v',name:'查看列表'},{id:'a7r',name:'发送提醒'},{id:'a7e',name:'导出'}]},
+      { id:'a8', name:'AML配置', children:[{id:'a8v',name:'查看'},{id:'a8m',name:'修改'}]},
+    ]},
+  ]},
+  ...['查看会员在线统计','财务管理','平台概况','数据统计','系统管理'].map((n,i)=>({id:'r'+i,name:n})),
+]};
+const leaves = n => n.children ? n.children.flatMap(leaves) : [n.id];
+const findN = (id,n=PTREE) => n.id===id ? n : (n.children||[]).map(c=>findN(id,c)).find(Boolean);
+let draft = new Set();
+const roles = [ ['超级管理员', new Set(leaves(PTREE))], ['RCPD', new Set(['a1s','a1v','a2v','a5v','a5h','a7v','a7r','u2'])], ['客服权限', new Set(['u2','u3'])] ];
+function pagePerm(){
+  return `${crumb('系统管理','权限管理')}${head('权限管理','既有页面。本次异动：权限树「用户管理」最后新增「AML Monitoring」，含各页的查询与控制权限。')}
+  <div class="filters"><button class="btn btn--primary" type="button" data-role="new">＋ 新增角色权限</button><label class="sr-only" for="roleK">筛选名称</label><input class="input input--w" id="roleK" placeholder="筛选名称"><button class="btn btn--primary" type="button" data-demo>搜索</button></div>
+  <div class="table-wrap"><table class="table" style="min-width:640px"><thead><tr><th>#</th><th>权限名称</th><th>AML Monitoring 权限（原型示意栏）</th><th>操作</th></tr></thead>
+  <tbody>${roles.map((r,i)=>{const n=leaves(findN('aml')).filter(x=>r[1].has(x)).length;return `<tr><td>${i+1}</td><td>${r[0]}</td><td>${n?`已勾选 ${n} 项`:'<span class="muted">—</span>'}</td><td><button class="btn btn--link" type="button" data-role="${i}">编辑</button></td></tr>`;}).join('')}</tbody></table></div>`;
+}
+function treeHtml(n){
+  const ls=leaves(n), c=ls.filter(x=>draft.has(x)).length, st=c===0?'none':c===ls.length?'all':'some';
+  return `<div class="tree__row${n.isNew?' tree__row--new':''}">${n.children?`<button class="tree__toggle" type="button" data-tt="${n.id}" aria-expanded="${!!n.open}" aria-label="展开或收合 ${esc(n.name)}">▶</button>`:'<span class="tree__spacer"></span>'}
+    <label class="check"><input type="checkbox" data-tc="${n.id}" ${st==='all'?'checked':''} data-ind="${st==='some'}"> ${esc(n.name)}${n.isNew?' <span class="badge-new">新增</span>':''}</label></div>
+    ${n.children&&n.open?`<ul>${n.children.map(ch=>`<li>${treeHtml(ch)}</li>`).join('')}</ul>`:''}`;
+}
+function drawTree(){ $('#ptree').innerHTML=`<ul class="tree"><li>${treeHtml(PTREE)}</li></ul>`; $$('#ptree [data-ind="true"]').forEach(i=>i.indeterminate=true); }
+function openRole(i){
+  const r = i==='new'?null:roles[+i]; draft=new Set(r?r[1]:[]);
+  openModal(`${mHead(r?'编辑':'新增')}<div class="modal__body"><div class="perm-form">
+    <div class="field"><label class="field__label" for="rn"><span class="req">*</span>权限名称</label><input class="input" id="rn" value="${r?esc(r[0]):''}"><span class="field__error" id="rnErr"></span></div>
+    <div class="tree-box" id="ptree"></div></div></div>
+    <footer class="modal__foot"><button class="btn" data-close>取消</button><button class="btn btn--primary" id="rSave">确定</button></footer>`,'modal--l');
+  drawTree(); const amlRow=$('#ptree .tree__row--new'); if(amlRow) $('#ptree').scrollTop=amlRow.offsetTop-$('#ptree').offsetTop-80;
+  $('#ptree').addEventListener('click',e=>{const t=e.target.closest('[data-tt]'); if(t){const n=findN(t.dataset.tt); n.open=!n.open; drawTree();}});
+  $('#ptree').addEventListener('change',e=>{const c=e.target.closest('[data-tc]'); if(!c) return; leaves(findN(c.dataset.tc)).forEach(l=>c.checked?draft.add(l):draft.delete(l)); drawTree();});
+  $('#rSave').onclick=()=>{ const n=$('#rn').value.trim(); if(!n){$('#rnErr').textContent='请输入权限名称'; $('#rn').classList.add('input--error'); return;}
+    if(r){ r[0]=n; r[1]=new Set(draft);} else roles.push([n,new Set(draft)]); closeModal(); render(); toast(r?'修改成功':'新增成功'); };
+}
+
+/* ==========================================================================
+   Modal
+   ========================================================================== */
+let lastFocus=null;
+const mHead = t => `<header class="modal__head"><h2 class="modal__title" id="mTitle">${esc(t)}</h2><button class="modal__close" type="button" data-close aria-label="关闭">✕</button></header>`;
+function openModal(html, size=''){ lastFocus=document.activeElement; $('#modalRoot').innerHTML=`<div class="overlay" data-ov><div class="modal ${size}" role="dialog" aria-modal="true" aria-labelledby="mTitle">${html}</div></div>`;
+  const f=$('#modalRoot').querySelector('input:not([type=checkbox]):not([type=radio]),textarea,select,button.modal__close'); f&&f.focus(); }
+function closeModal(){ $('#modalRoot').innerHTML=''; lastFocus&&lastFocus.focus&&lastFocus.focus(); }
+function openTagPicker(n){
+  openModal(`${mHead(`加标签（已选 ${n} 位）`)}<div class="modal__body"><div class="check-grid" id="tagList">${TAGS.filter(t=>t!=='无标签').map(t=>`<label class="check"><input type="checkbox" value="${t}"> ${t}</label>`).join('')}</div><span class="field__error" id="tagErr"></span>
+    <p class="note">标签来源：用户管理 › 会员代理标签配置（类型：会员）。</p></div><footer class="modal__foot"><button class="btn" data-close>取消</button><button class="btn btn--primary" id="tagOk">确定</button></footer>`);
+  $('#tagOk').onclick=()=>{ const v=$$('#tagList input:checked'); if(!v.length){$('#tagErr').textContent='请至少选择一个标签'; return;} closeModal(); toast(`已为 ${n} 位玩家加上标签`); };
+}
+/* Account Status › 单笔修改状态（选项与「会员」页修改状态相同） */
+const EDIT_STATUS = ['待审核','正常','冻结','停用','禁止投注','临时冻结','ndrp冻结'];
+function openChangeStatus(id){
+  const p=findP(id), row=acctLog.find(r=>r[0]===id), cur=row?row[2]:p.status;
+  openModal(`${mHead('修改状态 · '+p.acc)}<div class="modal__body">
+    <dl class="kv"><dt>会员ID</dt><dd class="num">${p.id}</dd><dt>真实姓名</dt><dd>${esc(p.name)}</dd><dt>目前状态</dt><dd>${statusPill(cur)}</dd></dl>
+    <fieldset class="field" style="border:0;padding:0;margin:0"><legend class="field__label"><span class="req">*</span>状态</legend>
+      <div class="check-grid">${EDIT_STATUS.map(st=>`<label class="check"><input type="radio" name="chst" value="${st}" ${st===cur?'checked':''}> ${st}</label>`).join('')}</div>
+      <span class="field__error" id="chstErr"></span></fieldset>
+    <div class="field"><label class="field__label" for="chstR">备注</label><textarea class="textarea" id="chstR" rows="2" maxlength="200" placeholder="选填，写入会员状态变更记录"></textarea></div></div>
+    <footer class="modal__foot"><button class="btn" data-close>取消</button><button class="btn btn--primary" id="chstOk">确定</button></footer>`);
+  $('#chstOk').onclick=()=>{ const v=$('input[name="chst"]:checked').value;
+    if(v===cur){ $('#chstErr').textContent='请选择与目前不同的状态'; return; }
+    const remark=$('#chstR').value.trim();
+    if(row){ row[1]=cur; row[2]=v; row[3]=remark||'—'; row[4]='admin01'; row[5]=NOW; }
+    p.status=v; closeModal(); render(); toast('修改成功'); };
+}
+function openStatus(n, to){
+  openModal(`${mHead(to==='冻结'?'冻结账号':'恢复正常')}<div class="modal__body"><p>确定将已选的 ${n} 位玩家状态改为「${to}」吗？</p>
+    <div class="field"><label class="field__label" for="stR">备注</label><textarea class="textarea" id="stR" rows="2" maxlength="200" placeholder="选填，写入会员状态变更记录"></textarea></div></div>
+    <footer class="modal__foot"><button class="btn" data-close>取消</button><button class="btn ${to==='冻结'?'btn--danger':'btn--primary'}" id="stOk">确定</button></footer>`);
+  $('#stOk').onclick=()=>{ closeModal(); toast(`已将 ${n} 位玩家改为「${to}」`); };
+}
+function openEdd(n){
+  openModal(`${mHead(`更新 EDD 状态（已选 ${n} 位）`)}<div class="modal__body"><div class="field"><label class="field__label" for="eddS"><span class="req">*</span>EDD 状态</label>
+    <select class="select" id="eddS"><option value="">请选择</option><option>不适用</option><option>待 EDD</option><option>EDD 完成</option></select><span class="field__error" id="eddErr"></span></div></div>
+    <footer class="modal__foot"><button class="btn" data-close>取消</button><button class="btn btn--primary" id="eddOk">确定</button></footer>`);
+  $('#eddOk').onclick=()=>{ const v=$('#eddS').value; if(!v){$('#eddErr').textContent='请选择 EDD 状态'; return;} closeModal(); toast(`已将 ${n} 位玩家的 EDD 状态改为「${v}」`); };
+}
+
+/* ==========================================================================
+   铃铛告警提示
+   ========================================================================== */
+let bellRead = new Set(['AL20261126004']);
+function renderBell(){
+  const show = role!=='none';
+  $('#bellBtn').hidden=!show; if(!show) return;
+  const unread = alerts.filter(a=>!bellRead.has(a.aid));
+  $('#bellCount').textContent=unread.length; $('#bellCount').hidden=!unread.length;
+  $('#bellList').innerHTML = alerts.slice(0,8).map(a=>`<li class="${bellRead.has(a.aid)?'read':''}"><button type="button" data-bell="${a.aid}"><span class="t">${a.type}</span><br><span class="d">${findP(a.pid).acc} · ${a.time}</span></button></li>`).join('');
+}
+
+/* ==========================================================================
+   渲染与事件（集中）
+   ========================================================================== */
+const PAGES = { players:pagePlayers, risk:pageRisk, acct:pageAcct, txn:pageTxn, alerts:pageAlerts, large:pageLarge, periodic:pagePeriodic, config:pageConfig, perm:pagePerm };
+function render(){
+  renderNav(); renderBell();
+  const amlPage = current!=='perm';
+  let html;
+  if(amlPage && role==='none') html = `<div class="panel"><p class="noperm">您没有「AML Monitoring」权限，无法查看此页。</p></div>`;
+  else if(current==='config' && role!=='all') html = `<div class="panel">${crumb('用户管理','AML Monitoring','AML配置')}<p class="noperm">您没有「AML配置 · 修改」权限，以下为只读示意。</p>${pageConfig()}</div>`;
+  else html = `<div class="panel">${PAGES[current]()}</div>`;
+  $('#main').innerHTML = html;
+  if(current==='config' && role!=='all') { /* 只读时 pageConfig 已依权限停用控件 */ }
+}
+function selectedRows(){ return $$('#main input[data-row]:checked').map(i=>i.dataset.row); }
+function syncBulk(){ const n=selectedRows().length; const bar=$('#main .bulk'); if(bar){ bar.hidden=!n; bar.querySelector('[data-count]').textContent=n; } }
+
+document.addEventListener('click', e=>{
+  const t=e.target;
+  if(t.matches('[data-ov]')){ closeModal(); return; }
+  if(t.closest('[data-close]')){ closeModal(); return; }
+  const pg=t.closest('[data-page]'); if(pg){ current=pg.dataset.page; render(); window.scrollTo(0,0); return; }
+  const tg=t.closest('[data-toggle]'); if(tg){ const open=tg.getAttribute('aria-expanded')!=='true'; tg.setAttribute('aria-expanded',open); $('#'+tg.dataset.toggle).hidden=!open; return; }
+  const jp=t.closest('[data-jump]'); if(jp){ toast(`前往「${jp.dataset.jump}」，查询条件：账号＝${jp.dataset.acc}（原型示意）`,'info'); return; }
+  if(t.closest('[data-demo]')){ toast('原型仅示意 AML Monitoring 与权限管理','info'); return; }
+  const act=t.closest('[data-act]'); if(act){ toast({search:'已依条件查询',export:'已导出',refresh:'数据已刷新'}[act.dataset.act],'info'); return; }
+  const so=t.closest('[data-sort]'); if(so){ sortBy(so.closest('th')); return; }
+  const ut=t.closest('[data-untag]'); if(ut){ riskTags=riskTags.filter(x=>x!==ut.dataset.untag); render(); return; }
+  const b=t.closest('[data-bulk]'); if(b){ const k=b.dataset.bulk, ids=selectedRows(), n=ids.length;
+    if(k==='clear'){ $$('#main input[data-row],#main input[data-all]').forEach(i=>i.checked=false); syncBulk(); return; }
+    if(k==='tag') openTagPicker(n); if(k==='freeze') openStatus(n,'冻结'); if(k==='restore') openStatus(n,'正常'); if(k==='edd') openEdd(n);
+    if(k==='expSel') toast(`已导出所选 ${n} 笔`,'info'); if(k==='remind') openRemind(ids); return; }
+  const rk=t.closest('[data-risk]'); if(rk){ openRisk(rk.dataset.risk); return; }
+  const al=t.closest('[data-alert]'); if(al){ openAlert(al.dataset.alert); return; }
+  const rm=t.closest('[data-remind]'); if(rm){ openRemind([rm.dataset.remind]); return; }
+  const lt=t.closest('[data-ltab]'); if(lt){ largeTab=lt.dataset.ltab; render(); return; }
+  const sv=t.closest('[data-save]'); if(sv){ saveCfg(sv.dataset.save); return; }
+  const s=t.closest('[data-sw]'); if(s && !s.disabled){ cfg[s.dataset.sw]=!cfg[s.dataset.sw]; s.setAttribute('aria-checked',cfg[s.dataset.sw]); toast('保存成功'); return; }
+  if(t.closest('#natBox')){ openNat(); return; }
+  const cs=t.closest('[data-chst]'); if(cs){ openChangeStatus(cs.dataset.chst); return; }
+  const ro=t.closest('[data-role]'); if(ro){ openRole(ro.dataset.role); return; }
+  if(t.closest('#alertSearch')){ alertFilter={type:$('#fType').value,sev:$('#fSev').value,state:$('#fState').value}; render(); return; }
+  if(t.closest('#bellBtn')){ const pop=$('#bellPop'); pop.hidden=!pop.hidden; $('#bellBtn').setAttribute('aria-expanded',!pop.hidden); return; }
+  const bl=t.closest('[data-bell]'); if(bl){ bellRead.add(bl.dataset.bell); $('#bellPop').hidden=true; current='alerts'; render(); openAlert(bl.dataset.bell); return; }
+  if(t.closest('#bellAll')){ $('#bellPop').hidden=true; current='alerts'; render(); return; }
+  if(!t.closest('#bellPop')) $('#bellPop').hidden=true;
+});
+function sortBy(th){
+  const table=th.closest('table'), idx=[...th.parentNode.children].indexOf(th), tb=table.tBodies[0];
+  const dir=th.getAttribute('aria-sort')==='ascending'?'descending':'ascending';
+  $$('th[aria-sort]',table).forEach(h=>{ h.setAttribute('aria-sort','none'); h.querySelector('.th-sort__icon').textContent='⇅'; });
+  th.setAttribute('aria-sort',dir); th.querySelector('.th-sort__icon').textContent=dir==='ascending'?'↑':'↓';
+  const val=tr=>{ const td=tr.children[idx]; return td ? (td.dataset.v ?? td.textContent.trim()) : ''; };
+  const isNum=v=>/^-?₱?[\d,]+(\.\d+)?$/.test(v), n=v=>parseFloat(String(v).replace(/[₱,]/g,''));
+  const rows=[...tb.rows].filter(r=>!r.querySelector('.empty'));
+  rows.sort((a,b)=>{ const x=val(a), y=val(b); const c=(isNum(x)&&isNum(y))?n(x)-n(y):x.localeCompare(y,'zh'); return dir==='ascending'?c:-c; });
+  rows.forEach(r=>tb.append(r));
+}
+document.addEventListener('change', e=>{
+  if(e.target.id==='rT' && e.target.value){ riskTags.push(e.target.value); render(); return; }
+  if(e.target.matches('#main input[data-all]')){ $$('#main input[data-row]').forEach(i=>i.checked=e.target.checked); syncBulk(); }
+  if(e.target.matches('#main input[data-row]')) syncBulk();
+});
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ if($('#modalRoot').innerHTML) closeModal(); $('#bellPop').hidden=true; } if(e.key==='Enter' && e.target.id==='natBox') openNat(); });
+$('#roleSel').addEventListener('change', e=>{ role=e.target.value; render(); });
+setInterval(()=>{ const d=new Date(2026,10,27,10,0,0); d.setSeconds(d.getSeconds()+Math.floor(performance.now()/1000)); $('#clock').textContent=d.toLocaleString('zh-CN',{hour12:false}).replace(/\//g,'/'); },1000);
+/* ==========================================================================
+   语系切换（中文／English）
+   做法：页面以中文产生；切换为 English 时，翻译所有文字节点与 placeholder／aria-label／title。
+   之后新产生的内容（换页、弹窗、提示）由 MutationObserver 自动翻译。
+   标签名称、玩家姓名、备注等「资料内容」不翻译（随后台资料显示）。
+   ========================================================================== */
+const I18N_EXACT = {
+  // 选单与框架
+  '菜单':'Menu','个人中心':'Personal Center','用户管理':'User Management','总代':'General Agent','投注站':'Betting Station','大代理':'Master Agent','代理':'Agent','会员':'Member',
+  '会员状态变更记录':'Member Status Change Log','子账号':'Sub-account','会员代理标签配置':'Member & Agent Tag Config','VIP特权':'VIP Privileges','KYC审核':'KYC Review',
+  '会员资料修改审核':'Member Info Change Review','一级标签数据变更记录':'Level-1 Tag Change Log','二级标签数据变更记录':'Level-2 Tag Change Log',
+  '财务管理 ›':'Finance ›','数据报表 ›':'Reports ›','系统管理':'System Management','权限管理':'Permission Management','角色管理':'Role Management','系统参数管理':'System Parameters',
+  'AML配置':'AML Config','新增':'New','异动':'Changed','后台选单':'Backend menu','位置':'Location','平台概况':'Platform overview','告警提示':'Alerts',
+  '原型示意 · 当前账号权限':'Prototype · Account permission','AML 全部权限':'All AML permissions','只有查询权限':'View only','无 AML Monitoring 权限':'No AML Monitoring permission',
+  'AML 告警':'AML Alerts','查看全部':'View all','语言':'Language','AML Monitoring 后台原型':'AML Monitoring Backend Prototype',
+  '原型仅示意 AML Monitoring 与权限管理':'This prototype only covers AML Monitoring and Permission Management',
+  '您没有「AML Monitoring」权限，无法查看此页。':'You do not have AML Monitoring permission to view this page.',
+  '您没有「AML配置 · 修改」权限，以下为只读示意。':'You do not have "AML Config · Edit" permission. The page below is read-only.',
+  // 通用
+  '搜索':'Search','导出':'Export','导出所选':'Export Selected','清除':'Clear','笔':'selected','已选':'','前往':'Go to','页':'','页码':'Page number','全选':'Select all',
+  '⟳ 刷新':'⟳ Refresh','操作':'Operation','照片':'Photo','在线':'Online','离线':'Offline','关闭':'Close','取消':'Cancel','确定':'OK','保存':'Save','开启':'On','编辑':'Edit',
+  '请选择':'Please select','请输入关键字':'Enter keyword','账号类型':'Account type','关键字':'Keyword','过滤测试用户':'Filter Test Users','备注':'Remarks',
+  '已依条件查询':'Search completed','已导出':'Exported','数据已刷新':'Data refreshed','已保存':'Saved','保存成功':'Saved successfully','新增成功':'Added successfully','修改成功':'Updated successfully',
+  '无资料':'No data','（无资料）':'(No data)','系统':'System','值':'Value','天':'days','高':'High','中':'Medium','低':'Low','未计算':'Not calculated','未命中':'No match',
+  '需「导出」权限':'Requires "Export" permission','选填，写入会员状态变更记录':'Optional; written to the Member Status Change Log',
+  // 账号类型
+  '会员ID':'Member ID','账号':'Username','真实姓名':'Real Name','手机号':'Phone','邮箱':'Email','身分证字号':'ID Number',
+  // 会员状态 / KYC 状态
+  '全部状态':'All Status','待审核':'Under Review','正常':'Normal','冻结':'Freeze','停用':'Deactivate','注销':'Deleted','禁止投注':'banBet','临时冻结':'Temporarily frozen','ndrp冻结':'NDRP Freeze',
+  '未认证':'Not certified','已认证':'Verified','补充信息':'Incomplete Info','待复审':'Pending Review','待补充信息':'Pending Supplement','验证失败':'Authentication Failed','完全验证':'Fully Verify',
+  // 国籍
+  '全部国籍':'All Nation','本地（菲律宾）':'Local (Philippines)','外籍':'Foreign','菲律宾':'Philippines','中国':'China','伊朗':'Iran','朝鲜':'North Korea','俄罗斯':'Russia','阿富汗':'Afghanistan',
+  '缅甸':'Myanmar','叙利亚':'Syria','也门':'Yemen','美国':'United States','日本':'Japan','韩国':'South Korea','越南':'Vietnam','印度尼西亚':'Indonesia','马来西亚':'Malaysia','新加坡':'Singapore','泰国':'Thailand',
+  '菲律宾 (默认)':'Philippines (default)','默认层':'Default','VIP层':'VIP',
+  // Total Number of Players
+  '玩家总览。统计每日 00:00（菲律宾时间）更新；栏位与筛选沿用「用户管理 › 会员」。':'Player overview. Statistics update daily at 00:00 (Philippine time). Columns and filters follow "User Management › Member".',
+  '注册起始时间':'Register Start Time','注册结束时间':'Register End Time','注册总数':'Total Registered Players','本地':'Local','依实名审核「国籍」':'Based on KYC "Nationality"',
+  '活跃（前一天）':'Active (previous day)','前一天有充值或投注':'Deposited or bet on the previous day','近 3 个月新注册':'Newly Registered (3 mo)',
+  '本地 vs 外籍':'Local vs Foreign','活跃 vs 非活跃（前一天）':'Active vs Inactive (previous day)','活跃':'Active','非活跃':'Inactive',
+  '玩家列表':'Player List','会员信息':'Member Information','层级＆VIP':'Level & VIP','国籍':'Nation','状态':'Account Status','注册时间':'Register Time','KYC状态':'KYC Status','会员标签':'User Tags',
+  '资金明细':'Funding Details','投注记录':'Betting Records','第三方对局记录':'Third-party Game Records','加标签':'Add Tag','请至少选择一个标签':'Please select at least one tag',
+  '标签来源：用户管理 › 会员代理标签配置（类型：会员）。':'Tag source: User Management › Member & Agent Tag Config (type: Member).','冻结账号':'Freeze Accounts',
+  // Risk Profiling
+  '风险等级依 Automated Risk Factor 四项因子自动判定，取最高等级；不显示分数、不开放手动调整。EDD 状态由后台人员手动更新。':'Risk level is set automatically from the four Automated Risk Factors, taking the highest. No score is shown and it cannot be adjusted manually. EDD status is updated manually by backend staff.',
+  'KYC状态（全部）':'KYC Status (all)','全部标签（可多选）':'All Tags (multi-select)','会员标签（可多选）':'User Tags (multi-select)','风险等级（全部）':'Risk Level (all)','EDD状态（全部）':'EDD Status (all)',
+  '低风险':'Low Risk','中风险':'Medium Risk','高风险':'High Risk','待 EDD':'Pending EDD','未计算（未完成 KYC）':'Not calculated (KYC incomplete)','风险等级分布':'Risk Distribution',
+  'EDD 状态':'EDD Status','EDD状态':'EDD Status','不适用':'Not Applicable','EDD 完成':'EDD Completed','玩家风险列表':'Player Risk Profiles','风险等级':'Risk Level','收入':'Income','年龄':'Age',
+  '最后评估':'Last Assessed','风险详情':'Risk Profile','更新 EDD 状态':'Update EDD Status','请选择 EDD 状态':'Please select an EDD status',
+  '整体风险等级':'Overall risk level','（四项中最高者）':'(highest of the four)','风险因子':'Risk factor','玩家资料':'Player data','等级':'Level',
+  '收入区间（薪资范围）':'Income range (salary range)','出生日期（年龄）':'Date of birth (age)','本地观察名单／NDRP':'Local watchlist / NDRP','确认命中':'Confirmed match',
+  '资料来源：会员 › 实名审核（薪资范围、生日、国籍）、NDRP名单配置。KYC 已通过但缺资料者，该因子视为高风险。':'Data source: Member › KYC review (salary range, birthday, nationality) and NDRP List Config. If KYC is passed but data is missing, that factor is treated as High.',
+  '此玩家尚未完成 KYC，不计算风险等级。':'This player has not completed KYC; risk level is not calculated.',
+  // Account Status
+  '账户状态与限制原因。原因沿用「会员状态变更记录」的备注。':'Account status and restriction reason. The reason uses the remarks in the Member Status Change Log.',
+  '状态变更起始时间':'Status Change Start','状态变更结束时间':'Status Change End','受限账户类型':'Restricted Accounts by Type','账户状态列表':'Account Status List',
+  '原因（备注）':'Reason (remarks)','操作人':'Operator','变更时间':'Status Since','恢复正常':'Restore to Normal','修改状态':'Change Status','目前状态':'Current status','请选择与目前不同的状态':'Please select a status different from the current one',
+  'EDD 资料不符':'EDD documents mismatch','系统：未满21岁自动冻结':'System: auto-frozen (under 21)','批量临时冻结未KYC会员':'Batch temporary freeze of non-KYC members',
+  // Daily Transaction Monitoring
+  '每人每日存提款统计。只计入充值「成功」与提款「出款成功」订单，按菲律宾时间逐日计算。':'Daily deposit and withdrawal totals per player. Only successful deposits and paid-out withdrawals are counted, per day in Philippine time.',
+  '开始日期':'Start Date','结束日期':'End Date','交易类型':'Transaction Type','全部类型':'All Types','存款':'Deposit','提款':'Withdrawal','金额（本次查询）':'Amount (this search)','笔数（本次查询）':'Order count (this search)',
+  '存款金额前 3 名（本次查询）':'Top 3 Depositors (this search)','其他':'Others','每日交易列表':'Daily Transactions','日期':'Date','存款笔数':'Count of Deposit','存款金额':'Sum of Deposit','提款笔数':'Count of Withdrawal','提款金额':'Sum of Withdrawal',
+  // Red Flag Alerts
+  '系统依 AML配置的三项规则自动产生告警，只供后台查询与提示，不对外申报。':'Alerts are generated automatically from the three rules in AML Config. They are for backend review and notification only, with no external reporting.',
+  '重复账户侦测':'Duplicate Account Detection','NDRP／受限玩家侦测':'NDRP / Restricted Player Detection','休眠账户重新激活并伴随大额存款':'Dormant Account Reactivation with a Significant Deposit',
+  '待处理':'Pending','已处理':'Resolved','告警类型（全部）':'Alert Type (all)','严重度（全部）':'Severity (all)','处理状态（全部）':'Handling Status (all)','触发起始时间':'Trigger Start Time','触发结束时间':'Trigger End Time',
+  '告警ID／账号／会员ID':'Alert ID / Username / Member ID','严重度分布（本次查询）':'By Severity (this search)','告警类型分布（全部告警）':'By Alert Type (all alerts)',
+  '告警ID':'Alert ID','告警类型':'Alert Type','触发详情':'Trigger Details','严重度':'Severity','触发时间':'Trigger Time','处理状态':'Handling Status','处理人':'Handled By','处理':'Handle','详情':'Details',
+  '没有符合条件的告警':'No matching alerts','账户状态':'Account Status','比对结果':'Match result','相符账户':'Matching account','相符字段':'Matching field',
+  '系统动作：加上标签（AML配置所选标签）。':'System action: add tag (tag selected in AML Config).','NDRP 名单比对':'NDRP list check','筛查时机':'Screening point','命中':'Match','仅全名相同':'Full name only',
+  'NDRP 名单':'NDRP list','玩家':'Player','全名':'Full name','生日':'Birthday','登录':'Login','系统动作：账户改为 ndrp冻结；加上标签「NDRP标签」':'System action: account set to NDRP Freeze; tag "NDRP标签" added',
+  '系统动作：只产生告警，不冻结':'System action: alert only, no freeze','休眠与激活':'Dormancy and reactivation','最后存款':'Last deposit','最后提款':'Last withdrawal','最后投注':'Last bet',
+  '休眠天数':'Dormant days','激活日期':'Reactivation date','激活当日存款合计':'Reactivation-day deposit total','系统动作：只产生告警，不冻结、不加标签。':'System action: alert only, no freeze, no tag.',
+  '存款概况':'Deposit overview','近 24 小时成功充值':'Successful deposits (last 24 h)','近 30 日平均（每日）':'30-day average (per day)','结论备注':'Conclusion notes',
+  '改为「已处理」时必填，最多 500 字':'Required when set to "Resolved"; up to 500 characters','请填写结论备注':'Please enter conclusion notes','已标记为已处理':'Marked as resolved','处理时间':'Handled At',
+  'NDRP 名单全名、生日皆相同（登录筛查）':'NDRP list: full name and birthday both match (login screening)','NDRP 名单仅全名相同（生日不同）':'NDRP list: full name matches only (different birthday)',
+  '生日不同，经 RCPD 比对证件确认非同一人。':'Different birthday; RCPD checked the ID and confirmed it is not the same person.','系统：NDRP 名单命中（AL20261127002）':'System: NDRP list match (AL20261127002)',
+  // Large Amount Report
+  '直接沿用「数据报表 › 大额存取款报表」，门槛依现有报表；本次新增「导出」。':'Reuses "Reports › Large Deposit & Withdrawal Report" with its existing threshold. "Export" is new.',
+  '存款统计':'Deposit statistics','取款统计':'Withdrawal statistics','存取款金额':'Amount by Type','存取款笔数':'Order Count by Type','取款':'Withdrawal','存款金额占比（本页）':'Deposit Share (this page)','取款金额占比（本页）':'Withdrawal Share (this page)',
+  '⚑ 只显示金额超过门槛的订单（门槛沿用现有报表）':'⚑ Showing only orders above the threshold (existing report threshold)','开始时间':'Start Time','结束时间':'End Time','用户名':'Username','金额':'Amount','合计':'Total',
+  // Periodic Updating of Users
+  '6 个项目任一缺漏即列入；系统每日更新一次，「会员」资料更新时同步。「发送提醒」寄 Email 给 RCPD，不通知玩家。':'Players missing any of the 6 items are listed. The list updates daily and whenever member data changes. "Send Reminder" emails RCPD; players are not notified.',
+  '全部缺少项目':'All Missing Items','缺少项目':'Missing Information','列入起始日期':'Listed Start Date','列入结束日期':'Listed End Date','缺少项目分布':'Missing Item Breakdown','待更新玩家列表':'Players to Update',
+  '列入日期':'Listed Date','发送提醒':'Send Reminder','查看会员':'View Member','收件 Email':'Recipient Email','请输入收件 Email':'Please enter a recipient email','Email 格式不正确，请检查':'Invalid email format, please check',
+  '多个以逗号分隔，例：rcpd@company.com, rcpd2@company.com':'Separate multiple addresses with commas, e.g. rcpd@company.com, rcpd2@company.com',
+  '收入来源':'Source of income','永久居住地址':'Permanent address','证件照或 EKYC 截屏':'ID photo or EKYC screenshot',
+  '主旨':'Subject','内容':'Content','寄出':'Send','寄送记录写入「日志管理 › 操作日志」。':'Sending is recorded in "Log Management › Operation Log".','（寄出当下）':'(time of sending)',
+  // AML 配置
+  '国家设置':'Country Settings','国家':'Country','AML 告警条件配置':'AML Alert Rule Config','比对字段（勾选的字段全部相同才命中）':'Fields to compare (hit only when all selected fields match)',
+  '姓名（姓、名、中间名）':'Name (last, first, middle)','出生日期':'Date of birth','地址':'Address','银行／金融账户号码':'Bank / financial account number','证件号码':'ID number','手机号码':'Phone number','电子邮件':'Email','设备':'Device','支付资料':'Payment details',
+  '命中后加上标签':'Tag to add on match','请至少勾选一个比对字段':'Please select at least one field','请选择命中后加上的标签':'Please select the tag to add on match',
+  '比对时机：新玩家 KYC 验证通过时；旧玩家于上线后第一次登录时比对一次。比对对象含已冻结、停用、注销账户。标签来源：会员代理标签配置（类型：会员）。':'When: new players when KYC passes; existing players once at their first login after launch. Includes frozen, deactivated and deleted accounts. Tag source: Member & Agent Tag Config (type: Member).',
+  '登录时比对 NDRP 名单':'Check NDRP list at login',
+  '每次登录比对「NDRP名单配置」；全名、生日都相同为命中（冻结＋上标签，沿用 KYC配置「NDRP名单自动冻结用户标签」）；只有全名相同产生告警、不冻结':'Checks "NDRP List Config" at every login. Full name and birthday both match = hit (freeze + tag, per KYC Config "NDRP auto-freeze tag"). Full name only = alert, no freeze.',
+  '休眠账户重新激活':'Dormant account reactivation','无存款、提款、投注: >':'No deposit, withdrawal or bet: >','激活当日累计存款: >=':'Reactivation-day total deposits: >=',
+  '激活当日累计存款':'Reactivation-day total deposits','休眠天数请输入大于 0 的整数':'Dormant days must be an integer greater than 0','存款金额请输入大于 0 的整数':'Deposit amount must be an integer greater than 0',
+  '登录不重置休眠；只产生告警，不冻结、不加标签。':'Login does not reset dormancy. Alert only, no freeze, no tag.','风险分级配置':'Risk Level Config',
+  '风险等级取以下四项中最高者：收入区间（本卡）、高风险国籍（本卡）、出生日期（未满 21 岁＝高，固定）、NDRP 名单（命中＝高，固定）。保存后，系统于背景重新计算所有已完成 KYC 玩家的风险等级。':'Risk level is the highest of four factors: income range (this card), high-risk nationality (this card), date of birth (under 21 = High, fixed), NDRP list (match = High, fixed). After saving, risk levels of all KYC-completed players are recalculated in the background.',
+  '高风险国籍':'High-risk nationalities','选择高风险国籍':'Select high-risk nationalities','菲律宾以外、未列入此名单的国籍为「中」。':'Nationalities other than the Philippines that are not on this list are "Medium".',
+  '请至少选择一个国籍':'Please select at least one nationality','国籍选项来源：实名审核「国籍」下拉（原型仅列部分）。':'Options come from the KYC "Nationality" dropdown (partial list in this prototype).',
+  // 权限管理
+  '既有页面。本次异动：权限树「用户管理」最后新增「AML Monitoring」，含各页的查询与控制权限。':'Existing page. Change: "AML Monitoring" is added at the end of "User Management" in the permission tree, with view and control permissions for each page.',
+  '＋ 新增角色权限':'+ Add Role Permission','筛选名称':'Filter by name','权限名称':'Permission Name','AML Monitoring 权限（原型示意栏）':'AML Monitoring permissions (prototype column)',
+  '超级管理员':'Super Admin','客服权限':'Customer Service','请输入权限名称':'Please enter a permission name','顶层菜单':'Top Menu','总代理':'General Agent','在线用户':'Online Users','会员等级管理':'Member Level Management',
+  '成长值配置':'Growth Points Config','下级代理':'Sub-agents','用户一级标签变更记录':'User Level-1 Tag Change Log','用户二级标签变更记录':'User Level-2 Tag Change Log','查看会员在线统计':'View Online Member Stats',
+  '数据统计':'Statistics','财务管理':'Finance','搜索条件':'Search Conditions','查看列表':'View List','批量加标签':'Batch Add Tag','批量冻结':'Batch Freeze','查看列表、风险详情':'View List, Risk Profile',
+  '恢复正常、冻结':'Restore to Normal, Freeze','查看告警':'View Alerts','处理告警（处理状态、结论备注）':'Handle Alerts (status, conclusion notes)','查看':'View','修改':'Edit',
+};
+const I18N_LABELS = {'会员ID':'Member ID','会员 ID':'Member ID','账号':'Username','真实姓名':'Real Name','昵称':'Nickname','装置':'Device','投注站代码':'Betting Station Code','玩家账号':'Username',
+  '缺少项目':'Missing Items','列入日期':'Listed Date','寄件人':'Sender','寄送时间':'Sent At','当前时间':'Current Time','在线人数':'Online','当日注册':'Registered Today','充值':'Deposits','提款':'Withdrawals',
+  '最后更新':'Last updated','后台字段':'Backend field','系统':'System'};
+const trSalary = v => v.replace(/^([\d,]+)以下\/月$/,'Below $1/month').replace(/^([\d,]+)以上\/月$/,'Above $1/month').replace(/\/月$/,'/month');
+const trList = v => v.split('、').map(x=>tr(x)).join(', ');
+const I18N_RULES = [
+  [/^共 ([\d,]+) 笔$/, m=>`Total ${m[1]}`],
+  [/^(\d+) 笔\/页$/, m=>`${m[1]}/page`],
+  [/^选取 (.+)$/, m=>`Select ${m[1]}`],
+  [/^移除 (.+)$/, m=>`Remove ${m[1]}`],
+  [/^展开或收合 (.+)$/, m=>`Expand or collapse ${tr(m[1])}`],
+  [/^(.+) 开启$/, m=>`${tr(m[1])}: on`],
+  [/^已勾选 (\d+) 项$/, m=>`${m[1]} selected`],
+  [/^(\d+) 岁$/, m=>`${m[1]} years old`],
+  [/^风险详情 · (.+)$/, m=>`Risk Profile · ${m[1]}`],
+  [/^告警详情 · (.+)$/, m=>`Alert Details · ${m[1]}`],
+  [/^修改状态 · (.+)$/, m=>`Change Status · ${m[1]}`],
+  [/^加标签（已选 (\d+) 位）$/, m=>`Add Tag (${m[1]} selected)`],
+  [/^更新 EDD 状态（已选 (\d+) 位）$/, m=>`Update EDD Status (${m[1]} selected)`],
+  [/^已为 (\d+) 位玩家加上标签$/, m=>`Tags added to ${m[1]} player(s)`],
+  [/^确定将已选的 (\d+) 位玩家状态改为「(.+)」吗？$/, m=>`Change the status of ${m[1]} selected player(s) to "${tr(m[2])}"?`],
+  [/^已将 (\d+) 位玩家改为「(.+)」$/, m=>`${m[1]} player(s) changed to "${tr(m[2])}"`],
+  [/^已将 (\d+) 位玩家的 EDD 状态改为「(.+)」$/, m=>`EDD status of ${m[1]} player(s) changed to "${tr(m[2])}"`],
+  [/^已导出所选 (\d+) 笔$/, m=>`Exported ${m[1]} selected row(s)`],
+  [/^已寄出 (\d+) 封提醒$/, m=>`${m[1]} reminder(s) sent`],
+  [/^信件预览（共 (\d+) 封，每位玩家一封）$/, m=>`Email preview (${m[1]} email(s), one per player)`],
+  [/^\[AML\] 定期资料更新提醒－(.+?)( 等)?$/, m=>`[AML] Periodic KYC update reminder - ${m[1]}${m[2]?' and others':''}`],
+  [/^前往「(.+)」，查询条件：账号＝(.+)（原型示意）$/, m=>`Go to "${tr(m[1])}" with filter Username = ${m[2]} (prototype only)`],
+  [/^薪资范围：(.+)$/, m=>`Salary range: ${trSalary(m[1])}`],
+  [/^(.+)\/月$/, m=>trSalary(m[0])],
+  [/^(.+)（今日）$/, m=>`${tr(m[1])} (today)`],
+  [/^(.+)：无资料$/, m=>`${tr(m[1])}: no data`],
+  [/^(.+)（会员ID (\d+)）$/, m=>`${m[1]} (Member ID ${m[2]})`],
+  [/^与 (\d+) 个账户(.+)相同$/, m=>`Same ${tr(m[2])} as ${m[1]} account(s)`],
+  [/^休眠 (\d+) 天，激活当日存款 (.+)$/, m=>`Dormant ${m[1]} days; reactivation-day deposits ${m[2]}`],
+  [/^(\d+) 天（门槛 > (\d+) 天）$/, m=>`${m[1]} days (threshold > ${m[2]} days)`],
+  [/^(₱[\d,.]+)（门槛 ≥ (₱[\d,.]+)）$/, m=>`${m[1]} (threshold ≥ ${m[2]})`],
+  [/^比对字段（AML配置勾选）：(.+)；勾选字段全部相同才命中。$/, m=>`Fields compared (from AML Config): ${trList(m[1])}. Hit only when all selected fields match.`],
+  [/^([^：]{1,30})：(.*)$/, m=> I18N_LABELS[m[1]] ? `${I18N_LABELS[m[1]]}: ${m[2] ? (/[一-鿿]/.test(m[2]) ? trList(m[2]) : m[2]) : ''}` : (I18N_EXACT[m[1]] && !m[2] ? `${I18N_EXACT[m[1]]}:` : null)],
+];
+function tr(str){
+  if(!str || !/[一-鿿]/.test(str)) return str;
+  if(str in I18N_EXACT) return I18N_EXACT[str];
+  for(const [re,fn] of I18N_RULES){ const m=str.match(re); if(m){ const r=fn(m); if(r!=null) return r; } }
+  return str;
+}
+let lang='zh';
+const I18N_ATTRS=['placeholder','aria-label','title'];
+function i18nNode(node){
+  if(node.nodeType===3){
+    const par=node.parentNode; if(!par || par.closest('script,style,[data-no-i18n]')) return;
+    if(lang==='en'){
+      const orig = node.__zh ?? node.textContent; const t=orig.trim(); if(!/[一-鿿]/.test(t)) return;
+      if(par.tagName==='OPTION' && !par.hasAttribute('value')) par.setAttribute('value', par.textContent.trim());
+      node.__zh = orig; const out = orig.replace(t, tr(t)); if(node.textContent!==out) node.textContent = out;
+    } else if(node.__zh!=null){ node.textContent=node.__zh; node.__zh=null; }
+    return;
+  }
+  if(node.nodeType!==1 || node.closest('script,style,[data-no-i18n]')) return;
+  const els=[node,...node.querySelectorAll('*')];
+  els.forEach(el=>{ if(el.closest('[data-no-i18n]')) return; I18N_ATTRS.forEach(a=>{ const key='zh_'+a.replace('-','_');
+    if(lang==='en'){ const v=el.__i18n?.[key] ?? el.getAttribute(a); if(v && /[一-鿿]/.test(v)){ el.__i18n={...(el.__i18n||{}),[key]:v}; el.setAttribute(a,tr(v)); } }
+    else if(el.__i18n?.[key]!=null){ el.setAttribute(a,el.__i18n[key]); delete el.__i18n[key]; } }); });
+  const w=document.createTreeWalker(node,NodeFilter.SHOW_TEXT); let n; const list=[]; while(n=w.nextNode()) list.push(n); list.forEach(i18nNode);
+}
+function setLang(l){
+  lang=l; document.documentElement.lang = l==='en'?'en':'zh-CN';
+  try{ localStorage.setItem('amlProtoLang',l); }catch(e){}
+  $('#langSel').value=l; i18nNode(document.body);
+}
+new MutationObserver(ms=>{ if(lang!=='en') return; ms.forEach(m=>m.addedNodes.forEach(i18nNode)); }).observe(document.body,{childList:true,subtree:true});
+$('#langSel').addEventListener('change',e=>setLang(e.target.value));
+
+render();
+try{ if(localStorage.getItem('amlProtoLang')==='en') setLang('en'); }catch(e){}
+</script>
+
+</body>
+</html>
