@@ -875,6 +875,17 @@ button.nt[data-amt]:hover{border-color:var(--c-gold);}
 .theme-game .act-landing .step--cur .step__n{background:var(--g-yel);color:var(--g-ink);}
 .theme-game .act-landing .kycbar{background:#d9fbe9;border:2px solid var(--g-mint);color:#0d5a43;}
 @media (prefers-reduced-motion:reduce){.theme-game .act-landing *{animation:none !important;}}
+
+/* === 活动详情页充值弹窗（由下往上展开）=== */
+.sheet--dep{padding:0;height:56%;max-height:56%;display:flex;flex-direction:column;overflow:hidden;background:#f4f5f8;}
+.sheet--dep .sheet__scroll{flex:1 1 auto;min-height:0;max-height:none;overflow-y:auto;}
+.dep__bar--sheet{position:sticky;top:0;z-index:2;border-radius:16px 16px 0 0;padding-top:16px;}
+.sheet--dep .dep__sec--btn{position:sticky;bottom:0;z-index:2;margin-bottom:0;box-shadow:0 -4px 10px rgba(20,30,60,.06);}
+.dep__grab{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:36px;height:4px;border-radius:2px;background:#d3d8e2;}
+.dep__rec--l{width:56px;text-align:left;}
+.dep__close{background:none;width:56px;text-align:right;color:#5d6780;font-size:1rem;}
+/* 活动详情页：滑到最底部时预留空间 */
+.act-landing::after{content:"";display:block;height:32px;}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
 </style>
 </head>
@@ -1081,6 +1092,7 @@ function render(){
   else if(s==='my') h = viewMy();
   else if(s==='yourRewards') h = viewYourRewards();
   else h = viewLanding();
+  if(state.depSheet) h += depSheet();
   h += viewOverlay();
   if(state.toast) h += '<div class="toast'+(state.toast.err?' toast--err':'')+'" role="status">'+state.toast.msg+'</div>';
   /* 保留捲动位置：同一画面重新绘制时（开弹窗、领取、切分页等），页面与弹窗清单不跳回顶部 */
@@ -1093,9 +1105,11 @@ function render(){
   if(newPage) newPage.scrollTop = pageTop;
   if(newList) newList.scrollTop = listTop;
   /* 底部弹窗刚打开时：由下向上展开（只在打开当下播放一次） */
-  var sheetMask = phone.querySelector('.mask--sheet');
+  var sheetMask = phone.querySelector('.mask--sheet:not(.dep-sheet)');
   if(sheetMask && !sameSheet && state._shownOverlay!=='claimOk') sheetMask.classList.add('anim-in');   /* 从领取成功弹窗返回 History 时不重播 */
-  state._shownScreen = state.screen; state._shownOverlay = state.overlay;
+  var depMask = phone.querySelector('.dep-sheet');
+  if(depMask && !state._shownDep) depMask.classList.add('anim-in');
+  state._shownScreen = state.screen; state._shownOverlay = state.overlay; state._shownDep = !!state.depSheet;
   renderNav(); renderNotes(); tick(); setupHomeCarousel();
   var target = state.focusTier!==null ? document.querySelector('[data-tier="'+state.focusTier+'"]') :
                state.focusClaim ? document.getElementById('claimList') : null;
@@ -1644,10 +1658,14 @@ var COUPONS = [
 ];
 function curChannel(){ return (CHANNELS[state.payTab]||[]).filter(function(c){return c.n===state.payCh;})[0] || null; }
 function amountReady(){ var c = curChannel(); return !!c && (!c.subs.length || !!state.paySub); }
-function viewDeposit(){
-  var h = '<div class="phone__scroll dep light">';
-  h += '<header class="dep__bar"><button class="dep__back" data-act="depBack" aria-label="返回">‹</button><h1 class="dep__title">Wallet</h1><button class="dep__rec" data-act="soon">Record</button></header>';
-  h += '<section class="dep__bal"><span class="dep__amt"><i class="coin coin--p" aria-hidden="true">₱</i>'+state.mainBal.toLocaleString('en-US',{minimumFractionDigits:2})+'</span><button class="dep__ref" aria-label="刷新余额">↻</button><span class="topbar__sp"></span><button class="dep__fund" data-act="soon">💳 Withdrawal Acct.</button></section>';
+function viewDeposit(asSheet){
+  /* asSheet：从活动详情页点充值时，以底部弹窗呈现（由下往上展开），不切换页面 */
+  var h = asSheet ? '<div class="sheet__scroll dep light">' : '<div class="phone__scroll dep light">';
+  h += asSheet
+    ? '<header class="dep__bar dep__bar--sheet"><span class="dep__grab" aria-hidden="true"></span><span class="dep__rec dep__rec--l" aria-hidden="true"></span><h1 class="dep__title">Deposit</h1><button class="dep__close" data-act="depBack" aria-label="关闭">✕</button></header>'
+    : '<header class="dep__bar"><button class="dep__back" data-act="depBack" aria-label="返回">‹</button><h1 class="dep__title">Wallet</h1><button class="dep__rec" data-act="soon">Record</button></header>';
+  /* 底部弹窗（活动详情页进入）：不显示余额卡、Newcomer Bonus、Promotions */
+  if(!asSheet) h += '<section class="dep__bal"><span class="dep__amt"><i class="coin coin--p" aria-hidden="true">₱</i>'+state.mainBal.toLocaleString('en-US',{minimumFractionDigits:2})+'</span><button class="dep__ref" aria-label="刷新余额">↻</button><span class="topbar__sp"></span><button class="dep__fund" data-act="soon">💳 Withdrawal Acct.</button></section>';
   /* 付款方式 */
   var tabs = [['qrph','QRPH'],['bank','Bank Transfer'],['ewallet','E-wallet'],['redeem','Redeem Code']];
   h += '<section class="dep__sec"><h2 class="dep__h">Payment Methods</h2><div class="dep__tabs" role="tablist">'+tabs.map(function(t){return '<button role="tab" aria-selected="'+(state.payTab===t[0])+'" class="dep__tab'+(state.payTab===t[0]?' dep__tab--on':'')+'" data-paytab="'+t[0]+'">'+t[1]+'</button>';}).join('')+'</div>';
@@ -1660,11 +1678,11 @@ function viewDeposit(){
     h += '<section class="dep__sec"><h2 class="dep__h">Payment Bank</h2><div class="dep__ch" role="radiogroup" aria-label="子渠道">'+ch.subs.map(function(sb){return '<button role="radio" aria-checked="'+(state.paySub===sb)+'" class="dep__chb dep__chb--sub'+(state.paySub===sb?' dep__chb--on':'')+'" data-paysub="'+sb+'">'+sb+'</button>';}).join('')+'</div></section>';
   }
   /* 新人活动奖励（独立区块，More › → 活动详情页） */
-  h += depNewcomer();
+  if(!asSheet) h += depNewcomer();
   /* 促销活动 */
-  h += depPromotions();
+  if(!asSheet) h += depPromotions();
   /* 金额：选好渠道（与子渠道）后才出现；勾选存送券时每个金额按钮右上角显示该券奖励标签 */
-  var selCoupon = COUPONS.filter(function(x){return x.id===state.coupon;})[0] || null;
+  var selCoupon = asSheet ? null : (COUPONS.filter(function(x){return x.id===state.coupon;})[0] || null);
   if(amountReady()){
     h += '<section class="dep__sec"><h2 class="dep__h">Payment Amount</h2><div class="dep__grid'+(selCoupon?' dep__grid--tag':'')+'">'+ADD_AMTS.map(function(v){return '<button class="dep__add" data-add="'+v+'">+ '+v+(selCoupon?'<span class="dep__tag">'+selCoupon.pct+'</span>':'')+'</button>';}).join('')+'</div>'+
          '<label class="sr" for="depInput">Amount</label><input id="depInput" class="dep__input'+(state.depError?' dep__input--err':'')+'" inputmode="numeric" placeholder="Enter amount ₱ '+DEP_MIN+'-'+DEP_MAX.toLocaleString('en-US')+'" value="'+state.depAmount+'" autocomplete="off">'+
@@ -1673,8 +1691,20 @@ function viewDeposit(){
     h += '<p class="dep__hint">'+(ch ? 'Select a payment bank to enter the amount.' : 'Select a payment channel to continue.')+(state.depAmount?' (Amount ₱'+state.depAmount+' kept)':'')+'</p>';
   }
   h += '<div class="dep__sec dep__sec--btn"><button class="dep__submit" data-act="pay"'+(amountReady() && state.depAmount ? '' : ' disabled')+'>Submit</button></div>';
-  h += '<div class="dep__ad" role="img" aria-label="广告位示意">Ad banner slot</div>';
+  if(!asSheet) h += '<div class="dep__ad" role="img" aria-label="广告位示意">Ad banner slot</div>';
   return h + '</div>';
+}
+function depSheet(){
+  return '<div class="mask mask--sheet dep-sheet" role="dialog" aria-modal="true" aria-labelledby="depSheetT"><div class="sheet sheet--dep"><span class="sr" id="depSheetT">Deposit</span>'+viewDeposit(true)+'</div></div>';
+}
+/* 关闭充值弹窗：由上往下收起，结束后移除 */
+function closeDepSheet(after){
+  var m = document.querySelector('#phone .dep-sheet');
+  var done = function(){ state.depSheet = false; if(after) after(); render(); };
+  if(!m) return done();
+  if(m.classList.contains('anim-out')) return;
+  m.classList.remove('anim-in'); m.classList.add('anim-out');
+  setTimeout(done, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 240);
 }
 /* Promotions：新人活动（自动参加，不需勾选）＋ 存送券（勾选其一，View More Offers 弹窗） */
 function depPromotions(){
@@ -1743,7 +1773,7 @@ function resultDlg(){
    传入今日档位索引阵列；同一档只会入帐一次（非 claimable 一律略过＝防重复点击） */
 /* 关闭浮层：底部弹窗（History／Rules）先播放由上向下收起动画，结束后再移除 */
 function closeOverlay(after){
-  var m = document.querySelector('#phone .mask--sheet');
+  var m = document.querySelector('#phone .mask--sheet:not(.dep-sheet)');
   var done = function(){ state.overlay = null; if(after) after(); render(); };
   if(!m) return done();
   if(m.classList.contains('anim-out')) return;
@@ -1785,8 +1815,10 @@ function openDeposit(amount, src){
     return render();
   }
   if(amount) state.depAmount = String(Math.max(amount, DEP_MIN));
+  state.depSource = src || state.screen; state.depError=''; state.overlay=null;
+  if(state.screen==='landing'){ state.depSheet = true; return render(); }   /* 活动详情页：由下往上展开充值弹窗 */
   if(state.screen!=='deposit') state.depReturn = state.screen;
-  state.depSource = src || state.screen; state.depError=''; state.overlay=null; state.screen='deposit';
+  state.screen='deposit';
   render();
 }
 function pay(){
@@ -1830,11 +1862,15 @@ function nextDay(){
 var phone = document.getElementById('phone');
 phone.addEventListener('click', function(e){
   /* 点遮罩关闭底部弹窗（History／Rules／存款抽屉） */
+  if(e.target.classList.contains('dep-sheet')) return closeDepSheet();
   if(e.target.classList.contains('mask--sheet')) return closeOverlay();
   var t = e.target.closest('button'); if(!t) return;
   if(t.hasAttribute('data-close')){
-    if(t.closest('.mask--sheet')) return closeOverlay();
-    if(state.overlay==='result' && state.screen==='deposit' && state.lastResult && state.lastResult.type!=='failed') state.screen = state.depReturn || 'landing';
+    if(t.closest('.mask--sheet:not(.dep-sheet)')) return closeOverlay();
+    if(state.overlay==='result' && state.lastResult && state.lastResult.type!=='failed'){
+      if(state.depSheet){ state.overlay=null; return closeDepSheet(); }   /* 充值成功／处理中：关闭结果后收起充值弹窗，回到活动详情页 */
+      if(state.screen==='deposit') state.screen = state.depReturn || 'landing';
+    }
     state.overlay = (state.overlay==='claimOk' && state.claimFrom==='history') ? 'history' : null; state.claimFrom=null; return render();
   }
   if(t.dataset.go){
@@ -1863,12 +1899,12 @@ phone.addEventListener('click', function(e){
   if(a==='claimAll') return claim(claimableIdx(), t.dataset.src);
   if(a==='toYR'){ state.yrFrom=t.dataset.from||'landing'; state.screen='yourRewards'; state.focusClaim = t.dataset.from==='rewards'; if(state.focusClaim) state.calSel = state.day; return render(); }
   if(a==='toHist'){ state.histTab='all'; state.overlay='history'; return render(); }
-  if(a==='viewRewards'){ state.overlay=null; state.screen='landing'; var c=state.tierStatus.indexOf('claimable'); if(c>-1) state.focusTier=c; return render(); }
+  if(a==='viewRewards'){ state.overlay=null; state.depSheet=false; state.screen='landing'; var c=state.tierStatus.indexOf('claimable'); if(c>-1) state.focusTier=c; return render(); }
   if(a==='checkStatus') return toast('Still processing. We\'ll update your progress once confirmed.');
-  if(a==='retryPay'){ state.depAmount=String(state.lastResult.amt); state.overlay=null; state.screen='deposit'; return render(); }
-  if(a==='depBack'){ state.screen = state.depReturn || 'landing'; return render(); }
+  if(a==='retryPay'){ state.depAmount=String(state.lastResult.amt); state.overlay=null; if(!state.depSheet) state.screen='deposit'; return render(); }
+  if(a==='depBack'){ if(state.depSheet) return closeDepSheet(); state.screen = state.depReturn || 'landing'; return render(); }
   if(a==='soon') return toast('示意：非本次需求范围');
-  if(a==='ncMore'){ state.screen='landing'; return render(); }
+  if(a==='ncMore'){ if(state.depSheet) return closeDepSheet(); state.screen='landing'; return render(); }
   if(a==='moreOffers'){ state.couponTmp = state.coupon || 'none'; state.overlay='offers'; return render(); }
   if(a==='offersOk'){ state.coupon = state.couponTmp==='none' ? null : state.couponTmp; state.overlay=null; return render(); }
   if(a==='kycStart'){ state.kycDep={amount:null, src:state.screen}; state.overlay = state.kyc==='pending' ? 'kycPending' : 'kyc'; return render(); }
@@ -1935,7 +1971,7 @@ function renderNav(){
 }
 document.getElementById('navScreens').addEventListener('click', function(e){
   var b = e.target.closest('[data-screen]'); if(!b) return;
-  var id = b.dataset.screen; state.overlay=null;
+  var id = b.dataset.screen; state.overlay=null; state.depSheet=false;
   if(id==='popup'){ state.screen='home'; if(visible() && state.stage!=='ended') state.overlay='popup'; else toast('此状态不弹出 Popup（非名单／已结束）'); }
   else if(id==='deposit') return openDeposit(null,'landing');
   else if(id==='result'){
@@ -1980,7 +2016,8 @@ var NOTES = {
            '统计至 23:50：倒数「Deposit count ends in」；23:50–00:00 显示统计关闭，此时段存款不计入任何一天，未达标档位显示 Closed today，已达标仍可领取。',
            '领取期限＝当日 00:00 前；有可领时显示过期倒数，00:00 后未领即过期，不可补领。',
            '等级徽章只显示目前等级；升降级条件与生效时间'+T],
-  deposit:['版面参考 okbet-v1.cxsport.net 测试环境充值页：标题列（‹／Wallet／Record）→ 余额卡（Withdrawal Account）→ Payment Methods（QRPH／Bank Transfer／E-wallet／Redeem Code）→ 渠道卡 → Payment Bank（有子渠道时）→ Promotions → Payment Amount → Submit → 广告位。',
+  deposit:['从活动详情页点任一 Deposit：不跳转，充值页以底部弹窗由下往上展开（固定高度约画面 56%，上缘约在 Progress／倒数资讯列位置，超出时在弹窗内捲动，Submit 固定在弹窗底部；标题为「Deposit」；只含 Payment Methods、Payment Bank、Payment Amount、Submit，不显示 Record、余额卡、Newcomer Bonus、Promotions 与广告位）；✕、点遮罩、Esc 由上往下收起回到活动详情页。充值成功关闭结果后收起弹窗；失败则留在弹窗内。其他入口仍进入独立充值页。',
+           '版面参考 okbet-v1.cxsport.net 测试环境充值页：标题列（‹／Wallet／Record）→ 余额卡（Withdrawal Account）→ Payment Methods（QRPH／Bank Transfer／E-wallet／Redeem Code）→ 渠道卡 → Payment Bank（有子渠道时）→ Promotions → Payment Amount → Submit → 广告位。',
            '流程：选分页 → 选渠道 → 有子渠道时选 Payment Bank → 才出现金额区（+ 累加按钮 9 格＋输入框 ₱100–2,000 依渠道）；未选完时显示提示，Submit 不可点。切换分页会清空渠道选择，已输入金额保留。',
            'Newcomer Bonus 独立区块（位于 Promotions 上方）：标题右侧「More ›」→ 活动详情页（04）；每个奖励一张独立小卡（可左右滑动），只提示「Deposit ₱X → +₱Y」（X＝距离该档还差的金额）；输入金额达到时标示「✓ This deposit」、未达到显示「Tap to fill」；已达标未领显示 Reached；已领取变淡排到最后；点小卡带入所需金额（低于渠道最低金额时以最低金额带入）【待确认】。新人活动自动计入，不需勾选。',
            '存送券：可勾选一张，勾选后 Payment Amount 每个「+ 金额」按钮右上角显示该券奖励标签（如 10%），取消勾选即移除；「View More Offers ›」开启 Offers 弹窗，可选一张或「I choose not to claim this reward」，按 Confirm 生效。与新人活动叠加规则【待确认】。',
@@ -2028,7 +2065,8 @@ function tick(){
 setInterval(tick, 1000);
 function toast(msg, err){ state.toast={msg:msg, err:!!err}; render(); clearTimeout(toast._t); toast._t=setTimeout(function(){ state.toast=null; render(); }, 2200); }
 function log(msg){ var el=document.getElementById('log'); el.textContent = msg + '\n' + el.textContent; }
-document.addEventListener('keydown', function(e){ if(e.key==='Escape' && state.overlay){ if(document.querySelector('#phone .mask--sheet')) closeOverlay(); else { state.overlay=null; render(); } } });
+document.addEventListener('keydown', function(e){ if(e.key==='Escape' && !state.overlay && state.depSheet){ return closeDepSheet(); }
+  if(e.key==='Escape' && state.overlay){ if(document.querySelector('#phone .mask--sheet:not(.dep-sheet)')) closeOverlay(); else { state.overlay=null; render(); } } });
 
 render();
 </script>
