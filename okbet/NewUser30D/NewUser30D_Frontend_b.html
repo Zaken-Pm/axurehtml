@@ -3,9 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>新人30日存款赠金 — 前台原型 (H5) 活动详情页风格试作</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;600;700&display=swap">
+<title>新人30日存款赠金 — 前台原型 (H5) v0.9</title>
 <style>
 /* =========================================================
    Design Tokens — 沿用 BRD 落地页示意图：暗红底＋金黄字＋礼盒
@@ -618,171 +616,10 @@ button.nt[data-amt]:hover{border-color:var(--c-gold);}
 .hlink__btn{background:none;color:var(--c-text-2);font-size:.74rem;font-weight:600;text-decoration:underline;text-underline-offset:2px;padding:2px 0;}
 .hlink__btn:hover{color:var(--c-gold);}
 .hlink + .tiers{margin-top:var(--sp-2);}
-
-/* =========================================================
-   金色奢华 VIP — 只作用于活动详情页（.act-landing）
-   VOICE  沉稳、高级；IDEA 私人会所的会员邀请卡
-   COLOUR 近黑底＋香槟金单一强调色＋象牙白文字
-   TYPE   标题与金额用衬线 Cormorant Garamond，内文 Inter
-   LAYOUT 细金线框、大量留白、无厚重阴影
-   ========================================================= */
-.theme-vip .act-landing{
-  --v-bg:#0d0b08; --v-card:#15120d; --v-line:rgba(212,178,106,.45); --v-gold:#d4b26a; --v-gold-hi:#f3dc9b; --v-gold-d:#9c7a35;
-  --v-ink:#f5efe2; --v-mute:#b9ab8f;
-  --c-gold:var(--v-gold); --c-text-2:var(--v-mute); --c-text-3:#8f8470;
-  --v-serif:"Cormorant Garamond","Times New Roman",serif; --v-sans:"Inter","PingFang SC","Microsoft YaHei",Arial,sans-serif;
-  background:radial-gradient(120% 60% at 50% 0%,rgba(212,178,106,.18),transparent 60%),var(--v-bg);
-  color:var(--v-ink);font-family:var(--v-sans);
-}
-.theme-vip .act-landing .appbar{background:var(--v-bg);color:var(--v-gold);border-bottom:1px solid var(--v-line);}
-.theme-vip .act-landing .appbar__back,.theme-vip .act-landing .appbar__title{color:var(--v-gold);}
-.theme-vip .act-landing .appbar__title{font-family:var(--v-serif);font-size:1rem;letter-spacing:.5px;}
-/* 主视觉 */
-.theme-vip .act-landing .hero{padding-top:var(--sp-5);}
-.theme-vip .crown{width:88px;height:66px;display:block;margin:0 auto;filter:drop-shadow(0 0 10px rgba(212,178,106,.35));}
-.theme-vip .act-landing .hero__title{font-family:var(--v-serif);font-weight:700;font-size:1.6rem;line-height:1.1;margin-top:10px;
-  background:linear-gradient(180deg,var(--v-gold-hi),var(--v-gold) 55%,var(--v-gold-d));-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;}
-.theme-vip .act-landing .hero__sub{color:var(--v-mute);}
-.theme-vip .act-landing .hero__sub::before{content:"";display:block;width:64px;height:1px;margin:8px auto;background:linear-gradient(90deg,transparent,var(--v-gold),transparent);}
-.theme-vip .act-landing .hero__rules{background:transparent;color:var(--v-gold);border:1px solid var(--v-gold);border-right:none;font-weight:600;}
-/* 资讯列 */
-.theme-vip .act-landing .info2__cell{background:transparent;border:1px solid var(--v-line);border-radius:10px;}
-.theme-vip .act-landing .info2__k{color:var(--v-mute);}
-.theme-vip .act-landing .info2__v{color:var(--v-gold-hi);font-family:var(--v-serif);font-size:1.15rem;}
-/* 进度 */
-.theme-vip .act-landing .prog{background:var(--v-card);border:1px solid var(--v-line);border-radius:12px;}
-.theme-vip .act-landing .prog__head{color:var(--v-mute);}
-.theme-vip .act-landing .prog__amt{color:var(--v-gold-hi);font-family:var(--v-serif);font-size:1.3rem;}
-.theme-vip .act-landing .prog__amt small{color:var(--v-mute);font-family:var(--v-sans);}
-.theme-vip .act-landing .prog__track{height:6px;background:#2a241a;border-radius:3px;}
-.theme-vip .act-landing .prog__fill{background:linear-gradient(90deg,var(--v-gold-d),var(--v-gold-hi));border-radius:3px;}
-.theme-vip .act-landing .ms__dot{background:var(--v-bg);border:1.5px solid var(--v-gold);color:var(--v-gold);}
-.theme-vip .act-landing .ms--hit .ms__dot{background:var(--v-gold);color:var(--v-bg);}
-.theme-vip .act-landing .ms__top{color:var(--v-gold-hi);}
-.theme-vip .act-landing .ms__bot{color:var(--v-mute);}
-.theme-vip .act-landing .prog__hint{color:var(--v-ink);}
-.theme-vip .act-landing .prog__hint b{color:var(--v-gold-hi);}
-.theme-vip .act-landing .hlink__btn{color:var(--v-gold);}
-/* 档位卡：会员邀请卡 */
-.theme-vip .act-landing .tier{background:linear-gradient(160deg,#1b1711,var(--v-card));border:1px solid var(--v-line);border-radius:12px;box-shadow:none;}
-.theme-vip .act-landing .tier__flag{background:var(--v-bg);color:var(--v-gold-hi);border:1px solid var(--v-gold);box-shadow:none;font-family:var(--v-serif);font-size:.85rem;border-radius:4px;}
-.theme-vip .act-landing .tier__flag::before{color:var(--v-gold);}
-.theme-vip .medal{display:grid;place-items:center;width:46px;height:46px;margin:0 auto;border-radius:50%;border:1.5px solid var(--v-gold);color:var(--v-gold-hi);font-family:var(--v-serif);font-size:1.1rem;font-weight:700;background:radial-gradient(circle at 35% 30%,rgba(243,220,155,.18),transparent 60%);}
-.theme-vip .act-landing .tier__name{color:var(--v-ink);}
-.theme-vip .act-landing .tier__name em{color:var(--v-gold-hi);font-family:var(--v-serif);font-size:1.05em;}
-.theme-vip .act-landing .tier__sub{color:var(--v-mute);}
-.theme-vip .act-landing .tier--claimable{border-color:var(--v-gold);box-shadow:0 0 0 1px var(--v-gold),0 0 18px rgba(212,178,106,.25);}
-/* 按钮：Deposit 金色线框、Claim 金色实心 */
-.theme-vip .act-landing .btn{border-radius:6px;font-family:var(--v-sans);letter-spacing:.2px;}
-.theme-vip .act-landing .btn--deposit{background:transparent;color:var(--v-gold-hi);border:1px solid var(--v-gold);box-shadow:none;}
-.theme-vip .act-landing .btn--claim{background:linear-gradient(180deg,var(--v-gold-hi),var(--v-gold));color:#1a1408;box-shadow:none;}
-.theme-vip .act-landing .btn--ghost{background:transparent;color:var(--v-gold);border:1px solid var(--v-line);}
-.theme-vip .act-landing .chip--ok{background:rgba(212,178,106,.14);color:var(--v-gold-hi);}
-.theme-vip .act-landing .chip--proc{background:rgba(255,255,255,.08);color:var(--v-ink);}
-.theme-vip .act-landing .chip--lock{background:rgba(255,255,255,.05);color:var(--v-mute);}
-/* 其他区块 */
-.theme-vip .act-landing .done-box,.theme-vip .act-landing .allclear{background:transparent;border:1px solid var(--v-line);color:var(--v-ink);}
-.theme-vip .act-landing .done-box summary{color:var(--v-mute);}
-.theme-vip .act-landing .done-box li{border-top-color:rgba(212,178,106,.2);}
-.theme-vip .act-landing .allclear b{color:var(--v-gold-hi);}
-.theme-vip .act-landing .expire{background:transparent;border-color:var(--v-line);color:var(--v-mute);}
-.theme-vip .act-landing .expire b{color:var(--v-gold-hi);}
-.theme-vip .act-landing .banner-warn{background:transparent;border-color:var(--v-line);color:var(--v-mute);}
-.theme-vip .act-landing .state{background:var(--v-card);border:1px solid var(--v-line);}
-.theme-vip .act-landing .steps{background:var(--v-card);border:1px solid var(--v-line);}
-.theme-vip .act-landing .steps__h{color:var(--v-gold-hi);font-family:var(--v-serif);font-size:1rem;}
-.theme-vip .act-landing .step{background:rgba(255,255,255,.03);}
-.theme-vip .act-landing .step--cur{background:rgba(212,178,106,.08);outline-color:var(--v-gold);}
-.theme-vip .act-landing .step--cur .step__n{background:var(--v-gold);color:#1a1408;}
-.theme-vip .act-landing .kycbar{background:transparent;border-color:var(--v-line);color:var(--v-ink);}
-
-/* =========================================================
-   霓虹赌场风 — 只作用于活动详情页（.act-landing）
-   VOICE  刺激、夜场感；IDEA 赌场大厅的霓虹招牌
-   COLOUR 紫黑夜色底＋霓虹粉／青／黄三色发光
-   TYPE   标题与金额 Bungee（招牌字），内文 Inter
-   LAYOUT 深色卡片＋发光细框，底部透视格线地板
-   ========================================================= */
-.theme-neon .act-landing{
-  --n-bg:#0b0618; --n-card:#140b2a; --n-pink:#ff2bd6; --n-cyan:#22e6ff; --n-yellow:#ffe14d; --n-violet:#8b5cff;
-  --n-ink:#f3ecff; --n-mute:#b7a8d9;
-  --c-gold:var(--n-yellow); --c-text-2:var(--n-mute); --c-text-3:#8d7fb3;
-  --n-disp:"Bungee","Arial Black",sans-serif; --n-sans:"Inter","PingFang SC","Microsoft YaHei",Arial,sans-serif;
-  background:
-    linear-gradient(transparent 70%, rgba(255,43,214,.10)),
-    repeating-linear-gradient(90deg, rgba(139,92,255,.10) 0 1px, transparent 1px 40px),
-    repeating-linear-gradient(0deg, rgba(139,92,255,.08) 0 1px, transparent 1px 40px),
-    radial-gradient(80% 40% at 50% 0%, rgba(255,43,214,.25), transparent 70%),
-    var(--n-bg);
-  color:var(--n-ink);font-family:var(--n-sans);
-}
-.theme-neon .act-landing .appbar{background:var(--n-bg);border-bottom:1px solid rgba(34,230,255,.35);}
-.theme-neon .act-landing .appbar__back,.theme-neon .act-landing .appbar__title{color:var(--n-cyan);text-shadow:0 0 6px rgba(34,230,255,.8);}
-/* 主视觉 */
-.theme-neon .neon-gift{width:110px;height:92px;display:block;margin:0 auto;filter:drop-shadow(0 0 6px #ff2bd6) drop-shadow(0 0 14px rgba(34,230,255,.6));}
-.theme-neon .act-landing .hero__title{font-family:var(--n-disp);font-weight:400;font-size:1.35rem;line-height:1.15;color:#ffd6f7;
-  text-shadow:0 0 4px #fff,0 0 10px var(--n-pink),0 0 22px var(--n-pink),0 0 36px rgba(255,43,214,.6);animation:neonFlicker 4s infinite;}
-.theme-neon .act-landing .hero__sub{color:var(--n-cyan);text-shadow:0 0 6px rgba(34,230,255,.6);}
-.theme-neon .act-landing .hero__rules{background:transparent;color:var(--n-cyan);border:1.5px solid var(--n-cyan);border-right:none;box-shadow:0 0 10px rgba(34,230,255,.6);}
-@keyframes neonFlicker{0%,92%,100%{opacity:1;}93%{opacity:.55;}94%{opacity:1;}96%{opacity:.7;}97%{opacity:1;}}
-/* 资讯列 */
-.theme-neon .act-landing .info2__cell{background:var(--n-card);border:1.5px solid rgba(34,230,255,.6);border-radius:12px;box-shadow:0 0 10px rgba(34,230,255,.25), inset 0 0 12px rgba(34,230,255,.08);}
-.theme-neon .act-landing .info2__k{color:var(--n-mute);}
-.theme-neon .act-landing .info2__v{color:var(--n-yellow);font-family:var(--n-disp);font-weight:400;text-shadow:0 0 8px rgba(255,225,77,.7);}
-/* 进度 */
-.theme-neon .act-landing .prog{background:var(--n-card);border:1.5px solid rgba(255,43,214,.6);border-radius:14px;box-shadow:0 0 14px rgba(255,43,214,.3);}
-.theme-neon .act-landing .prog__head{color:var(--n-mute);}
-.theme-neon .act-landing .prog__amt{color:var(--n-yellow);font-family:var(--n-disp);font-weight:400;text-shadow:0 0 8px rgba(255,225,77,.7);}
-.theme-neon .act-landing .prog__amt small{color:var(--n-mute);font-family:var(--n-sans);text-shadow:none;}
-.theme-neon .act-landing .prog__track{height:10px;background:#1f1340;border:1px solid rgba(139,92,255,.6);}
-.theme-neon .act-landing .prog__fill{background:linear-gradient(90deg,var(--n-pink),var(--n-violet),var(--n-cyan));box-shadow:0 0 12px rgba(255,43,214,.8);}
-.theme-neon .act-landing .ms__dot{background:var(--n-bg);border:2px solid var(--n-cyan);color:var(--n-cyan);box-shadow:0 0 8px rgba(34,230,255,.8);}
-.theme-neon .act-landing .ms--hit .ms__dot{background:var(--n-cyan);color:var(--n-bg);}
-.theme-neon .act-landing .ms__top{color:var(--n-yellow);text-shadow:0 0 6px rgba(255,225,77,.7);}
-.theme-neon .act-landing .ms__bot{color:var(--n-mute);}
-.theme-neon .act-landing .prog__hint{color:var(--n-ink);}
-.theme-neon .act-landing .prog__hint b{color:var(--n-yellow);}
-.theme-neon .act-landing .hlink__btn{color:var(--n-cyan);text-shadow:0 0 6px rgba(34,230,255,.6);}
-/* 档位卡：三色霓虹招牌 */
-.theme-neon .act-landing .tier{background:var(--n-card);border:1.5px solid var(--tc,#22e6ff);border-radius:14px;box-shadow:0 0 12px var(--tg,rgba(34,230,255,.35)), inset 0 0 14px rgba(255,255,255,.03);}
-.theme-neon .act-landing .tier[data-tier="0"]{--tc:#22e6ff;--tg:rgba(34,230,255,.35);}
-.theme-neon .act-landing .tier[data-tier="1"]{--tc:#ff2bd6;--tg:rgba(255,43,214,.35);}
-.theme-neon .act-landing .tier[data-tier="2"]{--tc:#ffe14d;--tg:rgba(255,225,77,.35);}
-.theme-neon .act-landing .tier__flag{background:var(--n-bg);color:var(--tc);border:1.5px solid var(--tc);box-shadow:0 0 8px var(--tg);font-family:var(--n-disp);font-weight:400;border-radius:999px;}
-.theme-neon .act-landing .tier__flag::before{color:var(--tc);}
-.theme-neon .neon-chip{width:50px;height:50px;filter:drop-shadow(0 0 6px currentColor);}
-.theme-neon .act-landing .tier__name{color:var(--n-ink);}
-.theme-neon .act-landing .tier__name em{color:var(--tc);text-shadow:0 0 6px var(--tg);}
-.theme-neon .act-landing .tier__sub{color:var(--n-mute);}
-.theme-neon .act-landing .tier--claimable{box-shadow:0 0 0 1.5px var(--tc),0 0 24px var(--tc);animation:neonPulse 1.6s ease-in-out infinite;}
-@keyframes neonPulse{50%{box-shadow:0 0 0 1.5px var(--tc),0 0 8px var(--tc);}}
-/* 按钮 */
-.theme-neon .act-landing .btn{border-radius:999px;font-family:var(--n-sans);}
-.theme-neon .act-landing .btn--deposit{background:linear-gradient(90deg,var(--n-pink),var(--n-violet));color:#fff;box-shadow:0 0 12px rgba(255,43,214,.7);}
-.theme-neon .act-landing .btn--claim{background:var(--n-yellow);color:#2a1700;box-shadow:0 0 14px rgba(255,225,77,.9);}
-.theme-neon .act-landing .btn--ghost{background:transparent;color:var(--n-cyan);border:1.5px solid var(--n-cyan);}
-.theme-neon .act-landing .chip--ok{background:rgba(34,230,255,.15);color:var(--n-cyan);}
-.theme-neon .act-landing .chip--proc{background:rgba(255,225,77,.15);color:var(--n-yellow);}
-.theme-neon .act-landing .chip--lock{background:rgba(255,255,255,.06);color:var(--n-mute);}
-/* 其他区块 */
-.theme-neon .act-landing .done-box,.theme-neon .act-landing .allclear{background:var(--n-card);border:1px solid rgba(139,92,255,.6);color:var(--n-ink);}
-.theme-neon .act-landing .done-box summary{color:var(--n-mute);}
-.theme-neon .act-landing .done-box li{border-top-color:rgba(139,92,255,.3);}
-.theme-neon .act-landing .allclear b{color:var(--n-yellow);}
-.theme-neon .act-landing .expire{background:rgba(255,225,77,.08);border-color:rgba(255,225,77,.6);color:var(--n-ink);}
-.theme-neon .act-landing .expire b{color:var(--n-yellow);}
-.theme-neon .act-landing .banner-warn{background:rgba(255,43,214,.08);border-color:rgba(255,43,214,.6);color:#ffd6f7;}
-.theme-neon .act-landing .state,.theme-neon .act-landing .steps{background:var(--n-card);border:1.5px solid rgba(34,230,255,.5);}
-.theme-neon .act-landing .steps__h{color:var(--n-pink);font-family:var(--n-disp);font-weight:400;text-shadow:0 0 8px rgba(255,43,214,.7);}
-.theme-neon .act-landing .step{background:rgba(255,255,255,.04);}
-.theme-neon .act-landing .step--cur{background:rgba(34,230,255,.08);outline-color:var(--n-cyan);}
-.theme-neon .act-landing .step--cur .step__n{background:var(--n-cyan);color:var(--n-bg);}
-.theme-neon .act-landing .kycbar{background:transparent;border-color:rgba(34,230,255,.5);color:var(--n-ink);}
-@media (prefers-reduced-motion:reduce){.theme-neon .act-landing *{animation:none !important;}}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
 </style>
 </head>
-<body class="theme-neon">
+<body>
 <div class="layout">
 
   <!-- ================================================================
@@ -790,15 +627,7 @@ button.nt[data-amt]:hover{border-color:var(--c-gold);}
        ================================================================ -->
   <aside class="panel" aria-label="原型控制面板">
     <h1>新人30日存款赠金 · 前台原型</h1>
-    <p class="panel__ver">v0.9 活动详情页风格试作 · 2026-11-27 · 依据《20261124 新客活动BRD》</p>
-
-    <h2>视觉风格（仅活动详情页）</h2>
-    <div class="panel__row"><label for="selTheme">活动详情页</label>
-      <select id="selTheme">
-        <option value="neon" selected>霓虹赌场风</option>
-        <option value="vip">金色奢华 VIP</option>
-        <option value="classic">暗红礼盒（原版）</option>
-      </select></div>
+    <p class="panel__ver">v0.9 · 2026-11-24 · 依据《20261124 新客活动BRD》</p>
 
     <h2>画面（UI 编号）</h2>
     <div class="panel__nav" id="navScreens"></div>
@@ -1346,7 +1175,7 @@ function historySheet(){
 
 /* ---------- UI 04 / 06 Landing ---------- */
 function viewLanding(){
-  var h = '<div class="phone__scroll act-landing">'+appbar('Reward details','home');
+  var h = '<div class="phone__scroll">'+appbar('Reward details','home');
   if(state.elig==='notLogin') return h+stateBox('🔒','Log in to view your offer','This offer is for selected new players.','<button class="btn btn--deposit" data-act="login">Log in</button>')+'</div>';
   if(state.elig==='loading') return h+'<div class="skel" style="height:150px"></div><div class="skel" style="height:60px"></div><div class="skel" style="height:110px"></div><div class="skel" style="height:110px"></div></div>';
   if(state.elig==='error') return h+stateBox('⚠️','Couldn\'t load your offer','Please check your connection and try again. Regular deposits are still available.','<button class="btn btn--deposit" data-act="retry">Retry</button>')+'</div>';
@@ -1381,38 +1210,8 @@ function kycBar(){
   if(state.kyc==='pending') return '<div class="kycbar" role="note"><span aria-hidden="true">⏳</span><span>Your verification is under review. You can deposit once it\'s approved.</span></div>';
   return '<div class="kycbar" role="note"><span aria-hidden="true">🛡️</span><span>Verify your identity before depositing to join this promo.</span><button class="btn btn--claim btn--sm" data-act="kycStart">Verify Now</button></div>';
 }
-/* 视觉风格：金色奢华 VIP（只套用活动详情页）／暗红礼盒（原版） */
-function isVip(){ return document.body.classList.contains('theme-vip'); }
-function isNeon(){ return document.body.classList.contains('theme-neon'); }
-document.getElementById('selTheme').addEventListener('change', function(){
-  document.body.classList.toggle('theme-vip', this.value==='vip');
-  document.body.classList.toggle('theme-neon', this.value==='neon'); render();
-});
-/* 霓虹礼盒（SVG 线条＋发光） */
-function neonGiftSvg(){
-  return '<svg class="neon-gift" viewBox="0 0 120 100" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-linejoin="round">'+
-    '<rect x="22" y="44" width="76" height="48" rx="4" stroke="#ff2bd6" stroke-width="4"/>'+
-    '<rect x="16" y="32" width="88" height="14" rx="3" stroke="#ff2bd6" stroke-width="4"/>'+
-    '<path d="M60 32 V92" stroke="#22e6ff" stroke-width="4"/>'+
-    '<path d="M60 32 C44 6 24 16 38 30 Z M60 32 C76 6 96 16 82 30 Z" stroke="#ffe14d" stroke-width="4"/></g>'+
-    '<g fill="#22e6ff"><circle cx="10" cy="20" r="2"/><circle cx="108" cy="14" r="2.5"/><circle cx="112" cy="60" r="1.8"/><circle cx="6" cy="70" r="1.6"/></g></svg>';
-}
-/* 霓虹筹码（档位图示） */
-function neonChip(n, c){
-  return '<svg class="neon-chip" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="22" fill="none" stroke="'+c+'" stroke-width="3"/>'+
-    '<circle cx="26" cy="26" r="15" fill="none" stroke="'+c+'" stroke-width="1.5" stroke-dasharray="4 4"/>'+
-    '<text x="26" y="32" text-anchor="middle" font-family="Bungee,Arial,sans-serif" font-size="16" fill="'+c+'">'+n+'</text></svg>';
-}
-/* 金色线条皇冠（SVG） */
-function crownSvg(){
-  return '<svg class="crown" viewBox="0 0 120 90" aria-hidden="true"><defs><linearGradient id="gdC" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6e3a8"/><stop offset="1" stop-color="#b8893b"/></linearGradient></defs>'+
-    '<path d="M14 70 L8 22 L36 44 L60 12 L84 44 L112 22 L106 70 Z" fill="none" stroke="url(#gdC)" stroke-width="4" stroke-linejoin="round"/>'+
-    '<rect x="14" y="74" width="92" height="8" rx="2" fill="url(#gdC)"/>'+
-    '<circle cx="8" cy="20" r="5" fill="url(#gdC)"/><circle cx="60" cy="9" r="6" fill="url(#gdC)"/><circle cx="112" cy="20" r="5" fill="url(#gdC)"/>'+
-    '<path d="M60 40 l8 10 -8 10 -8 -10z" fill="url(#gdC)"/></svg>';
-}
 function heroBlock(){
-  return '<section class="hero" aria-label="活动主视觉"><div class="hero__gift" aria-hidden="true">'+(isNeon()?neonGiftSvg():isVip()?crownSvg():'🎁')+'</div><p class="hero__title">Newcomer 30 Days Promo</p><p class="hero__sub">Deposit daily, unlock up to 3 bonuses every day</p><button class="hero__rules" data-ov="rules">Rules</button></section>';
+  return '<section class="hero" aria-label="活动主视觉"><div class="hero__gift" aria-hidden="true">🎁</div><p class="hero__title">Newcomer 30 Days Promo</p><p class="hero__sub">Deposit daily, unlock up to 3 bonuses every day</p><button class="hero__rules" data-ov="rules">Rules</button></section>';
 }
 /* 资讯列（依截图）：左＝Progress Day X/30，右＝倒数（统计开放时到 23:50；关闭后到 00:00） */
 function infoRow(){
@@ -1451,7 +1250,7 @@ function tierList(){
   return h;
 }
 function tierCard(i){
-  var t = plan()[i], st = state.tierStatus[i], gifts = isNeon() ? [neonChip(1,'#22e6ff'),neonChip(2,'#ff2bd6'),neonChip(3,'#ffe14d')] : isVip() ? ['<span class="medal">I</span>','<span class="medal">II</span>','<span class="medal">III</span>'] : ['🎁','🎀','💝'], act, sub;
+  var t = plan()[i], st = state.tierStatus[i], gifts = ['🎁','🎀','💝'], act, sub;
   if(st==='claimable'){ act='<button class="btn btn--claim" data-claim="'+i+'" data-from="landing">Claim</button>'; sub='Reached! Claim before 00:00.'; }
   else if(st==='claiming'){ act='<button class="btn btn--claim" disabled>Claiming…</button>'; sub='Please wait…'; }
   else if(st==='processing'){ act='<span class="chip chip--proc">Processing</span>'; sub='Bonus is being credited.'; }

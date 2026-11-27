@@ -164,7 +164,6 @@
    · 小标 `HOW TO PLAY:`：`Explore your VIP reward tiers`／`Complete your daily deposit or betting tiers`／`Claim your Christmas cash`
    · 小标 `RULES:`：`Daily progress and resets`／`Claim windows and expiry`／`Tier rewards and rebate percentages`／`Cash Bonus withdrawals`／`VIP upgrades`
    · 版面：小标与章节标题（`•• 🎄 标题 🎄 ••`）为黄字；内文为粉色斜体、项目符号条列，粗体处依规则图标示
-   · **套用后台的日期**：`Claim windows and expiry` 第 2 点的结束日（例 `31 December 2026`）与最后领取时间（结束日隔日 23:59，例 `23:59 on 1 January 2027`），依后台活动结束时间推算
    · 文末（RULES 各章节之后）固定显示一段白字：`OKGAMES reserves the right to interpret these promotion rules to the extent permitted by applicable laws and regulatory requirements.`
    · 其余为**固定文案**，不随后台配置变动（含 `18 cash reward tiers`、`VIP0–1, VIP2 or VIP3–4`、`1×`）
 
@@ -597,8 +596,9 @@ CLAIMED 移至列表底部；看板 Cash Bonus Claimed Today＋实得金额
 
 ### 2026-11-27
 
-1. **F1 活动规则 › 规则内容**：文末新增一段固定文案 `OKGAMES reserves the right to interpret these promotion rules to the extent permitted by applicable laws and regulatory requirements.`。
-2. **F6 次日补领弹窗 › 补领范围**：活动最后一天（结束日）未领取的奖励作废，结束日隔日不可补领（不跳次日补领弹窗）。
+1. **F1 活动规则 › 规则内容**：移除 `Claim windows and expiry` 第 2 点的句子 `Cash Bonuses earned on 31 December 2026 remain available to claim until 23:59 on 1 January 2027`。
+2. **F1 活动规则 › 规则内容**：文末新增一段固定文案 `OKGAMES reserves the right to interpret these promotion rules to the extent permitted by applicable laws and regulatory requirements.`。
+3. **F6 次日补领弹窗 › 补领范围**：活动最后一天（结束日）未领取的奖励作废，结束日隔日不可补领（不跳次日补领弹窗）。
 
 ### 2026-11-26
 
