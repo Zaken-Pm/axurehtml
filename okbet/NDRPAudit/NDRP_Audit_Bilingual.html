@@ -1,0 +1,198 @@
+<html lang="en"><head><meta charset="utf-8"><title>NDRP Audit Prototype</title><style>*{box-sizing:border-box}body{margin:0;font:13px Arial;color:#344054;background:#f4f6f9}aside{position:fixed;width:185px;height:100%;background:#eef3fa;padding:20px 12px}aside p{padding:12px;margin:0}aside .active{background:#d8e7ff;color:#1764c0;font-weight:bold}main{margin-left:185px;padding:20px}header{margin-bottom:20px}section{background:white;border:1px solid #dce2eb;padding:16px}button,input,select,textarea{font:inherit;border:1px solid #d5dce7;border-radius:3px;padding:8px;background:white;color:inherit}button{cursor:pointer}button:hover{filter:brightness(.95)}.blue,.selected{background:#409eff;color:white;border-color:#409eff}.green{background:#67c23a;color:white}.red{background:#f56c6c;color:white}.orange{background:#e6a23c;color:white}.tabs button{border-radius:0;padding:12px}.filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:16px 0}table{width:100%;border-collapse:collapse;table-layout:auto}th,td{border:1px solid #e1e6ef;padding:12px 8px;text-align:left;vertical-align:middle}th{background:#f2f5fa;font-size:12px}td{line-height:1.65}td input{width:130px}.tag{padding:4px 7px;border-radius:3px;background:#fff2dc;color:#b77813}.processing{background:#e7f0ff;color:#2165ba}.online{color:#398d20;background:#edf9e7}.offline{color:#777}.link{color:#409eff;cursor:pointer}dialog{border:1px solid #dce2eb;border-radius:6px;width:500px;padding:24px;box-shadow:0 12px 50px #0003}dialog::backdrop{background:#0005}dialog label{display:block;margin:15px 0}dialog select,dialog textarea{width:100%}footer{text-align:right;margin-top:18px}.note{color:#778397;font-size:12px}.ops button{display:block;margin:5px 0;max-width:240px}h3{margin-top:0}</style><style>body{font:12px Arial,sans-serif;color:#303b4b;background:#d5e3f2}aside{width:165px;background:#e9f0fa;padding:0;overflow:auto;border-right:1px solid #dce5f1;color:#182d42}.navtop{height:72px}aside p{padding:11px 13px;border-bottom:1px solid #e3eaf4;font-size:12px}aside .group{background:#d3e1f6;font-weight:bold}.sub{background:#fff}.sub p{padding:12px 17px;border:0;font-size:11px}.sub .active{background:#e3edfb;color:#142c45}.lower{background:#e9f0fa!important;font-size:13px!important}.topbar{margin-left:165px;height:73px;background:white;display:flex;align-items:center;gap:20px;padding:12px 22px;white-space:nowrap;overflow:hidden;color:#777}.metrics{background:#e5eefc;border-radius:24px 0 0 24px;padding:15px;color:#14263a;font-size:11px}.metrics b{color:#005bff}main{margin-left:165px;padding:18px 14px 14px 17px}.workspace{background:#fff;border-radius:5px;padding:9px;min-height:calc(100vh - 105px);box-shadow:0 1px 3px #a8b9ce55}header{padding:7px 8px;margin:0 0 3px;color:#182d42}.worktabs{background:#f2f5f8;padding:6px 8px;margin-bottom:8px;display:flex;gap:4px;flex-wrap:wrap}.worktabs span{border:1px solid #d9e1ec;background:white;padding:5px 9px;border-radius:2px;font-size:11px}.worktabs span.nav{cursor:pointer}.worktabs .current{background:#0665ee;color:white;border-color:#0665ee}section{padding:0;border:1px solid #dce2eb;box-shadow:0 1px 3px #0001}.tabs{display:flex;background:#f2f5f8;border-bottom:1px solid #dce2eb}.tabs button{padding:10px 16px;border:0;border-right:1px solid #dce2eb;background:transparent;color:#818b99}.tabs .selected{background:white;color:#409eff;border-bottom:1px solid white}.filters{margin:0 0 15px;gap:9px}#content{margin:13px;padding:9px;border:1px solid #dcdfe6;border-radius:4px;overflow-x:auto}button,input,select,textarea{font-size:11px;padding:6px 9px;border-color:#d4dce8;border-radius:2px}button.blue{background:#409eff}table{table-layout:auto;min-width:1050px}th,td{border-color:#e4eaf3;padding:12px 9px;font-size:11px}th{background:#fff;text-align:center;color:#7c8795;font-weight:600;padding:11px 6px}td{line-height:1.85;height:125px;text-align:center}td:nth-child(3),td:nth-child(4),td:nth-child(5){text-align:left}td input{width:100%;min-width:75px}td .link{font-size:10px;white-space:nowrap}.tag{font-size:10px;padding:3px 6px;border:1px solid #fae7c8;color:#e6a23c;background:#fdf6ec}.tag.online{border-color:#d9eccd;background:#f0f9eb;color:#67c23a}.tag.offline{background:#f4f4f5;border-color:#e9e9eb;color:#909399}.tag.processing{background:#ecf5ff;border-color:#d9ecff;color:#409eff}.ops button{margin:4px auto;font-size:10px;line-height:1.4}.note{font-size:10px;color:#909399}footer{padding:8px 12px;color:#606266}dialog{font-size:13px;border-radius:4px}dialog input{width:100%}dialog h3{font-size:16px;color:#303133}
+/* List pages (NDRP Whitelist / Risk control blacklist) */
+table.plain td{height:auto;text-align:center!important;padding:11px 9px;line-height:1.5}
+table.plain tr.fresh td{background:#f0f9eb}
+table.plain td button{padding:5px 12px;font-size:11px;margin:0 2px}
+aside .nav{cursor:pointer}aside .nav:hover{background:#eef4fd}
+#msgbox{width:430px;padding:0;border:0;border-radius:6px}
+.mb-head{display:flex;gap:14px;align-items:flex-start;padding:24px 24px 6px}
+.mb-icon{width:30px;height:30px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:bold;flex:none}
+.mb-icon.success{background:#67c23a}.mb-icon.warning{background:#e6a23c}.mb-icon.danger{background:#f56c6c}
+.mb-title{font-size:16px;font-weight:bold;color:#303133;margin:4px 0 8px}
+.mb-text{color:#606266;line-height:1.7;font-size:13px}
+.mb-text b{color:#303133}
+.mb-foot{padding:14px 24px 20px;text-align:right}
+.mb-foot button{padding:8px 16px;font-size:12px;margin-left:6px}
+.toast{position:fixed;top:24px;left:50%;transform:translateX(-50%);z-index:9999;padding:10px 18px;border-radius:4px;font-size:13px;border:1px solid;box-shadow:0 4px 14px #0002;animation:tin .2s}
+.toast.warning{background:#fdf6ec;border-color:#faecd8;color:#e6a23c}.toast.success{background:#f0f9eb;border-color:#e1f3d8;color:#67c23a}.toast.error{background:#fef0f0;border-color:#fde2e2;color:#f56c6c}
+@keyframes tin{from{opacity:0;top:10px}to{opacity:1;top:24px}}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.card{border:1px solid #e4eaf3;border-radius:4px;padding:12px 14px;border-left:3px solid #409eff}
+.card .v{font-size:22px;font-weight:bold;color:#303133;margin-top:4px}.card .k{color:#909399;font-size:11px}
+.card.g{border-left-color:#67c23a}.card.r{border-left-color:#f56c6c}.card.o{border-left-color:#e6a23c}.card.x{border-left-color:#909399}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.panel{border:1px solid #e4eaf3;border-radius:4px;padding:12px}.panel h4{margin:0 0 10px;font-size:13px;color:#303133}
+.panel .filters{margin-bottom:10px}
+table.stat{min-width:0}
+.bar{height:8px;background:#ebeef5;border-radius:4px;overflow:hidden;display:flex;min-width:90px}.bar i{display:block;height:100%}
+.act{font-size:10px;padding:2px 6px;border-radius:2px;background:#ecf5ff;color:#409eff;white-space:nowrap}
+.act.Normal{background:#f0f9eb;color:#67c23a}.act.Rejected,.act.Delete{background:#fef0f0;color:#f56c6c}
+.newtag{display:inline-block;margin-left:5px;font-size:9px;padding:1px 5px;border-radius:2px;background:#67c23a;color:#fff}
+</style></head><body><aside id="side"></aside><div class="topbar"><div id="languageSwitch" style="position:absolute;right:12px;top:9px;z-index:10;display:flex;gap:3px;background:white;padding:3px"><button id="langEN" class="blue" onclick="setLanguage('en')">English</button><button id="langZH" onclick="setLanguage('zh')">中文</button></div><span>Server Time: 2026/11/27 13:22:42 +08:00</span><div class="metrics">♧ &nbsp; Online Users: <b>8877</b> &nbsp; New Players: <b>2420</b> &nbsp; KYC Pending: <b>1</b> &nbsp; New Success Deposit: <b>116057</b> &nbsp; Recharge: <b>0</b> &nbsp; Withdrawal: <b>15</b> &nbsp; Risk control review: <b>1</b> &nbsp; Balance approval pending: <b>1</b></div></div><main><div class="workspace"><header id="loc">Location &nbsp; › &nbsp; NDRP Audit</header><div class="worktabs" id="worktabs"></div><section><div class="tabs" id="tabs"></div><div id="content"></div></section><p class="note">Prototype · Fictional records and simulated operations only. API fields and pending access policy require technical and Compliance confirmation.</p></div></main><dialog id="modal"></dialog><dialog id="msgbox"></dialog><script>
+let page='audit', tab=0,
+cats=[['GEL Holder',true],['Self Exclusion',true],['Family Exclusion',true],['AFP',true],['PNP',true],['Government Official',true]],
+rows=[{id:30210001,user:'okbet_demo01',name:'DEMO MEMBER A',bday:'1990-03-14',online:true,deposit:'900,000.00',withdraw:'180,004.00',time:'2026-11-27 12:30:07',lock:false,remark:''},{id:30210002,user:'okbet_demo02',name:'DEMO MEMBER B',bday:'1988-07-02',online:true,deposit:'1,000.00',withdraw:'15,000.00',time:'2026-11-27 12:31:48',lock:false,remark:''},{id:30210003,user:'okbet_demo03',name:'DEMO MEMBER C',bday:'1995-11-21',online:false,deposit:'5,314.00',withdraw:'2,000.00',time:'2026-11-27 12:32:02',lock:false,remark:''},{id:30210004,user:'okbet_demo04',name:'DEMO MEMBER D',bday:'1999-01-09',online:true,deposit:'150.00',withdraw:'0.00',time:'2026-11-27 12:33:02',lock:false,remark:''},{id:30209991,user:'okbet_demo91',name:'DEMO WHITELIST A',bday:'1987-09-30',online:false,deposit:'12,500.00',withdraw:'3,000.00',time:'2026-11-26 14:30:11',lock:false,result:'Normal',category:'GEL Holder',remark:'APPROVED BY DEMO',operating:'2026-11-26 14:48:37',operator:'admin001'},{id:30209992,user:'okbet_demo92',name:'DEMO WHITELIST B',bday:'1991-04-18',online:false,deposit:'4,200.00',withdraw:'1,000.00',time:'2026-11-26 14:51:40',lock:false,result:'Normal',category:'GEL Holder',remark:'APPROVED BY DEMO',operating:'2026-11-26 15:02:11',operator:'admin002'},{id:30209993,user:'okbet_demo93',name:'DEMO RESTRICTED A',bday:'1984-02-11',online:false,deposit:'60,000.00',withdraw:'0.00',time:'2026-11-24 12:58:03',lock:false,result:'Rejected',category:'GEL Holder',remark:'',operating:'2026-11-24 13:19:24',operator:'admin001'},{id:30209994,user:'okbet_demo94',name:'DEMO RESTRICTED B',bday:'1979-06-05',online:false,deposit:'2,000.00',withdraw:'500.00',time:'2026-11-25 10:02:47',lock:false,result:'Rejected',category:'Government Official',remark:'',operating:'2026-11-25 10:21:59',operator:'admin002'}],
+// NDRP Whitelist (fictional seed data)
+wl=[{sn:2,user:'okbet_demo92',full:'DEMO WHITELIST B',bday:'1991-04-18',remark:'GEL HOLDER - APPROVED BY DEMO',time:'2026-11-26 15:02:11',op:'admin001'},{sn:1,user:'okbet_demo91',full:'DEMO WHITELIST A',bday:'1987-09-30',remark:'GEL HOLDER - APPROVED BY DEMO',time:'2026-11-26 14:48:37',op:'admin001'}], wlSeq=3,
+// NDRP Configuration — restricted persons list (fictional seed data)
+nc=[{sn:3,full:'DEMO RESTRICTED B',bday:'1979-06-05',time:'2026-11-25 10:21:59',op:'admin002'},{sn:2,full:'DEMO RESTRICTED A',bday:'1984-02-11',time:'2026-11-24 13:19:24',op:'admin001'},{sn:1,full:'DEMO RESTRICTED SYSTEM',bday:'',time:'2024-10-24 12:00:00',op:'SYSTEM'}],ncSeq=4,
+logs=[],sFrom=new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Manila'}),sTo=sFrom,sAct='All',
+q='',filter='All',wq='',nq='',modal=document.getElementById('modal');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const now=()=>new Date().toLocaleString('sv-SE',{timeZone:'Asia/Manila'});
+const PAGES={audit:'NDRP Audit',whitelist:'NDRP Whitelist',ndrpconf:'NDRP Configuration'};
+const MENU={audit:'User Management',whitelist:'System Management',ndrpconf:'System Management'};
+
+function go(p){page=p;render()}
+/* ---------------- Pop-up message box & toast ---------------- */
+let mbOk=null;const ICON={success:'✓',warning:'!',danger:'!'};
+function msgBox({type='success',title,text,ok='OK',okClass='blue',cancel,onOk}){
+  const mb=document.getElementById('msgbox');mbOk=onOk||null;
+  mb.innerHTML=`<div class="mb-head"><div class="mb-icon ${type}">${ICON[type]}</div><div><div class="mb-title">${title}</div><div class="mb-text">${text}</div></div></div><div class="mb-foot">${cancel?`<button onclick="document.getElementById('msgbox').close()">${cancel}</button>`:''}<button class="${okClass}" onclick="document.getElementById('msgbox').close();mbOk&&mbOk()">${ok}</button></div>`;
+  mb.showModal();
+}
+function toast(text,type='warning'){const t=document.createElement('div');t.className='toast '+type;t.textContent=text;(modal.open?modal:document.body).appendChild(t);setTimeout(()=>t.remove(),2500)}
+function log(action,target,detail){logs.unshift({time:now(),op:'admin001',action,target,detail})}
+function setLock(i,v){rows[i].lock=v;log(v?'Lock':'Unlock',rows[i].user,v?'Audit locked for processing':'Audit released');render()}
+function renderSide(){
+  const item=(n,p)=>`<p class="${p?'nav':''} ${p===page?'active':''}" ${p?`onclick="go('${p}')"`:''}>▸ &nbsp; ${n}</p>`;
+  const user=[['NDRP Audit','audit']];
+  const sys=[['NDRP Configuration','ndrpconf'],['NDRP Whitelist','whitelist']];
+  const sub=a=>'<div class="sub">'+a.map(x=>Array.isArray(x)?item(x[0],x[1]):item(x)).join('')+'</div>';
+  document.getElementById('side').innerHTML=`<div class="navtop"></div><p class="group">♟ &nbsp; User Management ⌄</p>${sub(user)}<p class="group">⚙ &nbsp; System Management ⌄</p>${sub(sys)}`;
+}
+function switchTab(i){tab=i;q='';filter='All';render()}
+
+function render(){
+  renderSide();
+  // work tabs (clickable for the three working pages)
+  document.getElementById('worktabs').innerHTML=[['NDRP Audit','audit'],['NDRP Configuration','ndrpconf'],['NDRP Whitelist','whitelist']]
+    .map(([n,p])=>`<span class="${p?'nav':''} ${p===page?'current':''}" ${p?`onclick="go('${p}')"`:''}>${n} ×</span>`).join('');
+  document.getElementById('loc').innerHTML='Location &nbsp; › &nbsp; '+MENU[page]+' &nbsp; › &nbsp; '+PAGES[page];
+  const tabsEl=document.getElementById('tabs'), c=document.getElementById('content');
+  if(page==='whitelist'){tabsEl.style.display='none';return renderWhitelist(c)}
+  if(page==='ndrpconf'){tabsEl.style.display='none';return renderNdrpConf(c)}
+  tabsEl.style.display='flex';
+  renderAudit(tabsEl,c);
+}
+
+/* ---------------- NDRP Audit ---------------- */
+function renderAudit(tabsEl,c){
+  tabsEl.innerHTML=['NDRP Audit','NDRP Audit History','NDRP Category Configuration','NDRP Audit Statistics'].map((s,i)=>`<button class="${tab===i?'selected':''}" onclick="switchTab(${i})">${s}${i===0?' ('+rows.filter(r=>!r.result).length+')':''}</button>`).join('');
+  if(tab===3)return renderStats(c);
+  if(tab===2){c.innerHTML=`<div class="filters"><button class="blue" onclick="editCat(-1)">+ Add Category</button></div><table><tr><th>NDRP Category</th><th>Status</th><th>Operation</th></tr>${cats.map((a,i)=>`<tr><td>${esc(a[0])}</td><td>${a[1]?'Enabled':'Disabled'}</td><td><button onclick="editCat(${i})">Edit</button> <button onclick="cats[${i}][1]=!cats[${i}][1];render()">${a[1]?'Disable':'Enable'}</button></td></tr>`).join('')}</table>`;return}
+  let list=rows.filter(r=>(tab===1?!!r.result:!r.result)&&(!q||[r.user,r.id,r.name].some(x=>String(x).toLowerCase().includes(q.toLowerCase())))&&(filter==='All'||filter===(r.result||(r.lock?'Processing':'Pending'))));
+  c.innerHTML=`<div class="filters"><select aria-label="Search field"><option>Username / Member ID / Name</option></select><input id="query" placeholder="" value="${esc(q)}"><span>Audit Status</span><select id="filter">${['All',...(tab?['Normal','Rejected']:['Pending','Processing'])].map(x=>`<option ${x===filter?'selected':''}>${x}</option>`).join('')}</select><button class="blue" onclick="q=document.getElementById('query').value;filter=document.getElementById('filter').value;render()">Search</button><button onclick="q='';filter='All';render()">Reset</button>${tab?'<button onclick="exportCSV()">Export</button>':''}</div><table><thead><tr>${['Online','Username','Member Information','NDRP Matched Information','Total Deposit / Total Withdrawal','Submission Time',...(tab?['NDRP Status','NDRP Category','Remarks','Operating Time','Operator']:['Audit Status','Operator','Operation'])].map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${list.map(r=>{let i=rows.indexOf(r);return `<tr><td><span class="tag ${r.online?'online':'offline'}">${r.online?'Online':'Offline'}</span>${r.online?`<br><a class="link" onclick="kick(${i})">Kick off the line</a>`:''}</td><td>${esc(r.user)}</td><td>Member ID: ${r.id}<br>Real Name: ${esc(r.name)}<br>Master Agent: Pasay001<br>Betting Station Code: Pasay001</td><td><b>API match detected</b><br><span class="note">Matched information<br>Pending API field confirmation</span></td><td>Total Deposit: ${r.deposit}<br>Total Withdrawal: ${r.withdraw}</td><td>${r.time}</td>${tab?`<td style="color:${r.result==='Normal'?'green':'red'}">${r.result}<br><a class="link" onclick="go('${r.result==='Normal'?'whitelist':'ndrpconf'}')">${r.result==='Normal'?'View in NDRP Whitelist':'View in NDRP Configuration'}</a></td><td>${esc(r.category)}</td><td>${esc(r.remark)}</td><td>${r.operating}</td><td>${esc(r.operator||'admin001')}</td>`:`<td><span class="tag ${r.lock?'processing':''}">${r.lock?'Processing':'Pending'}</span></td><td>${r.lock?'admin001':'—'}</td><td class="ops">${r.lock?`<button class="green" onclick="audit(${i},'Normal')">Normal (Auto Added to NDRP Whitelist)</button><button class="red" onclick="audit(${i},'Rejected')">Rejected (Auto Added to NDRP Configuration)</button><button onclick="setLock(${i},false)">Unlock</button>`:`<button class="orange" onclick="setLock(${i},true)">Lock</button>`}</td>`}</tr>`}).join('')}</tbody></table><footer>Total ${list.length} &nbsp; ‹ &nbsp; 1 &nbsp; ›</footer>`;
+}
+function kick(i){msgBox({type:'warning',title:'Kick Off the Line',text:`Kick <b>${esc(rows[i].user)}</b> offline? (Simulated)`,ok:'Confirm',cancel:'Cancel',onOk:()=>{rows[i].online=false;log('Kick offline',rows[i].user,'All sessions ended');render();toast('Player kicked offline','success')}})}
+function audit(i,result){let r=rows[i];modal.innerHTML=`<h3>Confirm NDRP Audit Result</h3><p>Username: ${esc(r.user)}</p><p>Member ID: ${r.id}</p><p>Audit Result: <b>${result}</b></p><p class="note" style="font-size:12px">${result==='Normal'?'This member will be automatically added to <b>NDRP Whitelist</b>.':'This member will be automatically added to <b>NDRP Configuration</b>.'}</p><label>* NDRP Category<select id="category"><option value="">Please select</option>${cats.filter(a=>a[1]).map(a=>`<option>${esc(a[0])}</option>`).join('')}</select></label><label>Remarks<textarea id="remark" rows="4">${esc(r.remark)}</textarea></label><footer><button onclick="modal.close()">Cancel</button> <button class="blue" onclick="finish(${i},'${result}')">Confirm</button></footer>`;modal.showModal()}
+
+function finish(i,result){
+  let category=document.getElementById('category').value;
+  if(!category){toast('Please select NDRP Category');return}
+  let r=rows[i], remark=document.getElementById('remark').value.trim(), t=now();
+  r.category=category;r.remark=remark;r.result=result;r.operating=t;r.operator='admin001';r.lock=false;
+  // Remarks format follows the live lists, e.g. "GEL HOLDER - APPROVED BY DAVID"
+  const listRemark=(category+(remark?' - '+remark:'')).toUpperCase();
+  wl.forEach(x=>x.fresh=false);nc.forEach(x=>x.fresh=false);
+  let msg;
+  if(result==='Normal'){
+    // Auto add to NDRP Whitelist (update if the username is already there)
+    let ex=wl.find(x=>x.user===r.user);
+    if(ex){Object.assign(ex,{full:r.name,bday:r.bday,remark:listRemark,time:t,op:'admin001',fresh:true});wl=[ex,...wl.filter(x=>x!==ex)]}
+    else wl.unshift({sn:wlSeq++,user:r.user,full:r.name,bday:r.bday,remark:listRemark,time:t,op:'admin001',fresh:true});
+    msg='Account unchanged.';
+  }else{
+    // Auto add to NDRP Configuration (restricted list; update if the full name is already there)
+    let full=r.name.toUpperCase(), ex=nc.find(x=>x.full===full);
+    if(ex){Object.assign(ex,{bday:r.bday,time:t,op:'admin001',fresh:true});nc=[ex,...nc.filter(x=>x!==ex)]}
+    else nc.unshift({sn:ncSeq++,full,bday:r.bday,time:t,op:'admin001',fresh:true});
+    r.online=false;
+    msg='NDRP Frozen; all sessions logged out; player receives NDRP access restriction notice.';
+  }
+  log(result==='Normal'?'Normal':'Rejected',r.user,`${category}${remark?' - '+remark:''} → ${result==='Normal'?'NDRP Whitelist':'NDRP Configuration'}`);
+  modal.close();render();
+  const toWl=result==='Normal', dest=toWl?'NDRP Whitelist':'NDRP Configuration';
+  msgBox({type:toWl?'success':'danger',title:toWl?'Added to NDRP Whitelist':'Added to NDRP Configuration',
+    text:`<b>${esc(r.user)}</b> (${esc(r.name)}) has been automatically added to <b>${dest}</b>.<br>${msg}<br><span class="note">Simulated operation</span>`,
+    ok:'View '+(toWl?'NDRP Whitelist':'NDRP Configuration'),cancel:'Close',onOk:()=>go(toWl?'whitelist':'ndrpconf')});
+}
+function editCat(i){modal.innerHTML=`<h3>${i<0?'Add':'Edit'} NDRP Category</h3><label>Category Name<input id="catname" value="${i<0?'':esc(cats[i][0])}"></label><footer><button onclick="modal.close()">Cancel</button> <button class="blue" onclick="saveCat(${i})">Save</button></footer>`;modal.showModal()}
+function saveCat(i){let n=document.getElementById('catname').value.trim();if(!n||cats.some((a,j)=>j!==i&&a[0].toLowerCase()===n.toLowerCase())){toast('Enter a unique category name');return}if(i<0)cats.push([n,true]);else cats[i][0]=n;modal.close();render()}
+function downloadCSV(name,a){let blob=new Blob(['﻿'+a.map(r=>r.map(x=>'"'+String(x??'').replaceAll('"','""')+'"').join(',')).join('\n')],{type:'text/csv'});let l=document.createElement('a');l.href=URL.createObjectURL(blob);l.download=name;l.click();URL.revokeObjectURL(l.href)}
+function exportCSV(){downloadCSV('NDRP_Audit_History.csv',[['Username','Member ID','NDRP Status','NDRP Category','Remarks','Operating Time','Operator'],...rows.filter(r=>r.result).map(r=>[r.user,r.id,r.result,r.category,r.remark,r.operating,r.operator||'admin001'])])}
+
+/* ---------------- NDRP Audit Statistics ---------------- */
+function inRange(t){let d=String(t||'').slice(0,10);return (!sFrom||d>=sFrom)&&(!sTo||d<=sTo)}
+function renderStats(c){
+  const done=rows.filter(r=>r.result&&inRange(r.operating)), sub=rows.filter(r=>inRange(r.time));
+  const N=done.filter(r=>r.result==='Normal').length, R=done.length-N;
+  const pend=rows.filter(r=>!r.result&&!r.lock).length, proc=rows.filter(r=>!r.result&&r.lock).length;
+  const pct=(a,b)=>b?Math.round(a/b*100)+'%':'—';
+  const card=(k,v,cl='')=>`<div class="card ${cl}"><div class="k">${k}</div><div class="v">${v}</div></div>`;
+  const group=(arr,key)=>{let m={};arr.forEach(r=>{let g=m[key(r)]??={n:0,r:0};r.result==='Normal'?g.n++:g.r++});return m};
+  const bar=(n,r,max)=>`<div class="bar" title="Normal ${n} / Rejected ${r}"><i style="width:${max?n/max*100:0}%;background:#67c23a"></i><i style="width:${max?r/max*100:0}%;background:#f56c6c"></i></div>`;
+  const byCat=group(done,r=>r.category), catMax=Math.max(1,...Object.values(byCat).map(g=>g.n+g.r));
+  const byOp=group(done,r=>r.operator||'admin001');
+  let days={};sub.forEach(r=>{let d=r.time.slice(0,10);(days[d]??={s:0,n:0,r:0,p:0}).s++;if(!r.result)days[d].p++});
+  done.forEach(r=>{let d=r.operating.slice(0,10);days[d]??={s:0,n:0,r:0,p:0};r.result==='Normal'?days[d].n++:days[d].r++});
+  const acts=['All',...new Set(logs.map(l=>l.action))];
+  const lg=logs.filter(l=>inRange(l.time)&&(sAct==='All'||l.action===sAct));
+  const th=a=>`<tr>${a.map(x=>`<th>${x}</th>`).join('')}</tr>`;
+  c.innerHTML=`<div class="filters"><span>Operating Date</span><input type="date" id="sFrom" value="${sFrom}"><span>to</span><input type="date" id="sTo" value="${sTo}"><button class="blue" onclick="sFrom=document.getElementById('sFrom').value;sTo=document.getElementById('sTo').value;render()">Search</button><button onclick="sFrom='';sTo='';sAct='All';render()">Reset</button><button onclick="exportStats()">Export</button></div>
+  <div class="cards">${card('Total Submitted',sub.length)}${card('Total Audited',done.length)}${card('Normal (Whitelisted)',N,'g')}${card('Rejected (Added to NDRP Configuration)',R,'r')}${card('Normal Rate',pct(N,done.length),'g')}${card('Pending',pend,'o')}${card('Processing (Locked)',proc,'o')}${card('NDRP Whitelist Records',wl.length,'x')}${card('NDRP Configuration Records',nc.length,'x')}</div>
+  <div class="grid2"><div class="panel"><h4>By NDRP Category</h4><table class="plain stat">${th(['NDRP Category','Normal','Rejected','Total','Distribution'])}${Object.entries(byCat).sort((a,b)=>(b[1].n+b[1].r)-(a[1].n+a[1].r)).map(([k,g])=>`<tr><td>${esc(k)}</td><td style="color:#67c23a">${g.n}</td><td style="color:#f56c6c">${g.r}</td><td><b>${g.n+g.r}</b></td><td>${bar(g.n,g.r,catMax)}</td></tr>`).join('')||'<tr><td colspan="5">No data</td></tr>'}</table></div>
+  <div class="panel"><h4>By Operator</h4><table class="plain stat">${th(['Operator','Normal','Rejected','Total Audited','Normal Rate'])}${Object.entries(byOp).map(([k,g])=>`<tr><td>${esc(k)}</td><td style="color:#67c23a">${g.n}</td><td style="color:#f56c6c">${g.r}</td><td><b>${g.n+g.r}</b></td><td>${pct(g.n,g.n+g.r)}</td></tr>`).join('')||'<tr><td colspan="5">No data</td></tr>'}</table></div></div>
+  <div class="panel" style="margin-bottom:14px"><h4>Daily Summary</h4><table class="plain stat">${th(['Date','New Matches Submitted','Normal','Rejected','Still Pending'])}${Object.entries(days).sort((a,b)=>b[0].localeCompare(a[0])).map(([d,g])=>`<tr><td>${d}</td><td>${g.s}</td><td style="color:#67c23a">${g.n}</td><td style="color:#f56c6c">${g.r}</td><td style="color:#e6a23c">${g.p}</td></tr>`).join('')||'<tr><td colspan="5">No data</td></tr>'}</table></div>
+  <div class="panel"><h4>Operation Log</h4><div class="filters"><span>Action</span><select onchange="sAct=this.value;render()">${acts.map(a=>`<option ${a===sAct?'selected':''}>${esc(a)}</option>`).join('')}</select><span class="note">Records every lock, unlock, audit, kick, NDRP Whitelist and NDRP Configuration change made in this session.</span></div><table class="plain stat">${th(['Time','Operator','Action','Target','Details'])}${lg.map(l=>`<tr><td>${l.time}</td><td>${esc(l.op)}</td><td><span class="act ${l.action.split(' ').pop()}">${esc(l.action)}</span></td><td>${esc(l.target)}</td><td>${esc(l.detail)}</td></tr>`).join('')||'<tr><td colspan="5">No operations yet</td></tr>'}</table><footer>Total ${lg.length}</footer></div>`;
+}
+function exportStats(){downloadCSV('NDRP_Operation_Log.csv',[['Time','Operator','Action','Target','Details'],...logs.filter(l=>inRange(l.time)).map(l=>[l.time,l.op,l.action,l.target,l.detail])])}
+
+/* ---------------- NDRP Whitelist ---------------- */
+function renderWhitelist(c){
+  let list=wl.filter(x=>!wq||x.user.toLowerCase().includes(wq.toLowerCase()));
+  c.innerHTML=`<div class="filters"><button class="blue" onclick="editWl(-1)">+ Add</button><button class="green" onclick="exportWl()">⤓ Export</button><input id="wq" placeholder="User Name" value="${esc(wq)}" style="width:240px"><button class="blue" onclick="wq=document.getElementById('wq').value;render()">Search</button></div>
+  <table class="plain"><thead><tr>${['Serial number','User Name','Full Name','birthday','Remarks','Update Time','Operator','Operation'].map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>
+  ${list.map(x=>{let i=wl.indexOf(x);return `<tr class="${x.fresh?'fresh':''}"><td>${x.sn}</td><td>${esc(x.user)}${x.fresh?'<span class="newtag">NEW</span>':''}</td><td>${esc(x.full)}</td><td>${esc(x.bday)}</td><td>${esc(x.remark)}</td><td>${x.time}</td><td>${esc(x.op)}</td><td><button class="blue" onclick="editWl(${i})">Edit</button><button class="red" onclick="msgBox({type:'danger',title:'Delete Record',text:'Delete this NDRP Whitelist record?',ok:'Delete',okClass:'red',cancel:'Cancel',onOk:()=>{log('Delete',wl[${i}].user,'Removed from NDRP Whitelist');wl.splice(${i},1);render();toast('Deleted successfully','success')}})">Delete</button></td></tr>`}).join('')||'<tr><td colspan="8">No data</td></tr>'}
+  </tbody></table><footer>Total ${list.length} &nbsp; ‹ &nbsp; 1 &nbsp; ›</footer>`;
+}
+function editWl(i){let x=i<0?{user:'',full:'',bday:'',remark:''}:wl[i];modal.innerHTML=`<h3>${i<0?'Add':'Edit'} NDRP Whitelist</h3><label>* User Name<input id="w_user" value="${esc(x.user)}"></label><label>* Full Name<input id="w_full" value="${esc(x.full)}"></label><label>Birthday<input id="w_bday" type="date" value="${esc(x.bday)}"></label><label>Remarks<textarea id="w_rem" rows="3">${esc(x.remark)}</textarea></label><footer><button onclick="modal.close()">Cancel</button> <button class="blue" onclick="saveWl(${i})">Save</button></footer>`;modal.showModal()}
+function saveWl(i){let v=id=>document.getElementById(id).value.trim();let user=v('w_user'),full=v('w_full').toUpperCase();if(!user||!full){toast('User Name and Full Name are required');return}let d={user,full,bday:v('w_bday'),remark:v('w_rem').toUpperCase(),time:now(),op:'admin001'};if(i<0)wl.unshift({sn:wlSeq++,...d});else Object.assign(wl[i],d);log(i<0?'Whitelist Add':'Whitelist Edit',user,full);modal.close();render()}
+function exportWl(){downloadCSV('NDRP_Whitelist.csv',[['Serial number','User Name','Full Name','Birthday','Remarks','Update Time','Operator'],...wl.map(x=>[x.sn,x.user,x.full,x.bday,x.remark,x.time,x.op])])}
+
+/* ---------------- NDRP Configuration (restricted persons list) ---------------- */
+function renderNdrpConf(c){
+  let list=nc.filter(x=>!nq||x.full.toLowerCase().includes(nq.toLowerCase()));
+  c.innerHTML=`<div class="filters"><button class="blue" onclick="editNc(-1)">+ Add</button><input id="nq" placeholder="Full Name" value="${esc(nq)}" style="width:240px"><button class="blue" onclick="nq=document.getElementById('nq').value;render()">Search</button></div>
+  <table class="plain"><thead><tr>${['Serial number','Full Name','birthday','Update Time','Operator','Operation'].map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>
+  ${list.map(x=>{let i=nc.indexOf(x);return `<tr class="${x.fresh?'fresh':''}"><td>${x.sn}</td><td>${esc(x.full)}${x.fresh?'<span class="newtag">NEW</span>':''}</td><td>${esc(x.bday)}</td><td>${x.time}</td><td>${esc(x.op)}</td><td><button class="blue" onclick="editNc(${i})">Edit</button><button class="red" onclick="msgBox({type:'danger',title:'Delete Record',text:'Delete this NDRP Configuration record?',ok:'Delete',okClass:'red',cancel:'Cancel',onOk:()=>{log('Delete',nc[${i}].full,'Removed from NDRP Configuration');nc.splice(${i},1);render();toast('Deleted successfully','success')}})">Delete</button></td></tr>`}).join('')||'<tr><td colspan="6">No data</td></tr>'}
+  </tbody></table><footer>Total ${list.length} &nbsp; ‹ &nbsp; 1 &nbsp; ›</footer>`;
+}
+function editNc(i){let x=i<0?{full:'',bday:''}:nc[i];modal.innerHTML=`<h3>${i<0?'Add':'Edit'} NDRP Configuration</h3><label>* Full Name<input id="n_full" value="${esc(x.full)}"></label><label>Birthday<input id="n_bday" type="date" value="${esc(x.bday)}"></label><footer><button onclick="modal.close()">Cancel</button> <button class="blue" onclick="saveNc(${i})">Save</button></footer>`;modal.showModal()}
+function saveNc(i){let full=document.getElementById('n_full').value.trim().toUpperCase();if(!full){toast('Full Name is required');return}let d={full,bday:document.getElementById('n_bday').value,time:now(),op:'admin001'};if(i<0)nc.unshift({sn:ncSeq++,...d});else Object.assign(nc[i],d);log(i<0?'NDRP Config Add':'NDRP Config Edit',full,d.bday?'Birthday '+d.bday:'');modal.close();render()}
+
+rows.filter(r=>r.result).sort((a,b)=>a.operating.localeCompare(b.operating)).forEach(r=>logs.unshift({time:r.operating,op:r.operator,action:r.result,target:r.user,detail:`${r.category}${r.remark?' - '+r.remark:''} → ${r.result==='Normal'?'NDRP Whitelist':'NDRP Configuration'}`}));
+render();
+
+const dictionary = {"NDRP Audit Statistics": "NDRP 审核统计", "NDRP Category Configuration": "NDRP 类别配置", "NDRP Audit History": "NDRP 审核历史", "NDRP Audit": "NDRP 审核", "NDRP Configuration": "NDRP 黑名单配置", "NDRP Whitelist": "NDRP 白名单", "User Management": "用户管理", "System Management": "系统管理", "Location": "当前位置", "Server Time": "服务器时间", "Online Users": "在线用户", "New Players": "新增玩家", "KYC Pending": "KYC 待审核", "New Success Deposit": "新增成功存款", "Recharge": "充值", "Withdrawal": "提款", "Risk control review": "风控审核", "Balance approval pending": "余额待审批", "Username / Member ID / Name": "用户名 / 会员ID / 姓名", "Username": "用户名", "User Name": "用户名", "Member ID": "会员ID", "Member Information": "会员信息", "Real Name": "真实姓名", "Master Agent": "总代理", "Betting Station Code": "投注站代码", "NDRP Matched Information": "NDRP 命中信息", "API match detected": "API 检测到命中", "Matched information": "命中资料", "Pending API field confirmation": "待确认 API 返回字段", "Total Deposit": "累计存款", "Total Withdrawal": "累计提款", "Submission Time": "提交时间", "Audit Status": "审核状态", "NDRP Status": "NDRP 状态", "NDRP Category": "NDRP 类别", "Remarks": "备注", "Operating Time": "操作时间", "Operator": "操作人员", "Operation": "操作", "Online": "在线", "Offline": "离线", "Kick off the line": "踢下线", "Kick Off the Line": "踢下线", "Normal (Auto Added to NDRP Whitelist)": "正常（自动加入 NDRP 白名单）", "Rejected (Auto Added to NDRP Configuration)": "拒绝（自动加入 NDRP 黑名单）", "Normal (Whitelisted)": "正常（已加白）", "Rejected (Added to NDRP Configuration)": "拒绝（已加黑）", "Normal Rate": "正常比例", "Normal": "正常", "Rejected": "拒绝", "Processing (Locked)": "处理中（已锁定）", "Processing": "处理中", "Pending": "待审核", "Lock": "锁定", "Unlock": "解锁", "Search": "查询", "Reset": "重置", "Export": "导出", "All": "全部", "Add Category": "新增类别", "Category Name": "类别名称", "Enabled": "已启用", "Disabled": "已停用", "Enable": "启用", "Disable": "停用", "Edit": "编辑", "Add": "新增", "Delete": "删除", "Save": "保存", "Status": "状态", "Confirm NDRP Audit Result": "确认 NDRP 审核结果", "Audit Result": "审核结果", "Please select": "请选择", "Cancel": "取消", "Confirm": "确认", "Close": "关闭", "OK": "确定", "View in": "查看", "View": "查看", "This member will be automatically added to": "该会员将自动加入", "Added to": "已加入", "has been automatically added to": "已自动加入", "Account unchanged.": "账号状态不变。", "NDRP Frozen; all sessions logged out; player receives NDRP access restriction notice.": "NDRP 冻结；所有会话已登出；玩家收到 NDRP 限制访问提示。", "Simulated operation": "模拟操作", "(Simulated)": "（模拟）", "Kick": "踢出", "offline?": "下线？", "Player kicked offline": "玩家已下线", "Please select NDRP Category": "请选择 NDRP 类别", "Enter a unique category name": "请输入不重复的类别名称", "Operating Date": "操作日期", "to": "至", "Total Submitted": "提交总人数", "Total Audited": "已审核人数", "NDRP Whitelist Records": "NDRP 白名单记录数", "NDRP Configuration Records": "NDRP 黑名单记录数", "By NDRP Category": "按 NDRP 类别统计", "By Operator": "按操作人员统计", "Distribution": "分布", "Daily Summary": "每日汇总", "New Matches Submitted": "新增命中提交人数", "Still Pending": "尚未完成审核", "Operation Log": "操作日志", "Action": "操作类型", "Target": "操作对象", "Details": "详情", "Time": "时间", "Date": "日期", "Total": "合计", "No data": "暂无数据", "No operations yet": "暂无操作记录", "Records every lock, unlock, audit, kick, NDRP Whitelist and NDRP Configuration change made in this session.": "记录本次会话中的锁定、解锁、审核、踢下线及 NDRP 黑白名单变更。", "Serial number": "序号", "Full Name": "真实姓名", "birthday": "出生日期", "Birthday": "出生日期", "Update Time": "更新时间", "Delete Record": "删除记录", "Delete this NDRP Whitelist record?": "确定删除该 NDRP 白名单记录？", "Delete this NDRP Configuration record?": "确定删除该 NDRP 黑名单记录？", "Deleted successfully": "删除成功", "User Name and Full Name are required": "用户名和真实姓名为必填项", "Full Name is required": "真实姓名为必填项", "NEW": "新增", "GEL Holder": "GEL 持证人", "Self Exclusion": "自我排除", "Family Exclusion": "家庭排除", "AFP": "菲律宾武装部队", "PNP": "菲律宾国家警察", "Government Official": "政府官员", "Audit locked for processing": "审核任务已锁定", "Audit released": "审核任务已解锁", "All sessions ended": "所有会话已结束", "Kick offline": "踢下线", "Whitelist Add": "新增白名单", "Whitelist Edit": "编辑白名单", "NDRP Config Add": "新增黑名单", "NDRP Config Edit": "编辑黑名单", "Removed from NDRP Whitelist": "已从白名单移除", "Removed from NDRP Configuration": "已从黑名单移除", "Prototype · Fictional records and simulated operations only. API fields and pending access policy require technical and Compliance confirmation.": "原型：仅使用模拟数据及操作。API 字段及待审核期间的访问策略需技术与合规确认。"};
+let uiLang='en';
+const keys=Object.keys(dictionary).sort((a,b)=>b.length-a.length);
+function translateText(s){return s.replace(new RegExp(keys.map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|'),'g'),(m,offset,full)=>{if(/[A-Za-z]/.test(full[offset-1]||'')||/[A-Za-z]/.test(full[offset+m.length]||''))return m;return dictionary[m]});}
+const originalText=new WeakMap(), originalAttrs=new WeakMap();
+function localize(){
+ document.documentElement.lang=uiLang==='zh'?'zh-CN':'en';
+ document.querySelectorAll('option').forEach(o=>{if(!o.hasAttribute('value'))o.value=o.textContent});
+ const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n;
+ while(n=walker.nextNode()){
+  const e=n.parentElement;if(!e||e.closest('script,style,textarea,#languageSwitch'))continue;
+  const td=e.closest('td');if(td){const tr=td.parentElement;const table=td.closest('table');const h=table?.rows[0]?.cells[td.cellIndex];const label=h?(originalText.get(h.firstChild)||h.textContent):'';if(['Remarks','Full Name','User Name','Username','Operator','Target'].includes(label))continue;}
+  if(!originalText.has(n))originalText.set(n,n.nodeValue);const v=originalText.get(n);const next=uiLang==='zh'?translateText(v):v;if(n.nodeValue!==next)n.nodeValue=next;
+ }
+ document.querySelectorAll('[placeholder],[title],[aria-label]').forEach(e=>{let a=originalAttrs.get(e)||{};for(const k of ['placeholder','title','aria-label'])if(e.hasAttribute(k)){if(!(k in a))a[k]=e.getAttribute(k);e.setAttribute(k,uiLang==='zh'?translateText(a[k]):a[k]);}originalAttrs.set(e,a)});
+}
+function setLanguage(v){uiLang=v;localize();document.getElementById('langEN').classList.toggle('blue',v==='en');document.getElementById('langZH').classList.toggle('blue',v==='zh');}
+const observer=new MutationObserver(()=>{observer.disconnect();localize();observer.observe(document.body,{childList:true,subtree:true});});
+observer.observe(document.body,{childList:true,subtree:true});
+localize();
+</script>
+</body></html>
