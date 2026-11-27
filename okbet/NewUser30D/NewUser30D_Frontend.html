@@ -886,6 +886,37 @@ button.nt[data-amt]:hover{border-color:var(--c-gold);}
 .dep__close{background:none;width:56px;text-align:right;color:#5d6780;font-size:1rem;}
 /* 活动详情页：滑到最底部时预留空间 */
 .act-landing::after{content:"";display:block;height:32px;}
+.prog .prog__track{margin-bottom:26px;}
+
+/* History 连结：主视觉右下、低调文字（与 Rules 同侧） */
+.hero{padding-bottom:22px;}
+.hero__hist{position:absolute;right:var(--sp-3);bottom:2px;background:none;padding:2px 0;font-size:.67rem;font-weight:600;color:var(--c-text-2);opacity:.8;}
+.hero__hist:hover{opacity:1;text-decoration:underline;}
+.theme-game .act-landing .hero__hist{color:#fff;}
+.theme-cel .act-landing .hero__hist{color:var(--k);}
+.theme-light .act-landing .hero__hist{color:var(--l-mute);}
+/* History 弹窗：跟随活动详情页风格 */
+.theme-game .sheet--hist{background:#fff5fb;color:#2b1a4d;border-top:none;font-family:"Baloo 2","PingFang SC","Microsoft YaHei",Arial,sans-serif;}
+.theme-game .sheet--hist .sheet__h h2{color:#7b4dff;font-weight:800;}
+.theme-game .sheet--hist .dlg__x{color:#6e5c95;}
+.theme-game .sheet--hist .mini__i{background:#fff;color:#2b1a4d;border-radius:14px;box-shadow:0 3px 0 #d8c9ff;margin-bottom:4px;}
+.theme-game .sheet--hist .chip--ok{background:#d9fbe9;color:#169b6c;}
+.theme-game .sheet--hist .chip--proc{background:#fff2c9;color:#8a5a00;}
+.theme-game .sheet--hist .yr__empty{background:#fff;color:#6e5c95;}
+.theme-light .sheet--hist{background:#f4f6fa;color:#1b2340;border-top:none;}
+.theme-light .sheet--hist .sheet__h h2{color:#1b2340;}
+.theme-light .sheet--hist .dlg__x{color:#6b7590;}
+.theme-light .sheet--hist .mini__i{background:#fff;color:#1b2340;border:1px solid #e6eaf1;}
+.theme-light .sheet--hist .chip--ok{background:#d8f3ea;color:#0d7a5a;}
+.theme-light .sheet--hist .chip--proc{background:#fff3df;color:#a85d00;}
+.theme-light .sheet--hist .yr__empty{background:#fff;color:#6b7590;}
+.theme-cel .sheet--hist{background:#fff;color:#1b1430;border-top:3px solid #1b1430;font-family:"Baloo 2","PingFang SC","Microsoft YaHei",Arial,sans-serif;}
+.theme-cel .sheet--hist .sheet__h h2{color:#ff4d6d;font-weight:800;}
+.theme-cel .sheet--hist .dlg__x{color:#1b1430;}
+.theme-cel .sheet--hist .mini__i{background:#fff;color:#1b1430;border:2.5px solid #1b1430;box-shadow:3px 3px 0 #1b1430;border-radius:12px;margin-bottom:4px;}
+.theme-cel .sheet--hist .chip--ok{background:#7df0a6;color:#1b1430;border:2px solid #1b1430;}
+.theme-cel .sheet--hist .chip--proc{background:#ffd23f;color:#1b1430;border:2px solid #1b1430;}
+.theme-cel .sheet--hist .yr__empty{background:#f4f0ff;color:#4a3f66;}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
 </style>
 </head>
@@ -898,15 +929,6 @@ button.nt[data-amt]:hover{border-color:var(--c-gold);}
   <aside class="panel" aria-label="原型控制面板">
     <h1>新人30日存款赠金 · 前台原型</h1>
     <p class="panel__ver">v0.9 活动详情页风格试作 · 2026-11-27 · 依据《20261124 新客活动BRD》</p>
-
-    <h2>视觉风格（仅活动详情页）</h2>
-    <div class="panel__row"><label for="selTheme">活动详情页</label>
-      <select id="selTheme">
-        <option value="game" selected>游戏化卡通</option>
-        <option value="light">浅色清爽</option>
-        <option value="cel">赛璐璐风</option>
-        <option value="classic">暗红礼盒（原版）</option>
-      </select></div>
 
     <h2>画面（UI 编号）</h2>
     <div class="panel__nav" id="navScreens"></div>
@@ -1445,9 +1467,8 @@ function allRecords(){
 function historySheet(){
   var list = allRecords().filter(function(r){ return r.status==='credited' || r.status==='processing'; })
     .sort(function(a,b){ return b.day-a.day || a.tier-b.tier; });
-  var h = '<div class="mask mask--sheet" role="dialog" aria-modal="true" aria-labelledby="histT"><div class="sheet sheet--dark">'+
+  var h = '<div class="mask mask--sheet" role="dialog" aria-modal="true" aria-labelledby="histT"><div class="sheet sheet--dark sheet--hist">'+
           '<div class="sheet__h"><h2 id="histT">History</h2><button class="dlg__x dlg__x--light" style="position:static" data-close aria-label="关闭">✕</button></div>';
-  h += '<h3 class="hist2__h">Claimed</h3>';
   if(!list.length) h += '<p class="yr__empty">No claimed rewards yet.</p>';
   else h += '<div class="sheet__scroll"><ul class="mini" style="margin:0">'+list.map(function(r){
     return '<li class="mini__i"><div>Day '+r.day+' · Tier '+r.tier+' · '+peso(r.amt)+'</div>'+statusChip(r.status)+'</li>';
@@ -1472,7 +1493,7 @@ function viewLanding(){
   if(state.time==='closed') h += '<div class="banner-warn" role="note">Today\'s count closed at 23:50. Deposits made between 23:50 and 00:00 don\'t count toward any day\'s rewards. New tasks start at 00:00.</div>';
   if(state.stage==='before') h += steps();
   /* History：文字连结，放在进度区块与档位卡之间的右侧，点击开启 History 弹窗（不在底部另加区块） */
-  h += kycBar() + progressBlock() + expireHint() + '<div class="hlink"><button class="hlink__btn" data-act="toHist" data-from="landing">History ›</button></div>' + tierList();
+  h += kycBar() + progressBlock() + expireHint() + tierList();
   return h + '</div>';
 }
 /* 首存前流程引导：① 完成 KYC → ② 充值 → ③ 充值成功后领取奖励 */
@@ -1492,15 +1513,10 @@ function kycBar(){
   if(state.kyc==='pending') return '<div class="kycbar" role="note"><span aria-hidden="true">⏳</span><span>Your verification is under review. You can deposit once it\'s approved.</span></div>';
   return '<div class="kycbar" role="note"><span aria-hidden="true">🛡️</span><span>Verify your identity before depositing to join this promo.</span><button class="btn btn--claim btn--sm" data-act="kycStart">Verify Now</button></div>';
 }
-/* 视觉风格：赛璐璐（只套用活动详情页）／暗红礼盒（原版） */
+/* 视觉风格：活动详情页固定为游戏化卡通（body.theme-game） */
 function isCel(){ return document.body.classList.contains('theme-cel'); }
 function isLight(){ return document.body.classList.contains('theme-light'); }
 function isGame(){ return document.body.classList.contains('theme-game'); }
-document.getElementById('selTheme').addEventListener('change', function(){
-  document.body.classList.toggle('theme-game', this.value==='game');
-  document.body.classList.toggle('theme-cel', this.value==='cel');
-  document.body.classList.toggle('theme-light', this.value==='light'); render();
-});
 /* 浅色清爽：简洁扁平礼盒（单色＋浅色面） */
 /* 游戏化卡通：原创吉祥物「金币宝宝」（SVG 示意） */
 function gameMascot(){
@@ -1547,7 +1563,7 @@ function celHeroSvg(){
     '<svg class="cel-coin cel-coin--b" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="#ffd23f" stroke="#1b1430" stroke-width="3"/><path d="M20 4 A16 16 0 0 1 20 36 Z" fill="#e0a800"/><circle cx="20" cy="20" r="16" fill="none" stroke="#1b1430" stroke-width="3"/><rect x="11" y="11" width="4" height="9" rx="2" fill="#fff"/></svg></span>';
 }
 function heroBlock(){
-  return '<section class="hero" aria-label="活动主视觉"><div class="hero__gift" aria-hidden="true">'+(isGame()?'<span class="gm-hero"><span class="gm-star gm-star--a">★</span><span class="gm-star gm-star--b">★</span><span class="gm-star gm-star--c">✦</span>'+gameMascot()+'</span>':isLight()?'<span class="lt-hero">'+lightGift('#1667e8','#dce8ff',true)+'</span>':isCel()?celHeroSvg():'🎁')+'</div><p class="hero__title">Newcomer 30 Days Promo</p><p class="hero__sub">Deposit daily, unlock up to 3 bonuses every day</p><button class="hero__rules" data-ov="rules">Rules</button></section>';
+  return '<section class="hero" aria-label="活动主视觉"><div class="hero__gift" aria-hidden="true">'+(isGame()?'<span class="gm-hero"><span class="gm-star gm-star--a">★</span><span class="gm-star gm-star--b">★</span><span class="gm-star gm-star--c">✦</span>'+gameMascot()+'</span>':isLight()?'<span class="lt-hero">'+lightGift('#1667e8','#dce8ff',true)+'</span>':isCel()?celHeroSvg():'🎁')+'</div><p class="hero__title">Newcomer 30 Days Promo</p><p class="hero__sub">Deposit daily, unlock up to 3 bonuses every day</p><button class="hero__rules" data-ov="rules">Rules</button>'+(state.stage==='active'?'<button class="hero__hist" data-act="toHist" data-from="landing">History ›</button>':'')+'</section>';
 }
 /* 资讯列（依截图）：左＝Progress Day X/30，右＝倒数（统计开放时到 23:50；关闭后到 00:00） */
 function infoRow(){
@@ -1569,7 +1585,7 @@ function progressBlock(){
   else if(n===-1) hint = 'All 3 rewards unlocked today! Extra deposits won\'t add more bonus.';
   else hint = 'Deposit <b>'+peso(p[n].th-state.cum)+'</b> more to unlock <b>+'+peso(p[n].b)+'</b>'+(n<2?' · <b>'+peso(max-state.cum)+'</b> more to unlock all <b>'+peso(sumTiers([n,1,2].filter(function(v,i,a){return v>=n && a.indexOf(v)===i;})))+'</b>':'');
   return '<section class="prog" aria-label="今日累计存款进度"><div class="prog__head"><span>Today\'s total deposit</span><span class="prog__amt">'+peso(state.cum)+' <small>/ '+peso(max)+'</small></span></div>'+
-    '<div class="prog__track" role="progressbar" aria-valuemin="0" aria-valuemax="'+max+'" aria-valuenow="'+state.cum+'"><div class="prog__fill" style="width:'+w+'%"></div>'+ms+'</div><p class="prog__hint">'+hint+'</p></section>';
+    '<div class="prog__track" role="progressbar" aria-valuemin="0" aria-valuemax="'+max+'" aria-valuenow="'+state.cum+'"><div class="prog__fill" style="width:'+w+'%"></div>'+ms+'</div></section>';
 }
 function tierList(){
   var p = plan(), open = [], done = [];
@@ -2007,7 +2023,7 @@ var NOTES = {
            'UI 03 新人活动：与其他活动卡相同呈现（图片、Event time、名称、Read More ›），卡片高度、宽度、图片比例与文字栏位皆一致，Event time 与名称各 1 行、超出以「…」，不因本活动加高；归在 Newcomer 分类，点击 Read More 导向活动详情页（04 Landing）。',
            'Event time 显示个人 30 日起讫；未首存显示「30 days from first deposit」【待确认】。非名单或 30 日结束：不渲染此卡。',
            '其他活动卡、积分、优惠券、Task List 为示意，非本次需求范围。'],
-  landing:['04 配发（依截图）：主视觉＋Rules，资讯列左为 Progress Day X/30、右为倒数（Deposit count ends in／New tasks in）；进度区块下方右侧为「History ›」文字连结（开启 History 弹窗，不另加底部区块），已移除 Your Rewards 入口与 Daily Deposit 标题；异常：未登录／非名单／等待配发（不以 L1 兜底）。',
+  landing:['04 配发（依截图）：主视觉＋Rules，资讯列左为 Progress Day X/30、右为倒数（Deposit count ends in／New tasks in）；主视觉右下（副标题下方、与 Rules 同侧）为低调的「History ›」文字连结（开启 History 弹窗），已移除 Your Rewards 入口与 Daily Deposit 标题；异常：未登录／非名单／等待配发（不以 L1 兜底）。',
            '首存前（Day 0）显示「How to join」三步骤：① Verify identity → ② First deposit → ③ Claim rewards，目前步骤以金框标示，完成显示 ✓。',
            '已开始但 KYC 状态异常时显示验证提示条；任何 Deposit 按钮在未验证时先走 UI 09。',
            '06 当前任务：三档共用一条「当日累计有效存款」进度；里程碑上方为该档奖金，下方为累计门槛。',
@@ -2043,8 +2059,8 @@ var NOTES = {
                '可领奖励直接在「Today」区块逐档 Claim；≥2 档可领时显示「Claim total」一次领取，并显示 00:00 过期倒数（原独立 To Claim 区块已移除，避免重复）。',
                '已领（Claimed）显示最近 5 笔。',
                'Reward History › 以弹窗开启 12，不离开本页；返回键回到来源（Landing／Rewards／MY）。'],
-  history:['以底部弹窗呈现（由下向上展开、由上向下收起），不切换页面；入口：活动详情页进度区块下方右侧「History ›」、MY「Bonus History」、Your Rewards「Reward History ›」、30 日结束页按钮。',
-           '内容只显示「Claimed」已领取清单：Day · Tier · 奖金＋状态（Credited／Processing），依日期新到旧排列；无资料显示「No claimed rewards yet.」。',
+  history:['以底部弹窗呈现（由下向上展开、由上向下收起），不切换页面；入口：活动详情页主视觉右下「History ›」、MY「Bonus History」、Your Rewards「Reward History ›」、30 日结束页按钮。',
+           '标题仅「History」一个；内容为已领取清单，风格跟随活动详情页：Day · Tier · 奖金＋状态（Credited／Processing），依日期新到旧排列；无资料显示「No claimed rewards yet.」。',
            '关闭（✕、点遮罩、Esc）后停留原画面并保留捲动位置。'],
 };
 function renderNotes(){
